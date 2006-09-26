@@ -1,0 +1,10 @@
+#foreach ($fk in $table.ForeignKeys)
+    FOREIGN KEY ($fk.LocalColumnNames) REFERENCES $fk.ForeignTableName ($fk.ForeignColumnNames)
+  #if ($fk.hasOnUpdate())
+    ON UPDATE $fk.OnUpdate
+  #end
+  #if ($fk.hasOnDelete())
+    ON DELETE $fk.OnDelete 
+  #end
+,
+#end

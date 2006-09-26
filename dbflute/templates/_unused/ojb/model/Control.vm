@@ -1,0 +1,26 @@
+#set ($basePath = $generator.OutputPath)
+
+#foreach ($dataModel in $dataModels)
+  #foreach ($database in $dataModel.Databases)
+
+    #if ($database.Package)
+      #set ($package = $database.Package)
+    #else
+      #set ($package = $targetPackage)
+    #end
+
+    #set ( $path = $strings.getPackageAsPath($package) )
+    $files.mkdir("$outputDirectory/$path")
+
+    #foreach ($tbl in $database.Tables)
+      #if (!$tbl.isForReferenceOnly())
+        $tbl.Name
+        #set ( $firstcap=$tbl.JavaName )
+
+        #set ( $fname = "${firstcap}.java" )
+        #set ( $path = "${strings.getPackageAsPath($package)}$fname" )
+        $generator.parse("ojb/model/Object.vm",$path,"table",$tbl)
+      #end
+    #end
+  #end
+#end

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="Shift_JIS"?>
+<!DOCTYPE components PUBLIC "-//SEASAR2.1//DTD S2Container//EN"
+	"http://www.seasar.org/dtd/components21.dtd">
+
+<components namespace="${glDaoDiconNamespace}">
+    <include path="${glJ2EEDiconResourceName}"/>
+#foreach ($includePath in $database.DaoDiconOtherIncludePathList)
+
+    <include path="${includePath}"/>
+#end
+
+    <!-- S2Dao component. -->
+	<component class="org.seasar.dao.impl.FieldAnnotationReaderFactory"/>
+	<component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataFactoryImpl}"/>
+    <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
+
+    <!-- Common column setup interceptor. -->
+    <component name="commonColumnSetupBeforeInsertInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeInsertInterceptor}"/>
+    <component name="commonColumnSetupBeforeUpdateInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeUpdateInterceptor}"/>
+    <component name="commonColumnSetupBeforeDeleteInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeDeleteInterceptor}"/>
+
+    <!-- Dao selector. -->
+    <component name="daoSelector" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
+  #if (${database.isAvailableBehaviorGeneration()})
+
+    #foreach ($table in $database.Tables)
+      <property name="${table.UncapitalisedJavaName}Bhv">${table.UncapitalisedJavaName}Bhv</property>
+    #end
+  #end
+
+    </component>
+
+    <!-- Original dao component. -->
+    #foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
+      #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
+
+    <component name="${componentName}" class="${className}"/>
+    #end
+
+    <!-- Original behavior aspect. -->
+    #foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
+      #set ($className = ${database.getOriginalBehaviorAspectClassName($componentName)})
+
+    <component name="${componentName}" class="${className}"/>
+    #end
+
+#foreach ($table in $database.Tables)
+
+    <!-- ${table.Name} -->
+  #if (${database.isAvailableCommonColumnSetupInterceptorToDao()})
+
+    <component name="${table.UncapitalisedJavaName}Dao" class="${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao">
+        <aspect pointcut="${database.ColumnSetupBeforeInsertInterceptorToDaoPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeInsertInterceptor</aspect>
+        <aspect pointcut="${database.ColumnSetupBeforeUpdateInterceptorToDaoPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor</aspect>
+        <aspect pointcut="${database.ColumnSetupBeforeDeleteInterceptorToDaoPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeDeleteInterceptor</aspect>
+        <aspect>${glDaoDiconNamespace}.interceptor</aspect>
+    </component>
+  #else
+
+    <component name="${table.UncapitalisedJavaName}Dao" class="${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao">
+        <aspect>${glDaoDiconNamespace}.interceptor</aspect>
+    </component>
+  #end
+  #if (${database.isAvailableBehaviorGeneration()})
+    #if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
+
+    <component name="${table.UncapitalisedJavaName}Bhv" class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv">
+        <aspect pointcut="${database.RequiredTransactionToBehaviorPointcut}">${database.RequiredTxComponentName}</aspect>
+        <aspect pointcut="${database.ColumnSetupBeforeInsertInterceptorToBehaviorPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeInsertInterceptor</aspect>
+        <aspect pointcut="${database.ColumnSetupBeforeUpdateInterceptorToBehaviorPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor</aspect>
+        <aspect pointcut="${database.ColumnSetupBeforeDeleteInterceptorToBehaviorPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeDeleteInterceptor</aspect>
+        #foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
+          #set ($pointcut = ${database.getOriginalBehaviorAspectPointcut($componentName)})
+
+        <aspect pointcut="${pointcut}">${glDaoDiconNamespace}.${componentName}</aspect>
+        #end
+
+    </component>
+    #else
+
+    <component name="${table.UncapitalisedJavaName}Bhv" class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv">
+        <aspect pointcut="${database.RequiredTransactionToBehaviorPointcut}">${database.RequiredTxComponentName}</aspect>
+    #foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
+      #set ($pointcut = ${database.getOriginalBehaviorAspectPointcut($componentName)})
+
+        <aspect pointcut="${pointcut}">${glDaoDiconNamespace}.${componentName}</aspect>
+    #end
+
+    </component>
+    #end
+  #end
+#end
+
+#foreach ($table in $database.CustomizeTableList)
+
+    <!-- ${table.Name} (as customize dao) -->
+
+    <component name="${table.UncapitalisedJavaName}Dao" class="${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao">
+        <aspect>${glDaoDiconNamespace}.interceptor</aspect>
+    </component>
+#end
+
+</components>

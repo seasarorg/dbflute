@@ -1,0 +1,301 @@
+package ${glPackageBaseCommon};
+#if ($database.isAvailableBehaviorGeneration())
+
+import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
+import ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName};
+#end
+
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+
+
+/**
+ * The implementation of dao-selector.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} {
+
+    /**
+     * Get dao-readable by dao type.
+     * 
+     * @param daoType Dao type. (NotNull)
+     * @return Dao-readable. (NotNull)
+     */
+    public ${glDaoReadableInterfaceName} getRDao(Class daoType) {
+        assertObjectNotNull("daoType", daoType);
+        setupDaoCacheMap();
+        final ${glDaoReadableInterfaceName} dao = (${glDaoReadableInterfaceName})_daoCacheMap.get(daoType);
+        if (dao == null) {
+            String msg = "The daoCacheMap does not have the dao-type: daoType=" + daoType + " daoCacheMap=" + _daoCacheMap;
+            throw new IllegalStateException(msg);
+        }
+        return dao;
+    }
+
+    /**
+     * Get dao-readable by entity.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Dao-readable. (NotNull)
+     */
+    public ${glDaoReadableInterfaceName} getRDao(${glEntityInterfaceName} entity) {
+        assertObjectNotNull("entity", entity);
+        return getRDao(entity.getDBMeta().getDaoType());
+    }
+
+    /**
+     * Get dao-readable by table multi-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Dao-readable. (NotNull)
+     */
+    public ${glDaoReadableInterfaceName} getRDao(String tableMultiName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
+        return getRDao(dbmeta.getDaoType());
+    }
+
+    /**
+     * Get dao-writable by dao type.
+     * 
+     * @param daoType Dao type. (NotNull)
+     * @return Dao-writable. (NotNull)
+     */
+    public ${glDaoWritableInterfaceName} getWDao(Class daoType) {
+        assertObjectNotNull("daoType", daoType);
+        return (${glDaoWritableInterfaceName})getRDao(daoType);
+    }
+
+    /**
+     * Get dao-writable by entity.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Dao-writable. (NotNull)
+     */
+    public ${glDaoWritableInterfaceName} getWDao(${glEntityInterfaceName} entity) {
+        assertObjectNotNull("entity", entity);
+        return (${glDaoWritableInterfaceName})getRDao(entity);
+    }
+
+    /**
+     * Get dao-writable by table multi-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Dao-writable. (NotNull)
+     */
+    public ${glDaoReadableInterfaceName} getWDao(String tableMultiName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+        return (${glDaoWritableInterfaceName})getRDao(tableMultiName);
+    }
+#if ($database.isAvailableBehaviorGeneration())
+
+    /**
+     * Get bhv-readable by bhv type.
+     * 
+     * @param bhvType Bhv type. (NotNull)
+     * @return Bhv-readable. (NotNull)
+     */
+    public ${glBehaviorReadableInterfaceName} getRBhv(Class bhvType) {
+        assertObjectNotNull("bhvType", bhvType);
+        setupBhvCacheMap();
+        final ${glBehaviorReadableInterfaceName} bhv = (${glBehaviorReadableInterfaceName})_bhvCacheMap.get(bhvType);
+        if (bhv == null) {
+            String msg = "The bhvCacheMap does not have the bhv-type: bhvType=" + bhvType + " bhvCacheMap=" + _bhvCacheMap;
+            throw new IllegalStateException(msg);
+        }
+        return bhv;
+    }
+
+    /**
+     * Get bhv-readable by entity.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Bhv-readable. (NotNull)
+     */
+    public ${glBehaviorReadableInterfaceName} getRBhv(${glEntityInterfaceName} entity) {
+        assertObjectNotNull("entity", entity);
+        return getRBhv(getBhvType(entity.getDBMeta()));
+    }
+
+    /**
+     * Get bhv-readable by table multi-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Bhv-readable. (NotNull)
+     */
+    public ${glBehaviorReadableInterfaceName} getRBhv(String tableMultiName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
+        return getRBhv(getBhvType(dbmeta));
+    }
+
+    /**
+     * Get bhv-writable by bhv type.
+     * 
+     * @param bhvType Bhv type. (NotNull)
+     * @return Bhv-writable. (NotNull)
+     */
+    public ${glBehaviorWritableInterfaceName} getWBhv(Class bhvType) {
+        assertObjectNotNull("bhvType", bhvType);
+        return (${glBehaviorWritableInterfaceName})getRBhv(bhvType);
+    }
+
+    /**
+     * Get bhv-writable by entity.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Bhv-writable. (NotNull)
+     */
+    public ${glBehaviorWritableInterfaceName} getWBhv(${glEntityInterfaceName} entity) {
+        assertObjectNotNull("entity", entity);
+        return (${glBehaviorWritableInterfaceName})getRBhv(entity);
+    }
+
+    /**
+     * Get bhv-writable by table multi-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Bhv-writable. (NotNull)
+     */
+    public ${glBehaviorWritableInterfaceName} getWBhv(String tableMultiName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+        return (${glBehaviorWritableInterfaceName})getRBhv(tableMultiName);
+    }
+
+    /**
+     * Get bhv-type by dbmeta.
+     * 
+     * @param dbmeta Dbmeta. (NotNull)
+     * @return Bhv-type. (NotNull)
+     */
+    protected Class getBhvType(${glDBMetaInterfaceName} dbmeta) {
+        assertObjectNotNull("dbmeta", dbmeta);
+        setupDaoBhvMap();
+        if (_daoBhvMap == null) {
+            String msg = "The daoBhvMap has not been initialized yet!";
+            throw new IllegalStateException(msg);
+        }
+        final Class daoType = dbmeta.getDaoType();
+        if (daoType == null) {
+            String msg = "The dbmeta.getDaoType() should not return null: dbmeta=" + dbmeta;
+            throw new IllegalStateException(msg);
+        }
+        return (Class)_daoBhvMap.get(dbmeta.getDaoType());
+    }
+#end
+#set ($mapGenericDefinition = "Class, ${glDaoReadableInterfaceName}")
+
+    protected java.util.Map${database.filterGenericsString(${mapGenericDefinition})} _daoCacheMap;
+    protected void setupDaoCacheMap() {
+        if (_daoCacheMap == null) {
+            _daoCacheMap = new java.util.HashMap${database.filterGenericsString(${mapGenericDefinition})}();
+#foreach ($table in $database.Tables)
+
+            _daoCacheMap.put(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao.class, get${table.JavaName}Dao());
+#end
+#foreach ($table in $database.CustomizeTableList)
+
+            _daoCacheMap.put(${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao.class, get${table.JavaName}Dao());
+#end
+
+        }
+    }
+#foreach ($table in $database.Tables)
+
+    protected ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;
+    public void set${table.JavaName}Dao(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao dao) {
+        _${table.UncapitalisedJavaName}Dao = dao;
+    }
+    public ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao get${table.JavaName}Dao() {
+        return _${table.UncapitalisedJavaName}Dao;
+    }
+#end
+#foreach ($table in $database.CustomizeTableList)
+
+    protected ${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;
+    public void set${table.JavaName}Dao(${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao dao) {
+        _${table.UncapitalisedJavaName}Dao = dao;
+    }
+    public ${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao get${table.JavaName}Dao() {
+        return _${table.UncapitalisedJavaName}Dao;
+    }
+#end
+#if ($database.isAvailableBehaviorGeneration())
+  #set ($mapGenericDefinition = "Class, ${glBehaviorReadableInterfaceName}")
+
+    protected java.util.Map${database.filterGenericsString(${mapGenericDefinition})} _bhvCacheMap;
+    protected void setupBhvCacheMap() {
+        if (_bhvCacheMap == null) {
+            _bhvCacheMap = new java.util.HashMap${database.filterGenericsString(${mapGenericDefinition})}();
+  #foreach ($table in $database.Tables)
+
+            _bhvCacheMap.put(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv.class, get${table.JavaName}Bhv());
+  #end
+
+        }
+    }
+  #set ($mapGenericDefinition = "Class, Class")
+
+    protected java.util.Map${database.filterGenericsString(${mapGenericDefinition})} _daoBhvMap;
+    protected void setupDaoBhvMap() {
+        if (_daoBhvMap == null) {
+            _daoBhvMap = new java.util.HashMap${database.filterGenericsString(${mapGenericDefinition})}();
+  #foreach ($table in $database.Tables)
+
+            _daoBhvMap.put(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao.class, ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv.class);
+  #end
+
+        }
+    }
+  #foreach ($table in $database.Tables)
+
+    protected ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv _${table.UncapitalisedJavaName}Bhv;
+    public void set${table.JavaName}Bhv(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv bhv) {
+        _${table.UncapitalisedJavaName}Bhv = bhv;
+    }
+    public ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv get${table.JavaName}Bhv() {
+        return _${table.UncapitalisedJavaName}Bhv;
+    }
+  #end
+#end
+
+    // ----------------------------------------------------------------
+    //                                                    Assert Object
+    //                                                    -------------
+    /**
+     * Assert that the object is not null.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    //                                                    Assert String
+    //                                                    -------------
+    /**
+     * Assert that the entity is not null and not trimmed empty.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     */
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull("value", value);
+        if (value.trim().length() ==0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+}

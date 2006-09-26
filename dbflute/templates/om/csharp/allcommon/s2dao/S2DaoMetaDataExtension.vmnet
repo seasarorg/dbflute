@@ -1,0 +1,204 @@
+
+using System;
+using System.Reflection;
+using System.Collections;
+using System.Text;
+
+using Seasar.Dao;
+using Seasar.Dao.Dbms;
+using Seasar.Dao.Impl;
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
+using Seasar.Extension.ADO.Types;
+using Seasar.Framework.Beans;
+using Seasar.Framework.Util;
+
+using ${glPackageBaseCommonCBean};
+
+namespace ${glPackageBaseCommonS2Dao} {
+
+    /**
+     * My-DaoMetaDataImpl.
+     * Overrides original class 'DaoMetaDataImpl'.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public class ${glDaoMetaDataExtension} : Seasar.Dao.Impl.DaoMetaDataImpl {
+
+        /**
+         * Constructor.
+         * 
+         * @param daoType DAO-Type
+         * @param dataSource DataSource
+         * @param statementFactory StatementFactory
+         * @param resultSetFactory ResultSetFactory
+         */
+        public ${glDaoMetaDataExtension}(Type daoType, IDataSource dataSource,ICommandFactory commandFactory,
+            IDataReaderFactory dataReaderFactory, IDatabaseMetaData dbMetaData)
+            : base(daoType, dataSource, commandFactory, dataReaderFactory, dbMetaData) {}
+
+        /**
+         * This method overrides the method that is declared at super.
+         * 
+         * @param methodInfo Method-information instance. (NotNull)
+         */
+        protected override void SetupSelectMethodByAuto(MethodInfo methodInfo) {
+            String query = annotationReader.GetQuery(methodInfo.Name);
+            IDataReaderHandler handler = CreateDataReaderHandler(methodInfo);
+            SelectDynamicCommand cmd = null;
+            String[] argNames = MethodUtil.GetParameterNames(methodInfo);
+            Type[] argTypes = MethodUtil.GetParameterTypes(methodInfo);
+            if (query != null && !StartsWithOrderBy(query)) {
+                cmd = CreateSelectDynamicCommand(handler, query);
+            } else {
+                cmd = CreateSelectDynamicCommand(handler);
+                String sql = null;
+                if (argTypes.Length == 1 && ValueTypes.GetValueType(argTypes[0]) == ValueTypes.OBJECT) {
+                    argNames = new String[] { "dto" };
+                    // /----------------------------------------------------- [MyExtension]
+                    if (${glConditionBeanContextName}.IsTheTypeConditionBean(argTypes[0])) {
+                        ${glSelectDynamicCommand} dynamicCommand = New${glSelectDynamicCommand}(handler);
+                        String sqlNormal = GetSelectClause();
+                        String sqlPKOnly = GetSelectClausePKOnly();
+                        sql = sqlNormal;
+                        cmd = dynamicCommand;
+                        dynamicCommand.SetSelectClause(sqlNormal);
+                        dynamicCommand.SetSelectClausePKOnly(sqlPKOnly);
+                    } else {
+                        if (typeof(${glSelectResourceInterfaceName}).IsAssignableFrom(argTypes[0])) {
+                            String msg = "If the first argument type is select-resource(and not condition-bean), ";
+                            msg = msg + "the method should not use auto-select-sql-by-dto.";
+                            msg = msg + " (Do you want to use outer-file-sql? Please check your sql-file-name and build-action!)";
+                            msg = msg + ": dao=" + methodInfo.DeclaringType + " method=" + methodInfo.Name + "()";
+                            msg = msg + " firstArgument=" + argTypes[0] + " argTypes.Length=" + argTypes.Length;
+                            throw new SystemException(msg);
+                        }
+                        sql = CreateAutoSelectSqlByDto(argTypes[0]);
+                    }
+                    // -----------/
+                } else {
+                    // /----------------------------------------------------- [MyExtension]
+                    if (argTypes.Length > 1 && ValueTypes.GetValueType(argTypes[0]) == ValueTypes.OBJECT) {
+                        if (typeof(${glSelectResourceInterfaceName}).IsAssignableFrom(argTypes[0])) {
+                            String msg = "If the number of argument is more than 1 and the first argument type is select-resource, ";
+                            msg = msg + "the method should not use auto-select-sql.";
+                            msg = msg + " (Do you want to use outer-file-sql? Please check your sql-file-name and build-action!)";
+                            msg = msg + ": dao=" + methodInfo.DeclaringType + " method=" + methodInfo.Name + "()";
+                            msg = msg + " firstArgument=" + argTypes[0] + " argTypes.Length=" + argTypes.Length;
+                            throw new SystemException(msg);
+                        }
+                    }
+                    // -----------/
+                    sql = CreateAutoSelectSql(argNames, argTypes);
+                }
+                if (query != null) {
+                    sql = sql + " " + query;
+                }
+                cmd.Sql = sql;
+            }
+            cmd.ArgNames = argNames;
+            cmd.ArgTypes = argTypes;
+            sqlCommands[methodInfo.Name] = cmd;
+        }
+
+        /**
+         * Get select clause PK only.
+         * 
+         * @param beanMetaData BeanMetaData. (NotNull)
+         * @return Select clause PK only. (NotNull)
+         */
+        protected String GetSelectClausePKOnly() {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("select/*$dto.SelectHint*/ ");
+
+            StringBuilder sbMySelectList = new StringBuilder(100);
+            for (int i = 0; i < beanMetaData.PropertyTypeSize; ++i) {
+                IPropertyType pt = beanMetaData.GetPropertyType(i);
+                if (pt.IsPersistent && pt.IsPrimaryKey) {
+                    if (sbMySelectList.Length != 0) {
+                        sbMySelectList.Append(", ");
+                    }
+                    sbMySelectList.Append(beanMetaData.TableName);
+                    sbMySelectList.Append(".");
+                    sbMySelectList.Append(pt.ColumnName);
+                }
+            }
+            sb.Append(sbMySelectList);
+
+            return sb.ToString();
+        }
+
+        /**
+         * Get select clause.
+         * 
+         * @param beanMetaData BeanMetaData. (NotNull)
+         * @return Select clause. (NotNull)
+         */
+        protected String GetSelectClause() {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("select/*$dto.SelectHint*/ ");
+
+            StringBuilder sbMySelectList = new StringBuilder(100);
+            for (int i = 0; i < beanMetaData.PropertyTypeSize; ++i) {
+                IPropertyType pt = beanMetaData.GetPropertyType(i);
+                if (pt.IsPersistent) {
+                    if (sbMySelectList.Length != 0) {
+                        sbMySelectList.Append(", ");
+                    }
+                    sbMySelectList.Append(beanMetaData.TableName);
+                    sbMySelectList.Append(".");
+                    sbMySelectList.Append(pt.ColumnName);
+                }
+            }
+            sb.Append(sbMySelectList);
+
+            for (int i = 0; i < beanMetaData.RelationPropertyTypeSize; ++i) {
+                StringBuilder sbYourSelectList = new StringBuilder(100);
+                IRelationPropertyType rpt = beanMetaData.GetRelationPropertyType(i);
+                if (rpt == null) {
+                    String msg = "The beanMetaData.GetRelationPropertyType(" + i + ") returned null";
+                    msg = msg + ": beanMetaData.TableName=" + beanMetaData.TableName;
+                    msg = msg + ": beanMetaData.RelationPropertyTypeSize=" + beanMetaData.RelationPropertyTypeSize;
+                    throw new SystemException(msg);
+                }
+
+                IBeanMetaData bmd = rpt.BeanMetaData;
+
+                String ifComment = "/*IF dto." + rpt.PropertyName + "_isSelect != null*/";
+                String endComment = "/*END*/";
+                for (int j = 0; j < bmd.PropertyTypeSize; ++j) {
+                    IPropertyType pt = bmd.GetPropertyType(j);
+                    if (pt.IsPersistent) {
+                        String columnName = pt.ColumnName;
+
+                        if (sbMySelectList.Length != 0 || sbYourSelectList.Length != 0) {
+                            sbYourSelectList.Append(", ");
+                        }
+                        sbYourSelectList.Append(rpt.PropertyName).Append(".").Append(columnName);
+                        sbYourSelectList.Append(" AS ");
+                        sbYourSelectList.Append(pt.ColumnName).Append("_").Append(rpt.RelationNo);
+                    }
+                }
+                sb.Append(ifComment).Append(sbYourSelectList).Append(endComment);
+            }
+
+            return sb.ToString();
+        }
+
+        protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler drh) {
+            return NewS2DaoSelectDynamicCommand(drh);
+        }
+
+        /**
+         * New my select dynamic command.
+         * <p>
+         * Override super.setupSelectMethodByAuto().
+         * 
+         * @param handler ResultSetHandler
+         * @return My select dynamic command. (NotNull)
+         */
+        protected ${glSelectDynamicCommand} New${glSelectDynamicCommand}(IDataReaderHandler handler) {
+            return new ${glSelectDynamicCommand}(dataSource, commandFactory, handler, dataReaderFactory);
+        }
+    }
+}

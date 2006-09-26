@@ -1,0 +1,59 @@
+package ${glPackageBaseCommon};
+
+#set ($myClassName = "${glClassificationDefinition}")
+
+/**
+ * The definition class that has classification.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // =====================================================================================
+    //                                                        Classification-Code-Definition
+    //                                                        ==============================
+#foreach ($classificationName in $database.ClassificationNameList)
+  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+  #foreach ($classificationMap in $classificationMapList)
+
+    /** The classification code of ${classificationMap.get('name')}. */
+    public static final String CODE_${classificationName}_${classificationMap.get('name')} = "$classificationMap.get('code')";
+  #end
+#end
+
+    // =====================================================================================
+    //                                                 Classification-CodeNameMap-Definition
+    //                                                 =====================================
+#foreach ($classificationName in $database.ClassificationNameList)
+  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+
+    /** The classification code-name map of ${classificationName}. */
+    public static final java.util.Map${database.filterGenericsString('String, String')} CODE_NAME_MAP_${classificationName};
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+  #foreach ($classificationMap in $classificationMapList)
+
+        map.put(CODE_${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
+  #end
+
+        CODE_NAME_MAP_${classificationName} = java.util.Collections.unmodifiableMap(map);
+    }
+#end
+
+#foreach ($classificationName in $database.ClassificationNameList)
+  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+
+    /** The classification code-alias map of ${classificationName}. */
+    public static final java.util.Map${database.filterGenericsString('String, String')} CODE_ALIAS_MAP_${classificationName};
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+  #foreach ($classificationMap in $classificationMapList)
+
+        map.put(CODE_${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
+  #end
+
+        CODE_ALIAS_MAP_${classificationName} = java.util.Collections.unmodifiableMap(map);
+    }
+#end
+
+}

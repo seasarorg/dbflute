@@ -1,0 +1,726 @@
+#set ($myClassName = "${glSqlClauseAbstractName}")
+
+using System;
+using System.Collections;
+using System.Text;
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonCValue};
+
+namespace ${glPackageBaseCommonSqlClause} {
+
+    /// <summary>
+    /// The abstract class of SqlClause.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        /** Target table name. */
+        protected String _tableName;
+
+        /** Included select column map. */
+        protected System.Collections.IDictionary _includedSelectColumnMap = new System.Collections.Hashtable();
+
+        /** Outer join map. */
+        protected System.Collections.IDictionary _outerJoinMap = new System.Collections.Hashtable();
+
+        /** Outer join list. (For order guarantee) */
+        protected System.Collections.IList _outerJoinList = new System.Collections.ArrayList();
+
+        /** Where list. */
+        protected System.Collections.IList _whereList = new System.Collections.ArrayList();
+
+        /** Order by clause. */
+        protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
+
+        /** Is order-by effective? Default value is false. */
+        protected bool _isOrderByEffective = false;
+
+        /** Fetch start index. (for fetchXxx()) */
+        protected int _fetchStartIndex = 0;
+
+        /** Fetch size. (for fetchXxx()) Default value is ${database.FetchPageDefaultFetchSize}. */
+        protected int _fetchSize = ${database.FetchPageDefaultFetchSize};
+
+        /** Fetch page number. (for fetchXxx()) This value should be plus. */
+        protected int _fetchPageNumber = 1;
+
+        /** Is fetch-narrowing effective? Default value is false. */
+        protected bool _isFetchScopeEffective = false;
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        /**
+         * Constructor.
+         * 
+         * @param tableName Table name. (NotNull)
+         **/
+        public ${myClassName}(String tableName) {
+            if (tableName == null) {
+                String msg = "Argument[tableName] must not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            _tableName = tableName;
+        }
+
+        // =====================================================================================
+        //                                                                                Clause
+        //                                                                                ======
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Clause string. (NotNull)
+         */
+        public String GetClause() {
+            StringBuilder sb = new StringBuilder(128);
+            if (_includedSelectColumnMap.Count != 0) {
+                sb.Append(" ").Append(GetIncludedSelectColumnClause());
+            }
+            sb.Append(GetFromClause());
+            sb.Append(" ");
+            sb.Append(GetFromHint());
+            sb.Append(" ");
+            sb.Append(GetWhereClause());
+
+            if (_isOrderByEffective && !_orderByClause.IsEmpty()) {
+                sb.Append(" ");
+                sb.Append(GetOrderByClause());
+            }
+            sb.Append(" ");
+            sb.Append(GetSqlSuffix());
+            return sb.ToString();
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return select-hint. {select [select-hint] * from table...}
+         */
+        public String GetSelectHint() {
+            return CreateSelectHint();
+        }
+
+        public String GetIncludedSelectColumnClause() {
+            StringBuilder sb = new StringBuilder();
+            System.Collections.ICollection keySet = _includedSelectColumnMap.Keys;
+            foreach (String aliasName in keySet) {
+                String realColumnName = (String)_includedSelectColumnMap[aliasName];
+                sb.Append(", ").Append(realColumnName).Append(" as ").Append(aliasName);
+            }
+            return sb.ToString();
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return From clause. (NotNull)
+         */
+        public String GetFromClause() {
+            StringBuilder sb = new StringBuilder(128);
+            sb.Append(" from ").Append(_tableName);
+            sb.Append(GetFromBaseTableHint());
+            foreach (String key in _outerJoinList) {
+                sb.Append(" ").Append(_outerJoinMap[key]);
+            }
+            return sb.ToString();
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return from-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+         */
+        public String GetFromBaseTableHint() {
+            return CreateFromBaseTableHint();
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return from-hint. {select * from table [from-hint] where ...} (NotNull)
+         */
+        public String GetFromHint() {
+            return CreateFromHint();
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Where clause. (NotNull)
+         */
+        public String GetWhereClause() {
+            StringBuilder sb = new StringBuilder(128);
+            int count = 0;
+            foreach (String clause in _whereList) {
+                if (count == 0) {
+                    sb.Append("where ").Append(clause);
+                } else {
+                    sb.Append(" and ").Append(clause);
+                }
+                count++;
+            }
+            return sb.ToString();
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Order-by clause. (NotNull)
+         */
+        public String GetOrderByClause() {
+            return _orderByClause.GetOrderByClause();
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return from-hint. {select * from table where ... order by ... [sql-suffix]}
+         */
+        public String GetSqlSuffix() {
+            return CreateSqlSuffix();
+        }
+
+        // =====================================================================================
+        //                                                                  IncludedSelectColumn
+        //                                                                  ====================
+        public ${glSqlClauseInterfaceName} RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
+            _includedSelectColumnMap.Add(aliasName, realColumnName);
+            return this;
+        }
+
+        // =====================================================================================
+        //                                                                             OuterJoin
+        //                                                                             =========
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param joinTableName Join table name(outer join [joinTableName]). (NotNull)
+         * @param aliasName Alias name of join table. (NotNull and Unique per invoking method.)
+         * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} RegisterOuterJoin(String joinTableName, String aliasName, System.Collections.IDictionary joinOnMap) {
+            AssertAlreadyOuterJoin(aliasName);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("left outer join ").Append(joinTableName).Append(" ").Append(aliasName).Append(" on ");
+            int count = 0;
+            System.Collections.ICollection localColumnNameSet = joinOnMap.Keys;
+            foreach (String localColumnName in localColumnNameSet) {
+                String foreignColumnName = (String)joinOnMap[localColumnName];
+                if (count != 0) {
+                    sb.Append(" and ");
+                }
+                sb.Append(localColumnName).Append(" = ").Append(foreignColumnName);
+                count++;
+            }
+            _outerJoinMap.Add(aliasName, sb.ToString());
+            _outerJoinList.Add(aliasName);// For order guarantee
+            return this;
+        }
+
+        /**
+         * Assert whether the alias name have already registered in outer join.
+         * 
+         * @param aliasName Alias name.
+         * @return this.
+         */
+        protected ${myClassName} AssertAlreadyOuterJoin(String aliasName) {
+            if (_outerJoinMap.Contains(aliasName)) {
+                String msg = "The alias name have already registered in outer join: " + aliasName;
+                throw new ArgumentOutOfRangeException(msg);
+            }
+            return this;
+        }
+
+        // =====================================================================================
+        //                                                                                 Where
+        //                                                                                 =====
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param columnName Column name([table-name].[column-name]). (NotNull)
+         * @param key Condition key. (NotNull)
+         * @param value Condition value. (NotNull)
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} RegisterWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+            AssertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+            key.AddWhereClause(_whereList, columnName, value);
+            return this;
+        }
+
+        /**
+         * Register where clause.
+         * 
+         * @param clause Where clause. (NotNull)
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} RegisterWhereClause(String clause) {
+            AssertStringNotNullAndNotTrimmedEmpty("clause", clause);
+            _whereList.Add(clause);
+            return this;
+        }
+
+        // =====================================================================================
+        //                                                                               OrderBy
+        //                                                                               =======
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public ${glOrderByClauseName} GetSqlComponentOfOrderByClause() {
+            return _orderByClause;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} ClearOrderBy() {
+            _isOrderByEffective = false;
+            _orderByClause.Clear();
+            return this;
+        }
+
+       /**
+        * ${database.ImplementComment}
+        * 
+        * @return this. (NotNull)
+        */
+        public ${glSqlClauseInterfaceName} IgnoreOrderBy() {
+            _isOrderByEffective = false;
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} MakeOrderByEffective() {
+            _isOrderByEffective = true;
+            return this;
+        }
+
+        public ${glSqlClauseInterfaceName} ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, bool isAsc) {
+            return ReverseOrderBy_Or_OverrideOrderBy(columnFullName, null, isAsc);
+        }
+
+        public ${glSqlClauseInterfaceName} ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc) {
+            _isOrderByEffective = true;
+            if (!_orderByClause.IsSameOrderByColumn(columnFullName)) {
+                ClearOrderBy();
+                if (isAsc) {
+                    RegisterOrderBy(columnFullName, registeredColumnFullName, true);
+                } else {
+                    RegisterOrderBy(columnFullName, registeredColumnFullName, false);
+                }
+                return this;
+            }
+
+            _orderByClause.ReverseAll();
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
+         * @param registeredColumnFullName Registered-column-full-name. ([table-name].[column-name]) (Nullable)
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} RegisterOrderBy(String columnFullName, bool isAsc) {
+            return RegisterOrderBy(columnFullName, null, isAsc);
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
+         * @param registeredColumnFullName Registered-column-full-name. ([table-name].[column-name]) (Nullable)
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} RegisterOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc) {
+            try {
+                String[] orderByArray = columnFullName.Split('/');
+                if (registeredColumnFullName == null || registeredColumnFullName.Trim().Length ==0) {
+                    registeredColumnFullName = columnFullName;
+                }
+                String[] registeredOrderByArray = registeredColumnFullName.Split('/');
+                int count = 0;
+                foreach (String orderBy in orderByArray) {
+                    String registeredOrderBy = registeredOrderByArray[count];
+
+                    _isOrderByEffective = true;
+                    String aliasName = null;
+                    String columnName = null;
+                    String registeredAliasName = null;
+                    String registeredColumnName = null;
+
+                    if (orderBy.IndexOf(".") < 0) {
+                        columnName = orderBy;
+                    } else {
+                        aliasName = orderBy.Substring(0, orderBy.LastIndexOf("."));
+                        columnName = orderBy.Substring(orderBy.LastIndexOf(".") + 1);
+                    }
+
+                    if (registeredOrderBy.IndexOf(".") < 0) {
+                        registeredColumnName = registeredOrderBy;
+                    } else {
+                        registeredAliasName = registeredOrderBy.Substring(0, registeredOrderBy.LastIndexOf("."));
+                        registeredColumnName = registeredOrderBy.Substring(registeredOrderBy.LastIndexOf(".") + 1);
+                    }
+
+                    ${glOrderByElementName} element = new ${glOrderByElementName}();
+                    element.AliasName = aliasName;
+                    element.ColumnName = columnName;
+                    element.RegisteredAliasName = registeredAliasName;
+                    element.RegisteredColumnName = registeredColumnName;
+                    if (isAsc) {
+                        element.SetupAsc();
+                    } else {
+                        element.SetupDesc();
+                    }
+                    _orderByClause.AddOrderByElement(element);
+
+                    count++;
+                }
+                return this;
+            } catch (Exception e) {
+                String msg = "RegisterOrderBy() threw the exception: columnFullName=" + columnFullName;
+                msg = msg + " registeredColumnFullName=" + registeredColumnFullName;
+                msg = msg + " isAsc=" + isAsc;
+                msg = msg + " sqlClause=" + this.ToString();
+                throw new SystemException(msg, e);
+            }
+        }
+
+        // =====================================================================================
+        //                                                                               Advance
+        //                                                                               =======
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param fetchSize Fetch-size. (NotMinus & NotZero)
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} FetchFirst(int fetchSize) {
+            _isFetchScopeEffective = true;
+            if (fetchSize <= 0) {
+                String msg = "Argument[fetchSize] must be plus: " + fetchSize;
+                throw new ArgumentOutOfRangeException(msg);
+            }
+            _fetchStartIndex = 0;
+            _fetchSize = fetchSize;
+            _fetchPageNumber = 1;
+            DoClearFetchPageClause();
+            DoFetchFirst();
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
+         * @param fetchSize Fetch size. (NotMinus)
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} FetchScope(int fetchStartIndex, int fetchSize) {
+            _isFetchScopeEffective = true;
+            if (fetchStartIndex < 0) {
+                String msg = "Argument[fetchStartIndex] must be plus or zero: " + fetchStartIndex;
+                throw new ArgumentOutOfRangeException(msg);
+            }
+            if (fetchSize <= 0) {
+                String msg = "Argument[fetchSize] must be plus: " + fetchSize;
+                throw new ArgumentOutOfRangeException(msg);
+            }
+            _fetchStartIndex = fetchStartIndex;
+            _fetchSize = fetchSize;
+            return FetchPage(1);
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param fetchPageNumber Page-number. 1 origin. (NotMinus & NotZero)
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} FetchPage(int fetchPageNumber) {
+            _isFetchScopeEffective = true;
+            if (fetchPageNumber <= 0) {
+                String msg = "Argument[fetchPageNumber] must be plus: " + fetchPageNumber;
+                throw new ArgumentOutOfRangeException(msg);
+            }
+            if (_fetchSize <= 0) {
+                String msg = "Fetch size must not be minus or zero when you invoke this method. ";
+                msg = msg + "When you invoke this, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. ";
+                msg = msg + ": fetchPageNumber=" + fetchPageNumber + " _fetchSize=" + _fetchSize;
+                throw new SystemException(msg);
+            }
+            _fetchPageNumber = fetchPageNumber;
+            if (_fetchPageNumber == 1 && _fetchStartIndex == 0) {
+                return FetchFirst(_fetchSize);
+            }
+            DoClearFetchPageClause();
+            DoFetchPage();
+            return this;
+        }
+
+        /**
+         * Do fetch first.
+         */
+        abstract protected void DoFetchFirst();
+
+        /**
+         * Do fetch page.
+         */
+        abstract protected void DoFetchPage();
+
+        /**
+         * Do clear fetch-page clause.
+         */
+        abstract protected void DoClearFetchPageClause();
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch start index.
+         */
+        public int FetchStartIndex {
+            get {
+                return _fetchStartIndex;
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch size.
+         */
+        public int FetchSize {
+            get {
+                return _fetchSize;
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch page number.
+         */
+        public int FetchPageNumber {
+            get {
+                return _fetchPageNumber;
+            }
+        }
+
+        /**
+         * Get page start index.
+         * 
+         * @return Page start index. 0 origin. (NotMinus)
+         */
+        protected int GetPageStartIndex() {
+            if (_fetchPageNumber <= 0) {
+                String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
+                throw new SystemException(msg);
+            }
+            return _fetchStartIndex + (_fetchSize * (_fetchPageNumber - 1));
+        }
+
+        /**
+         * Get page end index.
+         * 
+         * @return Page end index. 0 origin. (NotMinus)
+         */
+        protected int GetPageEndIndex() {
+            if (_fetchPageNumber <= 0) {
+                String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
+                throw new SystemException(msg);
+            }
+            return _fetchStartIndex + (_fetchSize * _fetchPageNumber);
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} IgnoreFetchScope() {
+            _isFetchScopeEffective = false;
+            DoClearFetchPageClause();
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public ${glSqlClauseInterfaceName} MakeFetchScopeEffective() {
+            _isFetchScopeEffective = true;
+            if (this.FetchPageNumber > 0) {
+                FetchPage(this.FetchPageNumber);
+            }
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determination.
+         */
+        public virtual bool IsFetchStartIndexSupported {
+            get {
+                return true; // Default
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determination.
+         */
+        public virtual bool IsFetchSizeSupported {
+            get {
+                return true; // Default
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        abstract public ${glSqlClauseInterfaceName} LockForUpdate();
+
+        /**
+         * Create select-hint.
+         * 
+         * @return Select-hint. {select [select-hint] * from table...} (NotNull)
+         */
+        abstract protected String CreateSelectHint();
+
+        /**
+         * Create from-base-table-hint.
+         * 
+         * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+         */
+        abstract protected String CreateFromBaseTableHint();
+
+        /**
+         * Create from-hint.
+         * 
+         * @return From-hint. {select * from table [from-hint] where ...} (NotNull)
+         */
+        abstract protected String CreateFromHint();
+
+        /**
+         * Create sql-suffix.
+         * 
+         * @return Sql-suffix. {select * from table where ... order by ... [sql-suffix]} (NotNull)
+         */
+        abstract protected String CreateSqlSuffix();
+
+        // =====================================================================================
+        //                                                                        FetchNarrowing
+        //                                                                        ==============
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch-narrowing start-index.
+         */
+        public int FetchNarrowingSkipStartIndex {
+            get {
+                if (this.IsFetchStartIndexSupported) {
+                    return 0;
+                } else {
+                    return GetPageStartIndex();
+                }
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch-narrowing size.
+         */
+        public int FetchNarrowingLoopCount {
+            get {
+                return this.FetchSize;
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determiantion.
+         */
+        public bool IsFetchNarrowingEffective {
+            get {
+                return _isFetchScopeEffective;
+            }
+        }
+
+
+        // ----------------------------------------------------------------
+        //                                                    Assert Object
+        //                                                    -------------
+        #region Assert Object
+
+        /**
+         * Assert that the argument is not null.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param arg Argument. (NotNull)
+         */
+        protected void AssertObjectNotNull(String variableName, Object arg) {
+            if (variableName == null) {
+                String msg = "Argument[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (arg == null) {
+                String msg = "Argument[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+        }
+
+        #endregion
+
+        // ----------------------------------------------------------------
+        //                                                    Assert String
+        //                                                    -------------
+        #region Assert String
+
+        /**
+         * Assert that the string is not null and not trimmed empty.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param arg Argument. (NotNull)
+         */
+        protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+            if (variableName == null) {
+                String msg = "Variable[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (value == null) {
+                String msg = "Variable[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (value.Trim().Length == 0) {
+                String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+
+        #endregion
+    }
+}

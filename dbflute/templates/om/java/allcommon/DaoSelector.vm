@@ -1,0 +1,112 @@
+package ${glPackageBaseCommon};
+#if ($database.isAvailableBehaviorGeneration())
+
+import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
+import ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName};
+#end
+
+/**
+ * The interface of dao-selector.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glDaoSelectorInterfaceName} {
+
+	/**
+	 * Get dao-readable by dao type.
+	 * 
+	 * @param daoType Dao type. (NotNull)
+	 * @return Dao-readable. (NotNull)
+	 */
+	public ${glDaoReadableInterfaceName} getRDao(Class daoType);
+
+	/**
+	 * Get dao-readable by entity.
+	 * 
+	 * @param entity Entity. (NotNull)
+	 * @return Dao-readable. (NotNull)
+	 */
+	public ${glDaoReadableInterfaceName} getRDao(${glEntityInterfaceName} entity);
+
+    /**
+     * Get dao-readable by table multi-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Dao-readable. (NotNull)
+     */
+    public ${glDaoReadableInterfaceName} getRDao(String tableMultiName);
+
+	/**
+	 * Get dao-writable by dao type.
+	 * 
+	 * @param daoType Dao type. (NotNull)
+	 * @return Dao-writable. (NotNull)
+	 */
+	public ${glDaoWritableInterfaceName} getWDao(Class daoType);
+
+	/**
+	 * Get dao-writable by entity.
+	 * 
+	 * @param entity Entity. (NotNull)
+	 * @return Dao-writable. (NotNull)
+	 */
+	public ${glDaoWritableInterfaceName} getWDao(${glEntityInterfaceName} entity);
+
+    /**
+     * Get dao-writable by table multi-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Dao-writable. (NotNull)
+     */
+    public ${glDaoReadableInterfaceName} getWDao(String tableMultiName);
+#if ($database.isAvailableBehaviorGeneration())
+
+	/**
+	 * Get bhv-readable by bhv type.
+	 * 
+	 * @param bhvType Bhv type. (NotNull)
+	 * @return Bhv-readable. (NotNull)
+	 */
+	public ${glBehaviorReadableInterfaceName} getRBhv(Class bhvType);
+
+	/**
+	 * Get bhv-readable by entity.
+	 * 
+	 * @param entity Entity. (NotNull)
+	 * @return Bhv-readable. (NotNull)
+	 */
+	public ${glBehaviorReadableInterfaceName} getRBhv(${glEntityInterfaceName} entity);
+
+    /**
+     * Get bhv-readable by table multi-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Bhv-readable. (NotNull)
+     */
+    public ${glBehaviorReadableInterfaceName} getRBhv(String tableMultiName);
+
+	/**
+	 * Get bhv-writable by bhv type.
+	 * 
+	 * @param bhvType Bhv type. (NotNull)
+	 * @return Bhv-writable. (NotNull)
+	 */
+	public ${glBehaviorWritableInterfaceName} getWBhv(Class bhvType);
+
+	/**
+	 * Get bhv-writable by entity.
+	 * 
+	 * @param entity Entity. (NotNull)
+	 * @return Bhv-writable. (NotNull)
+	 */
+	public ${glBehaviorWritableInterfaceName} getWBhv(${glEntityInterfaceName} entity);
+
+    /**
+     * Get bhv-writable by table multi-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Bhv-writable. (NotNull)
+     */
+    public ${glBehaviorWritableInterfaceName} getWBhv(String tableMultiName);
+#end
+}

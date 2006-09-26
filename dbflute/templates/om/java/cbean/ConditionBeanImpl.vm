@@ -1,0 +1,429 @@
+package ${glPackageCB};
+
+#set ($myClassName = "${myConditionBeanClassName}")
+
+import ${glPackageBaseCommonCBean}.${glConditionBeanAbstractName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
+import ${glPackageBaseCommonHelper}.${glMapListStringName};
+import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
+
+/**
+ * The condition-bean of ${table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glConditionBeanAbstractName} {
+
+    // =====================================================================================
+    //                                                                            Annotation
+    //                                                                            ==========
+    /** TABLE-Annotation */
+    public static final String TABLE = "$table.Name";
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    /** Condition query. */
+    protected ${myConditionQueryClassName} _conditionQuery;
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor.
+     */
+    public ${myClassName}() {
+    }
+
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   MyTable = [$table.Name]
+    // * * * * * * * * */
+
+    // =====================================================================================
+    //                                                                            Table name
+    //                                                                            ==========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    final public String getTableDbName() {
+        return "${table.Name}";
+    }
+
+    // =====================================================================================
+    //                                                                    Accept Primary-Key
+    //                                                                    ==================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param primaryKeyMap Primary key map. (NotNull and NotEmpty)
+     * @return Instance of query. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
+        if (primaryKeyMap == null) {
+            String msg = "The argument[primaryKeyMap] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (primaryKeyMap.isEmpty()) {
+            String msg = "The argument[primaryKeyMap] must not be empty.";
+            throw new IllegalArgumentException(msg);
+        }
+#if ($table.hasPrimaryKey())
+  #foreach ($col in $table.PrimaryKey)
+
+        if (!primaryKeyMap.containsKey("${col.Name}")) {
+            String msg = "The primaryKeyMap must have the value of ${col.Name}";
+            throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+        }
+        {
+            Object obj = primaryKeyMap.get("${col.Name}");
+            if (obj instanceof ${col.JavaNative}) {
+                query().set${col.JavaName}_Equal((${col.JavaNative})obj);
+            } else {
+                if (!(obj instanceof String)) {
+                    String msg = "The value should be ${col.JavaNative} or String: ";
+                    msg = msg + "valueType=" + (obj != null ? obj.getClass() : null) + " value=" + obj;
+                    throw new IllegalArgumentException(msg);
+                }
+    #if ($col.isJavaNativeStringObject())
+
+                query().set${col.JavaName}_Equal((String)obj);
+    #else
+      #if ($col.isJavaNativeDateObject())
+
+                String value = (String)obj;
+                if (value != null) {
+                    try {
+                        query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value));
+                    } catch (java.text.ParseException e) {
+                        String msg = "query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    } catch (RuntimeException e) {
+                        String msg = "query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    }
+                }
+      #else
+        #if (${col.isJavaNativeBinaryObject()})
+
+                set${col.JavaName}(null);// Binary as String is out of target.
+        #else
+
+                String value = (String)obj;
+                if (value != null) {
+                    try {
+                        query().set${col.JavaName}_Equal(new ${col.JavaNative}(value));
+                    } catch (RuntimeException e) {
+                        String msg = "query().set${col.JavaName}_Equal(new ${col.JavaNative}(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    }
+                }
+        #end
+      #end
+    #end
+
+            }
+        }
+  #end
+
+        return this;
+#else
+  #foreach ($col in $table.Columns)
+
+        if (!primaryKeyMap.containsKey("${col.Name}")) {
+            String msg = "The primaryKeyMap must have the value of ${col.Name}";
+            throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+        }
+        {
+            final Object obj = primaryKeyMap.get("${col.Name}");
+            if (obj == null) {
+                query().set${col.JavaName}_Equal(null);
+            } else {
+                if (obj instanceof ${col.JavaNative}) {
+                    query().set${col.JavaName}_Equal((${col.JavaNative})obj);
+                } else {
+                    if (!(obj instanceof String)) {
+                        String msg = "The value should be ${col.JavaNative} or String: ";
+                        msg = msg + "valueType=" + obj.getClass() + " value=" + obj;
+                        throw new IllegalArgumentException(msg);
+                    }
+    #if ($col.isJavaNativeStringObject())
+
+                    query().set${col.JavaName}_Equal((String)obj);
+    #else
+      #if ($col.isJavaNativeDateObject())
+
+                    final String value = (String)obj;
+                    try {
+                        query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value));
+                    } catch (java.text.ParseException e) {
+                        String msg = "query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    } catch (RuntimeException e) {
+                        String msg = "query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    }
+      #else
+        #if (${col.isJavaNativeBinaryObject()})
+
+                    set${col.JavaName}(null);// Binary as String is out of target.
+        #else
+
+                    final String value = (String)obj;
+                    try {
+                        query().set${col.JavaName}_Equal(new ${col.JavaNative}(value));
+                    } catch (RuntimeException e) {
+                        String msg = "query().set${col.JavaName}_Equal(new ${col.JavaNative}(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    }
+        #end
+      #end
+    #end
+
+                }
+            }
+        }
+  #end
+
+        return this;
+#end
+
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param primaryKeyMapString Primary-key map. (NotNull and NotEmpty)
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} acceptPrimaryKeyMapString(String primaryKeyMapString) {
+        if (primaryKeyMapString == null) {
+            String msg = "The argument[primaryKeyMapString] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+        final String suffix = MAP_STRING_END_BRACE;
+        if (!primaryKeyMapString.trim().startsWith(prefix)) {
+            primaryKeyMapString = prefix + primaryKeyMapString;
+        }
+        if (!primaryKeyMapString.trim().endsWith(suffix)) {
+            primaryKeyMapString = primaryKeyMapString + suffix;
+        }
+        ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+        mapListString.setMapMark(MAP_STRING_MAP_MARK);
+        mapListString.setListMark(MAP_STRING_LIST_MARK);
+        mapListString.setDelimiter(MAP_STRING_DELIMITER);
+        mapListString.setStartBrace(MAP_STRING_START_BRACE);
+        mapListString.setEndBrace(MAP_STRING_END_BRACE);
+        mapListString.setEqual(MAP_STRING_EQUAL);
+        return acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+    }
+
+    // =====================================================================================
+    //                                                                 Add-OrderBy-PK Method
+    //                                                                 =====================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} addOrderBy_PK_Asc() {
+#if ($table.hasPrimaryKey())
+  #foreach ($col in $table.PrimaryKey)
+
+        query().addOrderBy_${col.JavaName}_Asc();
+  #end
+
+        return this;
+#else
+  #foreach ($col in $table.Columns)
+
+        query().addOrderBy_${col.JavaName}_Asc();
+  #end
+
+        return this;
+#end
+
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} addOrderBy_PK_Desc() {
+#if ($table.hasPrimaryKey())
+  #foreach ($col in $table.PrimaryKey)
+
+        query().addOrderBy_${col.JavaName}_Desc();
+  #end
+
+        return this;
+#else
+  #foreach ($col in $table.Columns)
+
+        query().addOrderBy_${col.JavaName}_Desc();
+  #end
+
+        return this;
+#end
+
+    }
+
+    // =====================================================================================
+    //                                                                                 Query
+    //                                                                                 =====
+    /**
+     * Query.
+     * 
+     * @return Instance of query. (NotNull)
+     */
+    public ${myConditionQueryClassName} query() {
+        return getConditionQuery();
+    }
+
+    /**
+     * Get condition query. {Internal method for s2dao}
+     * 
+     * @return Instance of condition query. (NotNull)
+     */
+    public ${myConditionQueryClassName} getConditionQuery() {
+        if (_conditionQuery == null) {
+            _conditionQuery = new ${myConditionQueryClassName}(null, getSqlClause(), getTableDbName(), 0);
+        }
+        return _conditionQuery;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Instance of query as interface. (NotNull)
+     */
+    public ${glConditionQueryInterfaceName} getConditionQueryAsInterface() {
+        return getConditionQuery();
+    }
+
+    // =====================================================================================
+    //                                                                          Limit Select
+    //                                                                          ============
+    /** Is limit-select PK only? */
+    protected boolean _isLimitSelectPKOnly;
+
+    /**
+     * Is limit-select PK only?
+     * 
+     * @return Determination.
+     */
+    public boolean isLimitSelect_PKOnly() {
+        return _isLimitSelectPKOnly;
+    }
+
+    /**
+     * Limit select PK only.
+     *
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} limitSelect_PKOnly() {
+        _isLimitSelectPKOnly = true;
+        return this;
+    }
+
+    /**
+     * Limit select off.
+     *
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} limitSelect_Off() {
+        _isLimitSelectPKOnly = false;
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                          Setup Select
+    //                                                                          ============
+  #foreach ($foreignKeys in $table.ForeignKeys)
+
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   ForeignTable    = [${foreignKeys.foreignTable.Name}]
+    //   ForeignProperty = [${foreignKeys.foreignPropertyName}]
+    // * * * * * * * * */
+
+    /** Mark of select for ${foreignKeys.foreignPropertyName} */
+    protected String _select${foreignKeys.foreignPropertyNameInitCap};
+    /**
+     * Get mark of select for ${foreignKeys.foreignPropertyName}.
+     * 
+     * @return Mark of select. (If null, this foreign entity is out of select.)
+     */
+    public String get${foreignKeys.foreignPropertyNameInitCap}_isSelect() {
+        return _select${foreignKeys.foreignPropertyNameInitCap};
+    }
+    /**
+     * Set up select for ${foreignKeys.foreignPropertyName}.
+     * If you invoke this, this foreign entity is target of select.
+     *
+     * @return this.
+     */
+    public ${myClassName} setupSelect_${foreignKeys.foreignPropertyNameInitCap}() {
+        // For setting outer join.
+        query().query${foreignKeys.foreignPropertyNameInitCap}();
+
+        // Set dummy string that means this foreign entity is target of select.
+        _select${foreignKeys.foreignPropertyNameInitCap} = "dummy";
+
+        limitSelect_Off();
+        return this;
+    }
+  #end
+
+  #foreach ($refferer in $table.Referrers)
+    #if (${refferer.isOneToOne()})
+
+    // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
+    //   RefferTable    = [${refferer.Table.Name}]
+    //   RefferProperty = [${refferer.ReffererPropertyNameAsOne}]
+    // * * * * * * * * */
+
+    /** Mark of select for ${refferer.ReffererPropertyNameAsOne} */
+    protected String _select${refferer.ReffererPropertyNameInitCapAsOne};
+    /**
+     * Get mark of select for ${refferer.ReffererPropertyNameAsOne}.
+     * 
+     * @return Mark of select. (If null, this refferer entity is out of select.)
+     */
+    public String get${refferer.ReffererPropertyNameInitCapAsOne}_isSelect() {
+        return _select${refferer.ReffererPropertyNameInitCapAsOne};
+    }
+    /**
+     * Set up select for ${refferer.ReffererPropertyNameAsOne}.
+     * If you invoke this, this refferer entity is target of select.
+     *
+     * @return this.
+     */
+    public ${myClassName} setupSelect_${refferer.ReffererPropertyNameInitCapAsOne}() {
+        // For setting outer join.
+        query().query${refferer.ReffererPropertyNameInitCapAsOne}();
+
+        // Set dummy string that means this refferer entity is target of select.
+        _select${refferer.ReffererPropertyNameInitCapAsOne} = "dummy";
+
+        limitSelect_Off();
+        return this;
+    }
+    #end
+  #end
+
+    // =====================================================================================
+    //                                                                 Basic-Override Method
+    //                                                                 =====================
+    /**
+     * This method overrides the method that is declared at super.
+     * 
+     * @return Clause string. (NotNull)
+     */
+    public String toString() {
+        return getSqlClause().getClause();
+    }
+}

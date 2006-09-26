@@ -1,0 +1,142 @@
+
+using System;
+using System.Collections;
+
+using ${glPackageBaseCommon};
+
+namespace ${glPackageBaseCommonBhv} {
+
+    /**
+     * The interface of behavior-writable.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public interface ${glBehaviorWritableInterfaceName} : ${glBehaviorReadableInterfaceName} {
+
+        /**
+         * Get dao-writable.
+         * 
+         * @return Dao-writable. (NotNull)
+         */
+        ${glDaoWritableInterfaceName} GetDaoWritable();
+
+        /**
+         * Create entity. (Delegate-Method)
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Inserted count.
+         */
+        int DelegateCreateTx(${glEntityInterfaceName} entity);
+
+        /**
+         * Modify entity. (Delegate-Method)
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Updated count.
+         */
+        int DelegateModifyTx(${glEntityInterfaceName} entity);
+
+        /**
+         * Remove entity. (Delegate-Method)
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Deleted count.
+         */
+        int DelegateRemoveTx(${glEntityInterfaceName} entity);
+
+        /**
+         * Create several entity-list. (Delegate-Method)
+         * 
+         * @param entityList Entity-list that the type is entity-interface. (NotNull)
+         * @return Inserted count.
+         */
+/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
+//        int DelegateCreateListTx(System.Collections.IList entityList);
+
+        /**
+         * Modify several entity-list. (Delegate-Method)
+         * 
+         * @param entityList Entity-list that the type is entity-interface. (NotNull)
+         * @return Updated count.
+         */
+/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
+//        int DelegateModifyListTx(System.Collections.IList entityList);
+
+        /**
+         * Remove several entity-list. (Delegate-Method)
+         * 
+         * @param entityList Entity-list that the type is entity-interface. (NotNull)
+         * @return Deleted count.
+         */
+/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
+//        int DelegateRemoveListTx(System.Collections.IList entityList);
+
+        /**
+         * Modify after select-for-update.
+         * 
+         * @param entity Entity.
+         * @return Updated count.
+         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+         */
+// TODO: Commented out because GetDaoReadable().GetType() doesn't have the method.
+//        int ModifyAfterSelectForUpdateTx(${glEntityInterfaceName} entity);
+
+        // =====================================================================================
+        //                                                                          Basic Update
+        //                                                                          ============
+        #region Basic Update
+
+         /// <summary>
+        /// Modify after select-for-update.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Updated count.</returns>
+        /// <exception cref="MspadminBiz.Dao.Allcommon.exception.RecordHasAlreadyBeenDeletedException"></exception>
+        int ModifyAfterSelectForUpdateTx(MspadminBiz.Dao.Allcommon.Entity entity);
+
+        /// <summary>
+        /// Reflect(insert or update) from separated-file.
+        /// </summary>
+        /// <remarks>
+        /// If transaction already started, The argument 'batchCount' is invalid. (Inherit the transaction)
+        /// </remarks>
+        /// <param name="filename">Name of the file. (NotNull and NotEmpty)</param>
+        /// <param name="encoding">Encoding of the file. (NotNull and NotEmpty)</param>
+        /// <param name="delimiter">Delimiter of the file. (NotNull and NotEmpty)</param>
+        /// <param name="batchCount">Batch-count for transaction.</param>
+        /// <param name="isErrorContinue">If true, this method continue in spite of throwing the exception.</param>
+        /// <returns>The list of InsertOrUpdateExceptionResult. (NotNull)</returns>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="IOException"></exception>
+        System.Collections.Generic.IList<OneEntityExceptionResult> ReflectFromSeparatedFile(
+            String filename, String encoding, String delimiter, 
+            int batchCount, bool isErrorContinue);
+
+        #endregion
+    }
+
+
+    /// <summary>
+    /// Exception result for one entity. 
+    /// </summary>
+    public class OneEntityExceptionResult {
+        protected String _primaryKeyMapString;
+        protected ${glEntityInterfaceName} _entity;
+        protected Exception _exception;
+
+        public String PrimaryKeyMapString{
+            get { return _primaryKeyMapString; }
+            set { _primaryKeyMapString = value; }
+        }
+        
+        public ${glEntityInterfaceName} Entity{
+            get { return _entity; }
+            set { _entity = value; }
+        }
+        
+        public Exception Exception{
+            get { return _exception; }
+            set { _exception = value; }
+        }
+    }
+}

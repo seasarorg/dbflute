@@ -1,0 +1,419 @@
+#set ($myClassName = "${glConditionBeanAbstractName}")
+
+using System;
+using System.Collections;
+using System.Text;
+
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The condition-bean as abstract.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public abstract class $myClassName : ${glConditionBeanInterfaceName} {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        /** SQL clause instance. */
+        protected readonly ${glSqlClauseName} _sqlClause;
+
+        /// <summary>Argument-bean. (for SqlComment)</summary>
+        protected Object _argumentBean;
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        /**
+         * Constructor.
+         */
+        public ${myClassName}() {
+            _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(GetTableDbName());
+        }
+
+        // =====================================================================================
+        //                                                                            Table Name
+        //                                                                            ==========
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        abstract public String GetTableDbName();
+
+        // =====================================================================================
+        //                                                                            PrimaryKey
+        //                                                                            ==========
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="primaryKeyMap">Primary key map. (NotNull and NotEmpty)</param>
+        /// <returns>this. (NotNull)</returns>
+        abstract public ${glConditionBeanInterfaceName} AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary key map-string. (NotNull and NotEmpty)</param>
+        /// <returns>this. (NotNull)</returns>
+        abstract public ${glConditionBeanInterfaceName} AcceptPrimaryKeyMapString(String primaryKeyMapString);
+
+        // =====================================================================================
+        //                                                                             SqlClause
+        //                                                                             =========
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Sql clause. (NotNull)
+         */
+        public ${glSqlClauseName} SqlClause {
+            get {
+                return _sqlClause;
+            }
+        }
+
+        /**
+         * Get clause string.
+         * 
+         * @return Sql clause string. (NotNUll)
+         */
+        public String GetClause() {
+            return this.SqlClause.GetClause();
+        }
+
+        // =====================================================================================
+        //                                                                                 Query
+        //                                                                                 =====
+        /// <summary>
+        /// The property of condition-query as inteface.
+        /// </summary>
+        /// <returns>Instance of condition-query. (NotNull)</returns>
+        abstract public ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
+
+        // =====================================================================================
+        //                                                                        FetchNarrowing
+        //                                                                        ==============
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch-narrowing start-index.
+         */
+        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.FetchNarrowingSkipStartIndex; } }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch-narrowing size.
+         */
+        public int FetchNarrowingLoopCount { get { return this.SqlClause.FetchNarrowingLoopCount; } }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determination.
+         */
+        public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.IsFetchStartIndexSupported; } }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determination.
+         */
+        public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.IsFetchSizeSupported; } }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determiantion.
+         */
+        public bool IsFetchNarrowingEffective { get { return this.SqlClause.IsFetchNarrowingEffective; } }
+
+        // =====================================================================================
+        //                                                                                Paging
+        //                                                                                ======
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param fetchSize Fetch-size. (NotMinus & NotZero)
+         * @return this. (NotNUll)
+         */
+        public ${glPagingBeanInterfaceName} FetchFirst(int fetchSize) {
+            this.SqlClause.FetchFirst(fetchSize);
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
+         * @param fetchSize Fetch-size. (NotMinus & NotZero)
+         * @return this. (NotNUll)
+         */
+        public ${glPagingBeanInterfaceName} FetchScope(int fetchStartIndex, int fetchSize) {
+            this.SqlClause.FetchScope(fetchStartIndex, fetchSize);
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero)
+         * @return this. (NotNull)
+         */
+        public ${glPagingBeanInterfaceName} FetchPage(int fetchPageNumber) {
+            this.SqlClause.FetchPage(fetchPageNumber);
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNUll)
+         */
+        public ${glConditionBeanInterfaceName} LockForUpdate() {
+            this.SqlClause.LockForUpdate();
+            return this;
+        }
+
+        public int FetchPageNumber {
+            get { return this.SqlClause.FetchPageNumber; }
+        }
+
+        public int FetchStartIndex {
+            get { return this.SqlClause.FetchStartIndex; }
+        }
+
+        public int FetchSize {
+            get { return this.SqlClause.FetchSize; }
+        }
+
+        // =====================================================================================
+        //                                                                          Limit Select
+        //                                                                          ============
+        /**
+         * Is limit-select PK only?
+         * 
+         * @return Determination.
+         */
+        abstract public bool IsLimitSelect_PKOnly();
+
+        /**
+         * Limit select PK only.
+         *
+         * @return this. (NotNull)
+         */
+        abstract public ${glConditionBeanInterfaceName} LimitSelect_PKOnly();
+
+        /**
+         * Limit select off.
+         *
+         * @return this. (NotNull)
+         */
+        abstract public ${glConditionBeanInterfaceName} LimitSelect_Off();
+
+        // =====================================================================================
+        //                                                                               OrderBy
+        //                                                                               =======
+        /// <summary>
+        /// The property of sql component of order-by clause.
+        /// </summary>
+        public ${glOrderByClauseName} SqlComponentOfOrderByClause {
+            get { return this.SqlClause.GetSqlComponentOfOrderByClause(); }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public ${glOrderByBeanInterfaceName} ClearOrderBy() {
+            this.SqlClause.ClearOrderBy();
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public ${glOrderByBeanInterfaceName} IgnoreOrderBy() {
+            this.SqlClause.IgnoreOrderBy();
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public $glOrderByBeanInterfaceName MakeOrderByEffective() {
+            this.SqlClause.MakeOrderByEffective();
+            return this;
+        }
+
+        /**
+         * Setup order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
+         * 
+         * @return this. (NotNUll)
+         */
+        abstract public ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc();
+
+        /**
+         * Setup order-by PrimaryKey desc. {order by primaryKey1 desc, primaryKey2 desc...}
+         * 
+         * @return this. (NotNUll)
+         */
+        abstract public ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc();
+
+        /**
+         * Register order-by-asc.
+         * 
+         * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+         * @return this. (NotNull)
+         */
+        public ${glOrderByBeanInterfaceName} RegisterOrderByAsc(String orderByProperty) {
+            this.SqlClause.RegisterOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, true);
+            return this;
+        }
+
+        /**
+         * Register order-by-desc.
+         * 
+         * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+         * @return this. (NotNull)
+         */
+        public ${glOrderByBeanInterfaceName} RegisterOrderByDesc(String orderByProperty) {
+            this.SqlClause.RegisterOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, false);
+            return this;
+        }
+
+        /**
+         * Reverse order-by or Override order-by asc.
+         * 
+         * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+         * @return this. (NotNull)
+         */
+        public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByAsc(String orderByProperty) {
+            this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, true);
+            return this;
+        }
+
+        /**
+         * Reverse order-by or Override order-by desc.
+         * 
+         * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+         * @return this. (NotNull)
+         */
+        public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByDesc(String orderByProperty) {
+            this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, false);
+            return this;
+        }
+
+        protected String FilterOrderByProperty(String orderByProperty) {
+            String[] orderBySlashArray = orderByProperty.Split('/');
+            StringBuilder sb = new StringBuilder();
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableDbName(GetTableDbName());
+            ${glConditionQueryInterfaceName} query = this.ConditionQueryAsInterface;
+            foreach (String orderBySlashElement in orderBySlashArray) {
+                String[] orderByDotArray = orderBySlashElement.Split('.');
+
+                if (orderByDotArray.Length == 1) {
+                    if (dbmeta.IsExistMultiName(orderBySlashElement)) {
+                        sb.Append("/").Append(query.GetRealColumnName(dbmeta.GetDbNameByMultiName(orderBySlashElement)));
+                    } else {
+                        sb.Append("/").Append(orderBySlashElement);
+                    }
+                } else {
+                    ${glDBMetaInterfaceName} foreignDBMeta = dbmeta;
+                    ${glConditionQueryInterfaceName} foreignQuery = query;
+                    int count = 0;
+                    foreach (String orderByDotElement in orderByDotArray) {
+                        count++;
+
+                        if (orderByDotArray.Length == count) {// Last Loop!
+                            if (!foreignDBMeta.IsExistMultiName(orderByDotElement)) {
+                                String msg = "The name for order-by is not existing: name=" + orderByDotElement;
+                                msg = msg + " orderBySlashElement=" + orderBySlashElement + " orderByProperty=" + orderByProperty;
+                                throw new SystemException(msg);
+                            }
+                            sb.Append("/").Append(foreignQuery.GetRealColumnName(foreignDBMeta.GetDbNameByMultiName(orderByDotElement)));
+                            break;
+                        }
+
+                        foreignDBMeta = foreignDBMeta.GetForeignDBMeta(orderByDotElement);
+                        foreignQuery = foreignQuery.GetForeignConditionQuery(orderByDotElement);
+                    }
+                }
+            }
+            sb.Remove(0, "/".Length);
+            return sb.ToString();
+        }
+
+        // =====================================================================================
+        //                                                               'for SqlComment' Method
+        //                                                               =======================
+        /**
+         * Get select-hint. {select [select-hint] * from table...}
+         * 
+         * @return Select-hint. (NotNull)
+         */
+        public String SelectHint {
+            get { return this.SqlClause.GetSelectHint(); }
+        }
+
+        /**
+         * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
+         * 
+         * @return From-base-table-hint. (NotNull)
+         */
+        public String FromBaseTableHint {
+            get { return this.SqlClause.GetFromBaseTableHint(); }
+        }
+
+        /**
+         * Get from-hint. {select * from table [from-hint] where ...}
+         * 
+         * @return From-hint. (NotNull)
+         */
+        public String FromHint {
+            get { return this.SqlClause.GetFromHint(); }
+        }
+
+        /**
+         * Get where clause. {order by [base-table].[column] asc, [fk-alias].[column] desc}
+         * 
+         * @return Where clause. (NotNull)
+         */
+        public String WhereClause {
+            get { return this.SqlClause.GetWhereClause(); }
+        }
+
+        /**
+         * Get order-by clause. {order by [base-table].[column] asc, [fk-alias].[column] desc}
+         * 
+         * @return Order-by clause. (NotNull)
+         */
+        public String OrderByClause {
+            get { return this.SqlClause.GetOrderByClause(); }
+        }
+
+        /**
+         * Get Sql-suffix. {select * from table where ... order by ... [sql-suffix]}
+         * 
+         * @return Sql-suffix. (NotNull)
+         */
+        public String SqlSuffix {
+            get { return this.SqlClause.GetSqlSuffix(); }
+        }
+
+        /// <summary>
+        /// The property of argumentBean. (for SqlComment)
+        /// </summary>
+        public Object ArgumentBean {
+            get { return _argumentBean; }
+            set { _argumentBean = value; }
+        }
+    }
+}

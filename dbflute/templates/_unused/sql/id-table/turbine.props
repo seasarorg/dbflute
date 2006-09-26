@@ -1,0 +1,12 @@
+# -------------------------------------------------------------------------
+# The values for the ID_TABLE_ID column in the ID_TABLE will have
+# reserved values from 1-100 for turbine tables. The rest will
+# be for tables used for projects.
+# -------------------------------------------------------------------------
+initialID = 1
+
+#
+# Setting for initial Value and Step
+#
+initialIDValue = 1000
+initialIDStep  = 10

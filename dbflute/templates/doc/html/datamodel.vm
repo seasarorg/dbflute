@@ -1,0 +1,35 @@
+#set ( $database = $dataModel.database )
+<html>
+<header>
+  <title>$dataModel.name</title>
+  <style>
+  .normalFont {
+    $docHtmlNormalFont
+  }
+  </style>
+</header>
+
+<body class="normalFont">
+  <table border="1" cellspacing="0" cellpadding="0">
+    <tr bgcolor="#CCCCCC">
+      <th class="normalFont">Table Name</th>
+      <th class="normalFont">Entity Name</th>
+      <th class="normalFont">Foreign Table</th>
+      <th class="normalFont">Refferer Table</th>
+    </tr>
+  #foreach ($tbl in $database.tables)
+    <tr>
+      <td class="normalFont"><a href="#$tbl.Name">$tbl.Name</a></td>
+      <td class="normalFont">$tbl.JavaName</td>
+      <td class="normalFont">$tbl.ForeignTableNameCommaString</td>
+      <td class="normalFont">$tbl.ReferrerTableNameCommaString</td>
+    </tr>
+  #end
+  </table>
+
+  #foreach ($tbl in $database.tables)
+    $generator.parse("doc/html/table.vm",$outFile,"table",$tbl)
+  #end
+
+</body>
+</html>

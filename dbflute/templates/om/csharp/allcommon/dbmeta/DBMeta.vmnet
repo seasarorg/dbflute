@@ -1,0 +1,250 @@
+#set ($myClassName = "${glDBMetaInterfaceName}")
+
+using System;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+
+namespace ${glPackageBaseCommonDBMeta} {
+
+    /// <summary>
+    /// The interface of dbmeta.
+    /// Author : ${database.ClassAuthor}
+    /// </summary>
+    public interface ${myClassName} {
+
+        // =====================================================================================
+        //                                                                            Table Name
+        //                                                                            ==========
+        /// <summary>
+        /// Get table db-name.
+        /// </summary> 
+        /// <returns>Table db-name. (NotNull)</returns>
+        String GetTableDbName();
+
+        /// <summary>
+        /// Get table cap-prop-name.
+        /// </summary> 
+        /// <returns>Table cap-prop-name. (NotNull)</returns>
+        String GetTableCapPropName();
+
+        /// <summary>
+        /// Get table uncap-prop-name.
+        /// </summary> 
+        /// <returns>Table uncap-prop-name. (NotNull)</returns>
+        String GetTableUncapPropName();
+
+        // =====================================================================================
+        //                                                                        DB-Name Method
+        //                                                                        ==============
+        /// <summary>
+        /// Is existing db-name.
+        /// </summary> 
+        /// <param name="dbName">Db-name. (NotNull)</param>
+        /// <returns>Determination.</returns>
+        bool IsExistDbName(String dbName);
+
+        /// <summary>
+        /// Is existing cap-prop-name.
+        /// </summary> 
+        /// <param name="capPropName">Capitalized property-name. (NotNull)</param>
+        /// <returns>Determination.</returns>
+        bool IsExistCapPropName(String capPropName);
+
+        /// <summary>
+        /// Is existing un-cap-prop-name.
+        /// </summary> 
+        /// <param name="unCapPropName">Uncapitalized property-name. (NotNull)</param>
+        /// <returns>Determination.</returns>
+        bool IsExistUncapPropName(String unCapProp);
+
+        /// <summary>
+        /// Is existing multi-name.
+        /// </summary> 
+        /// <param name="multiName">Multi-name. (NotNull)</param>
+        /// <returns>Determination. (NotNull)</returns>
+        bool IsExistMultiName(String multiName);
+
+        /// <summary>
+        /// Get db-name by un-cap-prop-name.
+        /// </summary> 
+        /// <param name="unCapPropName">Uncapitalized property-name. (NotNull)</param>
+        /// <returns>Db-name. (NotNull)</returns>
+        String GetDbNameByUncapPropName(String unCapProp);
+
+        /// <summary>
+        /// Get un-cap-prop-name by db-name.
+        /// </summary> 
+        /// <param name="dbName">Db-name.</param>
+        /// <returns>Uncapitalized property-name. (NotNull)</returns>
+        String GetUncapPropNameByDbName(String dbName);
+
+        /// <summary>
+        /// Get db-name by cap-prop-name.
+        /// </summary> 
+        /// <param name="capPropName">Capitalized property-name. (NotNull)</param>
+        /// <returns>Db-name.</returns>
+        String GetDbNameByCapPropName(String capPropName);
+
+        /// <summary>
+        /// Get cap-prop-name by db-name.
+        /// </summary> 
+        /// <param name="dbName">Db-name. (NotNull)</param>
+        /// <returns>Capitalized property-name. (NotNull)</returns>
+        String GetCapPropNameByDbName(String dbName);
+
+        /// <summary>
+        /// Get cap-prop-name by uncap-prop-name.
+        /// </summary> 
+        /// <param name="unCapProp">Uncap-prop-name. (NotNull)</param>
+        /// <returns>Capitalized property-name. (NotNull)</returns>
+        String GetCapPropNameByUncapPropName(String unCapProp);
+
+        /// <summary>
+        /// Get uncap-prop-name by cap-prop-name.
+        /// </summary> 
+        /// <param name="capProp">Cap-prop-name. (NotNull)</param>
+        /// <returns>Uncapitalized property-name. (NotNull)</returns>
+        String GetUncapPropNameByCapPropName(String capProp);
+
+        /// <summary>
+        /// Get db-name by property-name.
+        /// </summary> 
+        /// <param name="multiName">Multi-name. (NotNull)</param>
+        /// <returns>Db-name. (NotNull)</returns>
+        String GetDbNameByMultiName(String multiName);
+
+        /// <summary>
+        /// Get cap-prop-name by multi-name.
+        /// </summary> 
+        /// <param name="multiName">Multi-name. (NotNull)</param>
+        /// <returns>Cap-prop-name. (NotNull)</returns>
+        String GetCapPropNameByMultiName(String multiName);
+
+        /// <summary>
+        /// Get uncap-prop-name by multi-name.
+        /// </summary> 
+        /// <param name="multiName">Multi-name. (NotNull)</param>
+        /// <returns>Uncap-prop-name. (NotNull)</returns>
+        String GetUncapPropNameByMultiName(String multiName);
+
+        // =====================================================================================
+        //                                                                    DB-Name-Map Getter
+        //                                                                    ==================
+        /// <summary>
+        /// Get uncap-prop-name db-name map.
+        /// </summary> 
+        /// <returns>{un-cap-prop-name : db-name} map.</returns>
+        System.Collections.Generic.IDictionary<String, String> GetUncapPropNameDbNameMap();
+
+        /// <summary>
+        /// Get db-name uncap-prop-name map.
+        /// </summary> 
+        /// <returns>{db-name : un-cap-prop-name} map.</returns>
+        System.Collections.Generic.IDictionary<String, String> GetDbNameUncapPropNameMap();
+
+        /// <summary>
+        /// Get cap-prop-name db-name map.
+        /// </summary> 
+        /// <returns>{cap-prop-name : db-name} map.</returns>
+        System.Collections.Generic.IDictionary<String, String> GetCapPropNameDbNameMap();
+
+        /// <summary>
+        /// Get db-name cap-prop-name map.
+        /// </summary> 
+        /// <returns>{db-name : cap-prop-name} map.</returns>
+        System.Collections.Generic.IDictionary<String, String> GetDbNameCapPropNameMap();
+
+        /// <summary>
+        /// Get cap-prop-name uncap-prop-name map.
+        /// </summary>
+        /// <returns>{cap-prop-name : uncap-prop-name} map.</returns>
+        System.Collections.Generic.IDictionary<String, String> GetCapPropNameUncapPropNameMap();
+
+        /// <summary>
+        /// Get uncap-prop-name cap-prop-name map.
+        /// </summary>
+        /// <returns>{uncap-prop-name : cap-prop-name} map.</returns>
+        System.Collections.Generic.IDictionary<String, String> GetUncapPropNameCapPropNameMap();
+
+        // =====================================================================================
+        //                                                                           Type Getter
+        //                                                                           ===========
+        /**
+         * Get the type of dao.
+         * 
+         * @return The type of dao. (NotNull)
+         */
+        Type GetDaoType();
+
+        /**
+         * Get the type of entity.
+         * 
+         * @return The type of entity. (NotNull)
+         */
+        Type GetEntityType();
+
+        /**
+         * Get the type of condition-bean.
+         * 
+         * @return The type of condition-bean. (NotNull)
+         */
+        Type GetConditionBeanType();
+
+        // =====================================================================================
+        //                                                                       Instance Getter
+        //                                                                       ===============
+        /**
+         * New the instance of entity.
+         * 
+         * @return The instance of entity. (NotNull)
+         */
+        ${glEntityInterfaceName} NewEntity();
+
+        /**
+         * New the instance of condition-bean.
+         * 
+         * @return The instance of condition-bean. (NotNull)
+         */
+        ${glConditionBeanInterfaceName} NewConditionBean();
+
+        // =====================================================================================
+        //                                                                   Entity PropertyInfo
+        //                                                                   ===================
+        #region Entity PropertyInfo
+        /// <summary>
+        /// Get entity property-info by multi-name.
+        /// </summary>
+        /// <param name="multiName">Multi-name. (NotNull)</param>
+        /// <returns>Entity property-info of entity. (NotNull)</returns>
+        System.Reflection.PropertyInfo GetEntityPropertyInfoByMultiName(String multiName);
+        #endregion
+
+        // =====================================================================================
+        //                                                                        Foreign DBMeta
+        //                                                                        ==============
+        /// <summary>
+        /// Get foreign dbmeta.
+        /// </summary>
+        /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
+        /// <returns>Foreign DBMeta. (NotNull)</returns>
+        ${myClassName} GetForeignDBMeta(String foreignPropertyName);
+
+        // =====================================================================================
+        //                                                                         Determination
+        //                                                                         =============
+        /**
+         * Has two or more primary-keys?
+         * 
+         * @return Determination.
+         */
+        bool HasTwoOrMorePrimaryKeys { get; }
+
+        /**
+         * Has common column?
+         * 
+         * @return Determination.
+         */
+        bool HasCommonColumn { get; }
+    }
+}

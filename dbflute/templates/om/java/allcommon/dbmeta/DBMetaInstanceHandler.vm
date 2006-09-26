@@ -1,0 +1,190 @@
+package ${glPackageBaseCommonDBMeta};
+
+#set ($myClassName = "${glDBMetaInstanceHandlerName}")
+#set ($instanceMapGenericDefinition = "String, ${glDBMetaInterfaceName}")
+
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+/**
+ * DBMeta instance handler.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    /** Table db-name instance map. */
+    protected static final Map${database.filterGenericsString(${instanceMapGenericDefinition})} _tableDbNameInstanceMap;
+    static {
+        Map${database.filterGenericsString(${instanceMapGenericDefinition})} tmpMap = new LinkedHashMap${database.filterGenericsString(${instanceMapGenericDefinition})}();
+
+#foreach ($table in $database.Tables)
+
+        tmpMap.put("${table.Name}", getDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+#end
+
+        _tableDbNameInstanceMap = java.util.Collections.unmodifiableMap(tmpMap);
+    }
+
+    /** Table cap-prop-name instance map. */
+    protected static final Map${database.filterGenericsString(${instanceMapGenericDefinition})} _tableCapPropNameInstanceMap;
+    static {
+        Map${database.filterGenericsString(${instanceMapGenericDefinition})} tmpMap = new LinkedHashMap${database.filterGenericsString(${instanceMapGenericDefinition})}();
+
+#foreach ($table in $database.Tables)
+
+        tmpMap.put("${table.JavaName}", getDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+#end
+
+        _tableCapPropNameInstanceMap = java.util.Collections.unmodifiableMap(tmpMap);
+    }
+
+    /** Table uncap-prop-name instance map. */
+    protected static final Map${database.filterGenericsString(${instanceMapGenericDefinition})} _tableUncapPropNameInstanceMap;
+    static {
+        Map${database.filterGenericsString(${instanceMapGenericDefinition})} tmpMap = new LinkedHashMap${database.filterGenericsString(${instanceMapGenericDefinition})}();
+
+#foreach ($table in $database.Tables)
+
+        tmpMap.put("${table.UncapitalisedJavaName}", getDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+#end
+
+        _tableUncapPropNameInstanceMap = java.util.Collections.unmodifiableMap(tmpMap);
+    }
+
+    protected static ${glDBMetaInterfaceName} getDBMeta(String className) {
+        try {
+            final Class clazz = Class.forName(className);
+            final java.lang.reflect.Method methoz = clazz.getMethod("getInstance", (Class[])null);
+            final Object result = methoz.invoke(null, (Object[])null);
+            return (${glDBMetaInterfaceName})result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Get instance by table db-name.
+     * 
+     * @param tableDbName Table db-name. (NotNull)
+     * @return Instance. (NotNull)
+     */
+    public static ${glDBMetaInterfaceName} getInstanceByTableDbName(String tableDbName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);
+        final ${glDBMetaInterfaceName} instance = (${glDBMetaInterfaceName})_tableDbNameInstanceMap.get(tableDbName);
+        if (instance == null) {
+            String msg = "The instance map returned null by the key: key=" + tableDbName + " instanceMap=" + _tableDbNameInstanceMap;
+            throw new IllegalStateException(msg);
+        }
+        return instance;
+    }
+
+    /**
+     * Get instance by table cap-prop-name.
+     * 
+     * @param tableCapPropName Table cap-prop-name. (NotNull)
+     * @return Instance. (NotNull)
+     */
+    public static ${glDBMetaInterfaceName} getInstanceByTableCapPropName(String tableCapPropName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableCapPropName", tableCapPropName);
+        final ${glDBMetaInterfaceName} instance = (${glDBMetaInterfaceName})_tableCapPropNameInstanceMap.get(tableCapPropName);
+        if (instance == null) {
+            String msg = "The instance map returned null by the key: key=" + tableCapPropName + " instanceMap=" + _tableCapPropNameInstanceMap;
+            throw new IllegalStateException(msg);
+        }
+        return instance;
+    }
+
+    /**
+     * Get instance by table uncap-prop-name.
+     * 
+     * @param tableUncapPropName Table uncap-prop-name. (NotNull)
+     * @return Instance. (NotNull)
+     */
+    public static ${glDBMetaInterfaceName} getInstanceByTableUncapPropName(String tableUncapPropName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableUncapPropName", tableUncapPropName);
+        final ${glDBMetaInterfaceName} instance = (${glDBMetaInterfaceName})_tableUncapPropNameInstanceMap.get(tableUncapPropName);
+        if (instance == null) {
+            String msg = "The instance map returned null by the key: key=" + tableUncapPropName + " instanceMap=" + _tableUncapPropNameInstanceMap;
+            throw new IllegalStateException(msg);
+        }
+        return instance;
+    }
+
+    /**
+     * Get instance by table uncap-prop-name.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Instance. (NotNull)
+     */
+    public static ${glDBMetaInterfaceName} getInstanceByTableMultiName(String tableMultiName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+        {
+            final ${glDBMetaInterfaceName} instance = (${glDBMetaInterfaceName})_tableDbNameInstanceMap.get(tableMultiName);
+            if (instance != null) {
+                return instance;
+            }
+        }
+        {
+            final ${glDBMetaInterfaceName} instance = (${glDBMetaInterfaceName})_tableCapPropNameInstanceMap.get(tableMultiName);
+            if (instance != null) {
+                return instance;
+            }
+        }
+        {
+            final ${glDBMetaInterfaceName} instance = (${glDBMetaInterfaceName})_tableUncapPropNameInstanceMap.get(tableMultiName);
+            if (instance != null) {
+                return instance;
+            }
+        }
+        String msg = "The tableMultiName does not exist in all-instance-map: tableMultiName=" + tableMultiName;
+        msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
+        msg = msg + " tableCapPropNameInstanceMap=" + _tableCapPropNameInstanceMap;
+        msg = msg + " tableUncapPropNameInstanceMap=" + _tableUncapPropNameInstanceMap;
+        throw new IllegalStateException(msg);
+    }
+
+    // ----------------------------------------------------------------
+    //                                                    Assert Object
+    //                                                    -------------
+    /**
+     * Assert that the argument is not null.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param arg Argument. (NotNull)
+     */
+    protected static void assertObjectNotNull(String variableName, Object arg) {
+        if (variableName == null) {
+            String msg = "Argument[variableName] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (arg == null) {
+            String msg = "Argument[" + variableName + "] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    //                                                    Assert String
+    //                                                    -------------
+    /**
+     * Assert that the string is not null and not trimmed empty.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     */
+    protected static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        if (variableName == null) {
+            String msg = "Variable[variableName] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "Variable[" + variableName + "] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (value.trim().length() == 0) {
+            String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+}

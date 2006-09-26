@@ -1,0 +1,119 @@
+
+using System;
+using System.Collections;
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The condition-bean as interface.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public interface ${glConditionBeanInterfaceName} : ${glPagingBeanInterfaceName} {
+
+        // =====================================================================================
+        //                                                                            Table Name
+        //                                                                            ==========
+        /// <summary>
+        /// Get the value of tableName. (readonly)
+        /// </summary>
+        String GetTableDbName();
+
+        // =====================================================================================
+        //                                                                            PrimaryKey
+        //                                                                            ==========
+        /// <summary>
+        /// Accept primary key map.
+        /// </summary>
+        /// <param name="primaryKeyMap">Primary key map. (NotNull and NotEmpty)</param>
+        /// <returns>this. (NotNull)</returns>
+        ${glConditionBeanInterfaceName} AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
+
+        /// <summary>
+        /// Accept primary key map-string. Delimiter is atmark and semicolon {@;}.
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary key map-string. (NotNull and NotEmpty)</param>
+        /// <returns>this. (NotNull)</returns>
+        ${glConditionBeanInterfaceName} AcceptPrimaryKeyMapString(String primaryKeyMapString);
+
+        // =====================================================================================
+        //                                                                             SqlClause
+        //                                                                             =========
+        /**
+         * Get sql-clause instance.
+         * 
+         * @return Sql-clause. (NotNUll)
+         */
+        ${glSqlClauseName} SqlClause { get; }
+
+        /**
+         * Get clause string.
+         * 
+         * @return Sql clause string. (NotNUll)
+         */
+        String GetClause();
+
+        // =====================================================================================
+        //                                                                                 Query
+        //                                                                                 =====
+        /// <summary>
+        /// The property of condition-query as inteface.
+        /// </summary>
+        /// <returns>Instance of condition-query. (NotNull)</returns>
+        ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
+
+	    // =====================================================================================
+	    //                                                                          Limit Select
+	    //                                                                          ============
+	    /**
+	     * Is limit-select PK only?
+	     * 
+	     * @return Determination.
+	     */
+	    bool IsLimitSelect_PKOnly();
+
+	    /**
+	     * Limit select PK only.
+	     *
+	     * @return this. (NotNull)
+	     */
+	    ${glConditionBeanInterfaceName} LimitSelect_PKOnly();
+
+	    /**
+	     * Limit select off.
+	     *
+	     * @return this. (NotNull)
+	     */
+	    ${glConditionBeanInterfaceName} LimitSelect_Off();
+
+        // =====================================================================================
+        //                                                                               OrderBy
+        //                                                                               =======
+        /**
+         * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
+         * 
+         * @return this. (NotNUll)
+         */
+        ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc();
+
+        /**
+         * Add order-by PrimaryKey desc. {order by primaryKey1 desc, primaryKey2 desc...}
+         * 
+         * @return this. (NotNUll)
+         */
+        ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc();
+
+        // =====================================================================================
+        //                                                                               Advance
+        //                                                                               =======
+	    /**
+	     * Lock for update.
+	     * <p>
+	     * If you invoke this, your SQL lock target records for update.
+	     * It depends whether this method supports this on the database type.
+	     * 
+	     * @return this. (NotNUll)
+	     */
+        $glConditionBeanInterfaceName LockForUpdate();
+    }
+}

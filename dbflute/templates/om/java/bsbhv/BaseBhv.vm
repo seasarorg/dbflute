@@ -1,0 +1,763 @@
+#set ($myClassName = "${myBaseBhvClassName}")
+
+package ${glPackageBaseBhv};
+
+import ${glPackageBaseCommon}.*;
+import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+#if (${table.hasOnlyOnePrimaryKey()})
+  #if (${table.hasReferrer()})
+
+import ${glPackageExtendedBhv}.*;
+  #end
+#end
+
+import ${glPackageExtendedDao}.*;
+import ${glPackageExtendedEntity}.*;
+import ${myDBMetaPackageName}.*;
+import ${glPackageCB}.*;
+
+#set ($myExtendClassName = "")
+#if ($table.isWritable())
+  #set ($myExtendClassName = "${glBehaviorWritableAbstractName}")
+#else
+  #set ($myExtendClassName = "${glBehaviorReadableAbstractName}")
+#end
+
+
+/**
+ * The behavior of ${table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExtendClassName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    /** Dao instance. */
+    protected ${myExtendedDaoClassName} _dao;
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor.
+     */
+    public ${myClassName}() {
+    }
+
+    // =====================================================================================
+    //                                                                            Table name
+    //                                                                            ==========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    public String getTableDbName() {
+        return "${table.Name}";
+    }
+
+    // =====================================================================================
+    //                                                                                DBMeta
+    //                                                                                ======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return DBMeta. (NotNull)
+     */
+    public ${glDBMetaInterfaceName} getDBMeta() {
+        return ${myDBMetaClassName}.getInstance();
+    }
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    /**
+     * Get my dao.
+     * 
+     * @return My dao.
+     */
+    public ${myExtendedDaoClassName} getMyDao() {
+        return _dao;
+    }
+
+    /**
+     * Set my dao.
+     * 
+     * @param dao My dao. (NotNull)
+     */
+    public void setMyDao(${myExtendedDaoClassName} dao) {
+        assertObjectNotNull("dao", dao);
+        _dao = dao;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Dao-readable. (NotNull)
+     */
+    public ${glDaoReadableInterfaceName} getDaoReadable() {
+        return getMyDao();
+    }
+
+#if ($table.isWritable())
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Dao-writable. (NotNull)
+     */
+    public ${glDaoWritableInterfaceName} getDaoWritable() {
+        return getMyDao();
+    }
+#end
+
+    // =====================================================================================
+    //                                                                          New Instance
+    //                                                                          ============
+
+    /**
+     * New my entity.
+     * 
+     * @return My entity. (NotNull)
+     */
+    public ${myExtendedObjectClassName} newMyEntity() {
+        return new ${myExtendedObjectClassName}();
+    }
+
+    /**
+     * New my condition-bean.
+     * 
+     * @return My condition-bean. (NotNull)
+     */
+    public ${myConditionBeanClassName} newMyConditionBean() {
+        return new ${myConditionBeanClassName}();
+    }
+
+    // =====================================================================================
+    //                                                                       Delegate Method
+    //                                                                       ===============
+    /**
+     * Get count as all. (Delegate-Method)
+     * 
+     * @return All count. (NotNull)
+     */
+    public int delegateGetCountAllTx() {
+        return getMyDao().getCountAll();
+    }
+
+    /**
+     * Get list as all. (Delegate-Method)
+     * 
+     * @return All list. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateGetListAllTx() {
+        return getMyDao().getListAll();
+    }
+#if ($table.hasPrimaryKey())
+
+    //
+    // Get entity. (Delegate-Method)
+    // 
+    // @param Primary-keys (NotNull)
+    // @return Entity. (NotNull)
+    //
+    public ${myExtendedObjectClassName} delegateGetEntityTx(${table.PrimaryKeyArgsString}) {
+        return getMyDao().getEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()});
+    }
+#end
+
+    /**
+     * Select count by condition-bean. (Delegate-Method)
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Selected count. (NotNull)
+     */
+    public int delegateSelectCountIgnoreFetchScopeTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        return getMyDao().selectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
+    }
+
+    /**
+     * Select entity by condition-bean. (Delegate-Method)
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Selected entity. If the select result is zero, it returns null. (Nullable)
+     */
+    public ${myExtendedObjectClassName} delegateSelectEntityTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        return getMyDao().selectEntity(${glAttachedCBArgsVariableName});
+    }
+
+    /**
+     * Select list by condition-bean. (Delegate-Method)
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateSelectListTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        return getMyDao().selectList(${glAttachedCBArgsVariableName});
+    }
+
+#if ($table.isUseSequence())
+
+    /**
+     * Select next value as sequence. (Delegate-Method)
+     * 
+     * @return Next value. (NotNull)
+     */
+    public java.math.BigDecimal delegateSelectNextValTx() {
+        return getMyDao().selectNextVal();
+    }
+#end
+
+#if ($table.isWritable())
+
+    /**
+     * Insert one entity. (Delegate-Method)
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Inserted count.
+     */
+    public int delegateInsertTx(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        filterEntityOfInsert(entity);
+        assertEntityOfInsert(entity);
+        return getMyDao().insert(entity);
+    }
+
+    /**
+     * Update one entity. (Delegate-Method)
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Updated count.
+     */
+    public int delegateUpdateTx(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        filterEntityOfUpdate(entity);
+        assertEntityOfUpdate(entity);
+        return getMyDao().update(entity);
+    }
+
+    /**
+     * Delete one entity. (Delegate-Method)
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Deleted count.
+     */
+    public int delegateDeleteTx(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        filterEntityOfDelete(entity);
+        assertEntityOfDelete(entity);
+        return getMyDao().delete(entity);
+    }
+
+    /**
+     * Insert several entities. (Delegate-Method)
+     * 
+     * @param entityList Entity-list. (NotNull & NotEmpty)
+     * @return Inserted count.
+     */
+    public int delegateInsertListTx(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+        assertListNotNullAndEmpty(entityList);
+        return getMyDao().insertList(entityList);
+    }
+
+    /**
+     * Update several entities. (Delegate-Method)
+     * 
+     * @param entityList Entity-list. (NotNull & NotEmpty)
+     * @return Updated count.
+     */
+    public int delegateUpdateListTx(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+        assertListNotNullAndEmpty(entityList);
+        return getMyDao().updateList(entityList);
+    }
+
+    /**
+     * Delete several entities. (Delegate-Method)
+     * 
+     * @param entityList Entity-list. (NotNull & NotEmpty)
+     * @return Deleted count.
+     */
+    public int delegateDeleteListTx(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+        assertListNotNullAndEmpty(entityList);
+        return getMyDao().deleteList(entityList);
+    }
+#end
+
+    // =====================================================================================
+    //                                                                          Basic Select
+    //                                                                          ============
+    /**
+     * Select list.
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return List-result-bean. (NotNull)
+     */
+    public ${glListResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectListTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        return new ResultBeanBuilder${database.filterGenericsString(${myExtendedObjectClassName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateSelectListTx(${glAttachedCBArgsVariableName}));
+    }
+
+    /**
+     * Select page.
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Selected page as first page. (NotNull)
+     */
+    public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPageTx(final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})}() {
+            public ${glPagingBeanInterfaceName} getPagingBean() { return ${glAttachedCBArgsVariableName}; }
+            public int selectCountIgnoreFetchScope() {
+                return delegateSelectCountIgnoreFetchScopeTx(${glAttachedCBArgsVariableName});
+            }
+            public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectList() {
+                return delegateSelectListTx(${glAttachedCBArgsVariableName});
+            }
+        };
+        return new SelectPageInvoker${database.filterGenericsString(${myExtendedObjectClassName})}(this).invokeSelectPage(pageCallback);
+    }
+
+    /**
+     * Select entity by condition-bean with deleted check.
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Entity that is selected from database by select-for-update. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public ${myExtendedObjectClassName} selectEntityWithDeletedCheckTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntityTx(${glAttachedCBArgsVariableName});
+        assertRecordHasNotBeenDeleted(currentEntity, ${glAttachedCBArgsVariableName}.toString());
+        return currentEntity;
+    }
+
+    // =====================================================================================
+    //                                                                        Various Select
+    //                                                                        ==============
+
+    /**
+     * Select list after checking count(ignore fetch scope).
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param maxCount Max count.
+     * @return List-result-bean. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+     */
+    public ${glListResultBeanName} selectListAfterCheckingCountIgnoreFetchScopeTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int maxCount) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final int selectedCount = delegateSelectCountIgnoreFetchScopeTx(${glAttachedCBArgsVariableName});
+        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());
+        return new ResultBeanBuilder${database.filterGenericsString(${myExtendedObjectClassName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateSelectListTx(${glAttachedCBArgsVariableName}));
+    }
+
+#if ($table.hasPrimaryKey())
+
+    public ${myExtendedObjectClassName} selectForReadOnlyByPKValueWithDeletedCheckTx(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        return selectForReadOnlyByPKMapStringWithDeletedCheckTx(entity.extractPrimaryKeyMapString());
+    }
+#end
+
+    /**
+     * Select for read only with deleted check.
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull)
+     * @return Entity that is selected from database by select-for-read-only. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public ${myExtendedObjectClassName} selectForReadOnlyByPKMapStringWithDeletedCheckTx(String primaryKeyMapString) {
+        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
+        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
+        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
+        final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntityTx(${glAttachedCBArgsVariableName});
+        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
+        return currentEntity;
+    }
+#if ($table.hasPrimaryKey())
+
+    public ${myExtendedObjectClassName} selectForUpdateByPKValueWithDeletedCheckTx(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        return selectForReadOnlyByPKMapStringWithDeletedCheckTx(entity.extractPrimaryKeyMapString());
+    }
+#end
+
+    /**
+     * Select for update with deleted check.
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull)
+     * @return Entity that is selected from database by select-for-update. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public ${myExtendedObjectClassName} selectForUpdateByPKMapStringWithDeletedCheckTx(String primaryKeyMapString) {
+        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
+        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
+        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString).lockForUpdate();
+        final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntityTx(${glAttachedCBArgsVariableName});
+        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
+        return currentEntity;
+    }
+
+#if (${table.hasOnlyOnePrimaryKey()})
+
+    // =====================================================================================
+    //                                                                         Load Refferer
+    //                                                                         =============
+  #foreach ($refferer in $table.Referrers)
+    #set ($reffererTable = $refferer.Table)
+    #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
+    #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
+    #set ($reffererBhvClassName = "${reffererEntityClassName}Bhv")
+    #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
+    #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+    #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
+    #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List${database.filterGenericsString(${reffererEntityClassName})}")
+
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   ReffererTable    = [${refferer.Table.Name}]
+    //   ReffererProperty = [${refferer.ReffererPropertyName}]
+    // * * * * * * * * */
+
+    /**
+     * Load refferer of ${refferer.ReffererPropertyName}.
+     * 
+     * Default refferer order-by is 'primary-key asc'.
+     * <pre>
+     *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
+     * 
+     *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
+     *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
+     *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
+     *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
+     *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls);
+     * 
+     * </pre>
+     * 
+     * @param ls Entity list of main table. (NotNull)
+     */
+    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls) {
+        final ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition = new ReffererCondition${refferer.ReffererPropertyNameInitCap}() {
+            public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName}) {
+                ${glAttachedCBArgsVariableName}.addOrderBy_PK_Asc();// Default OrderBy for Refferer.
+            }
+        };
+        load${refferer.ReffererPropertyNameInitCap}(ls, reffererCondition);
+    }
+
+    /**
+     * Load refferer of ${refferer.ReffererPropertyName}.
+     * 
+     * <pre>
+     *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
+     * 
+     *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
+     *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
+     *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
+     *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
+     *     final ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition = new ReffererCondition${refferer.ReffererPropertyNameInitCap}() {
+     *         public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName}) {
+     *             ${glAttachedCBArgsVariableName}.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+     *         }
+     *     };
+     *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls, reffererCondition);
+     * 
+     * </pre>
+     * 
+     * @param ls Entity list of main table. (NotNull)
+     * @param reffererCondition Refferer condition instance for registering refferer condition. (NotNull)
+     */
+    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition) {
+        assertObjectNotNull("ls", ls);
+        assertObjectNotNull("reffererCondition", reffererCondition);
+        if (ls.isEmpty()) {
+            return;
+        }
+
+        final java.util.Map${database.filterGenericsString(${genericPKMyEntityMap})} pkMyEntityMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKMyEntityMap})}();
+        final java.util.List${database.filterGenericsString(${table.getPrimaryKeyJavaNativeAsOne()})} pkList = new java.util.ArrayList${database.filterGenericsString(${table.getPrimaryKeyJavaNativeAsOne()})}();
+        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            pkList.add(entity.get${table.getPrimaryKeyJavaNameAsOne()}());
+            pkMyEntityMap.put(entity.get${table.getPrimaryKeyJavaNameAsOne()}(), entity);
+        }
+        final ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})getDaoSelector().getRBhv(${reffererBhvClassName}.class);
+        final ${reffererCBClassName} ${glAttachedCBArgsVariableName} = reffererBhv.newMyConditionBean();
+        ${glAttachedCBArgsVariableName}.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+        ${glAttachedCBArgsVariableName}.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+        reffererCondition.setup(${glAttachedCBArgsVariableName});
+        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.delegateSelectListTx(${glAttachedCBArgsVariableName});
+
+        final java.util.Map${database.filterGenericsString(${genericPKChildListMap})} pkReffererListMap;
+        pkReffererListMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKChildListMap})}();
+        for (final java.util.Iterator ite = reffererList.iterator(); ite.hasNext(); ) {
+            final ${reffererEntityClassName} reffererEntity = (${reffererEntityClassName})ite.next();
+            if (!pkReffererListMap.containsKey(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}())) {
+                pkReffererListMap.put(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}(), new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
+            }
+            ((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}())).add(reffererEntity);
+
+            // for Reverse Reference.
+            final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap.get(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}());
+            reffererEntity.set${refferer.ForeignPropertyNameInitCap}(myEntity);
+        }
+
+        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            entity.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(entity.get${table.getPrimaryKeyJavaNameAsOne()}()));
+        }
+    }
+
+    /**
+     * The interface of refferer condition for ${refferer.ReffererPropertyName}.
+     */
+    public static interface ReffererCondition${refferer.ReffererPropertyNameInitCap} {
+        /**
+         * Set up refferer condition.
+         * 
+         * @param ${glAttachedCBArgsVariableName} Condition-bean for refferer. (NotNull)
+         */
+        public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName});
+    }
+  #end
+#end
+
+    // =====================================================================================
+    //                                                                          Basic Update
+    //                                                                          ============
+
+#if ($table.isWritable())
+
+    /**
+     * Insert or update after select-for-update.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @return Updated count.
+     */
+    public int insertOrUpdateAfterSelectForUpdateTx(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        final String mapString = entity.extractPrimaryKeyMapString();
+        ${myExtendedObjectClassName} currentEntity = null;
+        try {
+            currentEntity = selectForUpdateByPKMapStringWithDeletedCheckTx(mapString);
+        } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+            return delegateInsertTx(entity);
+        }
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        mergeEntity(entity, currentEntity);
+        return delegateUpdateTx(currentEntity);
+    }
+
+    /**
+     * Update after select-for-update.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int updateAfterSelectForUpdateTx(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        final ${myExtendedObjectClassName} currentEntity = selectForUpdateByPKMapStringWithDeletedCheckTx(entity.extractPrimaryKeyMapString());
+        mergeEntity(entity, currentEntity);
+        return delegateUpdateTx(currentEntity);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param sourceEntity Source entity. (NotNull)
+     * @param destinationEntity Destination entity. (NotNull)
+     */
+    protected void mergeEntity(${glEntityInterfaceName} sourceEntity, ${glEntityInterfaceName} destinationEntity) {
+        assertEntityNotNull(sourceEntity);
+        assertEntityNotNull(destinationEntity);
+        final ${myExtendedObjectClassName} sourceMyEntity = (${myExtendedObjectClassName})sourceEntity;
+        final ${myExtendedObjectClassName} destinationMyEntity = (${myExtendedObjectClassName})destinationEntity;
+  #foreach ($col in $table.Columns)
+
+        if (sourceMyEntity.isSetterInvoked${col.JavaName}()) {
+            destinationMyEntity.set${col.JavaName}(sourceMyEntity.get${col.JavaName}());
+        }
+  #end
+
+    }
+
+    // =====================================================================================
+    //                                                                        Various Update
+    //                                                                        ==============
+
+  #if ($table.hasLogicalDeleteColumn())
+    #if ($table.hasPrimaryKey())
+
+    // 
+    // Logical-delete after select-for-update.
+    // 
+    // @param primaryKey Primary-keys. (NotNull)
+    // @return Updated count.
+    // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+    // 
+    public int logicalDeleteByPKValueAfterSelectForUpdateTx(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        return logicalDeleteByPKMapStringAfterSelectForUpdateTx(entity.extractPrimaryKeyMapString());
+    }
+    #end
+
+    /**
+     * Logical-delete after select-for-update.
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull)
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int logicalDeleteByPKMapStringAfterSelectForUpdateTx(String primaryKeyMapString) {
+        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
+        final ${myExtendedObjectClassName} currentEntity = selectForUpdateByPKMapStringWithDeletedCheckTx(primaryKeyMapString);
+        setupLogicalDeleteValue(currentEntity);
+        filterLogicalDeleteEntity(currentEntity);
+        return delegateUpdateTx(currentEntity);
+    }
+
+    /**
+     * Set up 'revival from logical-delete' value.
+     * 
+     * @param entity Entity having primary-key value. (NotNull)
+     */
+    protected void setupLogicalDeleteValue(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+    #foreach ($logicalDeleteColumn in $table.LogicalDeleteColumnList)
+      #set ($logic = ${table.LogicalDeleteColumnValueMap.get(${logicalDeleteColumn.Name})})
+      #if ($database.isCommonColumnSetupInvokingLogic($logic))
+        #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+            ${filteredLogic}
+      #else
+
+            entity.set${logicalDeleteColumn.JavaName}(${logic});
+      #end
+    #end
+
+    }
+
+    /**
+     * Filter 'logical-delete' entity.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    protected void filterLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
+    }
+  #end
+
+  #if ($table.hasRevivalFromLogicalDeleteColumn())
+    #if ($table.hasPrimaryKey())
+
+    // 
+    // Revival from logical-delete after select-for-update.
+    // 
+    // @param primaryKey Primary-keys. (NotNull)
+    // @return Updated count.
+    // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+    // 
+    public int revivalFromLogicalDeleteByPKValueAfterSelectForUpdateTx(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        return revivalFromLogicalDeleteByPKMapStringAfterSelectForUpdateTx(entity.extractPrimaryKeyMapString());
+    }
+    #end
+
+    /**
+     * Revival from logical-delete after select-for-update.
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull)
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int revivalFromLogicalDeleteByPKMapStringAfterSelectForUpdateTx(String primaryKeyMapString) {
+        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
+        final ${myExtendedObjectClassName} currentEntity = selectForUpdateByPKMapStringWithDeletedCheckTx(primaryKeyMapString);
+        setupRevivalFromLogicalDeleteValue(currentEntity);
+        filterRevivalFromLogicalDeleteEntity(currentEntity);
+        return delegateUpdateTx(currentEntity);
+    }
+
+    /**
+     * Set up 'revival from logical-delete' value.
+     * 
+     * @param entity Entity having primary-key value. (NotNull)
+     */
+    protected void setupRevivalFromLogicalDeleteValue(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+    #foreach ($revivalFromLogicalDeleteColumn in $table.RevivalFromLogicalDeleteColumnList)
+      #set ($logic = ${table.RevivalFromLogicalDeleteColumnValueMap.get(${revivalFromLogicalDeleteColumn.Name})})
+      #if ($database.isCommonColumnSetupInvokingLogic($logic))
+        #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+            ${filteredLogic}
+      #else
+
+            entity.set${revivalFromLogicalDeleteColumn.JavaName}(${logic});
+      #end
+    #end
+
+    }
+
+    /**
+     * Filter 'revival from logical-delete' entity.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    protected void filterRevivalFromLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
+    }
+  #end
+
+  #if ($table.isUseIdentity())
+    #if ($table.hasPrimaryKey())
+
+    // 
+    // Copy-insert after select-for-update.
+    // 
+    // @param primaryKey Primary-keys. (NotNull)
+    // @return Inserted count.
+    // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+    // 
+    public int copyInsertByPKValueAfterSelectForReadOnlyTx(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        return copyInsertByPKMapStringAfterSelectForReadOnlyTx(entity.extractPrimaryKeyMapString());
+    }
+    #end
+
+    /**
+     * Copy-insert after select for read only.
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull)
+     * @return Inserted count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int copyInsertByPKMapStringAfterSelectForReadOnlyTx(String primaryKeyMapString) {
+        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
+        final ${myExtendedObjectClassName} currentEntity = selectForReadOnlyByPKMapStringWithDeletedCheckTx(primaryKeyMapString);
+        filterCopyInsertEntity(currentEntity);
+        return delegateInsertTx(currentEntity);
+    }
+
+    /**
+     * Filter 'copy-insert' entity.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    protected void filterCopyInsertEntity(${myExtendedObjectClassName} entity) {
+    }
+
+  #end
+#end
+
+}

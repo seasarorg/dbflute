@@ -1,0 +1,898 @@
+#set ($myClassName = "${myExtendedObjectClassName}")
+
+using System;
+using System.Reflection;
+using System.Collections;
+using System.Text;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonHelper};
+using ${myDBMetaPackageName};
+
+#if (${database.isAvailableEntityLazyLoad()})
+  #if (${table.hasRelation()})
+
+using ${myExtendedDaoPackageName};
+  #end
+#end
+
+#set ($myEntityInterfaceName = "")
+#if (${table.hasAllCommonColumn()})
+  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
+#else
+  #set ($myEntityInterfaceName = ${glEntityInterfaceName})
+#end
+
+namespace ${myExtendedEntityPackageName} {
+
+    [Seasar.Dao.Attrs.Table("${table.AnnotationTableName}")]
+
+#if ($table.isUseUpdateDate())
+    [Seasar.Dao.Attrs.TimestampProperty("${table.UpdateDateUncapitalisedJavaName}")]
+#end
+#if ($table.isUseVersionNo())
+
+    [Seasar.Dao.Attrs.VersionNoProperty("${table.VersionNoUncapitalisedJavaName}")]
+#end
+
+    [System.Serializable]
+    /// <summary>
+    /// The entity of ${table.Name}. (partial interface for auto-generation)
+    /// 
+    /// [primary-key]
+    ///     ${table.PrimaryKeyNameCommaString}
+    /// 
+    /// [all-columns]
+    ///     ${table.ColumnNameCommaString}
+    /// 
+    /// [foreign-table]
+    ///     ${table.ForeignPropertyNameCommaString}
+    /// 
+    /// [refferer-table]
+    ///     ${table.ReferrerPropertyNameCommaString}
+    /// 
+    /// [sequence]
+    ///     ${table.DefinedSequenceName}
+    /// 
+    /// [identity]
+    ///     ${table.IdentityPropertyName}
+    /// 
+    /// [update-date]
+    ///     ${table.UpdateDateJavaName}
+    /// 
+    /// [version-no]
+    ///     ${table.VersionNoJavaName}
+    /// 
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public partial class ${myClassName} : ${myEntityInterfaceName} {
+
+        // =====================================================================================
+        //                                                                            Definition
+        //                                                                            ==========
+        /** Map-string map-mark. */
+        public static readonly String MAP_STRING_MAP_MARK = "map:";
+
+        /** Map-string list-mark. */
+        public static readonly String MAP_STRING_LIST_MARK = "list:";
+
+        /** Map-string start-brace. */
+        public static readonly String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
+
+        /** Map-string end-brace. */
+        public static readonly String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
+
+        /** Map-string delimiter. */
+        public static readonly String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
+
+        /** Map-string equal. */
+        public static readonly String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        #region Attribute
+
+#foreach ($col in $table.Columns)
+
+        /// <summary>The value of ${col.UncapitalisedJavaName}.</summary>
+        protected ${col.JavaNative} _${col.UncapitalisedJavaName};
+
+        /// <summary>Has the setter of ${col.UncapitalisedJavaName} been invoked?</summary>
+        protected bool _isSetterInvoked${col.JavaName};
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        #region Constructor
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ${myClassName}() {
+        }
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                            Table Name
+        //                                                                            ==========
+        #region Table Name
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        public String TableDbName {
+            get { return "${table.Name}"; }
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        public String TableCapPropName {
+            get { return "${table.JavaName}"; }
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        public String TableUncapPropName {
+            get { return "${table.UncapitalisedJavaName}"; }
+        }
+        #endregion
+
+        // =====================================================================================
+        //                                                                                DBMeta
+        //                                                                                ======
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        public ${glDBMetaInterfaceName} DBMeta {
+            get { return ${myDBMetaClassName}.GetInstance(); }
+        }
+
+        // =====================================================================================
+        //                                                                              Property
+        //                                                                              ========
+        #region Property
+#foreach ($col in $table.Columns)
+  #if ($col.isIdentity())
+
+        /// <summary>
+        /// The property of ${col.UncapitalisedJavaName}. This is identity.
+        /// </summary>
+        [Seasar.Dao.Attrs.ID("identity")]
+        [Seasar.Dao.Attrs.Column("${col.Name}")]
+        public ${col.JavaNative} ${col.JavaName} {
+            get { return _${col.UncapitalisedJavaName}; }
+            set { _isSetterInvoked${col.JavaName} = true; _${col.UncapitalisedJavaName} = value; }
+        }
+  #else
+
+        /// <summary>
+        /// The property of ${col.UncapitalisedJavaName}.
+        /// </summary>
+        public ${col.JavaNative} ${col.JavaName} {
+            get { return _${col.UncapitalisedJavaName}; }
+            set { _isSetterInvoked${col.JavaName} = true; _${col.UncapitalisedJavaName} = value; }
+        }
+  #end
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                Invoking Determination
+        //                                                                ======================
+        #region Invoking Determination
+#foreach ($col in $table.Columns)
+
+        /// <summary>
+        /// Has the setter of ${col.UncapitalisedJavaName} been invoked?
+        /// </summary>
+        /// <returns>Determination.</returns>
+        public bool IsSetterInvoked${col.JavaName}() {
+            return _isSetterInvoked${col.JavaName};
+        }
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                       Classify Method
+        //                                                                       ===============
+        #region Classify Method
+#foreach ($col in $table.Columns)
+  #if (${col.hasClassification()})
+    #foreach ($classificationMap in $col.ClassificationMapList)
+
+        /// <summary>
+        /// Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
+        /// </summary>
+        public void Classify${col.JavaName}${classificationMap.get('name')}() {
+            String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+            ${col.JavaName} = code;
+        }
+    #end
+  #end
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                 Classification Getter
+        //                                                                 =====================
+        #region Classification Getter
+#foreach ($col in $table.Columns)
+  #if (${col.hasClassification()})
+
+        /// <summary>
+        /// Get the value of ${col.UncapitalisedJavaName} as classification-name.
+        /// </summary>
+        /// <returns>The value of ${col.UncapitalisedJavaName} as classification-name.</returns>
+        public String Get${col.JavaName}Name() {
+            if (_${col.UncapitalisedJavaName} == null) {
+                return null;
+            }
+            Object obj = _${col.UncapitalisedJavaName};
+            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                return null;
+            }
+            System.Collections.IDictionary hash = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
+            return (String)hash[_${col.UncapitalisedJavaName}.ToString()];
+        }
+
+        /// <summary>
+        /// Get the value of ${col.UncapitalisedJavaName} as classification-alias.
+        /// </summary>
+        /// <returns>The value of ${col.UncapitalisedJavaName} as classification-alias.</returns>
+        public String Get${col.JavaName}Alias() {
+            if (_${col.UncapitalisedJavaName} == null) {
+                return null;
+            }
+            Object obj = _${col.UncapitalisedJavaName};
+            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                return null;
+            }
+            System.Collections.IDictionary hash = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
+            return (String)hash[_${col.UncapitalisedJavaName}.ToString()];
+        }
+  #end
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                          Classification Determination
+        //                                                          ============================
+        #region Classification Determination
+#foreach ($col in $table.Columns)
+  #if (${col.hasClassification()})
+    #foreach ($classificationMap in $col.ClassificationMapList)
+
+        /// <summary>
+        /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// The difference of capital letters and small letters is NOT distinguished.
+        /// If the value is null, this method returns false!
+        /// </summary>
+        /// <returns>Determanation.</returns>
+        public bool Is${col.JavaName}${classificationMap.get('name')}() {
+            if (_${col.UncapitalisedJavaName} == null) {
+                return false;
+            }
+            Object obj = _${col.UncapitalisedJavaName};
+            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                return false;
+            }
+            String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+            return code.ToLower().Equals(_${col.UncapitalisedJavaName}.ToString().ToLower());
+        }
+
+        /// <summary>
+        /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// The difference of capital letters and small letters is NOT distinguished.
+        /// If the value is null, this method throws exception!
+        /// </summary>
+        /// <returns>Determanation.</returns>
+        public bool Is${col.JavaName}${classificationMap.get('name')}IfNullException() {
+            if (_${col.UncapitalisedJavaName} == null) {
+                String msg = "If the value of ${col.UncapitalisedJavaName} is null, this method throws exception!";
+                throw new SystemException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
+            }
+            Object obj = _${col.UncapitalisedJavaName};
+            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                String msg = "If the nullable-type-value of ${col.UncapitalisedJavaName} does not have value, this method throws exception!";
+                throw new SystemException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
+            }
+            return Is${col.JavaName}${classificationMap.get('name')}();
+        }
+    #end
+  #end
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                         Foreign Table
+        //                                                                         =============
+        #region Foreign Table
+#set ($foreignKeysIndex = 0)
+#foreach ($foreignKeys in $table.ForeignKeys)
+  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
+  #set ($foreignDaoClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}Dao")
+  #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
+  #set ($parentCBClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionBeanInitialName}")
+
+        // /* * * * * * * * * * * * * * * * * * * * * * *
+        //   ForeignTable    = [${foreignKeys.ForeignTable.Name}]
+        //   ForeignProperty = [${foreignKeys.ForeignPropertyName}]
+        // * * * * * * * * */
+
+        /// <summary>The entity of foreign table.</summary>
+        protected ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
+
+        /// <summary>
+        /// Property of ${foreignKeys.ForeignPropertyName} as the entity of foreign table.
+        /// </summary>
+        [Seasar.Dao.Attrs.Relno(${foreignKeysIndex}), Seasar.Dao.Attrs.Relkeys("$foreignKeys.RelationKeysCommaString")]
+        public ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignKeys.foreignPropertyNameInitCap} {
+  #if (${database.isAvailableEntityLazyLoad()})
+
+            get {
+                if (${foreignVariableName} != null) {
+                    return ${foreignVariableName};
+                }
+    #foreach ($columnName in $foreignKeys.LocalColumns)
+      #set ($localColumn = $table.getColumn($columnName))
+
+                if (_${localColumn.UncapitalisedJavaName} == null) {
+                    return null;
+                }
+    #end
+
+                // [LazyLoad] - If the target instance does not exist, lazyload the instance and return it.
+                ${foreignDaoClassName} dao = (${foreignDaoClassName})${glLazyLoadContainerClassName}.GetInstance().GetDaoInstance(typeof(${foreignDaoClassName}));
+                ${glPackageCB}.${parentCBClassName} ${glAttachedCBArgsVariableName} = new ${glPackageCB}.${parentCBClassName}();
+                ${glAttachedCBArgsVariableName}.Query().${foreignKeys.getForeignTableBeanSetupString("_Equal", "Set")};
+                ${foreignVariableName} = dao.SelectEntity(${glAttachedCBArgsVariableName});
+                return $foreignVariableName;
+            }
+            set { ${foreignVariableName} = value; }
+        }
+  #else
+
+            get { return ${foreignVariableName}; }
+            set { ${foreignVariableName} = value; }
+        }
+  #end
+  #set ($foreignKeysIndex = $foreignKeysIndex + 1)
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                        Refferer Table
+        //                                                                        ==============
+        #region Refferer Table
+#foreach ($refferer in $table.Referrers)
+  #set ($reffererTable = $refferer.Table)
+  #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
+  #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
+  #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
+  #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+  #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
+
+  #if (${refferer.isOneToOne()})
+
+        // /* * * * * * * * * * * * * * * * * * * * * * * {one-to-one}
+        //   ReffererTable    = [${refferer.Table.Name}]
+        //   ReffererProperty = [${refferer.ReffererPropertyName}]
+        // * * * * * * * * */
+  #else
+
+        // /* * * * * * * * * * * * * * * * * * * * * * *
+        //   ReffererTable    = [${refferer.Table.Name}]
+        //   ReffererProperty = [${refferer.ReffererPropertyName}]
+        // * * * * * * * * */
+  #end
+
+        /// <summary>The list of refferer table.</summary>
+        protected System.Collections.IList $reffererVariableName;
+
+        /// <summary>
+        /// Property of ${refferer.ReffererPropertyName} as the list of refferer table.
+        /// </summary>
+        public System.Collections.IList ${refferer.ReffererPropertyNameInitCap} {
+  #if (${database.isAvailableEntityLazyLoad()})
+
+            get {
+                if (${reffererVariableName} != null) {
+                    return ${reffererVariableName};
+                }
+    #foreach ($col in $table.PrimaryKey)
+
+                if (_${col.UncapitalisedJavaName} == null) {
+                    return null;
+                }
+    #end
+
+                // [LazyLoad] - If the target instance does not exist, lazyload the instance and return it.
+                ${reffererDaoClassName} dao = (${reffererDaoClassName})${glLazyLoadContainerClassName}.GetInstance().GetDaoInstance(typeof(${reffererDaoClassName}));
+                ${glPackageCB}.${reffererCBClassName} ${glAttachedCBArgsVariableName} = new ${glPackageCB}.${reffererCBClassName}();
+                ${glAttachedCBArgsVariableName}.Query().${refferer.getChildrenTableBeanSetupString("_Equal", "Set")};
+                ${glAttachedCBArgsVariableName}.AddOrderBy_PK_Asc();
+                ${reffererVariableName} = dao.SelectList(${glAttachedCBArgsVariableName});
+                return $reffererVariableName;
+            }
+            set {
+                if (value == null) {
+                    ${reffererVariableName} = null;
+                } else {
+                    ${reffererVariableName} = value;
+                }
+            }
+        }
+  #else
+
+            get { return ${reffererVariableName}; }
+            set {
+                if (value == null) {
+                    ${reffererVariableName} = null;
+                } else {
+                    ${reffererVariableName} = value;
+                }
+            }
+        }
+  #end
+  #if (${refferer.isOneToOne()})
+
+        /// <summary>
+        /// Property of ${refferer.ReffererPropertyName} as one of refferer table.
+        /// </summary>
+        [Seasar.Dao.Attrs.Relno(${foreignKeysIndex}), Seasar.Dao.Attrs.Relkeys("$refferer.RelationKeysCommaStringForOneToOneRefferer")]
+        public ${reffererEntityLongClassName} ${refferer.ReffererPropertyNameInitCapAsOne} {
+            get {
+                System.Collections.IList ls = this.${refferer.ReffererPropertyNameInitCap};
+                if (ls.Count == 0) {
+                    return null;
+                }
+                if (ls.Count > 1) {
+                    String msg = "The size of the list must be one because this relation is 'one-to-one'";
+                    msg = msg + ": list=" + ls + ": ToString()=" + ToString();
+                    throw new SystemException(msg);
+                }
+                return (${reffererEntityLongClassName})ls[0];
+            }
+            set {
+                if (value == null) {
+                    ${reffererVariableName} = null;
+                    return;
+                }
+                System.Collections.IList ls = new System.Collections.ArrayList();
+                ls.Add(value);
+                ${reffererVariableName} = ls;
+            }
+        }
+    #set ($foreignKeysIndex = $foreignKeysIndex + 1)
+  #end
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                                Accept
+        //                                                                                ======
+        #region Accept
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="primaryKeyMap">Primary-key map. (NotNull and NotEmpty)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${glEntityInterfaceName} AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap) {
+            if (primaryKeyMap == null) {
+                String msg = "The argument[primaryKeyMap] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (primaryKeyMap.Count == 0) {
+                String msg = "The argument[primaryKeyMap] should not be empty.";
+                throw new ArgumentOutOfRangeException(msg);
+            }
+#if ($table.hasPrimaryKey())
+  #foreach ($col in $table.PrimaryKey)
+
+            if (!primaryKeyMap.ContainsKey("${col.Name}")) {
+                ${col.JavaName} = null;
+            } else {
+                String value = (String)primaryKeyMap["${col.Name}"];
+    #if ($col.isJavaNativeStringObject())
+
+                ${col.JavaName} = value;
+    #else
+
+                ${col.JavaName} = ${col.JavaNative}.Parse(value);
+    #end
+
+            }
+  #end
+
+            return this;
+#else
+  #foreach ($col in $table.Columns)
+
+            if (!primaryKeyMap.ContainsKey("${col.Name}")) {
+                String msg = "The primaryKeyMap must have the value of ${col.Name}";
+                throw new ArgumentOutOfRangeException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+            } else {
+                String value = (String)primaryKeyMap["${col.Name}"];
+    #if ($col.isJavaNativeStringObject())
+
+                ${col.JavaName} = value;
+    #else
+
+                ${col.JavaName} = ${col.JavaNative}.Parse(value);
+    #end
+
+            }
+  #end
+
+            return this;
+#end
+
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${glEntityInterfaceName} AcceptPrimaryKeyMapString(String primaryKeyMapString) {
+            if (primaryKeyMapString == null) {
+                String msg = "The argument[primaryKeyMapString] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+            String suffix = MAP_STRING_END_BRACE;
+            if (!primaryKeyMapString.Trim().StartsWith(prefix)) {
+                primaryKeyMapString = prefix + primaryKeyMapString;
+            }
+            if (!primaryKeyMapString.Trim().EndsWith(suffix)) {
+                primaryKeyMapString = primaryKeyMapString + suffix;
+            }
+            ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+            mapListString.MapMark = MAP_STRING_MAP_MARK;
+            mapListString.ListMark = MAP_STRING_LIST_MARK;
+            mapListString.StartBrace = MAP_STRING_START_BRACE;
+            mapListString.EndBrace = MAP_STRING_END_BRACE;
+            mapListString.Delimiter = MAP_STRING_DELIMITER;
+            mapListString.Equal = MAP_STRING_EQUAL;
+            return AcceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="columnValueMap">Column-value map. (NotNull and NotEmpty)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${glEntityInterfaceName} AcceptColumnValueMap(System.Collections.Generic.IDictionary<String, Object> columnValueMap) {
+            if (columnValueMap == null) {
+                String msg = "The argument[columnValueMap] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (columnValueMap.Count == 0) {
+                String msg = "The argument[columnValueMap] should not be empty.";
+                throw new ArgumentOutOfRangeException(msg);
+            }
+
+  #foreach ($col in $table.Columns)
+
+            if (!columnValueMap.ContainsKey("${col.Name}")) {
+                ${col.JavaName} = null;
+            } else {
+                String value = (String)columnValueMap["${col.Name}"];
+    #if ($col.isJavaNativeStringObject())
+
+                ${col.JavaName} = value;
+    #else
+
+                ${col.JavaName} = ${col.JavaNative}.Parse(value);
+    #end
+
+            }
+  #end
+
+            return this;
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="columnValueMapString">Column-value map-string. (NotNull)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${glEntityInterfaceName} AcceptColumnValueMapString(String columnValueMapString) {
+            if (columnValueMapString == null) {
+                String msg = "The argument[columnValueMapString] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+            String suffix = MAP_STRING_END_BRACE;
+            if (!columnValueMapString.Trim().StartsWith(prefix)) {
+                columnValueMapString = prefix + columnValueMapString;
+            }
+            if (!columnValueMapString.Trim().EndsWith(suffix)) {
+                columnValueMapString = columnValueMapString + suffix;
+            }
+            ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+            mapListString.MapMark = MAP_STRING_MAP_MARK;
+            mapListString.ListMark = MAP_STRING_LIST_MARK;
+            mapListString.StartBrace = MAP_STRING_START_BRACE;
+            mapListString.EndBrace = MAP_STRING_END_BRACE;
+            mapListString.Delimiter = MAP_STRING_DELIMITER;
+            mapListString.Equal = MAP_STRING_EQUAL;
+            return AcceptColumnValueMap(mapListString.generateMap(columnValueMapString));
+        }
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                               Extract
+        //                                                                               =======
+        #region Extract
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <returns>Primary key map-string.</returns>
+        public String ExtractPrimaryKeyMapString() {
+#if ($table.hasPrimaryKey())
+
+            String startBrace = MAP_STRING_START_BRACE;
+            String endBrace = MAP_STRING_END_BRACE;
+            String delimiter = MAP_STRING_DELIMITER;
+            String equal = MAP_STRING_EQUAL;
+            String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
+            StringBuilder sb = new StringBuilder();
+
+  #foreach ($col in $table.PrimaryKey)
+    
+            sb.Append(delimiter);
+            {
+                Object obj = _${col.UncapitalisedJavaName};
+                if (obj != null && (obj.GetType().IsPrimitive || obj is DateTime)) {
+                    sb.Append("${col.Name}").Append(equal).Append(obj);
+                } else {
+                    sb.Append("${col.Name}").Append(equal).Append((obj != null ? obj.ToString() : ""));
+                }
+            }
+  #end
+
+            sb.Remove(0, delimiter.Length).Insert(0, mapMarkAndStartBrace).Append(endBrace);
+            return sb.ToString();
+#else
+
+            return ExtractColumnValueMapString();
+#end
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <returns>Column-value map-string.</returns>
+        public String ExtractColumnValueMapString() {
+            String startBrace = MAP_STRING_START_BRACE;
+            String endBrace = MAP_STRING_END_BRACE;
+            String delimiter = MAP_STRING_DELIMITER;
+            String equal = MAP_STRING_EQUAL;
+            String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
+            String listMarkAndStartBrace = MAP_STRING_LIST_MARK + startBrace;
+            StringBuilder sb = new StringBuilder();
+
+#foreach ($col in $table.Columns)
+    
+            sb.Append(delimiter);
+            {
+                Object obj = _${col.UncapitalisedJavaName};
+                if (obj != null && (obj.GetType().IsPrimitive || obj is DateTime)) {
+                    sb.Append("${col.Name}").Append(equal).Append(obj);
+                } else {
+                    sb.Append("${col.Name}").Append(equal).Append((obj != null ? obj.ToString() : ""));
+                }
+            }
+#end
+
+            sb.Remove(0, delimiter.Length).Insert(0, mapMarkAndStartBrace).Append(endBrace);
+            return sb.ToString();
+        }
+
+## TODO: Is it unnecessary???
+## #foreach ($foreignKeys in $table.ForeignKeys)
+##   #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
+## 
+##             sb.Append(delimiter);
+##             if (${foreignVariableName} != null) {
+##                 sb.Append("${foreignKeys.ForeignPropertyName}").Append(equal).Append(${foreignVariableName}.ExtractColumnValueMapString());
+##             } else {
+##                 sb.Append("${foreignKeys.ForeignPropertyName}").Append(equal).Append("null");
+##             }
+## #end
+## #foreach ($refferer in $table.Referrers)
+##   #set ($reffererTable = $refferer.Table)
+##   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
+##   #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+## 
+##             sb.Append(delimiter).Append("${refferer.ReffererPropertyName}").Append(equal);
+##             if (${reffererVariableName} != null) {
+##                 StringBuilder reffererTmpSb = new StringBuilder();
+##                 foreach (${reffererEntityClassName} refferer in ${reffererVariableName}) {
+##                     reffererTmpSb.Append(delimiter).Append(refferer.ExtractColumnValueMapString());
+##                 }
+##                 reffererTmpSb.Remove(0, delimiter.Length).Insert(0, listMarkAndStartBrace).Append(endBrace);
+##                 sb.Append(reffererTmpSb);
+##             } else {
+##                 sb.Append("null");
+##             }
+## #end
+
+#if (${table.hasAllCommonColumn()})
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <returns>Common-column-value map-string.</returns>
+        public String ExtractCommonColumnValueMapString() {
+            String startBrace = MAP_STRING_START_BRACE;
+            String endBrace = MAP_STRING_END_BRACE;
+            String delimiter = MAP_STRING_DELIMITER;
+            String equal = MAP_STRING_EQUAL;
+            String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
+            StringBuilder sb = new StringBuilder();
+
+  #foreach ($columnName in ${database.CommonColumnNameList})
+    #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+
+            sb.Append(delimiter);
+            {
+                Object obj = _${uncapitalisedJavaName};
+                if (obj != null && (obj.GetType().IsPrimitive || obj is DateTime)) {
+                    sb.Append("${columnName}").Append(equal).Append(obj);
+                } else {
+                    sb.Append("${columnName}").Append(equal).Append((obj != null ? obj.ToString() : ""));
+                }
+            }
+  #end
+
+            sb.Remove(0, delimiter.Length).Insert(0, mapMarkAndStartBrace).Append(endBrace);
+            return sb.ToString();
+        }
+#end
+
+        #endregion
+
+
+        // =====================================================================================
+        //                                                                         Determination
+        //                                                                         =============
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determination.
+         */
+        public bool HasPrimaryKeyValue {
+            get {
+  #foreach ($col in $table.PrimaryKey)
+
+                if (_${col.UncapitalisedJavaName} == null) {
+                    return false;
+                }
+  #end
+
+                return true;
+            }
+        }
+
+        // =====================================================================================
+        //                                                                 Basic-Override Method
+        //                                                                 =====================
+        #region Basic-Override Method
+
+#if ($table.hasPrimaryKey())
+    
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// If the primary-key of the other is same as this one, returns true.
+        /// </summary>
+        /// <param name="other">Other entity.</param>
+        /// <returns>Comparing result.</returns>
+        public override bool Equals(Object other) {
+            if (!(other is $myClassName)) {
+                return false;
+            }
+            if (other == null) {
+                return false;
+            }
+            String thisMap = ExtractPrimaryKeyMapString();
+            String otherMap = (($myClassName)other).ExtractPrimaryKeyMapString();
+
+            return thisMap.Equals(otherMap);
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// Calculates hash-code from primary-key.
+        /// </summary>
+        /// <returns>Hash-code from primary-keys.</returns>
+        public override int GetHashCode() {
+            int result = 0;
+  #foreach ($col in $table.PrimaryKey)
+    #if (!${col.isJavaNativeNumberObject()})
+
+            if (_${col.UncapitalisedJavaName} != null) {
+                result = result + _${col.UncapitalisedJavaName}.GetHashCode();
+            }
+    #else
+
+            result = result + _${col.UncapitalisedJavaName}.GetHashCode();
+    #end
+  #end
+
+            return result;
+        }
+#else
+    
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// If the all-column value of the other is same as this one, returns true.
+        /// </summary>
+        /// <param name="other">Other entity.</param>
+        /// <returns>Comparing result.</returns>
+        public override bool Equals(Object other) {
+            if (!(other is $myClassName)) {
+                return false;
+            }
+            if (other == null) {
+                return false;
+            }
+            String thisMap = ExtractColumnValueMapString();
+            String otherMap = (($myClassName)other).ExtractColumnValueMapString();
+
+            return thisMap.Equals(otherMap);
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// Calculates hash-code from all-columns.
+        /// </summary>
+        /// <returns>Hash-code from all-columns.</returns>
+        public override int GetHashCode() {
+            int result = 0;
+  #foreach ($col in $table.Columns)
+    #if (!${col.isJavaNativeNumberObject()})
+
+            if (_${col.UncapitalisedJavaName} != null) {
+                result = result + _${col.UncapitalisedJavaName}.GetHashCode();
+            }
+    #else
+
+            result = result + _${col.UncapitalisedJavaName}.GetHashCode();
+    #end
+  #end
+     
+            return result;
+        }
+#end
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary>
+        /// <returns>Column-map. (NotNull)</returns>
+        public override String ToString() {
+            return "[PK] " + ExtractPrimaryKeyMapString() + " [ALL] " + ExtractColumnValueMapString();
+        }
+
+        #endregion
+    }
+}

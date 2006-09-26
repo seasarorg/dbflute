@@ -1,0 +1,59 @@
+package ${glPackageBaseCommon};
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+
+/**
+ * The interface of dao-writable.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glDaoWritableInterfaceName} extends ${glDaoReadableInterfaceName} {
+
+    /**
+     * Insert one entity that the type is entity-interface.
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Inserted count.
+     */
+    public int create(${glEntityInterfaceName} entity);
+
+    /**
+     * Update one entity that the type is entity-interface.
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Updated count.
+     */
+    public int modify(${glEntityInterfaceName} entity);
+
+    /**
+     * Delete one entity that the type is entity-interface.
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Deleted count.
+     */
+    public int remove(${glEntityInterfaceName} entity);
+
+    /**
+     * Insert several entities that the type is entity-interface.
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Inserted count.
+     */
+    public int createList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Update several entities that the type is entity-interface.
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Updated count.
+     */
+    public int modifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Delete several entities that the type is entity-interface.
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Deleted count.
+     */
+    public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+}

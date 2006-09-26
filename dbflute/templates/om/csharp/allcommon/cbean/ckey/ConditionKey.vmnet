@@ -1,0 +1,226 @@
+#set ($myClassName = "${glConditionKeyName}")
+
+using System;
+using System.Collections;
+using ${glPackageBaseCommonCValue};
+
+namespace ${glPackageBaseCommonCKey} {
+
+    /// <summary>
+    /// The abstract class of condition-key.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public abstract class ${myClassName} {
+
+        /** Mark of replaced value. */
+        public static readonly String MARK_OF_REPLACED_VALUE = "ReplacedValue";
+
+        /** The condition key of equal. */
+        public static readonly ${myClassName} CK_EQUAL = new ${myClassName}Equal();
+
+        /** The condition key of notEqual. */
+        public static readonly ${myClassName} CK_NOT_EQUAL = new ${myClassName}NotEqual();
+
+        /** The condition key of greaterThan. */
+        public static readonly ${myClassName} CK_GREATER_THAN = new ${myClassName}GreaterThan();
+
+        /** The condition key of lessrThan. */
+        public static readonly ${myClassName} CK_LESS_THAN = new ${myClassName}LessThan();
+
+        /** The condition key of greaterEqual. */
+        public static readonly ${myClassName} CK_GREATER_EQUAL = new ${myClassName}GreaterEqual();
+
+        /** The condition key of lessEqual. */
+        public static readonly ${myClassName} CK_LESS_EQUAL = new ${myClassName}LessEqual();
+
+        /** The condition key of prefixSearch. */
+        public static readonly ${myClassName} CK_PREFIX_SEARCH = new ${myClassName}PrefixSearch();
+
+        /** The condition key of inScope. */
+        public static readonly ${myClassName} CK_IN_SCOPE = new ${myClassName}InScope();
+
+        /** The condition key of notInScope. */
+        public static readonly ${myClassName} CK_NOT_IN_SCOPE = new ${myClassName}NotInScope();
+
+        /** The condition key of isNull. */
+        public static readonly ${myClassName} CK_IS_NULL = new ${myClassName}IsNull();
+
+        /** The condition key of isNotNull. */
+        public static readonly ${myClassName} CK_IS_NOT_NULL = new ${myClassName}IsNotNull();
+
+        /** Dummy-object for IsNull and IsNotNull and so on... */
+        protected static readonly Object DUMMY_OBJECT = new Object();
+
+        /** Condition-key. */
+        protected String _conditionKey;
+
+        /** Operand. */
+        protected String _operand;
+
+        /**
+         * Get condition-key.
+         * 
+         * @return Condition-key.
+         */
+        public String GetConditionKey() {
+            // Because initial charactor of property name is capital in dotNet world.
+            return (_conditionKey != null ? _conditionKey.Substring(0, 1).ToUpper() + _conditionKey.Substring(1) : null);
+        }
+
+        /**
+         * Get operand.
+         * 
+         * @return Operand.
+         */
+        public String GetOperand() {
+            return _operand;
+        }
+
+        /**
+         * Is valid registration?
+         * 
+         * @param conditionValue Condition value. (NotNull)
+         * @param value Value. (NotNull)
+         * @return Determination.
+         */
+        abstract public bool IsValidRegistration(${glConditionValueName} conditionValue, Object value);
+
+        /**
+         * Add where clause.
+         * 
+         * @param conditionList Condition list. (NotNull)
+         * @param columnName Column name. (NotNull)
+         * @param value Condition value. (NotNull)
+         * @return this.
+         */
+        public ${myClassName} AddWhereClause(System.Collections.IList conditionList, String columnName, ${glConditionValueName} value) {
+            if (value == null) {
+                String msg = "Argument[value] must not be null:";
+                throw new ArgumentNullException(msg + " value=" + value + " this.ToString()=" + ToString());
+            }
+            DoAddWhereClause(conditionList, columnName, value);
+            return this;
+        }
+
+        /**
+         * Do add where clause.
+         * 
+         * @param conditionList Condition list. (NotNull)
+         * @param columnName Column name. (NotNull)
+         * @param value Condition value. (NotNull)
+         */
+        abstract protected void DoAddWhereClause(System.Collections.IList conditionList, String columnName, ${glConditionValueName} value);
+
+        /**
+         * Setup condition value.
+         * 
+         * @param conditionValue Condition value. (NotNull)
+         * @param value Value. (Nullable)
+         * @param location Location. (Nullable)
+         * @return Condition value. (The same as argument[conditionValue]) (NotNull)
+         */
+        public ${glConditionValueName} SetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+            if (conditionValue == null) {
+                String msg = "Argument[conditionValue] must not be null:";
+                throw new ArgumentNullException(msg + " value=" + value + " this.ToString()=" + ToString());
+            }
+            DoSetupConditionValue(conditionValue, value, location);
+            return conditionValue;
+        }
+
+        /**
+         * Do setup condition value.
+         * 
+         * @param conditionValue Condition value. (NotNull)
+         * @param value Value. (NotNull)
+         * @param location Location. (NotNull)
+         */
+        abstract protected void DoSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location);
+
+        /**
+         * Build bind clause. (for s2dao)
+         * 
+         * @param columnName Column name. (NotNull)
+         * @param location Location. (NotNull)
+         * @return Bind clause. (NotNull)
+         */
+        protected String BuildBindClause(String columnName, String location) {
+            return columnName + " " + GetOperand() + " " + "/*dto." + location + "*/null";
+        }
+
+        /**
+         * Build bind clause. (for s2dao)
+         * 
+         * @param columnName Column name. (NotNull)
+         * @param location Location. (NotNull)
+         * @param dummyValue Dummy value. (NotNull)
+         * @return Bind clause. (NotNull)
+         */
+        protected String BuildBindClause(String columnName, String location, String dummyValue) {
+            return columnName + " " + GetOperand() + " " + "/*dto." + location + "*/" + dummyValue;
+        }
+
+        /**
+         * Build clause without value.
+         * 
+         * @param columnName Column name. (NotNull)
+         * @return Clause without value. (NotNull)
+         */
+        protected String BuildClauseWithoutValue(String columnName) {
+            return columnName + " " + GetOperand();
+        }
+
+        /**
+         * Get wild-card.
+         * 
+         * @return Wild-card.
+         */
+        protected String GetWildCard() {
+            return "${database.WildCard}";
+        }
+
+        protected bool isNullableTypeNull(Object obj) {
+            if (obj != null && obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+
+        /**
+         * ${database.OverrideComment}
+         * Returns hash-code of this condition-key string.
+         * 
+         * @return HashCode.
+         */
+        public override int GetHashCode() {
+            return GetConditionKey().GetHashCode();
+        }
+
+        /**
+         * ${database.OverrideComment}
+         * If the condition-key of the other is same as this one, returns true.
+         * 
+         * @param other Other entity. (Nullable)
+         * @return Comparing result. If other is null, returns false.
+         */
+        public override bool Equals(Object other) {
+            if (other is ${myClassName}) {
+                if (this.GetConditionKey().Equals(((${myClassName})other).GetConditionKey())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * ${database.OverrideComment}
+         * 
+         * @return View-string of condition key information.
+         */
+        public override String ToString() {
+            return "${myClassName}: " + GetConditionKey() + " " + GetOperand() + " wild-card=[" + GetWildCard() + "]";
+        }
+    }
+}

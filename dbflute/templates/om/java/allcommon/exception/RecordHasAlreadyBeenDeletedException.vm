@@ -1,0 +1,21 @@
+package ${glPackageBaseCommonException};
+
+/**
+ * The exception when the record has already been deleted (by other thread).
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glRecordHasAlreadyBeenDeletedException} extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     */
+    public ${glRecordHasAlreadyBeenDeletedException}(String msg) {
+        super(msg);
+    }
+}

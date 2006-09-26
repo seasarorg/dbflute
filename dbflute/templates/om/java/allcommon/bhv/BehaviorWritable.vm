@@ -1,0 +1,131 @@
+package ${glPackageBaseCommonBhv};
+
+import ${glPackageBaseCommon}.${glDaoWritableInterfaceName};
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+
+/**
+ * The interface of behavior-writable.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadableInterfaceName} {
+
+    /**
+     * Get dao-writable.
+     * 
+     * @return Dao-writable. (NotNull)
+     */
+    public ${glDaoWritableInterfaceName} getDaoWritable();
+
+    /**
+     * Create entity. (Delegate-Method)
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Inserted count.
+     */
+    public int delegateCreateTx(${glEntityInterfaceName} entity);
+
+    /**
+     * Modify entity. (Delegate-Method)
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Updated count.
+     */
+    public int delegateModifyTx(${glEntityInterfaceName} entity);
+
+    /**
+     * Remove entity. (Delegate-Method)
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Deleted count.
+     */
+    public int delegateRemoveTx(${glEntityInterfaceName} entity);
+
+    /**
+     * Create several entity-list. (Delegate-Method)
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Inserted count.
+     */
+    public int delegateCreateListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Modify several entity-list. (Delegate-Method)
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Updated count.
+     */
+    public int delegateModifyListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Remove several entity-list. (Delegate-Method)
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Deleted count.
+     */
+    public int delegateRemoveListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Create or modify after select-for-update.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @return Updated count.
+     */
+    public int createOrModifyAfterSelectForUpdateTx(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Modify after select-for-update.
+     * 
+     * @param entity Entity.
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int modifyAfterSelectForUpdateTx(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Reflect(insert or update) from separated-file.
+     * 
+     * If transaction already started, The argument 'batchCount' is invalid. (Inherit the transaction)
+     * 
+     * @param filename Name of the file. (NotNull and NotEmpty)
+     * @param encoding Encoding of the file. (NotNull and NotEmpty)
+     * @param delimiter Delimiter of the file. (NotNull and NotEmpty)
+     * @param batchCount Batch-count for transaction.
+     * @param isErrorContinue If true, this method continue in spite of throwing the exception.   
+     * @return The list of InsertOrUpdateExceptionResult. (NotNull)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public java.util.List${database.filterGenericsString('OneEntityExceptionResult')} reflectFromSeparatedFile(
+            String filename, String encoding,
+            String delimiter, int batchCount, boolean isErrorContinue
+            ) throws java.io.FileNotFoundException, java.io.IOException;
+
+    /**
+     * Exception result for one entity. 
+     */
+    public static class OneEntityExceptionResult {
+        protected String _primaryKeyMapString;
+        protected ${glEntityInterfaceName} _entity;
+        protected Exception _exception;
+        
+        public String getPrimaryKeyMapString() {
+            return _primaryKeyMapString;
+        }
+        public void setPrimaryKeyMapString(String value) {
+            _primaryKeyMapString = value;
+        }
+        public ${glEntityInterfaceName} getEntity() {
+            return _entity;
+        }
+        public void setEntity(${glEntityInterfaceName} value) {
+            _entity = value;
+        }
+        public Exception getException() {
+            return _exception;
+        }
+        public void setException(Exception value) {
+            _exception = value;
+        }
+    }
+}

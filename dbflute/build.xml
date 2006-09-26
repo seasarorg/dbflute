@@ -1,0 +1,64 @@
+<project name="S2DBFlute" default="main" basedir=".">
+
+  <!-- ================================================================ -->
+  <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
+  <!-- ================================================================ -->
+  <property name="version" value="0.1"/>
+  <property name="dbflute.jar.file" value="dbflute-${version}.jar"/>
+  <property name="dbflute.jar.dirfile" value="dist/${dbflute.jar.file}"/>
+  <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
+  <property name="dbflute.zip.dirfile" value="dist/${dbflute.zip.file}"/>
+  <property name="dbflute.deploy.dir" value="/java/dbflute-${version}"/>
+
+  <target name="dist" description="==> generates distribution">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Generating dist for YOUR datamodel!      |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+    <mkdir dir="dist"/>
+    <delete file="${dbflute.jar.dirfile}"/>
+    <jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
+    <delete file="${dbflute.zip.dirfile}"/>
+	<zip zipfile="${dbflute.zip.dirfile}">
+		<zipfileset prefix="etc/cmd" dir="etc/cmd">
+			<include name="*.cmd"/>
+		</zipfileset>
+		<zipfileset prefix="etc/sample4use" dir="etc/sample4use"/>
+		<zipfileset prefix="lib/forExecute" dir="dist">
+			<include name="${dbflute.jar.file}"/>
+		</zipfileset>
+		<zipfileset prefix="lib/forExecute" dir="lib/forExecute">
+			<include name="*.jar"/>
+			<include name="*.zip"/>
+		</zipfileset>
+		<zipfileset prefix="log" dir="log">
+			<include name="readme.txt"/>
+		</zipfileset>
+		<zipfileset prefix="log" dir="log">
+			<include name="readme.txt"/>
+		</zipfileset>
+		<zipfileset prefix="output/doc" dir="output/doc">
+			<include name="readme.txt"/>
+		</zipfileset>
+		<zipfileset prefix="schema" dir="schema">
+			<include name="readme.txt"/>
+		</zipfileset>
+		<zipfileset prefix="templates" dir="templates">
+			<include name="readme.txt"/>
+		</zipfileset>
+		<zipfileset prefix="templates" dir="templates">
+		</zipfileset>
+		<zipfileset prefix="" dir="">
+			<include name="readme.txt"/>
+			<include name="build-torque.xml"/>
+			<include name="introduction.txt"/>
+		</zipfileset>
+	</zip>
+    <delete dir="${dbflute.deploy.dir}"/>
+	<unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+  </target>
+
+</project>

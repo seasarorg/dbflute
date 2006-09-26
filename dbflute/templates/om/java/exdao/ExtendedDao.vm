@@ -1,0 +1,11 @@
+package ${myExtendedDaoPackageName};
+
+#set ($myClassName = "${myExtendedDaoClassName}")
+
+/**
+ * The dao interface of ${table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${myClassName} extends ${myBaseDaoPackageName}.${myBaseDaoClassName} {
+}

@@ -1,0 +1,105 @@
+
+using System;
+using System.Reflection;
+using System.Collections;
+using System.Text;
+
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
+using Seasar.Dao;
+
+namespace ${glPackageBaseCommonS2Dao} {
+
+    /**
+     * My-SelectDynamicCommand.
+     * Overrides original class 'SelectDynamicCommand'.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public class ${glSelectDynamicCommand} : Seasar.Dao.Impl.SelectDynamicCommand {
+
+        /** Log-instance. */
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        /** Select clause. */
+        private String _selectClause;
+
+        /** Select clause PK only. */
+        private String _selectClausePKOnly;
+
+        private IDataReaderHandler dataReaderHandler;
+        private IDataReaderFactory dataReaderFactory;
+
+        /**
+         * Constructor.
+         * 
+         * @param dataSource Data source.
+         * @param statementFactory Statement factory.
+         * @param resultSetHandler Result set handler.
+         * @param resultSetFactory Result set factory.
+         */
+        public ${glSelectDynamicCommand}(IDataSource dataSource, ICommandFactory commandFactory
+                , IDataReaderHandler dataReaderHandler, IDataReaderFactory dataReaderFactory)
+            : base(dataSource, commandFactory, dataReaderHandler, dataReaderFactory) {
+                this.dataReaderHandler = dataReaderHandler;
+                this.dataReaderFactory = dataReaderFactory;
+        }
+
+        public override object Execute(object[] args) {
+            ICommandContext ctx = Apply(args);
+            BasicSelectHandler selectHandler = new BasicSelectHandler(DataSource,
+                ctx.Sql, dataReaderHandler, CommandFactory,
+                dataReaderFactory);
+#if ($database.isSelectQueryTimeoutValid())
+
+            int timeout = ${database.SelectQueryTimeout};
+            if (_log.IsDebugEnabled) {
+                _log.Debug("@SelectDynamicCommand: selectHandler.CommandTimeout = " + timeout + ";// from ${database.SelectQueryTimeout}");
+            }
+            selectHandler.CommandTimeout = timeout;
+#end
+
+            return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes, ctx.BindVariableNames);
+        }
+
+        /**
+         * Get select clause.
+         * 
+         * @return Select clause.
+         */
+        public String GetSelectClause() {
+            return _selectClause;
+        }
+
+        /**
+         * Set select clause.
+         * 
+         * @param value Select clause.
+         * @return this. (NotNull)
+         */
+        public ${glSelectDynamicCommand} SetSelectClause(String value) {
+            _selectClause = value;
+            return this;
+        }
+
+        /**
+         * Get select clause PK only.
+         * 
+         * @return Select clause PK only.
+         */
+        public String GetSelectClausePKOnly() {
+            return _selectClausePKOnly;
+        }
+
+        /**
+         * Set select clause PK only.
+         * 
+         * @param value Select clause PK only.
+         * @return this. (NotNull)
+         */
+        public ${glSelectDynamicCommand} SetSelectClausePKOnly(String value) {
+            _selectClausePKOnly = value;
+            return this;
+        }
+    }
+}

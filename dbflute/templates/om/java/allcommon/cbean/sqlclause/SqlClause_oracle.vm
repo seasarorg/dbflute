@@ -1,0 +1,114 @@
+package ${glPackageBaseCommonSqlClause};
+
+#set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
+
+/**
+ * SqlClause for Oracle.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glSqlClauseAbstractName} {
+
+    /** String of fetch-scope as select-hint. */
+    protected String _fetchScopeSelectHint = "";
+
+    /** String of fetch-scope as sql-suffix. */
+    protected String _fetchScopeSqlSuffix = "";
+
+    /** String of lock as sql-suffix. */
+    protected String _lockSqlSuffix = "";
+
+    /**
+     * Constructor.
+     * 
+     * @param tableName Table name. (NotNull)
+     **/
+    public ${myClassName}(String tableName) {
+        super(tableName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchFirst() {
+        if (isFetchSizeSupported()) {
+            _fetchScopeSelectHint = " * from (select";
+            _fetchScopeSqlSuffix = ") where rownum <= " + getFetchSize();
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchPage() {
+        if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
+            return;
+        }
+        _fetchScopeSelectHint = " * from (select";
+        _fetchScopeSqlSuffix = "";
+        if (isFetchStartIndexSupported()) {
+            _fetchScopeSqlSuffix = ") where rownum > " + getPageStartIndex();
+        }
+        if (isFetchSizeSupported()) {
+            if (isFetchStartIndexSupported()) {
+                _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rownum <= " + getPageEndIndex();
+            } else {
+                _fetchScopeSqlSuffix = ") where rownum <= " + getFetchSize();
+            }
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doClearFetchPageClause() {
+        _fetchScopeSelectHint = "";
+        _fetchScopeSqlSuffix = "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glSqlClauseInterfaceName} lockForUpdate() {
+        _lockSqlSuffix = " for update";
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Select-hint. (NotNull)
+     */
+    protected String createSelectHint() {
+        return _fetchScopeSelectHint;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+     */
+    protected String createFromBaseTableHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return From-hint. (NotNull)
+     */
+    protected String createFromHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql-suffix. (NotNull)
+     */
+    protected String createSqlSuffix() {
+        return _fetchScopeSqlSuffix + _lockSqlSuffix;
+    }
+}

@@ -1,0 +1,549 @@
+package ${myDBMetaPackageName};
+
+#set ($myClassName = "${myDBMetaClassName}")
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
+import ${myExtendedDaoPackageName}.*;
+import ${myExtendedEntityPackageName}.*;
+#if (${isExistConditionBean})
+
+import ${glPackageCB}.*;
+#end
+
+/**
+ * The dbmeta of ${table.Name}. (Singleton)
+ * 
+ * <pre>
+ * [primary-key]
+ *     ${table.PrimaryKeyNameCommaString}
+ * 
+ * [column-property]
+ *     ${table.ColumnNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.ForeignPropertyNameCommaString}
+ * 
+ * [refferer-property]
+ *     ${table.ReferrerPropertyNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.DefinedSequenceName}
+ * 
+ * [identity]
+ *     ${table.IdentityPropertyName}
+ * 
+ * [update-date]
+ *     ${table.UpdateDateJavaName}
+ * 
+ * [version-no]
+ *     ${table.VersionNoJavaName}
+ * 
+ * </pre>
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glDBMetaAbstractName} {
+
+    /** The type of entity. */
+    public static final Class DAO_TYPE = ${myExtendedDaoClassName}.class;
+
+    /** The type of entity. */
+    public static final Class ENTITY_TYPE = ${myExtendedObjectClassName}.class;
+#if (${isExistConditionBean})
+
+    /** The type of condition-bean. */
+    public static final Class CONDITION_BEAN_TYPE = ${myConditionBeanClassName}.class;
+#end
+
+    /** Singleton instance. */
+    private static final ${myClassName} _instance = new ${myClassName}();
+
+    /**
+     * Constructor
+     */
+    private ${myClassName}() {
+    }
+
+    /**
+     * Get instance.
+     * 
+     * @return Singleton instance. (NotNull)
+     */
+    public static ${myClassName} getInstance() {
+        return _instance;
+    }
+
+    // =====================================================================================
+    //                                                                       Name Definition
+    //                                                                       ===============
+    /** Table db name. */
+    public static final String TABLE_DB_NAME = "$table.Name";
+
+    /** Table cap-prop name. */
+    public static final String TABLE_CAP_PROP_NAME = "$table.JavaName";
+
+    /** Table uncap-prop name. */
+    public static final String TABLE_UNCAP_PROP_NAME = "$table.UncapitalisedJavaName";
+
+#foreach ($col in $table.Columns)
+
+    /** Db-name of ${col.JavaName}. */
+    public static final String COLUMN_DB_NAME_OF_${col.JavaName} = "$col.Name";
+#end
+
+#foreach ($col in $table.Columns)
+
+    /** Cap-prop-name of ${col.JavaName}. */
+    public static final String COLUMN_CAP_PROP_NAME_OF_${col.JavaName} = "$col.JavaName";
+#end
+#foreach ($foreignKeys in $table.ForeignKeys)
+
+    /** Cap-prop-name of ${foreignKeys.ForeignPropertyName}. */
+    public static final String COLUMN_CAP_PROP_NAME_OF_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.ForeignPropertyNameInitCap";
+#end
+#foreach ($children in $table.Referrers)
+
+    /** Cap-prop-name of ${children.ReffererPropertyNameInitCap}. */
+    public static final String COLUMN_CAP_PROP_NAME_OF_${children.ReffererPropertyNameInitCap} = "$children.ReffererPropertyNameInitCap";
+#end
+
+#foreach ($col in $table.Columns)
+
+    /** Uncap-prop-name of ${col.JavaName}. */
+    public static final String COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName} = "$col.UncapitalisedJavaName";
+#end
+#foreach ($foreignKeys in $table.ForeignKeys)
+
+    /** Uncap-prop-name of ${foreignKeys.ForeignPropertyName}. */
+    public static final String COLUMN_UNCAP_PROP_NAME_OF_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.ForeignPropertyName";
+#end
+#foreach ($children in $table.Referrers)
+
+    /** Uncap-prop-name of ${children.ReffererPropertyName}. */
+    public static final String COLUMN_UNCAP_PROP_NAME_OF_${children.ReffererPropertyNameInitCap} = "$children.ReffererPropertyName";
+#end
+
+    /** {db-name : cap-prop-name} map. */
+    protected static final java.util.Map${database.filterGenericsString('String, String')} _dbNameCapPropNameMap;
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        map.put(TABLE_DB_NAME, TABLE_CAP_PROP_NAME);
+#foreach ($col in $table.Columns)
+
+        map.put(COLUMN_DB_NAME_OF_${col.JavaName}, COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
+#end
+
+        _dbNameCapPropNameMap = java.util.Collections.unmodifiableMap(map);
+    }
+
+    /** {db-name : uncap-prop-name} map. */
+    protected static final java.util.Map${database.filterGenericsString('String, String')} _dbNameUncapPropNameMap;
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        map.put(TABLE_DB_NAME, TABLE_UNCAP_PROP_NAME);
+#foreach ($col in $table.Columns)
+
+        map.put(COLUMN_DB_NAME_OF_${col.JavaName}, COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName});
+#end
+
+        _dbNameUncapPropNameMap = java.util.Collections.unmodifiableMap(map);
+    }
+
+    /** {cap-prop-name : db-name} map. */
+    protected static final java.util.Map${database.filterGenericsString('String, String')} _capPropNameDbNameMap;
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        map.put(TABLE_CAP_PROP_NAME, TABLE_DB_NAME);
+#foreach ($col in $table.Columns)
+
+        map.put(COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, COLUMN_DB_NAME_OF_${col.JavaName});
+#end
+
+        _capPropNameDbNameMap = java.util.Collections.unmodifiableMap(map);
+    }
+
+    /** {cap-prop-name : uncap-prop-name} map. */
+    protected static final java.util.Map${database.filterGenericsString('String, String')} _capPropNameUncapPropNameMap;
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        map.put(TABLE_CAP_PROP_NAME, TABLE_UNCAP_PROP_NAME);
+#foreach ($col in $table.Columns)
+
+        map.put(COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName});
+#end
+
+        _capPropNameUncapPropNameMap = java.util.Collections.unmodifiableMap(map);
+    }
+
+    /** {uncap-prop-name : db-name} map. */
+    protected static final java.util.Map${database.filterGenericsString('String, String')} _uncapPropNameDbNameMap;
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        map.put(TABLE_UNCAP_PROP_NAME, TABLE_DB_NAME);
+#foreach ($col in $table.Columns)
+
+        map.put(COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName}, COLUMN_DB_NAME_OF_${col.JavaName});
+#end
+
+        _uncapPropNameDbNameMap = java.util.Collections.unmodifiableMap(map);
+    }
+
+    /** {uncap-prop-name : cap-prop-name} map. */
+    protected static final java.util.Map${database.filterGenericsString('String, String')} _uncapPropNameCapPropNameMap;
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        map.put(TABLE_UNCAP_PROP_NAME, TABLE_CAP_PROP_NAME);
+#foreach ($col in $table.Columns)
+
+        map.put(COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName}, COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
+#end
+
+        _uncapPropNameCapPropNameMap = java.util.Collections.unmodifiableMap(map);
+    }
+
+    // =====================================================================================
+    //                                                                            Table Name
+    //                                                                            ==========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    public String getTableDbName() {
+        return TABLE_DB_NAME;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table cap-prop-name. (NotNull)
+     */
+    public String getTableCapPropName() {
+        return TABLE_CAP_PROP_NAME;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table property-name. (NotNull)
+     */
+    public String getTableUncapPropName() {
+        return TABLE_UNCAP_PROP_NAME;
+    }
+
+    // =====================================================================================
+    //                                                                    DB-Name-Map Getter
+    //                                                                    ==================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {db-name : cap-prop-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getDbNameCapPropNameMap() {
+        return _dbNameCapPropNameMap;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {db-name : uncap-prop-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getDbNameUncapPropNameMap() {
+        return _dbNameUncapPropNameMap;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {cap-prop-name : db-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getCapPropNameDbNameMap() {
+        return _capPropNameDbNameMap;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {cap-prop-name : uncap-prop-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getCapPropNameUncapPropNameMap() {
+        return _capPropNameUncapPropNameMap;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {uncap-prop-name : db-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameDbNameMap() {
+        return _uncapPropNameDbNameMap;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {uncap-prop-name : cap-prop-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameCapPropNameMap() {
+        return _uncapPropNameCapPropNameMap;
+    }
+
+
+    // =====================================================================================
+    //                                                                          Class Getter
+    //                                                                          ============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type of dao. (NotNull)
+     */ 
+    public Class getDaoType() {
+        return DAO_TYPE;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type of entity. (NotNull)
+     */ 
+    public Class getEntityType() {
+        return ENTITY_TYPE;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type of condition-bean. (NotNull)
+     */ 
+    public Class getConditionBeanType() {
+#if (${isExistConditionBean})
+
+        return CONDITION_BEAN_TYPE;
+#else
+
+        String msg = "The entity does not have condition-bean. So this method is invalid.";
+        throw new IllegalStateException(msg + " dbmeta=" + toString());
+#end
+    }
+
+    // =====================================================================================
+    //                                                                       Instance Getter
+    //                                                                       ===============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type of entity. (NotNull)
+     */ 
+    public ${glEntityInterfaceName} newEntity() {
+        return newMyEntity();
+    }
+
+    /**
+     * New the instance of my entity.
+     * 
+     * @return The instance of my entity. (NotNull)
+     */ 
+    public ${myExtendedObjectClassName} newMyEntity() {
+        return new ${myExtendedObjectClassName}();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type of condition-bean. (NotNull)
+     */ 
+    public ${glConditionBeanInterfaceName} newConditionBean() {
+#if (${isExistConditionBean})
+
+        return newMyConditionBean();
+#else
+
+        String msg = "The entity does not have condition-bean. So this method is invalid.";
+        throw new IllegalStateException(msg + " dbmeta=" + toString());
+#end
+    }
+#if (${isExistConditionBean})
+
+    /**
+     * New the instance of my condition-bean.
+     * 
+     * @return The instance of condition-bean. (NotNull)
+     */ 
+    public ${myConditionBeanClassName} newMyConditionBean() {
+        return new ${myConditionBeanClassName}();
+    }
+#end
+
+    // =====================================================================================
+    //                                                                         Entity Method
+    //                                                                         =============
+#foreach ($col in $table.Columns)
+
+    /** The getter method of ${col.UncapitalisedJavaName}. */
+    public static final java.lang.reflect.Method ENTITY_GETTER_METHOD_${col.JavaName};
+    static {
+        try {
+            ENTITY_GETTER_METHOD_${col.JavaName} = ENTITY_TYPE.getMethod("get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, new Class[] {});
+        } catch (NoSuchMethodException e) {
+            String msg = "The method doen not exist: methodName=" + "get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName} + " argsType=${col.JavaNative}";
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    /** <summary>The setter method of ${col.UncapitalisedJavaName}. */
+    public static final java.lang.reflect.Method ENTITY_SETTER_METHOD_${col.JavaName};
+    static {
+        try {
+            ENTITY_SETTER_METHOD_${col.JavaName} = ENTITY_TYPE.getMethod("set" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, new Class[] {${col.JavaNative}.class});
+        } catch (NoSuchMethodException e) {
+            String msg = "The method doen not exist: methodName=" + "get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName} + " argsType=${col.JavaNative}";
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+#end
+
+#foreach ($col in $table.Columns)
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The getter method of ${col.UncapitalisedJavaName}. (NotNull)
+     */
+    public java.lang.reflect.Method getEntityGetterMethod_${col.JavaName}() {
+        return ENTITY_GETTER_METHOD_${col.JavaName};
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The setter method of ${col.UncapitalisedJavaName}. (NotNull)
+     */
+    public java.lang.reflect.Method getEntitySetterMethod_${col.JavaName}() {
+        return ENTITY_SETTER_METHOD_${col.JavaName};
+    }
+#end
+
+    /**
+     * Get entity getter method by multi-name.
+     * 
+     * @param multiName Multi-name. (NotNull)
+     * @return Entity getter method of entity. (NotNull)
+     */ 
+    public java.lang.reflect.Method getEntityGetterMethodByMultiName(String multiName) {
+        assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
+        final String capPropName = getCapPropNameByMultiName(multiName);
+        final String methodName = "getEntityGetterMethod_" + capPropName;
+
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName);
+        } catch (NoSuchMethodException e) {
+            String msg = "The multiName is not found: multiName=" + multiName;
+            msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (java.lang.reflect.Method)method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    /**
+     * Get entity setter method by multi-name.
+     * 
+     * @param multiName Multi-name. (NotNull)
+     * @return Entity setter method of entity. (NotNull)
+     */ 
+    public java.lang.reflect.Method getEntitySetterMethodByMultiName(String multiName) {
+        assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
+        final String capPropName = getCapPropNameByMultiName(multiName);
+        final String methodName = "getEntitySetterMethod_" + capPropName;
+
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName);
+        } catch (NoSuchMethodException e) {
+            String msg = "The multiName is not found: multiName=" + multiName;
+            msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (java.lang.reflect.Method)method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    // =====================================================================================
+    //                                                                        Foreign DBMeta
+    //                                                                        ==============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param foreignPropertyName Foreign-property-name(Both OK - InitCap or not). (NotNull)
+     * @return Foreign DBMeta. (NotNull)
+     */ 
+    public ${glDBMetaInterfaceName} getForeignDBMeta(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        final String methodName = "getForeignDBMeta_" + foreignPropertyName.substring(0, 1) + foreignPropertyName.substring(1);
+
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName);
+        } catch (NoSuchMethodException e) {
+            String msg = "The foreignPropertyName is not found: foreignPropertyName=" + foreignPropertyName;
+            msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+#foreach ($foreignKeys in $table.ForeignKeys)
+
+    /**
+     * Get foreign dbmeta of ${foreignKeys.foreignPropertyNameInitCap}.
+     * 
+     * @return Foreign DBMeta. (NotNull)
+     */
+    public ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm getForeignDBMeta_${foreignKeys.foreignPropertyNameInitCap}() {
+        return ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm.getInstance();
+    }
+#end
+
+
+    // =====================================================================================
+    //                                                                         Determination
+    //                                                                         =============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean hasTwoOrMorePrimaryKeys() {
+        return ${table.hasTwoOrMorePrimaryKeys()};
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean hasCommonColumn() {
+        return ${table.hasAllCommonColumn()};
+    }
+}

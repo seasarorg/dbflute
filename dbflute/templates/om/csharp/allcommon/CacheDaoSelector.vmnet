@@ -1,0 +1,304 @@
+
+using System;
+using System.Collections;
+
+#if ($database.isAvailableBehaviorGeneration())
+
+using ${glPackageBaseCommonBhv};
+#end
+
+using ${glPackageBaseCommonDBMeta};
+
+namespace ${glPackageBaseCommon} {
+
+    /**
+     * The implementation of dao-selector.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public class ${glCacheDaoSelectorName} : ${glDaoSelectorInterfaceName} {
+
+        /**
+         * Get dao-readable by dao type.
+         * 
+         * @param daoType Dao type. (NotNull)
+         * @return Dao-readable. (NotNull)
+         */
+        public ${glDaoReadableInterfaceName} GetRDao(Type daoType) {
+            AssertObjectNotNull("daoType", daoType);
+            SetupDaoCacheMap();
+            ${glDaoReadableInterfaceName} dao = (${glDaoReadableInterfaceName})_daoCacheMap[daoType];
+            if (dao == null) {
+                String msg = "The daoCacheMap does not have the dao-type: daoType=" + daoType + " daoCacheMap=" + _daoCacheMap;
+                throw new SystemException(msg);
+            }
+            return dao;
+        }
+
+        /**
+         * Get dao-readable by entity.
+         * 
+         * @param entity Entity. (NotNull)
+         * @return Dao-readable. (NotNull)
+         */
+        public ${glDaoReadableInterfaceName} GetRDao(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+            return GetRDao(entity.DBMeta.GetDaoType());
+        }
+
+        /**
+         * Get dao-readable by table multi-name.
+         * 
+         * @param tableMultiName Table multi-name. (NotNull)
+         * @return Dao-readable. (NotNull)
+         */
+        public ${glDaoReadableInterfaceName} GetRDao(String tableMultiName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableMultiName(tableMultiName);
+            return GetRDao(dbmeta.GetDaoType());
+        }
+
+        /**
+         * Get dao-writable by dao type.
+         * 
+         * @param daoType Dao type. (NotNull)
+         * @return Dao-writable. (NotNull)
+         */
+        public ${glDaoWritableInterfaceName} GetWDao(Type daoType) {
+            AssertObjectNotNull("daoType", daoType);
+            return (${glDaoWritableInterfaceName})GetRDao(daoType);
+        }
+
+        /**
+         * Get dao-writable by entity.
+         * 
+         * @param entity Entity. (NotNull)
+         * @return Dao-writable. (NotNull)
+         */
+        public ${glDaoWritableInterfaceName} GetWDao(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+            return (${glDaoWritableInterfaceName})GetRDao(entity);
+        }
+
+        /**
+         * Get dao-writable by table multi-name.
+         * 
+         * @param tableMultiName Table multi-name. (NotNull)
+         * @return Dao-writable. (NotNull)
+         */
+        public ${glDaoWritableInterfaceName} GetWDao(String tableMultiName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+            return (${glDaoWritableInterfaceName})GetRDao(tableMultiName);
+        }
+    #if ($database.isAvailableBehaviorGeneration())
+
+        /**
+         * Get bhv-readable by bhv type.
+         * 
+         * @param bhvType Bhv type. (NotNull)
+         * @return Bhv-readable. (NotNull)
+         */
+        public ${glBehaviorReadableInterfaceName} GetRBhv(Type bhvType) {
+            AssertObjectNotNull("bhvType", bhvType);
+            SetupBhvCacheMap();
+            ${glBehaviorReadableInterfaceName} bhv = (${glBehaviorReadableInterfaceName})_bhvCacheMap[bhvType];
+            if (bhv == null) {
+                String msg = "The bhvCacheMap does not have the bhv-type: bhvType=" + bhvType + " bhvCacheMap=" + _bhvCacheMap;
+                throw new SystemException(msg);
+            }
+            return bhv;
+        }
+
+        /**
+         * Get bhv-readable by entity.
+         * 
+         * @param entity Entity. (NotNull)
+         * @return Bhv-readable. (NotNull)
+         */
+        public ${glBehaviorReadableInterfaceName} GetRBhv(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+            return GetRBhv(GetBhvType(entity.DBMeta));
+        }
+
+        /**
+         * Get bhv-readable by table multi-name.
+         * 
+         * @param tableMultiName Table multi-name. (NotNull)
+         * @return Bhv-readable. (NotNull)
+         */
+        public ${glBehaviorReadableInterfaceName} GetRBhv(String tableMultiName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableMultiName(tableMultiName);
+            return GetRBhv(GetBhvType(dbmeta));
+        }
+
+        /**
+         * Get bhv-writable by bhv type.
+         * 
+         * @param bhvType Bhv type. (NotNull)
+         * @return Bhv-writable. (NotNull)
+         */
+        public ${glBehaviorWritableInterfaceName} GetWBhv(Type bhvType) {
+            AssertObjectNotNull("bhvType", bhvType);
+            return (${glBehaviorWritableInterfaceName})GetRBhv(bhvType);
+        }
+
+        /**
+         * Get bhv-writable by entity.
+         * 
+         * @param entity Entity. (NotNull)
+         * @return Bhv-writable. (NotNull)
+         */
+        public ${glBehaviorWritableInterfaceName} GetWBhv(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+            return (${glBehaviorWritableInterfaceName})GetRBhv(entity);
+        }
+
+        /**
+         * Get bhv-writable by table multi-name.
+         * 
+         * @param tableMultiName Table multi-name. (NotNull)
+         * @return Bhv-writable. (NotNull)
+         */
+        public ${glBehaviorWritableInterfaceName} GetWBhv(String tableMultiName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+            return (${glBehaviorWritableInterfaceName})GetRBhv(tableMultiName);
+        }
+
+        /**
+         * Get bhv-type by dbmeta.
+         * 
+         * @param dbmeta Dbmeta. (NotNull)
+         * @return Bhv-type. (NotNull)
+         */
+        protected Type GetBhvType(${glDBMetaInterfaceName} dbmeta) {
+            SetupDaoBhvMap();
+            return (Type)_daoBhvMap[dbmeta.GetDaoType()];
+        }
+    #end
+
+        protected System.Collections.Generic.IDictionary<Type, ${glDaoReadableInterfaceName}> _daoCacheMap;
+        protected void SetupDaoCacheMap() {
+            if (_daoCacheMap == null) {
+                _daoCacheMap = new System.Collections.Generic.Dictionary<Type, ${glDaoReadableInterfaceName}>();
+    #foreach ($table in $database.Tables)
+
+                _daoCacheMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), this.${table.JavaName}Dao);
+    #end
+    #foreach ($table in $database.CustomizeTableList)
+
+                _daoCacheMap.Add(typeof(${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao), this.${table.JavaName}Dao);
+    #end
+
+            }
+        }
+    #foreach ($table in $database.Tables)
+
+        protected ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;
+        public ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao ${table.JavaName}Dao {
+            get { return _${table.UncapitalisedJavaName}Dao; }
+            set { _${table.UncapitalisedJavaName}Dao = value; }
+        }
+    #end
+    #foreach ($table in $database.CustomizeTableList)
+
+        protected ${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;
+        public ${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao ${table.JavaName}Dao {
+            get { return _${table.UncapitalisedJavaName}Dao; }
+            set { _${table.UncapitalisedJavaName}Dao = value; }
+        }
+    #end
+    #if ($database.isAvailableBehaviorGeneration())
+
+        protected System.Collections.Generic.IDictionary<Type, ${glBehaviorReadableInterfaceName}> _bhvCacheMap;
+        protected void SetupBhvCacheMap() {
+            if (_bhvCacheMap == null) {
+                _bhvCacheMap = new System.Collections.Generic.Dictionary<Type, ${glBehaviorReadableInterfaceName}>();
+      #foreach ($table in $database.Tables)
+        #if ($database.isAvailableBehaviorInterfacePrefixI())
+
+                _bhvCacheMap.Add(typeof(${glPackageExtendedBhv}.I${glProjectPrefix}${table.JavaName}Bhv), this.${table.JavaName}Bhv);
+        #else
+
+                _bhvCacheMap.Add(typeof(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv), this.${table.JavaName}Bhv);
+        #end
+      #end
+
+            }
+        }
+
+        protected System.Collections.Generic.IDictionary<Type, Type> _daoBhvMap;
+        protected void SetupDaoBhvMap() {
+            if (_daoBhvMap == null) {
+                _daoBhvMap = new System.Collections.Generic.Dictionary<Type, Type>();
+      #foreach ($table in $database.Tables)
+        #if ($database.isAvailableBehaviorInterfacePrefixI())
+
+                _daoBhvMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), typeof(${glPackageExtendedBhv}.I${glProjectPrefix}${table.JavaName}Bhv));
+        #else
+
+                _daoBhvMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), typeof(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv));
+        #end
+      #end
+
+            }
+        }
+      #foreach ($table in $database.Tables)
+        #if ($database.isAvailableBehaviorInterfacePrefixI())
+
+        protected ${glPackageExtendedBhv}.I${glProjectPrefix}${table.JavaName}Bhv _${table.UncapitalisedJavaName}Bhv;
+        public ${glPackageExtendedBhv}.I${glProjectPrefix}${table.JavaName}Bhv ${table.JavaName}Bhv {
+            get { return _${table.UncapitalisedJavaName}Bhv; }
+            set { _${table.UncapitalisedJavaName}Bhv = value; }
+        }
+        #else
+
+        protected ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv _${table.UncapitalisedJavaName}Bhv;
+        public ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv ${table.JavaName}Bhv {
+            get { return _${table.UncapitalisedJavaName}Bhv; }
+            set { _${table.UncapitalisedJavaName}Bhv = value; }
+        }
+        #end
+      #end
+    #end
+
+        // ----------------------------------------------------------------
+        //                                                    Assert Object
+        //                                                    -------------
+        /**
+         * Assert that the object is not null.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param value Value. (NotNull)
+         * @exception IllegalArgumentException
+         */
+        protected void AssertObjectNotNull(String variableName, Object value) {
+            if (variableName == null) {
+                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+                throw new SystemException(msg);
+            }
+            if (value == null) {
+                String msg = "The value should not be null: variableName=" + variableName;
+                throw new SystemException(msg);
+            }
+        }
+
+        // ----------------------------------------------------------------
+        //                                                    Assert String
+        //                                                    -------------
+        /**
+         * Assert that the entity is not null and not trimmed empty.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param value Value. (NotNull)
+         */
+        protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+            AssertObjectNotNull("variableName", variableName);
+            AssertObjectNotNull("value", value);
+            if (value.Trim().Length ==0) {
+                String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+                throw new SystemException(msg);
+            }
+        }
+    }
+}

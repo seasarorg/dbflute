@@ -1,0 +1,121 @@
+#set ($myClassName = "${glListResultBeanName}")
+
+using System;
+using System.Text;
+
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The list-result-bean of ${myClassName}.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public class ${myClassName} {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        #region Attribute
+
+        /// <summary>The value of table db-name.</summary>
+        protected String _tableDbName;
+
+        /// <summary>The value of all record count.</summary>
+        protected int _allRecordCount;
+
+        /// <summary>Selected list. Default value is empty.</summary>
+        protected System.Collections.IList _selectedList = new System.Collections.ArrayList();
+
+        /// <summary>The value of current page number.</summary>
+        protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
+
+        /// <summary>Has the setter of selected list invoked?</summary>
+        protected bool _isSetterInvokedSelectedList;
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        #region Constructor
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ${myClassName}() {
+        }
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                              Property
+        //                                                                              ========
+        #region Property
+
+        /// <summary>
+        /// The property of table db-name.
+        /// </summary>
+        public String TableDbName {
+            get { return _tableDbName; }
+            set { _tableDbName = value; }
+        }
+
+        /// <summary>
+        /// The property of all record count.
+        /// </summary>
+        public int AllRecordCount {
+            get { return _allRecordCount; }
+            set { _allRecordCount = value; }
+        }
+
+        /// <summary>
+        /// The property of all record count.
+        /// </summary>
+        public System.Collections.IList SelectedList {
+            get { return _selectedList; }
+            set { _isSetterInvokedSelectedList=true; _selectedList = value; }
+        }
+
+        /// <summary>
+        /// The property of order-by clause.
+        /// </summary>
+        public ${glOrderByClauseName} OrderByClause
+        {
+            get { return _orderByClause; }
+            set { _orderByClause = value; }
+        }
+        #endregion
+
+
+        // =====================================================================================
+        //                                                                         Determination
+        //                                                                         =============
+        #region Determination
+        /// <summary>
+        /// Has this result selected?
+        /// </summary>
+        /// <returns>Determination.</returns>
+        public bool IsSelectedResult { get { return _isSetterInvokedSelectedList; } }
+        #endregion
+
+        // =====================================================================================
+        //                                                                 Basic-Override Method
+        //                                                                 =====================
+        /// <summary>
+        /// This method overrides the method that is declared at super.
+        /// </summary>
+        /// <returns>View-string of all-columns value.</returns>
+        public override String ToString() {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(" tableDbName=").Append(_tableDbName);
+            sb.Append(" allRecordCount=").Append(_tableDbName);
+            sb.Append(" selectedList.Count=").Append(_selectedList.Count);
+            sb.Append(" orderByClause=").Append(_orderByClause);
+
+            return sb.ToString();
+        }
+    }
+}

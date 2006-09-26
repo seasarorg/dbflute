@@ -1,0 +1,278 @@
+package ${glPackageBaseCommonDBMeta};
+
+#set ($myClassName = "${glDBMetaInterfaceName}")
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+
+/**
+ * The interface of dbmeta.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${myClassName} {
+
+    // =====================================================================================
+    //                                                                            Table Name
+    //                                                                            ==========
+    /**
+     * Get table db-name.
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    public String getTableDbName();
+
+    /**
+     * Get table cap-prop-name.
+     * 
+     * @return Table cap-prop-name. (NotNull)
+     */
+    public String getTableCapPropName();
+
+    /**
+     * Get table uncap-prop-name.
+     * 
+     * @return Table uncap-prop-name. (NotNull)
+     */
+    public String getTableUncapPropName();
+
+    // =====================================================================================
+    //                                                                         Name Handling
+    //                                                                         =============
+    /**
+     * Is existing db-name?
+     * 
+     * @param dbName Db-name. (NotNull)
+     * @return Determination.
+     */
+    public boolean isExistDbName(String dbName);
+
+    /**
+     * Is existing cap-prop-name?
+     * 
+     * @param capPropName Cap-prop-name. (NotNull)
+     * @return Determination.
+     */
+    public boolean isExistCapPropName(String capPropName);
+
+    /**
+     * Is existing uncap-prop-name?
+     * 
+     * @param uncapPropName Uncap-prop-name. (NotNull)
+     * @return Determination.
+     */
+    public boolean isExistUncapPropName(String uncapPropName);
+
+    /**
+     * Is existing multi-name?
+     * 
+     * @param multiName Multi-name. (NotNull)
+     * @return Determination.
+     */
+    public boolean isExistMultiName(String multiName);
+
+    /**
+     * Get db-name by property-name.
+     * 
+     * @param capPropName Cap-prop-name.
+     * @return Db-name.
+     */
+    public String getDbNameByCapPropName(String capPropName);
+
+    /**
+     * Get db-name by property-name.
+     * 
+     * @param propertyName Uncap-prop-name.
+     * @return {db-name : cap-prop-name} map.
+     */
+    public String getDbNameByUncapPropName(String propertyName);
+
+    /**
+     * Get cap-prop-name by db-name.
+     * 
+     * @param dbName Db-name.
+     * @return Cap-prop-name.
+     */
+    public String getCapPropNameByDbName(String dbName);
+
+    /**
+     * Get cap-prop-name by property-name.
+     * 
+     * @param propertyName Uncap-prop-name.
+     * @return Cap-prop-name.
+     */
+    public String getCapPropNameByUncapPropName(String propertyName);
+
+    /**
+     * Get property-name by db-name.
+     * 
+     * @param dbName Db-name.
+     * @return Uncap-prop-name.
+     */
+    public String getUncapPropNameByDbName(String dbName);
+
+    /**
+     * Get property-name by cap-prop-name.
+     * 
+     * @param capPropName Cap-prop-name.
+     * @return Uncap-prop-name.
+     */
+    public String getUncapPropNameByCapPropName(String capPropName);
+
+    /**
+     * Get db-name by multi-name.
+     * 
+     * @param multiName Multi-name.
+     * @return Db-name.
+     */
+    public String getDbNameByMultiName(String multiName);
+
+    /**
+     * Get cap-prop-name by multi-name.
+     * 
+     * @param multiName Multi-name.
+     * @return Cap-prop-name.
+     */
+    public String getCapPropNameByMultiName(String multiName);
+
+    /**
+     * Get property-name by multi-name.
+     * 
+     * @param multiName Multi-name.
+     * @return Uncap-prop-name.
+     */
+    public String getUncapPropNameByMultiName(String multiName);
+
+    // =====================================================================================
+    //                                                                    DB-Name-Map Getter
+    //                                                                    ==================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {db-name : cap-prop-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getDbNameCapPropNameMap();
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {db-name : uncap-prop-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getDbNameUncapPropNameMap();
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {cap-prop-name : db-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getCapPropNameDbNameMap();
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {cap-prop-name : uncap-prop-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getCapPropNameUncapPropNameMap();
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {uncap-prop-name : db-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameDbNameMap();
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return {uncap-prop-name : cap-prop-name} map.
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameCapPropNameMap();
+
+    // =====================================================================================
+    //                                                                           Type Getter
+    //                                                                           ===========
+    /**
+     * Get the type of dao.
+     * 
+     * @return The type of dao. (NotNull)
+     */ 
+    public Class getDaoType();
+
+    /**
+     * Get the type of entity.
+     * 
+     * @return The type of entity. (NotNull)
+     */ 
+    public Class getEntityType();
+
+    /**
+     * Get the type of condition-bean.
+     * 
+     * @return The type of condition-bean. (NotNull)
+     */ 
+    public Class getConditionBeanType();
+
+    // =====================================================================================
+    //                                                                       Instance Getter
+    //                                                                       ===============
+    /**
+     * New the instance of entity.
+     * 
+     * @return The instance of entity. (NotNull)
+     */ 
+    public ${glEntityInterfaceName} newEntity();
+
+    /**
+     * New the instance of condition-bean.
+     * 
+     * @return The instance of condition-bean. (NotNull)
+     */ 
+    public ${glConditionBeanInterfaceName} newConditionBean();
+
+    // =====================================================================================
+    //                                                                         Entity Method
+    //                                                                         =============
+    /**
+     * Get entity setter method by multi-name.
+     * 
+     * @param multiName Multi-name. (NotNull)
+     * @return Entity setter method of entity. (NotNull)
+     */ 
+    public java.lang.reflect.Method getEntitySetterMethodByMultiName(String multiName);
+
+    /**
+     * Get entity getter method by multi-name.
+     * 
+     * @param multiName Multi-name. (NotNull)
+     * @return Entity getter method of entity. (NotNull)
+     */ 
+    public java.lang.reflect.Method getEntityGetterMethodByMultiName(String multiName);
+
+    // =====================================================================================
+    //                                                                        Foreign DBMeta
+    //                                                                        ==============
+    /**
+     * Get foreign dbmeta.
+     * 
+     * @param foreignPropertyName Foreign-property-name(Both OK - InitCap or not). (NotNull)
+     * @return Foreign DBMeta. (NotNull)
+     */ 
+    public ${myClassName} getForeignDBMeta(String foreignPropertyName);
+
+    // =====================================================================================
+    //                                                                         Determination
+    //                                                                         =============
+    /**
+     * Has two or more primary-keys?
+     * 
+     * @return Determination.
+     */
+    public boolean hasTwoOrMorePrimaryKeys();
+
+    /**
+     * Has common column?
+     * 
+     * @return Determination.
+     */
+    public boolean hasCommonColumn();
+}

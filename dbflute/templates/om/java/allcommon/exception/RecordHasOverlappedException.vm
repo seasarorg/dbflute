@@ -1,0 +1,21 @@
+package ${glPackageBaseCommonException};
+
+/**
+ * The exception when the record has overlapped.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glRecordHasOverlappedException} extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     */
+    public ${glRecordHasOverlappedException}(String msg) {
+        super(msg);
+    }
+}

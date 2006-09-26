@@ -1,0 +1,6 @@
+#set ( $fname = "sql/id-table/idtable.$targetDatabase" )
+#foreach ($dataModel in $dataModels)
+#set ( $outFile = "${dataModel.name}-idtable-init.sql" )
+$generator.parse($fname,"$outFile","tables",$dataModel.database.tables)
+#set ( $initialID = $initialID + 1000 )
+#end

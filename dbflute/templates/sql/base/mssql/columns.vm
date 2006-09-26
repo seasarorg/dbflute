@@ -1,0 +1,18 @@
+#foreach ($col in $table.Columns)
+    #set ( $type = $dbprops.get($col.Type) )
+    #if ($type == "INT" || $type == "TEXT")
+      #set ( $size = "" )
+    #else   
+      #set ( $size = $col.printSize() )
+    #end
+    #set ( $default = $col.DefaultSetting )
+    #set ( $nullString = $strings.select($col.isNotNull(), $dbprops.get("NOTNULL"),$dbprops.get("NULL")) )
+    #if ($col.isAutoIncrement() && $table.IdMethod == "native")
+      #set ( $autoIncrement = $dbprops.get("AUTOINCREMENT") )
+    #else
+      #set ( $autoIncrement = " " )
+    #end    
+    #set ( $entry = "$col.Name $type $size $default $nullString $autoIncrement," )
+    $strings.sub($strings.collapseSpaces($entry)," ,",",")
+#end
+

@@ -1,0 +1,60 @@
+#set ( $basePath = ${generator.OutputPath} )
+
+#foreach ($dataModel in $dataModels)
+  #foreach ($database in $dataModel.Databases)
+  
+    #if ($database.Package)
+      #set ($package = $database.Package)   
+    #else   
+      #set ($package = $targetPackage)
+    #end
+  
+    #set ( $path = $strings.getPackageAsPath($package) )
+    $files.mkdir("$outputDirectory/$path")
+  
+    #foreach ($tbl in $database.Tables)
+      $tbl.Name
+      #set ( $firstcap=$tbl.JavaName )
+      
+      #set ( $fname = "${firstcap}.java" )
+      #set ( $path = "${strings.getPackageAsPath($package)}$fname" )
+
+      #if (!$files.file($basePath,$path).exists())
+        $generator.parse("ojb/model/ExtensionObject.vm",$path,"table",$tbl)
+      #end
+
+      #set ( $fname = "${basePrefix}${firstcap}.java" )
+      #set ( $path = "${strings.getPackageAsPath($package)}$fname" )
+      $generator.parse("ojb/model/Object.vm",$path,"table",$tbl)
+
+      #if ( $ojbUseProxy == true )
+ 	     
+      	#set ( $fname = "${firstcap}ProxyInterface.java" )
+       	#set ( $path = "${strings.getPackageAsPath($package)}$fname" )
+      	#if (!$files.file($basePath,$path).exists())
+      	  $generator.parse("ojb/model/ExtensionProxyInterface.vm",$path,"table",$tbl)
+      	#end
+
+      	#set ( $fname = "${basePrefix}${firstcap}ProxyInterface.java" )
+       	#set ( $path = "${strings.getPackageAsPath($package)}$fname" )
+      	$generator.parse("ojb/model/ProxyInterface.vm",$path,"table",$tbl)
+      
+      #end
+
+      #if ($ojbUseInterface == true )
+
+        #set ( $fname = "${firstcap}Interface.java" )
+        #set ( $path = "${strings.getPackageAsPath($package)}$fname" )
+        #if (!$files.file($basePath,$path).exists())
+          $generator.parse("ojb/model/ExtensionInterface.vm",$path,"table",$tbl)
+        #end	
+      
+        #set ( $fname = "${basePrefix}${firstcap}Interface.java" )
+        #set ( $path = "${strings.getPackageAsPath($package)}$fname" )     
+        $generator.parse("ojb/model/Interface.vm",$path,"table",$tbl)
+
+      #end
+    #end
+  #end
+
+#end

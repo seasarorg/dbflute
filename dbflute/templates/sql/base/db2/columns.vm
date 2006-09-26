@@ -1,0 +1,24 @@
+#foreach ($col in $table.Columns)
+    #set ( $type = $dbprops.get($col.Type) )
+    #set ( $size = $col.printSize() )
+    #if ( $type == "INTEGER" )
+        #set ( $size = "" )
+    #end
+    #set ( $rawsize = $col.Size )
+    #set ( $torquetype = $col.TorqueType )
+    #set ( $default = $col.DefaultSetting )
+    #if ($col.isAutoIncrement() && $table.IdMethod == "native")
+      #set ( $autoIncrement = $dbprops.get("AUTOINCREMENT") )
+    #else
+      #set ( $autoIncrement = " " )
+    #end    
+    #set ( $nullString = $strings.select($col.isNotNull(), $dbprops.get("NOTNULL"),"") )
+    #if ( $torquetype == "BINARY" )
+        #set ( $entry = "$col.Name CHAR($rawsize) FOR BIT DATA $default $nullString $autoIncrement," )
+    #elseif ( $torquetype == "VARBINARY" )
+        #set ( $entry = "$col.Name VARCHAR($rawsize) FOR BIT DATA $default $nullString $autoIncrement," )
+    #else
+        #set ( $entry = "$col.Name $type $size $default $nullString $autoIncrement," )
+    #end
+    $strings.sub($strings.collapseSpaces($entry)," ,",",")
+#end

@@ -1,0 +1,65 @@
+#set ($myClassName = "${glClassificationDefinition}")
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommon} {
+
+    /// <summary>
+    /// The definition class that has classification.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public static class ${myClassName} {
+
+        // =====================================================================================
+        //                                                        Classification-Code-Definition
+        //                                                        ==============================
+#foreach ($classificationName in $database.ClassificationNameList)
+  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+  #foreach ($classificationMap in $classificationMapList)
+
+        /** The classification code of ${classificationMap.get('name')}. */
+        public const String CODE_${classificationName}_${classificationMap.get('name')} = "$classificationMap.get('code')";
+  #end
+#end
+
+        // =====================================================================================
+        //                                                 Classification-CodeNameMap-Definition
+        //                                                 =====================================
+#foreach ($classificationName in $database.ClassificationNameList)
+  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+
+        /** The classification code-name map of ${classificationName}. */
+        public static readonly System.Collections.IDictionary CODE_NAME_MAP_${classificationName};
+
+        /** The classification code-alias map of ${classificationName}. */
+        public static readonly System.Collections.IDictionary CODE_ALIAS_MAP_${classificationName};
+#end
+
+        static ${myClassName}() {
+#foreach ($classificationName in $database.ClassificationNameList)
+  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+
+            {
+                System.Collections.IDictionary map = new System.Collections.Hashtable();
+  #foreach ($classificationMap in $classificationMapList)
+
+                map.Add(CODE_${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
+  #end
+
+                CODE_NAME_MAP_${classificationName} = map;//java.util.Collections.unmodifiableMap(map);
+            }
+            {
+                System.Collections.IDictionary map = new System.Collections.Hashtable();
+  #foreach ($classificationMap in $classificationMapList)
+
+                map.Add(CODE_${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
+  #end
+
+                CODE_ALIAS_MAP_${classificationName} = map;//java.util.Collections.unmodifiableMap(map);
+            }
+#end
+
+        }
+    }
+}

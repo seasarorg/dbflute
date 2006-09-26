@@ -1,0 +1,247 @@
+#set ($myClassName = "${glPagingResultBeanName}")
+
+using System;
+using System.Text;
+
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The paging-result-bean of ${myClassName}.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public class ${myClassName} : ${glListResultBeanName} {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        #region Attribute
+
+        /// <summary>The value of all page size.</summary>
+        protected int _pageSize;
+
+        /// <summary>The value of current page number.</summary>
+        protected int _currentPageNumber;
+
+        /// <summary>The value of page-group size. Default value is ${database.PageResultBeanDefaultPageGroupSize}.</summary>
+        protected int _pageGroupSize = ${database.PageResultBeanDefaultPageGroupSize};
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        #region Constructor
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ${myClassName}() {
+        }
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                              Property
+        //                                                                              ========
+        #region Property
+
+        /// <summary>
+        /// The property of page size.
+        /// </summary>
+        public int PageSize
+        {
+            get { return _pageSize; }
+            set { _pageSize = value; }
+        }
+
+        /// <summary>
+        /// The property of current page number.
+        /// </summary>
+        public int CurrentPageNumber
+        {
+            get { return _currentPageNumber; }
+            set { _currentPageNumber = value; }
+        }
+
+        /// <summary>
+        /// The property of all page count.
+        /// </summary>
+        public int AllPageCount
+        {
+            get { return CalculateAllPageCount(_allRecordCount, _pageSize); }
+        }
+
+        /// <summary>
+        /// The property of page-group size.
+        /// </summary>
+        public int PageGroupSize
+        {
+            get { return _pageGroupSize; }
+            set { _pageGroupSize = value; }
+        }
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                             Calculate
+        //                                                                             =========
+        #region Calculate
+        /**
+         * Calculate all page count.
+         * 
+         * @param allRecordCount All record count.
+         * @param pageSize Fetch-size.
+         * @returns All page count.
+         */
+        public int CalculateAllPageCount(int allRecordCount, int pageSize) {
+            if (allRecordCount == 0) {
+                return 1;
+            }
+            int pageCountBase = (allRecordCount / pageSize);
+            if (allRecordCount % pageSize > 0) {
+                pageCountBase++;
+            }
+            return pageCountBase;
+        }
+
+        /// <summary>
+        /// Calculate current page-group start-page-number.
+        /// Using values are currentPageNumber and pageGroupSize.
+        /// </summary>
+        /// <returns>Current page-group start-page-number.</returns>
+        public int CalculateCurrentPageGroupStartPageNumber()
+        {
+            if (_pageGroupSize == 0) {
+                return 1;
+            }
+            if (_pageGroupSize == 1) {
+                String msg = "The pageGroupSize should be greater than 1 or equal 0. {value > 1 || value == 0}";
+                msg = msg + ": pageGroupSize=" + _pageGroupSize;
+                throw new SystemException(msg);
+            }
+            int currentPageGroupNumber = (_currentPageNumber / _pageGroupSize);
+            if ((_currentPageNumber % _pageGroupSize) == 0)
+            {
+                currentPageGroupNumber--;
+            }
+            int currentPageGroupStartPageNumber = (_pageGroupSize * currentPageGroupNumber) + 1;
+            if (!(_currentPageNumber >= currentPageGroupStartPageNumber)) {
+                String msg = "currentPageNumber should be greater equal currentPageGroupStartPageNumber. But:";
+                msg = msg + " currentPageNumber=" + _currentPageNumber;
+                msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+                throw new SystemException(msg);
+            }
+            return currentPageGroupStartPageNumber;
+        }
+
+        /// <summary>
+        /// Get current page-group page-number-array.
+        /// Using values are currentPageNumber and pageGroupSize and allPageCount.
+        /// </summary>
+        /// <returns>Current page-group page-number-array.</returns>
+        public int[] GetCurrentPageGroupPageNumberArray()
+        {
+            int allPageCount = this.AllPageCount;
+            int currentPageGroupStartPageNumber = CalculateCurrentPageGroupStartPageNumber();
+            if (!(currentPageGroupStartPageNumber > 0)) {
+                String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
+                msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+                throw new SystemException(msg);
+            }
+            int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupSize;
+            int[] currentPageGroupArray = null;
+            if (this.AllPageCount < nextPageGroupStartPageNumber) {
+                currentPageGroupArray = new int[(allPageCount-currentPageGroupStartPageNumber)+1];
+            } else {
+                currentPageGroupArray = new int[_pageGroupSize];
+            }
+            int arrayIndex = 0;
+            for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++, arrayIndex++) {
+                currentPageGroupArray[arrayIndex] = i;
+            }
+            return currentPageGroupArray;
+        }
+        #endregion
+
+        // =====================================================================================
+        //                                                                         Determination
+        //                                                                         =============
+        #region Determination
+        /// <summary>
+        /// Is existing previous page?
+        /// Using values are currentPageNumber.
+        /// </summary>
+        /// <returns>Determination.</returns>
+        public bool IsExistPrePage()
+        {
+            return (_currentPageNumber > 1);
+        }
+
+        /// <summary>
+        /// Is existing next page?
+        /// Using values are currentPageNumber and allPageCount.
+        /// </summary>
+        /// <returns>Determination.</returns>
+        public bool IsExistNextPage()
+        {
+            return (_currentPageNumber < this.AllPageCount);
+        }
+
+        /// <summary>
+        /// Is existing previous page-group?
+        /// Using values are currentPageNumber and pageGroupSize.
+        /// </summary>
+        /// <returns>Determination.</returns>
+        public bool IsExistPrePageGroup()
+        {
+            return (_currentPageNumber > _pageGroupSize);
+        }
+
+        /// <summary>
+        /// Is existing next page-group?
+        /// Using values are currentPageNumber and pageGroupSize and allPageCount.
+        /// </summary>
+        /// <returns>Determination.</returns>
+        public bool IsExistNextPageGroup()
+        {
+            int currentPageGroupStartPageNumber = CalculateCurrentPageGroupStartPageNumber();
+            if (!(currentPageGroupStartPageNumber > 0)) {
+                String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
+                msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+                throw new SystemException(msg);
+            }
+            int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupSize;
+            return (nextPageGroupStartPageNumber <= this.AllPageCount);
+        }
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                 Basic-Override Method
+        //                                                                 =====================
+        /// <summary>
+        /// This method overrides the method that is declared at super.
+        /// </summary>
+        /// <returns>View-string of all-columns value.</returns>
+        public override String ToString() {
+            StringBuilder result = new StringBuilder();
+
+	        result.Append(" ").Append(this.CurrentPageNumber).Append("/").Append(this.AllPageCount);
+	        result.Append(" ").Append(this.AllRecordCount);
+	        result.Append(" - ").Append(IsExistPrePage()).Append(" ").Append(IsExistPrePageGroup());
+	        result.Append(" ");
+	        int[] currentPageGroupPageNumberArray = GetCurrentPageGroupPageNumberArray();
+	        for (int i=0; i < currentPageGroupPageNumberArray.Length; i++) {
+	            result.Append(currentPageGroupPageNumberArray[i]);
+	        }
+	        result.Append(" ").Append(IsExistNextPageGroup()).Append(" ").Append(IsExistNextPage());
+            result.Append(" pageSize=").Append(this.PageSize);
+            result.Append(" selectedList.Count=").Append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
+
+            return result.ToString();
+        }
+    }
+}

@@ -1,0 +1,135 @@
+package ${glPackageBaseCommon};
+
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+
+/**
+ * The interface of entity.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glEntityInterfaceName} {
+
+    // =====================================================================================
+    //                                                                            Definition
+    //                                                                            ==========
+    /** Map-string map-mark. */
+    public static final String MAP_STRING_MAP_MARK = "map:";
+
+    /** Map-string list-mark. */
+    public static final String MAP_STRING_LIST_MARK = "list:";
+
+    /** Map-string start-brace. */
+    public static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
+
+    /** Map-string end-brace. */
+    public static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
+
+    /** Map-string delimiter. */
+    public static final String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
+
+    /** Map-string equal. */
+    public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
+
+    // =====================================================================================
+    //                                                                                DBMeta
+    //                                                                                ======
+    /**
+     * Get dbmeta.
+     * 
+     * @return DBMeta. (NotNull)
+     */
+    public ${glDBMetaInterfaceName} getDBMeta();
+
+    // =====================================================================================
+    //                                                                            Table Name
+    //                                                                            ==========
+    /**
+     * Get table db-name.
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    public String getTableDbName();
+
+    /**
+     * Get table cap-prop-name.
+     * 
+     * @return Table cap-prop-name. (NotNull)
+     */
+    public String getTableCapPropName();
+
+    /**
+     * Get table uncap-prop-name.
+     * 
+     * @return Table uncap-prop-name. (NotNull)
+     */
+    public String getTableUncapPropName();
+
+    // =====================================================================================
+    //                                                                                Accept
+    //                                                                                ======
+    /**
+     * Accept primary-key map.
+     * 
+     * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
+     * @return Instance of query. (NotNull)
+     */
+    public ${glEntityInterfaceName} acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
+
+    /**
+     * Accept primary-key map-string.
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glEntityInterfaceName} acceptPrimaryKeyMapString(String primaryKeyMapString);
+
+    /**
+     * Accept column-value map.
+     * 
+     * @param columnValueMap Column-value map. (NotNull and NotEmpty)
+     * @return Instance of query. (NotNull)
+     */
+    public ${glEntityInterfaceName} acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap);
+
+    /**
+     * Accept column-value map-string.
+     * 
+     * @param columnValueMapString Column-value map-string. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glEntityInterfaceName} acceptColumnValueMapString(String columnValueMapString);
+
+    // =====================================================================================
+    //                                                                               Extract
+    //                                                                               =======
+    /**
+     * Extract primary-key map-string. Delimiter is at-mark and semicolon.
+     * <p>
+     * <pre>
+     * ex) Uses that this method have.
+     *   final String primaryKeyMapString = entity.extractPrimaryKeyMapString();
+     *   final LdBook entity = dao.selectEntity(new LdBookCB().acceptPrimaryKeyMapString(primaryKeyMapString));
+     *   ... // as primary key for condition.
+     * </pre>
+     * 
+     * @return Primary-key map-string. (NotNull)
+     */
+    public String extractPrimaryKeyMapString();
+
+    /**
+     * Extract column-value map-string. Delimiter is at-mark and semicolon.
+     * 
+     * @return Column-value map-string. (NotNull)
+     */
+    public String extractColumnValueMapString();
+
+    // =====================================================================================
+    //                                                                         Determination
+    //                                                                         =============
+    /**
+     * Has primary-key value?
+     * 
+     * @return Determination.
+     */
+    public boolean hasPrimaryKeyValue();
+}

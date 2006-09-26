@@ -1,0 +1,437 @@
+#set ($myClassName = "${glBehaviorReadableAbstractName}")
+
+package ${glPackageBaseCommonBhv};
+
+import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+
+
+/**
+ * The abstract class of behavior-readable.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public abstract class $myClassName implements ${glBehaviorReadableInterfaceName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    /** Dao-selector instance. */
+    protected ${glDaoSelectorInterfaceName} _daoSelector;
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor.
+     */
+    public ${myClassName}() {
+    }
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Dao-selector.
+     */
+    public ${glDaoSelectorInterfaceName} getDaoSelector() {
+        return _daoSelector;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param value Dao-selector.
+     */
+    public void setDaoSelector(${glDaoSelectorInterfaceName} value) {
+        _daoSelector = value;
+    }
+
+    // =====================================================================================
+    //                                                                       Delegate Method
+    //                                                                       ===============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return All count.
+     */
+    public int delegateReadCountAllTx() {
+        final Object target = getDaoReadable();
+        final String name = "getCountAll";
+        final java.lang.reflect.Method mtd = getMethod(target.getClass(), name, new Class[]{});
+        final Object result = invoke(mtd, target, new Object[]{});
+        return ((Integer)result).intValue();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return All list. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListAllTx() {
+        final Object target = getDaoReadable();
+        final String name = "getListAll";
+        final java.lang.reflect.Method mtd = getMethod(target.getClass(), name, new Class[]{});
+        final Object result = invoke(mtd, target, new Object[]{});
+        return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @return Read count. (NotNull)
+     */
+    public int delegateReadCountIgnoreFetchScopeTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final Object target = getDaoReadable();
+        final String name = "selectCountIgnoreFetchScope";
+        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+        final java.lang.reflect.Method mtd = getMethod(target.getClass(), name, types);
+        final Object result = invoke(mtd, target, new Object[]{${glAttachedCBArgsVariableName}});
+        return ((Integer)result).intValue();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @return Read entity. If the select result is zero, it returns null. (Nullable)
+     */
+    public ${glEntityInterfaceName} delegateReadEntityTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final Object target = getDaoReadable();
+        final String name = "selectEntity";
+        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+        final java.lang.reflect.Method mtd = getMethod(target.getClass(), name, types);
+        final Object result = invoke(mtd, target, new Object[]{${glAttachedCBArgsVariableName}});
+        return (${glEntityInterfaceName})result;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final Object target = getDaoReadable();
+        final String name = "selectList";
+        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+        final java.lang.reflect.Method mtd = getMethod(target.getClass(), name, types);
+        final Object result = invoke(mtd, target, new Object[]{${glAttachedCBArgsVariableName}});
+        return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
+    }
+
+    private java.lang.reflect.Method getMethod(Class clazz, String methodName, Class[] argTypes) {
+        try {
+            return clazz.getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException ex) {
+            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
+            throw new RuntimeException(msg, ex);
+        }
+    }
+
+    private Object invoke(java.lang.reflect.Method method, Object target, Object[] args) {
+        try {
+            return method.invoke(target, args);
+        } catch (java.lang.reflect.InvocationTargetException ex) {
+            Throwable t = ex.getCause();
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
+            if (t instanceof Error) {
+                throw (Error) t;
+            }
+            String msg = "target=" + target + " method=" + method + "-" + java.util.Arrays.asList(args);
+            throw new RuntimeException(msg, ex);
+        } catch (IllegalAccessException ex) {
+            String msg = "target=" + target + " method=" + method + "-" + java.util.Arrays.asList(args);
+            throw new RuntimeException(msg, ex);
+        }
+    }
+
+    // =====================================================================================
+    //                                                                          Basic Select
+    //                                                                          ============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean.
+     * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
+     */
+    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateReadListTx(${glAttachedCBArgsVariableName}));
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Read page. (NotNull)
+     */
+    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPageTx(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})}() {
+            public ${glPagingBeanInterfaceName} getPagingBean() { return ${glAttachedCBArgsVariableName}; }
+            public int selectCountIgnoreFetchScope() {
+                return delegateReadCountIgnoreFetchScopeTx(${glAttachedCBArgsVariableName});
+            }
+            public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} selectList() {
+                return delegateReadListTx(${glAttachedCBArgsVariableName});
+            }
+        };
+        return new SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})}(this).invokeSelectPage(pageCallback);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Entity that is read from database. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public ${glEntityInterfaceName} readEntityWithDeletedCheckTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        ${glEntityInterfaceName} currentEntity = delegateReadEntityTx(${glAttachedCBArgsVariableName});
+        assertRecordHasNotBeenDeleted(currentEntity, ${glAttachedCBArgsVariableName}.toString());
+        return currentEntity;
+    }
+
+    /**
+     * Assert that record has not been deleted.
+     * 
+     * @param entity Selected entity.
+     * @param searchKey4log Search-key for Logging.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    protected void assertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
+        if (entity == null) {
+            String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+        }
+    }
+
+    /**
+     * Assert that record has not been deleted.
+     * 
+     * @param ls Selected list.
+     * @param searchKey4log Search-key for Logging.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4log) {
+        if (ls == null || ls.isEmpty()) {
+            String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+        }
+    }
+
+    /**
+     * Assert that record has been selected as one.
+     * 
+     * @param ls Selected list.
+     * @param searchKey4log Search-key for Logging.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4log) {
+        if (ls == null || ls.isEmpty()) {
+            String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+        }
+        if (ls.size() != 1) {
+            String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
+            msg = msg + " resultCount=" + ls.size();
+            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+        }
+    }
+
+    // =====================================================================================
+    //                                                                        Various Select
+    //                                                                        ==============
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean.
+     * @param maxCount Max count.
+     * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+     */
+    public ${glListResultBeanName} readListAfterCheckingCountIgnoreFetchScopeTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final int selectedCount = delegateReadCountIgnoreFetchScopeTx(${glAttachedCBArgsVariableName});
+        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());
+        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateReadListTx(${glAttachedCBArgsVariableName}));
+    }
+
+    /**
+     * Assert that selected count has not exceeded max count.
+     * 
+     * @param selectedCount Selected count.
+     * @param maxCount Max count.
+     * @param clauseString Clause string for exception message.
+     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+     */
+    protected void assertSelectedCountHasNotExceededMaxCount(int selectedCount, int maxCount, String clauseString) {
+        if (selectedCount > maxCount) {
+            String msg = "Selected count[" + selectedCount + "] has exceeded max count[" + maxCount + "]: clauseString=" + clauseString;
+            throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
+     * @return Entity that is read from database by select-for-read-only. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheckTx(String primaryKeyMapString) {
+        assertObjectNotNull("primaryKeyMapString", primaryKeyMapString);
+        final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = getDBMeta().newConditionBean();
+        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
+        final ${glEntityInterfaceName} currentEntity = delegateReadEntityTx(${glAttachedCBArgsVariableName});
+        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
+        return currentEntity;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
+     * @return Entity that is read from database by select-for-update. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public ${glEntityInterfaceName} readForUpdateByPKMapStringWithDeletedCheckTx(String primaryKeyMapString) {
+        assertObjectNotNull("primaryKeyMapString", primaryKeyMapString);
+        final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = getDBMeta().newConditionBean();
+        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString).lockForUpdate();
+        final ${glEntityInterfaceName} currentEntity = delegateReadEntityTx(${glAttachedCBArgsVariableName});
+        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
+        return currentEntity;
+    }
+
+    // =====================================================================================
+    //                                                                         Helper Method
+    //                                                                         =============
+    // ----------------------------------------------------------------
+    //                                                    Assert Object
+    //                                                    -------------
+    /**
+     * Assert that the object is not null.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the entity is not null.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    protected void assertEntityNotNull(${glEntityInterfaceName} entity) {
+        assertObjectNotNull("entity", entity);
+    }
+
+    /**
+     * Assert that the condition-bean is not null.
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     */
+    protected void assertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        assertObjectNotNull("${glAttachedCBArgsVariableName}", ${glAttachedCBArgsVariableName});
+    }
+
+    /**
+     * Assert that the entity has primary-key value.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    protected void assertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            String msg = "The entity must should primary-key: entity=" + entity;
+            throw new IllegalArgumentException(msg + entity);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    //                                                    Assert String
+    //                                                    -------------
+    /**
+     * Assert that the entity is not null and not trimmed empty.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     */
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull("value", value);
+        if (value.trim().length() ==0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    //                                                      Assert List
+    //                                                      -----------
+    /**
+     * Assert that the list is empty.
+     * 
+     * @param ls List. (NotNull)
+     */
+    protected void assertListNotNullAndEmpty(java.util.List ls) {
+        assertObjectNotNull("ls", ls);
+        if (!ls.isEmpty()) {
+            String msg = "The list should be empty: ls=" + ls.toString();
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the list is not empty.
+     * 
+     * @param ls List. (NotNull)
+     */
+    protected void assertListNotNullAndNotEmpty(java.util.List ls) {
+        assertObjectNotNull("ls", ls);
+        if (ls.isEmpty()) {
+            String msg = "The list should not be empty: ls=" + ls.toString();
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the list having only one.
+     * 
+     * @param ls List. (NotNull)
+     */
+    protected void assertListNotNullAndHasOnlyOne(java.util.List ls) {
+        assertObjectNotNull("ls", ls);
+        if (ls.size() != 1) {
+            String msg = "The list should contain only one object: ls=" + ls.toString();
+            throw new IllegalArgumentException(msg);
+        }
+    }
+}

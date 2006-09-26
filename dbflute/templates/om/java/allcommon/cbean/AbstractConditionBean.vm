@@ -1,0 +1,359 @@
+package ${glPackageBaseCommonCBean};
+
+#set ($myClassName = "${glConditionBeanAbstractName}")
+
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName}${database.DaoGenDbName};
+
+
+/**
+ * The condition-bean as abstract.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    /** SQL clause instance. */
+    protected final ${glSqlClauseName} _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(getTableDbName());
+
+    // =====================================================================================
+    //                                                                             SqlClause
+    //                                                                             =========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql clause. (NotNull)
+     */
+    public ${glSqlClauseName} getSqlClause() {
+        return _sqlClause;
+    }
+
+    // =====================================================================================
+    //                                                                        FetchNarrowing
+    //                                                                        ==============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch start index.
+     */
+    public int getFetchNarrowingSkipStartIndex() {
+        return getSqlClause().getFetchNarrowingSkipStartIndex();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch size.
+     */
+    public int getFetchNarrowingLoopCount() {
+        return getSqlClause().getFetchNarrowingLoopCount();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchNarrowingSkipStartIndexEffective() {
+        return !getSqlClause().isFetchStartIndexSupported();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchNarrowingLoopCountEffective() {
+        return !getSqlClause().isFetchSizeSupported();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determiantion.
+     */
+    public boolean isFetchNarrowingEffective() {
+        return getSqlClause().isFetchNarrowingEffective();
+    }
+
+    // =====================================================================================
+    //                                                                                Paging
+    //                                                                                ======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param fetchSize Fetch-size. (NotMinus & NotZero)
+     * @return this. (NotNUll)
+     */
+    public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize) {
+        getSqlClause().fetchFirst(fetchSize);
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
+     * @param fetchSize Fetch-size. (NotMinus & NotZero)
+     * @return this. (NotNUll)
+     */
+    public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize) {
+        getSqlClause().fetchScope(fetchStartIndex, fetchSize);
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero)
+     * @return this. (NotNull)
+     */
+    public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber) {
+        getSqlClause().fetchPage(fetchPageNumber);
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch-start-index.
+     */
+    public int getFetchStartIndex() {
+        return _sqlClause.getFetchStartIndex();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch-size.
+     */
+    public int getFetchSize() {
+        return _sqlClause.getFetchSize();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch-page-number.
+     */
+    public int getFetchPageNumber() {
+        return _sqlClause.getFetchPageNumber();
+    }
+
+    // =====================================================================================
+    //                                                                               OrderBy
+    //                                                                               =======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql component of order-by clause. (NotNull)
+     */
+    public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
+        return getSqlClause().getSqlComponentOfOrderByClause();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Order-by clause. (NotNull)
+     */
+    public String getOrderByClause() {
+        return _sqlClause.getOrderByClause();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} clearOrderBy() {
+        getSqlClause().clearOrderBy();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} ignoreOrderBy() {
+        getSqlClause().ignoreOrderBy();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} makeOrderByEffective() {
+        getSqlClause().makeOrderByEffective();
+        return this;
+    }
+
+    /**
+     * Register order-by-asc.
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} registerOrderByAsc(String orderByProperty) {
+        getSqlClause().registerOrderBy(filterOrderByProperty(orderByProperty), orderByProperty, true);
+        return this;
+    }
+
+    /**
+     * Register order-by-desc.
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} registerOrderByDesc(String orderByProperty) {
+        getSqlClause().registerOrderBy(filterOrderByProperty(orderByProperty), orderByProperty, false);
+        return this;
+    }
+
+    /**
+     * Reverse order-by or Override order-by asc.
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByAsc(String orderByProperty) {
+        getSqlClause().reverseOrderBy_Or_OverrideOrderBy(filterOrderByProperty(orderByProperty), orderByProperty, true);
+        return this;
+    }
+
+    /**
+     * Reverse order-by or Override order-by desc.
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByDesc(String orderByProperty) {
+        getSqlClause().reverseOrderBy_Or_OverrideOrderBy(filterOrderByProperty(orderByProperty), orderByProperty, false);
+        return this;
+    }
+
+    protected String filterOrderByProperty(String orderByProperty) {
+        final java.util.List${database.filterGenericsString('String')} orderBySlashList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        {
+            final java.util.StringTokenizer st = new java.util.StringTokenizer(orderByProperty, "/");
+            while (st.hasMoreElements()) {
+                orderBySlashList.add(st.nextToken());
+            }
+        }
+
+        final StringBuffer sb = new StringBuffer();
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
+        ${glConditionQueryInterfaceName} query = this.getConditionQueryAsInterface();
+        for (final java.util.Iterator ite = orderBySlashList.iterator(); ite.hasNext(); ) {
+            final String orderBySlashElement = (String)ite.next();
+	        final java.util.List${database.filterGenericsString('String')} orderByDotList = new java.util.ArrayList${database.filterGenericsString('String')}();
+	        {
+	            final java.util.StringTokenizer st = new java.util.StringTokenizer(orderBySlashElement, "/");
+	            while (st.hasMoreElements()) {
+	                orderByDotList.add(st.nextToken());
+	            }
+	        }
+
+            if (orderByDotList.size() == 1) {
+                if (dbmeta.isExistMultiName(orderBySlashElement)) {
+                    sb.append("/").append(query.getRealColumnName(dbmeta.getDbNameByMultiName(orderBySlashElement)));
+                } else {
+                    sb.append("/").append(orderBySlashElement);
+                }
+            } else {
+                ${glDBMetaInterfaceName} foreignDBMeta = dbmeta;
+                ${glConditionQueryInterfaceName} foreignQuery = query;
+                int count = 0;
+                for (final java.util.Iterator ite2 = orderByDotList.iterator(); ite2.hasNext(); ) {
+                    String orderByDotElement = (String)ite2.next();
+                    count++;
+
+                    if (orderByDotList.size() == count) {// Last Loop!
+                        if (!foreignDBMeta.isExistMultiName(orderByDotElement)) {
+                            String msg = "The name for order-by is not existing: name=" + orderByDotElement;
+                            msg = msg + " orderBySlashElement=" + orderBySlashElement + " orderByProperty=" + orderByProperty;
+                            throw new IllegalStateException(msg);
+                        }
+                        sb.append("/").append(foreignQuery.getRealColumnName(foreignDBMeta.getDbNameByMultiName(orderByDotElement)));
+                        break;
+                    }
+
+                    foreignDBMeta = foreignDBMeta.getForeignDBMeta(orderByDotElement);
+                    foreignQuery = foreignQuery.getForeignConditionQuery(orderByDotElement);
+                }
+            }
+        }
+        sb.delete(0, "/".length());
+        return sb.toString();
+    }
+
+    // =====================================================================================
+    //                                                                               Advance
+    //                                                                               =======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} lockForUpdate() {
+        getSqlClause().lockForUpdate();
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                        For SqlComment
+    //                                                                        ==============
+    /**
+     * Get select-hint. {select [select-hint] * from table...}
+     * 
+     * @return select-hint. (NotNull)
+     */
+    public String getSelectHint() {
+        return getSqlClause().getSelectHint();
+    }
+
+    /**
+     * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
+     * 
+     * @return from-base-table-hint. (NotNull)
+     */
+    public String getFromBaseTableHint() {
+        return getSqlClause().getFromBaseTableHint();
+    }
+
+    /**
+     * Get from-hint. {select * from table left outer join ... on ... [from-hint] where ...}
+     * 
+     * @return from-hint. (NotNull)
+     */
+    public String getFromHint() {
+        return getSqlClause().getFromHint();
+    }
+
+    /**
+     * Get where clause.
+     * 
+     * @return Where clause. (NotNull)
+     */
+    public String getWhereClause() {
+        return getSqlClause().getWhereClause();
+    }
+
+    /**
+     * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
+     * 
+     * @return Sql-suffix.  (NotNull)
+     */
+    public String getSqlSuffix() {
+        return getSqlClause().getSqlSuffix();
+    }
+}

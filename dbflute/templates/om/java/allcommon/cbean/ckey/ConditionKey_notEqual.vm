@@ -1,0 +1,71 @@
+package ${glPackageBaseCommonCKey};
+
+#set ($myClassName = "${glConditionKeyName}NotEqual")
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import ${glPackageBaseCommonCValue}.${glConditionValueName};
+
+/**
+ * The condition-key of notEqual.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glConditionKeyName} {
+
+    /** Log-instance. */
+    private static final Log _log = LogFactory.getLog(${myClassName}.class);
+
+    /**
+     * Constructor.
+     */
+    protected ${myClassName}() {
+        _conditionKey = "notEqual";
+        _operand = "!=";
+    }
+
+    /**
+     * Is valid registration?
+     * 
+     * @param conditionValue Condition value. (NotNull)
+     * @param value Value. (NotNull)
+     * @return Determination.
+     */
+    public boolean isValidRegistration(${glConditionValueName} conditionValue, Object value) {
+        if (value == null) {
+            return false;
+        }
+        Object valueObject = conditionValue.getNotEqual();
+        if (valueObject != null && valueObject.equals(value)) {
+            _log.warn("The value has already registered at " + _conditionKey + ": " + valueObject + " = " + value);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * This method implements super#doAddWhereClause().
+     * 
+     * @param conditionList Condition list. (NotNull)
+     * @param columnName Column name. (NotNull)
+     * @param value Condition value. (NotNull)
+     */
+    protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value) {
+        if (value.getNotEqual() == null) {
+            return;
+        }
+        conditionList.add(buildBindClause(columnName, value.getNotEqualLocation()));
+    }
+
+    /**
+     * This method implements super#doSetupConditionValue().
+     * 
+     * @param conditionValue Condition value. (NotNull)
+     * @param value Value. (NotNull)
+     * @param location Location. (NotNull)
+     */
+    protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+        conditionValue.setNotEqual(value).setNotEqualLocation(location);
+    }
+}

@@ -1,0 +1,106 @@
+#set ( $database = $dataModel.database )
+#set ( $unknownTorqueTypes = [  'NULL', 'OTHER',  'JAVA_OBJECT', 'DISTINCT', 'STRUCT', 'ARRAY', 'REF', 'BOOLEANINT', 'BOOLEANCHAR' ] )
+#set ( $mappedJdbcTypes = ['INTEGER', 'BLOB', 'BLOB', 'BLOB', 'BLOB', 'BLOB', 'BLOB', 'INTEGER', 'CHAR' ] )
+#set ( $fieldsWithNoSize = ['INTEGER', 'BLOB', 'CLOB', 'DATE', 'TIME', 'TIMESTAMP', 'BINARY', 'BIGINT', 'SMALLINT', 'TINYINT' ] )
+#if ($database.Package)
+    #set ($package = $database.Package)
+#else
+    #set ($package = $targetPackage)
+#end
+
+#foreach ($table in $database.tables)
+
+<!--
+==============================================================
+            TABLE $table.Name
+==============================================================
+$!table.getDescription()
+-->
+  <class-descriptor
+    #if ($ojbUseProxy)
+        proxy="dynamic"
+    #end
+    class="${package}.${table.JavaName}"
+    table="$table.Name"
+  >
+  #set ( $indices = [ "" ] )
+  #foreach ($index in $table.getIndices())
+    #set ( $indexColumnListString = $index.getColumnList() )
+    #set ( $indexColumnList = $indexColumnListString.split(",") )
+    #foreach ( $indexedColumn in $indexColumnList )
+      #set ( $result = $indices.add($indexedColumn) )
+    #end
+  #end
+  #foreach ($col in $table.Columns)
+
+<!--
+ COLUMN $col.Name
+..............................................
+$!col.getDescription()
+-->
+    #set ( $mappingPos = $unknownTorqueTypes.indexOf($col.TorqueType) )
+    #set ( $size = "" )
+    #set ( $precision = "" )
+    #set ( $colType = $col.getType() )
+    #set ( $colTypeClass =  $colType.getClass() )
+    #set ( $colTypeClassName =  $colTypeClass.getName() )
+    ## === determine the type of the field. OJB recognizes less types than Torque, thus unkown types must be mapped
+    #if ($mappingPos != -1)
+      #set ( $jdbcFieldType = $mappedJdbcTypes.get($mappingPos) )
+      #if ( $mappedJdbcTypes.get($mappingPos) == "CHAR" )
+        #set ( $size = "1" )
+      #else
+        #set ( $size = "" )
+      #end
+    #else  ## == no mapping is required
+      #set ( $jdbcFieldType = $col.TorqueType )
+      ## === split the size field into length and precision
+      #if ($col.size != "")
+        #set ( $sizeList = $size.split(",") )
+        #set ( $foundPart = 0 )
+        ## == unfortunatedly $sizeList.get(0) dows not work so I did this hack
+        #foreach ( $part in $sizeList)
+          #if ($foundPart == 0)
+            #set ( $size = $part )
+            #set ( $foundPart = 1 )
+          #elseif ($foundPart == 1)
+            #set ( $precision = $part )
+            #set ( $foundPart = 2 )
+          #end
+        #end
+      #end
+    #end
+
+    <field-descriptor id="$velocityCount"
+      name="$col.UncapitalisedJavaName"
+      column="$col.Name"
+      jdbc-type="$jdbcFieldType"
+#if ($col.isNotNull()) 
+      nullable="false" 
+#end
+#if ($indices.indexOf($col.Name) != -1) 
+      indexed="true" 
+#end
+#if ($col.isPrimaryKey()) 
+      primarykey="true" 
+#end
+#if ($col.isAutoIncrement()) 
+      autoincrement="true" 
+#end
+#if ($size != "" && $size != "0") 
+      length="${size}" 
+#end
+#if ($precision != "") 
+      precision="${precision}" 
+#end
+#if ($col.TorqueType == "BOOLEANINT")
+      conversion="org.apache.ojb.broker.accesslayer.conversions.Boolean2IntFieldConversion"
+#end
+#if ($col.TorqueType == "BOOLEANCHAR")
+      conversion="insert-conversion-class-here"
+#end
+    />
+
+  #end
+  </class-descriptor>
+#end

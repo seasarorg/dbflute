@@ -1,0 +1,1063 @@
+#set ($myClassName = "${myBaseObjectClassName}")
+
+package ${myBaseEntityPackageName};
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${myDBMetaPackageName}.${myDBMetaClassName};
+
+import ${glPackageBaseCommonHelper}.${glMapListStringName};
+import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
+
+#if (${database.isAvailableEntityLazyLoad()})
+  #if (${table.hasRelation()})
+
+import ${glPackageBaseCommon}.${glLazyLoadContainerClassName};
+import ${myExtendedDaoPackageName}.*;
+  #end
+#end
+#set ($myEntityInterfaceName = "")
+#if (${table.hasAllCommonColumn()})
+  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
+
+import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
+#else
+  #set ($myEntityInterfaceName = ${glEntityInterfaceName})
+#end
+
+/**
+ * The entity of ${table.Name}.
+ * 
+ * <pre>
+ * [primary-key]
+ *     ${table.PrimaryKeyNameCommaString}
+ * 
+ * [column-property]
+ *     ${table.ColumnNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.ForeignPropertyNameCommaString}
+ * 
+ * [refferer-property]
+ *     ${table.ReferrerPropertyNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.DefinedSequenceName}
+ * 
+ * [identity]
+ *     ${table.IdentityPropertyName}
+ * 
+ * [update-date]
+ *     ${table.UpdateDateJavaName}
+ * 
+ * [version-no]
+ *     ${table.VersionNoJavaName}
+ * 
+ * </pre>
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.Serializable {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /** TABLE-Annotation for S2Dao */
+    public static final String TABLE = "${table.AnnotationTableName}";
+
+#if ($table.isUseUpdateDate())
+    
+    /** TIMESTAMP-Annotation */
+    public static final String TIMESTAMP_PROPERTY = "$table.UpdateDateUncapitalisedJavaName";
+#end
+#if ($table.isUseVersionNo())
+    
+    /** VERSION_NO-Annotation */
+    public static final String VERSION_NO_PROPERTY = "$table.VersionNoUncapitalisedJavaName";
+#end
+#if ($table.isUseIdentity())
+    
+    /** ID-Annotation */
+    public static final String ${table.IdentityPropertyName}_ID = "identity";
+#end
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+#foreach ($col in $table.Columns)
+    
+    /** The value of ${col.UncapitalisedJavaName}. */
+    protected ${col.JavaNative} _${col.UncapitalisedJavaName};
+
+    /** Has the setter of ${col.UncapitalisedJavaName} been invoked? */
+    protected boolean _isSetterInvoked${col.JavaName};
+#end
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor.
+     */
+    public ${myClassName}() {
+    }
+
+    // =====================================================================================
+    //                                                                                DBMeta
+    //                                                                                ======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return DBMeta. (NotNull)
+     */
+    public ${glDBMetaInterfaceName} getDBMeta() {
+        return ${myDBMetaClassName}.getInstance();
+    }
+
+    // =====================================================================================
+    //                                                                            Table Name
+    //                                                                            ==========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    public String getTableDbName() {
+        return getDBMeta().getTableDbName();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table cap-prop-name. (NotNull)
+     */
+    public String getTableCapPropName() {
+        return getDBMeta().getTableCapPropName();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table uncap-prop-name. (NotNull)
+     */
+    public String getTableUncapPropName() {
+        return getDBMeta().getTableUncapPropName();
+    }
+
+    // =====================================================================================
+    //                                                                         Getter Setter
+    //                                                                         =============
+#foreach ($col in $table.Columns)
+
+    /**
+     * Get the value of ${col.UncapitalisedJavaName}.
+     * 
+     * @return The value of ${col.UncapitalisedJavaName}. (Nullable)
+     */
+    public ${col.JavaNative} get${col.JavaName}() {
+        return _${col.UncapitalisedJavaName};
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName}.
+     * 
+     * @param v The value of ${col.UncapitalisedJavaName}. (Nullable)
+     */
+    public void set${col.JavaName}(${col.JavaNative} v) {
+        _isSetterInvoked${col.JavaName} = true;
+        _${col.UncapitalisedJavaName} = v;
+    }
+#end
+
+    // =====================================================================================
+    //                                                                Invoking Determination
+    //                                                                ======================
+#foreach ($col in $table.Columns)
+
+    /**
+     * Has the setter of ${col.UncapitalisedJavaName} been invoked?
+     * 
+     * @return Determination.
+     */
+    public boolean isSetterInvoked${col.JavaName}() {
+        return _isSetterInvoked${col.JavaName};
+    }
+#end
+
+    // =====================================================================================
+    //                                                                       Classify Method
+    //                                                                       ===============
+#foreach ($col in $table.Columns)
+  #if (${col.hasClassification()})
+    #foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
+     */
+    public void classify${col.JavaName}${classificationMap.get('name')}() {
+        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        set${col.JavaName}(new ${col.JavaNative}(code));
+    }
+    #end
+  #end
+#end
+
+    // =====================================================================================
+    //                                                                 Classification Getter
+    //                                                                 =====================
+#foreach ($col in $table.Columns)
+  #if (${col.hasClassification()})
+
+    /**
+     * Get the value of ${col.UncapitalisedJavaName} as classification-name.
+     * 
+     * @return The value of ${col.UncapitalisedJavaName} as classification-name. (Nullable)
+     */
+    public String get${col.JavaName}Name() {
+        if (_${col.UncapitalisedJavaName} == null) {
+            return null;
+        }
+        final java.util.Map${database.filterGenericsString('String, String')} map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
+        return (String)map.get(_${col.UncapitalisedJavaName}.toString());
+    }
+
+    /**
+     * Get the value of ${col.UncapitalisedJavaName} as classification-alias.
+     * 
+     * @return The value of ${col.UncapitalisedJavaName} as classification-alias. (Nullable)
+     */
+    public String get${col.JavaName}Alias() {
+        if (_${col.UncapitalisedJavaName} == null) {
+            return null;
+        }
+        final java.util.Map${database.filterGenericsString('String, String')} map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
+        return (String)map.get(_${col.UncapitalisedJavaName}.toString());
+    }
+  #end
+#end
+
+    // =====================================================================================
+    //                                                          Classification Determination
+    //                                                          ============================
+#foreach ($col in $table.Columns)
+  #if (${col.hasClassification()})
+    #foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+     * The difference of capital letters and small letters is NOT distinguished.
+     * If the value is null, this method returns false!
+     * 
+     * @return Determanation.
+     */
+    public boolean is${col.JavaName}${classificationMap.get('name')}() {
+        if (_${col.UncapitalisedJavaName} == null) {
+            return false;
+        }
+        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        return code.equalsIgnoreCase(_${col.UncapitalisedJavaName}.toString());
+    }
+
+    /**
+     * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+     * The difference of capital letters and small letters is NOT distinguished.
+     * If the value is null, this method throws exception!
+     * 
+     * @return Determanation.
+     */
+    public boolean is${col.JavaName}${classificationMap.get('name')}IfNullException() {
+        if (_${col.UncapitalisedJavaName} == null) {
+            String msg = "If the value of ${col.UncapitalisedJavaName} is null, this method throws exception!";
+            throw new IllegalStateException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
+        }
+        return is${col.JavaName}${classificationMap.get('name')}();
+    }
+    #end
+  #end
+#end
+
+    // =====================================================================================
+    //                                                                         Foreign Table
+    //                                                                         =============
+#set ($foreignKeysIndex = 0)
+#foreach ($foreignKeys in $table.ForeignKeys)
+  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
+  #set ($foreignDaoClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}Dao")
+  #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
+  #set ($parentCBClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionBeanInitialName}")
+
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   ForeignTable    = [${foreignKeys.ForeignTable.Name}]
+    //   ForeignProperty = [${foreignKeys.ForeignPropertyName}]
+    // * * * * * * * * */
+
+    /** RELNO of foreign table for s2dao. */
+    public static final int ${foreignKeys.ForeignJavaBeansRulePropertyName}_RELNO = ${foreignKeysIndex};
+
+    /** RELKEYS of foreign table for s2dao. */
+    public static final String ${foreignKeys.ForeignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.RelationKeysCommaString";
+
+    /** The entity of foreign table. */
+    protected ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
+  #if (${database.isAvailableEntityLazyLoad()})
+
+    /**
+     * Get the entity of foreign table.
+     * 
+     * @return The entity of foreign table.
+     */
+    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignPropertyNameInitCap}() {
+        if (${foreignVariableName} != null) {
+            return ${foreignVariableName};
+        }
+  #foreach ($columnName in $foreignKeys.LocalColumns)
+    #set ($localColumn = $table.getColumn($columnName))
+
+        if (_${localColumn.UncapitalisedJavaName} == null) {
+            return null;
+        }
+  #end
+
+        // [LazyLoad] - If the target instance does not exist, lazyload the instance and return it.
+        final ${foreignDaoClassName} dao = (${foreignDaoClassName})${glLazyLoadContainerClassName}.getInstance().getDaoInstance(${foreignDaoClassName}.class);
+        final ${glPackageCB}.${parentCBClassName} ${glAttachedCBArgsVariableName} = new ${glPackageCB}.${parentCBClassName}();
+        ${glAttachedCBArgsVariableName}.query().${foreignKeys.getForeignTableBeanSetupString("_Equal")};
+        ${foreignVariableName} = dao.selectEntity(${glAttachedCBArgsVariableName});
+        return $foreignVariableName;
+    }
+
+    /**
+     * Get the entity of foreign table without lazyload.
+     * 
+     * @return The entity of foreign table.
+     */
+    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignPropertyNameInitCap}WithoutLazy() {
+        return ${foreignVariableName};
+    }
+  #else
+
+    /**
+     * Get the entity of foreign table without lazyload.
+     * 
+     * @return The entity of foreign table.
+     */
+    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignPropertyNameInitCap}() {
+        return ${foreignVariableName};
+    }
+  #end
+
+    /**
+     * Set the entity of foreign table.
+     * 
+     * @param v The entity of foreign table.
+     */
+    public void set${foreignKeys.foreignPropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} v) {
+        ${foreignVariableName} = v;
+    }
+  #set ($foreignKeysIndex = $foreignKeysIndex + 1)
+#end
+
+    // =====================================================================================
+    //                                                                        Refferer Table
+    //                                                                        ==============
+#foreach ($refferer in $table.Referrers)
+  #set ($reffererTable = $refferer.Table)
+  #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
+  #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
+  #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
+  #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+  #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
+
+  #if (${refferer.isOneToOne()})
+
+    // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
+    //   ReffererTable    = [${refferer.Table.Name}]
+    //   ReffererProperty = [${refferer.ReffererPropertyName}]
+    // * * * * * * * * */
+
+    /** RELNO of foreign table for s2dao. */
+    public static final int ${refferer.ReffererJavaBeansRulePropertyNameAsOne}_RELNO = ${foreignKeysIndex};
+
+    /** RELKEYS of foreign table for s2dao. */
+    public static final String ${refferer.ReffererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$refferer.RelationKeysCommaStringForOneToOneRefferer";
+    #set ($foreignKeysIndex = $foreignKeysIndex + 1)
+  #else
+
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   ReffererTable    = [${refferer.Table.Name}]
+    //   ReffererProperty = [${refferer.ReffererPropertyName}]
+    // * * * * * * * * */
+  #end
+
+    /** The list of refferer table. */
+    protected java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} $reffererVariableName;
+  #if (${database.isAvailableEntityLazyLoad()})
+
+    /**
+     * Get the list of refferer table.
+     * If it's not loaded yet and its primary keys are invalid, returns null.
+     * 
+     * @return The list of refferer table. (Nullable)
+     */
+    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.ReffererPropertyNameInitCap}() {
+        if (${reffererVariableName} != null) {
+            return ${reffererVariableName};
+        }
+    #foreach ($col in $table.PrimaryKey)
+
+        if (_${col.UncapitalisedJavaName} == null) {
+            return null;
+        }
+    #end
+
+        // [LazyLoad] - If the target instance does not exist, lazyload the instance and return it.
+        final ${reffererDaoClassName} dao = (${reffererDaoClassName})${glLazyLoadContainerClassName}.getInstance().getDaoInstance(${reffererDaoClassName}.class);
+        final ${glPackageCB}.${reffererCBClassName} ${glAttachedCBArgsVariableName} = new ${glPackageCB}.${reffererCBClassName}();
+        ${glAttachedCBArgsVariableName}.query().${refferer.getChildrenTableBeanSetupString("_Equal")};
+        ${reffererVariableName} = dao.selectList(${glAttachedCBArgsVariableName});
+        return $reffererVariableName;
+    }
+
+    /**
+     * Get the list of refferer table without lazyload.
+     * If it's not loaded yet, returns null.
+     * 
+     * @return The list of refferer table. (Nullable)
+     */
+    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.ReffererPropertyNameInitCap}WithoutLazy() {
+        return ${reffererVariableName};
+    }
+
+    /**
+     * Set the list of refferer table.
+     * 
+     * @param value The list of refferer table. (Nullable)
+     */
+    public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} value) {
+        ${reffererVariableName} = value;
+    }
+    #if (${refferer.isOneToOne()})
+
+    /**
+     * Get the entity of refferer table as one.
+     * If it's not loaded yet and its primary keys are invalid, returns null.
+     * If the size of the refferer table list is zero, throws the exception.
+     * 
+     * @return The entity of refferer table. (Nullable)
+     */
+    public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}() {
+        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}();
+        if (ls.isEmpty()) {
+            return null;
+        }
+        if (ls.size() > 1) {
+            String msg = "The size of the list must be one because this relation is 'one-to-one'";
+            msg = msg + ": list=" + ls + ": toString()=" + toString();
+            throw new IllegalStateException(msg);
+        }
+        return (${reffererEntityLongClassName})ls.get(0);
+    }
+
+    /**
+     * Get the entity of refferer table as one without lazyload.
+     * If it's not loaded yet, returns null.
+     * If the size of the refferer list is zero, throws the exception.
+     * 
+     * @return The entity of refferer table. (Nullable)
+     */
+    public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}WithoutLazy() {
+        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}WithoutLazy();
+        if (ls.isEmpty()) {
+            return null;
+        }
+        if (ls.size() > 1) {
+            String msg = "The size of the list must be one because this relation is 'one-to-one'";
+            msg = msg + ": list=" + ls + ": toString()=" + toString();
+            throw new IllegalStateException(msg);
+        }
+        return (${reffererEntityLongClassName})ls.get(0);
+    }
+
+    /**
+     * Set the entity of refferer table as one.
+     * 
+     * @param entity The entity of refferer table. (Nullable)
+     */
+    public void set${refferer.ReffererPropertyNameInitCapAsOne}(${reffererEntityLongClassName} entity) {
+        if (entity == null) {
+            ${reffererVariableName} = null;
+            return;
+        }
+        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = new java.util.ArrayList${database.filterGenericsString(${reffererEntityLongClassName})}();
+        ls.add(entity);
+        ${reffererVariableName} = ls;
+    }
+
+    #end
+  #else
+
+    /**
+     * Get the list of refferer table without lazyload.
+     * If it's not loaded yet, returns null.
+     * 
+     * @return The list of refferer table. (Nullable)
+     */
+    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.ReffererPropertyNameInitCap}() {
+        return ${reffererVariableName};
+    }
+
+    /**
+     * Set the list of refferer table.
+     * 
+     * @param value The list of refferer table. (Nullable)
+     */
+    public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} value) {
+        ${reffererVariableName} = value;
+    }
+    #if (${refferer.isOneToOne()})
+
+    /**
+     * Get the entity of refferer table as one without lazyload.
+     * If it's not loaded yet, returns null.
+     * If the size of the refferer table list is zero, throws the exception.
+     * 
+     * @return The entity of refferer table. (Nullable)
+     */
+    public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}() {
+        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}();
+        if (ls.isEmpty()) {
+            return null;
+        }
+        if (ls.size() > 1) {
+            String msg = "The size of the list must be one because this relation is 'one-to-one'";
+            msg = msg + ": list=" + ls + ": toString()=" + toString();
+            throw new IllegalStateException(msg);
+        }
+        return (${reffererEntityLongClassName})ls.get(0);
+    }
+
+    /**
+     * Set the entity of refferer table as one.
+     * 
+     * @param entity The entity of refferer table. (Nullable)
+     */
+    public void set${refferer.ReffererPropertyNameInitCapAsOne}(${reffererEntityLongClassName} entity) {
+        if (entity == null) {
+            ${reffererVariableName} = null;
+            return;
+        }
+        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = new java.util.ArrayList${database.filterGenericsString(${reffererEntityLongClassName})}();
+        ls.add(entity);
+        ${reffererVariableName} = ls;
+    }
+    #end
+  #end
+#end
+
+    // =====================================================================================
+    //                                                                                Accept
+    //                                                                                ======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param primaryKeyMap Primary key map. (NotNull and NotEmpty)
+     * @return Instance of query. (NotNull)
+     */
+    public ${glEntityInterfaceName} acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
+        if (primaryKeyMap == null) {
+            String msg = "The argument[primaryKeyMap] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (primaryKeyMap.isEmpty()) {
+            String msg = "The argument[primaryKeyMap] should not be empty.";
+            throw new IllegalArgumentException(msg);
+        }
+#if ($table.hasPrimaryKey())
+  #foreach ($col in $table.PrimaryKey)
+
+        if (!primaryKeyMap.containsKey("${col.Name}")) {
+            String msg = "The primaryKeyMap must have the value of ${col.Name}";
+            throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+        }
+        {
+            final Object obj = primaryKeyMap.get("${col.Name}");
+            if (obj == null) {
+                set${col.JavaName}(null);
+            } else {
+                if (obj instanceof ${col.JavaNative}) {
+                    set${col.JavaName}((${col.JavaNative})obj);
+                } else {
+                    if (!(obj instanceof String)) {
+                        String msg = "The value should be ${col.JavaNative} or String: ";
+                        msg = msg + "valueType=" + obj.getClass() + " value=" + obj;
+                        throw new IllegalArgumentException(msg);
+                    }
+    #if ($col.isJavaNativeStringObject())
+
+                    set${col.JavaName}((String)obj);
+    #else
+      #if ($col.isJavaNativeDateObject())
+
+                    final String value = (String)obj;
+                    try {
+                        set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value));
+                    } catch (java.text.ParseException e) {
+                        String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    } catch (RuntimeException e) {
+                        String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    }
+      #else
+        #if (${col.isJavaNativeBinaryObject()})
+
+                    set${col.JavaName}(null);// Binary as String is out of target.
+        #else
+
+                    final String value = (String)obj;
+                    try {
+                        set${col.JavaName}(new ${col.JavaNative}(value));
+                    } catch (RuntimeException e) {
+                        String msg = "set${col.JavaName}(new ${col.JavaNative}(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    }
+        #end
+      #end
+    #end
+
+                }
+            }
+        }
+  #end
+
+        return this;
+#else
+
+        return acceptColumnValueMap(primaryKeyMap);
+#end
+
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull and NotEmpty)
+     * @return this. (NotNull)
+     */
+    public ${glEntityInterfaceName} acceptPrimaryKeyMapString(String primaryKeyMapString) {
+        if (primaryKeyMapString == null) {
+            String msg = "The argument[primaryKeyMapString] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+        final String suffix = MAP_STRING_END_BRACE;
+        if (!primaryKeyMapString.trim().startsWith(prefix)) {
+            primaryKeyMapString = prefix + primaryKeyMapString;
+        }
+        if (!primaryKeyMapString.trim().endsWith(suffix)) {
+            primaryKeyMapString = primaryKeyMapString + suffix;
+        }
+        ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+        mapListString.setMapMark(MAP_STRING_MAP_MARK);
+        mapListString.setListMark(MAP_STRING_LIST_MARK);
+        mapListString.setStartBrace(MAP_STRING_START_BRACE);
+        mapListString.setEndBrace(MAP_STRING_END_BRACE);
+        mapListString.setEqual(MAP_STRING_EQUAL);
+        mapListString.setDelimiter(MAP_STRING_DELIMITER);
+        return acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param columnValueMap Column-value map. (NotNull and NotEmpty)
+     * @return Instance of query. (NotNull)
+     */
+    public ${glEntityInterfaceName} acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
+        if (columnValueMap == null) {
+            String msg = "The argument[columnValueMap] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (columnValueMap.isEmpty()) {
+            String msg = "The argument[columnValueMap] should not be empty.";
+            throw new IllegalArgumentException(msg);
+        }
+  #foreach ($col in $table.Columns)
+
+        {
+            final Object obj = columnValueMap.get("${col.Name}");
+            if (obj == null) {
+                set${col.JavaName}(null);
+            } else {
+                if (obj instanceof ${col.JavaNative}) {
+                    set${col.JavaName}((${col.JavaNative})obj);
+                } else {
+                    if (!(obj instanceof String)) {
+                        String msg = "The value should be ${col.JavaNative} or String: ";
+                        msg = msg + "valueType=" + obj.getClass() + " value=" + obj;
+                        throw new IllegalArgumentException(msg);
+                    }
+    #if ($col.isJavaNativeStringObject())
+
+                    set${col.JavaName}((String)obj);
+    #else
+      #if ($col.isJavaNativeDateObject())
+
+                    final String value = (String)obj;
+                    try {
+                        set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value));
+                    } catch (java.text.ParseException e) {
+                        String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    } catch (RuntimeException e) {
+                        String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    }
+      #else
+        #if (${col.isJavaNativeBinaryObject()})
+
+                    set${col.JavaName}(null);// Binary as String is out of target.
+        #else
+
+                    final String value = (String)obj;
+                    try {
+                        set${col.JavaName}(new ${col.JavaNative}(value));
+                    } catch (RuntimeException e) {
+                        String msg = "set${col.JavaName}(new ${col.JavaNative}(value))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                    }
+        #end
+      #end
+    #end
+
+                }
+            }
+        }
+  #end
+
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param columnValueMapString Column-value map-string. (NotNull and NotEmpty)
+     * @return this. (NotNull)
+     */
+    public ${glEntityInterfaceName} acceptColumnValueMapString(String columnValueMapString) {
+        if (columnValueMapString == null) {
+            String msg = "The argument[columnValueMapString] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+        final String suffix = MAP_STRING_END_BRACE;
+        if (!columnValueMapString.trim().startsWith(prefix)) {
+            columnValueMapString = prefix + columnValueMapString;
+        }
+        if (!columnValueMapString.trim().endsWith(suffix)) {
+            columnValueMapString = columnValueMapString + suffix;
+        }
+        ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+        mapListString.setMapMark(MAP_STRING_MAP_MARK);
+        mapListString.setListMark(MAP_STRING_LIST_MARK);
+        mapListString.setStartBrace(MAP_STRING_START_BRACE);
+        mapListString.setEndBrace(MAP_STRING_END_BRACE);
+        mapListString.setEqual(MAP_STRING_EQUAL);
+        mapListString.setDelimiter(MAP_STRING_DELIMITER);
+        return acceptColumnValueMap(mapListString.generateMap(columnValueMapString));
+    }
+
+    // =====================================================================================
+    //                                                                               Extract
+    //                                                                               =======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Primary-key map-string. (NotNull)
+     */
+    public String extractPrimaryKeyMapString() {
+        final String startBrace = MAP_STRING_START_BRACE;
+        final String endBrace = MAP_STRING_END_BRACE;
+        final String delimiter = MAP_STRING_DELIMITER;
+        final String equal = MAP_STRING_EQUAL;
+        return extractPrimaryKeyMapString(startBrace, endBrace, delimiter, equal);
+    }
+
+    /**
+     * Extract primary-key map-string.
+     * 
+     * @param startBrace Start-brace. (NotNull)
+     * @param endBrace End-brace. (NotNull)
+     * @param delimiter Delimiter. (NotNull)
+     * @param equal Equal. (NotNull)
+     * @return Primary-key map-string. (NotNull)
+     */
+    public String extractPrimaryKeyMapString(String startBrace, String endBrace, String delimiter, String equal) {
+#if ($table.hasPrimaryKey())
+
+        final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
+        final StringBuffer sb = new StringBuffer();
+
+  #foreach ($col in $table.PrimaryKey)
+    #if ($col.isJavaNativeDateObject())
+
+        sb.append(delimiter).append("${col.Name}").append(equal);
+        sb.append((_${col.UncapitalisedJavaName} != null ? java.text.DateFormat.getDateTimeInstance().format(_${col.UncapitalisedJavaName}) : ""));
+    #else
+
+        sb.append(delimiter).append("${col.Name}").append(equal);
+        sb.append((_${col.UncapitalisedJavaName} != null ? _${col.UncapitalisedJavaName}.toString() : ""));
+    #end
+  #end
+
+        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
+        return sb.toString();
+#else
+
+        return extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
+#end
+
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Column-value map-string. (NotNull)
+     */
+    public String extractColumnValueMapString() {
+        final String startBrace = MAP_STRING_START_BRACE;
+        final String endBrace = MAP_STRING_END_BRACE;
+        final String delimiter = MAP_STRING_DELIMITER;
+        final String equal = MAP_STRING_EQUAL;
+        return extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
+    }
+
+    /**
+     * Extract column-value map-string.
+     * 
+     * @param startBrace Start-brace. (NotNull)
+     * @param endBrace End-brace. (NotNull)
+     * @param delimiter Delimiter. (NotNull)
+     * @param equal Equal. (NotNull)
+     * @return Column-value map-string. (NotNull)
+     */
+    public String extractColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal) {
+        final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
+        final StringBuffer sb = new StringBuffer();
+
+#foreach ($col in $table.Columns)
+    #if ($col.isJavaNativeDateObject())
+
+        sb.append(delimiter).append("${col.Name}").append(equal);
+        sb.append((_${col.UncapitalisedJavaName} != null ? java.text.DateFormat.getDateTimeInstance().format(_${col.UncapitalisedJavaName}) : ""));
+    #else
+
+        sb.append(delimiter).append("${col.Name}").append(equal);
+        sb.append((_${col.UncapitalisedJavaName} != null ? _${col.UncapitalisedJavaName}.toString() : ""));
+    #end
+#end
+
+        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
+        return sb.toString();
+    }
+#if (${table.hasAllCommonColumn()})
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Column-value map-string. (NotNull)
+     */
+    public String extractCommonColumnValueMapString() {
+        final String startBrace = MAP_STRING_START_BRACE;
+        final String endBrace = MAP_STRING_END_BRACE;
+        final String delimiter = MAP_STRING_DELIMITER;
+        final String equal = MAP_STRING_EQUAL;
+        return extractCommonColumnValueMapString(startBrace, endBrace, delimiter, equal);
+    }
+
+    /**
+     * Extract common-column-value map-string.
+     * 
+     * @param startBrace Start-brace. (NotNull)
+     * @param endBrace End-brace. (NotNull)
+     * @param delimiter Delimiter. (NotNull)
+     * @param equal Equal. (NotNull)
+     * @return Common-column-value map-string. (NotNull)
+     */
+    public String extractCommonColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal) {
+        final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
+        final StringBuffer sb = new StringBuffer();
+  #foreach ($columnName in ${database.CommonColumnNameList})
+    #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+    #set ($col = $table.getColumn($columnName))
+    #if ($col.isJavaNativeDateObject())
+
+        sb.append(delimiter).append("${columnName}").append(equal);
+        sb.append((_${col.UncapitalisedJavaName} != null ? java.text.DateFormat.getDateTimeInstance().format(_${uncapitalisedJavaName}) : ""));
+    #else
+
+        sb.append(delimiter).append("${columnName}").append(equal);
+        sb.append((_${col.UncapitalisedJavaName} != null ? _${uncapitalisedJavaName}.toString() : ""));
+    #end
+  #end
+
+        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
+        return sb.toString();
+    }
+#end
+
+## TODO: Is it unnecessary???
+## #foreach ($foreignKeys in $table.ForeignKeys)
+##   #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
+## 
+##         {
+##             sb.append(delimiter);
+##             if (${foreignVariableName} != null) {
+##                 sb.append("${foreignKeys.ForeignPropertyName}").append(equal);
+##                 sb.append(${foreignVariableName}.extractColumnValueMapString(startBrace, endBrace, delimiter, equal));
+##             } else {
+##                 sb.append("${foreignKeys.ForeignPropertyName}").append(equal).append("null");
+##             }
+##         }
+## #end
+## #foreach ($refferer in $table.Referrers)
+##   #set ($reffererTable = $refferer.Table)
+##   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
+##   #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+## 
+##         {
+##             final String listMarkAndStartBrace = MAP_STRING_LIST_MARK + startBrace;
+##             sb.append(delimiter).append("${refferer.ReffererPropertyName}").append(equal);
+##             if (${reffererVariableName} != null) {
+##                 final StringBuffer reffererTmpSb = new StringBuffer();
+##                 for (final java.util.Iterator ite = ${reffererVariableName}.iterator(); ite.hasNext(); ) {
+##                     final ${glPackageExtendedEntity}.${reffererEntityClassName} refferer;
+##                     refferer = (${glPackageExtendedEntity}.${reffererEntityClassName})ite.next();
+##                     reffererTmpSb.append(delimiter);
+##                     reffererTmpSb.append(refferer.extractColumnValueMapString(startBrace, endBrace, delimiter, equal));
+##                 }
+##                 reffererTmpSb.delete(0, delimiter.length()).insert(0, listMarkAndStartBrace).append(endBrace);
+##                 sb.append(reffererTmpSb);
+##             } else {
+##                 sb.append("null");
+##             }
+##         }
+## #end
+
+    // =====================================================================================
+    //                                                                         Determination
+    //                                                                         =============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean hasPrimaryKeyValue() {
+  #foreach ($col in $table.PrimaryKey)
+
+        if (_${col.UncapitalisedJavaName} == null) {
+            return false;
+        }
+  #end
+
+        return true;
+    }
+
+    // =====================================================================================
+    //                                                                 Basic-Override Method
+    //                                                                 =====================
+#if ($table.hasPrimaryKey())
+    
+    /**
+     * ${database.OverrideComment}
+     * If the primary-key of the other is same as this one, returns true.
+     * 
+     * @param other Other entity.
+     * @return Comparing result.
+     */
+    public boolean equals(Object other) {
+        if (!(other instanceof $myClassName)) {
+            return false;
+        }
+        if (other == null) {
+            return false;
+        }
+        final String thisMapString = extractPrimaryKeyMapString();
+        final String otherMapString = (($myClassName)other).extractPrimaryKeyMapString();
+
+        return thisMapString.equals(otherMapString);
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * Calculates hash-code from primary-key.
+     * 
+     * @return Hash-code from primary-keys.
+     */
+    public int hashCode() {
+        int result = 0;
+  #foreach ($col in $table.PrimaryKey)
+
+        if (this.get${col.JavaName}() != null) {
+            result = result + this.get${col.JavaName}().hashCode();
+        }
+  #end
+
+        return result;
+    }
+#else
+    
+    /**
+     * ${database.OverrideComment}
+     * If the all-column value of the other is same as this one, returns true.
+     * 
+     * @param other Other entity. (Nullable)
+     * @return Comparing result. If other is null, returns false.
+     */
+    public boolean equals(Object other) {
+        if (!(other instanceof $myClassName)) {
+            return false;
+        }
+        if (other == null) {
+            return false;
+        }
+        final String thisMapString = extractColumnValueMapString();
+        final String otherMapString = (($myClassName)other).extractColumnValueMapString();
+
+        return thisMapString.equals(otherMapString);
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * Calculates hash-code from all-columns.
+     * 
+     * @return Hash-code from all-columns.
+     */
+    public int hashCode() {
+        int result = 0;
+  #foreach ($col in $table.Columns)
+
+        if (this.get${col.JavaName}() != null) {
+            result = result + this.get${col.JavaName}().hashCode();
+        }
+  #end
+
+        return result;
+    }
+#end
+
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return Column-value map-string. (NotNull)
+     */
+    public String toString() {
+        final String startBrace = "{";
+        final String endBrace = "}";
+        final String delimiter = ";";
+        final String equal = "=";
+        final String primaryKeyMapString = extractPrimaryKeyMapString(startBrace, endBrace, delimiter, equal);
+        final String columnValueMapString = extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
+        return "[PK] " + primaryKeyMapString + " [ALL] " + columnValueMapString;
+    }
+}

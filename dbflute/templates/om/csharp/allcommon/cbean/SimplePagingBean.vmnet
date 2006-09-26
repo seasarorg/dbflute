@@ -1,0 +1,245 @@
+
+using System;
+using System.Collections;
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The condition-bean as interface.
+    /// 
+    /// This bean is supported:
+    ///   o FetchNarrowing
+    ///   o Paging
+    ///   o OrderBy
+    /// 
+    /// - ${glSimplePagingBeanName} pb = new ${glSimplePagingBeanName}();
+    /// - pb.FetchFirst(1);
+    /// - pb.RegisterOrderByAsc("BOOK_ID");
+    /// - ...
+    /// 
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public class ${glSimplePagingBeanName} : ${glPagingBeanInterfaceName} {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        /** SQL clause instance. */
+        protected readonly ${glSqlClauseName} _sqlClause;
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        /**
+         * Constructor.
+         */
+        public ${glSimplePagingBeanName}() {
+            _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}("Dummy");
+        }
+
+        protected ${glSqlClauseName} SqlClause {
+            get { return _sqlClause; }
+        }
+
+        // =====================================================================================
+        //                                                                                Paging
+        //                                                                                ======
+        /// <summary>
+        /// Fetch first.
+        /// If you invoke this, your SQL returns [fetch-size] records from first.
+        /// </summary>
+        /// <param name="fetchSize">Fetch-size. (NotMinus & NotZero)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${glPagingBeanInterfaceName} FetchFirst(int fetchSize) {
+            this.SqlClause.FetchFirst(fetchSize);
+            return this;
+        }
+
+        /// <summary>
+        /// Fetch scope.
+        /// If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
+        /// </summary>
+        /// <param name="fetchStartIndex">Fetch-start-index. 0 origin. (NotMinus)</param>
+        /// <param name="fetchSize">Fetch-size. (NotMinus & NotZero)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${glPagingBeanInterfaceName} FetchScope(int fetchStartIndex, int fetchSize) {
+            this.SqlClause.FetchScope(fetchStartIndex, fetchSize);
+            return this;
+        }
+
+        /// <summary>
+        /// Fetch page.
+        /// When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
+        /// But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
+        /// If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
+        /// </summary>
+        /// <param name="fetchPageNumber">Fetch-page-number. 1 origin. (NotMinus & NotZero)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${glPagingBeanInterfaceName} FetchPage(int fetchPageNumber) {
+            this.SqlClause.FetchPage(fetchPageNumber);
+            return this;
+        }
+
+        public int FetchPageNumber {
+            get { return this.SqlClause.FetchPageNumber; }
+        }
+
+        public int FetchStartIndex {
+            get { return this.SqlClause.FetchStartIndex; }
+        }
+
+        public int FetchSize {
+            get { return this.SqlClause.FetchSize; }
+        }
+
+        // =====================================================================================
+        //                                                                        FetchNarrowing
+        //                                                                        ==============
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch-narrowing start-index.
+         */
+        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.FetchNarrowingSkipStartIndex; } }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Fetch-narrowing size.
+         */
+        public int FetchNarrowingLoopCount { get { return this.SqlClause.FetchNarrowingLoopCount; } }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determination.
+         */
+        public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.IsFetchStartIndexSupported; } }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determination.
+         */
+        public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.IsFetchSizeSupported; } }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Determiantion.
+         */
+        public bool IsFetchNarrowingEffective { get { return this.SqlClause.IsFetchNarrowingEffective; } }
+
+
+        // =====================================================================================
+        //                                                                                Clause
+        //                                                                                ======
+	    /**
+	     * Get select-hint.
+	     * 
+	     * @return Select-hint. (NotNull)
+	     */
+	    public String SelectHint { get { return this.SqlClause.GetSelectHint(); } }
+
+        /**
+         * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
+         * 
+         * @return From-base-table-hint. (NotNull)
+         */
+        public String FromBaseTableHint { get { return this.SqlClause.GetFromBaseTableHint(); } }
+
+	    /**
+	     * Get from-hint.
+	     * 
+	     * @return From-hint. (NotNull)
+	     */
+	    public String FromHint { get { return this.SqlClause.GetFromHint(); } }
+
+	    /**
+	     * Get sql-suffix.
+	     * 
+	     * @return Sql-suffix. (NotNull)
+	     */
+	    public String SqlSuffix { get { return this.SqlClause.GetSqlSuffix(); } }
+
+	    /**
+	     * Get order-by clause.
+	     * 
+	     * @return Order-by clause. (NotNull)
+	     */
+	    public String OrderByClause { get { return this.SqlClause.GetOrderByClause(); } }
+
+        // =====================================================================================
+        //                                                                               OrderBy
+        //                                                                               =======
+        /// <summary>
+        /// The property of sql component of order-by clause.
+        /// </summary>
+        public ${glOrderByClauseName} SqlComponentOfOrderByClause {
+            get { return this.SqlClause.GetSqlComponentOfOrderByClause(); }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public ${glOrderByBeanInterfaceName} ClearOrderBy() {
+            this.SqlClause.ClearOrderBy();
+            return this;
+        }
+
+	    /**
+	     * ${database.ImplementComment}
+	     * 
+	     * @return this. (NotNull)
+	     */
+        public ${glOrderByBeanInterfaceName} IgnoreOrderBy() {
+            this.SqlClause.IgnoreOrderBy();
+            return this;
+        }
+
+	    /**
+	     * ${database.ImplementComment}
+	     * 
+	     * @return this. (NotNull)
+	     */
+        public ${glOrderByBeanInterfaceName} MakeOrderByEffective() {
+            this.SqlClause.MakeOrderByEffective();
+            return this;
+        }
+
+	    /**
+	     * Register order-by-asc.
+	     * 
+	     * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
+	     * @return this. (NotNull)
+	     */
+	    public ${glOrderByBeanInterfaceName} RegisterOrderByAsc(String columnFullName) {
+	        this.SqlClause.RegisterOrderBy(columnFullName, null, true);
+	        return this;
+	    }
+
+	    /**
+	     * Register order-by-desc.
+	     * 
+	     * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
+	     * @return this. (NotNull)
+	     */
+	    public ${glOrderByBeanInterfaceName} RegisterOrderByDesc(String columnFullName) {
+	        this.SqlClause.RegisterOrderBy(columnFullName, null, false);
+	        return this;
+	    }
+
+	    public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByAsc(String columnFullName) {
+	        this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(columnFullName, null, true);
+	        return this;
+	    }
+
+	    public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByDesc(String columnFullName) {
+	        this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(columnFullName, null, false);
+	        return this;
+	    }
+    }
+}
