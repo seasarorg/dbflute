@@ -11,7 +11,7 @@
 #                                                               Support Version
 #                                                               ===============
 Java
-	Java-1.4.X or Java-5.0
+	JDK-1.4.X or JDK-5.0
 	S2Dao = 1.0.35
 
 CSharp
