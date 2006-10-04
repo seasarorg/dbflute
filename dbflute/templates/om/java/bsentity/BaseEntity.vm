@@ -447,7 +447,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}() {
         final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}();
-        if (ls.isEmpty()) {
+        if (ls == null || ls.isEmpty()) {
             return null;
         }
         if (ls.size() > 1) {
@@ -467,7 +467,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}WithoutLazy() {
         final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}WithoutLazy();
-        if (ls.isEmpty()) {
+        if (ls == null || ls.isEmpty()) {
             return null;
         }
         if (ls.size() > 1) {
@@ -525,7 +525,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}() {
         final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}();
-        if (ls.isEmpty()) {
+        if (ls == null || ls.isEmpty()) {
             return null;
         }
         if (ls.size() > 1) {
@@ -582,32 +582,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         {
             final Object obj = primaryKeyMap.get("${col.Name}");
             if (obj == null) {
-                set${col.JavaName}(null);
+                _${col.UncapitalisedJavaName} = null;
+                _isSetterInvoked${col.JavaName} = false;
             } else {
                 if (obj instanceof ${col.JavaNative}) {
                     set${col.JavaName}((${col.JavaNative})obj);
                 } else {
-                    if (!(obj instanceof String)) {
-                        String msg = "The value should be ${col.JavaNative} or String: ";
-                        msg = msg + "valueType=" + obj.getClass() + " value=" + obj;
-                        throw new IllegalArgumentException(msg);
-                    }
+                    checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
     #if ($col.isJavaNativeStringObject())
 
                     set${col.JavaName}((String)obj);
     #else
       #if ($col.isJavaNativeDateObject())
 
-                    final String value = (String)obj;
-                    try {
-                        set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value));
-                    } catch (java.text.ParseException e) {
-                        String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    } catch (RuntimeException e) {
-                        String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    }
+                    set${col.JavaName}((${col.JavaNative})parseDate((String)obj));
       #else
         #if (${col.isJavaNativeBinaryObject()})
 
@@ -687,32 +675,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         {
             final Object obj = columnValueMap.get("${col.Name}");
             if (obj == null) {
-                set${col.JavaName}(null);
+                _${col.UncapitalisedJavaName} = null;
+                _isSetterInvoked${col.JavaName} = false;
             } else {
                 if (obj instanceof ${col.JavaNative}) {
                     set${col.JavaName}((${col.JavaNative})obj);
                 } else {
-                    if (!(obj instanceof String)) {
-                        String msg = "The value should be ${col.JavaNative} or String: ";
-                        msg = msg + "valueType=" + obj.getClass() + " value=" + obj;
-                        throw new IllegalArgumentException(msg);
-                    }
+                    checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
     #if ($col.isJavaNativeStringObject())
 
                     set${col.JavaName}((String)obj);
     #else
       #if ($col.isJavaNativeDateObject())
 
-                    final String value = (String)obj;
-                    try {
-                        set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value));
-                    } catch (java.text.ParseException e) {
-                        String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    } catch (RuntimeException e) {
-                        String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    }
+                    set${col.JavaName}((${col.JavaNative})parseDate((String)obj));
       #else
         #if (${col.isJavaNativeBinaryObject()})
 
@@ -765,6 +741,29 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         mapListString.setEqual(MAP_STRING_EQUAL);
         mapListString.setDelimiter(MAP_STRING_DELIMITER);
         return acceptColumnValueMap(mapListString.generateMap(columnValueMapString));
+    }
+
+    protected void checkTypeString(Object value, String propertyName, String typeName) {
+        if (value == null) {
+            throw new IllegalArgumentException("The value should not be null: " + propertyName);
+        }
+        if (!(value instanceof String)) {
+            String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
+            msg = msg + "valueType=" + value.getClass() + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected java.util.Date parseDate(String value) {
+        try {
+            return java.text.DateFormat.getDateTimeInstance().parse(value);
+        } catch (java.text.ParseException e) {
+            String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+        } catch (RuntimeException e) {
+            String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+        }
     }
 
     // =====================================================================================

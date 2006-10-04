@@ -70,6 +70,9 @@ public interface ${glEntityInterfaceName} {
     /**
      * Accept primary-key map.
      * 
+     * The column that column-value map-string doesn't have the key of or the value of is initialized.
+     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
+     * 
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
      * @return Instance of query. (NotNull)
      */
@@ -77,6 +80,9 @@ public interface ${glEntityInterfaceName} {
 
     /**
      * Accept primary-key map-string.
+     * 
+     * The column that column-value map-string doesn't have the key of or the value of is initialized.
+     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      * @return this. (NotNull)
@@ -86,6 +92,9 @@ public interface ${glEntityInterfaceName} {
     /**
      * Accept column-value map.
      * 
+     * The column that column-value map-string doesn't have the key of or the value of is initialized.
+     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
+     * 
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
      * @return Instance of query. (NotNull)
      */
@@ -93,6 +102,9 @@ public interface ${glEntityInterfaceName} {
 
     /**
      * Accept column-value map-string.
+     * 
+     * The column that column-value map-string doesn't have the key of or the value of is initialized.
+     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param columnValueMapString Column-value map-string. (NotNull)
      * @return this. (NotNull)

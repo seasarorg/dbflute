@@ -457,7 +457,7 @@ namespace ${myExtendedEntityPackageName} {
         public ${reffererEntityLongClassName} ${refferer.ReffererPropertyNameInitCapAsOne} {
             get {
                 System.Collections.IList ls = this.${refferer.ReffererPropertyNameInitCap};
-                if (ls.Count == 0) {
+                if (ls == null || ls.Count == 0) {
                     return null;
                 }
                 if (ls.Count > 1) {
@@ -505,8 +505,9 @@ namespace ${myExtendedEntityPackageName} {
 #if ($table.hasPrimaryKey())
   #foreach ($col in $table.PrimaryKey)
 
-            if (!primaryKeyMap.ContainsKey("${col.Name}")) {
-                ${col.JavaName} = null;
+            if (!primaryKeyMap.ContainsKey("${col.Name}") || primaryKeyMap["${col.Name}"] == null) {
+                _${col.UncapitalisedJavaName} = null;
+                _isSetterInvoked${col.JavaName} = false;
             } else {
                 String value = (String)primaryKeyMap["${col.Name}"];
     #if ($col.isJavaNativeStringObject())
@@ -590,8 +591,9 @@ namespace ${myExtendedEntityPackageName} {
 
   #foreach ($col in $table.Columns)
 
-            if (!columnValueMap.ContainsKey("${col.Name}")) {
-                ${col.JavaName} = null;
+            if (!columnValueMap.ContainsKey("${col.Name}") || columnValueMap["${col.Name}"] == null) {
+                _${col.UncapitalisedJavaName} = null;
+                _isSetterInvoked${col.JavaName} = false;
             } else {
                 String value = (String)columnValueMap["${col.Name}"];
     #if ($col.isJavaNativeStringObject())
