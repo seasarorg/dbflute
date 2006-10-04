@@ -90,14 +90,14 @@ public interface ${glBehaviorReadableInterfaceName} {
      * 
      * @return All count. (NotNull)
      */
-    public int delegateReadCountAllTx() ;
+    public int delegateReadCountAll() ;
 
     /**
      * Read list as all. (Delegate-Method)
      * 
      * @return All list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListAllTx();
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListAll();
 
     /**
      * Read count by condition-bean. (Delegate-Method)
@@ -106,7 +106,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read count. (NotNull)
      */
-    public int delegateReadCountIgnoreFetchScopeTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+    public int delegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
     /**
      * Read entity by condition-bean. (Delegate-Method)
@@ -114,7 +114,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read entity. If the select result is zero, it returns null. (Nullable)
      */
-    public ${glEntityInterfaceName} delegateReadEntityTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+    public ${glEntityInterfaceName} delegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
     /**
      * Read list by condition-bean. (Delegate-Method)
@@ -122,7 +122,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
     // =====================================================================================
     //                                                                          Basic Select
@@ -133,7 +133,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @param ${glAttachedCBArgsVariableName} Condition-bean.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    public ${glListResultBeanName} readListTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+    public ${glListResultBeanName} readList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
     /**
      * Read page.
@@ -141,7 +141,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName} readPageTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+    public ${glPagingResultBeanName} readPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
     /**
      * ${database.ImplementComment}
@@ -150,7 +150,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Entity that is selected from database. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public ${glEntityInterfaceName} readEntityWithDeletedCheckTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+    public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
     // =====================================================================================
     //                                                                        Various Select
@@ -163,7 +163,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
      */
-    public ${glListResultBeanName} readListAfterCheckingCountIgnoreFetchScopeTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
+    public ${glListResultBeanName} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
 
     /**
      * Read for read only by primary-key map-string with deleted check.
@@ -172,7 +172,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Entity that is read from database by select-for-read-only. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheckTx(String primaryKeyMapString);
+    public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
 
     /**
      * Read for update by primary-key map-string with deleted check.
@@ -181,7 +181,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Entity that is read from database by select-for-update. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public ${glEntityInterfaceName} readForUpdateByPKMapStringWithDeletedCheckTx(String primaryKeyMapString);
+    public ${glEntityInterfaceName} readForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString);
 
     /**
      * The interface of select-page callback.

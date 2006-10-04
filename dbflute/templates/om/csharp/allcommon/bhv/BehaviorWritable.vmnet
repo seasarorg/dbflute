@@ -26,7 +26,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Inserted count.
          */
-        int DelegateCreateTx(${glEntityInterfaceName} entity);
+        int DelegateCreate(${glEntityInterfaceName} entity);
 
         /**
          * Modify entity. (Delegate-Method)
@@ -34,7 +34,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Updated count.
          */
-        int DelegateModifyTx(${glEntityInterfaceName} entity);
+        int DelegateModify(${glEntityInterfaceName} entity);
 
         /**
          * Remove entity. (Delegate-Method)
@@ -42,7 +42,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Deleted count.
          */
-        int DelegateRemoveTx(${glEntityInterfaceName} entity);
+        int DelegateRemove(${glEntityInterfaceName} entity);
 
         /**
          * Create several entity-list. (Delegate-Method)
@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @return Inserted count.
          */
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int DelegateCreateListTx(System.Collections.IList entityList);
+//        int DelegateCreateList(System.Collections.IList entityList);
 
         /**
          * Modify several entity-list. (Delegate-Method)
@@ -60,7 +60,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @return Updated count.
          */
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int DelegateModifyListTx(System.Collections.IList entityList);
+//        int DelegateModifyList(System.Collections.IList entityList);
 
         /**
          * Remove several entity-list. (Delegate-Method)
@@ -69,7 +69,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @return Deleted count.
          */
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int DelegateRemoveListTx(System.Collections.IList entityList);
+//        int DelegateRemoveList(System.Collections.IList entityList);
 
         /**
          * Modify after select-for-update.
@@ -79,7 +79,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
          */
 // TODO: Commented out because GetDaoReadable().GetType() doesn't have the method.
-//        int ModifyAfterSelectForUpdateTx(${glEntityInterfaceName} entity);
+//        int ModifyAfterSelectForUpdate(${glEntityInterfaceName} entity);
 
         // =====================================================================================
         //                                                                          Basic Update
@@ -91,7 +91,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
         /// <returns>Updated count.</returns>
-        int CreateOrModifyAfterSelectForUpdateTx(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        int CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
         /// Modify after select-for-update.
@@ -99,14 +99,11 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="entity">Entity.</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="MspadminBiz.Dao.Allcommon.exception.RecordHasAlreadyBeenDeletedException"></exception>
-        int ModifyAfterSelectForUpdateTx(MspadminBiz.Dao.Allcommon.Entity entity);
+        int ModifyAfterSelectForUpdate(MspadminBiz.Dao.Allcommon.Entity entity);
 
         /// <summary>
         /// Reflect(insert or update) from separated-file.
         /// </summary>
-        /// <remarks>
-        /// If transaction already started, The argument 'batchCount' is invalid. (Inherit the transaction)
-        /// </remarks>
         /// <param name="filename">Name of the file. (NotNull and NotEmpty)</param>
         /// <param name="encoding">Encoding of the file. (NotNull and NotEmpty)</param>
         /// <param name="delimiter">Delimiter of the file. (NotNull and NotEmpty)</param>

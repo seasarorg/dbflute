@@ -748,6 +748,10 @@ public class Database {
     public String getRequiredTxComponentName() {
         return getProperties().getRequiredTxComponentName();
     }
+    
+    public String getRequiresNewTxComponentName() {
+        return getProperties().getRequiresNewTxComponentName();
+    }
 
     public List<String> getDaoDiconOtherIncludePathList() {
         return getProperties().getDaoDiconOtherIncludePathList();
@@ -1371,6 +1375,10 @@ public class Database {
 
     public String getRequiredTransactionToBehaviorPointcut() {
         return ".*Tx";
+    }
+    
+    public String getRequiresNewTransactionToBehaviorPointcut() {
+        return ".*NewTx";
     }
 
     public String getOverrideComment() {

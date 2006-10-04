@@ -66,6 +66,7 @@
     #if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
 
     <component name="${table.UncapitalisedJavaName}Bhv" class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv">
+        <aspect pointcut="${database.RequiresNewTransactionToBehaviorPointcut}">${database.RequiresNewTxComponentName}</aspect>
         <aspect pointcut="${database.RequiredTransactionToBehaviorPointcut}">${database.RequiredTxComponentName}</aspect>
         <aspect pointcut="${database.ColumnSetupBeforeInsertInterceptorToBehaviorPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeInsertInterceptor</aspect>
         <aspect pointcut="${database.ColumnSetupBeforeUpdateInterceptorToBehaviorPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor</aspect>
@@ -80,6 +81,7 @@
     #else
 
     <component name="${table.UncapitalisedJavaName}Bhv" class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv">
+        <aspect pointcut="${database.RequiresNewTransactionToBehaviorPointcut}">${database.RequiresNewTxComponentName}</aspect>
         <aspect pointcut="${database.RequiredTransactionToBehaviorPointcut}">${database.RequiredTxComponentName}</aspect>
     #foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
       #set ($pointcut = ${database.getOriginalBehaviorAspectPointcut($componentName)})

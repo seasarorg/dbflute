@@ -61,7 +61,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @return All count.
      */
-    public int delegateReadCountAllTx() {
+    public int delegateReadCountAll() {
         final Object target = getDaoReadable();
         final String name = "getCountAll";
         final java.lang.reflect.Method mtd = getMethod(target.getClass(), name, new Class[]{});
@@ -74,7 +74,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @return All list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListAllTx() {
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListAll() {
         final Object target = getDaoReadable();
         final String name = "getListAll";
         final java.lang.reflect.Method mtd = getMethod(target.getClass(), name, new Class[]{});
@@ -88,7 +88,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      */
-    public int delegateReadCountIgnoreFetchScopeTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+    public int delegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final Object target = getDaoReadable();
         final String name = "selectCountIgnoreFetchScope";
@@ -104,7 +104,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read entity. If the select result is zero, it returns null. (Nullable)
      */
-    public ${glEntityInterfaceName} delegateReadEntityTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+    public ${glEntityInterfaceName} delegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final Object target = getDaoReadable();
         final String name = "selectEntity";
@@ -120,7 +120,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final Object target = getDaoReadable();
         final String name = "selectList";
@@ -167,9 +167,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param ${glAttachedCBArgsVariableName} Condition-bean.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateReadListTx(${glAttachedCBArgsVariableName}));
+        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateReadList(${glAttachedCBArgsVariableName}));
     }
 
     /**
@@ -178,15 +178,15 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPageTx(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})}() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return ${glAttachedCBArgsVariableName}; }
             public int selectCountIgnoreFetchScope() {
-                return delegateReadCountIgnoreFetchScopeTx(${glAttachedCBArgsVariableName});
+                return delegateReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
             }
             public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} selectList() {
-                return delegateReadListTx(${glAttachedCBArgsVariableName});
+                return delegateReadList(${glAttachedCBArgsVariableName});
             }
         };
         return new SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})}(this).invokeSelectPage(pageCallback);
@@ -199,9 +199,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return Entity that is read from database. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public ${glEntityInterfaceName} readEntityWithDeletedCheckTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+    public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        ${glEntityInterfaceName} currentEntity = delegateReadEntityTx(${glAttachedCBArgsVariableName});
+        ${glEntityInterfaceName} currentEntity = delegateReadEntity(${glAttachedCBArgsVariableName});
         assertRecordHasNotBeenDeleted(currentEntity, ${glAttachedCBArgsVariableName}.toString());
         return currentEntity;
     }
@@ -266,11 +266,11 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
      */
-    public ${glListResultBeanName} readListAfterCheckingCountIgnoreFetchScopeTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
+    public ${glListResultBeanName} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final int selectedCount = delegateReadCountIgnoreFetchScopeTx(${glAttachedCBArgsVariableName});
+        final int selectedCount = delegateReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
         assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());
-        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateReadListTx(${glAttachedCBArgsVariableName}));
+        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateReadList(${glAttachedCBArgsVariableName}));
     }
 
     /**
@@ -295,11 +295,11 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return Entity that is read from database by select-for-read-only. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheckTx(String primaryKeyMapString) {
+    public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
         assertObjectNotNull("primaryKeyMapString", primaryKeyMapString);
         final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = getDBMeta().newConditionBean();
         ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
-        final ${glEntityInterfaceName} currentEntity = delegateReadEntityTx(${glAttachedCBArgsVariableName});
+        final ${glEntityInterfaceName} currentEntity = delegateReadEntity(${glAttachedCBArgsVariableName});
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;
     }
@@ -311,11 +311,11 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return Entity that is read from database by select-for-update. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public ${glEntityInterfaceName} readForUpdateByPKMapStringWithDeletedCheckTx(String primaryKeyMapString) {
+    public ${glEntityInterfaceName} readForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
         assertObjectNotNull("primaryKeyMapString", primaryKeyMapString);
         final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = getDBMeta().newConditionBean();
         ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString).lockForUpdate();
-        final ${glEntityInterfaceName} currentEntity = delegateReadEntityTx(${glAttachedCBArgsVariableName});
+        final ${glEntityInterfaceName} currentEntity = delegateReadEntity(${glAttachedCBArgsVariableName});
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;
     }

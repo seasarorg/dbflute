@@ -23,7 +23,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Inserted count.
      */
-    public int delegateCreateTx(${glEntityInterfaceName} entity);
+    public int delegateCreate(${glEntityInterfaceName} entity);
 
     /**
      * Modify entity. (Delegate-Method)
@@ -31,7 +31,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Updated count.
      */
-    public int delegateModifyTx(${glEntityInterfaceName} entity);
+    public int delegateModify(${glEntityInterfaceName} entity);
 
     /**
      * Remove entity. (Delegate-Method)
@@ -39,7 +39,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Deleted count.
      */
-    public int delegateRemoveTx(${glEntityInterfaceName} entity);
+    public int delegateRemove(${glEntityInterfaceName} entity);
 
     /**
      * Create several entity-list. (Delegate-Method)
@@ -47,7 +47,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Inserted count.
      */
-    public int delegateCreateListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public int delegateCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
     /**
      * Modify several entity-list. (Delegate-Method)
@@ -55,7 +55,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Updated count.
      */
-    public int delegateModifyListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public int delegateModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
     /**
      * Remove several entity-list. (Delegate-Method)
@@ -63,7 +63,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Deleted count.
      */
-    public int delegateRemoveListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public int delegateRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
     /**
      * Create or modify after select-for-update.
@@ -71,7 +71,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @return Updated count.
      */
-    public int createOrModifyAfterSelectForUpdateTx(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
      * Modify after select-for-update.
@@ -80,12 +80,10 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int modifyAfterSelectForUpdateTx(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public int modifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
      * Reflect(insert or update) from separated-file.
-     * 
-     * If transaction already started, The argument 'batchCount' is invalid. (Inherit the transaction)
      * 
      * @param filename Name of the file. (NotNull and NotEmpty)
      * @param encoding Encoding of the file. (NotNull and NotEmpty)

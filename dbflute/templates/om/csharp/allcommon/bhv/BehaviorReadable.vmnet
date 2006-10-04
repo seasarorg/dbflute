@@ -49,7 +49,7 @@ namespace ${glPackageBaseCommonBhv} {
          * 
          * @return Read all list. (NotNull)
          */
-        IList DelegateReadAllListTx();
+        IList DelegateReadAllList();
 
         /**
          * Read count by condition-bean. (Delegate-Method)
@@ -58,7 +58,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
          * @return Read count. (NotNull)
          */
-        int DelegateReadCountIgnoreFetchScopeTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        int DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
         /**
          * Read entity by condition-bean. (Delegate-Method)
@@ -66,7 +66,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
          * @return Read entity. If the select result is zero, it returns null. (Nullable)
          */
-        ${glEntityInterfaceName} DelegateReadEntityTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        ${glEntityInterfaceName} DelegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
         /**
          * Read list by condition-bean. (Delegate-Method)
@@ -74,7 +74,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
          * @return Read list. If the select result is zero, it returns empty list. (NotNull)
          */
-        IList DelegateReadListTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        IList DelegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
         // =====================================================================================
         //                                                                          Basic Select
@@ -86,14 +86,14 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
-        ${glListResultBeanName} ReadListTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPageTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
         /// <summary>
         /// Read entity with deleted check.
@@ -101,7 +101,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Entity that is read from database. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        ${glEntityInterfaceName} ReadEntityWithDeletedCheckTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
         #endregion
 
         // =====================================================================================
@@ -116,7 +116,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @return Read list. If the select result is zero, it returns empty list. (NotNull)
          * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
          */
-        ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScopeTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
+        ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
 
         /// <summary>
         /// Read page as first page.
@@ -124,7 +124,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <param name="fetchSize">Fetch-size.</param>
         /// <returns>Read page as first page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPageAsFirstTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchSize);
+        ${glPagingResultBeanName} ReadPageAsFirst(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchSize);
 
         /// <summary>
         /// Read page by page-number.
@@ -133,7 +133,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <param name="fetchPageNumber">Fetch-page-number.</param>
         /// <returns>Read page as [fetchPageNumber] page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPageByPageNumberTx(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchPageNumber);
+        ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchPageNumber);
 
         /// <summary>
         /// Read for read only by primary-key map-string with deleted check.
@@ -141,7 +141,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Entity that is read from database by select-for-read-only. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        ${glEntityInterfaceName} ReadForReadOnlyByPKMapStringWithDeletedCheckTx(String primaryKeyMapString);
+        ${glEntityInterfaceName} ReadForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
 
         /// <summary>
         /// Read for update by primary-key map-string with deleted check.
@@ -149,7 +149,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Entity that is read from database by select-for-update. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        ${glEntityInterfaceName} ReadForUpdateByPKMapStringWithDeletedCheckTx(String primaryKeyMapString);
+        ${glEntityInterfaceName} ReadForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString);
         #endregion
     }
 }

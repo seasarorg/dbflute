@@ -1,9 +1,9 @@
-<project name="S2DBFlute" default="main" basedir=".">
+<project name="DBFlute" default="main" basedir=".">
 
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
-  <property name="version" value="0.1.01"/>
+  <property name="version" value="0.1.02"/>
   <property name="dbflute.jar.file" value="dbflute-${version}.jar"/>
   <property name="dbflute.jar.dirfile" value="dist/${dbflute.jar.file}"/>
   <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>

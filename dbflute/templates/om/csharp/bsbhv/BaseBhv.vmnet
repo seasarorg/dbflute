@@ -170,7 +170,7 @@ namespace ${glPackageExtendedBhv} {
         /// Select all list. (Delegate-Method)
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList ${myExtendedBhvInterfaceName}.DelegateSelectAllListTx() {
+        IList ${myExtendedBhvInterfaceName}.DelegateSelectAllList() {
             return this.Dao.SelectList(new ${myConditionBeanClassName}());
         }
 #if ($table.hasPrimaryKey())
@@ -181,7 +181,7 @@ namespace ${glPackageExtendedBhv} {
         // @param Primary-keys (NotNull)
         // @return Entity. (NotNull)
         //
-        ${myExtendedObjectClassName} ${myExtendedBhvInterfaceName}.DelegateGetEntityTx(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} ${myExtendedBhvInterfaceName}.DelegateGetEntity(${table.PrimaryKeyArgsString}) {
             return this.Dao.GetEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()});
         }
 #end
@@ -191,7 +191,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected count. (NotNull)</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateSelectCountIgnoreFetchScopeTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        int ${myExtendedBhvInterfaceName}.DelegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
             return this.Dao.SelectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
         }
@@ -201,7 +201,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
-        ${myExtendedObjectClassName} ${myExtendedBhvInterfaceName}.DelegateSelectEntityTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        ${myExtendedObjectClassName} ${myExtendedBhvInterfaceName}.DelegateSelectEntity(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
             return this.Dao.SelectEntity(${glAttachedCBArgsVariableName});
         }
@@ -211,7 +211,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary> 
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList ${myExtendedBhvInterfaceName}.DelegateSelectListTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        IList ${myExtendedBhvInterfaceName}.DelegateSelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
             return this.Dao.SelectList(${glAttachedCBArgsVariableName});
         }
@@ -221,7 +221,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
         protected override IList DoDelegateReadAllList() {
-            return this.Self.DelegateSelectAllListTx();
+            return this.Self.DelegateSelectAllList();
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected count. (NotNull)</returns>
         protected override int DoDelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            return this.Self.DelegateSelectCountIgnoreFetchScopeTx((${myConditionBeanClassName})${glAttachedCBArgsVariableName});
+            return this.Self.DelegateSelectCountIgnoreFetchScope((${myConditionBeanClassName})${glAttachedCBArgsVariableName});
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
         protected override ${glEntityInterfaceName} DoDelegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            return this.Self.DelegateSelectEntityTx((${myConditionBeanClassName})${glAttachedCBArgsVariableName});
+            return this.Self.DelegateSelectEntity((${myConditionBeanClassName})${glAttachedCBArgsVariableName});
         }
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
         protected override IList DoDelegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            return this.Self.DelegateSelectListTx((${myConditionBeanClassName})${glAttachedCBArgsVariableName});
+            return this.Self.DelegateSelectList((${myConditionBeanClassName})${glAttachedCBArgsVariableName});
         }
 
     #if ($table.isUseSequence())
@@ -257,7 +257,7 @@ namespace ${glPackageExtendedBhv} {
         /// Select next value as sequence. (Delegate-Method)
         /// </summary>
         /// <returns>Next value. (NotNull)</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateSelectNextValTx() {
+        int ${myExtendedBhvInterfaceName}.DelegateSelectNextVal() {
             return this.Dao.SelectNextVal();
         }
     #end
@@ -269,7 +269,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Inserted count.</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateInsertTx(${myExtendedObjectClassName} entity) {
+        int ${myExtendedBhvInterfaceName}.DelegateInsert(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
             FilterEntityOfInsert(entity);
             AssertEntityOfInsert(entity);
@@ -281,7 +281,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Updated count.</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateUpdateTx(${myExtendedObjectClassName} entity) {
+        int ${myExtendedBhvInterfaceName}.DelegateUpdate(${myExtendedObjectClassName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             FilterEntityOfUpdate(entity);
             AssertEntityOfUpdate(entity);
@@ -293,7 +293,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Deleted count.</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateDeleteTx(${myExtendedObjectClassName} entity) {
+        int ${myExtendedBhvInterfaceName}.DelegateDelete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             FilterEntityOfDelete(entity);
             AssertEntityOfDelete(entity);
@@ -306,7 +306,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Inserted count.</returns>
         protected override int DoDelegateCreate(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateInsertTx((${myExtendedObjectClassName})entity);
+            return this.Self.DelegateInsert((${myExtendedObjectClassName})entity);
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Updated count.</returns>
         protected override int DoDelegateModify(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateUpdateTx((${myExtendedObjectClassName})entity);
+            return this.Self.DelegateUpdate((${myExtendedObjectClassName})entity);
         }
 
         /// <summary>
@@ -324,7 +324,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Deleted count.</returns>
         protected override int DoDelegateRemove(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateDeleteTx((${myExtendedObjectClassName})entity);
+            return this.Self.DelegateDelete((${myExtendedObjectClassName})entity);
         }
     #end
         #endregion
@@ -339,9 +339,9 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}"></exception>
-        public ${glListResultBeanName} SelectListTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        public ${glListResultBeanName} SelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            return BuildListResultBean(${glAttachedCBArgsVariableName}, this.Self.DelegateSelectListTx(${glAttachedCBArgsVariableName}));
+            return BuildListResultBean(${glAttachedCBArgsVariableName}, this.Self.DelegateSelectList(${glAttachedCBArgsVariableName}));
         }
 
         /// <summary>
@@ -349,7 +349,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected page. (NotNull)</returns>
-        public ${glPagingResultBeanName} SelectPageTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        public ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
             return InvokeSelectPage(new SelectPageSimpleCallback(${glAttachedCBArgsVariableName}, this));
         }
@@ -360,9 +360,9 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public ${myExtendedObjectClassName} SelectEntityWithDeletedCheckTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        public ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = this.Self.DelegateSelectEntityTx(${glAttachedCBArgsVariableName});
+            ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = this.Self.DelegateSelectEntity(${glAttachedCBArgsVariableName});
             AssertRecordHasNotBeenDeleted(currentEntity, ${glAttachedCBArgsVariableName}.ToString());
             return currentEntity;
         }
@@ -379,11 +379,11 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="maxCount">Max count.</param>
         /// <returns>List-result-bean. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}"></exception>
-        public ${glListResultBeanName} SelectListAfterCheckingCountIgnoreFetchScopeTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int maxCount) {
+        public ${glListResultBeanName} SelectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int maxCount) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            int selectedCount = this.Self.DelegateSelectCountIgnoreFetchScopeTx(${glAttachedCBArgsVariableName});
+            int selectedCount = this.Self.DelegateSelectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
             AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.ToString());
-            return BuildListResultBean(${glAttachedCBArgsVariableName}, this.Self.DelegateSelectListTx(${glAttachedCBArgsVariableName}));
+            return BuildListResultBean(${glAttachedCBArgsVariableName}, this.Self.DelegateSelectList(${glAttachedCBArgsVariableName}));
         }
 
         /// <summary>
@@ -392,10 +392,10 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <param name="fetchSize">Fetch-size.</param>
         /// <returns>Selected page as first page. (NotNull)</returns>
-        public ${glPagingResultBeanName} SelectPageAsFirstTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int fetchSize) {
+        public ${glPagingResultBeanName} SelectPageAsFirst(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int fetchSize) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
             ${glAttachedCBArgsVariableName}.FetchFirst(fetchSize);
-            return this.Self.SelectPageTx(${glAttachedCBArgsVariableName});
+            return this.Self.SelectPage(${glAttachedCBArgsVariableName});
         }
 
         /// <summary>
@@ -405,18 +405,18 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <param name="fetchPageNumber">Fetch-page-number.</param>
         /// <returns>Selected page as [fetchPageNumber] page. (NotNull)</returns>
-        public ${glPagingResultBeanName} SelectPageByPageNumberTx(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int fetchPageNumber) {
+        public ${glPagingResultBeanName} SelectPageByPageNumber(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int fetchPageNumber) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
             ${glAttachedCBArgsVariableName}.FetchPage(fetchPageNumber);
-            return this.Self.SelectPageTx(${glAttachedCBArgsVariableName});
+            return this.Self.SelectPage(${glAttachedCBArgsVariableName});
         }
 
     #if ($table.hasPrimaryKey())
 
-        public ${myExtendedObjectClassName} SelectForReadOnlyByPKValueWithDeletedCheckTx(${table.PrimaryKeyArgsString}) {
+        public ${myExtendedObjectClassName} SelectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
             ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            return SelectForReadOnlyByPKMapStringWithDeletedCheckTx(entity.ExtractPrimaryKeyMapString());
+            return SelectForReadOnlyByPKMapStringWithDeletedCheck(entity.ExtractPrimaryKeyMapString());
         }
     #end
 
@@ -426,21 +426,21 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public ${myExtendedObjectClassName} SelectForReadOnlyByPKMapStringWithDeletedCheckTx(String primaryKeyMapString) {
+        public ${myExtendedObjectClassName} SelectForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
             ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = NewMyConditionBean();
             ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString);
-            ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = this.Self.DelegateSelectEntityTx(${glAttachedCBArgsVariableName});
+            ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = this.Self.DelegateSelectEntity(${glAttachedCBArgsVariableName});
             AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
             return currentEntity;
         }
 
     #if ($table.hasPrimaryKey())
 
-        public ${myExtendedObjectClassName} SelectForUpdateByPKValueWithDeletedCheckTx(${table.PrimaryKeyArgsString}) {
+        public ${myExtendedObjectClassName} SelectForUpdateByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
             ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            return SelectForUpdateByPKMapStringWithDeletedCheckTx(entity.ExtractPrimaryKeyMapString());
+            return SelectForUpdateByPKMapStringWithDeletedCheck(entity.ExtractPrimaryKeyMapString());
         }
     #end
 
@@ -450,11 +450,11 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public ${myExtendedObjectClassName} SelectForUpdateByPKMapStringWithDeletedCheckTx(String primaryKeyMapString) {
+        public ${myExtendedObjectClassName} SelectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
             ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = NewMyConditionBean();
             ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString).LockForUpdate();
-            ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = this.Self.DelegateSelectEntityTx(${glAttachedCBArgsVariableName});
+            ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = this.Self.DelegateSelectEntity(${glAttachedCBArgsVariableName});
             AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
             return currentEntity;
         }
@@ -548,7 +548,7 @@ namespace ${glPackageExtendedBhv} {
             ${glAttachedCBArgsVariableName}.Query().Set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
             ${glAttachedCBArgsVariableName}.Query().AddOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
             reffererCondition.Setup(${glAttachedCBArgsVariableName});
-            System.Collections.IList reffererList = reffererBhv.DelegateSelectListTx(${glAttachedCBArgsVariableName});
+            System.Collections.IList reffererList = reffererBhv.DelegateSelectList(${glAttachedCBArgsVariableName});
 
             System.Collections.IDictionary pkReffererListMap = new System.Collections.Hashtable();
             foreach (${reffererEntityClassName} reffererEntity in reffererList) {
@@ -597,18 +597,21 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int InsertOrUpdateAfterSelectForUpdateTx(${myExtendedObjectClassName} entity) {
+        public int InsertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
+            if (!entity.HasPrimaryKeyValue) {
+                return this.Self.DelegateInsert(entity);
+            }
             String mapString = entity.ExtractPrimaryKeyMapString();
             ${myExtendedObjectClassName} currentEntity = null;
             try {
-                currentEntity = SelectForUpdateByPKMapStringWithDeletedCheckTx(mapString);
+                currentEntity = SelectForUpdateByPKMapStringWithDeletedCheck(mapString);
             } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-                return this.Self.DelegateInsertTx(entity);
+                return this.Self.DelegateInsert(entity);
             }
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             MergeEntity(entity, currentEntity);
-            return this.Self.DelegateUpdateTx(currentEntity);
+            return this.Self.DelegateUpdate(currentEntity);
         }
 
         /// <summary>
@@ -617,11 +620,11 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int UpdateAfterSelectForUpdateTx(${myExtendedObjectClassName} entity) {
+        public int UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheckTx(entity.ExtractPrimaryKeyMapString());
+            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheck(entity.ExtractPrimaryKeyMapString());
             MergeEntity(entity, currentEntity);
-            return this.Self.DelegateUpdateTx(currentEntity);
+            return this.Self.DelegateUpdate(currentEntity);
         }
 
         /// <summary>
@@ -657,10 +660,10 @@ namespace ${glPackageExtendedBhv} {
         // <param name="primaryKey">Primary-keys. (NotNull)</param>
         // <returns>Updated count.</returns>
         // <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int LogicalDeleteByPKValueAfterSelectForUpdateTx(${table.PrimaryKeyArgsString}) {
+        public int LogicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}) {
             ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            return LogicalDeleteByPKMapStringAfterSelectForUpdateTx(entity.ExtractPrimaryKeyMapString());
+            return LogicalDeleteByPKMapStringAfterSelectForUpdate(entity.ExtractPrimaryKeyMapString());
         }
           #if ($table.isUseUpdateDate())
 
@@ -671,10 +674,10 @@ namespace ${glPackageExtendedBhv} {
         // <param name="${table.UpdateDateUncapitalisedJavaName}">The value of update-date for optimistic-lock. (NotNull)</param>
         // <returns>Updated count.</returns>
         // <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int LogicalDeleteByPKValueAfterSelectForUpdateTx(${table.PrimaryKeyArgsString}, ${table.UpdateDateJavaNative} ${table.UpdateDateUncapitalisedJavaName}) {
+        public int LogicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}, ${table.UpdateDateJavaNative} ${table.UpdateDateUncapitalisedJavaName}) {
             ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            return LogicalDeleteByPKMapStringAfterSelectForUpdateTx(entity.ExtractPrimaryKeyMapString(), ${table.UpdateDateUncapitalisedJavaName});
+            return LogicalDeleteByPKMapStringAfterSelectForUpdate(entity.ExtractPrimaryKeyMapString(), ${table.UpdateDateUncapitalisedJavaName});
         }
           #end
         #end
@@ -685,12 +688,12 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int LogicalDeleteByPKMapStringAfterSelectForUpdateTx(String primaryKeyMapString) {
+        public int LogicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheckTx(primaryKeyMapString);
+            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheck(primaryKeyMapString);
             SetupLogicalDeleteValue(currentEntity);
             FilterLogicalDeleteEntity(currentEntity);
-            return this.Self.DelegateUpdateTx(currentEntity);
+            return this.Self.DelegateUpdate(currentEntity);
         }
         #if ($table.isUseUpdateDate())
 
@@ -701,13 +704,13 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${table.UpdateDateUncapitalisedJavaName}">The value of update-date for optimistic-lock. (NotNull)</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int LogicalDeleteByPKMapStringAfterSelectForUpdateTx(String primaryKeyMapString, ${table.UpdateDateJavaNative} ${table.UpdateDateUncapitalisedJavaName}) {
+        public int LogicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString, ${table.UpdateDateJavaNative} ${table.UpdateDateUncapitalisedJavaName}) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheckTx(primaryKeyMapString);
+            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheck(primaryKeyMapString);
             currentEntity.${table.UpdateDateJavaName} = ${table.UpdateDateUncapitalisedJavaName};
             SetupLogicalDeleteValue(currentEntity);
             FilterLogicalDeleteEntity(currentEntity);
-            return this.Self.DelegateUpdateTx(currentEntity);
+            return this.Self.DelegateUpdate(currentEntity);
         }
         #end
 
@@ -742,10 +745,10 @@ namespace ${glPackageExtendedBhv} {
         // <param name="primaryKey">Primary-keys. (NotNull)</param>
         // <returns>Updated count.</returns>
         // <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int RevivalFromLogicalDeleteByPKValueAfterSelectForUpdateTx(${table.PrimaryKeyArgsString}) {
+        public int RevivalFromLogicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}) {
             ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            return RevivalFromLogicalDeleteByPKMapStringAfterSelectForUpdateTx(entity.ExtractPrimaryKeyMapString());
+            return RevivalFromLogicalDeleteByPKMapStringAfterSelectForUpdate(entity.ExtractPrimaryKeyMapString());
         }
           #if ($table.isUseUpdateDate())
 
@@ -756,10 +759,10 @@ namespace ${glPackageExtendedBhv} {
         // <param name="${table.UpdateDateUncapitalisedJavaName}">The value of update-date for optimistic-lock. (NotNull)</param>
         // <returns>Updated count.</returns>
         // <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int RevivalFromLogicalDeleteByPKValueAfterSelectForUpdateTx(${table.PrimaryKeyArgsString}, ${table.UpdateDateJavaNative} ${table.UpdateDateUncapitalisedJavaName}) {
+        public int RevivalFromLogicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}, ${table.UpdateDateJavaNative} ${table.UpdateDateUncapitalisedJavaName}) {
             ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            return RevivalFromLogicalDeleteByPKMapStringAfterSelectForUpdateTx(entity.ExtractPrimaryKeyMapString(), ${table.UpdateDateUncapitalisedJavaName});
+            return RevivalFromLogicalDeleteByPKMapStringAfterSelectForUpdate(entity.ExtractPrimaryKeyMapString(), ${table.UpdateDateUncapitalisedJavaName});
         }
           #end
         #end
@@ -770,12 +773,12 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int RevivalFromLogicalDeleteByPKMapStringAfterSelectForUpdateTx(String primaryKeyMapString) {
+        public int RevivalFromLogicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheckTx(primaryKeyMapString);
+            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheck(primaryKeyMapString);
             SetupRevivalFromLogicalDeleteValue(currentEntity);
             FilterRevivalFromLogicalDeleteEntity(currentEntity);
-            return this.Self.DelegateUpdateTx(currentEntity);
+            return this.Self.DelegateUpdate(currentEntity);
         }
         #if ($table.isUseUpdateDate())
 
@@ -786,13 +789,13 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${table.UpdateDateUncapitalisedJavaName}">The value of update-date for optimistic-lock. (NotNull)</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int RevivalFromLogicalDeleteByPKMapStringAfterSelectForUpdateTx(String primaryKeyMapString, ${table.UpdateDateJavaNative} ${table.UpdateDateUncapitalisedJavaName}) {
+        public int RevivalFromLogicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString, ${table.UpdateDateJavaNative} ${table.UpdateDateUncapitalisedJavaName}) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheckTx(primaryKeyMapString);
+            ${myExtendedObjectClassName} currentEntity = SelectForUpdateByPKMapStringWithDeletedCheck(primaryKeyMapString);
             currentEntity.${table.UpdateDateJavaName} = ${table.UpdateDateUncapitalisedJavaName};
             SetupRevivalFromLogicalDeleteValue(currentEntity);
             FilterRevivalFromLogicalDeleteEntity(currentEntity);
-            return this.Self.DelegateUpdateTx(currentEntity);
+            return this.Self.DelegateUpdate(currentEntity);
         }
         #end
 
@@ -833,10 +836,10 @@ namespace ${glPackageExtendedBhv} {
         // <param name="primaryKey">Primary-keys. (NotNull)</param>
         // <returns>Inserted count.</returns>
         // <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int CopyInsertByPKValueAfterSelectTx(${table.PrimaryKeyArgsString}) {
+        public int CopyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
             ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            return CopyInsertByPKMapStringAfterSelectTx(entity.ExtractPrimaryKeyMapString());
+            return CopyInsertByPKMapStringAfterSelect(entity.ExtractPrimaryKeyMapString());
         }
         #end
 
@@ -846,11 +849,11 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="primaryKeyMapString">Primary-Key map-string. (NotNull)</param>
         /// <returns>Inserted count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int CopyInsertByPKMapStringAfterSelectTx(String primaryKeyMapString) {
+        public int CopyInsertByPKMapStringAfterSelect(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${myExtendedObjectClassName} currentEntity = SelectForReadOnlyByPKMapStringWithDeletedCheckTx(primaryKeyMapString);
+            ${myExtendedObjectClassName} currentEntity = SelectForReadOnlyByPKMapStringWithDeletedCheck(primaryKeyMapString);
             FilterCopyInsertEntity(currentEntity);
-            return this.Self.DelegateInsertTx(currentEntity);
+            return this.Self.DelegateInsert(currentEntity);
         }
       #end
     #end

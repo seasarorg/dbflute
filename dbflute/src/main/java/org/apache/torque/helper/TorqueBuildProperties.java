@@ -443,7 +443,29 @@ public final class TorqueBuildProperties {
     }
 
     public String getRequiredTxComponentName() {
-        return stringProp("torque.requiredTxComponentName", "requiredTx");
+        String defaultValue = null;
+        if (isTargetLanguageJava()) {
+            defaultValue = "requiredTx";
+        } else if (isTargetLanguageCSharp()) {
+            defaultValue = "LocalRequiredTx";
+        } else {
+            String msg = "The language is unsupported: " + getTargetLanguage();
+            throw new IllegalStateException(msg);
+        }
+        return stringProp("torque.requiredTxComponentName", defaultValue);
+    }
+    
+    public String getRequiresNewTxComponentName() {
+        String defaultValue = null;
+        if (isTargetLanguageJava()) {
+            defaultValue = "requiresNewTx";
+        } else if (isTargetLanguageCSharp()) {
+            defaultValue = "LocalRequiresNewTx";
+        } else {
+            String msg = "The language is unsupported: " + getTargetLanguage();
+            throw new IllegalStateException(msg);
+        }
+        return stringProp("torque.requiresNewTxComponentName", defaultValue);
     }
 
     public static final String KEY_daoDiconOtherIncludeDefinitionMap = "daoDiconOtherIncludeDefinitionMap";

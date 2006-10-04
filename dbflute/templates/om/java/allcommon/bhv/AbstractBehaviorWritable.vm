@@ -37,7 +37,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Inserted count.
      */
-    public int delegateCreateTx(${glEntityInterfaceName} entity) {
+    public int delegateCreate(${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         filterEntityOfInsert(entity);
         assertEntityOfInsert(entity);
@@ -66,7 +66,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Updated count.
      */
-    public int delegateModifyTx(${glEntityInterfaceName} entity) {
+    public int delegateModify(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
@@ -95,7 +95,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Deleted count.
      */
-    public int delegateRemoveTx(${glEntityInterfaceName} entity) {
+    public int delegateRemove(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfDelete(entity);
         assertEntityOfDelete(entity);
@@ -124,7 +124,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Inserted count.
      */
-    public int delegateCreateListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int delegateCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
@@ -140,7 +140,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Updated count.
      */
-    public int delegateModifyListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int delegateModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
@@ -156,7 +156,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Deleted count.
      */
-    public int delegateRemoveListTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public int delegateRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
@@ -175,18 +175,21 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @return Updated count.
      */
-    public int createOrModifyAfterSelectForUpdateTx(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            return delegateCreate(entity);
+        }
         final String mapString = entity.extractPrimaryKeyMapString();
         ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
         try {
-            currentEntity = readForUpdateByPKMapStringWithDeletedCheckTx(mapString);
+            currentEntity = readForUpdateByPKMapStringWithDeletedCheck(mapString);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return delegateCreateTx(entity);
+            return delegateCreate(entity);
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return delegateModifyTx(currentEntity);
+        return delegateModify(currentEntity);
     }
 
     /**
@@ -196,11 +199,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int modifyAfterSelectForUpdateTx(${glEntityInterfaceName} entity) {
+    public int modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${glEntityInterfaceName} currentEntity = readForUpdateByPKMapStringWithDeletedCheckTx(entity.extractPrimaryKeyMapString());
+        final ${glEntityInterfaceName} currentEntity = readForUpdateByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
         mergeEntity(entity, currentEntity);
-        return delegateModifyTx(currentEntity);
+        return delegateModify(currentEntity);
     }
 
     /**
@@ -214,8 +217,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Reflect(insert or update) from separated-file.
-     * 
-     * If transaction already started, The argument 'batchCount' is invalid. (Inherit the transaction)
      * 
      * @param filename Name of the file. (NotNull and NotEmpty)
      * @param encoding Encoding of the file. (NotNull and NotEmpty)
@@ -257,7 +258,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                 final String lineString = br.readLine();
                 if (lineString == null) {
                     if (entityList.size() > 0) {
-                        final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} tmpList = reflectAfterSelectForUpdateTx(entityList, isErrorContinue);
+                        final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} tmpList = reflectAfterSelectForUpdateNewTx(entityList, isErrorContinue);
                         exceptionList.addAll(tmpList);
                         entityList.clear();
                     }
@@ -274,7 +275,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                 entityList.add(entity);
 
                 if (entityList.size() == batchCount) {
-                    final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} tmpList = reflectAfterSelectForUpdateTx(entityList, isErrorContinue);
+                    final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} tmpList = reflectAfterSelectForUpdateNewTx(entityList, isErrorContinue);
                     exceptionList.addAll(tmpList);
                     entityList.clear();
                 }
@@ -304,18 +305,16 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     /**
      * Reflect(insert or update) from separated-file.
      * 
-     * If transaction already started, The argument 'batchCount' is invalid. (Inherit the transaction)
-     * 
      * @param entityList The list of entity that is reflection target. (NotNull)
      * @param isErrorContinue If true, this method continue in spite of throwing the exception.
      * @return The list of InsertOrUpdateExceptionResult. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('OneEntityExceptionResult')} reflectAfterSelectForUpdateTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList,
+    public java.util.List${database.filterGenericsString('OneEntityExceptionResult')} reflectAfterSelectForUpdateNewTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList,
             boolean isErrorContinue) {
         final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} exceptionList = new java.util.ArrayList${database.filterGenericsString('OneEntityExceptionResult')}();
         for (${glEntityInterfaceName} entity : entityList) {
             try {
-                createOrModifyAfterSelectForUpdateTx(entity);
+                createOrModifyAfterSelectForUpdate(entity);
             } catch (RuntimeException e) {
                 if (isErrorContinue) {
                     final OneEntityExceptionResult result = new OneEntityExceptionResult();
