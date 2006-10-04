@@ -5,6 +5,7 @@ using System.Collections;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
+using ${myDBMetaPackageName};
 using ${glPackageExtendedDao};
 using ${glPackageExtendedEntity};
 using ${glPackageCB};
@@ -23,6 +24,16 @@ namespace ${glPackageExtendedBhv} {
     /// Author : ${database.ClassAuthor}
     /// </summary>
     public partial interface ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName} {
+
+        // =====================================================================================
+        //                                                                                DBMeta
+        //                                                                                ======
+        #region DBMeta
+        /// <summary>
+        /// The property of my dbmeta.
+        /// </summary>
+        ${myDBMetaClassName} MyDBMeta { get; }
+        #endregion
 
         // =====================================================================================
         //                                                                      Dao GetterSetter
