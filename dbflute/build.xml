@@ -1,4 +1,4 @@
-<project name="DBFlute" default="main" basedir=".">
+<project name="DBFlute" default="dist" basedir=".">
 
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
