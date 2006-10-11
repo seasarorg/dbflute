@@ -74,7 +74,7 @@ public interface ${glEntityInterfaceName} {
      * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
-     * @return Instance of query. (NotNull)
+     * @return this. (NotNull)
      */
     public ${glEntityInterfaceName} acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
 
@@ -96,7 +96,7 @@ public interface ${glEntityInterfaceName} {
      * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
-     * @return Instance of query. (NotNull)
+     * @return this. (NotNull)
      */
     public ${glEntityInterfaceName} acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap);
 

@@ -321,7 +321,7 @@ namespace ${glPackageBaseCommonBhv} {
             foreach(${glEntityInterfaceName} entity in entityList) {
                 try {
                     CreateOrModifyAfterSelectForUpdate(entity);
-                } catch (System.SystemException e) {
+                } catch (System.Exception e) {
                     if (isErrorContinue) {
                         OneEntityExceptionResult result = new OneEntityExceptionResult();
                         result.PrimaryKeyMapString = entity.ExtractPrimaryKeyMapString();
