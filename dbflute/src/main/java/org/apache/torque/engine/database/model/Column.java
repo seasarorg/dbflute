@@ -145,6 +145,7 @@ public class Column {
      *
      * @param columns Either a list of <code>Column</code> objects, or
      * a list of <code>String</code> objects with column names.
+     * @return Comma string of all columns.
      */
     public static String makeList(List columns) {
         Object obj = columns.get(0);
@@ -165,6 +166,8 @@ public class Column {
 
     /**
      * Imports a column from an XML specification
+     * 
+     * @param attrib Attributes.
      */
     public void loadFromXML(Attributes attrib) {
         //Name
@@ -200,7 +203,7 @@ public class Column {
         _isNotNull = (notNull != null && "true".equals(notNull));
 
         //AutoIncrement/Sequences
-        String autoIncrement = attrib.getValue("autoIncrement");
+        final String autoIncrement = attrib.getValue("autoIncrement");
         _isAutoIncrement = ("true".equals(autoIncrement));
 
         //Default column value.
@@ -219,6 +222,8 @@ public class Column {
 
     /**
      * Returns table.column
+     * 
+     * @return Fully qualified name.
      */
     public String getFullyQualifiedName() {
         return (_parentTable.getName() + '.' + _name);
@@ -876,7 +881,7 @@ public class Column {
         return getTable().getDatabase().getClassificationDeploymentMap();
     }
 
-    public Map<String, Object> getClassificationDefinitionMap() {
+    public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
         return getTable().getDatabase().getClassificationDefinitionMap();
     }
 
@@ -916,7 +921,7 @@ public class Column {
 
     public List<Map> getClassificationMapList() {
         try {
-            final Map<String, Object> definitionMap = getClassificationDefinitionMap();
+            final Map<String, List<Map<String, String>>> definitionMap = getClassificationDefinitionMap();
             final String classificationName = getClassificationName();
             final List<Map> classificationMapList = (List<Map>) definitionMap.get(classificationName);
             if (classificationMapList == null) {
@@ -935,7 +940,12 @@ public class Column {
     //                                                           Properties - Identity
     //                                                           =====================
     public boolean isIdentity() {
-        return getTable().isUseIdentity() && getUncapitalisedJavaName().equals(getTable().getIdentityPropertyName());
+        if (_isAutoIncrement) {
+            // It gives priority to auto-increment information of JDBC.
+            return true;
+        } else {
+            return getTable().isUseIdentity() && getUncapitalisedJavaName().equals(getTable().getIdentityPropertyName());
+        }
     }
 
     // Commented out at 2006/04/27 because of drop function.

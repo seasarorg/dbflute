@@ -947,7 +947,7 @@ public class Database {
         return getProperties().hasClassificationDefinitionMap();
     }
 
-    public Map<String, Object> getClassificationDefinitionMap() {
+    public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
         return getProperties().getClassificationDefinitionMap();
     }
 
@@ -959,7 +959,7 @@ public class Database {
         return getProperties().getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
-    public List<String> getClassificationMapList(String classificationName) {
+    public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
         return getProperties().getClassificationMapList(classificationName);
     }
 

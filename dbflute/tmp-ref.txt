@@ -1,0 +1,19 @@
+@if "%DEBUG%" == "" @echo off
+@rem ##########################################################################
+@rem dotnet arkfw版のアプリケーションの作成を行う
+@rem ##########################################################################
+set DIRNAME=%~dp0.
+
+xcopy /D /S /Y %DIRNAME%\..\..\..\tol-main\MspadminBiz\bin\Debug\*.dll %DIRNAME%\webapp\Bin
+
+set CONTENT=aspnet2.0
+if "%1" == "clean" rmdir /S /Q %DIRNAME%\..\..\output\%CONTENT%\src
+call ant -f build.xml resource.copy
+ruby -KS %DIRNAME%\%CONTENT%.rb
+ruby -KS %DIRNAME%\create.rb
+if %ERRORLEVEL% == 1 goto end
+
+if "%1" == "nobuild" goto end
+aspnet_compiler.exe -v /aspnet2.0 -p %DIRNAME%\..\..\output\%CONTENT% -u -f -d PrecompiledWeb\%CONTENT%\
+
+:end

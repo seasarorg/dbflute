@@ -1,5 +1,10 @@
 package org.apache.torque.helper;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -377,7 +382,7 @@ public final class TorqueBuildProperties {
     public boolean isAvailableBehaviorGeneration() {
         return booleanProp("torque.isAvailableBehaviorGeneration", false);
     }
-    
+
     public boolean isAvailableBehaviorInterfacePrefixI() {
         return booleanProp("torque.isAvailableBehaviorInterfacePrefixI", false);
     }
@@ -454,7 +459,7 @@ public final class TorqueBuildProperties {
         }
         return stringProp("torque.requiredTxComponentName", defaultValue);
     }
-    
+
     public String getRequiresNewTxComponentName() {
         String defaultValue = null;
         if (isTargetLanguageJava()) {
@@ -557,11 +562,11 @@ public final class TorqueBuildProperties {
     public String getUpdateDateFieldName() {
         return stringProp("torque.updateDateFieldName", "");
     }
-    
+
     public List<Object> getUpdateDateExceptTableList() {
         return listProp("torque.updateDateExceptTableList", DEFAULT_EMPTY_LIST);
     }
-    
+
     /**
      * Is table out of sight?
      * 
@@ -811,16 +816,123 @@ public final class TorqueBuildProperties {
     //                             Definition
     //                             ----------
     public static final String KEY_classificationDefinitionMap = "classificationDefinitionMap";
-    protected Map<String, Object> _classificationDefinitionMap;
+    protected Map<String, List<Map<String, String>>> _classificationDefinitionMap;
 
     public boolean hasClassificationDefinitionMap() {
         return !getClassificationDefinitionMap().isEmpty();
     }
 
-    public Map<String, Object> getClassificationDefinitionMap() {
+    public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
         if (_classificationDefinitionMap == null) {
+            _classificationDefinitionMap = new LinkedHashMap<String, List<Map<String, String>>>();
+
             final String key = "torque." + KEY_classificationDefinitionMap;
-            _classificationDefinitionMap = mapProp(key, DEFAULT_EMPTY_MAP);
+            final Map<String, Object> tmpMap = mapProp(key, DEFAULT_EMPTY_MAP);
+            final Set<String> definitionKeySet = tmpMap.keySet();
+
+            for (String classificationName : definitionKeySet) {
+                final Object value = tmpMap.get(classificationName);
+
+                if (value instanceof List) {
+                    final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
+                    final List tmpList = (List) value;
+                    for (Object element : tmpList) {
+                        if (element instanceof Map) {
+                            final Map<String, String> elementMap = (Map<String, String>) element;
+
+                            // ********
+                            // revising
+                            // ********
+                            final String table = elementMap.get("table");
+                            if (table != null) {
+                                final String code = elementMap.get("code");
+                                if (code == null) {
+                                    String msg = "The code of " + classificationName + " should not be null";
+                                    throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                                }
+
+                                String name = elementMap.get("name");
+                                name = (name != null ? name : code);
+                                String alias = elementMap.get("alias");
+                                alias = (alias != null ? alias : name);
+
+                                final StringBuffer sb = new StringBuffer();
+                                sb.append("select ").append(code).append(", ").append(name).append(", ").append(alias);
+                                sb.append(" from ").append(table);
+
+                                Connection conn = null;
+                                Statement stmt = null;
+                                ResultSet rs = null;
+                                try {
+                                    conn = getConnection();
+                                    stmt = conn.createStatement();
+                                    _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+                                    _log.debug("The classification sql: " + sb.toString());
+                                    rs = stmt.executeQuery(sb.toString());
+                                    while (rs.next()) {
+                                        final String tmpCodeValue = rs.getString(code);
+                                        final String tmpNameValue = rs.getString(name);
+                                        final String tmpAliasValue = rs.getString(alias);
+                                        final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
+                                        selectedTmpMap.put("code", tmpCodeValue);
+                                        selectedTmpMap.put("name", tmpNameValue);
+                                        selectedTmpMap.put("alias", tmpAliasValue);
+                                        _log.debug("    code: " + tmpCodeValue);
+                                        _log.debug("    name: " + name);
+                                        _log.debug("    alias: " + alias);
+                                        elementList.add(selectedTmpMap);
+                                    }
+                                    _log.debug("- - - - - - - - /");
+                                } catch (SQLException e) {
+                                    throw new RuntimeException("The sql is " + sb.toString(), e);
+                                } finally {
+                                    try {
+                                        if (conn != null) {
+                                            conn.close();
+                                        }
+                                        if (stmt != null) {
+                                            stmt.close();
+                                        }
+                                        if (rs != null) {
+                                            rs.close();
+                                        }
+                                    } catch (SQLException ignored) {
+                                        _log.warn("The close() threw the exception: ", ignored);
+                                    }
+                                }
+                            } else {
+                                final String code = elementMap.get("code");
+                                if (code == null) {
+                                    String msg = "The code of " + classificationName + " should not be null";
+                                    throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                                }
+
+                                final String name = elementMap.get("name");
+                                if (name == null) {
+                                    elementMap.put("name", code);
+                                }
+
+                                final String alias = elementMap.get("alias");
+                                if (alias == null) {
+                                    elementMap.put("alias", code);
+                                }
+
+                                elementList.add(elementMap);
+                            }
+                        } else {
+                            String msg = "The element of List should be Map but " + element.getClass();
+                            msg = msg + " element = " + element;
+                            throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                        }
+                    }
+
+                    _classificationDefinitionMap.put(classificationName, elementList);
+                } else {
+                    String msg = "The value of Map should be List but " + value.getClass();
+                    msg = msg + " value = " + value;
+                    throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                }
+            }
         }
         return _classificationDefinitionMap;
     }
@@ -834,8 +946,8 @@ public final class TorqueBuildProperties {
         return filterDoubleQuotation(removeNewLine(property));
     }
 
-    public List<String> getClassificationMapList(String classificationName) {
-        return (List<String>) getClassificationDefinitionMap().get(classificationName);
+    public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
+        return getClassificationDefinitionMap().get(classificationName);
     }
 
     // --------------------------------------
@@ -1370,6 +1482,38 @@ public final class TorqueBuildProperties {
 
     public String getExtractAcceptEqual() {
         return stringProp("torque.extractAcceptEqual", "@=");
+    }
+
+    // ===============================================================================
+    //                                                      Properties - Database Info
+    //                                                      ==========================
+    public String getDatabaseDriver() {
+        return stringProp("torque.database.driver");
+    }
+
+    public String getDatabaseUri() {
+        return stringProp("torque.database.url");
+    }
+
+    public String getDatabaseUser() {
+        return stringProp("torque.database.user");
+    }
+
+    public String getDatabasePassword() {
+        return stringProp("torque.database.password");
+    }
+
+    public Connection getConnection() {
+        try {
+            Class.forName(getDatabaseDriver());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            return DriverManager.getConnection(getDatabaseUri(), getDatabaseUser(), getDatabasePassword());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // ===============================================================================

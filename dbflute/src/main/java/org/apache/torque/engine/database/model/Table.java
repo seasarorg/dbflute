@@ -1629,6 +1629,15 @@ public class Table implements IDMethod {
      * @return Determination.
      */
     public boolean isUseIdentity() {
+        
+        // It gives priority to auto-increment information of JDBC.
+        final Column[] columnArray = getColumns();
+        for (Column column : columnArray) {
+            if (column.isAutoIncrement()) {
+                return true;
+            }
+        }
+        
         return getDatabase().getIdentityDefinitionMap().containsKey(getName());
     }
 
@@ -1641,6 +1650,15 @@ public class Table implements IDMethod {
         if (!isUseIdentity()) {
             return "";
         }
+        
+        // It gives priority to auto-increment information of JDBC.
+        final Column[] columnArray = getColumns();
+        for (Column column : columnArray) {
+            if (column.isAutoIncrement()) {
+                return column.getUncapitalisedJavaName();
+            }
+        }
+        
         final String columnName = (String) getDatabase().getIdentityDefinitionMap().get(getName());
         final Column col = getColumn(columnName);
         if (col == null) {

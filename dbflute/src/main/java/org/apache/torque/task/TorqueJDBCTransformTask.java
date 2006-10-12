@@ -60,7 +60,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -247,9 +249,10 @@ public class TorqueJDBCTransformTask extends Task {
             _log.info("$ ");
 
         } catch (Exception e) {
+            _log.error("JDBCToXMLSchema failed: ", e);
             throw new BuildException(e);
         }
-        log("------------------------------------------------------- [Torque - JDBCToXMLSchema] Finish!");
+        _log.debug("------------------------------------------------------- [Torque - JDBCToXMLSchema] Finish!");
     }
 
     /**
@@ -358,6 +361,13 @@ public class TorqueJDBCTransformTask extends Task {
 
                     columnElement.setAttribute("default", defaultValue);
                 }
+
+                if (primaryColumnNameList.contains(name)) {
+                    if (isAutoIncrementColumn(dbMetaData, currentTable, name, conn)) {
+                        columnElement.setAttribute("autoIncrement", "true");
+                    }
+                }
+
                 tableElement.appendChild(columnElement);
             }
 
@@ -378,14 +388,15 @@ public class TorqueJDBCTransformTask extends Task {
                 }
                 tableElement.appendChild(foreignKeyElement);
             }
-            
+
             // Unique keys for this table.
             final Map<String, Map<Integer, String>> uniqueMap = getUniqueColumnNameList(dbMetaData, currentTable);
             final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
             for (final String uniqueIndexName : uniqueKeySet) {
                 final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
                 if (uniqueElementMap.isEmpty()) {
-                    throw new IllegalStateException("The uniqueKey has no elements: " + uniqueIndexName + " : " + uniqueMap);
+                    throw new IllegalStateException("The uniqueKey has no elements: " + uniqueIndexName + " : "
+                            + uniqueMap);
                 }
                 final Element uniqueKeyElement = _doc.createElement("unique");
                 uniqueKeyElement.setAttribute("name", uniqueIndexName);
@@ -399,7 +410,7 @@ public class TorqueJDBCTransformTask extends Task {
                 }
                 tableElement.appendChild(uniqueKeyElement);
             }
-            
+
             _databaseNode.appendChild(tableElement);
         }
         _doc.appendChild(_databaseNode);
@@ -515,35 +526,43 @@ public class TorqueJDBCTransformTask extends Task {
     //        return resultSet.getString(4);
     //    }
 
-    //    /**
-    //     * Retrieves a list of the columns composing the primary key for a given table.
-    //     * <p>
-    //     * @param dbMeta JDBC metadata.
-    //     * @param tableName Table from which to retrieve PK information.
-    //     * @return A list of the primary key parts for <code>tableName</code>.
-    //     * @throws SQLException
-    //     */
-    //    protected boolean isIdentity(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-    //        final List<String> pk = new ArrayList<String>();
-    //        ResultSet parts = null;
-    //        try {
-    //            parts = dbMeta.getPrimaryKeys(null, _dbSchema, tableName);
-    //            _log.debug(tableName + " - 1:" + parts.getMetaData().isAutoIncrement(1));
-    //            _log.debug(tableName + " - 2:" + parts.getMetaData().isAutoIncrement(2));
-    //            _log.debug(tableName + " - 3:" + parts.getMetaData().isAutoIncrement(3));
-    //            _log.debug(tableName + " - 4:" + parts.getMetaData().isAutoIncrement(4));
-    //            
-    //            while (parts.next()) {
-    //                pk.add(parts.getString(4));
-    //            }
-    //            
-    //        } finally {
-    //            if (parts != null) {
-    //                parts.close();
-    //            }
-    //        }
-    //        return false;
-    //    }
+    /**
+     * Get auto-increment column name.
+     * <p>
+     * @param dbMeta JDBC metadata.
+     * @param tableName Table from which to retrieve PK information.
+     * @param primaryKeyColumnName Primary-key column-name.
+     * @param conn Connection.
+     * @return Auto-increment column name. (Nullable)
+     * @throws SQLException
+     */
+    protected boolean isAutoIncrementColumn(DatabaseMetaData dbMeta, String tableName, String primaryKeyColumnName,
+            Connection conn) throws SQLException {
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT " + primaryKeyColumnName + " FROM " + tableName);
+            final ResultSetMetaData rsmd = rs.getMetaData();
+
+            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                final String currentColumnName = rsmd.getColumnName(i);
+                if (primaryKeyColumnName.equals(currentColumnName)) {
+                    return rsmd.isAutoIncrement(i);
+                }
+            }
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
+        }
+        String msg = "The primaryKeyColumnName is not found in the table: ";
+        msg = msg + tableName + " - " + primaryKeyColumnName;
+        throw new RuntimeException(msg);
+    }
 
     /**
      * Retrieves a list of foreign key columns for a given table.
