@@ -209,6 +209,7 @@ namespace ${myExtendedEntityPackageName} {
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
+      #if (${col.hasClassificationName()})
 
         /// <summary>
         /// Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
@@ -217,50 +218,17 @@ namespace ${myExtendedEntityPackageName} {
             String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
             ${col.JavaName} = code;
         }
+      #else
+
+        /// <summary>
+        /// Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
+        /// </summary>
+        public void Classify${col.JavaName}_${classificationMap.get('name')}() {
+            String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+            ${col.JavaName} = code;
+        }
+      #end
     #end
-  #end
-#end
-
-        #endregion
-
-        // =====================================================================================
-        //                                                                 Classification Getter
-        //                                                                 =====================
-        #region Classification Getter
-#foreach ($col in $table.Columns)
-  #if (${col.hasClassification()})
-
-        /// <summary>
-        /// Get the value of ${col.UncapitalisedJavaName} as classification-name.
-        /// </summary>
-        /// <returns>The value of ${col.UncapitalisedJavaName} as classification-name.</returns>
-        public String Get${col.JavaName}Name() {
-            if (_${col.UncapitalisedJavaName} == null) {
-                return null;
-            }
-            Object obj = _${col.UncapitalisedJavaName};
-            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
-                return null;
-            }
-            System.Collections.IDictionary hash = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
-            return (String)hash[_${col.UncapitalisedJavaName}.ToString()];
-        }
-
-        /// <summary>
-        /// Get the value of ${col.UncapitalisedJavaName} as classification-alias.
-        /// </summary>
-        /// <returns>The value of ${col.UncapitalisedJavaName} as classification-alias.</returns>
-        public String Get${col.JavaName}Alias() {
-            if (_${col.UncapitalisedJavaName} == null) {
-                return null;
-            }
-            Object obj = _${col.UncapitalisedJavaName};
-            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
-                return null;
-            }
-            System.Collections.IDictionary hash = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
-            return (String)hash[_${col.UncapitalisedJavaName}.ToString()];
-        }
   #end
 #end
 
@@ -273,6 +241,7 @@ namespace ${myExtendedEntityPackageName} {
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
+      #if (${col.hasClassificationName()})
 
         /// <summary>
         /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
@@ -309,6 +278,92 @@ namespace ${myExtendedEntityPackageName} {
                 throw new SystemException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
             }
             return Is${col.JavaName}${classificationMap.get('name')}();
+        }
+      #else
+
+        /// <summary>
+        /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// The difference of capital letters and small letters is NOT distinguished.
+        /// If the value is null, this method returns false!
+        /// </summary>
+        /// <returns>Determanation.</returns>
+        public bool Is${col.JavaName}_${classificationMap.get('name')}() {
+            if (_${col.UncapitalisedJavaName} == null) {
+                return false;
+            }
+            Object obj = _${col.UncapitalisedJavaName};
+            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                return false;
+            }
+            String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+            return code.ToLower().Equals(_${col.UncapitalisedJavaName}.ToString().ToLower());
+        }
+
+        /// <summary>
+        /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// The difference of capital letters and small letters is NOT distinguished.
+        /// If the value is null, this method throws exception!
+        /// </summary>
+        /// <returns>Determanation.</returns>
+        public bool Is${col.JavaName}_${classificationMap.get('name')}_IfNullException() {
+            if (_${col.UncapitalisedJavaName} == null) {
+                String msg = "If the value of ${col.UncapitalisedJavaName} is null, this method throws exception!";
+                throw new SystemException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
+            }
+            Object obj = _${col.UncapitalisedJavaName};
+            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                String msg = "If the nullable-type-value of ${col.UncapitalisedJavaName} does not have value, this method throws exception!";
+                throw new SystemException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
+            }
+            return Is${col.JavaName}_${classificationMap.get('name')}();
+        }
+      #end
+    #end
+  #end
+#end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                 Classification Getter
+        //                                                                 =====================
+        #region Classification Getter
+#foreach ($col in $table.Columns)
+  #if (${col.hasClassification()})
+    #if (${col.hasClassificationName()})
+
+        /// <summary>
+        /// Get the value of ${col.UncapitalisedJavaName} as classification-name.
+        /// </summary>
+        /// <returns>The value of ${col.UncapitalisedJavaName} as classification-name.</returns>
+        public String Get${col.JavaName}Name() {
+            if (_${col.UncapitalisedJavaName} == null) {
+                return null;
+            }
+            Object obj = _${col.UncapitalisedJavaName};
+            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                return null;
+            }
+            System.Collections.IDictionary hash = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
+            return (String)hash[_${col.UncapitalisedJavaName}.ToString()];
+        }
+    #end
+    #if (${col.hasClassificationAlias()})
+
+        /// <summary>
+        /// Get the value of ${col.UncapitalisedJavaName} as classification-alias.
+        /// </summary>
+        /// <returns>The value of ${col.UncapitalisedJavaName} as classification-alias.</returns>
+        public String Get${col.JavaName}Alias() {
+            if (_${col.UncapitalisedJavaName} == null) {
+                return null;
+            }
+            Object obj = _${col.UncapitalisedJavaName};
+            if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                return null;
+            }
+            System.Collections.IDictionary hash = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
+            return (String)hash[_${col.UncapitalisedJavaName}.ToString()];
         }
     #end
   #end

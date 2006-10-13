@@ -190,6 +190,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
+      #if (${col.hasClassificationName()})
 
     /**
      * Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
@@ -198,41 +199,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
         set${col.JavaName}(new ${col.JavaNative}(code));
     }
+      #else
+
+    /**
+     * Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
+     */
+    public void classify${col.JavaName}_${classificationMap.get('name')}() {
+        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        set${col.JavaName}(new ${col.JavaNative}(code));
+    }
+      #end
     #end
-  #end
-#end
-
-    // =====================================================================================
-    //                                                                 Classification Getter
-    //                                                                 =====================
-#foreach ($col in $table.Columns)
-  #if (${col.hasClassification()})
-
-    /**
-     * Get the value of ${col.UncapitalisedJavaName} as classification-name.
-     * 
-     * @return The value of ${col.UncapitalisedJavaName} as classification-name. (Nullable)
-     */
-    public String get${col.JavaName}Name() {
-        if (_${col.UncapitalisedJavaName} == null) {
-            return null;
-        }
-        final java.util.Map${database.filterGenericsString('String, String')} map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
-        return (String)map.get(_${col.UncapitalisedJavaName}.toString());
-    }
-
-    /**
-     * Get the value of ${col.UncapitalisedJavaName} as classification-alias.
-     * 
-     * @return The value of ${col.UncapitalisedJavaName} as classification-alias. (Nullable)
-     */
-    public String get${col.JavaName}Alias() {
-        if (_${col.UncapitalisedJavaName} == null) {
-            return null;
-        }
-        final java.util.Map${database.filterGenericsString('String, String')} map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
-        return (String)map.get(_${col.UncapitalisedJavaName}.toString());
-    }
   #end
 #end
 
@@ -242,6 +219,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
+      #if (${col.hasClassificationName()})
 
     /**
      * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
@@ -271,6 +249,76 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
             throw new IllegalStateException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
         }
         return is${col.JavaName}${classificationMap.get('name')}();
+    }
+      #else
+
+    /**
+     * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+     * The difference of capital letters and small letters is NOT distinguished.
+     * If the value is null, this method returns false!
+     * 
+     * @return Determanation.
+     */
+    public boolean is${col.JavaName}_${classificationMap.get('name')}() {
+        if (_${col.UncapitalisedJavaName} == null) {
+            return false;
+        }
+        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        return code.equalsIgnoreCase(_${col.UncapitalisedJavaName}.toString());
+    }
+
+    /**
+     * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+     * The difference of capital letters and small letters is NOT distinguished.
+     * If the value is null, this method throws exception!
+     * 
+     * @return Determanation.
+     */
+    public boolean is${col.JavaName}_${classificationMap.get('name')}_IfNullException() {
+        if (_${col.UncapitalisedJavaName} == null) {
+            String msg = "If the value of ${col.UncapitalisedJavaName} is null, this method throws exception!";
+            throw new IllegalStateException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
+        }
+        return is${col.JavaName}_${classificationMap.get('name')}();
+    }
+      #end
+    #end
+  #end
+#end
+
+    // =====================================================================================
+    //                                                                 Classification Getter
+    //                                                                 =====================
+#foreach ($col in $table.Columns)
+  #if (${col.hasClassification()})
+    #if (${col.hasClassificationName()})
+
+    /**
+     * Get the value of ${col.UncapitalisedJavaName} as classification-name.
+     * 
+     * @return The value of ${col.UncapitalisedJavaName} as classification-name. (Nullable)
+     */
+    public String get${col.JavaName}Name() {
+        if (_${col.UncapitalisedJavaName} == null) {
+            return null;
+        }
+        final java.util.Map${database.filterGenericsString('String, String')} map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
+        return (String)map.get(_${col.UncapitalisedJavaName}.toString());
+    }
+    #end
+    #if (${col.hasClassificationAlias()})
+
+    /**
+     * Get the value of ${col.UncapitalisedJavaName} as classification-alias.
+     * 
+     * @return The value of ${col.UncapitalisedJavaName} as classification-alias. (Nullable)
+     */
+    public String get${col.JavaName}Alias() {
+        if (_${col.UncapitalisedJavaName} == null) {
+            return null;
+        }
+        final java.util.Map${database.filterGenericsString('String, String')} map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
+        return (String)map.get(_${col.UncapitalisedJavaName}.toString());
     }
     #end
   #end

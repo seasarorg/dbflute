@@ -954,6 +954,14 @@ public class Database {
     public List<String> getClassificationNameList() {
         return getProperties().getClassificationNameList();
     }
+    
+    public List<String> getClassificationNameListValidNameOnly() {
+        return getProperties().getClassificationNameListValidNameOnly();
+    }
+    
+    public List<String> getClassificationNameListValidAliasOnly() {
+        return getProperties().getClassificationNameListValidAliasOnly();
+    }
 
     public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
         return getProperties().getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();

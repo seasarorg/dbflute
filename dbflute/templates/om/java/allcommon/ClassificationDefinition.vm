@@ -24,7 +24,8 @@ public class ${myClassName} {
     // =====================================================================================
     //                                                 Classification-CodeNameMap-Definition
     //                                                 =====================================
-#foreach ($classificationName in $database.ClassificationNameList)
+
+#foreach ($classificationName in $database.ClassificationNameListValidNameOnly)
   #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
 
     /** The classification code-name map of ${classificationName}. */
@@ -40,7 +41,7 @@ public class ${myClassName} {
     }
 #end
 
-#foreach ($classificationName in $database.ClassificationNameList)
+#foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
   #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
 
     /** The classification code-alias map of ${classificationName}. */

@@ -909,6 +909,22 @@ public class Column {
         }
         return true;
     }
+    
+    public boolean hasClassificationName() {
+        final String classificationName = getClassificationName();
+        if (classificationName == null) {
+            return false;
+        }
+        return getTable().getDatabase().getClassificationNameListValidNameOnly().contains(classificationName);
+    }
+    
+    public boolean hasClassificationAlias() {
+        final String classificationName = getClassificationName();
+        if (classificationName == null) {
+            return false;
+        }
+        return getTable().getDatabase().getClassificationNameListValidAliasOnly().contains(classificationName);
+    }
 
     public String getClassificationName() {
         final Map<String, Object> deploymentMap = getClassificationDeploymentMap();

@@ -941,6 +941,43 @@ public final class TorqueBuildProperties {
         return new ArrayList<String>(getClassificationDefinitionMap().keySet());
     }
 
+    public List<String> getClassificationNameListValidNameOnly() {
+        final List<String> resultList = new ArrayList<String>();
+        final Set<String> keySet = getClassificationDefinitionMap().keySet();
+
+        classificationNameListLoop: for (String string : keySet) {
+            List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
+            for (Map<String, String> map : list) {
+                final String code = map.get("code");
+                final String name = map.get("name");
+                if (!code.equals(name)) {
+                    resultList.add(string);
+                    continue classificationNameListLoop;
+                }
+            }
+        }
+        return resultList;
+    }
+
+    public List<String> getClassificationNameListValidAliasOnly() {
+        final List<String> resultList = new ArrayList<String>();
+        final Set<String> keySet = getClassificationDefinitionMap().keySet();
+
+        classificationNameListLoop: for (String string : keySet) {
+            List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
+            for (Map<String, String> map : list) {
+                final String code = map.get("code");
+                final String name = map.get("name");
+                final String alias = map.get("alias");
+                if (!code.equals(alias) && !name.equals(alias)) {
+                    resultList.add(string);
+                    continue classificationNameListLoop;
+                }
+            }
+        }
+        return resultList;
+    }
+
     public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
         final String property = stringProp("torque." + KEY_classificationDefinitionMap, DEFAULT_EMPTY_MAP_STRING);
         return filterDoubleQuotation(removeNewLine(property));
