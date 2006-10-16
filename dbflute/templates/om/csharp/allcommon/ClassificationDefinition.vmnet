@@ -55,6 +55,7 @@ namespace ${glPackageBaseCommon} {
             }
 #end
 #foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
+  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
             {
                 System.Collections.IDictionary map = new System.Collections.Hashtable();
   #foreach ($classificationMap in $classificationMapList)

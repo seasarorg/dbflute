@@ -100,7 +100,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Entity that is read from database. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}">If the result is nothing.</exception>
         ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
         #endregion
 

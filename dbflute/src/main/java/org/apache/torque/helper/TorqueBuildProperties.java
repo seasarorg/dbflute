@@ -946,7 +946,7 @@ public final class TorqueBuildProperties {
         final Set<String> keySet = getClassificationDefinitionMap().keySet();
 
         classificationNameListLoop: for (String string : keySet) {
-            List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
+            final List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
             for (Map<String, String> map : list) {
                 final String code = map.get("code");
                 final String name = map.get("name");
@@ -964,7 +964,7 @@ public final class TorqueBuildProperties {
         final Set<String> keySet = getClassificationDefinitionMap().keySet();
 
         classificationNameListLoop: for (String string : keySet) {
-            List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
+            final List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
             for (Map<String, String> map : list) {
                 final String code = map.get("code");
                 final String name = map.get("name");

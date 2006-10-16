@@ -199,7 +199,6 @@ namespace ${glPackageBaseCommonBhv} {
             return InvokeSelectPage(new SelectPageSimpleCallback(${glAttachedCBArgsVariableName}, this));
         }
 
-
         /// <summary>
         /// The interface of select-page callback.
         /// 
