@@ -266,7 +266,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
      */
-    public ${glListResultBeanName} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
+    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final int selectedCount = delegateReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
         assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());

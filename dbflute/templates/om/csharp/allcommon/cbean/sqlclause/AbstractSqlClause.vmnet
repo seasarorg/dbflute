@@ -34,6 +34,9 @@ namespace ${glPackageBaseCommonSqlClause} {
         /** Where list. */
         protected System.Collections.IList _whereList = new System.Collections.ArrayList();
 
+        /** Inline where list for BaseTable. */
+        protected System.Collections.IList _baseTableInlineWhereList = new System.Collections.ArrayList();
+
         /** Order by clause. */
         protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
 
@@ -81,6 +84,7 @@ namespace ${glPackageBaseCommonSqlClause} {
             if (_includedSelectColumnMap.Count != 0) {
                 sb.Append(" ").Append(GetIncludedSelectColumnClause());
             }
+            sb.Append(" ");
             sb.Append(GetFromClause());
             sb.Append(" ");
             sb.Append(GetFromHint());
@@ -122,11 +126,59 @@ namespace ${glPackageBaseCommonSqlClause} {
          */
         public String GetFromClause() {
             StringBuilder sb = new StringBuilder(128);
-            sb.Append(" from ").Append(_tableName);
-            sb.Append(GetFromBaseTableHint());
-            foreach (String key in _outerJoinList) {
-                sb.Append(" ").Append(_outerJoinMap[key]);
+            sb.Append("from ").Append(_tableName);
+            if (_baseTableInlineWhereList.Count == 0) {
+                sb.Append(_tableName);
+            } else {
+                sb.Append(GetInlineViewClause(_tableName, _baseTableInlineWhereList)).Append(" ").Append(_tableName);
             }
+            sb.Append(GetFromBaseTableHint());
+            sb.Append(GetLeftOuterJoinClause());
+            return sb.ToString();
+        }
+
+        protected String GetLeftOuterJoinClause() {
+            StringBuilder sb = new StringBuilder();
+            foreach (String aliasName in _outerJoinList) {
+                LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
+                String joinTableName = joinInfo.JoinTableName;
+                System.Collections.IList inlineWhereClauseList = joinInfo.InlineWhereClauseList;
+                System.Collections.IDictionary joinOnMap = joinInfo.JoinOnMap;
+                AssertJoinOnMapNotEmpty(joinOnMap, aliasName);
+
+                sb.Append(" left outer join ");
+                if (inlineWhereClauseList.Count == 0) {
+                    sb.Append(joinTableName);
+                } else {
+                    sb.Append(GetInlineViewClause(joinTableName, inlineWhereClauseList));
+                }
+                sb.Append(" ").Append(aliasName).Append(" on ");
+                int count = 0;
+                System.Collections.ICollection localColumnNameSet = joinOnMap.Keys;
+                foreach (String localColumnName in localColumnNameSet) {
+                    String foreignColumnName = (String)joinOnMap[localColumnName];
+                    if (count != 0) {
+                        sb.Append(" and ");
+                    }
+                    sb.Append(localColumnName).Append(" = ").Append(foreignColumnName);
+                    count++;
+                }
+            }
+            return sb.ToString();
+        }
+
+        protected String GetInlineViewClause(String joinTableName, System.Collections.IList inlineWhereClauseList) {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("(select * from ").Append(joinTableName).Append(" where ");
+            int count = 0;
+            foreach (String whereClause in inlineWhereClauseList) {
+                if (count > 0) {
+                    sb.Append(" and ");
+                }
+                sb.Append(whereClause);
+                ++count;
+            }
+            sb.Append(")");
             return sb.ToString();
         }
 
@@ -206,22 +258,39 @@ namespace ${glPackageBaseCommonSqlClause} {
          */
         public ${glSqlClauseInterfaceName} RegisterOuterJoin(String joinTableName, String aliasName, System.Collections.IDictionary joinOnMap) {
             AssertAlreadyOuterJoin(aliasName);
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append("left outer join ").Append(joinTableName).Append(" ").Append(aliasName).Append(" on ");
-            int count = 0;
-            System.Collections.ICollection localColumnNameSet = joinOnMap.Keys;
-            foreach (String localColumnName in localColumnNameSet) {
-                String foreignColumnName = (String)joinOnMap[localColumnName];
-                if (count != 0) {
-                    sb.Append(" and ");
-                }
-                sb.Append(localColumnName).Append(" = ").Append(foreignColumnName);
-                count++;
-            }
-            _outerJoinMap.Add(aliasName, sb.ToString());
+            AssertJoinOnMapNotEmpty(joinOnMap, aliasName);
+            LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
+            joinInfo.AliasName = aliasName;
+            joinInfo.JoinTableName = joinTableName;
+            joinInfo.JoinOnMap = joinOnMap;
+            _outerJoinMap.Add(aliasName, joinInfo);
             _outerJoinList.Add(aliasName);// For order guarantee
             return this;
+        }
+
+        public class LeftOuterJoinInfo {
+            protected String _aliasName;
+            protected String _joinTableName;
+            protected System.Collections.IList _inlineWhereClauseList = new System.Collections.ArrayList();
+            protected System.Collections.IDictionary _joinOnMap;
+            public String AliasName {
+                get { return _aliasName; }
+                set { _aliasName = value; }
+            }
+            public String JoinTableName {
+                get { return _joinTableName; }
+                set { _joinTableName = value; }
+            }
+            public System.Collections.IList InlineWhereClauseList {
+                get { return _inlineWhereClauseList; }
+            }
+            public void AddInlineWhereClause(String value) {
+                _inlineWhereClauseList.Add(value);
+            }
+            public System.Collections.IDictionary JoinOnMap {
+                get { return _joinOnMap; }
+                set { _joinOnMap = value; }
+            }
         }
 
         /**
@@ -233,6 +302,20 @@ namespace ${glPackageBaseCommonSqlClause} {
         protected ${myClassName} AssertAlreadyOuterJoin(String aliasName) {
             if (_outerJoinMap.Contains(aliasName)) {
                 String msg = "The alias name have already registered in outer join: " + aliasName;
+                throw new ArgumentOutOfRangeException(msg);
+            }
+            return this;
+        }
+
+        /**
+         * Assert whether the joinOnMap should not be empty.
+         * 
+         * @param aliasName Alias name.
+         * @return this.
+         */
+        protected ${myClassName} AssertJoinOnMapNotEmpty(System.Collections.IDictionary joinOnMap, String aliasName) {
+            if (joinOnMap.Count == 0) {
+                String msg = "The joinOnMap should not be empty: aliasName=" + aliasName;
                 throw new ArgumentOutOfRangeException(msg);
             }
             return this;
@@ -264,6 +347,41 @@ namespace ${glPackageBaseCommonSqlClause} {
         public ${glSqlClauseInterfaceName} RegisterWhereClause(String clause) {
             AssertStringNotNullAndNotTrimmedEmpty("clause", clause);
             _whereList.Add(clause);
+            return this;
+        }
+
+        // =====================================================================================
+        //                                                                           InlineWhere
+        //                                                                           ===========
+        public ${glSqlClauseInterfaceName} RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+            RegisterWhereClause(columnName, key, value);
+            String inlineWhereClause = (String)_whereList[_whereList.Count-1];
+            _whereList.RemoveAt(_whereList.Count-1);
+            _baseTableInlineWhereList.Add(inlineWhereClause);
+            return this;
+        }
+
+        public ${glSqlClauseInterfaceName} RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+            AssertNotYetOuterJoin(aliasName);
+            LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
+            RegisterWhereClause(columnName, key, value);
+            String inlineWhereClause = (String)_whereList[_whereList.Count-1];
+            _whereList.RemoveAt(_whereList.Count-1);
+            joinInfo.AddInlineWhereClause(inlineWhereClause);
+            return this;
+        }
+
+        /**
+         * Assert whether the alias name have already registered in outer join.
+         * 
+         * @param aliasName Alias name.
+         * @return this.
+         */
+        protected ${myClassName} AssertNotYetOuterJoin(String aliasName) {
+            if (!_outerJoinMap.Contains(aliasName)) {
+                String msg = "The alias name have not registered in outer join yet: " + aliasName;
+                throw new ArgumentOutOfRangeException(msg);
+            }
             return this;
         }
 

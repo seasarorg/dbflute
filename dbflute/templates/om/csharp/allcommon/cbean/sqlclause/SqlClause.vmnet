@@ -108,6 +108,12 @@ namespace ${glPackageBaseCommonSqlClause} {
         ${glSqlClauseInterfaceName} RegisterWhereClause(String clause);
 
         // =====================================================================================
+        //                                                                           InlineWhere
+        //                                                                           ===========
+        ${glSqlClauseInterfaceName} RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+        ${glSqlClauseInterfaceName} RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+
+        // =====================================================================================
         //                                                                               OrderBy
         //                                                                               =======
         /**
@@ -124,18 +130,18 @@ namespace ${glPackageBaseCommonSqlClause} {
          */
         ${glSqlClauseInterfaceName} ClearOrderBy();
 
-	    /**
-	     * Ignore order-by.
-	     * 
-	     * @return this. (NotNull)
-	     */
+        /**
+         * Ignore order-by.
+         * 
+         * @return this. (NotNull)
+         */
         ${glSqlClauseInterfaceName} IgnoreOrderBy();
 
-	    /**
-	     * Make order-by effective.
-	     * 
-	     * @return this. (NotNull)
-	     */
+        /**
+         * Make order-by effective.
+         * 
+         * @return this. (NotNull)
+         */
         ${glSqlClauseInterfaceName} MakeOrderByEffective();
 
         /**

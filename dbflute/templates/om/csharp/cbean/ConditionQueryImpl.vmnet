@@ -45,7 +45,7 @@ namespace ${glPackageCB} {
         //                                                                              RealName
         //                                                                              ========
         /// <summary>
-        ///	Get real alias name(that has nest level mark).
+        ///    Get real alias name(that has nest level mark).
         /// </summary>
         /// <returns>Real alias name. (NotNull)</returns>
         public override String GetRealAliasName() {
@@ -144,7 +144,7 @@ namespace ${glPackageCB} {
             }
         }
     #if (${col.isJavaNativeStringObject()})
-    
+
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as equal. { = }
         /// If the value is null or empty-string, this condition is ignored.
@@ -153,6 +153,16 @@ namespace ${glPackageCB} {
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_Equal($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, FilterRemoveEmptyString(value));
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as equal to inline. { = }
+        /// If the value is null or empty-string, this condition is ignored.
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as equal.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_Equal_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, FilterRemoveEmptyString(value));
         }
 
         /// <summary>
@@ -172,6 +182,14 @@ namespace ${glPackageCB} {
         public ${myClassName} Set${tmpJavaName}_Equal_As_${classificationMap.get('name')}() {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
         }
+
+        /// <summary>
+        /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal to inline. { = }
+        /// </summary>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_Equal_As_${classificationMap.get('name')}_ToInline() {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        }
         #end
       #end
 
@@ -186,6 +204,16 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as notEqual to inline. { != }
+        /// If the value is null or empty-string, this condition is ignored.
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as notEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_NotEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, FilterRemoveEmptyString(value));
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as greaterThan. { &gt; }
         /// If the value is null or empty-string, this condition is ignored.
         /// </summary>
@@ -193,6 +221,16 @@ namespace ${glPackageCB} {
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, FilterRemoveEmptyString(value));
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as greaterThan to inline. { &gt; }
+        /// If the value is null or empty-string, this condition is ignored.
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as greaterThan.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_GreaterThan_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, FilterRemoveEmptyString(value));
         }
 
         /// <summary>
@@ -206,6 +244,16 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as lessThan to inline. { &lt; }
+        /// If the value is null or empty-string, this condition is ignored.
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessThan.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_LessThan_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, FilterRemoveEmptyString(value));
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as greaterEqual. { &gt;= }
         /// If the value is null or empty-string, this condition is ignored.
         /// </summary>
@@ -213,6 +261,16 @@ namespace ${glPackageCB} {
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, FilterRemoveEmptyString(value));
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as greaterEqual to inline. { &gt;= }
+        /// If the value is null or empty-string, this condition is ignored.
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as greaterEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_GreaterEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, FilterRemoveEmptyString(value));
         }
 
         /// <summary>
@@ -226,6 +284,16 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as lessEqual to inline. { &lt;= }
+        /// If the value is null or empty-string, this condition is ignored.
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_LessEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, FilterRemoveEmptyString(value));
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as prefixSearch. { like 'xxx%' }
         /// If the value is null or empty-string, this condition is ignored.
         /// </summary>
@@ -233,6 +301,16 @@ namespace ${glPackageCB} {
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, FilterRemoveEmptyString(value));
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as prefixSearch to inline. { like 'xxx%' }
+        /// If the value is null or empty-string, this condition is ignored.
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as prefixSearch.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_PrefixSearch_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, FilterRemoveEmptyString(value));
         }
 
         /// <summary>
@@ -260,31 +338,31 @@ namespace ${glPackageCB} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-	    /// <summary>The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.</summary>
-	    protected ${reffererCQClassName} _${subQueryPropertyName};
+        /// <summary>The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.</summary>
+        protected ${reffererCQClassName} _${subQueryPropertyName};
 
         /// <summary>
-	    /// The property of sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
-	    /// </summary>
-	    public ${reffererCQClassName} ${subQueryPropertyNameInitCap} {
-	        get { return _${subQueryPropertyName}; }
-	    }
+        /// The property of sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
+        /// </summary>
+        public ${reffererCQClassName} ${subQueryPropertyNameInitCap} {
+            get { return _${subQueryPropertyName}; }
+        }
 
         /// <summary>
-	    /// Set the sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
-	    /// { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
-	    /// This method use from clause and where clause of the sub-query instance.
-	    /// this query save the sub-query instance for query-value.
-	    /// After you invoke this, If you set query in the argument[subQuery], the query is ignored.
-	    /// </summary>
-	    /// <param name="subQuery">The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery. (NotNull)</param>
-	    /// <returns>this. (NotNull)</returns>
-	    public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
-	        AssertObjectNotNull("subQuery", subQuery);
-	        _${subQueryPropertyName} = subQuery;// for saving query-value.
-	        RegisterInScopeSubQuery(subQuery, GetRealColumnName(COL_${col.Name}), "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
-	        return this;
-	    }
+        /// Set the sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
+        /// { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+        /// This method use from clause and where clause of the sub-query instance.
+        /// this query save the sub-query instance for query-value.
+        /// After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+        /// </summary>
+        /// <param name="subQuery">The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery. (NotNull)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+            AssertObjectNotNull("subQuery", subQuery);
+            _${subQueryPropertyName} = subQuery;// for saving query-value.
+            RegisterInScopeSubQuery(subQuery, GetRealColumnName(COL_${col.Name}), "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            return this;
+        }
         #end
       #end
     #end
@@ -298,6 +376,15 @@ namespace ${glPackageCB} {
         public ${myClassName} Set${tmpJavaName}_Equal($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
         }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as equal to inline. { = }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as equal.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_Equal_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+        }
       #if (${col.hasClassification()})
         #foreach ($classificationMap in $col.ClassificationMapList)
 
@@ -307,6 +394,14 @@ namespace ${glPackageCB} {
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_Equal_As_${classificationMap.get('name')}() {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        }
+
+        /// <summary>
+        /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal to inline. { = }
+        /// </summary>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_Equal_As_${classificationMap.get('name')}_ToInline() {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
         }
         #end
       #end
@@ -321,12 +416,30 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as notEqual to inline. { != }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as notEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_NotEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as greaterThan. { &gt; }
         /// </summary>
         /// <param name="value">The value of ${col.UncapitalisedJavaName} as greaterThan.</param>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as greaterThan to inline. { &gt; }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as greaterThan.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_GreaterThan_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
         }
 
         /// <summary>
@@ -339,6 +452,15 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as lessThan to inline. { &lt; }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessThan.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_LessThan_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as greaterEqual. { &gt;= }
         /// </summary>
         /// <param name="value">The value of ${col.UncapitalisedJavaName} as greaterEqual.</param>
@@ -348,12 +470,30 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as greaterEqual to inline. { &gt;= }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as greaterEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_GreaterEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as lessEqual. { &lt;= }
         /// </summary>
         /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessEqual.</param>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_LessEqual($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as lessEqual to inline. { &lt;= }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_LessEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
         }
 
         /// <summary>
@@ -381,31 +521,31 @@ namespace ${glPackageCB} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-	    /// <summary>The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.</summary>
-	    protected ${reffererCQClassName} _${subQueryPropertyName};
+        /// <summary>The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.</summary>
+        protected ${reffererCQClassName} _${subQueryPropertyName};
 
         /// <summary>
-	    /// The property of sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
-	    /// </summary>
-	    public ${reffererCQClassName} ${subQueryPropertyNameInitCap} {
-	        get { return _${subQueryPropertyName}; }
-	    }
+        /// The property of sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
+        /// </summary>
+        public ${reffererCQClassName} ${subQueryPropertyNameInitCap} {
+            get { return _${subQueryPropertyName}; }
+        }
 
         /// <summary>
-	    /// Set the sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
-	    /// { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
-	    /// This method use from clause and where clause of the sub-query instance.
-	    /// this query save the sub-query instance for query-value.
-	    /// After you invoke this, If you set query in the argument[subQuery], the query is ignored.
-	    /// </summary>
-	    /// <param name="subQuery">The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery. (NotNull)</param>
-	    /// <returns>this. (NotNull)</returns>
-	    public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
-	        AssertObjectNotNull("subQuery", subQuery);
-	        _${subQueryPropertyName} = subQuery;// for saving query-value.
-	        RegisterInScopeSubQuery(subQuery, GetRealColumnName(COL_${col.Name}), "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
-	        return this;
-	    }
+        /// Set the sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
+        /// { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+        /// This method use from clause and where clause of the sub-query instance.
+        /// this query save the sub-query instance for query-value.
+        /// After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+        /// </summary>
+        /// <param name="subQuery">The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery. (NotNull)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+            AssertObjectNotNull("subQuery", subQuery);
+            _${subQueryPropertyName} = subQuery;// for saving query-value.
+            RegisterInScopeSubQuery(subQuery, GetRealColumnName(COL_${col.Name}), "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            return this;
+        }
         #end
       #end
     #end
@@ -421,12 +561,30 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as equal to inline. { = }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as equal.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_Equal_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as notEqual. { != }
         /// </summary>
         /// <param name="value">The value of ${col.UncapitalisedJavaName} as notEqual.</param>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_NotEqual($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as notEqual to inline. { != }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as notEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_NotEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
         }
 
         /// <summary>
@@ -439,12 +597,30 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as greaterThan to inline. { &gt; }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as greaterThan.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_GreaterThan_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as lessThan. { &lt; }
         /// </summary>
         /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessThan.</param>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_LessThan($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as lessThan to inline. { &lt; }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessThan.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_LessThan_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
         }
 
         /// <summary>
@@ -457,12 +633,30 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as greaterEqual to inline. { &gt;= }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as greaterEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_GreaterEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+        }
+
+        /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as lessEqual. { &lt;= }
         /// </summary>
         /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessEqual.</param>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_LessEqual($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+        }
+
+        /// <summary>
+        /// Set the value of ${col.UncapitalisedJavaName} as lessEqual to inline. { &lt;= }
+        /// </summary>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName} as lessEqual.</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_LessEqual_ToInline($col.JavaNative value) {
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
         }
 
         /// <summary>
@@ -490,31 +684,31 @@ namespace ${glPackageCB} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-	    /// <summary>The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.</summary>
-	    protected ${reffererCQClassName} _${subQueryPropertyName};
+        /// <summary>The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.</summary>
+        protected ${reffererCQClassName} _${subQueryPropertyName};
 
         /// <summary>
-	    /// The property of sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
-	    /// </summary>
-	    public ${reffererCQClassName} ${subQueryPropertyNameInitCap} {
-	        get { return _${subQueryPropertyName}; }
-	    }
+        /// The property of sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
+        /// </summary>
+        public ${reffererCQClassName} ${subQueryPropertyNameInitCap} {
+            get { return _${subQueryPropertyName}; }
+        }
 
         /// <summary>
-	    /// Set the sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
-	    /// { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
-	    /// This method use from clause and where clause of the sub-query instance.
-	    /// this query save the sub-query instance for query-value.
-	    /// After you invoke this, If you set query in the argument[subQuery], the query is ignored.
-	    /// </summary>
-	    /// <param name="subQuery">The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery. (NotNull)</param>
-	    /// <returns>this. (NotNull)</returns>
-	    public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
-	        AssertObjectNotNull("subQuery", subQuery);
-	        _${subQueryPropertyName} = subQuery;// for saving query-value.
-	        RegisterInScopeSubQuery(subQuery, GetRealColumnName(COL_${col.Name}), "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
-	        return this;
-	    }
+        /// Set the sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery.
+        /// { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+        /// This method use from clause and where clause of the sub-query instance.
+        /// this query save the sub-query instance for query-value.
+        /// After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+        /// </summary>
+        /// <param name="subQuery">The sub-query of ${subQueryPropertyNameInitCap} as inScopeSubQuery. (NotNull)</param>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+            AssertObjectNotNull("subQuery", subQuery);
+            _${subQueryPropertyName} = subQuery;// for saving query-value.
+            RegisterInScopeSubQuery(subQuery, GetRealColumnName(COL_${col.Name}), "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            return this;
+        }
         #end
       #end
     #end
@@ -560,6 +754,24 @@ namespace ${glPackageCB} {
             if (key.IsValidRegistration(this.${tmpJavaName}, value)) {
                 key.SetupConditionValue(this.${tmpJavaName}, value, GetLocation(J_${col.JavaName}, key));
                 GetSqlClause().RegisterWhereClause(GetRealColumnName(COL_${col.Name}), key, _${tmpUncapitalisedJavaName});
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Register inline condition of ${col.UncapitalisedJavaName}.
+        /// </summary>
+        /// <param name="key">Condition key. (NotNull)</param>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
+        /// <returns>this. (NotNull)</returns>
+        protected ${myClassName} RegisterInline${tmpJavaName}(${glConditionKeyName} key, Object value) {
+            if (key.IsValidRegistration(this.${tmpJavaName}, value)) {
+                key.SetupConditionValue(this.${tmpJavaName}, value, GetLocation(UJ_${col.UncapitalisedJavaName}, key));
+                if (IsBaseQuery(this)) {
+                    GetSqlClause().RegisterBaseTableInlineWhereClause(COL_${col.Name}, key, _${tmpUncapitalisedJavaName});
+                } else {
+                    GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), COL_${col.Name}, key, _${tmpUncapitalisedJavaName});
+                }
             }
             return this;
         }
@@ -684,7 +896,7 @@ namespace ${glPackageCB} {
         }
 
         /// <summary>
-      	/// Setup outer join for ${refferer.ReffererPropertyNameAsOne}.
+          /// Setup outer join for ${refferer.ReffererPropertyNameAsOne}.
         /// </summary>
         public void SetupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}() {
             System.Collections.IDictionary joinOnMap = new System.Collections.Hashtable();
@@ -704,7 +916,7 @@ namespace ${glPackageCB} {
             GetSqlClause().RegisterOuterJoin(joinTableName, aliasName, joinOnMap);
         }
 
-        /// <summary> Condition-query for ${refferer.ReffererPropertyNameAsOne}.	</summary>
+        /// <summary> Condition-query for ${refferer.ReffererPropertyNameAsOne}.    </summary>
         protected ${reffererCQClassName} _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
 
         /// <summary>

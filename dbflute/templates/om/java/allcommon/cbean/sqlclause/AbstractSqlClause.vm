@@ -27,7 +27,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /** Where list. */
     protected java.util.List${database.filterGenericsString('String')} _whereList = new java.util.ArrayList${database.filterGenericsString('String')}();
 
-    /** Inline where list. */
+    /** Inline where list for BaseTable. */
     protected java.util.List${database.filterGenericsString('String')} _baseTableInlineWhereList = new java.util.ArrayList${database.filterGenericsString('String')}();
 
     /** Order-by clause. */
@@ -134,29 +134,29 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     protected String getLeftOuterJoinClause() {
         final StringBuffer sb = new StringBuffer();
         for (final java.util.Iterator ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
-			final String aliasName = (String)ite.next();
-	        final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-			final String joinTableName = joinInfo.getJoinTableName();
-			final java.util.List${database.filterGenericsString('String')} inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
-	        final java.util.Map${database.filterGenericsString('String, String')} joinOnMap = joinInfo.getJoinOnMap();
+            final String aliasName = (String)ite.next();
+            final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
+            final String joinTableName = joinInfo.getJoinTableName();
+            final java.util.List${database.filterGenericsString('String')} inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
+            final java.util.Map${database.filterGenericsString('String, String')} joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
-	        sb.append(" left outer join ");
+            sb.append(" left outer join ");
             if (inlineWhereClauseList.isEmpty()) {
                 sb.append(joinTableName);
             } else {
-	            sb.append(getInlineViewClause(joinTableName, inlineWhereClauseList));
+                sb.append(getInlineViewClause(joinTableName, inlineWhereClauseList));
             }
             sb.append(" ").append(aliasName).append(" on ");
-	        int count = 0;
-	        for (final java.util.Iterator joinOnMapIte = joinOnMap.keySet().iterator(); joinOnMapIte.hasNext(); count++) {
-	            final String localColumnName = (String)joinOnMapIte.next();
-	            final String foreignColumnName = (String)joinOnMap.get(localColumnName);
-	            if (count != 0) {
-	                sb.append(" and ");
-	            }
-	            sb.append(localColumnName).append(" = ").append(foreignColumnName);
-	        }
+            int count = 0;
+            for (final java.util.Iterator joinOnMapIte = joinOnMap.keySet().iterator(); joinOnMapIte.hasNext(); count++) {
+                final String localColumnName = (String)joinOnMapIte.next();
+                final String foreignColumnName = (String)joinOnMap.get(localColumnName);
+                if (count != 0) {
+                    sb.append(" and ");
+                }
+                sb.append(localColumnName).append(" = ").append(foreignColumnName);
+            }
         }
         return sb.toString();
     }
@@ -176,7 +176,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         sb.append(")");
         return sb.toString();
     }
-
 
     /**
      * ${database.ImplementComment}
@@ -252,35 +251,35 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return this;
     }
 
-    public static class LeftOuterJoinInfo {
-    	protected String _aliasName;
-    	protected String _joinTableName;
-    	protected java.util.List${database.filterGenericsString('String')} _inlineWhereClauseList = new java.util.ArrayList${database.filterGenericsString('String')}();
-    	protected java.util.Map${database.filterGenericsString('String, String')} _joinOnMap;
-    	public String getAliasName() {
-    		return _aliasName;
-    	}
-    	public void setAliasName(String value) {
-    		_aliasName = value;
-    	}
-    	public String getJoinTableName() {
-    		return _joinTableName;
-    	}
-    	public void setJoinTableName(String value) {
-    		_joinTableName = value;
-    	}
-    	public java.util.List${database.filterGenericsString('String')} getInlineWhereClauseList() {
-    		return _inlineWhereClauseList;
-    	}
-    	public void addInlineWhereClause(String value) {
-    		_inlineWhereClauseList.add(value);
-    	}
-    	public java.util.Map${database.filterGenericsString('String, String')} getJoinOnMap() {
-    		return _joinOnMap;
-    	}
-    	public void setJoinOnMap(java.util.Map${database.filterGenericsString('String, String')} value) {
-    		_joinOnMap = value;
-    	}
+    protected static class LeftOuterJoinInfo {
+        protected String _aliasName;
+        protected String _joinTableName;
+        protected java.util.List${database.filterGenericsString('String')} _inlineWhereClauseList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        protected java.util.Map${database.filterGenericsString('String, String')} _joinOnMap;
+        public String getAliasName() {
+            return _aliasName;
+        }
+        public void setAliasName(String value) {
+            _aliasName = value;
+        }
+        public String getJoinTableName() {
+            return _joinTableName;
+        }
+        public void setJoinTableName(String value) {
+            _joinTableName = value;
+        }
+        public java.util.List${database.filterGenericsString('String')} getInlineWhereClauseList() {
+            return _inlineWhereClauseList;
+        }
+        public void addInlineWhereClause(String value) {
+            _inlineWhereClauseList.add(value);
+        }
+        public java.util.Map${database.filterGenericsString('String, String')} getJoinOnMap() {
+            return _joinOnMap;
+        }
+        public void setJoinOnMap(java.util.Map${database.filterGenericsString('String, String')} value) {
+            _joinOnMap = value;
+        }
     }
 
     /**
@@ -300,6 +299,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /**
      * Assert whether the joinOnMap should not be empty.
      * 
+     * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
      * @param aliasName Alias name.
      * @return this.
      */
