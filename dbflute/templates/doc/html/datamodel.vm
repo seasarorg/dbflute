@@ -1,4 +1,6 @@
 #set ( $database = $dataModel.database )
+${database.initializeClassificationDeployment()}
+
 <html>
 <header>
   <title>$dataModel.name</title>

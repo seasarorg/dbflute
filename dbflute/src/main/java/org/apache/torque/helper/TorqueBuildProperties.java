@@ -878,8 +878,8 @@ public final class TorqueBuildProperties {
                                         selectedTmpMap.put("name", tmpNameValue);
                                         selectedTmpMap.put("alias", tmpAliasValue);
                                         _log.debug("    code: " + tmpCodeValue);
-                                        _log.debug("    name: " + name);
-                                        _log.debug("    alias: " + alias);
+                                        _log.debug("    name: " + tmpNameValue);
+                                        _log.debug("    alias: " + tmpAliasValue);
                                         elementList.add(selectedTmpMap);
                                     }
                                     _log.debug("- - - - - - - - /");

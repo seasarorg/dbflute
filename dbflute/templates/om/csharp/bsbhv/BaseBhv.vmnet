@@ -546,7 +546,7 @@ namespace ${glPackageExtendedBhv} {
 
             System.Collections.IDictionary pkMyEntityMap = new System.Collections.Hashtable();
             System.Collections.IList pkList = new System.Collections.ArrayList();
-            foreach (${myExtendedObjectClassName} entity in pkList) {
+            foreach (${myExtendedObjectClassName} entity in ls) {
                 pkList.Add(entity.${table.getPrimaryKeyJavaNameAsOne()});
                 pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
             }
@@ -569,7 +569,7 @@ namespace ${glPackageExtendedBhv} {
                 reffererEntity.${refferer.ForeignPropertyNameInitCap} = myEntity;
             }
 
-            foreach (${myExtendedObjectClassName} entity in pkList) {
+            foreach (${myExtendedObjectClassName} entity in ls) {
                 entity.${refferer.ReffererPropertyNameInitCap} = (System.Collections.IList)pkReffererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
             }
         }

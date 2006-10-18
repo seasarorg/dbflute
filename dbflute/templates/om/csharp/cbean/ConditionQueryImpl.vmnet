@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections;
+
+using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCValue};
@@ -160,6 +162,18 @@ namespace ${glPackageCB} {
         public ${myClassName} Set${tmpJavaName}_Equal_As_EmptyString() {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, "");
         }
+      #if (${col.hasClassification()})
+        #foreach ($classificationMap in $col.ClassificationMapList)
+
+        /// <summary>
+        /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+        /// </summary>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_Equal_As_${classificationMap.get('name')}() {
+            return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        }
+        #end
+      #end
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as notEqual. { != }
@@ -284,6 +298,18 @@ namespace ${glPackageCB} {
         public ${myClassName} Set${tmpJavaName}_Equal($col.JavaNative value) {
             return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
         }
+      #if (${col.hasClassification()})
+        #foreach ($classificationMap in $col.ClassificationMapList)
+
+        /// <summary>
+        /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+        /// </summary>
+        /// <returns>this. (NotNull)</returns>
+        public ${myClassName} Set${tmpJavaName}_Equal_As_${classificationMap.get('name')}() {
+            return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        }
+        #end
+      #end
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} as notEqual. { != }

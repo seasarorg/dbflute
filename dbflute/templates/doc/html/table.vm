@@ -5,32 +5,32 @@ $!table.Description
 <table border="1" cellspacing="0">
   <tr>
     <th class="normalFont" bgcolor="#CCCCCC">Name</th>
-    <th class="normalFont" bgcolor="#CCCCCC">TorqueType</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Type of dbflute</th>
+    <th class="normalFont" bgcolor="#CCCCCC">PK</th>
+    <th class="normalFont" bgcolor="#CCCCCC">AutoInc</th>
+    <th class="normalFont" bgcolor="#CCCCCC">NotNull</th>
     <th class="normalFont" bgcolor="#CCCCCC">Size</th>
     <th class="normalFont" bgcolor="#CCCCCC">Default</th>
-    <th class="normalFont" bgcolor="#CCCCCC">JavaName</th>
-    <th class="normalFont" bgcolor="#CCCCCC">JavaNative</th>
-    <th class="normalFont" bgcolor="#CCCCCC">PK</th>
-    <th class="normalFont" bgcolor="#CCCCCC">FK</th>
-    <th class="normalFont" bgcolor="#CCCCCC">not null</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Description</th>
     <th class="normalFont" bgcolor="#CCCCCC">ForeignTable</th>
     <th class="normalFont" bgcolor="#CCCCCC">ReffererTable</th>
+    <th class="normalFont" bgcolor="#CCCCCC">CapPropName</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Type of ${table.Database.TargetLanguage}</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Classification</th>
   </tr>
 #foreach ($col in $table.Columns)
   <tr>
     <td class="normalFont" id="$table.Name$col.Name">$col.Name</td>
     <td class="normalFont">$col.TorqueType</td>
+    <td class="normalFont"><center> #if ($col.isPrimaryKey()==true)o#else &nbsp;#end </center></td>
+    <td class="normalFont"><center> #if ($col.isAutoIncrement()==true)o#else &nbsp;#end </center></td>
+    <td class="normalFont"><center> #if ($col.isNotNull()==true)o#else &nbsp;#end </center></td>
     <td class="normalFont">#if ($col.printSize() && $col.printSize().length() > 0) $col.printSize() #else &nbsp;#end</td>
     <td class="normalFont">#if ($col.DefaultValue) $col.DefaultValue#else &nbsp;#end</td>
+    <td class="normalFont">${col.ForeignTableName}&nbsp;</td>
+    <td class="normalFont">${col.ReferrerCommaString}&nbsp;</td>
     <td class="normalFont">$col.JavaName</td>
     <td class="normalFont">$col.JavaNative</td>
-    <td class="normalFont"><center> #if ($col.isPrimaryKey()==true)X#else &nbsp;#end </center></td>
-    <td class="normalFont"><center> #if ($col.isForeignKey()==true)X#else &nbsp;#end </center></td>
-    <td class="normalFont"><center> #if ($col.isNotNull()==true)X#else &nbsp;#end </center></td>
-    <td class="normalFont">#if ($col.Description) $col.Description#else &nbsp;#end</td>
-    <td class="normalFont">${col.ForeignTableName}</td>
-    <td class="normalFont">${col.ReferrerCommaString}</td>
+    <td class="normalFont"><center> #if ($col.hasClassification()==true)${col.ClassificationName}#else &nbsp;#end </center></td>
   </tr>
 #end
 </table>

@@ -125,7 +125,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Inserted count.
      */
     public int delegateCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             filterEntityOfInsert(entity);
@@ -141,7 +141,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Updated count.
      */
     public int delegateModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             filterEntityOfUpdate(entity);
@@ -157,7 +157,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Deleted count.
      */
     public int delegateRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             filterEntityOfDelete(entity);
