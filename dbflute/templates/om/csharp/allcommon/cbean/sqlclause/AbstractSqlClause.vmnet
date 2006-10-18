@@ -126,7 +126,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          */
         public String GetFromClause() {
             StringBuilder sb = new StringBuilder(128);
-            sb.Append("from ").Append(_tableName);
+            sb.Append("from ");
             if (_baseTableInlineWhereList.Count == 0) {
                 sb.Append(_tableName);
             } else {

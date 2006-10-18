@@ -753,7 +753,7 @@ namespace ${glPackageCB} {
         protected ${myClassName} Register${tmpJavaName}(${glConditionKeyName} key, Object value) {
             if (key.IsValidRegistration(this.${tmpJavaName}, value)) {
                 key.SetupConditionValue(this.${tmpJavaName}, value, GetLocation(J_${col.JavaName}, key));
-                GetSqlClause().RegisterWhereClause(GetRealColumnName(COL_${col.Name}), key, _${tmpUncapitalisedJavaName});
+                GetSqlClause().RegisterWhereClause(GetRealColumnName(COL_${col.Name}), key, this.${tmpJavaName});
             }
             return this;
         }
@@ -768,9 +768,9 @@ namespace ${glPackageCB} {
             if (key.IsValidRegistration(this.${tmpJavaName}, value)) {
                 key.SetupConditionValue(this.${tmpJavaName}, value, GetLocation(UJ_${col.UncapitalisedJavaName}, key));
                 if (IsBaseQuery(this)) {
-                    GetSqlClause().RegisterBaseTableInlineWhereClause(COL_${col.Name}, key, _${tmpUncapitalisedJavaName});
+                    GetSqlClause().RegisterBaseTableInlineWhereClause(COL_${col.Name}, key, this.${tmpJavaName});
                 } else {
-                    GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), COL_${col.Name}, key, _${tmpUncapitalisedJavaName});
+                    GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), COL_${col.Name}, key, this.${tmpJavaName});
                 }
             }
             return this;
