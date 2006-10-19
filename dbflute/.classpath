@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/forCompile/ant-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/avalon-framework-4.1.4.jar"/>
@@ -22,5 +23,6 @@
 	<classpathentry kind="lib" path="lib/forCompile/xercesImpl-2.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/xmlParserAPIs-2.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/village-2.0-dev-20030825.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
