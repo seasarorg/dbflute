@@ -688,7 +688,7 @@ public class Database {
     public boolean isAvailableBehaviorInterfacePrefixI() {
         return getProperties().isAvailableBehaviorInterfacePrefixI();
     }
-    
+
     public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
         return getProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
     }
@@ -748,7 +748,7 @@ public class Database {
     public String getRequiredTxComponentName() {
         return getProperties().getRequiredTxComponentName();
     }
-    
+
     public String getRequiresNewTxComponentName() {
         return getProperties().getRequiresNewTxComponentName();
     }
@@ -817,7 +817,7 @@ public class Database {
     public String getUpdateDateFieldName() {
         return getProperties().getUpdateDateFieldName();
     }
-    
+
     /**
      * Is table out of sight?
      * 
@@ -954,11 +954,11 @@ public class Database {
     public List<String> getClassificationNameList() {
         return getProperties().getClassificationNameList();
     }
-    
+
     public List<String> getClassificationNameListValidNameOnly() {
         return getProperties().getClassificationNameListValidNameOnly();
     }
-    
+
     public List<String> getClassificationNameListValidAliasOnly() {
         return getProperties().getClassificationNameListValidAliasOnly();
     }
@@ -974,7 +974,7 @@ public class Database {
     // --------------------------------------
     //                             Deployment
     //                             ----------
-    public Map<String, Object> getClassificationDeploymentMap() {
+    public Map<String, Map<String, String>> getClassificationDeploymentMap() {
         return getProperties().getClassificationDeploymentMap();
     }
 
@@ -982,6 +982,22 @@ public class Database {
         return getProperties().getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
+    public boolean hasClassification(String tableName, String columnName) {
+        return getProperties().hasClassification(tableName, columnName);
+    }
+
+    public String getClassificationName(String tableName, String columnName) {
+        return getProperties().getClassificationName(tableName, columnName);
+    }
+
+    public boolean hasClassificationName(String tableName, String columnName) {
+        return getProperties().hasClassificationName(tableName, columnName);
+    }
+    
+    public boolean hasClassificationAlias(String tableName, String columnName) {
+        return getProperties().hasClassificationAlias(tableName, columnName);
+    }
+    
     public Map<String, String> getAllColumnClassificationMap() {
         return getProperties().getAllColumnClassificationMap();
     }
@@ -994,8 +1010,8 @@ public class Database {
         return getProperties().isAllClassificationColumn(columnName);
     }
 
-    public String getClassificationName(String columnName) {
-        return getProperties().getClassificationName(columnName);
+    public String getAllClassificationName(String columnName) {
+        return getProperties().getAllClassificationName(columnName);
     }
 
     // ===============================================================================
@@ -1020,15 +1036,15 @@ public class Database {
     public boolean isSelectQueryTimeoutValid() {
         return getProperties().isSelectQueryTimeoutValid();
     }
-    
+
     public String getStatementResultSetType() {
         return getProperties().getStatementResultSetType();
     }
-    
+
     public String getStatementResultSetConcurrency() {
         return getProperties().getStatementResultSetConcurrency();
     }
-    
+
     public boolean isStatementResultSetTypeValid() {
         return getProperties().isStatementResultSetTypeValid();
     }
@@ -1384,7 +1400,7 @@ public class Database {
     public String getRequiredTransactionToBehaviorPointcut() {
         return ".*Tx";
     }
-    
+
     public String getRequiresNewTransactionToBehaviorPointcut() {
         return ".*NewTx";
     }
@@ -1533,7 +1549,7 @@ public class Database {
     public void setupJavaDir_for_lazyLoadContainer() {
         setupJavaDir_for_allcommon();
     }
-    
+
     public void setupJavaDir_for_daoDicon() {
         setupJavaDir_for_extended();
     }
@@ -1541,7 +1557,7 @@ public class Database {
     public void setupJavaDir_for_daoSelector() {
         setupJavaDir_for_allcommon();
     }
-    
+
     public void setupJavaDir_for_cacheDaoSelector() {
         setupJavaDir_for_extended();
     }
@@ -1556,7 +1572,7 @@ public class Database {
             throw new IllegalStateException(msg);
         }
     }
-    
+
     public void setupJavaDir_for_dbmetaInstanceHandler() {
         if (isTargetLanguageJava()) {
             setupJavaDir_for_gen();
@@ -1567,7 +1583,7 @@ public class Database {
             throw new IllegalStateException(msg);
         }
     }
-    
+
     public void setupJavaDir_for_interceptor() {
         setupJavaDir_for_extended();
     }
@@ -1579,23 +1595,23 @@ public class Database {
     public void setupJavaDir_for_baseCustomizeDao() {
         setupJavaDir_for_extended();
     }
-    
+
     public void setupJavaDir_for_extendedCustomizeDao() {
         setupJavaDir_for_extended();
     }
-    
+
     public void setupJavaDir_for_baseSqlParameter() {
         setupJavaDir_for_extended();
     }
-    
+
     public void setupJavaDir_for_extendedSqlParameter() {
         setupJavaDir_for_extended();
     }
-    
+
     public void setupJavaDir_for_argumentBean() {
         setupJavaDir_for_extended();
     }
-    
+
     public void setupJavaDir_for_allcommon() {
         setupJavaDir_for_gen();
     }
@@ -1605,7 +1621,7 @@ public class Database {
             setupJavaDir_for_main();
         } else if (isTargetLanguageCSharp()) {
             // partialでも別のProjectだとダメだった。。。(2006/08/11)
-//            setupJavaDir_for_gen();
+            //            setupJavaDir_for_gen();
             setupJavaDir_for_main();
         } else {
             String msg = "The language is unsupported: " + getTargetLanguage();
@@ -1627,11 +1643,11 @@ public class Database {
     public void setupJavaDir_for_extended() {
         setupJavaDir_for_main();
     }
-    
+
     protected void setupJavaDir_for_main() {
         Generator.getInstance().setOutputPath(getJavaDir() + getProperties().getJavaLocation_for_main());
     }
-    
+
     protected void setupJavaDir_for_gen() {
         Generator.getInstance().setOutputPath(getJavaDir() + getProperties().getJavaLocation_for_gen());
     }

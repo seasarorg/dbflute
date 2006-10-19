@@ -992,10 +992,37 @@ public final class TorqueBuildProperties {
     //                             ----------
     public static final String KEY_classificationDeploymentMap = "classificationDeploymentMap";
     public static final String MARK_classificationDeploymentAllTable = "$$ALL$$";
-    protected Map<String, Object> _classificationDeploymentMap;
+    protected Map<String, Map<String, String>> _classificationDeploymentMap;
 
+    public Map<String, Map<String, String>> getClassificationDeploymentMap() {
+        if (_classificationDeploymentMap == null) {
+            final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
+            _classificationDeploymentMap = new LinkedHashMap<String, Map<String, String>>();
+            final Set<String> deploymentMapkeySet = map.keySet();
+            for (String tableName : deploymentMapkeySet) {
+                final Object value = map.get(tableName);
+                if (value instanceof Map) {
+                    final Map tmpMap = (Map) value;
+                    final Set tmpMapKeySet = tmpMap.keySet();
+                    final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>(); 
+                    for (Object columnNameObj : tmpMapKeySet) {
+                        final String columnName = (String)columnNameObj;
+                        final String classificationName = (String)tmpMap.get(columnName);
+                        columnClassificationMap.put(columnName, classificationName);
+                    }
+                    _classificationDeploymentMap.put(tableName, columnClassificationMap);
+                } else {
+                    String msg = "The value should be columnClassificationMap: " ;
+                    throw new IllegalStateException(msg+ "type=" + value.getClass() + " value=" + value);
+                }
+            }
+        }
+        return _classificationDeploymentMap;
+    }
+
+    
     public void initializeClassificationDeploymentMap(List<Table> tableList) {
-        final Map<String, Object> map = getClassificationDeploymentMap();
+        final Map<String, Map<String, String>> map = getClassificationDeploymentMap();
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
         if (allColumnClassificationMap == null) {
             return;
@@ -1014,24 +1041,54 @@ public final class TorqueBuildProperties {
         _classificationDeploymentMap = map;
     }
 
-    public Map<String, Object> getClassificationDeploymentMap() {
-        if (_classificationDeploymentMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
-            _classificationDeploymentMap = map;
-        }
-        return _classificationDeploymentMap;
-    }
-
     public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
         final String property = stringProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP_STRING);
         return filterDoubleQuotation(removeNewLine(property));
     }
 
-    public Map<String, String> getAllColumnClassificationMap() {
-        final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
-        return (Map<String, String>) map.get(MARK_classificationDeploymentAllTable);
+    public boolean hasClassification(String tableName, String columnName) {
+        final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
+        final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
+        if (columnClassificationMap == null) {
+            return false;
+        }
+        final String classificationName = columnClassificationMap.get(columnName);
+        if (classificationName == null) {
+            return false;
+        }
+        return true;
     }
-
+    
+    public String getClassificationName(String tableName, String columnName) {
+        final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
+        if (!deploymentMap.containsKey(tableName)) {
+            return null;
+        }
+        final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
+        return columnClassificationMap.get(columnName);
+    }
+    
+    public boolean hasClassificationName(String tableName, String columnName) {
+        final String classificationName = getClassificationName(tableName, columnName);
+        if (classificationName == null) {
+            return false;
+        }
+        return getClassificationNameListValidNameOnly().contains(classificationName);
+    }
+    
+    public boolean hasClassificationAlias(String tableName, String columnName) {
+        final String classificationName = getClassificationName(tableName, columnName);
+        if (classificationName == null) {
+            return false;
+        }
+        return getClassificationNameListValidAliasOnly().contains(classificationName);
+    }
+    
+    public Map<String, String> getAllColumnClassificationMap() {
+        return (Map<String, String>) getClassificationDeploymentMap().get(MARK_classificationDeploymentAllTable);
+    }
+    
+    
     public boolean isAllClassificationColumn(String columnName) {
         if (getAllColumnClassificationMap() == null) {
             return false;
@@ -1039,7 +1096,7 @@ public final class TorqueBuildProperties {
         return getAllColumnClassificationMap().containsKey(columnName);
     }
 
-    public String getClassificationName(String columnName) {
+    public String getAllClassificationName(String columnName) {
         if (getAllColumnClassificationMap() == null) {
             return null;
         }

@@ -26,7 +26,7 @@ namespace ${glPackageBaseCommon} {
         /// </summary>
         bool IsSetterInvoked${javaName}();
   #if (${database.isAllClassificationColumn($columnName)})
-    #set ($classificationName = $database.getClassificationName($columnName))
+    #set ($classificationName = $database.getAllClassificationName($columnName))
     #set ($classificationList = $database.getClassificationMapList($classificationName))
     #foreach ($classificationMap in $classificationList)
 

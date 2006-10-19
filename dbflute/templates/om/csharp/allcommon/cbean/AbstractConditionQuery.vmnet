@@ -137,6 +137,31 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         // =====================================================================================
+        //                                                                              RealName
+        //                                                                              ========
+        /// <summary>
+        ///    Get real alias name(that has nest level mark).
+        /// </summary>
+        /// <returns>Real alias name. (NotNull)</returns>
+        public override String GetRealAliasName() {
+            if (GetNestLevel() > 1) {
+                return GetAliasName() + "_n" + GetNestLevel();
+            } else {
+                return GetAliasName();
+            }
+        }
+
+        /// <summary>
+        /// Get real column name(with real alias name).
+        /// </summary>
+        /// <param name="columnName">Column name without alias name. This should not contain comma.</param>
+        /// <returns>Real column name.</returns>
+        public override String GetRealColumnName(String columnName) {
+            AssertColumnName(columnName);
+            return GetRealAliasName() + "." + columnName;
+        }
+
+        // =====================================================================================
         //                                                                                Invoke
         //                                                                                ======
         public ${glConditionValueName} InvokeGetter(String columnMultiName) {
@@ -277,6 +302,21 @@ namespace ${glPackageBaseCommonCBean} {
             return this;
         }
 
+        protected ${glConditionQueryInterfaceName} RegisterInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                     , String columnName, String firstReffererColumnName, String propertyName) {
+            String selectClause = "select " + subQuery.GetAliasName() + "." + firstReffererColumnName;
+            String fromClause = subQuery.GetSqlClause().GetFromClause();
+            String oldStr = ".ConditionQuery.";
+            String newStr = "." + GetLocationBase(propertyName) + ".";
+            String whereClause = subQuery.GetSqlClause().GetWhereClause().Replace(oldStr, newStr);
+            String finalClause = columnName + " in (" + selectClause + " " + fromClause + " " + whereClause + ")";
+	        if (IsBaseQuery(this)) {
+	            GetSqlClause().RegisterBaseTableInlineWhereClause(finalClause);
+	        } else {
+	            GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), finalClause);
+	        }
+            return this;
+        }
 
         // ----------------------------------------------------------------
         //                                                    Assert Object

@@ -240,9 +240,8 @@ namespace ${glPackageBaseCommonSqlClause} {
         // =====================================================================================
         //                                                                  IncludedSelectColumn
         //                                                                  ====================
-        public ${glSqlClauseInterfaceName} RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
+        public void RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
             _includedSelectColumnMap.Add(aliasName, realColumnName);
-            return this;
         }
 
         // =====================================================================================
@@ -254,9 +253,8 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @param joinTableName Join table name(outer join [joinTableName]). (NotNull)
          * @param aliasName Alias name of join table. (NotNull and Unique per invoking method.)
          * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
-         * @return this. (NotNull)
          */
-        public ${glSqlClauseInterfaceName} RegisterOuterJoin(String joinTableName, String aliasName, System.Collections.IDictionary joinOnMap) {
+        public void RegisterOuterJoin(String joinTableName, String aliasName, System.Collections.IDictionary joinOnMap) {
             AssertAlreadyOuterJoin(aliasName);
             AssertJoinOnMapNotEmpty(joinOnMap, aliasName);
             LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
@@ -265,7 +263,6 @@ namespace ${glPackageBaseCommonSqlClause} {
             joinInfo.JoinOnMap = joinOnMap;
             _outerJoinMap.Add(aliasName, joinInfo);
             _outerJoinList.Add(aliasName);// For order guarantee
-            return this;
         }
 
         public class LeftOuterJoinInfo {
@@ -293,32 +290,18 @@ namespace ${glPackageBaseCommonSqlClause} {
             }
         }
 
-        /**
-         * Assert whether the alias name have already registered in outer join.
-         * 
-         * @param aliasName Alias name.
-         * @return this.
-         */
-        protected ${myClassName} AssertAlreadyOuterJoin(String aliasName) {
+        protected void AssertAlreadyOuterJoin(String aliasName) {
             if (_outerJoinMap.Contains(aliasName)) {
                 String msg = "The alias name have already registered in outer join: " + aliasName;
                 throw new ArgumentOutOfRangeException(msg);
             }
-            return this;
         }
 
-        /**
-         * Assert whether the joinOnMap should not be empty.
-         * 
-         * @param aliasName Alias name.
-         * @return this.
-         */
-        protected ${myClassName} AssertJoinOnMapNotEmpty(System.Collections.IDictionary joinOnMap, String aliasName) {
+        protected void AssertJoinOnMapNotEmpty(System.Collections.IDictionary joinOnMap, String aliasName) {
             if (joinOnMap.Count == 0) {
                 String msg = "The joinOnMap should not be empty: aliasName=" + aliasName;
                 throw new ArgumentOutOfRangeException(msg);
             }
-            return this;
         }
 
         // =====================================================================================
@@ -330,12 +313,10 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @param columnName Column name([table-name].[column-name]). (NotNull)
          * @param key Condition key. (NotNull)
          * @param value Condition value. (NotNull)
-         * @return this. (NotNull)
          */
-        public ${glSqlClauseInterfaceName} RegisterWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+        public void RegisterWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
             AssertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
             key.AddWhereClause(_whereList, columnName, value);
-            return this;
         }
 
         /**
@@ -344,45 +325,50 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @param clause Where clause. (NotNull)
          * @return this. (NotNull)
          */
-        public ${glSqlClauseInterfaceName} RegisterWhereClause(String clause) {
+        public void RegisterWhereClause(String clause) {
             AssertStringNotNullAndNotTrimmedEmpty("clause", clause);
             _whereList.Add(clause);
-            return this;
         }
 
         // =====================================================================================
         //                                                                           InlineWhere
         //                                                                           ===========
-        public ${glSqlClauseInterfaceName} RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+        public void RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
             RegisterWhereClause(columnName, key, value);
             String inlineWhereClause = (String)_whereList[_whereList.Count-1];
             _whereList.RemoveAt(_whereList.Count-1);
             _baseTableInlineWhereList.Add(inlineWhereClause);
-            return this;
         }
 
-        public ${glSqlClauseInterfaceName} RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+        public void RegisterBaseTableInlineWhereClause(String columnName, String value) {
+            _baseTableInlineWhereList.Add(inlineWhereClause);
+        }
+
+        public void RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
             AssertNotYetOuterJoin(aliasName);
             LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
             RegisterWhereClause(columnName, key, value);
             String inlineWhereClause = (String)_whereList[_whereList.Count-1];
             _whereList.RemoveAt(_whereList.Count-1);
             joinInfo.AddInlineWhereClause(inlineWhereClause);
-            return this;
+        }
+
+        public void RegisterOuterJoinInlineWhereClause(String aliasName, String value) {
+            AssertNotYetOuterJoin(aliasName);
+            LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
+            joinInfo.AddInlineWhereClause(inlineWhereClause);
         }
 
         /**
          * Assert whether the alias name have already registered in outer join.
          * 
          * @param aliasName Alias name.
-         * @return this.
          */
-        protected ${myClassName} AssertNotYetOuterJoin(String aliasName) {
+        protected void AssertNotYetOuterJoin(String aliasName) {
             if (!_outerJoinMap.Contains(aliasName)) {
                 String msg = "The alias name have not registered in outer join yet: " + aliasName;
                 throw new ArgumentOutOfRangeException(msg);
             }
-            return this;
         }
 
         // =====================================================================================
@@ -428,11 +414,11 @@ namespace ${glPackageBaseCommonSqlClause} {
             return this;
         }
 
-        public ${glSqlClauseInterfaceName} ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, bool isAsc) {
-            return ReverseOrderBy_Or_OverrideOrderBy(columnFullName, null, isAsc);
+        public void ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, bool isAsc) {
+            ReverseOrderBy_Or_OverrideOrderBy(columnFullName, null, isAsc);
         }
 
-        public ${glSqlClauseInterfaceName} ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc) {
+        public void ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc) {
             _isOrderByEffective = true;
             if (!_orderByClause.IsSameOrderByColumn(columnFullName)) {
                 ClearOrderBy();
@@ -441,11 +427,8 @@ namespace ${glPackageBaseCommonSqlClause} {
                 } else {
                     RegisterOrderBy(columnFullName, registeredColumnFullName, false);
                 }
-                return this;
             }
-
             _orderByClause.ReverseAll();
-            return this;
         }
 
         /**
@@ -453,10 +436,9 @@ namespace ${glPackageBaseCommonSqlClause} {
          * 
          * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
          * @param registeredColumnFullName Registered-column-full-name. ([table-name].[column-name]) (Nullable)
-         * @return this. (NotNull)
          */
         public ${glSqlClauseInterfaceName} RegisterOrderBy(String columnFullName, bool isAsc) {
-            return RegisterOrderBy(columnFullName, null, isAsc);
+            RegisterOrderBy(columnFullName, null, isAsc);
         }
 
         /**
@@ -464,9 +446,8 @@ namespace ${glPackageBaseCommonSqlClause} {
          * 
          * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
          * @param registeredColumnFullName Registered-column-full-name. ([table-name].[column-name]) (Nullable)
-         * @return this. (NotNull)
          */
-        public ${glSqlClauseInterfaceName} RegisterOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc) {
+        public void RegisterOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc) {
             try {
                 String[] orderByArray = columnFullName.Split('/');
                 if (registeredColumnFullName == null || registeredColumnFullName.Trim().Length ==0) {
@@ -511,7 +492,6 @@ namespace ${glPackageBaseCommonSqlClause} {
 
                     count++;
                 }
-                return this;
             } catch (Exception e) {
                 String msg = "RegisterOrderBy() threw the exception: columnFullName=" + columnFullName;
                 msg = msg + " registeredColumnFullName=" + registeredColumnFullName;

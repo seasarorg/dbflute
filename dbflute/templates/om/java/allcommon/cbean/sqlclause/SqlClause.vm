@@ -86,7 +86,7 @@ public interface ${myClassName} {
     // =====================================================================================
     //                                                                  IncludedSelectColumn
     //                                                                  ====================
-    public ${glSqlClauseInterfaceName} registerIncludedSelectColumn(String aliasName, String realColumnName);
+    public void registerIncludedSelectColumn(String aliasName, String realColumnName);
 
     // =====================================================================================
     //                                                                             OuterJoin
@@ -99,7 +99,7 @@ public interface ${myClassName} {
      * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
      * @return this. (NotNull)
      */
-    public ${myClassName} registerOuterJoin(String joinTableName, String aliasName, Map${database.filterGenericsString('String, String')} joinOnMap);
+    public void registerOuterJoin(String joinTableName, String aliasName, Map${database.filterGenericsString('String, String')} joinOnMap);
 
     // =====================================================================================
     //                                                                                 Where
@@ -112,7 +112,7 @@ public interface ${myClassName} {
      * @param value Condition value. (NotNull)
      * @return this. (NotNull)
      */
-    public ${myClassName} registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value);
 
     /**
      * Register where clause.
@@ -120,13 +120,15 @@ public interface ${myClassName} {
      * @param clause Where-clause. (NotNull)
      * @return this. (NotNull)
      */
-    public ${glSqlClauseInterfaceName} registerWhereClause(String clause);
+    public void registerWhereClause(String clause);
 
     // =====================================================================================
     //                                                                           InlineWhere
     //                                                                           ===========
-    public ${glSqlClauseInterfaceName} registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
-    public ${glSqlClauseInterfaceName} registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    public void registerBaseTableInlineWhereClause(String value);
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    public void registerOuterJoinInlineWhereClause(String aliasName, String value);
 
     // =====================================================================================
     //                                                                               OrderBy
@@ -154,9 +156,9 @@ public interface ${myClassName} {
      */
     public ${myClassName} makeOrderByEffective();
 
-    public ${myClassName} registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
+    public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
 
-    public ${glSqlClauseInterfaceName} reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
+    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
 
     // =====================================================================================
     //                                                                               Advance

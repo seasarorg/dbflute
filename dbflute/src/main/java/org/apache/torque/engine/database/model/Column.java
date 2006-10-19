@@ -699,14 +699,6 @@ public class Column {
         return _defaultValue;
     }
 
-    // TODO: DaoGen - Commented out at 2006/04/21 Because this method is inneed.
-    //    /**
-    //     * Returns the class name to do input validation
-    //     */
-    //    public String getInputValidator() {
-    //        return this._inputValidator;
-    //    }
-
     /**
      * Return auto increment/sequence string for the target database. We need to
      * pass in the props for the target database!
@@ -780,15 +772,6 @@ public class Column {
     public String getJavaNative() {
         return TypeMap.getJavaNative(_torqueType);
     }
-
-    // TODO: PPMethodが何だかわからないが、不要かな？
-    //    /**
-    //     * Return ParameterParser getX() method which
-    //     * corresponds to the JDBC type which represents this column.
-    //     */
-    //    public String getParameterParserMethod() {
-    //        return TypeMap.getPPMethod(_torqueType);
-    //    }
 
     // ===================================================================================
     //                                                                  Type Determination
@@ -877,7 +860,7 @@ public class Column {
     // ===============================================================================
     //                                                     Properties - Classification
     //                                                     ===========================
-    public Map<String, Object> getClassificationDeploymentMap() {
+    public Map<String, Map<String, String>> getClassificationDeploymentMap() {
         return getTable().getDatabase().getClassificationDeploymentMap();
     }
 
@@ -885,61 +868,27 @@ public class Column {
         return getTable().getDatabase().getClassificationDefinitionMap();
     }
 
-    //    public boolean hasClassification() {
-    //        final Map<String, Object> deploymentMap = getClassificationDeploymentMap();
-    //        final Set<String> classificationKeySet = deploymentMap.keySet();
-    //        for (String classificationKey : classificationKeySet) {
-    //            final Map<String, String> tableColumnMap = (Map<String, String>) deploymentMap.get(classificationKey);
-    //            if (tableColumnMap.containsKey(getTableName()) && tableColumnMap.containsValue(getName())) {
-    //                return true;
-    //            }
-    //        }
-    //        return false;
-    //    }
-
     public boolean hasClassification() {
-        final Map<String, Object> deploymentMap = getClassificationDeploymentMap();
-        final Map<String, String> columnClassificationMap = (Map<String, String>) deploymentMap.get(getTableName());
-        if (columnClassificationMap == null) {
-            return false;
-        }
-        final String classificationName = columnClassificationMap.get(getName());
-        if (classificationName == null) {
-            return false;
-        }
-        return true;
+        return getTable().getDatabase().hasClassification(getTableName(), getName());
     }
     
     public boolean hasClassificationName() {
-        final String classificationName = getClassificationName();
-        if (classificationName == null) {
-            return false;
-        }
-        return getTable().getDatabase().getClassificationNameListValidNameOnly().contains(classificationName);
+        return getTable().getDatabase().hasClassificationName(getTableName(), getName());
     }
     
     public boolean hasClassificationAlias() {
-        final String classificationName = getClassificationName();
-        if (classificationName == null) {
-            return false;
-        }
-        return getTable().getDatabase().getClassificationNameListValidAliasOnly().contains(classificationName);
+        return getTable().getDatabase().hasClassificationAlias(getTableName(), getName());
     }
 
     public String getClassificationName() {
-        final Map<String, Object> deploymentMap = getClassificationDeploymentMap();
-        if (!deploymentMap.containsKey(getTableName())) {
-            return null;
-        }
-        final Map<String, String> columnClassificationMap = (Map<String, String>) deploymentMap.get(getTableName());
-        return columnClassificationMap.get(getName());
+        return getTable().getDatabase().getClassificationName(getTableName(), getName());
     }
 
-    public List<Map> getClassificationMapList() {
+    public List<Map<String, String>> getClassificationMapList() {
         try {
             final Map<String, List<Map<String, String>>> definitionMap = getClassificationDefinitionMap();
             final String classificationName = getClassificationName();
-            final List<Map> classificationMapList = (List<Map>) definitionMap.get(classificationName);
+            final List<Map<String, String>> classificationMapList = definitionMap.get(classificationName);
             if (classificationMapList == null) {
                 String msg = "The definitionMap did not contain the classificationName: ";
                 msg = msg + "definitionMap=" + definitionMap + " classificationName=" + classificationName;
@@ -963,44 +912,4 @@ public class Column {
             return getTable().isUseIdentity() && getUncapitalisedJavaName().equals(getTable().getIdentityPropertyName());
         }
     }
-
-    // Commented out at 2006/04/27 because of drop function.
-    //    // /------------------------------------------------------- [MyExtension]
-    //
-    //    public String getFieldMyJavaType() {
-    //        return getFieldInfomation(getTable().getDatabase().getFieldMyJavaTypeMap());
-    //    }
-    //
-    //    public String getFieldMyDefaultValue() {
-    //        return getFieldInfomation(getTable().getDatabase().getFieldMyDefaultValueMap());
-    //    }
-    //
-    //    protected String getFieldInfomation(Map fieldMap) {
-    //        // TODO: I want to refactor this judgement logic for hint someday. {Other: JDBCTransformTask}
-    //
-    //        final String prefixMark = "prefix:";
-    //        final String suffixMark = "suffix:";
-    //        for (Iterator ite = fieldMap.keySet().iterator(); ite.hasNext();) {
-    //            final String fieldHint = (String) ite.next();
-    //            final String infomation = (String) fieldMap.get(fieldHint);
-    //            if (fieldHint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
-    //                String pureFieldHint = fieldHint.substring(prefixMark.length(), fieldHint.length());
-    //                if (getName().toLowerCase().startsWith(pureFieldHint.toLowerCase())) {
-    //                    return infomation;
-    //                }
-    //            } else if (fieldHint.toLowerCase().startsWith(suffixMark.toLowerCase())) {
-    //                String pureFieldHint = fieldHint.substring(suffixMark.length(), fieldHint.length());
-    //                if (getName().toLowerCase().endsWith(pureFieldHint.toLowerCase())) {
-    //                    return infomation;
-    //                }
-    //            } else {
-    //                if (getName().toLowerCase().indexOf(fieldHint.toLowerCase()) != -1) {
-    //                    return infomation;
-    //                }
-    //            }
-    //        }
-    //        return null;
-    //    }
-    //
-    //    // -----------------------------/
 }

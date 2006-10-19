@@ -113,6 +113,33 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // =====================================================================================
+    //                                                                             Real name
+    //                                                                             =========
+    /**
+     * Get real alias name(that has nest level mark).
+     * 
+     * @return Real alias name.
+     */
+    public String getRealAliasName() {
+        if (getNestLevel() > 1) {
+            return getAliasName() + "_n" + getNestLevel();
+        } else {
+            return getAliasName();
+        }
+    }
+
+    /**
+     * Get real column name(with real alias name).
+     * 
+     * @param columnName Column name without alias name. This should not contain comma. (NotNull)
+     * @return Real column name.
+     */
+    public String getRealColumnName(String columnName) {
+        assertColumnName(columnName);
+        return getRealAliasName() + "." + columnName;
+    }
+
+    // =====================================================================================
     //                                                                                Invoke
     //                                                                                ======
     public ${glConditionValueName} invokeGetter(String columnMultiName) {
@@ -285,6 +312,22 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String newStr = "." + getLocationBase(propertyName) + ".";
         final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause(), oldStr, newStr);
         getSqlClause().registerWhereClause(realColumnName + " in (" + selectClause + " " + fromClause + " " + whereClause + ")");
+        return this;
+    }
+
+    protected ${glConditionQueryInterfaceName} registerInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String firstReffererColumnName, String propertyName) {
+        final String selectClause = "select " + subQuery.getAliasName() + "." + firstReffererColumnName;
+        final String fromClause = subQuery.getSqlClause().getFromClause();
+        final String oldStr = ".conditionQuery.";
+        final String newStr = "." + getLocationBase(propertyName) + ".";
+        final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause(), oldStr, newStr);
+        final String finalClause = columnName + " in (" + selectClause + " " + fromClause + " " + whereClause + ")";
+        if (isBaseQuery(this)) {
+            getSqlClause().registerBaseTableInlineWhereClause(finalClause);
+        } else {
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
+        }
         return this;
     }
 

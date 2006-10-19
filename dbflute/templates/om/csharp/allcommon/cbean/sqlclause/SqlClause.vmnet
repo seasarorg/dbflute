@@ -84,7 +84,7 @@ namespace ${glPackageBaseCommonSqlClause} {
         // =====================================================================================
         //                                                                  IncludedSelectColumn
         //                                                                  ====================
-        ${glSqlClauseInterfaceName} RegisterIncludedSelectColumn(String aliasName, String realColumnName);
+        void RegisterIncludedSelectColumn(String aliasName, String realColumnName);
 
         // =====================================================================================
         //                                                                                 Where
@@ -95,23 +95,23 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @param columnName Column name([table-name].[column-name]). (NotNull)
          * @param key Condition key. (NotNull)
          * @param value Condition value. (NotNull)
-         * @return this. (NotNull)
          */
-        ${glSqlClauseInterfaceName} RegisterWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+        void RegisterWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
 
         /**
          * Register where clause.
          * 
          * @param clause Where clause. (NotNull)
-         * @return this. (NotNull)
          */
-        ${glSqlClauseInterfaceName} RegisterWhereClause(String clause);
+        void RegisterWhereClause(String clause);
 
         // =====================================================================================
         //                                                                           InlineWhere
         //                                                                           ===========
-        ${glSqlClauseInterfaceName} RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
-        ${glSqlClauseInterfaceName} RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+        void RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+        void RegisterBaseTableInlineWhereClause(String columnName, String value) {
+        void RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+        void RegisterOuterJoinInlineWhereClause(String aliasName, String value);
 
         // =====================================================================================
         //                                                                               OrderBy
@@ -144,35 +144,23 @@ namespace ${glPackageBaseCommonSqlClause} {
          */
         ${glSqlClauseInterfaceName} MakeOrderByEffective();
 
-        /**
-         * Reverse order-by (between 'asc' and 'desc') or override order-by of ${col.UncapitalisedJavaName}.
-         * 
-         * @return this. (NotNull)
-         */
-        ${glSqlClauseInterfaceName} ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, bool isAsc);
+        void ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, bool isAsc);
 
-        /**
-         * Reverse order-by (between 'asc' and 'desc') or override order-by of ${col.UncapitalisedJavaName}.
-         * 
-         * @return this. (NotNull)
-         */
-        ${glSqlClauseInterfaceName} ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc);
+        void ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc);
 
         /**
          * Register order-by-asc.
          * 
          * @param columnFullName Column-full-name([table-name].[column-name]). (NotNull)
-         * @return this. (NotNull)
          */
-        ${glSqlClauseInterfaceName} RegisterOrderBy(String columnFullName, bool isAsc);
+        void RegisterOrderBy(String columnFullName, bool isAsc);
 
         /**
          * Register order-by-asc.
          * 
          * @param columnFullName Column-full-name([table-name].[column-name]). (NotNull)
-         * @return this. (NotNull)
          */
-        ${glSqlClauseInterfaceName} RegisterOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc);
+        void RegisterOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc);
 
         /**
          * Register outer join.
@@ -180,9 +168,8 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @param joinTableName Join table name(outer join [joinTableName]). (NotNull)
          * @param aliasName Alias name of join table. (NotNull and Unique per invoking method.)
          * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
-         * @return this. (NotNull)
          */
-        ${glSqlClauseInterfaceName} RegisterOuterJoin(String joinTableName, String aliasName, System.Collections.IDictionary joinOnMap);
+        void RegisterOuterJoin(String joinTableName, String aliasName, System.Collections.IDictionary joinOnMap);
 
         // =====================================================================================
         //                                                                               Advance
