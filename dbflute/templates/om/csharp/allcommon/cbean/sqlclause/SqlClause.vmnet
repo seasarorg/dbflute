@@ -109,7 +109,7 @@ namespace ${glPackageBaseCommonSqlClause} {
         //                                                                           InlineWhere
         //                                                                           ===========
         void RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
-        void RegisterBaseTableInlineWhereClause(String columnName, String value) {
+        void RegisterBaseTableInlineWhereClause(String value);
         void RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
         void RegisterOuterJoinInlineWhereClause(String aliasName, String value);
 

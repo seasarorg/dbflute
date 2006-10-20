@@ -95,19 +95,6 @@ namespace ${glPackageBaseCommonCBean} {
             return _aliasName;
         }
 
-        /// <summary>
-        ///    Get real alias name(that has nest level mark).
-        /// </summary>
-        /// <returns>Real alias name. (NotNull)</returns>
-        abstract public String GetRealAliasName();
-
-        /// <summary>
-        /// Get real column name(with real alias name).
-        /// </summary>
-        /// <param name="columnName">Column name without alias name.</param>
-        /// <returns>Real column name.</returns>
-        abstract public String GetRealColumnName(String columnName);
-
         /**
          * Get nest level.
          * 
@@ -143,7 +130,7 @@ namespace ${glPackageBaseCommonCBean} {
         ///    Get real alias name(that has nest level mark).
         /// </summary>
         /// <returns>Real alias name. (NotNull)</returns>
-        public override String GetRealAliasName() {
+        public String GetRealAliasName() {
             if (GetNestLevel() > 1) {
                 return GetAliasName() + "_n" + GetNestLevel();
             } else {
@@ -156,7 +143,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// </summary>
         /// <param name="columnName">Column name without alias name. This should not contain comma.</param>
         /// <returns>Real column name.</returns>
-        public override String GetRealColumnName(String columnName) {
+        public String GetRealColumnName(String columnName) {
             AssertColumnName(columnName);
             return GetRealAliasName() + "." + columnName;
         }

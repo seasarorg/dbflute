@@ -340,8 +340,8 @@ namespace ${glPackageBaseCommonSqlClause} {
             _baseTableInlineWhereList.Add(inlineWhereClause);
         }
 
-        public void RegisterBaseTableInlineWhereClause(String columnName, String value) {
-            _baseTableInlineWhereList.Add(inlineWhereClause);
+        public void RegisterBaseTableInlineWhereClause(String value) {
+            _baseTableInlineWhereList.Add(value);
         }
 
         public void RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
@@ -356,7 +356,7 @@ namespace ${glPackageBaseCommonSqlClause} {
         public void RegisterOuterJoinInlineWhereClause(String aliasName, String value) {
             AssertNotYetOuterJoin(aliasName);
             LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
-            joinInfo.AddInlineWhereClause(inlineWhereClause);
+            joinInfo.AddInlineWhereClause(value);
         }
 
         /**
@@ -437,7 +437,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
          * @param registeredColumnFullName Registered-column-full-name. ([table-name].[column-name]) (Nullable)
          */
-        public ${glSqlClauseInterfaceName} RegisterOrderBy(String columnFullName, bool isAsc) {
+        public void RegisterOrderBy(String columnFullName, bool isAsc) {
             RegisterOrderBy(columnFullName, null, isAsc);
         }
 
