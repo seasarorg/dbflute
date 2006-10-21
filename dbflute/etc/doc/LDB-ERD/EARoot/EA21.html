@@ -1,87 +1,264 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<link href="../ea.css" rel=stylesheet>
-	<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>LB_USER</title>
+<link href="../css/ea.css" rel="stylesheet" type="text/css" />
+<script>
+function initPage(src) {
+	if(parent==this&&(this.location+"").indexOf('EARoot')!=-1)
+		document.location=(this.location+"").substring(0,(this.location+"").indexOf('EARoot'))+"index"+(this.location+"").substring((this.location+"").lastIndexOf('.'))+"?goto="+((this.location+"").substring((this.location+"").indexOf('EARoot')+7,(this.location+"").lastIndexOf('.')).replace(/\//g,':').replace(/EA/g,""));
+	else
+		parent.initPage(src);
+}
+</script>
 </head>
-
-<body>
-	<TABLE class="HeaderTable" align="center" cellSpacing=0 cellPadding=0>
-  <TBODY >
-	<TR>
-		<TD colspan=2 WIDTH="100%" class="Header">�m�[�g: </TD>
-	</TR>
-	<TR>
-		<TD WIDTH="48%" class="HeaderDetails"></TD>
-		<TD WIDTH="48%" class="HeaderDetails"></TD>
-	</TR>
-	<TR>
-		<TD WIDTH="40%" class="HeaderDetails"></TD>
-		<TD WIDTH="60%" class="HeaderDetails"></TD>
-	</TR>
-	<TR><TD colspan="2" width="100%"><HR></TD></TR>
-	</TBODY>
-</TABLE><table cellPadding=2 cellSpacing=2 width="100%">
-  <tbody>
+<body onload="initPage(this);" class="Content">
+<div class="pageHeader"></div>
+<div class="PageBody">
+	<span class="ObjectTitle">LB_USER  (利用者) : public   &lt;&lt;table&gt;&gt; クラス</span>
+	<table border="0" cellpadding="0" cellspacing="0" class="ObjectDetails">
 		<tr>
-			<td class=ObjectTitle>
-				�m�[�g 
-			</td>
+			<td width="15%" class="ObjectDetailsTopic">作成日:</td>
+			<td width="85%" class="ObjectDetailsValue">2006/04/04 14:28:39</td>
 		</tr>
 		<tr>
-			<td>
-				<table class=ObjectDetails cellPadding=2 cellSpacing=2 width="100%">
-				  <tbody>
-						<tr>
-							<td width="15%" class=ObjectDetailsTopic>���:</td>
-							<td width="85%" class=ObjectDetailsValue>kubo</td>
-						</tr>
-						<tr>
-							<td width="15%" class=ObjectDetailsTopic>���t:</td>
-							<td width="85%" class=ObjectDetailsValue>�쐬��: 2006/09/11 15:42:41; �ύX��: 2006/09/11 15:42:50; �o�[�W����: 1.0; �t�F�[�Y: 1.0</td>
-						</tr>
-						<tr>
-							<td width="15%" class=ObjectDetailsTopic>UUID:</td>
-							<td width="85%" class=ObjectDetailsValue>{2FE4BE2F-E862-4725-8AD4-C77B6924AE7B}</td>
-						</tr>
-						<tr>
-							<td colspan="2" width="100%" class=ObjectDetailsTopic>���ȎQ�Ƃ���������</td>
-						</tr>
-					</tbody>
-				</table>
-			</td>
+			<td class="ObjectDetailsTopic">更新日:</td>
+			<td class="ObjectDetailsValue">2006/04/21 14:05:11</td>
+		</tr>
+		<tr style="height: 10px"><td colspan="2"></td></tr>
+		<tr>
+			<td class="ObjectDetailsTopic"><img src="../images/plus03.gif" align="absmiddle" id="proj" onclick="parent.toggleData(this.id)" />プロジェクト:</td>
+			<td class="ObjectDetailsValue"></td>
+		</tr>
+		<tr id="proj00" style="display: none;">
+			<td class="ObjectDetailsTopic" style="padding-left: 18px;">作者:</td>
+			<td class="ObjectDetailsValue"></td>
+		</tr>
+		<tr id="proj01" style="display: none;">
+			<td class="ObjectDetailsTopic" style="padding-left: 18px;">バージョン:</td>
+			<td class="ObjectDetailsValue">1.0</td>
+		</tr>
+		<tr id="proj02" style="display: none;">
+			<td class="ObjectDetailsTopic" style="padding-left: 18px;">フェーズ:</td>
+			<td class="ObjectDetailsValue">1.0</td>
+		</tr>
+		<tr id="proj03" style="display: none;">
+			<td class="ObjectDetailsTopic" style="padding-left: 18px;">状態:</td>
+			<td class="ObjectDetailsValue">設計中</td>
+		</tr>
+		<tr id="proj04" style="display: none;">
+			<td class="ObjectDetailsTopic" style="padding-left: 18px;">複雑度:</td>
+			<td class="ObjectDetailsValue">簡単</td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
+			<td class="ObjectDetailsTopic"><img src="../images/plus03.gif" align="absmiddle" id="adv" onclick="parent.toggleData(this.id)" />追加情報:</td>
+			<td class="ObjectDetailsValue"></td>
 		</tr>
-	</tbody>
-</table><p><table cellPadding=0 cellSpacing=0 width="100%">
-  <tbody>
+		<tr id="adv00" style="display: none;">
+			<td class="ObjectDetailsTopic" style="padding-left: 18px;">GUID:</td>
+			<td class="ObjectDetailsValue">{3013096A-8BCA-49de-BBA3-BE6268F231AC}</td>
+		</tr>
+		<tr id="adv01" style="display: none;">
+			<td class="ObjectDetailsTopic" style="padding-left: 18px;">ダイアグラム:</td>
+			<td class="ObjectDetailsValue"><a href="EA1.html">LDB-ERD</a></td>
+		</tr>
+	</table>
+	
+	<div class="TableGroup" id="TableGroup">
+		<ul class="ItemTitle">
+			<li onClick="parent.toggleItem('Attributes');" id="AttributesTitle">属性</li>
+			<li onClick="parent.toggleItem('Operations');" id="OperationsTitle">操作</li>
+			<li onClick="parent.toggleItem('Associationsソース');" id="AssociationsソースTitle">接続の概要 ソース</li>
+		</ul>
+<div class="ItemBody" id="AttributesTable">
+	<table border="0" cellspacing="0" cellpadding="0" class="Table">
 		<tr>
-			<td width="10%" class="ObjectSubTitle">
-				�_�C�A�O����:
-			</td>
-			<td width="90%">
-				<a href="EA1.html">LDB-ERD</a>
-			</td>
+			<td width="40%" class="TableHeading">属性</td>
+			<td width="60%" class="TableHeading">詳細</td>
 		</tr>
-	</tbody>
-</table>
-<P/><TABLE class="FooterTable" align="center" cellSpacing=0 cellPadding=0>
-  <TBODY >
-	<TR><TD colspan="2" width="100%"><HR></TD></TR>
-	<TR>
-		<TD colspan=2 WIDTH="100%" class="Footer">�m�[�g: </TD>
-	</TR>
-	<TR>
-		<TD WIDTH="48%" class="FooterDetails"></TD>
-		<TD WIDTH="48%" class="FooterDetails"></TD>
-	</TR>
-	<TR>
-		<TD WIDTH="40%" class="FooterDetails"></TD>
-		<TD WIDTH="60%" class="FooterDetails"></TD>
-	</TR>
-	</TBODY>
-</TABLE> 
+						<tr>
+				<td width="40%" class="TableRow" valign="top"><i>public integer</i><br /><strong>&nbsp;&nbsp;LB_USER_ID</strong></td>
+				<td width="60%" class="TableRow" valign="top"><i>別名:</i> 利用者ID<br><i>&lt;&lt;column&gt;&gt;Ordered <br /></i>property=AutoNum=1;StartNum=1;Increment=1;NotForRep=0;<br>&nbsp;</td>
+			</tr>			<tr>
+				<td width="40%" class="TableRow" valign="top"><i>public varchar(80)</i><br /><strong>&nbsp;&nbsp;LB_USER_NAME</strong></td>
+				<td width="60%" class="TableRow" valign="top"><i>別名:</i> 利用者名<br><i>&lt;&lt;column&gt;&gt;<br></i>&nbsp;</td>
+			</tr>			<tr>
+				<td width="40%" class="TableRow" valign="top"><i>public varchar(50)</i><br /><strong>&nbsp;&nbsp;USER_PASSWORD</strong></td>
+				<td width="60%" class="TableRow" valign="top"><i>別名:</i> 利用者パスワード<br><i>&lt;&lt;column&gt;&gt;<br></i>&nbsp;</td>
+			</tr>			<tr>
+				<td width="40%" class="TableRow" valign="top"><i>public timestamp</i><br /><strong>&nbsp;&nbsp;R_TIME</strong></td>
+				<td width="60%" class="TableRow" valign="top"><i>&lt;&lt;column&gt;&gt;<br><i>初期値:</i> current_time<br></i><div class="ObjectDetailsNotes"><table>
+	<tr>
+		<td valign="top">
+			<i>ノート: </i><span style="margin-left: .4cm;"> </span>
+		</td>
+		<td>
+			該当レコードが登録された日時。｛タイムスタンプ｝&lt;br&nbsp;<WBR>/&gt;登録時に値が格納され、その後更新されることはない。
+		</td>
+	</tr>
+</table>PAD<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script src="js/displayToc.js"></script>
+<link rel="stylesheet" href="css/eacont.css" />
+</head>
+<body onload="tocInit()">
 </body>
+</html></div>
+</td>
+			</tr>			<tr>
+				<td width="40%" class="TableRow" valign="top"><i>public timestamp</i><br /><strong>&nbsp;&nbsp;U_TIME</strong></td>
+				<td width="60%" class="TableRow" valign="top"><i>&lt;&lt;column&gt;&gt;<br><i>初期値:</i> current_time<br></i><div class="ObjectDetailsNotes"><table>
+	<tr>
+		<td valign="top">
+			<i>ノート: </i><span style="margin-left: .4cm;"> </span>
+		</td>
+		<td>
+			該当レコードが更新された日時。｛タイムスタンプ｝&lt;br&nbsp;<WBR>/&gt;登録時は、登録日時と同値が格納され、その後更新される度に新しい値が格納される。
+		</td>
+	</tr>
+</table>PAD<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script src="js/displayToc.js"></script>
+<link rel="stylesheet" href="css/eacont.css" />
+</head>
+<body onload="tocInit()">
+</body>
+</html></div>
+</td>
+			</tr>			<tr>
+				<td width="40%" class="TableRow" valign="top"><i>public varchar(50)</i><br /><strong>&nbsp;&nbsp;R_USER</strong></td>
+				<td width="60%" class="TableRow" valign="top"><i>&lt;&lt;column&gt;&gt;<br><i>初期値:</i> 'default-user'<br></i><div class="ObjectDetailsNotes"><table>
+	<tr>
+		<td valign="top">
+			<i>ノート: </i><span style="margin-left: .4cm;"> </span>
+		</td>
+		<td>
+			該当レコードを登録したスタッフ。｛可変文字列｝&lt;br&nbsp;<WBR>/&gt;登録時に値が格納され、その後更新されることはない。
+		</td>
+	</tr>
+</table>PAD<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script src="js/displayToc.js"></script>
+<link rel="stylesheet" href="css/eacont.css" />
+</head>
+<body onload="tocInit()">
+</body>
+</html></div>
+</td>
+			</tr>			<tr>
+				<td width="40%" class="TableRow" valign="top"><i>public varchar(50)</i><br /><strong>&nbsp;&nbsp;U_USER</strong></td>
+				<td width="60%" class="TableRow" valign="top"><i>&lt;&lt;column&gt;&gt;<br><i>初期値:</i> 'default-user'<br></i><div class="ObjectDetailsNotes"><table>
+	<tr>
+		<td valign="top">
+			<i>ノート: </i><span style="margin-left: .4cm;"> </span>
+		</td>
+		<td>
+			該当レコードを更新したスタッフ。｛可変文字列｝&lt;br&nbsp;<WBR>/&gt;登録時は、登録スタッフと同値が格納され、その後更新される度に新しい値が格納される。
+		</td>
+	</tr>
+</table>PAD<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script src="js/displayToc.js"></script>
+<link rel="stylesheet" href="css/eacont.css" />
+</head>
+<body onload="tocInit()">
+</body>
+</html></div>
+</td>
+			</tr>
+		</table>
+</div><div class="ItemBody" id="OperationsTable">
+	<table border="0" cellspacing="0" cellpadding="0" class="Table">
+		<tr>
+			<td width="40%" class="TableHeading">操作</td>
+			<td width="60%" class="TableHeading">詳細</td>
+		</tr>
+						<tr>
+				<td width="40%" class="TableRow">
+					<i>public</i><br />
+					<strong>PK_LB_USER</strong>(<br />
+					<a href="#" onclick="parent.toggleData('param{3A8255E1-A6F3-485e-8FAF-E2FC8EE352FF}')" style="text-decoration: none; color: #000000;"><img src="../images/plus03.gif" align="absmiddle" id="param{3A8255E1-A6F3-485e-8FAF-E2FC8EE352FF}" border="0" />LB_USER_ID: integer</a>, 
+					<table border="0" cellspacing="0" cellpadding="0" class="Table" style="padding: 4px 18px;">
+						<tr id="param{3A8255E1-A6F3-485e-8FAF-E2FC8EE352FF}00" style="display: none;">
+							<td width="50"><strong>既定値:</strong></td>
+							<td></td>
+						</tr>
+						<tr id="param{3A8255E1-A6F3-485e-8FAF-E2FC8EE352FF}01" style="display: none;">
+							<td width="50"><strong>型:</strong></td>
+							<td>in</td>
+						</tr>
+						<tr id="param{3A8255E1-A6F3-485e-8FAF-E2FC8EE352FF}02" style="display: none;">
+							<td width="50"><strong>ステレオタイプ: </strong></td>
+							<td></td>
+						</tr>
+						<tr id="param{3A8255E1-A6F3-485e-8FAF-E2FC8EE352FF}03" style="display: none;">
+							<td width="50"></td>
+							<td></td>
+						</tr>
+					</table>
+):
+				</td>
+				<td width="60%" class="TableRow">
+					<i> &lt;&lt;PK&gt;&gt; </i>
+					<table>
+						<tr>
+							<td valign = "top"><i></i><span style="margin-left: .7cm;"> </span></td>
+							<td></td>
+						</tr>
+					</table>
+					
+				</td>
+			</tr>
 
+		</table>
+</div>		<div class="ItemBody" id="AssociationsソースTable">
+			<table border="0" cellspacing="0" cellpadding="0" class="Table">
+				<tr>
+					<td width="20%" class="TableHeading">要素</td>
+					<td width="25%" class="TableHeading">ソースの役割</td>
+					<td width="25%" class="TableHeading">ターゲットの役割</td>
+					<td width="30%" class="TableHeading">詳細</td>
+				</tr>
+				<tr>
+					<td width="20%" class="TableRow" valign="top">
+						<a href="EA25.html">«table» LIBRARY_USER</a><br />
+						クラス «FK» 
+					</td>
+					<td width="20%" class="TableRow" valign="top">
+						<strong>Name:</strong> FK_LIBRARY_USER_LB_USER<br />
+						&nbsp;
+					</td>
+					<td width="20%" class="TableRow" valign="top">
+						<strong>Name:</strong> PK_LB_USER<br />
+						&nbsp;	
+					</td>
+					<td width="30%" class="TableRow" valign="top">&nbsp;</td>
+				</tr>
+				<tr>
+					<td width="20%" class="TableRow" valign="top">
+						<a href="EA14.html">«table» BLACK_LIST</a><br />
+						クラス «FK» 
+					</td>
+					<td width="20%" class="TableRow" valign="top">
+						<strong>Name:</strong> FK_BLACK_LIST_LB_USER<br />
+						&nbsp;
+					</td>
+					<td width="20%" class="TableRow" valign="top">
+						<strong>Name:</strong> PK_LB_USER<br />
+						&nbsp;	
+					</td>
+					<td width="30%" class="TableRow" valign="top">&nbsp;</td>
+				</tr>
+
+			</table>
+		</div>
+	</div>
+<div class="pageFooter"></div>
+ 
+</body>
 </html>
