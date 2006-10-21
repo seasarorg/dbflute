@@ -758,8 +758,12 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                  Properties - EntityDao Package
-    //                                                  ==============================
+    //                                            Properties - Generated Class Package
+    //                                            ====================================
+    public String getPackageBase() {
+        return getProperties().getPackageBase();
+    }
+    
     public String getBaseCommonPackage() {
         return getProperties().getBaseCommonPackage();
     }

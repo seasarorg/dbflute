@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.helper.properties.ClassificationProperties;
+import org.apache.torque.helper.properties.GeneratedClassPackageProperties;
 import org.apache.torque.helper.stateless.FlPropertyUtil;
 import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyBooleanFormatException;
 import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyIntegerFormatException;
@@ -490,38 +491,51 @@ public final class TorqueBuildProperties {
     }
 
     // ===============================================================================
-    //                                                  Properties - EntityDao Package
-    //                                                  ==============================
+    //                                            Properties - Generated Class Package
+    //                                            ====================================
+    protected GeneratedClassPackageProperties _generatedClassPackage;
+    
+    protected GeneratedClassPackageProperties getGeneratedClassPackageProperties() {
+        if (_generatedClassPackage == null) {
+            _generatedClassPackage = new GeneratedClassPackageProperties(_buildProperties);
+        }
+        return _generatedClassPackage;
+    }
+    
+    public String getPackageBase() {
+        return getGeneratedClassPackageProperties().getPackageBase();
+    }
+    
     public String getBaseCommonPackage() {
-        return stringProp("torque.baseCommonPackage");
+        return getGeneratedClassPackageProperties().getBaseCommonPackage();
     }
 
     public String getBaseBehaviorPackage() {
-        return stringProp("torque.baseBehaviorPackage");
+        return getGeneratedClassPackageProperties().getBaseBehaviorPackage();
     }
 
     public String getBaseDaoPackage() {
-        return stringProp("torque.baseDaoPackage");
+        return getGeneratedClassPackageProperties().getBaseDaoPackage();
     }
 
     public String getBaseEntityPackage() {
-        return stringProp("torque.baseEntityPackage");
+        return getGeneratedClassPackageProperties().getBaseEntityPackage();
     }
 
     public String getConditionBeanPackage() {
-        return stringProp("torque.conditionBeanPackage");
+        return getGeneratedClassPackageProperties().getConditionBeanPackage();
     }
 
     public String getExtendedBehaviorPackage() {
-        return stringProp("torque.extendedBehaviorPackage");
+        return getGeneratedClassPackageProperties().getExtendedBehaviorPackage();
     }
 
     public String getExtendedDaoPackage() {
-        return stringProp("torque.extendedDaoPackage");
+        return getGeneratedClassPackageProperties().getExtendedDaoPackage();
     }
 
     public String getExtendedEntityPackage() {
-        return stringProp("torque.extendedEntityPackage");
+        return getGeneratedClassPackageProperties().getExtendedEntityPackage();
     }
 
     // ===============================================================================
@@ -816,9 +830,6 @@ public final class TorqueBuildProperties {
     // --------------------------------------
     //                             Definition
     //                             ----------
-    public static final String KEY_classificationDefinitionMap = "classificationDefinitionMap";
-    protected Map<String, List<Map<String, String>>> _classificationDefinitionMap;
-
     protected ClassificationProperties _classificationProperties;
     
     protected ClassificationProperties getClassificationProperties() {
