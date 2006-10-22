@@ -1,8 +1,10 @@
 package ${glPackageCB};
 
 #set ($myClassName = "${myConditionQueryClassName}")
-
+#if ($database.hasClassificationDefinitionMap())
 import ${glPackageBaseCommon}.${glClassificationDefinition};
+#end
+
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
