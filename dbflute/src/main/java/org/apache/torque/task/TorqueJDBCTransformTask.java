@@ -508,6 +508,10 @@ public class TorqueJDBCTransformTask extends Task {
                     final String nonUnique = parts.getString(4);
                     isNonUnique = (nonUnique != null && nonUnique.equals("true") ? true : false);
                 }
+                if (isNonUnique) {
+                    continue;
+                }
+                
                 final String indexType;
                 {
                     indexType = parts.getString(7);
@@ -518,6 +522,10 @@ public class TorqueJDBCTransformTask extends Task {
                     continue;
                 }
 
+                if (primaryColumnNameList.contains(columnName)) {
+                    continue;
+                }
+                
                 final String indexName = parts.getString(6);
                 final Integer ordinalPosition;
                 {
@@ -536,13 +544,6 @@ public class TorqueJDBCTransformTask extends Task {
                         _log.warn(msg);
                         continue;
                     }
-                }
-
-                if (isNonUnique) {
-                    continue;
-                }
-                if (primaryColumnNameList.contains(columnName)) {
-                    continue;
                 }
 
                 if (uniqueMap.containsKey(indexName)) {
