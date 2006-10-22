@@ -7,8 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.extension.jdbc.impl.BasicStatementFactory;
 import org.seasar.framework.exception.SQLRuntimeException;
 
@@ -29,14 +27,8 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
 public class ${glDaoStatementFactory} extends BasicStatementFactory {
 #if (${database.isStatementResultSetTypeValid()})
 
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${glDaoStatementFactory}.class);
-
     public PreparedStatement createPreparedStatement(Connection con, String sql) {
         try {
-            if (_log.isDebugEnabled()) {
-                _log.debug("@StatementFactory: con.prepareStatement(sql, ${database.StatementResultSetType}, ${database.StatementResultSetConcurrency});");
-            }
             return con.prepareStatement(sql, ${database.StatementResultSetType}, ${database.StatementResultSetConcurrency});
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);

@@ -52,9 +52,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 for (int i=0; i < length; i++) {
                     sb.Append("=");
                 }
-                _log.Debug("/==================================================================" + sb.ToString() + "==");
-                _log.Debug("                                                      Dao Method - " + invokeName + "()");
-                _log.Debug("                                                      =============" + sb.ToString() + "=/");
+                _log.Debug("/=====================================================" + sb.ToString() + "==");
+                _log.Debug("                                                      " + invokeName + "()");
+                _log.Debug("                                                      " + sb.ToString() + "=/");
             }
             Type targetType = GetComponentDef(invocation).ComponentType;
             Seasar.Dao.ISqlCommand cmd = null;
@@ -114,7 +114,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
             if (_log.IsDebugEnabled) {
                 try {
-                    String daoResultPrefix = "===========/ [Dao Result (" + GetPerformanceView(before, after) + ") - ";
+                    String daoResultPrefix = "===========/ [" + GetPerformanceView(before, after) + " - ";
                     if (typeof(System.Collections.IList).IsAssignableFrom(retType)) {
                         if (ret == null) {
                             _log.Debug(daoResultPrefix + "Selected count: null]");

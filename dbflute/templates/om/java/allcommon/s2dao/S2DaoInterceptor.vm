@@ -56,9 +56,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             for (int i=0; i < length; i++) {
                 sb.append("=");
             }
-            _log.debug("/==================================================================" + sb.toString() + "==");
-            _log.debug("                                                      Dao Method - " + invokeName + "()");
-            _log.debug("                                                      =============" + sb.toString() + "=/");
+            _log.debug("/=====================================================" + sb.toString() + "==");
+            _log.debug("                                                      " + invokeName + "()");
+            _log.debug("                                                      " + sb.toString() + "=/");
         }
 
         final org.seasar.dao.SqlCommand cmd;
@@ -94,7 +94,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
 
         if (_log.isDebugEnabled()) {
             try {
-                final String daoResultPrefix = "===========/ [Dao Result (" + getPerformanceView(after - before) + ") - ";
+                final String daoResultPrefix = "===========/ [" + getPerformanceView(after - before) + " - ";
                 if (java.util.List.class.isAssignableFrom(retType)) {
                     if (ret == null) {
                         _log.debug(daoResultPrefix + "Selected count: null]");
