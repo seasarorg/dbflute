@@ -1033,6 +1033,10 @@ public class Database {
         return getProperties().getPageResultBeanDefaultPageGroupSize();
     }
 
+    public int getPageResultBeanDefaultPageRangeSize() {
+        return getProperties().getPageResultBeanDefaultPageRangeSize();
+    }
+    
     public String getSelectQueryTimeout() {
         return getProperties().getSelectQueryTimeout();
     }

@@ -25,6 +25,9 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
     /** The value of page-group size. Default value is ${database.PageResultBeanDefaultPageGroupSize}. */
     protected int _pageGroupSize = ${database.PageResultBeanDefaultPageGroupSize};
 
+    /** The value of page-range size. Default value is ${database.PageResultBeanDefaultPageRangeSize}. */
+    protected int _pageRangeSize = ${database.PageResultBeanDefaultPageRangeSize};
+
     // =====================================================================================
     //                                                                           Constructor
     //                                                                           ===========
@@ -98,6 +101,24 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
      */
     public void setPageGroupSize(int value) {
         _pageGroupSize = value;
+    }
+
+    /**
+     * Get the value of pageRangeSize.
+     * 
+     * @return The value of pageRangeSize.
+     */
+    public int getPageRangeSize() {
+        return _pageRangeSize;
+    }
+
+    /**
+     * Set the value of pageRangeSize.
+     * 
+     * @param value The value of pageRangeSize.
+     */
+    public void setPageRangeSize(int value) {
+        _pageRangeSize = value;
     }
 
     // =====================================================================================
@@ -179,6 +200,59 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
         return currentPageGroupArray;
     }
 
+    // -------------------------------------------
+    //                                  Page Range
+    //                                  ----------
+    /**
+     * Get current page-range page-number-list.
+     * Using values are currentPageNumber and pageRangeSize and allPageCount.
+     * 
+     * @return Current page-range page-number-list.
+     */
+    public java.util.List${database.filterGenericsString('Integer')} getCurrentPageRangePageNumberList() {
+        final int allPageCount = this.getAllPageCount();
+        final int currentPageNumber = this.getCurrentPageNumber();
+        final int pageRangeSize = this.getPageRangeSize();
+
+        final java.util.List${database.filterGenericsString('Integer')} resultList = new java.util.ArrayList${database.filterGenericsString('Integer')}();
+
+        for (int i = currentPageNumber - pageRangeSize; i < currentPageNumber; i++) {
+            if (i < 1) {
+                continue;
+            }
+            resultList.add(new Integer(i));
+        }
+
+        resultList.add(new Integer(currentPageNumber));
+
+        int endPageNumber = (currentPageNumber + pageRangeSize);
+        for (int i=currentPageNumber+1 ; i <= endPageNumber; i++) {
+            if (i > allPageCount) {
+                break;
+            }
+            resultList.add(new Integer(i));
+        }
+        return resultList;
+    }
+
+    /**
+     * Get current page-range page-number-array.
+     * Using values are currentPageNumber and pageRangeSize and allPageCount.
+     * 
+     * @return Current page-range page-number-array.
+     */
+    public int[] getCurrentPageRangePageNumberArray() {
+        final java.util.List${database.filterGenericsString('Integer')} resultList = getCurrentPageRangePageNumberList();
+        int arrayIndex = 0;
+        int[] resultArray = new int[resultList.size()];
+        for (final java.util.Iterator ite = resultList.iterator(); ite.hasNext(); ) {
+            final Integer tmpPageNumber = (Integer)ite.next();
+            resultArray[arrayIndex] = tmpPageNumber;
+            arrayIndex++;
+        }
+        return resultArray;
+    }
+
     // =====================================================================================
     //                                                                         Determination
     //                                                                         =============
@@ -227,6 +301,36 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
         }
         int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupSize;
         return (nextPageGroupStartPageNumber <= getAllPageCount());
+    }
+
+    /**
+     * Is existing previous page-range?
+     * Using values are currentPageNumber and pageRangeSize.
+     * 
+     * @return Determination.
+     */
+    public boolean isExistPrePageRange() {
+        final int[] array = getCurrentPageRangePageNumberArray();
+        if (array.length == 0) {
+            String msg = "The current page-range page-number array is empty!" + toString();
+            throw new IllegalStateException(msg);
+        }
+        return array[0] > 1;
+    }
+
+    /**
+     * Is existing next page-range?
+     * Using values are currentPageNumber and pageRangeSize and allPageCount.
+     * 
+     * @return Determination.
+     */
+    public boolean isExistNextPageRange() {
+        final int[] array = getCurrentPageRangePageNumberArray();
+        if (array.length == 0) {
+            String msg = "The current page-range page-number array is empty!" + toString();
+            throw new IllegalStateException(msg);
+        }
+        return array[array.length-1] < getAllPageCount();
     }
 
     // =====================================================================================

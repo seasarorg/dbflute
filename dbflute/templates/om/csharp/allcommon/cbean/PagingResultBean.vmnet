@@ -28,6 +28,9 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>The value of page-group size. Default value is ${database.PageResultBeanDefaultPageGroupSize}.</summary>
         protected int _pageGroupSize = ${database.PageResultBeanDefaultPageGroupSize};
 
+        /// <summary>The value of page-range size. Default value is ${database.PageResultBeanDefaultPageRangeSize}.</summary>
+        protected int _pageRangeSize = ${database.PageResultBeanDefaultPageRangeSize};
+
         #endregion
 
         // =====================================================================================
@@ -83,6 +86,15 @@ namespace ${glPackageBaseCommonCBean} {
             set { _pageGroupSize = value; }
         }
 
+        /// <summary>
+        /// The property of range-group size.
+        /// </summary>
+        public int PageRangeSize
+        {
+            get { return _pageRangeSize; }
+            set { _pageRangeSize = value; }
+        }
+
         #endregion
 
         // =====================================================================================
@@ -107,6 +119,9 @@ namespace ${glPackageBaseCommonCBean} {
             return pageCountBase;
         }
 
+        // -------------------------------------------
+        //                                  Page Group
+        //                                  ----------
         /// <summary>
         /// Calculate current page-group start-page-number.
         /// Using values are currentPageNumber and pageGroupSize.
@@ -153,7 +168,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
             int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupSize;
             int[] currentPageGroupArray = null;
-            if (this.AllPageCount < nextPageGroupStartPageNumber) {
+            if (allPageCount < nextPageGroupStartPageNumber) {
                 currentPageGroupArray = new int[(allPageCount-currentPageGroupStartPageNumber)+1];
             } else {
                 currentPageGroupArray = new int[_pageGroupSize];
@@ -164,6 +179,55 @@ namespace ${glPackageBaseCommonCBean} {
             }
             return currentPageGroupArray;
         }
+
+        // -------------------------------------------
+        //                                  Page Range
+        //                                  ----------
+        /// <summary>
+        /// Get current page-range page-number-list.
+        /// Using values are currentPageNumber and pageRangeSize and allPageCount.
+        /// </summary>
+        /// <returns>Current page-range page-number-list.</returns>
+        public System.Collections.IList GetCurrentPageRangePageNumberList()
+        {
+            int allPageCount = this.AllPageCount;
+            int currentPageNumber = this.CurrentPageNumber;
+            int pageRangeSize = this.PageRangeSize;
+
+            System.Collections.IList resultList = new System.Collections.ArrayList();
+
+            for (int i = currentPageNumber - pageRangeSize; i < currentPageNumber; i++) {
+                if (i < 1) {
+                    continue;
+                }
+                resultList.Add(i);
+            }
+
+            resultList.Add(currentPageNumber);
+
+            int endPageNumber = (currentPageNumber + pageRangeSize);
+            for (int i=currentPageNumber+1 ; i <= endPageNumber; i++) {
+                if (i > allPageCount) {
+                    break;
+                }
+                resultList.Add(i);
+            }
+            return resultList;
+        }
+
+        /// <summary>
+        /// Get current page-range page-number-array.
+        /// Using values are currentPageNumber and pageRangeSize and allPageCount.
+        /// </summary>
+        /// <returns>Current page-range page-number-array.</returns>
+        public int[] GetCurrentPageRangePageNumberArray()
+        {
+            System.Collections.IList resultList = GetCurrentPageRangePageNumberList();
+            int[] resultArray = new int[resultList.Count];
+            resultList.CopyTo(resultArray, resultList.Count);
+            return resultArray;
+        }
+
         #endregion
 
         // =====================================================================================
@@ -216,6 +280,34 @@ namespace ${glPackageBaseCommonCBean} {
             int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupSize;
             return (nextPageGroupStartPageNumber <= this.AllPageCount);
         }
+
+        /// <summary>
+        /// Is existing previous page-range?
+        /// Using values are currentPageNumber and pageGroupSize.
+        /// </summary>
+        /// <returns>Determination.</returns>
+	    public bool isExistPrePageRange() {
+	        int[] array = GetCurrentPageRangePageNumberArray();
+	        if (array.Length == 0) {
+	            String msg = "The current page-range page-number array is empty!" + ToString();
+	            throw new SystemException(msg);
+	        }
+	        return array[0] > 1;
+	    }
+
+        /// <summary>
+        /// Is existing next page-range?
+        /// Using values are currentPageNumber and pageGroupSize and allPageCount.
+        /// </summary>
+        /// <returns>Determination.</returns>
+	    public bool isExistNextPageRange() {
+	        int[] array = GetCurrentPageRangePageNumberArray();
+	        if (array.Length == 0) {
+	            String msg = "The current page-range page-number array is empty!" + ToString();
+	            throw new SystemException(msg);
+	        }
+	        return array[array.Length-1] < this.AllPageCount;
+	    }
 
         #endregion
 

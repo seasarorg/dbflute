@@ -927,6 +927,10 @@ public final class TorqueBuildProperties {
     public int getPageResultBeanDefaultPageGroupSize() {
         return intProp("torque.pageResultBeanDefaultPageGroupSize", 10);
     }
+    
+    public int getPageResultBeanDefaultPageRangeSize() {
+        return intProp("torque.pageResultBeanDefaultPageRangeSize", 10);
+    }
 
     public String getSelectQueryTimeout() {
         return stringProp("torque.selectQueryTimeout", "-1");
