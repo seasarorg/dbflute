@@ -386,10 +386,10 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final java.lang.reflect.Method ENTITY_GETTER_METHOD_${col.JavaName};
     static {
         try {
-            ENTITY_GETTER_METHOD_${col.JavaName} = ENTITY_TYPE.getMethod("get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, new Class[] {});
+            ENTITY_GETTER_METHOD_${col.JavaName} = ENTITY_TYPE.getMethod("get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, null);
         } catch (NoSuchMethodException e) {
             String msg = "The method doen not exist: methodName=" + "get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName} + " argsType=${col.JavaNative}";
-            throw new IllegalStateException(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
@@ -397,10 +397,10 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final java.lang.reflect.Method ENTITY_SETTER_METHOD_${col.JavaName};
     static {
         try {
-            ENTITY_SETTER_METHOD_${col.JavaName} = ENTITY_TYPE.getMethod("set" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, new Class[] {${col.JavaNative}.class});
+            ENTITY_SETTER_METHOD_${col.JavaName} = ENTITY_TYPE.getMethod("set" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, new Class[]{${col.JavaNative}.class});
         } catch (NoSuchMethodException e) {
             String msg = "The method doen not exist: methodName=" + "get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName} + " argsType=${col.JavaNative}";
-            throw new IllegalStateException(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
@@ -440,14 +440,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName);
+            method = this.getClass().getMethod(methodName, null);
         } catch (NoSuchMethodException e) {
             String msg = "The multiName is not found: multiName=" + multiName;
             msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (java.lang.reflect.Method)method.invoke(this, new Object[]{});
+            return (java.lang.reflect.Method)method.invoke(this, null);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -468,14 +468,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName);
+            method = this.getClass().getMethod(methodName, null);
         } catch (NoSuchMethodException e) {
             String msg = "The multiName is not found: multiName=" + multiName;
             msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (java.lang.reflect.Method)method.invoke(this, new Object[]{});
+            return (java.lang.reflect.Method)method.invoke(this, null);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -498,14 +498,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName);
+            method = this.getClass().getMethod(methodName, null);
         } catch (NoSuchMethodException e) {
             String msg = "The foreignPropertyName is not found: foreignPropertyName=" + foreignPropertyName;
             msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
+            return (${glDBMetaInterfaceName})method.invoke(this, null);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {

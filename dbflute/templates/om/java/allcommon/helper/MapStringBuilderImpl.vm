@@ -57,7 +57,7 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         String[] valueArray = tokenToArgs(values, delimiter);
         assertValueArray(_columnNames, valueArray);
 
-        final StringBuilder sb = new StringBuilder();
+        final StringBuffer sb = new StringBuffer();
         sb.append(_msMapMark).append(_msStartBrace);
         for (int i = 0; i < _columnNames.length; i++ ) {
             sb.append(_columnNames[i]).append(_msEqual).append(valueArray[i]).append(_msDelimiter);

@@ -312,7 +312,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     public java.util.List${database.filterGenericsString('OneEntityExceptionResult')} reflectAfterSelectForUpdateNewTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList,
             boolean isErrorContinue) {
         final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} exceptionList = new java.util.ArrayList${database.filterGenericsString('OneEntityExceptionResult')}();
-        for (${glEntityInterfaceName} entity : entityList) {
+        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
+            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             try {
                 createOrModifyAfterSelectForUpdate(entity);
             } catch (RuntimeException e) {

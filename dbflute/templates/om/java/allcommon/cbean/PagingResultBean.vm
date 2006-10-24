@@ -247,7 +247,7 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
         int[] resultArray = new int[resultList.size()];
         for (final java.util.Iterator ite = resultList.iterator(); ite.hasNext(); ) {
             final Integer tmpPageNumber = (Integer)ite.next();
-            resultArray[arrayIndex] = tmpPageNumber;
+            resultArray[arrayIndex] = tmpPageNumber.intValue();
             arrayIndex++;
         }
         return resultArray;

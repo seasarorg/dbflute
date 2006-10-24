@@ -148,7 +148,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         String methodName = "get" + columnCapPropName;
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName);
+            method = this.getClass().getMethod(methodName, null);
         } catch (NoSuchMethodException e) {
             String msg = "The columnMultiName is not existing in this table: columnMultiName=" + columnMultiName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
@@ -189,19 +189,22 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     protected void invokeSetter(String columnMultiName, Object value, String conditionKeyName) {
+        if (value == null) {
+            return;
+        }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
         final String columnCapPropName = dbmeta.getCapPropNameByMultiName(columnMultiName);
         String methodName = "set" + columnCapPropName + "_" + conditionKeyName.substring(0, 1).toUpperCase() + conditionKeyName.substring(1);
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName);
+            method = this.getClass().getMethod(methodName, new Class[]{value.getClass()});
         } catch (NoSuchMethodException e) {
             String msg = "The columnMultiName is not existing in this table: columnMultiName=" + columnMultiName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            method.invoke(this, new Object[]{});
+            method.invoke(this, new Object[]{value});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -229,7 +232,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName);
+            method = this.getClass().getMethod(methodName, null);
         } catch (NoSuchMethodException e) {
             String msg = "The columnMultiName is not existing in this table: columnMultiName=" + columnMultiName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
@@ -256,7 +259,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String methodName = "Query" + foreignPropertyName.substring(0, 1) + foreignPropertyName.substring(1);
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName);
+            method = this.getClass().getMethod(methodName, null);
         } catch (NoSuchMethodException e) {
             String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
