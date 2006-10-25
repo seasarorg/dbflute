@@ -127,8 +127,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageGroupSize.
         /// </summary>
         /// <returns>Current page-group start-page-number.</returns>
-        public int CalculateCurrentPageGroupStartPageNumber()
-        {
+        public int CalculateCurrentPageGroupStartPageNumber() {
             if (_pageGroupSize == 0) {
                 return 1;
             }
@@ -153,12 +152,11 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         /// <summary>
-        /// Get current page-group page-number-array.
+        /// Get current page-group page-number-list.
         /// Using values are currentPageNumber and pageGroupSize and allPageCount.
         /// </summary>
-        /// <returns>Current page-group page-number-array.</returns>
-        public int[] GetCurrentPageGroupPageNumberArray()
-        {
+        /// <returns>Current page-group page-number-list.</returns>
+        public System.Collections.IList GetCurrentPageGroupPageNumberList() {
             int allPageCount = this.AllPageCount;
             int currentPageGroupStartPageNumber = CalculateCurrentPageGroupStartPageNumber();
             if (!(currentPageGroupStartPageNumber > 0)) {
@@ -167,17 +165,22 @@ namespace ${glPackageBaseCommonCBean} {
                 throw new SystemException(msg);
             }
             int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupSize;
-            int[] currentPageGroupArray = null;
-            if (allPageCount < nextPageGroupStartPageNumber) {
-                currentPageGroupArray = new int[(allPageCount-currentPageGroupStartPageNumber)+1];
-            } else {
-                currentPageGroupArray = new int[_pageGroupSize];
-            }
+
+            System.Collections.IList resultList = new System.Collections.ArrayList();
             int arrayIndex = 0;
-            for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++, arrayIndex++) {
-                currentPageGroupArray[arrayIndex] = i;
+            for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
+                resultList.Add(i);
             }
-            return currentPageGroupArray;
+            return resultList;
+        }
+
+        /// <summary>
+        /// Get current page-group page-number-array.
+        /// Using values are currentPageNumber and pageGroupSize and allPageCount.
+        /// </summary>
+        /// <returns>Current page-group page-number-array.</returns>
+        public int[] GetCurrentPageGroupPageNumberArray() {
+            return ConvertListToIntArray(GetCurrentPageGroupPageNumberList());
         }
 
         // -------------------------------------------
@@ -188,8 +191,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageRangeSize and allPageCount.
         /// </summary>
         /// <returns>Current page-range page-number-list.</returns>
-        public System.Collections.IList GetCurrentPageRangePageNumberList()
-        {
+        public System.Collections.IList GetCurrentPageRangePageNumberList() {
             int allPageCount = this.AllPageCount;
             int currentPageNumber = this.CurrentPageNumber;
             int pageRangeSize = this.PageRangeSize;
@@ -220,11 +222,18 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageRangeSize and allPageCount.
         /// </summary>
         /// <returns>Current page-range page-number-array.</returns>
-        public int[] GetCurrentPageRangePageNumberArray()
-        {
-            System.Collections.IList resultList = GetCurrentPageRangePageNumberList();
-            int[] resultArray = new int[resultList.Count];
-            resultList.CopyTo(resultArray, resultList.Count);
+        public int[] GetCurrentPageRangePageNumberArray() {
+            return ConvertListToIntArray(GetCurrentPageRangePageNumberList());
+        }
+
+        /// <summary>
+        /// Get current page-range page-number-array.
+        /// Using values are currentPageNumber and pageRangeSize and allPageCount.
+        /// </summary>
+        /// <returns>Current page-range page-number-array.</returns>
+        protected int[] ConvertListToIntArray(System.Collections.IList ls) {
+            int[] resultArray = new int[ls.Count];
+            ls.CopyTo(resultArray, 0);
             return resultArray;
         }
 
@@ -239,8 +248,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber.
         /// </summary>
         /// <returns>Determination.</returns>
-        public bool IsExistPrePage()
-        {
+        public bool IsExistPrePage() {
             return (_currentPageNumber > 1);
         }
 
@@ -249,8 +257,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and allPageCount.
         /// </summary>
         /// <returns>Determination.</returns>
-        public bool IsExistNextPage()
-        {
+        public bool IsExistNextPage() {
             return (_currentPageNumber < this.AllPageCount);
         }
 
@@ -259,8 +266,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageGroupSize.
         /// </summary>
         /// <returns>Determination.</returns>
-        public bool IsExistPrePageGroup()
-        {
+        public bool IsExistPrePageGroup() {
             return (_currentPageNumber > _pageGroupSize);
         }
 
@@ -269,8 +275,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageGroupSize and allPageCount.
         /// </summary>
         /// <returns>Determination.</returns>
-        public bool IsExistNextPageGroup()
-        {
+        public bool IsExistNextPageGroup() {
             int currentPageGroupStartPageNumber = CalculateCurrentPageGroupStartPageNumber();
             if (!(currentPageGroupStartPageNumber > 0)) {
                 String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
@@ -286,28 +291,26 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageGroupSize.
         /// </summary>
         /// <returns>Determination.</returns>
-	    public bool isExistPrePageRange() {
-	        int[] array = GetCurrentPageRangePageNumberArray();
-	        if (array.Length == 0) {
-	            String msg = "The current page-range page-number array is empty!" + ToString();
-	            throw new SystemException(msg);
-	        }
-	        return array[0] > 1;
-	    }
+        public bool IsExistPrePageRange() {
+            int[] array = GetCurrentPageRangePageNumberArray();
+            if (array.Length == 0) {
+                return false;
+            }
+            return array[0] > 1;
+        }
 
         /// <summary>
         /// Is existing next page-range?
         /// Using values are currentPageNumber and pageGroupSize and allPageCount.
         /// </summary>
         /// <returns>Determination.</returns>
-	    public bool isExistNextPageRange() {
-	        int[] array = GetCurrentPageRangePageNumberArray();
-	        if (array.Length == 0) {
-	            String msg = "The current page-range page-number array is empty!" + ToString();
-	            throw new SystemException(msg);
-	        }
-	        return array[array.Length-1] < this.AllPageCount;
-	    }
+        public bool IsExistNextPageRange() {
+            int[] array = GetCurrentPageRangePageNumberArray();
+            if (array.Length == 0) {
+                return false;
+            }
+            return array[array.Length-1] < this.AllPageCount;
+        }
 
         #endregion
 
@@ -319,21 +322,19 @@ namespace ${glPackageBaseCommonCBean} {
         /// </summary>
         /// <returns>View-string of all-columns value.</returns>
         public override String ToString() {
-            StringBuilder result = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 
-	        result.Append(" ").Append(this.CurrentPageNumber).Append("/").Append(this.AllPageCount);
-	        result.Append(" ").Append(this.AllRecordCount);
-	        result.Append(" - ").Append(IsExistPrePage()).Append(" ").Append(IsExistPrePageGroup());
-	        result.Append(" ");
-	        int[] currentPageGroupPageNumberArray = GetCurrentPageGroupPageNumberArray();
-	        for (int i=0; i < currentPageGroupPageNumberArray.Length; i++) {
-	            result.Append(currentPageGroupPageNumberArray[i]);
-	        }
-	        result.Append(" ").Append(IsExistNextPageGroup()).Append(" ").Append(IsExistNextPage());
-            result.Append(" pageSize=").Append(this.PageSize);
-            result.Append(" selectedList.Count=").Append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
+            sb.Append(this.CurrentPageNumber).Append("/").Append(this.AllPageCount);
+            sb.Append(" ").Append(this.AllRecordCount);
+            sb.Append(" listSize=").Append((this.SelectedList != null ? ""+this.SelectedList.Count : null));
+            sb.Append(" pageSize=").Append(this.PageSize);
+            sb.Append(" groupSize=").Append(this.PageGroupSize);
+            sb.Append(" rangeSize=").Append(this.PageRangeSize);
+            sb.Append(" page:{").Append(IsExistPrePage()).Append("/").Append(IsExistNextPage()).Append("}");
+            sb.Append(" group:{").Append(IsExistPrePageGroup()).Append("/").Append(IsExistNextPageGroup()).Append("}");
+            sb.Append(" range:{").Append(IsExistPrePageRange()).Append("/").Append(IsExistNextPageRange()).Append("}");
 
-            return result.ToString();
+            return sb.ToString();
         }
     }
 }
