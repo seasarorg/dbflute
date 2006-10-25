@@ -560,7 +560,22 @@ public class Column {
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrers) {
             final Table reffererTable = fk.getTable();
-            sb.append(", ").append(reffererTable.getName());
+            final String name = reffererTable.getName();
+            sb.append(", ").append(name);
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+    
+    public String getReferrerCommaStringWithHtmlHref() {
+        if (_referrers == null) {
+            _referrers = new ArrayList<ForeignKey>(5);
+        }
+        final StringBuffer sb = new StringBuffer();
+        for (ForeignKey fk : _referrers) {
+            final Table reffererTable = fk.getTable();
+            final String name = reffererTable.getName();
+            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
         }
         sb.delete(0, ", ".length());
         return sb.toString();

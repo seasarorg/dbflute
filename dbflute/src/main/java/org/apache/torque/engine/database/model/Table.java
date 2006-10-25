@@ -472,6 +472,25 @@ public class Table implements IDMethod {
     }
     
     /**
+     * Returns an comma string containing all the foreign table name.
+     * 
+     * @return Refferer table-name comma string.
+     */
+    public String getReferrerTableNameCommaStringWithHtmlHref() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<ForeignKey> ls = getReferrers();
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            final String name = fk.getTable().getName();
+            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+    
+    /**
      * Returns an comma string containing all the foreign property name.
      * 
      * @return Refferer property comma string.
@@ -537,6 +556,25 @@ public class Table implements IDMethod {
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
             sb.append(", ").append(fk.getForeignTableName());
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+    
+    /**
+     * Returns an comma string containing all the foreign table name.
+     * 
+     * @return Foreign table as comma string.
+     */
+    public String getForeignTableNameCommaStringWithHtmlHref() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<ForeignKey> ls = _foreignKeys;
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            final String name = fk.getForeignTableName();
+            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
         }
         sb.delete(0, ", ".length());
         return sb.toString();

@@ -23,8 +23,8 @@ ${database.initializeClassificationDeployment()}
     <tr>
       <td class="normalFont"><a href="#$tbl.Name">$tbl.Name</a></td>
       <td class="normalFont">$tbl.JavaName</td>
-      <td class="normalFont">$tbl.ForeignTableNameCommaString</td>
-      <td class="normalFont">$tbl.ReferrerTableNameCommaString</td>
+      <td class="normalFont">$tbl.ForeignTableNameCommaStringWithHtmlHref</td>
+      <td class="normalFont">$tbl.ReferrerTableNameCommaStringWithHtmlHref</td>
     </tr>
   #end
   </table>
