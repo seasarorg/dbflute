@@ -12,7 +12,7 @@ $!table.Description
     <th class="normalFont" bgcolor="#CCCCCC">Size</th>
     <th class="normalFont" bgcolor="#CCCCCC">Default</th>
     <th class="normalFont" bgcolor="#CCCCCC">ForeignTable</th>
-    <th class="normalFont" bgcolor="#CCCCCC">ReffererTable</th>
+    <th class="normalFont" bgcolor="#CCCCCC">ReferrerTable</th>
     <th class="normalFont" bgcolor="#CCCCCC">CapPropName</th>
     <th class="normalFont" bgcolor="#CCCCCC">Type of ${table.Database.TargetLanguage}</th>
     <th class="normalFont" bgcolor="#CCCCCC">Classification</th>
