@@ -99,7 +99,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="entity">Entity.</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="MspadminBiz.Dao.Allcommon.exception.RecordHasAlreadyBeenDeletedException"></exception>
-        int ModifyAfterSelectForUpdate(MspadminBiz.Dao.Allcommon.Entity entity);
+        int ModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
         /// Reflect(insert or update) from separated-file.
