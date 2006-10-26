@@ -139,6 +139,106 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return getRealAliasName() + "." + columnName;
     }
 
+
+    // =====================================================================================
+    //                                                                              Location
+    //                                                                              ========
+    /**
+     * Get location.
+     * 
+     * @param columnPropertyName Column property name.
+     * @param key Condition key.
+     * @return Next nest level.
+     */
+    protected String getLocation(String columnPropertyName, ${glConditionKeyName} key) {
+        return getLocationBase(columnPropertyName) + "." + key.getConditionKey();
+    }
+
+    protected String getLocationBase() {
+        final StringBuffer sb = new StringBuffer();
+        ${glConditionQueryInterfaceName} query = this;
+        while (true) {
+            if (query.isBaseQuery(query)) {
+                sb.insert(0, "conditionQuery.");
+                break;
+            } else {
+                sb.insert(0, "conditionQuery" + query.getAliasName() + ".");
+            }
+            query = query.getChildQuery();
+        }
+        return sb.toString();
+    }
+
+    protected String getLocationBase(String columnPropertyName) {
+        return getLocationBase() + columnPropertyName;
+    }
+
+    // =====================================================================================
+    //                                                                              SubQuery
+    //                                                                              ========
+    protected ${glConditionQueryInterfaceName} registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String reffererColumnName, String propertyName) {
+        final String realColumnName = getRealColumnName(columnName);
+        final String subQueryClause = getInScopeSubQuerySql(subQuery, reffererColumnName, propertyName);
+        getSqlClause().registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
+        return this;
+    }
+
+    protected ${glConditionQueryInterfaceName} registerInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String reffererColumnName, String propertyName) {
+        final String subQueryClause = getInScopeSubQuerySql(subQuery, reffererColumnName, propertyName);
+        final String finalClause = columnName + " in (" + subQueryClause + ")";
+        if (isBaseQuery(this)) {
+            getSqlClause().registerBaseTableInlineWhereClause(finalClause);
+        } else {
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
+        }
+        return this;
+    }
+
+    protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
+                                 , String reffererColumnName, String propertyName) {
+        final String selectClause = "select " + subQuery.getAliasName() + "." + reffererColumnName;
+        final String fromClause = subQuery.getSqlClause().getFromClause();
+        final String oldStr = ".conditionQuery.";
+        final String newStr = "." + getLocationBase(propertyName) + ".";
+        final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause(), oldStr, newStr);
+        return selectClause + " " + fromClause + " " + whereClause;
+    }
+
+    protected ${glConditionQueryInterfaceName} registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String reffererColumnName, String propertyName) {
+        final String realColumnName = getRealColumnName(columnName);
+        final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, reffererColumnName, propertyName);
+        getSqlClause().registerWhereClause("exists (" + subQueryClause + ")");
+        return this;
+    }
+
+// TODO: Unsupport ExistsSubQuery as inline because it's dangerous.
+//    protected ${glConditionQueryInterfaceName} registerInlineExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+//                                 , String columnName, String reffererColumnName, String propertyName) {
+//        final String realColumnName = getTableDbName() + "." + columnName;
+//        final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, reffererColumnName, propertyName);
+//        final String finalClause = "exists (" + subQueryClause + ")";
+//        if (isBaseQuery(this)) {
+//            getSqlClause().registerBaseTableInlineWhereClause(finalClause);
+//        } else {
+//            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
+//        }
+//        return this;
+//    }
+
+    protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
+                                 , String realColumnName, String reffererColumnName, String propertyName) {
+        final String selectClause = "select " + subQuery.getAliasName() + "." + reffererColumnName;
+        final String fromClause = subQuery.getSqlClause().getFromClause();
+        final String oldStr = ".conditionQuery.";
+        final String newStr = "." + getLocationBase(propertyName) + ".";
+        final String parentCondition = " and " + reffererColumnName + " = " + realColumnName;
+        final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause() + parentCondition, oldStr, newStr);
+        return selectClause + " " + fromClause + " " + whereClause;
+    }
+
     // =====================================================================================
     //                                                                                Invoke
     //                                                                                ======
@@ -272,66 +372,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         } catch (java.lang.reflect.InvocationTargetException e) {
             throw new RuntimeException(e.getCause());
         }
-    }
-
-    // =====================================================================================
-    //                                                                                 Other
-    //                                                                                 =====
-    /**
-     * Get location.
-     * 
-     * @param columnPropertyName Column property name.
-     * @param key Condition key.
-     * @return Next nest level.
-     */
-    protected String getLocation(String columnPropertyName, ${glConditionKeyName} key) {
-        return getLocationBase(columnPropertyName) + "." + key.getConditionKey();
-    }
-
-    protected String getLocationBase() {
-        final StringBuffer sb = new StringBuffer();
-        ${glConditionQueryInterfaceName} query = this;
-        while (true) {
-            if (query.isBaseQuery(query)) {
-                sb.insert(0, "conditionQuery.");
-                break;
-            } else {
-                sb.insert(0, "conditionQuery" + query.getAliasName() + ".");
-            }
-            query = query.getChildQuery();
-        }
-        return sb.toString();
-    }
-
-    protected String getLocationBase(String columnPropertyName) {
-        return getLocationBase() + columnPropertyName;
-    }
-
-    protected ${glConditionQueryInterfaceName} registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
-                                 , String realColumnName, String firstReffererColumnName, String propertyName) {
-        final String selectClause = "select " + subQuery.getAliasName() + "." + firstReffererColumnName;
-        final String fromClause = subQuery.getSqlClause().getFromClause();
-        final String oldStr = ".conditionQuery.";
-        final String newStr = "." + getLocationBase(propertyName) + ".";
-        final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause(), oldStr, newStr);
-        getSqlClause().registerWhereClause(realColumnName + " in (" + selectClause + " " + fromClause + " " + whereClause + ")");
-        return this;
-    }
-
-    protected ${glConditionQueryInterfaceName} registerInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
-                                 , String columnName, String firstReffererColumnName, String propertyName) {
-        final String selectClause = "select " + subQuery.getAliasName() + "." + firstReffererColumnName;
-        final String fromClause = subQuery.getSqlClause().getFromClause();
-        final String oldStr = ".conditionQuery.";
-        final String newStr = "." + getLocationBase(propertyName) + ".";
-        final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause(), oldStr, newStr);
-        final String finalClause = columnName + " in (" + selectClause + " " + fromClause + " " + whereClause + ")";
-        if (isBaseQuery(this)) {
-            getSqlClause().registerBaseTableInlineWhereClause(finalClause);
-        } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
-        }
-        return this;
     }
 
     // =====================================================================================

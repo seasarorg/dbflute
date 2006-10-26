@@ -385,7 +385,7 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
     public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         _${subQueryPropertyName} = subQuery;// for saving query-value.
-        registerInScopeSubQuery(subQuery, getRealColumnName(COL_${col.Name}), "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        registerInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
         return this;
     }
 
@@ -415,6 +415,42 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
         assertObjectNotNull("subQuery", subQuery);
         _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
         registerInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}_AsInline");
+        return this;
+    }
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    protected ${reffererCQClassName} _${subQueryPropertyName};
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public ${reffererCQClassName} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName};
+    }
+
+    /**
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+     * This method use from clause and where clause of the sub-query instance.
+     * this query save the sub-query instance for query-value.
+     * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+     * 
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        assertObjectNotNull("subQuery", subQuery);
+        _${subQueryPropertyName} = subQuery;// for saving query-value.
+        registerExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
         return this;
     }
         #end
@@ -736,7 +772,7 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
     public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         _${subQueryPropertyName} = subQuery;// for saving query-value.
-        registerInScopeSubQuery(subQuery, getRealColumnName(COL_${col.Name}), "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        registerInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
         return this;
     }
 
@@ -766,6 +802,42 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
         assertObjectNotNull("subQuery", subQuery);
         _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
         registerInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}_AsInline");
+        return this;
+    }
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    protected ${reffererCQClassName} _${subQueryPropertyName};
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public ${reffererCQClassName} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName};
+    }
+
+    /**
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+     * This method use from clause and where clause of the sub-query instance.
+     * this query save the sub-query instance for query-value.
+     * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+     * 
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        assertObjectNotNull("subQuery", subQuery);
+        _${subQueryPropertyName} = subQuery;// for saving query-value.
+        registerExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
         return this;
     }
         #end
