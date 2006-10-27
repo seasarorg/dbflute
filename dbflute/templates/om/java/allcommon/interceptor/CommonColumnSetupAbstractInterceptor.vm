@@ -17,7 +17,7 @@ public abstract class ${glCommonColumnSetupAbstractInterceptor} extends org.seas
     private static final long serialVersionUID = 1L;
 
     /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${glCommonColumnSetupBeforeUpdateInterceptor}.class);
+    private static final Log _log = LogFactory.getLog(${glCommonColumnSetupAbstractInterceptor}.class);
 
     /**
      * Invoke.

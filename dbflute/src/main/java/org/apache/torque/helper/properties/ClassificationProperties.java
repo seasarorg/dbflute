@@ -62,23 +62,37 @@ public final class ClassificationProperties extends AbstractHelperProperties {
                     final List tmpList = (List) value;
                     for (Object element : tmpList) {
                         if (element instanceof Map) {
-                            final Map<String, String> elementMap = (Map<String, String>) element;
+                            final Map elementMap = (Map) element;
 
                             // ********
                             // revising
                             // ********
-                            final String table = elementMap.get("table");
+                            final String table = (String) elementMap.get("table");
                             if (table != null) {
-                                final String code = elementMap.get("code");
+                                final String code = (String) elementMap.get("code");
                                 if (code == null) {
                                     String msg = "The code of " + classificationName + " should not be null";
                                     throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
                                 }
 
-                                String name = elementMap.get("name");
+                                String name = (String) elementMap.get("name");
                                 name = (name != null ? name : code);
-                                String alias = elementMap.get("alias");
+                                String alias = (String) elementMap.get("alias");
                                 alias = (alias != null ? alias : name);
+                                java.util.List exceptCodeList = new java.util.ArrayList();
+                                {
+                                    final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
+                                    if (exceptCodeObj != null) {
+                                        if (exceptCodeObj instanceof java.util.List) {
+                                            exceptCodeList = (java.util.List) exceptCodeObj;
+                                        } else {
+                                            String msg = "'exceptCodeList' should be java.util.List! But: "
+                                                    + exceptCodeObj.getClass();
+                                            msg = msg + " value=" + exceptCodeObj + " " + _classificationDefinitionMap;
+                                            throw new IllegalStateException(msg);
+                                        }
+                                    }
+                                }
 
                                 final StringBuffer sb = new StringBuffer();
                                 sb.append("select ").append(code).append(", ").append(name).append(", ").append(alias);
@@ -97,6 +111,12 @@ public final class ClassificationProperties extends AbstractHelperProperties {
                                         final String tmpCodeValue = rs.getString(code);
                                         final String tmpNameValue = rs.getString(name);
                                         final String tmpAliasValue = rs.getString(alias);
+
+                                        if (exceptCodeList.contains(tmpCodeValue)) {
+                                            _log.debug("    exceptCode: " + tmpCodeValue);
+                                            continue;
+                                        }
+
                                         final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
                                         selectedTmpMap.put("code", tmpCodeValue);
                                         selectedTmpMap.put("name", tmpNameValue);
@@ -125,18 +145,18 @@ public final class ClassificationProperties extends AbstractHelperProperties {
                                     }
                                 }
                             } else {
-                                final String code = elementMap.get("code");
+                                final String code = (String) elementMap.get("code");
                                 if (code == null) {
                                     String msg = "The code of " + classificationName + " should not be null";
                                     throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
                                 }
 
-                                final String name = elementMap.get("name");
+                                final String name = (String) elementMap.get("name");
                                 if (name == null) {
                                     elementMap.put("name", code);
                                 }
 
-                                final String alias = elementMap.get("alias");
+                                final String alias = (String) elementMap.get("alias");
                                 if (alias == null) {
                                     elementMap.put("alias", code);
                                 }

@@ -1653,10 +1653,44 @@ public class Database {
     }
 
     protected void setupJavaDir_for_main() {
-        Generator.getInstance().setOutputPath(getJavaDir() + getProperties().getJavaLocation_for_main());
+        final String fileSeparator = "/";
+        final String packageBase = getJavaDir();
+        final String javaLocation = getProperties().getJavaLocation_for_main();
+        String outputPath = "";
+        if (packageBase != null && packageBase.endsWith(fileSeparator)) {
+            if (javaLocation  != null && javaLocation.startsWith(fileSeparator)) {
+                outputPath = packageBase + javaLocation.substring(fileSeparator.length());
+            } else {
+                outputPath = packageBase + javaLocation;
+            }
+        } else {
+            if (javaLocation  != null && javaLocation.startsWith(fileSeparator)) {
+                outputPath = packageBase + javaLocation;
+            } else {
+                outputPath = packageBase + fileSeparator + javaLocation;
+            }
+        }
+        Generator.getInstance().setOutputPath(outputPath);
     }
 
     protected void setupJavaDir_for_gen() {
-        Generator.getInstance().setOutputPath(getJavaDir() + getProperties().getJavaLocation_for_gen());
+        final String fileSeparator = "/";
+        final String packageBase = getJavaDir();
+        final String javaLocation = getProperties().getJavaLocation_for_gen();
+        String outputPath = "";
+        if (packageBase != null && packageBase.endsWith(fileSeparator)) {
+            if (javaLocation  != null && javaLocation.startsWith(fileSeparator)) {
+                outputPath = packageBase + javaLocation.substring(fileSeparator.length());
+            } else {
+                outputPath = packageBase + javaLocation;
+            }
+        } else {
+            if (javaLocation  != null && javaLocation.startsWith(fileSeparator)) {
+                outputPath = packageBase + javaLocation;
+            } else {
+                outputPath = packageBase + fileSeparator + javaLocation;
+            }
+        }
+        Generator.getInstance().setOutputPath(outputPath);
     }
 }
