@@ -263,9 +263,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      * 
      * @param <T> The generic template for 'resultBean'.
      */
-    public static class SelectPageInvokerImpl${database.filterGenericsString('T')} implements SelectPageInvoker${database.filterGenericsString('T')} {
+    public static class SelectPageSimpleInvoker${database.filterGenericsString('T')} implements SelectPageInvoker${database.filterGenericsString('T')} {
         protected ${glBehaviorReadableInterfaceName} _bhv;
-        public SelectPageInvokerImpl(${glBehaviorReadableInterfaceName} bhv) {
+        public SelectPageSimpleInvoker(${glBehaviorReadableInterfaceName} bhv) {
             _bhv = bhv;
         }
 

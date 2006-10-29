@@ -299,7 +299,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return selectPage(${glAttachedCBArgsVariableName}, new SelectPageInvokerImpl${database.filterGenericsString(${myExtendedObjectClassName})}(this));
+        return selectPage(${glAttachedCBArgsVariableName}, new SelectPageSimpleInvoker${database.filterGenericsString(${myExtendedObjectClassName})}(this));
     }
 
     /**

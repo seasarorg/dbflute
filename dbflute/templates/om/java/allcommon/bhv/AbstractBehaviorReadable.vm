@@ -180,7 +180,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return readPage(${glAttachedCBArgsVariableName}, new SelectPageInvokerImpl${database.filterGenericsString(${glEntityInterfaceName})}(this));
+        return readPage(${glAttachedCBArgsVariableName}, new SelectPageSimpleInvoker${database.filterGenericsString(${glEntityInterfaceName})}(this));
     }
 
     /**
