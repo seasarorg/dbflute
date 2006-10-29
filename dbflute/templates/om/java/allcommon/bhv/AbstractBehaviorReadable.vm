@@ -180,6 +180,18 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        return readPage(${glAttachedCBArgsVariableName}, new SelectPageInvokerImpl${database.filterGenericsString(${glEntityInterfaceName})}(this));
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param invoker Select-page-invoker (NotNull)
+     * @return Read page. (NotNull)
+     */
+    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})}() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return ${glAttachedCBArgsVariableName}; }
             public int selectCountIgnoreFetchScope() {
@@ -189,7 +201,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
                 return delegateReadList(${glAttachedCBArgsVariableName});
             }
         };
-        return new SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})}(this).invokeSelectPage(pageCallback);
+        return invoker.invokeSelectPage(pageCallback);
     }
 
     /**

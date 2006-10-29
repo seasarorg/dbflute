@@ -299,6 +299,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        return selectPage(${glAttachedCBArgsVariableName}, new SelectPageInvokerImpl${database.filterGenericsString(${myExtendedObjectClassName})}(this));
+    }
+
+    /**
+     * Select page.
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param invoker Select-page-invoker (NotNull)
+     * @return Selected page as first page. (NotNull)
+     */
+    public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${myExtendedObjectClassName})} invoker) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})}() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return ${glAttachedCBArgsVariableName}; }
             public int selectCountIgnoreFetchScope() {
@@ -308,7 +320,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
                 return delegateSelectList(${glAttachedCBArgsVariableName});
             }
         };
-        return new SelectPageInvoker${database.filterGenericsString(${myExtendedObjectClassName})}(this).invokeSelectPage(pageCallback);
+        return invoker.invokeSelectPage(pageCallback);
     }
 
     /**

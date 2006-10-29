@@ -141,7 +141,16 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+
+    /**
+     * Read page.
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param invoker Select-page-invoker (NotNull)
+     * @return Read page. (NotNull)
+     */
+    public LdPagingResultBean${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker);
 
     /**
      * ${database.ImplementComment}
@@ -239,16 +248,27 @@ public interface ${glBehaviorReadableInterfaceName} {
         }
     }
 
+    public static interface SelectPageInvoker${database.filterGenericsString('T')} {
+        /**
+         * Invoke select-page by callback.
+         * 
+         * @param callback Callback. (NotNull)
+         * @return Paging-result-bean. (NotNull)
+         */
+        public LdPagingResultBean${database.filterGenericsString('T')} invokeSelectPage(SelectPageCallback${database.filterGenericsString('T')} callback);
+    }
+
     /**
      * The object of result-bean builder.
      * 
      * @param <T> The generic template for 'resultBean'.
      */
-    public static class SelectPageInvoker${database.filterGenericsString('T')} {
+    public static class SelectPageInvokerImpl${database.filterGenericsString('T')} implements SelectPageInvoker${database.filterGenericsString('T')} {
         protected ${glBehaviorReadableInterfaceName} _bhv;
-        public SelectPageInvoker(${glBehaviorReadableInterfaceName} bhv) {
+        public SelectPageInvokerImpl(${glBehaviorReadableInterfaceName} bhv) {
             _bhv = bhv;
         }
+
         /**
          * Invoke select-page by callback.
          * 
@@ -262,22 +282,24 @@ public interface ${glBehaviorReadableInterfaceName} {
             final ${glPagingResultBeanName}${database.filterGenericsString('T')} rb = new ResultBeanBuilder${database.filterGenericsString('T')}(_bhv).buildPagingResultBean(callback.getPagingBean(), allRecordCount, selectedList);
             if (isNecessaryToReadPageAgain(rb)) {
                 callback.getPagingBean().fetchPage(rb.getAllPageCount());
-                int reAllRecordCount = callback.selectCountIgnoreFetchScope();
-                java.util.List${database.filterGenericsString('T')} reSelectedList = callback.selectList();
+                final int reAllRecordCount = callback.selectCountIgnoreFetchScope();
+                final java.util.List${database.filterGenericsString('T')} reSelectedList = callback.selectList();
                 return new ResultBeanBuilder${database.filterGenericsString('T')}(_bhv).buildPagingResultBean(callback.getPagingBean(), reAllRecordCount, reSelectedList);
             } else {
                 return rb;
             }
         }
+
         /**
          * Is it necessary to read page again?
          * 
          * @param rb Paging-result-bean. (NotNull)
          * @return Determination.
          */
-        public boolean isNecessaryToReadPageAgain(${glPagingResultBeanName}${database.filterGenericsString('T')} rb) {
+        protected boolean isNecessaryToReadPageAgain(${glPagingResultBeanName}${database.filterGenericsString('T')} rb) {
             return rb.getAllRecordCount() > 0 && rb.getSelectedList().isEmpty();
         }
+
         /**
          * Assert that the object is not null.
          * 
