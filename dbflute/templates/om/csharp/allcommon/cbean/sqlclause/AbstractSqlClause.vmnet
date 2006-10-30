@@ -46,8 +46,8 @@ namespace ${glPackageBaseCommonSqlClause} {
         /** Fetch start index. (for fetchXxx()) */
         protected int _fetchStartIndex = 0;
 
-        /** Fetch size. (for fetchXxx()) Default value is ${database.FetchPageDefaultFetchSize}. */
-        protected int _fetchSize = ${database.FetchPageDefaultFetchSize};
+        /** Fetch size. (for fetchXxx()) */
+        protected int _fetchSize = 0;
 
         /** Fetch page number. (for fetchXxx()) This value should be plus. */
         protected int _fetchPageNumber = 1;

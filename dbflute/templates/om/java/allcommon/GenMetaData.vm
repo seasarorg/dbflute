@@ -386,24 +386,6 @@ public class ${myClassName} {
     }
 
     /**
-     * Get the property-value of fetchPageDefaultFetchSize.
-     *
-     * @return The property-value.
-     */
-    public int getSqlClauseDefaultFetchSize() {
-        return ${database.FetchPageDefaultFetchSize};
-    }
-
-    /**
-     * is available use absolute when result set fetch-narrowing?
-     *
-     * @return The property-value.
-     */
-    public boolean isAvailableUseAbsoluteWhenResultSetFetchNarrowing() {
-        return ${database.isAvailableUseAbsoluteWhenResultSetFetchNarrowing()};
-    }
-
-    /**
      * Get the property-value of selectQueryTimeout.
      *
      * @return The property-value.

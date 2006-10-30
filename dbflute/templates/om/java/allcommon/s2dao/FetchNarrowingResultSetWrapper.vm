@@ -33,9 +33,6 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     /** Fetch counter. */
     private long _counter;
 
-    /** Is absolute used? */
-    private boolean _isAbsoluteUsed = ${database.isAvailableUseAbsoluteWhenResultSetFetchNarrowing()};
-
     /**
      * Constructor.
      * 
@@ -162,7 +159,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
      * @return Determination.
      */
     protected boolean isCursorUsed() {
-        return _isAbsoluteUsed && isCursorSupported(getResultSet());
+        return isCursorSupported(getResultSet());
     }
 
     /**
