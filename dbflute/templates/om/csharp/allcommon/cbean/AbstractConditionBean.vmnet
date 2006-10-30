@@ -177,16 +177,34 @@ namespace ${glPackageBaseCommonCBean} {
             return this;
         }
 
-        public int FetchPageNumber {
-            get { return this.SqlClause.FetchPageNumber; }
-        }
-
         public int FetchStartIndex {
             get { return this.SqlClause.FetchStartIndex; }
         }
 
         public int FetchSize {
             get { return this.SqlClause.FetchSize; }
+        }
+
+        public int FetchPageNumber {
+            get { return this.SqlClause.FetchPageNumber; }
+        }
+
+        /**
+         * Get page start index.
+         * 
+         * @return Page start index. 0 origin. (NotMinus)
+         */
+        public int PageStartIndex {
+            get { return this.SqlClause.PageStartIndex; }
+        }
+
+        /**
+         * Get page end index.
+         * 
+         * @return Page end index. 0 origin. (NotMinus)
+         */
+        public int PageEndIndex {
+            get { return this.SqlClause.PageEndIndex; }
         }
 
         // =====================================================================================

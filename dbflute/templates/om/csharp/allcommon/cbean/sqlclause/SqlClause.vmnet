@@ -231,6 +231,20 @@ namespace ${glPackageBaseCommonSqlClause} {
         int FetchPageNumber { get; }
 
         /**
+         * Get page start index.
+         * 
+         * @return Page start index. 0 origin. (NotMinus)
+         */
+        int PageStartIndex { get; }
+
+        /**
+         * Get page end index.
+         * 
+         * @return Page end index. 0 origin. (NotMinus)
+         */
+        int PageEndIndex { get; }
+
+        /**
          * Ignore fetch-narrowing.
          * 
          * @return this. (NotNull)

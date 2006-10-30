@@ -214,7 +214,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return this;
     }
 
-// TODO: Unsupport ExistsSubQuery as inline because it's dangerous.
+// *Unsupport ExistsSubQuery as inline because it's so dangerous.
 //    protected ${glConditionQueryInterfaceName} registerInlineExistsSubQuery(${glConditionQueryInterfaceName} subQuery
 //                                 , String columnName, String reffererColumnName, String propertyName) {
 //        final String realColumnName = getTableDbName() + "." + columnName;

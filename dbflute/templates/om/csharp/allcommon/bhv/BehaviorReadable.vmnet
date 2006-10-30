@@ -96,6 +96,14 @@ namespace ${glPackageBaseCommonBhv} {
         ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
         /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="invoker">Select-page-invoker. (NotNull)</param>
+        /// <returns>Read page. (NotNull)</returns>
+        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker);
+
+        /// <summary>
         /// Read entity with deleted check.
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
@@ -151,5 +159,163 @@ namespace ${glPackageBaseCommonBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         ${glEntityInterfaceName} ReadForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString);
         #endregion
+    }
+
+    /// <summary>
+    /// The interface of select-page callback.
+    /// 
+    /// <![CDATA[
+    ///   ex) If you select as original method, the way is as follows:
+    /// 
+    ///      // Original behavior method of select-page-as-first as BookInfo.
+    ///      public SelectPageAsFirstBookInfo(BookCB cb, BookInfoPmb pmb, int fetchSize) {
+    ///          SelectPageCallback callback = new SelectPageAsFirstSimpleCallback(cb, pmb, fetchSize);
+    ///          return InvokeSelectPage(callback);
+    ///      }
+    /// 
+    ///      // Original select-page callback.
+    ///      public class SelectPageBookInfoCallback : SelectPageSimpleCallback {
+    ///          protected BookInfoPmb _pmb;
+    ///          public ${glConditionBeanInterfaceName} PagingBeanAsBookInfoCB { get { return (BookInfoCB)this.PagingBean; } }
+    ///          public SelectPageAsFirstBookInfo(BookBhv bhv, BookCB pb, BookInfoPmb pmb) : base(bhv, pb) {
+    ///              _pmb = pmb;
+    ///          }
+    ///          override int SelectPageCallback.SelectCountIgnoreFetchScope() {
+    ///              return this.Behavior.Dao.SelectCountIgnoreFetchScopeBookInfo(this.PagingBeanAsBookInfoCB, _pmb); // Original Method Invoking
+    ///          }
+    ///          override int SelectPageCallback.SelectList() {
+    ///              return this.Behavior.Dao.SelectListBookInfo(this.PagingBeanAsBookInfoCB, _pmb); // Original Method Invoking
+    ///          }
+    ///      }
+    /// ]]>
+    /// </summary>
+    public interface SelectPageCallback {
+        ${glPagingBeanInterfaceName} PagingBean { get; }
+        int SelectCountIgnoreFetchScope();
+        System.Collections.IList SelectList();
+    }
+
+    /// <summary>
+    /// The simple-implementation of select-page-as-first callback.
+    /// </summary>
+    public class SelectPageSimpleCallback : SelectPageCallback {
+        protected ${glPagingBeanInterfaceName} _pb;
+        protected ${glBehaviorReadableInterfaceName} _bhv;
+        public ${glPagingBeanInterfaceName} PagingBean { get { return _pb; } }
+        public SelectPageSimpleCallback(${glPagingBeanInterfaceName} pb, ${glBehaviorReadableInterfaceName} bhv) {
+            _pb = pb;
+            _bhv = bhv;
+        }
+        public virtual int SelectCountIgnoreFetchScope() {
+            // This is default method of select-count-ignore-fetch-scope.
+            return _bhv.DelegateReadCountIgnoreFetchScope((${glConditionBeanInterfaceName})this.PagingBean);
+        }
+        public virtual System.Collections.IList SelectList() {
+            // This is default method of select-list.
+            return _bhv.DelegateReadList((${glConditionBeanInterfaceName})this.PagingBean);
+        }
+    }
+
+    public class ResultBeanBuilder {
+        
+        protected ${glBehaviorReadableInterfaceName} _bhv;
+        public ${glBehaviorReadableInterfaceName} Bhv {
+            get { return _bhv; }
+            set { _bhv = value; }
+        }
+
+        /**
+         * Build list-reuslt-bean.
+         * 
+         * @param ob Order-by-bean. (NotNull)
+         * @param selectedList Selected list. (NotNull)
+         * @return List-result-bean. (NotNull)
+         */
+        protected ${glListResultBeanName} BuildListResultBean(${glOrderByBeanInterfaceName} ob, System.Collections.IList selectedList) {
+            ${glListResultBeanName} rb = new ${glListResultBeanName}();
+            rb.TableDbName = this.Bhv.TableDbName;
+            rb.AllRecordCount = selectedList.Count;
+            rb.SelectedList = selectedList;
+            rb.OrderByClause = ob.SqlComponentOfOrderByClause;
+            return rb;
+        }
+
+        /// <summary>
+        /// Build paging-result-bean.
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <returns>Paging result bean. (NotNull)</returns>
+        protected ${glPagingResultBeanName} BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, System.Collections.IList selectedList) {
+            ${glPagingResultBeanName} rb = new ${glPagingResultBeanName}();
+            rb.TableDbName = this.Bhv.TableDbName;
+            rb.AllRecordCount = allRecordCount;
+            rb.SelectedList = selectedList;
+            rb.PageSize = pb.FetchSize;
+            rb.CurrentPageNumber = pb.FetchPageNumber;
+            rb.OrderByClause = pb.SqlComponentOfOrderByClause;
+            return rb;
+        }
+    }
+
+    public interface SelectPageInvoker {
+        /// <summary>
+        /// Invoke select-page by callback.
+        /// </summary>
+        /// <param name="callback">Callback. (NotNull)</param>
+        PagingResultBean InvokeSelectPage(SelectPageCallback callback);
+    }
+
+    public class SelectPageSimpleInvoker : SelectPageInvoker {
+
+        protected ${glBehaviorReadableInterfaceName} _bhv;
+        public ${glBehaviorReadableInterfaceName} Bhv {
+            get { return _bhv; }
+            set { _bhv = value; }
+        }
+
+        /// <summary>
+        /// Invoke select-page by callback.
+        /// </summary>
+        /// <param name="callback">Callback. (NotNull)</param>
+        public PagingResultBean InvokeSelectPage(SelectPageCallback callback) {
+            AssertObjectNotNull("callback", callback);
+            int allRecordCount = callback.SelectCountIgnoreFetchScope();
+            System.Collections.IList selectedList = callback.SelectList();
+            ${glPagingResultBeanName} rb = new ResultBeanBuilder(this.Bhv).BuildPagingResultBean(callback.PagingBean, allRecordCount, selectedList);
+            if (IsNecessaryToReadPageAgain(rb)) {
+                callback.PagingBean.FetchPage(rb.AllPageCount);
+                int reAllRecordCount = callback.SelectCountIgnoreFetchScope();
+                System.Collections.IList reSelectedList = callback.SelectList();
+                return new ResultBeanBuilder(this.Bhv).BuildPagingResultBean(callback.PagingBean, reAllRecordCount, reSelectedList);
+            } else {
+                return rb;
+            }
+        }
+
+        /// <summary>
+        /// Is it necessary to read page again?
+        /// </summary>
+        /// <param name="rb">Paging-result-bean. (NotNull)<param>
+        /// <returns>Determination.</return>
+        protected bool IsNecessaryToReadPageAgain(${glPagingResultBeanName} rb) {
+            return rb.AllRecordCount > 0 && rb.SelectedList.Count == 0;
+        }
+
+        /**
+         * Assert that the argument is not null.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param arg Argument. (NotNull)
+         */
+        protected void AssertObjectNotNull(String variableName, Object arg) {
+            if (variableName == null) {
+                String msg = "Argument[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (arg == null) {
+                String msg = "Argument[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+        }
     }
 }

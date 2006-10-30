@@ -626,12 +626,14 @@ namespace ${glPackageBaseCommonSqlClause} {
          * 
          * @return Page start index. 0 origin. (NotMinus)
          */
-        protected int GetPageStartIndex() {
-            if (_fetchPageNumber <= 0) {
-                String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
-                throw new SystemException(msg);
+        public int PageStartIndex {
+            get {
+                if (_fetchPageNumber <= 0) {
+                    String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
+                    throw new SystemException(msg);
+                }
+                return _fetchStartIndex + (_fetchSize * (_fetchPageNumber - 1));
             }
-            return _fetchStartIndex + (_fetchSize * (_fetchPageNumber - 1));
         }
 
         /**
@@ -639,12 +641,14 @@ namespace ${glPackageBaseCommonSqlClause} {
          * 
          * @return Page end index. 0 origin. (NotMinus)
          */
-        protected int GetPageEndIndex() {
-            if (_fetchPageNumber <= 0) {
-                String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
-                throw new SystemException(msg);
+        public int PageEndIndex {
+            get {
+                if (_fetchPageNumber <= 0) {
+                    String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
+                    throw new SystemException(msg);
+                }
+                return _fetchStartIndex + (_fetchSize * _fetchPageNumber);
             }
-            return _fetchStartIndex + (_fetchSize * _fetchPageNumber);
         }
 
         /**
@@ -741,7 +745,7 @@ namespace ${glPackageBaseCommonSqlClause} {
                 if (this.IsFetchStartIndexSupported) {
                     return 0;
                 } else {
-                    return GetPageStartIndex();
+                    return this.PageStartIndex;
                 }
             }
         }

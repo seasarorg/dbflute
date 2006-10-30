@@ -220,6 +220,20 @@ public interface ${myClassName} {
     public int getFetchPageNumber();
 
     /**
+     * Get page start index.
+     * 
+     * @return Page start index. 0 origin. (NotMinus)
+     */
+    public int getPageStartIndex();
+
+    /**
+     * Get page end index.
+     * 
+     * @return Page end index. 0 origin. (NotMinus)
+     */
+    public int getPageEndIndex();
+
+    /**
      * Ignore fetch-narrowing.
      * 
      * @return this. (NotNull)

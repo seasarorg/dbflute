@@ -425,11 +425,11 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
     protected ${reffererCQClassName} _${subQueryPropertyName};
 
     /**
-     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
@@ -438,13 +438,13 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
 
     /**
-     * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
-     * { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
+     * { exists (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
      * This method use from clause and where clause of the sub-query instance.
      * this query save the sub-query instance for query-value.
      * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
      * 
-     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (NotNull)
      * @return this. (NotNull)
      */
     public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
@@ -812,26 +812,26 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
     protected ${reffererCQClassName} _${subQueryPropertyName};
 
     /**
-     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
      * 
-     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (Nullable)
      */
     public ${reffererCQClassName} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName};
     }
 
     /**
-     * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
-     * { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
+     * { exists (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
      * This method use from clause and where clause of the sub-query instance.
      * this query save the sub-query instance for query-value.
      * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
      * 
-     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (NotNull)
      * @return this. (NotNull)
      */
     public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {

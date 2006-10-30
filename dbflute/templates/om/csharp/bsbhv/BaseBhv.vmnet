@@ -348,7 +348,7 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}"></exception>
         public ${glListResultBeanName} SelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            return BuildListResultBean(${glAttachedCBArgsVariableName}, this.Self.DelegateSelectList(${glAttachedCBArgsVariableName}));
+            return new ResultBeanBuilder(this).BuildListResultBean(${glAttachedCBArgsVariableName}, this.Self.DelegateSelectList(${glAttachedCBArgsVariableName}));
         }
 
         /// <summary>
@@ -358,7 +358,18 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>Selected page. (NotNull)</returns>
         public ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            return InvokeSelectPage(new SelectPageSimpleCallback(${glAttachedCBArgsVariableName}, this));
+            return this.Self.SelectPage(${glAttachedCBArgsVariableName}, new SelectPageSimpleInvoker(this));
+        }
+
+        /// <summary>
+        /// Select page.
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="invoker">Select-page-invoker. (NotNull)</param>
+        /// <returns>Read page. (NotNull)</returns>
+        ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker) {
+            AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+            return invoker.InvokeSelectPage(new SelectPageSimpleCallback(${glAttachedCBArgsVariableName}, this));
         }
 
         /// <summary>
@@ -390,7 +401,7 @@ namespace ${glPackageExtendedBhv} {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
             int selectedCount = this.Self.DelegateSelectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
             AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.ToString());
-            return BuildListResultBean(${glAttachedCBArgsVariableName}, this.Self.DelegateSelectList(${glAttachedCBArgsVariableName}));
+            return new ResultBeanBuilder(this).BuildListResultBean(${glAttachedCBArgsVariableName}, this.Self.DelegateSelectList(${glAttachedCBArgsVariableName}));
         }
 
         /// <summary>

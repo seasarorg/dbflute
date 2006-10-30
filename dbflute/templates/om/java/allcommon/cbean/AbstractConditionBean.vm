@@ -125,7 +125,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      * @return Fetch-start-index.
      */
     public int getFetchStartIndex() {
-        return _sqlClause.getFetchStartIndex();
+        return getSqlClause().getFetchStartIndex();
     }
 
     /**
@@ -134,7 +134,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      * @return Fetch-size.
      */
     public int getFetchSize() {
-        return _sqlClause.getFetchSize();
+        return getSqlClause().getFetchSize();
     }
 
     /**
@@ -143,7 +143,25 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      * @return Fetch-page-number.
      */
     public int getFetchPageNumber() {
-        return _sqlClause.getFetchPageNumber();
+        return getSqlClause().getFetchPageNumber();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Page start index. 0 origin. (NotMinus)
+     */
+    public int getPageStartIndex() {
+        return getSqlClause().getPageStartIndex();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Page end index. 0 origin. (NotMinus)
+     */
+    public int getPageEndIndex() {
+        return getSqlClause().getPageEndIndex();
     }
 
     // =====================================================================================

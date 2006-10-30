@@ -151,6 +151,24 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
         return getSqlClause().getFetchPageNumber();
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Page start index. 0 origin. (NotMinus)
+     */
+    public int getPageStartIndex() {
+        return getSqlClause().getPageStartIndex();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Page end index. 0 origin. (NotMinus)
+     */
+    public int getPageEndIndex() {
+        return getSqlClause().getPageEndIndex();
+    }
+
     // =====================================================================================
     //                                                                        For SqlComment
     //                                                                        ==============

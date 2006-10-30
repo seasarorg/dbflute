@@ -41,13 +41,13 @@ namespace ${glPackageBaseCommonSqlClause} {
          */
         protected override void DoFetchPage() {
             if (this.IsFetchStartIndexSupported && this.IsFetchSizeSupported) {
-                _fetchScopeSelectHint = " first " + this.FetchSize + " skip " + GetPageStartIndex();
+                _fetchScopeSelectHint = " first " + this.FetchSize + " skip " + this.PageStartIndex;
             }
             if (this.IsFetchStartIndexSupported && !this.IsFetchSizeSupported) {
-                _fetchScopeSelectHint = " skip " + GetPageStartIndex();
+                _fetchScopeSelectHint = " skip " + this.PageStartIndex;
             }
             if (!this.IsFetchStartIndexSupported && this.IsFetchSizeSupported) {
-                _fetchScopeSelectHint = " first " + GetPageEndIndex();
+                _fetchScopeSelectHint = " first " + this.PageEndIndex;
             }
         }
 

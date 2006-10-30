@@ -44,7 +44,7 @@ namespace ${glPackageBaseCommonSqlClause} {
                 if (this.IsFetchStartIndexSupported) {
                     _fetchFirstSelectHint = " top " + this.FetchSize;
                 } else {
-                    _fetchFirstSelectHint = " top " + GetPageEndIndex();
+                    _fetchFirstSelectHint = " top " + this.PageEndIndex;
                 }
             }
         }

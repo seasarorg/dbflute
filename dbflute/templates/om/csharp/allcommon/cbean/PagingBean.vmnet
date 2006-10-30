@@ -42,8 +42,8 @@ namespace ${glPackageBaseCommonCBean} {
         ${glPagingBeanInterfaceName} FetchPage(int fetchPageNumber);
 
         // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
+        //                                                                              Property
+        //                                                                              ========
         /**
          * Get fetch start index.
          * 
@@ -64,6 +64,20 @@ namespace ${glPackageBaseCommonCBean} {
          * @return Fetch page number.
          */
         int FetchPageNumber { get; }
+
+        /**
+         * Get page start index.
+         * 
+         * @return Page start index. 0 origin. (NotMinus)
+         */
+        int PageStartIndex { get; }
+
+        /**
+         * Get page end index.
+         * 
+         * @return Page end index. 0 origin. (NotMinus)
+         */
+        int PageEndIndex { get; }
 
         // =====================================================================================
         //                                                                                Clause
