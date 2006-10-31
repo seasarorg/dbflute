@@ -150,7 +150,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @param invoker Select-page-invoker (NotNull)
      * @return Read page. (NotNull)
      */
-    public LdPagingResultBean${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker);
+    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker);
 
     /**
      * ${database.ImplementComment}
@@ -255,7 +255,7 @@ public interface ${glBehaviorReadableInterfaceName} {
          * @param callback Callback. (NotNull)
          * @return Paging-result-bean. (NotNull)
          */
-        public LdPagingResultBean${database.filterGenericsString('T')} invokeSelectPage(SelectPageCallback${database.filterGenericsString('T')} callback);
+        public ${glPagingResultBeanName}${database.filterGenericsString('T')} invokeSelectPage(SelectPageCallback${database.filterGenericsString('T')} callback);
     }
 
     /**
