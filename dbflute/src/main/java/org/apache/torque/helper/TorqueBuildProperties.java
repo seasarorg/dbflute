@@ -423,11 +423,11 @@ public final class TorqueBuildProperties {
     }
 
     public String getBasePrefix() {
-        return stringProp("torque.basePrefix", "Bs");
+        return "Bs";
     }
 
     public String getBaseSuffixForEntity() {
-        return stringProp("torque.baseSuffixForEntity", "");
+        return "";
     }
 
     // ===============================================================================
@@ -494,18 +494,18 @@ public final class TorqueBuildProperties {
     //                                            Properties - Generated Class Package
     //                                            ====================================
     protected GeneratedClassPackageProperties _generatedClassPackage;
-    
+
     protected GeneratedClassPackageProperties getGeneratedClassPackageProperties() {
         if (_generatedClassPackage == null) {
             _generatedClassPackage = new GeneratedClassPackageProperties(_buildProperties);
         }
         return _generatedClassPackage;
     }
-    
+
     public String getPackageBase() {
         return getGeneratedClassPackageProperties().getPackageBase();
     }
-    
+
     public String getBaseCommonPackage() {
         return getGeneratedClassPackageProperties().getBaseCommonPackage();
     }
@@ -831,14 +831,14 @@ public final class TorqueBuildProperties {
     //                             Definition
     //                             ----------
     protected ClassificationProperties _classificationProperties;
-    
+
     protected ClassificationProperties getClassificationProperties() {
         if (_classificationProperties == null) {
             _classificationProperties = new ClassificationProperties(_buildProperties);
         }
         return _classificationProperties;
     }
-    
+
     public boolean hasClassificationDefinitionMap() {
         return getClassificationProperties().hasClassificationDefinitionMap();
     }
@@ -860,7 +860,8 @@ public final class TorqueBuildProperties {
     }
 
     public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getClassificationProperties().getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
+        return getClassificationProperties()
+                .getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
     public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
@@ -874,36 +875,35 @@ public final class TorqueBuildProperties {
         return getClassificationProperties().getClassificationDeploymentMap();
     }
 
-    
     public void initializeClassificationDeploymentMap(List<Table> tableList) {
         getClassificationProperties().initializeClassificationDeploymentMap(tableList);
     }
 
     public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getClassificationProperties().getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
+        return getClassificationProperties()
+                .getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
     public boolean hasClassification(String tableName, String columnName) {
         return getClassificationProperties().hasClassification(tableName, columnName);
     }
-    
+
     public String getClassificationName(String tableName, String columnName) {
         return getClassificationProperties().getClassificationName(tableName, columnName);
     }
-    
+
     public boolean hasClassificationName(String tableName, String columnName) {
         return getClassificationProperties().hasClassificationName(tableName, columnName);
     }
-    
+
     public boolean hasClassificationAlias(String tableName, String columnName) {
         return getClassificationProperties().hasClassificationAlias(tableName, columnName);
     }
-    
+
     public Map<String, String> getAllColumnClassificationMap() {
         return getClassificationProperties().getAllColumnClassificationMap();
     }
-    
-    
+
     public boolean isAllClassificationColumn(String columnName) {
         return getClassificationProperties().isAllClassificationColumn(columnName);
     }
@@ -915,22 +915,23 @@ public final class TorqueBuildProperties {
     // ===============================================================================
     //                                                       Properties - Select Param
     //                                                       =========================
-
-    public String getFetchPageDefaultFetchSize() {
-        return stringProp("torque.fetchPageDefaultFetchSize", "20");
-    }
-
-    public boolean isAvailableUseAbsoluteWhenResultSetFetchNarrowing() {
-        return booleanProp("torque.isAvailableUseAbsoluteWhenResultSetFetchNarrowing", true);
-    }
-
-    public int getPageResultBeanDefaultPageGroupSize() {
-        return intProp("torque.pageResultBeanDefaultPageGroupSize", 10);
-    }
-    
-    public int getPageResultBeanDefaultPageRangeSize() {
-        return intProp("torque.pageResultBeanDefaultPageRangeSize", 10);
-    }
+    // Abort!
+    //
+    //    public String getFetchPageDefaultFetchSize() {
+    //        return stringProp("torque.fetchPageDefaultFetchSize", "20");
+    //    }
+    //
+    //    public boolean isAvailableUseAbsoluteWhenResultSetFetchNarrowing() {
+    //        return booleanProp("torque.isAvailableUseAbsoluteWhenResultSetFetchNarrowing", true);
+    //    }
+    //
+    //    public int getPageResultBeanDefaultPageGroupSize() {
+    //        return intProp("torque.pageResultBeanDefaultPageGroupSize", 10);
+    //    }
+    //
+    //    public int getPageResultBeanDefaultPageRangeSize() {
+    //        return intProp("torque.pageResultBeanDefaultPageRangeSize", 10);
+    //    }
 
     public String getSelectQueryTimeout() {
         return stringProp("torque.selectQueryTimeout", "-1");

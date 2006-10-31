@@ -763,7 +763,7 @@ public class Database {
     public String getPackageBase() {
         return getProperties().getPackageBase();
     }
-    
+
     public String getBaseCommonPackage() {
         return getProperties().getBaseCommonPackage();
     }
@@ -997,11 +997,11 @@ public class Database {
     public boolean hasClassificationName(String tableName, String columnName) {
         return getProperties().hasClassificationName(tableName, columnName);
     }
-    
+
     public boolean hasClassificationAlias(String tableName, String columnName) {
         return getProperties().hasClassificationAlias(tableName, columnName);
     }
-    
+
     public Map<String, String> getAllColumnClassificationMap() {
         return getProperties().getAllColumnClassificationMap();
     }
@@ -1021,22 +1021,23 @@ public class Database {
     // ===============================================================================
     //                                                       Properties - Select Param
     //                                                       =========================
-    public String getFetchPageDefaultFetchSize() {
-        return getProperties().getFetchPageDefaultFetchSize();
-    }
+    // Abort!
+    //    public String getFetchPageDefaultFetchSize() {
+    //        return getProperties().getFetchPageDefaultFetchSize();
+    //    }
+    //
+    //    public boolean isAvailableUseAbsoluteWhenResultSetFetchNarrowing() {
+    //        return getProperties().isAvailableUseAbsoluteWhenResultSetFetchNarrowing();
+    //    }
+    //
+    //    public int getPageResultBeanDefaultPageGroupSize() {
+    //        return getProperties().getPageResultBeanDefaultPageGroupSize();
+    //    }
+    //
+    //    public int getPageResultBeanDefaultPageRangeSize() {
+    //        return getProperties().getPageResultBeanDefaultPageRangeSize();
+    //    }
 
-    public boolean isAvailableUseAbsoluteWhenResultSetFetchNarrowing() {
-        return getProperties().isAvailableUseAbsoluteWhenResultSetFetchNarrowing();
-    }
-
-    public int getPageResultBeanDefaultPageGroupSize() {
-        return getProperties().getPageResultBeanDefaultPageGroupSize();
-    }
-
-    public int getPageResultBeanDefaultPageRangeSize() {
-        return getProperties().getPageResultBeanDefaultPageRangeSize();
-    }
-    
     public String getSelectQueryTimeout() {
         return getProperties().getSelectQueryTimeout();
     }
@@ -1637,11 +1638,22 @@ public class Database {
         }
     }
 
-    public void setupJavaDir_for_cbean() {
+    public void setupJavaDir_for_base_cbean() {
         if (isTargetLanguageJava()) {
             setupJavaDir_for_gen();
         } else if (isTargetLanguageCSharp()) {
             setupJavaDir_for_gen();
+        } else {
+            String msg = "The language is unsupported: " + getTargetLanguage();
+            throw new IllegalStateException(msg);
+        }
+    }
+    
+    public void setupJavaDir_for_extended_cbean() {
+        if (isTargetLanguageJava()) {
+            setupJavaDir_for_main();
+        } else if (isTargetLanguageCSharp()) {
+            setupJavaDir_for_main();
         } else {
             String msg = "The language is unsupported: " + getTargetLanguage();
             throw new IllegalStateException(msg);
@@ -1658,13 +1670,13 @@ public class Database {
         final String javaLocation = getProperties().getJavaLocation_for_main();
         String outputPath = "";
         if (packageBase != null && packageBase.endsWith(fileSeparator)) {
-            if (javaLocation  != null && javaLocation.startsWith(fileSeparator)) {
+            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
                 outputPath = packageBase + javaLocation.substring(fileSeparator.length());
             } else {
                 outputPath = packageBase + javaLocation;
             }
         } else {
-            if (javaLocation  != null && javaLocation.startsWith(fileSeparator)) {
+            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
                 outputPath = packageBase + javaLocation;
             } else {
                 outputPath = packageBase + fileSeparator + javaLocation;
@@ -1679,13 +1691,13 @@ public class Database {
         final String javaLocation = getProperties().getJavaLocation_for_gen();
         String outputPath = "";
         if (packageBase != null && packageBase.endsWith(fileSeparator)) {
-            if (javaLocation  != null && javaLocation.startsWith(fileSeparator)) {
+            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
                 outputPath = packageBase + javaLocation.substring(fileSeparator.length());
             } else {
                 outputPath = packageBase + javaLocation;
             }
         } else {
-            if (javaLocation  != null && javaLocation.startsWith(fileSeparator)) {
+            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
                 outputPath = packageBase + javaLocation;
             } else {
                 outputPath = packageBase + fileSeparator + javaLocation;
