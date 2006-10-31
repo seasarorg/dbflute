@@ -319,23 +319,6 @@ namespace ${glPackageBaseCommon} {
             return _mapListString.generateMap(property);
         }
 
-
-        /// <sumarry>
-        /// Get the property-value of fetchPageDefaultFetchSize.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public int GetSqlClauseDefaultFetchSize() {
-            return ${database.FetchPageDefaultFetchSize};
-        }
-
-        /// <sumarry>
-        /// is available use absolute when result set fetch-narrowing?
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public bool IsAvailableUseAbsoluteWhenResultSetFetchNarrowing() {
-            return ${database.isAvailableUseAbsoluteWhenResultSetFetchNarrowing()};
-        }
-
         /// <sumarry>
         /// Get the property-value of selectQueryTimeout.
         /// </sumarry>

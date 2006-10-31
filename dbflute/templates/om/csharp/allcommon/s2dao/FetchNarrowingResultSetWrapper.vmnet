@@ -33,9 +33,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         /** Fetch counter. */
         protected long _counter;
 
-        /** Is absolute used? */
-        protected bool _isAbsoluteUsed = ${database.isAvailableUseAbsoluteWhenResultSetFetchNarrowing()};
-
         /**
          * Constructor.
          * 
@@ -158,7 +155,7 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @return Determination.
          */
         protected bool IsCursorUsed() {
-            return _isAbsoluteUsed && IsCursorSupported(GetDataReader());
+            return IsCursorSupported(GetDataReader());
         }
 
         /**
@@ -168,7 +165,7 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @return Determation.
          */
         public static bool IsCursorSupported(System.Data.IDataReader dataReader) {
-            return false;// TODO: Is Cursor Unsupported???
+            return false;// Is Cursor Unsupported at C#?
         }
 
 #region IDataReader ÉÅÉìÉo
