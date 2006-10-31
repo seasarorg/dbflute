@@ -367,7 +367,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker) {
+        public ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker) {
             AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
             return invoker.InvokeSelectPage(new SelectPageSimpleCallback(${glAttachedCBArgsVariableName}, this));
         }

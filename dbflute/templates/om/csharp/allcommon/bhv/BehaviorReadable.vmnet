@@ -217,11 +217,13 @@ namespace ${glPackageBaseCommonBhv} {
     }
 
     public class ResultBeanBuilder {
-        
+
         protected ${glBehaviorReadableInterfaceName} _bhv;
+        public ResultBeanBuilder(${glBehaviorReadableInterfaceName} bhv) {
+            _bhv = bhv;
+        }
         public ${glBehaviorReadableInterfaceName} Bhv {
             get { return _bhv; }
-            set { _bhv = value; }
         }
 
         /**
@@ -231,7 +233,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param selectedList Selected list. (NotNull)
          * @return List-result-bean. (NotNull)
          */
-        protected ${glListResultBeanName} BuildListResultBean(${glOrderByBeanInterfaceName} ob, System.Collections.IList selectedList) {
+        public ${glListResultBeanName} BuildListResultBean(${glOrderByBeanInterfaceName} ob, System.Collections.IList selectedList) {
             ${glListResultBeanName} rb = new ${glListResultBeanName}();
             rb.TableDbName = this.Bhv.TableDbName;
             rb.AllRecordCount = selectedList.Count;
@@ -245,7 +247,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Paging result bean. (NotNull)</returns>
-        protected ${glPagingResultBeanName} BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, System.Collections.IList selectedList) {
+        public ${glPagingResultBeanName} BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, System.Collections.IList selectedList) {
             ${glPagingResultBeanName} rb = new ${glPagingResultBeanName}();
             rb.TableDbName = this.Bhv.TableDbName;
             rb.AllRecordCount = allRecordCount;
@@ -268,9 +270,11 @@ namespace ${glPackageBaseCommonBhv} {
     public class SelectPageSimpleInvoker : SelectPageInvoker {
 
         protected ${glBehaviorReadableInterfaceName} _bhv;
+        public SelectPageSimpleInvoker(${glBehaviorReadableInterfaceName} bhv) {
+            _bhv = bhv;
+        }
         public ${glBehaviorReadableInterfaceName} Bhv {
             get { return _bhv; }
-            set { _bhv = value; }
         }
 
         /// <summary>

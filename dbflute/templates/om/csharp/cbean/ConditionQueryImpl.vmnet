@@ -335,7 +335,7 @@ namespace ${glPackageCB} {
         public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             _${subQueryPropertyName} = subQuery;// for saving query-value.
-            RegisterInScopeSubQuery(subQuery, COL_${col.Name} "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            RegisterInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
             return this;
         }
 
@@ -361,7 +361,7 @@ namespace ${glPackageCB} {
         public ${myClassName} Set${subQueryPropertyNameInitCap}_AsInline(${reffererCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
-            RegisterInlineInScopeSubQuery(subQuery, COL_${col.Name} "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
+            RegisterInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
             return this;
         }
         #end
@@ -394,7 +394,7 @@ namespace ${glPackageCB} {
         public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             _${subQueryPropertyName} = subQuery;// for saving query-value.
-            RegisterExistsSubQuery(subQuery, COL_${col.Name} "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            RegisterExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
             return this;
         }
         #end
@@ -636,7 +636,7 @@ namespace ${glPackageCB} {
         public ${myClassName} Set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             _${subQueryPropertyName} = subQuery;// for saving query-value.
-            RegisterExistsSubQuery(subQuery, COL_${col.Name} "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            RegisterExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
             return this;
         }
         #end

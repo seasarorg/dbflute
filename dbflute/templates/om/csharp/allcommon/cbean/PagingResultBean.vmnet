@@ -193,7 +193,6 @@ namespace ${glPackageBaseCommonCBean} {
             int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupSize;
 
             System.Collections.IList resultList = new System.Collections.ArrayList();
-            int arrayIndex = 0;
             for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
                 resultList.Add(i);
             }

@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using ${glPackageBaseCommon};
+using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
 using ${myDBMetaPackageName};
