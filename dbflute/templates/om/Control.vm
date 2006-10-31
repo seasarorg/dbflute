@@ -956,8 +956,9 @@ targetdatabase = $targetDatabase
         $database.setupJavaDir_for_extended_cbean()
 
         #set ( $path = "${strings.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glTargetLanguage}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
-
+        #if (!$files.file(${generator.OutputPath},$path).exists())
+          $generator.parse("om/${glTargetLanguage}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
+        #end
       #end
     #end
     $database.debug("    }")
