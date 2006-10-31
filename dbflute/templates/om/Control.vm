@@ -150,7 +150,9 @@ targetdatabase = $targetDatabase
     #set ($glPackageExtendedCustomizeDao = "${database.extendedDaoPackage}.customize" )
     #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
     #set ($glPackageExtendedCustomizeEntity = "${database.extendedEntityPackage}.customize" )
+    #set ($glPackageBaseCB = "${database.conditionBeanPackage}.base")
     #set ($glPackageCB = "${database.conditionBeanPackage}")
+    #set ($glPackageCQ = "${database.conditionBeanPackage}.query")
     #set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
     #set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
     #set ($glPackageBaseSqlParameterBean = "${database.SqlParameterBeanPackage}.bsparam")
@@ -788,7 +790,16 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     ## Setup java directory for cbean.
-    $database.setupJavaDir_for_cbean()
+    $database.setupJavaDir_for_base_cbean()
+
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCB}))
+    $database.makeDirectory($path)
+
+    #set ($path = $strings.getPackageAsPath(${glPackageCQ}))
+    $database.makeDirectory($path)
+
+    ## Setup java directory for cbean.
+    $database.setupJavaDir_for_extended_cbean()
 
     #set ($path = $strings.getPackageAsPath(${glPackageCB}))
     $database.makeDirectory($path)
@@ -833,6 +844,7 @@ targetdatabase = $targetDatabase
         #set ($myExtendedObjectClassName = "${glProjectPrefix}${table.JavaName}")
         #set ($myExtendedEntityPackageName = "${glPackageExtendedEntity}")
 
+        #set ($myBaseConditionBeanClassName = "${myBaseObjectClassName}${glConditionBeanInitialName}")
         #set ($myConditionBeanClassName = "${myExtendedObjectClassName}${glConditionBeanInitialName}")
         #set ($myConditionQueryClassName = "${myExtendedObjectClassName}${glConditionQueryInitialName}")
 
@@ -931,14 +943,20 @@ targetdatabase = $targetDatabase
           $generator.parse("om/${glTargetLanguage}/exentity/ExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
         #end
 
-        ## Setup java directory for cbean.
-        $database.setupJavaDir_for_cbean()
+        ## Setup java directory for base-cbean.
+        $database.setupJavaDir_for_base_cbean()
+
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/cbean/BsConditionBean.${glTemplateFileExtension}", $path, "table", $table)
+
+        #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/cbean/ConditionQueryImpl.${glTemplateFileExtension}", $path, "table", $table)
+
+        ## Setup java directory for extended-cbean.
+        $database.setupJavaDir_for_extended_cbean()
 
         #set ( $path = "${strings.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glTargetLanguage}/cbean/ConditionBeanImpl.${glTemplateFileExtension}", $path, "table", $table)
-
-        #set ( $path = "${strings.getPackageAsPath(${glPackageCB})}${myConditionQueryClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glTargetLanguage}/cbean/ConditionQueryImpl.${glTemplateFileExtension}", $path, "table", $table)
+        $generator.parse("om/${glTargetLanguage}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
 
       #end
     #end

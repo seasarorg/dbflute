@@ -1,0 +1,11 @@
+package ${glPackageCB};
+
+#set ($myClassName = "${myConditionBeanClassName}")
+
+/**
+ * The condition-bean of ${table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glPackageBaseCB}.${myBaseConditionBeanClassName} {
+}

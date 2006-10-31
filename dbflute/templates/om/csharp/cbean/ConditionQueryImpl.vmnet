@@ -9,7 +9,7 @@ using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonSqlClause};
 
-namespace ${glPackageCB} {
+namespace ${glPackageCQ} {
 
     /// <summary>
     /// The condition-query of {table.Name}.
