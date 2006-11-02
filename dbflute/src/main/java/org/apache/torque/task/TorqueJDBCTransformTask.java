@@ -589,12 +589,12 @@ public class TorqueJDBCTransformTask extends Task {
         try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery("SELECT " + primaryKeyColumnName + " FROM " + tableName);
-            final ResultSetMetaData rsmd = rs.getMetaData();
+            final ResultSetMetaData md = rs.getMetaData();
 
-            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                final String currentColumnName = rsmd.getColumnName(i);
+            for (int i = 1; i <= md.getColumnCount(); i++) {
+                final String currentColumnName = md.getColumnName(i);
                 if (primaryKeyColumnName.equals(currentColumnName)) {
-                    return rsmd.isAutoIncrement(i);
+                    return md.isAutoIncrement(i);
                 }
             }
         } finally {

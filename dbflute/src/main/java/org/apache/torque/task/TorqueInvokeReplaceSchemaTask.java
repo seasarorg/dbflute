@@ -58,36 +58,95 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
 import org.apache.torque.helper.TorqueBuildProperties;
+import org.apache.torque.helper.jdbc.RunnerInformation;
+import org.apache.torque.helper.jdbc.SqlFileFireMan;
+import org.apache.torque.helper.jdbc.SqlFileRunnerExecute;
 
-public class TorqueInvokeReplaceSchemaTask extends TorqueAbstractPlaySQLTask {
+public class TorqueInvokeReplaceSchemaTask extends Task {
+
+    // =========================================================================================
+    //                                                                                 Attribute
+    //                                                                                 =========
+    /** DB driver. */
+    protected String _driver = null;
+
+    /** DB url. */
+    protected String _url = null;
+
+    /** User name. */
+    protected String _userId = null;
+
+    /** Password */
+    protected String _password = null;
+
+    // =========================================================================================
+    //                                                                                  Accessor
+    //                                                                                  ========
+    /**
+     * Set the JDBC driver to be used.
+     *
+     * @param driver driver class name
+     */
+    public void setDriver(String driver) {
+        this._driver = driver;
+    }
+
+    /**
+     * Set the DB connection url.
+     *
+     * @param url connection url
+     */
+    public void setUrl(String url) {
+        this._url = url;
+    }
+
+    /**
+     * Set the user name for the DB connection.
+     *
+     * @param userId database user
+     */
+    public void setUserId(String userId) {
+        this._userId = userId;
+    }
+
+    /**
+     * Set the password for the DB connection.
+     *
+     * @param password database password
+     */
+    public void setPassword(String password) {
+        this._password = password;
+    }
+
+    // =========================================================================================
+    //                                                                                   Execute
+    //                                                                                   =======
+    /**
+     * Load the sql file and then execute it.
+     *
+     * @throws BuildException
+     */
+    public void execute() throws BuildException {
+        final RunnerInformation runInfo = new RunnerInformation();
+        runInfo.setDriver(_driver);
+        runInfo.setUrl(_url);
+        runInfo.setUser(_userId);
+        runInfo.setPassword(_password);
+        runInfo.setAutoCommit(TorqueBuildProperties.getInstance().isInvokeReplaceSchemaAutoCommit());
+        runInfo.setErrorContinue(TorqueBuildProperties.getInstance().isInvokeReplaceSchemaErrorContinue());
+        runInfo.setRollbackOnly(TorqueBuildProperties.getInstance().isInvokeReplaceSchemaRollbackOnly());
+
+        final SqlFileFireMan fireMan = new SqlFileFireMan();
+        fireMan.execute(new SqlFileRunnerExecute(runInfo), getSqlFileList());
+    }
 
     protected List<File> getSqlFileList() {
         final String sqlFile = TorqueBuildProperties.getInstance().getInvokeReplaceSchemaSqlFile();
         final List<File> fileList = new ArrayList<File>();
         fileList.add(new File(sqlFile));
         return fileList;
-    }
-
-    protected boolean isAutoCommit() {
-        return TorqueBuildProperties.getInstance().isInvokeReplaceSchemaAutoCommit();
-    }
-
-    protected boolean isRollbackOnly() {
-        return TorqueBuildProperties.getInstance().isInvokeReplaceSchemaRollbackOnly();
-    }
-    
-    protected boolean isErrorContinue() {
-        return TorqueBuildProperties.getInstance().isInvokeReplaceSchemaErrorContinue();
-    }
-    
-    // TODO: Modify Encoding and Delimiter HardCode.
-    
-    protected String getEncoding() {
-        return null;   
-    }
-    
-    protected String getDelimiter() {
-        return ";";
     }
 }

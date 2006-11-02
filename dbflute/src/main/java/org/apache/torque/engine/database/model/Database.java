@@ -719,11 +719,11 @@ public class Database {
     }
 
     public String getBasePrefix() {
-        return getProperties().getBasePrefix();
+        return "Bs";
     }
 
     public String getBaseSuffixForEntity() {
-        return getProperties().getBaseSuffixForEntity();
+        return "";
     }
 
     // ===============================================================================
@@ -1606,6 +1606,14 @@ public class Database {
     }
 
     public void setupJavaDir_for_extendedCustomizeDao() {
+        setupJavaDir_for_extended();
+    }
+    
+    public void setupJavaDir_for_baseCustomizeEntity() {
+        setupJavaDir_for_extended();
+    }
+
+    public void setupJavaDir_for_extendedCustomizeEntity() {
         setupJavaDir_for_extended();
     }
 

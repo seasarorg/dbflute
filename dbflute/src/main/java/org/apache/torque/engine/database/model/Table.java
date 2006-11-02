@@ -385,6 +385,16 @@ public class Table implements IDMethod {
         return names;
     }
 
+    protected boolean _isJavaNameConvert = true;
+
+    public void setJavaNameConvertOff() {
+        _isJavaNameConvert = false;
+    }
+
+    public boolean isJavaNameConvert() {
+        return _isJavaNameConvert;
+    }
+
     // ============================================================================
     //                                                                     Referrer
     //                                                                     ========
@@ -419,7 +429,7 @@ public class Table implements IDMethod {
     public boolean hasSingleKeyReferrer() {
         return !getSingleKeyReferrers().isEmpty();
     }
-    
+
     /**
      * Get list of references to this column.
      * 
@@ -442,7 +452,7 @@ public class Table implements IDMethod {
         }
         return _singleKeyRefferrers;
     }
-    
+
     /**
      * Has refferer?
      * 
@@ -452,7 +462,6 @@ public class Table implements IDMethod {
         return (getReferrers() != null && !getReferrers().isEmpty());
     }
 
-    
     /**
      * Returns an comma string containing all the foreign table name.
      * 
@@ -470,7 +479,7 @@ public class Table implements IDMethod {
         sb.delete(0, ", ".length());
         return sb.toString();
     }
-    
+
     /**
      * Returns an comma string containing all the foreign table name.
      * 
@@ -489,7 +498,7 @@ public class Table implements IDMethod {
         sb.delete(0, ", ".length());
         return sb.toString();
     }
-    
+
     /**
      * Returns an comma string containing all the foreign property name.
      * 
@@ -560,7 +569,7 @@ public class Table implements IDMethod {
         sb.delete(0, ", ".length());
         return sb.toString();
     }
-    
+
     /**
      * Returns an comma string containing all the foreign table name.
      * 
@@ -579,7 +588,7 @@ public class Table implements IDMethod {
         sb.delete(0, ", ".length());
         return sb.toString();
     }
-    
+
     /**
      * Returns an comma string containing all the foreign property name.
      * 
@@ -597,7 +606,7 @@ public class Table implements IDMethod {
         sb.delete(0, ", ".length());
         return sb.toString();
     }
-    
+
     /**
      * A list of tables referenced by foreign keys in this table
      *
@@ -628,30 +637,32 @@ public class Table implements IDMethod {
         }
     }
 
-    public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList, List<String> foreignColumnNameList) {
-        
+    public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList) {
+
         final Set<String> localColumnNameSet = new HashSet<String>(localColumnNameList);
         final Set<String> foreignColumnNameSet = new HashSet<String>(foreignColumnNameList);
-        
+
         final ForeignKey[] fkArray = getForeignKeys();
         for (final ForeignKey key : fkArray) {
             if (key.getForeignTableName().equals(foreignTableName)) {
                 final List<String> currentLocalColumnNameList = key.getLocalColumns();
                 if (currentLocalColumnNameList == null || currentLocalColumnNameList.isEmpty()) {
                     String msg = "The foreignKey did not have local column name list: " + currentLocalColumnNameList;
-                    msg = msg +" key.getForeignTableName()=" + key.getForeignTableName();
+                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
                     throw new IllegalStateException(msg);
                 }
                 final List<String> currentForeignColumnNameList = key.getForeignColumns();
                 if (currentForeignColumnNameList == null || currentForeignColumnNameList.isEmpty()) {
-                    String msg = "The foreignKey did not have foreign column name list: " + currentForeignColumnNameList;
-                    msg = msg +" key.getForeignTableName()=" + key.getForeignTableName();
+                    String msg = "The foreignKey did not have foreign column name list: "
+                            + currentForeignColumnNameList;
+                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
                     throw new IllegalStateException(msg);
                 }
-                
+
                 final Set<String> currentLocalColumnNameSet = new HashSet<String>(currentLocalColumnNameList);
                 final Set<String> currentForeignColumnNameSet = new HashSet<String>(currentForeignColumnNameList);
-                
+
                 if (localColumnNameSet.equals(currentLocalColumnNameSet)) {
                     if (foreignColumnNameSet.equals(currentForeignColumnNameSet)) {
                         return true;
@@ -661,7 +672,7 @@ public class Table implements IDMethod {
         }
         return false;
     }
-    
+
     /**
      * Has foreign key?
      * 
@@ -780,7 +791,11 @@ public class Table implements IDMethod {
      */
     public String getJavaName() {
         if (_javaName == null) {
-            _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
+            if (isJavaNameConvert()) {
+                _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
+            } else {
+                _javaName = getName();
+            }
         }
         return _javaName;
     }
@@ -791,7 +806,7 @@ public class Table implements IDMethod {
     public String getUncapitalisedJavaName() {
         return getDatabase().convertUncapitalisedJavaNameByJdbcNameAsTable(getName());
     }
-    
+
     /**
      * Get variable name to use in Java sources (= uncapitalised java name)
      */
@@ -965,7 +980,6 @@ public class Table implements IDMethod {
         return _columnList.size();
     }
 
-
     /**
      * Returns a Collection of parameters relevant for the chosen
      * id generation method.
@@ -1019,7 +1033,7 @@ public class Table implements IDMethod {
         }
         return tbls;
     }
-    
+
     public List<Unique> getUniqueList() {
         return _unices;
     }
@@ -1083,7 +1097,6 @@ public class Table implements IDMethod {
         return _columnList.contains(col);
     }
 
-
     /**
      * Returns true if the table contains a specified column
      *
@@ -1093,7 +1106,7 @@ public class Table implements IDMethod {
     public boolean containsColumn(String name) {
         return _columnsByName.containsKey(name);
     }
-    
+
     /**
      * Returns true if the table contains a specified column
      *
@@ -1108,7 +1121,7 @@ public class Table implements IDMethod {
         }
         return true;
     }
-    
+
     // ============================================================================
     //                                                                     Database
     //                                                                     ========
@@ -1238,7 +1251,7 @@ public class Table implements IDMethod {
         }
         return pk;
     }
-    
+
     public Column getPrimaryKeyAsOne() {
         if (getPrimaryKey().size() != 1) {
             String msg = "This method is for only-one primary-key: getPrimaryKey().size()=" + getPrimaryKey().size();
@@ -1247,15 +1260,15 @@ public class Table implements IDMethod {
         }
         return getPrimaryKey().get(0);
     }
-    
+
     public String getPrimaryKeyNameAsOne() {
         return getPrimaryKeyAsOne().getName();
     }
-    
+
     public String getPrimaryKeyJavaNameAsOne() {
         return getPrimaryKeyAsOne().getJavaName();
     }
-    
+
     public String getPrimaryKeyJavaNativeAsOne() {
         return getPrimaryKeyAsOne().getJavaNative();
     }
@@ -1426,7 +1439,7 @@ public class Table implements IDMethod {
     public boolean hasOnlyOnePrimaryKey() {
         return (getPrimaryKey().size() == 1);
     }
-    
+
     /**
      * Determine whether this table has two or more primary keys.
      *
@@ -1553,7 +1566,7 @@ public class Table implements IDMethod {
     public String getCustomizeDaoArgument(String methodName) {
         return _customizeDaoMethodMap.get(methodName);
     }
-    
+
     public String getCustomizeDaoArgumentVariableCommaString(String methodName) {
         return getDatabase().getCustomizeDaoComponentMethodArgumentVariableCommaString(getName(), methodName);
     }
@@ -1667,7 +1680,7 @@ public class Table implements IDMethod {
      * @return Determination.
      */
     public boolean isUseIdentity() {
-        
+
         // It gives priority to auto-increment information of JDBC.
         final Column[] columnArray = getColumns();
         for (Column column : columnArray) {
@@ -1675,7 +1688,7 @@ public class Table implements IDMethod {
                 return true;
             }
         }
-        
+
         return getDatabase().getIdentityDefinitionMap().containsKey(getName());
     }
 
@@ -1688,7 +1701,7 @@ public class Table implements IDMethod {
         if (!isUseIdentity()) {
             return "";
         }
-        
+
         // It gives priority to auto-increment information of JDBC.
         final Column[] columnArray = getColumns();
         for (Column column : columnArray) {
@@ -1696,7 +1709,7 @@ public class Table implements IDMethod {
                 return column.getUncapitalisedJavaName();
             }
         }
-        
+
         final String columnName = (String) getDatabase().getIdentityDefinitionMap().get(getName());
         final Column col = getColumn(columnName);
         if (col == null) {
@@ -1756,7 +1769,7 @@ public class Table implements IDMethod {
     public String getUpdateDateUncapitalisedJavaName() {
         return StringUtils.uncapitalise(getUpdateDateJavaName());
     }
-    
+
     /**
      * Get the value of update-date as uncapitalised java name.
      * 

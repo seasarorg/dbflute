@@ -140,13 +140,6 @@ public class Column {
         this._name = name;
     }
 
-    /**
-     * Return a comma delimited string listing the specified columns.
-     *
-     * @param columns Either a list of <code>Column</code> objects, or
-     * a list of <code>String</code> objects with column names.
-     * @return Comma string of all columns.
-     */
     public static String makeList(List columns) {
         Object obj = columns.get(0);
         boolean isColumnList = (obj instanceof Column);
@@ -164,11 +157,6 @@ public class Column {
         return buf.toString();
     }
 
-    /**
-     * Imports a column from an XML specification
-     * 
-     * @param attrib Attributes.
-     */
     public void loadFromXML(Attributes attrib) {
         //Name
         _name = attrib.getValue("name");
@@ -220,62 +208,38 @@ public class Column {
         _description = attrib.getValue("description");
     }
 
-    /**
-     * Returns table.column
-     * 
-     * @return Fully qualified name.
-     */
     public String getFullyQualifiedName() {
         return (_parentTable.getName() + '.' + _name);
     }
 
-    /**
-     * Get the name of the column
-     */
     public String getName() {
         return _name;
     }
 
-    /**
-     * Set the name of the column
-     */
     public void setName(String newName) {
         _name = newName;
     }
 
-    /**
-     * Get the description for the Table
-     */
     public String getDescription() {
         return _description;
     }
 
-    /**
-     * Set the description for the Table
-     *
-     * @param newDescription description for the Table
-     */
     public void setDescription(String newDescription) {
         _description = newDescription;
     }
 
-    /**
-     * Get name to use in Java sources to build method names.
-     * 
-     * @return the capitalised javaName
-     */
     public String getJavaName() {
         if (_javaName == null) {
-            _javaName = getTable().getDatabase().convertJavaNameByJdbcNameAsColumn(getName());
+            _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
         }
         return _javaName;
     }
-
+    
     /**
      * Get variable name to use in Java sources (= uncapitalised java name)
      */
     public String getUncapitalisedJavaName() {
-        return getTable().getDatabase().convertUncapitalisedJavaNameByJdbcNameAsColumn(getName());
+        return getDatabaseChecked().convertUncapitalisedJavaNameByJdbcNameAsColumn(getName());
     }
 
     /**
@@ -616,6 +580,24 @@ public class Column {
                         .equals("CHAR"));
     }
 
+    // =========================================================================================
+    //                                                                            Checked Getter
+    //                                                                            ==============
+    protected Database getDatabaseChecked() {
+        final Table tbl = getTable();
+        if (tbl == null) {
+            throw new IllegalStateException("getTable() should not be null at " + getName());
+        }
+        final Database db = tbl.getDatabase();
+        if (db == null) {
+            throw new IllegalStateException("getTable().getDatabase() should not be null at " + getName());
+        }
+        return db;
+    }
+    
+    // =========================================================================================
+    //                                                                                toString()
+    //                                                                                ==========
     /**
      * String representation of the column. This is an xml representation.
      *

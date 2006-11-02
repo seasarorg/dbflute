@@ -1,14 +1,18 @@
 #set ($myClassName = "${myBaseObjectClassName}")
 
 package ${myBaseEntityPackageName};
+#if (${table.hasAllCommonColumn()})
+
+import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
+#else
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+#end
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${myDBMetaPackageName}.${myDBMetaClassName};
 
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
-
 #if (${database.isAvailableEntityLazyLoad()})
   #if (${table.hasRelation()})
 
@@ -16,11 +20,10 @@ import ${glPackageBaseCommon}.${glLazyLoadContainerClassName};
 import ${myExtendedDaoPackageName}.*;
   #end
 #end
+
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
   #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
-
-import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
 #else
   #set ($myEntityInterfaceName = ${glEntityInterfaceName})
 #end
@@ -609,9 +612,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * ${database.ImplementComment}
      * 
      * @param primaryKeyMap Primary key map. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glEntityInterfaceName} acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
+    public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
         if (primaryKeyMap == null) {
             String msg = "The argument[primaryKeyMap] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -665,11 +667,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
             }
         }
   #end
-
-        return this;
 #else
 
-        return acceptColumnValueMap(primaryKeyMap);
+        acceptColumnValueMap(primaryKeyMap);
 #end
 
     }
@@ -678,9 +678,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * ${database.ImplementComment}
      * 
      * @param primaryKeyMapString Primary-key map-string. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glEntityInterfaceName} acceptPrimaryKeyMapString(String primaryKeyMapString) {
+    public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
         if (primaryKeyMapString == null) {
             String msg = "The argument[primaryKeyMapString] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -700,16 +699,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         mapListString.setEndBrace(MAP_STRING_END_BRACE);
         mapListString.setEqual(MAP_STRING_EQUAL);
         mapListString.setDelimiter(MAP_STRING_DELIMITER);
-        return acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+        acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
     }
 
     /**
      * ${database.ImplementComment}
      * 
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glEntityInterfaceName} acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
+    public void acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
         if (columnValueMap == null) {
             String msg = "The argument[columnValueMap] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -759,16 +757,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         }
   #end
 
-        return this;
     }
 
     /**
      * ${database.ImplementComment}
      * 
      * @param columnValueMapString Column-value map-string. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glEntityInterfaceName} acceptColumnValueMapString(String columnValueMapString) {
+    public void acceptColumnValueMapString(String columnValueMapString) {
         if (columnValueMapString == null) {
             String msg = "The argument[columnValueMapString] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -788,7 +784,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         mapListString.setEndBrace(MAP_STRING_END_BRACE);
         mapListString.setEqual(MAP_STRING_EQUAL);
         mapListString.setDelimiter(MAP_STRING_DELIMITER);
-        return acceptColumnValueMap(mapListString.generateMap(columnValueMapString));
+        acceptColumnValueMap(mapListString.generateMap(columnValueMapString));
     }
 
     protected void checkTypeString(Object value, String propertyName, String typeName) {

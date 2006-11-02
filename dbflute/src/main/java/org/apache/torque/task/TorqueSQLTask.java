@@ -6,6 +6,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.transform.XmlToAppData;
+import org.apache.torque.task.bs.TorqueAbstractDbMetaTexenTask;
 import org.apache.velocity.context.Context;
 
 /**

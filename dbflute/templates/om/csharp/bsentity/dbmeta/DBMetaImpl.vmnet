@@ -8,10 +8,15 @@ using System.Text;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
-using ${myExtendedDaoPackageName};
 using ${myExtendedEntityPackageName};
+#if (${isExistDao})
+
+using ${myExtendedDaoPackageName};
+#end
+#if (${isExistConditionBean})
 using ${glPackageCB};
 
+#end
 namespace ${myDBMetaPackageName} {
 
     /// <summary>
@@ -45,11 +50,13 @@ namespace ${myDBMetaPackageName} {
     /// </summary>
     public class ${myClassName} : ${glDBMetaAbstractName} {
 
-        /// <summary>The type of dao.</summary>
-        public static readonly Type DAO_TYPE = typeof(${myExtendedDaoClassName});
-
         /// <summary>The type of entity.</summary>
         public static readonly Type ENTITY_TYPE = typeof(${myExtendedObjectClassName});
+#if (${isExistDao})
+
+        /// <summary>The type of dao.</summary>
+        public static readonly Type DAO_TYPE = typeof(${myExtendedDaoClassName});
+#end
 #if (${isExistConditionBean})
 
         /// <summary>The type of condition-bean.</summary>
@@ -302,19 +309,26 @@ namespace ${myDBMetaPackageName} {
         /**
          * ${database.ImplementComment}
          * 
-         * @return The type of dao. (NotNull)
+         * @return The type of entity. (NotNull)
          */
-        public override Type GetDaoType() {
-            return DAO_TYPE;
+        public override Type GetEntityType() {
+            return ENTITY_TYPE;
         }
 
         /**
          * ${database.ImplementComment}
          * 
-         * @return The type of entity. (NotNull)
+         * @return The type of dao. (NotNull)
          */
-        public override Type GetEntityType() {
-            return ENTITY_TYPE;
+        public override Type GetDaoType() {
+#if (${isExistDao})
+
+            return DAO_TYPE;
+#else
+
+            String msg = "The entity does not have dao. So this method is invalid.";
+            throw new SystemException(msg + " dbmeta=" + ToString());
+#end
         }
 
         /**
@@ -329,7 +343,7 @@ namespace ${myDBMetaPackageName} {
 #else
 
             String msg = "The entity does not have condition-bean. So this method is invalid.";
-           throw new SystemException(msg + " dbmeta=" + ToString());
+            throw new SystemException(msg + " dbmeta=" + ToString());
 #end
         }
 

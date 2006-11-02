@@ -422,14 +422,6 @@ public final class TorqueBuildProperties {
         return stringProp("torque.projectPrefix", "");
     }
 
-    public String getBasePrefix() {
-        return "Bs";
-    }
-
-    public String getBaseSuffixForEntity() {
-        return "";
-    }
-
     // ===============================================================================
     //                                               Properties - DaoDicon Information
     //                                               =================================

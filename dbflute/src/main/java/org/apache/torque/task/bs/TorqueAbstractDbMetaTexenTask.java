@@ -1,4 +1,4 @@
-package org.apache.torque.task;
+package org.apache.torque.task.bs;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import org.apache.velocity.texen.ant.TexenTask;
  * 
  * @author mkubo
  */
-public abstract class TorqueAbstractDbMetaTexenTask extends TexenTask {
+public abstract class TorqueAbstractDbMetaTexenTask extends TorqueTexenTask {
 
     /** Log instance. */
     public static final Log _log = LogFactory.getLog(TorqueAbstractDbMetaTexenTask.class);
@@ -49,8 +49,6 @@ public abstract class TorqueAbstractDbMetaTexenTask extends TexenTask {
     protected String _sqldbmap;
 
     private String _basePathToDbProps;
-
-    private String _targetDatabase;
 
     private String _targetPackage;
 
@@ -87,14 +85,6 @@ public abstract class TorqueAbstractDbMetaTexenTask extends TexenTask {
         _filesets.add(set);
     }
 
-    public String getTargetDatabase() {
-        return _targetDatabase;
-    }
-
-    public void setTargetDatabase(String v) {
-        _targetDatabase = v;
-    }
-
     public String getTargetPackage() {
         return _targetPackage;
     }
@@ -109,39 +99,6 @@ public abstract class TorqueAbstractDbMetaTexenTask extends TexenTask {
 
     public void setBasePathToDbProps(String v) {
         _basePathToDbProps = v;
-    }
-
-    public void setContextProperties(String file) {
-        try {
-            // /------------------------------------------------------------
-            // Initialize internal context properties as ExtendedProperties.
-            //   This property is used by Velocity Framework. 
-            // -------/
-            super.setContextProperties(file);
-            {
-                final Hashtable env = super.getProject().getProperties();
-                for (final Iterator ite = env.keySet().iterator(); ite.hasNext();) {
-                    final String key = (String) ite.next();
-                    if (key.startsWith("torque.")) {
-                        String newKey = key.substring("torque.".length());
-                        for (int j = newKey.indexOf("."); j != -1; j = newKey.indexOf(".")) {
-                            newKey = newKey.substring(0, j) + StringUtils.capitalise(newKey.substring(j + 1));
-                        }
-                        contextProperties.setProperty(newKey, (String) env.get(key));
-                    }
-                }
-            }
-
-            // /---------------------------------------------------------------------------------------------------
-            // Initialize torque properties as Properties and set up singleton class that saves 'build.properties'.
-            //   This property is used by You. 
-            // -------/
-            final Properties prop = TorqueTaskUtil.getBuildProperties(file, super.project);
-            TorqueBuildProperties.getInstance().setContextProperties(prop);
-
-        } catch (Exception e) {
-            _log.warn("setContextProperties() threw the exception!!!", e);
-        }
     }
 
     public Context initControlContext() throws Exception {
@@ -184,7 +141,7 @@ public abstract class TorqueAbstractDbMetaTexenTask extends TexenTask {
         _context = new VelocityContext();
         _context.put("dataModels", _dataModels);
         _context.put("databaseNames", _databaseNames);
-        _context.put("targetDatabase", _targetDatabase);
+        _context.put("targetDatabase", getTargetDatabase());
         _context.put("targetPackage", _targetPackage);
         return _context;
     }

@@ -1,0 +1,217 @@
+
+
+targetdatabase = $targetDatabase
+
+
+#set ( $dbprops = $properties.load("sql/base/$targetDatabase/db.props") )
+#include ( "sql/base/$targetDatabase/db.props" )
+
+##
+## Loop by data-model.
+##
+#foreach ($dataModel in $dataModels)
+
+  ##
+  ## Loop by database.
+  ##
+  #foreach ($database in $dataModel.Databases)
+
+    ## ------------------------------------------------------------------
+    ##                                                    Global-Paramter
+    ##                                                    ---------------
+    ## [Language]
+    #set ($glTargetLanguage = ${database.TargetLanguage})
+
+    ## [Extension]
+    #set ($glTemplateFileExtension = ${database.TemplateFileExtension})
+    #set ($glClassFileExtension = ${database.ClassFileExtension})
+
+    ## [Prefix-and-Suffix]
+    #set ($glProjectPrefix = ${database.ProjectPrefix})
+    #set ($glBasePrefix = ${database.BasePrefix})
+    #set ($glBaseSuffixForEntity = ${database.BaseSuffixForEntity})
+
+    ## [Dicon]
+    #set ($glDaoDiconNamespace = "${database.DaoDiconNamespace}")
+    #set ($glDaoDiconPackageName = "${database.DaoDiconPackageName}")
+    #set ($glDaoDiconFileName = "${database.DaoDiconFileName}")
+    #set ($glJ2EEDiconResourceName = "${database.J2eeDiconResourceName}")
+
+    ## [Common-Behavior]
+    #set ($glBehaviorReadableAbstractName = "${glProjectPrefix}AbstractBehaviorReadable")
+    #set ($glBehaviorWritableAbstractName = "${glProjectPrefix}AbstractBehaviorWritable")
+    #set ($glBehaviorReadableInterfaceName = "${glProjectPrefix}BehaviorReadable")
+    #set ($glBehaviorWritableInterfaceName = "${glProjectPrefix}BehaviorWritable")
+
+    ## [Common-Dao]
+    #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
+    #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
+
+    ## [Common-Entity]
+    #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
+    #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
+
+    ## [Common-DaoSelector]
+    #set ($glDaoSelectorInterfaceName = "${glProjectPrefix}DaoSelector")
+    #set ($glCacheDaoSelectorName = "${glProjectPrefix}CacheDaoSelector")
+
+    ## [ConditionBean]
+    #set ($glFetchNarrowingBeanInterfaceName = "${glProjectPrefix}FetchNarrowingBean")
+    #set ($glSimplePagingBeanName = "${glProjectPrefix}SimplePagingBean")
+    #set ($glSimpleOrderByBeanName = "${glProjectPrefix}SimpleOrderByBean")
+    #set ($glConditionBeanInterfaceName = "${glProjectPrefix}ConditionBean")
+    #set ($glConditionQueryInterfaceName = "${glProjectPrefix}ConditionQuery")
+    #set ($glOrderByBeanInterfaceName = "${glProjectPrefix}OrderByBean")
+    #set ($glPagingBeanInterfaceName = "${glProjectPrefix}PagingBean")
+    #set ($glSelectResourceInterfaceName = "${glProjectPrefix}SelectResource")
+    #set ($glFetchNarrowingBeanContextName = "${glProjectPrefix}FetchNarrowingBeanContext")
+    #set ($glPagingResultBeanName = "${glProjectPrefix}PagingResultBean")
+    #set ($glListResultBeanName = "${glProjectPrefix}ListResultBean")
+    #set ($glConditionBeanContextName = "${glProjectPrefix}ConditionBeanContext")
+    #set ($glConditionBeanAbstractName = "${glProjectPrefix}AbstractConditionBean")
+    #set ($glConditionQueryAbstractName = "${glProjectPrefix}AbstractConditionQuery")
+    #set ($glConditionKeyName = "${glProjectPrefix}ConditionKey")
+    #set ($glConditionValueName = "${glProjectPrefix}ConditionValue")
+    #set ($glSqlClauseName = "${glProjectPrefix}SqlClause")
+    #set ($glSqlClauseInterfaceName = "${glProjectPrefix}SqlClause")
+    #set ($glSqlClauseAbstractName = "${glProjectPrefix}AbstractSqlClause")
+
+    #set ($glOrderByClauseName = "${glProjectPrefix}OrderByClause")
+    #set ($glOrderByElementName = "${glProjectPrefix}OrderByElement")
+
+    #set ($glConditionBeanInitialName = "CB")
+    #set ($glConditionQueryInitialName = "CQ")
+    #set ($glAttachedCBArgsVariableName = "cb")
+
+    ## [DBMeta]
+    #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
+    #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
+    #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
+
+    ## [Exception]
+    #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
+    #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
+    #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
+    #set ($glSelectedCountExceedMaxCountExceptionName = "${glProjectPrefix}SelectedCountExceedMaxCountException")
+
+    ## [Helper]
+    #set ($glMapListStringName = "${glProjectPrefix}MapListString")
+    #set ($glMapListStringImplName = "${glProjectPrefix}MapListStringImpl")
+    #set ($glMapStringBuilderName = "${glProjectPrefix}MapStringBuilder")
+    #set ($glMapStringBuilderImplName = "${glProjectPrefix}MapStringBuilderImpl")
+
+    ## [Interceptor]
+    #set ($glCommonColumnSetupAbstractInterceptor = "${glProjectPrefix}CommonColumnSetupAbstractInterceptor")
+    #set ($glCommonColumnSetupBeforeInsertInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeInsertInterceptor")
+    #set ($glCommonColumnSetupBeforeUpdateInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeUpdateInterceptor")
+    #set ($glCommonColumnSetupBeforeDeleteInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeDeleteInterceptor")
+
+    ## [ExtendedS2DaoClass]
+    #set ($glSelectDynamicCommand = "${glProjectPrefix}S2DaoSelectDynamicCommand")
+    #set ($glDaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
+    #set ($glDaoMetaDataExtension = "${glProjectPrefix}S2DaoMetaDataExtension")
+    #set ($glDaoMetaDataFactoryImpl = "${glProjectPrefix}S2DaoMetaDataFactoryImpl")
+    #set ($glDaoStatementFactory = "${glProjectPrefix}S2DaoStatementFactory")
+    #set ($glFetchNarrowingResultSetFactory = "${glProjectPrefix}FetchNarrowingResultSetFactory")
+    #set ($glFetchNarrowingResultSetWrapper = "${glProjectPrefix}FetchNarrowingResultSetWrapper")
+
+    ## [LazyLoadContainer]
+    #set ($glLazyLoadContainerClassName = "${glProjectPrefix}LazyLoadContainer")
+
+    ## [GenMetaData]
+    #set ($glGenMetaDataClassName = "${glProjectPrefix}GenMetaData")
+
+    ## [ClassificationDefinition]
+    #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
+
+    ## [Package]
+    #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
+    #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
+    #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
+    #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
+    #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
+    #set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.cbean.cvalue")
+    #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
+    #set ($glPackageBaseCommonException = "${database.baseCommonPackage}.exception")
+    #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
+    #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
+    #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
+    #set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
+    #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
+    #set ($glPackageBaseCustomizeDao = "${database.baseDaoPackage}.customize" )
+    #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
+    #set ($glPackageBaseCustomizeEntity = "${database.baseEntityPackage}.customize" )
+    #set ($glPackageExtendedBhv = "${database.extendedBehaviorPackage}")
+    #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
+    #set ($glPackageExtendedCustomizeDao = "${database.extendedDaoPackage}.customize" )
+    #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
+    #set ($glPackageExtendedCustomizeEntity = "${database.extendedEntityPackage}.customize" )
+    #set ($glPackageBaseCB = "${database.conditionBeanPackage}.bs")
+    #set ($glPackageCB = "${database.conditionBeanPackage}")
+    #set ($glPackageCQ = "${database.conditionBeanPackage}.cq")
+    #set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
+    #set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
+    #set ($glPackageBaseSqlParameterBean = "${database.SqlParameterBeanPackage}.bsparam")
+    #set ($glPackageExtendedSqlParameterBean = "${database.SqlParameterBeanPackage}.exparam")
+    #set ($glPackageArgumentBean = "${database.ArgumentBeanPackage}")
+
+    ## [Other]
+    #set ($glParentVariablePrefix = "_parent")
+    #set ($glChildrenVariablePrefix = "_children")
+
+    ## -----------------------------------------------------------------------------------------------------
+    ##                                                                                    Parse cutomize dao
+    ##                                                                                    ------------------
+    ## Setup java directory.
+    $database.setupJavaDir_for_baseCustomizeEntity()
+
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCustomizeEntity}))
+    $database.makeDirectory($path)
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCustomizeDBMeta}))
+    $database.makeDirectory($path)
+
+    ## Setup java directory.
+    $database.setupJavaDir_for_extendedCustomizeEntity()
+
+    #set ($path = $strings.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
+    $database.makeDirectory($path)
+
+    $database.debug("public void parseCustomizeEntity() {")
+    $database.debug("    final List<String> tableNameList = getCustomizeTableList();")
+    $database.debug("    for (String tableName : tableNameList) {")
+    #foreach ($table in $database.TableList)
+      #set ($myBaseObjectClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}${glBaseSuffixForEntity}")
+      #set ($myBaseEntityPackageName = "${glPackageBaseCustomizeEntity}")
+      #set ($myExtendedObjectClassName = "${glProjectPrefix}${table.JavaName}")
+      #set ($myExtendedEntityPackageName = "${glPackageExtendedCustomizeEntity}")
+      #set ($myDBMetaClassName = "${glProjectPrefix}${table.JavaName}Dbm")
+      #set ($myDBMetaPackageName = "${glPackageBaseCustomizeDBMeta}")
+
+      #set ($isExistDao = false)
+      #set ($isExistConditionBean = false)
+
+      ## Setup java directory.
+      $database.setupJavaDir_for_baseCustomizeEntity()
+
+      $database.debug("        parseCustomizeBaseEntity(tableName); // ${myBaseObjectClassName}")
+      #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("        parseCustomizeDBMeta(tableName); // ${myDBMetaClassName}")
+      #set ( $path = "${strings.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
+
+      ## Setup java directory.
+      $database.setupJavaDir_for_extendedCustomizeEntity()
+
+      #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+      #if (!$files.file(${generator.OutputPath},$path).exists())
+        $database.debug("        parseArgumentExtendedEntity(tableName); // ${myExtendedObjectClassName}")
+        $generator.parse("om/${glTargetLanguage}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
+      #end
+
+    #end
+    $database.debug("    }")
+    $database.debug("}")
+  #end
+#end

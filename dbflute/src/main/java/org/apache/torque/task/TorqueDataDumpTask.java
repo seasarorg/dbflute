@@ -64,6 +64,7 @@ import java.util.NoSuchElementException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Project;
+import org.apache.torque.task.bs.TorqueAbstractDbMetaTexenTask;
 import org.apache.velocity.context.Context;
 
 import com.workingdogs.village.QueryDataSet;

@@ -55,66 +55,96 @@ package org.apache.torque.task;
  */
 
 import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
 import org.apache.torque.helper.TorqueBuildProperties;
+import org.apache.torque.helper.jdbc.RunnerInformation;
+import org.apache.torque.helper.jdbc.SqlFileFireMan;
+import org.apache.torque.helper.jdbc.SqlFileGetter;
+import org.apache.torque.helper.jdbc.SqlFileRunnerExecute;
 
-public class TorqueInvokeSqlDirectoryTask extends TorqueAbstractPlaySQLTask {
+public class TorqueInvokeSqlDirectoryTask extends Task {
 
-    protected final FileFilter _sqlFileFileter = new FileFilter() {
-        public boolean accept(File file) {
-            return file.getName().toLowerCase().endsWith(".sql");
-        }
-    };
+    // =========================================================================================
+    //                                                                                 Attribute
+    //                                                                                 =========
+    /** DB driver. */
+    protected String _driver = null;
 
-    protected final FileFilter _directoryOnlyFilter = new FileFilter() {
-        public boolean accept(File file) {
-            return file.isDirectory();
-        }
-    };
+    /** DB url. */
+    protected String _url = null;
+
+    /** User name. */
+    protected String _userId = null;
+
+    /** Password */
+    protected String _password = null;
+
+    // =========================================================================================
+    //                                                                                  Accessor
+    //                                                                                  ========
+    /**
+     * Set the JDBC driver to be used.
+     *
+     * @param driver driver class name
+     */
+    public void setDriver(String driver) {
+        this._driver = driver;
+    }
+
+    /**
+     * Set the DB connection url.
+     *
+     * @param url connection url
+     */
+    public void setUrl(String url) {
+        this._url = url;
+    }
+
+    /**
+     * Set the user name for the DB connection.
+     *
+     * @param userId database user
+     */
+    public void setUserId(String userId) {
+        this._userId = userId;
+    }
+
+    /**
+     * Set the password for the DB connection.
+     *
+     * @param password database password
+     */
+    public void setPassword(String password) {
+        this._password = password;
+    }
+
+    // =========================================================================================
+    //                                                                                   Execute
+    //                                                                                   =======
+    /**
+     * Load the sql file and then execute it.
+     *
+     * @throws BuildException
+     */
+    public void execute() throws BuildException {
+        final RunnerInformation runInfo = new RunnerInformation();
+        runInfo.setDriver(_driver);
+        runInfo.setUrl(_url);
+        runInfo.setUser(_userId);
+        runInfo.setPassword(_password);
+        runInfo.setAutoCommit(TorqueBuildProperties.getInstance().isInvokeSqlDirectoryAutoCommit());
+        runInfo.setErrorContinue(TorqueBuildProperties.getInstance().isInvokeSqlDirectoryErrorContinue());
+        runInfo.setRollbackOnly(TorqueBuildProperties.getInstance().isInvokeSqlDirectoryRollbackOnly());
+
+        final SqlFileFireMan fireMan = new SqlFileFireMan();
+        fireMan.execute(new SqlFileRunnerExecute(runInfo), getSqlFileList());
+    }
 
     protected List<File> getSqlFileList() {
         final String sqlDirectory = TorqueBuildProperties.getInstance().getInvokeSqlDirectorySqlDirectory();
-        final List<File> fileList = new ArrayList<File>();
-        {
-            final File file = new File(sqlDirectory);
-            registerFile(fileList, file);
-        }
-        return fileList;
-    }
-
-    protected void registerFile(List<File> fileList, File file) {
-        final File[] sqlFiles = file.listFiles(_sqlFileFileter);
-        final File[] directories = file.listFiles(_directoryOnlyFilter);
-        for (final File sqlFile : sqlFiles) {
-            fileList.add(sqlFile);
-        }
-        for (final File dir : directories) {
-            registerFile(fileList, dir);
-        }
-    }
-
-    protected boolean isAutoCommit() {
-        return TorqueBuildProperties.getInstance().isInvokeSqlDirectoryAutoCommit();
-    }
-
-    protected boolean isRollbackOnly() {
-        return TorqueBuildProperties.getInstance().isInvokeSqlDirectoryRollbackOnly();
-    }
-
-    protected boolean isErrorContinue() {
-        return TorqueBuildProperties.getInstance().isInvokeSqlDirectoryErrorContinue();
-    }
-    
-    // TODO: Modify Encoding and Delimiter HardCode.
-    
-    protected String getEncoding() {
-        return null;   
-    }
-    
-    protected String getDelimiter() {
-        return ";";
+        return new SqlFileGetter().getSqlFileList(sqlDirectory);
     }
 }

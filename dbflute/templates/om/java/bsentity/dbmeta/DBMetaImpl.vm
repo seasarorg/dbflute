@@ -6,8 +6,12 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
-import ${myExtendedDaoPackageName}.*;
 import ${myExtendedEntityPackageName}.*;
+#if (${isExistDao})
+
+import ${myExtendedDaoPackageName}.*;
+#end
+
 #if (${isExistConditionBean})
 
 import ${glPackageCB}.*;
@@ -48,10 +52,12 @@ import ${glPackageCB}.*;
 public class ${myClassName} extends ${glDBMetaAbstractName} {
 
     /** The type of entity. */
-    public static final Class DAO_TYPE = ${myExtendedDaoClassName}.class;
+    public static final Class ENTITY_TYPE = ${myExtendedObjectClassName}.class;
+#if (${isExistDao})
 
     /** The type of entity. */
-    public static final Class ENTITY_TYPE = ${myExtendedObjectClassName}.class;
+    public static final Class DAO_TYPE = ${myExtendedDaoClassName}.class;
+#end
 #if (${isExistConditionBean})
 
     /** The type of condition-bean. */
@@ -298,19 +304,26 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type of dao. (NotNull)
+     * @return The type of entity. (NotNull)
      */ 
-    public Class getDaoType() {
-        return DAO_TYPE;
+    public Class getEntityType() {
+        return ENTITY_TYPE;
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type of entity. (NotNull)
+     * @return The type of dao. (NotNull)
      */ 
-    public Class getEntityType() {
-        return ENTITY_TYPE;
+    public Class getDaoType() {
+#if (${isExistDao})
+
+        return DAO_TYPE;
+#else
+
+        String msg = "The entity does not have dao. So this method is invalid.";
+        throw new IllegalStateException(msg + " dbmeta=" + toString());
+#end
     }
 
     /**

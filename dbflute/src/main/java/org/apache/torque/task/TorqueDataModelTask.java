@@ -2,6 +2,7 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.task.bs.TorqueAbstractDbMetaTexenTask;
 
 /**
  * Data-model task for Torque.

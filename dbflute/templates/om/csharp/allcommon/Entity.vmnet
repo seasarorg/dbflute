@@ -45,29 +45,25 @@ namespace ${glPackageBaseCommon} {
         /// Accept primary-key map.
         /// </summary>
         /// <param name="primaryKeyMap">Primary-key map. (NotNull and NotEmpty)</param>
-        /// <returns>Instance of query. (NotNull)</returns>
-        ${glEntityInterfaceName} AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
+        void AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
 
         /// <summary>
         /// Accept primary-key map-string.
         /// </summary>
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>this. (NotNull)</returns>
-        ${glEntityInterfaceName} AcceptPrimaryKeyMapString(String primaryKeyMapString);
+        void AcceptPrimaryKeyMapString(String primaryKeyMapString);
 
         /// <summary>
         /// Accept column-value map.
         /// </summary>
         /// <param name="columnValueMap">Column-value map. (NotNull and NotEmpty)</param>
-        /// <returns>Instance of query. (NotNull)</returns>
-        ${glEntityInterfaceName} AcceptColumnValueMap(System.Collections.Generic.IDictionary<String, Object> columnValueMap);
+        void AcceptColumnValueMap(System.Collections.Generic.IDictionary<String, Object> columnValueMap);
 
         /// <summary>
         /// Accept column-value map-string.
         /// </summary>
         /// <param name="columnValueMapString">Column-value map-string. (NotNull)</param>
-        /// <returns>this. (NotNull)</returns>
-        ${glEntityInterfaceName} AcceptColumnValueMapString(String columnValueMapString);
+        void AcceptColumnValueMapString(String columnValueMapString);
 
         // =====================================================================================
         //                                                                    Extract Map-String

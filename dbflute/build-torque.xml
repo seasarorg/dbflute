@@ -91,6 +91,10 @@
     name="torque-invoke-sql-directory"
     classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueInvokeSqlDirectoryTask"/>
+  <taskdef
+    name="torque-sql2entity"
+    classpathref="torque-classpath"
+    classname="org.apache.torque.task.TorqueSql2EntityTask"/>
 
   <!-- ================================================================ -->
   <!-- M A I N  T A R G E T                                             -->
@@ -247,13 +251,14 @@
     	
     <echo message=" "/>
     <echo message="+-------------------------------------------------------------------------------+"/>
-    <echo message="driver       = ${torque.database.driver}"/>
-    <echo message="url          = ${torque.database.url}"/>
-    <echo message="userId       = ${torque.database.user}"/>
-    <echo message="password     = ${torque.database.password}"/>
+    <echo message="driver   = ${torque.database.driver}"/>
+    <echo message="url      = ${torque.database.url}"/>
+    <echo message="userId   = ${torque.database.user}"/>
+    <echo message="password = ${torque.database.password}"/>
     <echo message="+-----------------+"/>
   	
-    <torque-invoke-replace-schema contextProperties="${torque.contextProperties}"
+    <torque-invoke-replace-schema
+      contextProperties="${torque.contextProperties}"
       driver="${torque.database.driver}"
       url="${torque.database.url}"
       userId="${torque.database.user}"
@@ -271,18 +276,49 @@
   	
     <echo message=" "/>
     <echo message="+-------------------------------------------------------------------------------+"/>
-    <echo message="driver       = ${torque.database.driver}"/>
-    <echo message="url          = ${torque.database.url}"/>
-    <echo message="userId       = ${torque.database.user}"/>
-    <echo message="password     = ${torque.database.password}"/>
+    <echo message="driver   = ${torque.database.driver}"/>
+    <echo message="url      = ${torque.database.url}"/>
+    <echo message="userId   = ${torque.database.user}"/>
+    <echo message="password = ${torque.database.password}"/>
     <echo message="+-----------------+"/>
 	
-    <torque-invoke-sql-directory contextProperties="${torque.contextProperties}"
+    <torque-invoke-sql-directory
+      contextProperties="${torque.contextProperties}"
       driver="${torque.database.driver}"
       url="${torque.database.url}"
       userId="${torque.database.user}"
       password="${torque.database.password}">
     </torque-invoke-sql-directory>
+  </target>
+
+  <target name="sql2entity" description="==> sql2entity">
+
+    <echo message="+-----------------------------------------------+"/>
+    <echo message="|                                               |"/>
+    <echo message="| Sql 2 Entity !                                |"/>
+    <echo message="|                                               |"/>
+    <echo message="+-----------------------------------------------+"/>
+
+    <echo message=" "/>
+    <echo message="+-------------------------------------------------------------------------------+"/>
+    <echo message="driver   = ${torque.database.driver}"/>
+    <echo message="url      = ${torque.database.url}"/>
+    <echo message="userId   = ${torque.database.user}"/>
+    <echo message="password = ${torque.database.password}"/>
+    <echo message="+-----------------+"/>
+
+    <torque-sql2entity
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="${torque.template.sql2entity}"
+      outputDirectory="${torque.java.dir}"
+      outputFile="report.${torque.project}.sql2entity.generation"
+      targetDatabase="${torque.database}"
+      templatePath="${torque.templatePath}"
+      driver="${torque.database.driver}"
+      url="${torque.database.url}"
+      userId="${torque.database.user}"
+      password="${torque.database.password}">
+    </torque-sql2entity>
   </target>
 
   <!-- **************************************************************************************************** -->

@@ -1,5 +1,6 @@
 package org.apache.torque.task;
 
+import org.apache.torque.task.bs.TorqueAbstractDbMetaTexenTask;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 

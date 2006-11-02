@@ -656,6 +656,8 @@ targetdatabase = $targetDatabase
         #set ($myExtendedEntityPackageName = "${glPackageExtendedCustomizeEntity}")
         #set ($myDBMetaClassName = "${glProjectPrefix}${table.JavaName}Dbm")
         #set ($myDBMetaPackageName = "${glPackageBaseCustomizeDBMeta}")
+
+        #set ($isExistDao = true)
         #set ($isExistConditionBean = false)
 
         ## Setup java directory.
@@ -852,6 +854,8 @@ targetdatabase = $targetDatabase
         #set ($myDBMetaPackageName = "${glPackageBaseDBMeta}")
 
         #set ($myAttachedCBArgsString = "${glPackageCB}.${myConditionBeanClassName} ${glAttachedCBArgsVariableName}")
+
+        #set ($isExistDao = true)
         #set ($isExistConditionBean = true)
 
         ## Setup java directory for base.

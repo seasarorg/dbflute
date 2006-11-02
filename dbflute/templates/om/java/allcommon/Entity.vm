@@ -74,9 +74,8 @@ public interface ${glEntityInterfaceName} {
      * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glEntityInterfaceName} acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
+    public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
 
     /**
      * Accept primary-key map-string.
@@ -85,9 +84,8 @@ public interface ${glEntityInterfaceName} {
      * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @return this. (NotNull)
      */
-    public ${glEntityInterfaceName} acceptPrimaryKeyMapString(String primaryKeyMapString);
+    public void acceptPrimaryKeyMapString(String primaryKeyMapString);
 
     /**
      * Accept column-value map.
@@ -96,9 +94,8 @@ public interface ${glEntityInterfaceName} {
      * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glEntityInterfaceName} acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap);
+    public void acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap);
 
     /**
      * Accept column-value map-string.
@@ -107,9 +104,8 @@ public interface ${glEntityInterfaceName} {
      * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param columnValueMapString Column-value map-string. (NotNull)
-     * @return this. (NotNull)
      */
-    public ${glEntityInterfaceName} acceptColumnValueMapString(String columnValueMapString);
+    public void acceptColumnValueMapString(String columnValueMapString);
 
     // =====================================================================================
     //                                                                               Extract

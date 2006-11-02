@@ -547,8 +547,7 @@ namespace ${myExtendedEntityPackageName} {
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="primaryKeyMap">Primary-key map. (NotNull and NotEmpty)</param>
-        /// <returns>this. (NotNull)</returns>
-        public ${glEntityInterfaceName} AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap) {
+        public void AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap) {
             if (primaryKeyMap == null) {
                 String msg = "The argument[primaryKeyMap] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -575,8 +574,6 @@ namespace ${myExtendedEntityPackageName} {
 
             }
   #end
-
-            return this;
 #else
   #foreach ($col in $table.Columns)
 
@@ -595,8 +592,6 @@ namespace ${myExtendedEntityPackageName} {
 
             }
   #end
-
-            return this;
 #end
 
         }
@@ -605,8 +600,7 @@ namespace ${myExtendedEntityPackageName} {
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>this. (NotNull)</returns>
-        public ${glEntityInterfaceName} AcceptPrimaryKeyMapString(String primaryKeyMapString) {
+        public void AcceptPrimaryKeyMapString(String primaryKeyMapString) {
             if (primaryKeyMapString == null) {
                 String msg = "The argument[primaryKeyMapString] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -626,15 +620,14 @@ namespace ${myExtendedEntityPackageName} {
             mapListString.EndBrace = MAP_STRING_END_BRACE;
             mapListString.Delimiter = MAP_STRING_DELIMITER;
             mapListString.Equal = MAP_STRING_EQUAL;
-            return AcceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+            AcceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
         }
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="columnValueMap">Column-value map. (NotNull and NotEmpty)</param>
-        /// <returns>this. (NotNull)</returns>
-        public ${glEntityInterfaceName} AcceptColumnValueMap(System.Collections.Generic.IDictionary<String, Object> columnValueMap) {
+        public void AcceptColumnValueMap(System.Collections.Generic.IDictionary<String, Object> columnValueMap) {
             if (columnValueMap == null) {
                 String msg = "The argument[columnValueMap] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -662,15 +655,13 @@ namespace ${myExtendedEntityPackageName} {
             }
   #end
 
-            return this;
         }
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="columnValueMapString">Column-value map-string. (NotNull)</param>
-        /// <returns>this. (NotNull)</returns>
-        public ${glEntityInterfaceName} AcceptColumnValueMapString(String columnValueMapString) {
+        public void AcceptColumnValueMapString(String columnValueMapString) {
             if (columnValueMapString == null) {
                 String msg = "The argument[columnValueMapString] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -690,7 +681,7 @@ namespace ${myExtendedEntityPackageName} {
             mapListString.EndBrace = MAP_STRING_END_BRACE;
             mapListString.Delimiter = MAP_STRING_DELIMITER;
             mapListString.Equal = MAP_STRING_EQUAL;
-            return AcceptColumnValueMap(mapListString.generateMap(columnValueMapString));
+            AcceptColumnValueMap(mapListString.generateMap(columnValueMapString));
         }
 
         #endregion
