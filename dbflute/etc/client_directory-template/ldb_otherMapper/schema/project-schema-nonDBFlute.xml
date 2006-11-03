@@ -6,6 +6,7 @@
         <column autoIncrement="true" default="GENERATED_BY_DEFAULT"
             name="AUTHOR_ID" primaryKey="true" required="true" type="INTEGER"/>
         <column name="AUTHOR_NAME" required="true" size="80" type="VARCHAR"/>
+        <column name="AUTHOR_AGE" type="SMALLINT"/>
         <column default="CURRENT_TIMESTAMP" name="R_TIME"
             required="true" type="TIMESTAMP"/>
         <column default="CURRENT_TIMESTAMP" name="U_TIME"
@@ -21,6 +22,7 @@
         <column name="BLACK_LIST_ID" required="true" type="INTEGER"/>
         <column name="BLACK_ACTION_CODE" required="true" size="3" type="CHAR"/>
         <column name="BLACK_LEVEL" required="true" type="SMALLINT"/>
+        <column name="ACTION_DATE" type="TIMESTAMP"/>
         <column name="EVIDENCE_PHOTOGRAPH" type="BLOB"/>
         <column default="CURRENT_TIMESTAMP" name="R_TIME"
             required="true" type="TIMESTAMP"/>
@@ -66,10 +68,10 @@
         <foreign-key foreignTable="LB_USER">
             <reference foreign="LB_USER_ID" local="LB_USER_ID"/>
         </foreign-key>
-        <unique name="SQL061016042729350">
+        <unique name="SQL061022072024620">
             <unique-column name="LB_USER_ID" position="1"/>
         </unique>
-        <unique name="SQL061016042730360">
+        <unique name="SQL061022072025760">
             <unique-column name="LB_USER_ID" position="1"/>
         </unique>
     </table>
@@ -102,7 +104,7 @@
         <foreign-key foreignTable="GENRE">
             <reference foreign="GENRE_CODE" local="GENRE_CODE"/>
         </foreign-key>
-        <unique name="SQL061016042728670">
+        <unique name="SQL061022072024770">
             <unique-column name="ISBN_NO" position="1"/>
         </unique>
     </table>
@@ -126,7 +128,7 @@
         <foreign-key foreignTable="BOOK">
             <reference foreign="BOOK_ID" local="BOOK_ID"/>
         </foreign-key>
-        <unique name="SQL061016042728900">
+        <unique name="SQL061022072024920">
             <unique-column name="LIBRARY_ID" position="1"/>
             <unique-column name="BOOK_ID" position="2"/>
         </unique>
@@ -187,7 +189,6 @@
         <column autoIncrement="true" default="GENERATED_BY_DEFAULT"
             name="LB_USER_ID" primaryKey="true" required="true" type="INTEGER"/>
         <column name="LB_USER_NAME" required="true" size="80" type="VARCHAR"/>
-        <column name="LIBRARY_ID" required="true" type="SMALLINT"/>
         <column name="USER_PASSWORD" required="true" size="50" type="VARCHAR"/>
         <column default="CURRENT_TIMESTAMP" name="R_TIME"
             required="true" type="TIMESTAMP"/>
@@ -197,16 +198,11 @@
             size="50" type="VARCHAR"/>
         <column default="default-user" name="U_USER" required="true"
             size="50" type="VARCHAR"/>
-        <foreign-key foreignTable="LIBRARY">
-            <reference foreign="LIBRARY_ID" local="LIBRARY_ID"/>
-        </foreign-key>
     </table>
     <table name="LENDING">
-        <column autoIncrement="true" default="GENERATED_BY_DEFAULT"
-            name="LENDING_ID" primaryKey="true" required="true" type="INTEGER"/>
-        <column name="LIBRARY_ID" required="true" type="SMALLINT"/>
-        <column name="LB_USER_ID" required="true" type="INTEGER"/>
-        <column name="LENDING_DATE" required="true" type="TIMESTAMP"/>
+        <column name="LIBRARY_ID" primaryKey="true" required="true" type="SMALLINT"/>
+        <column name="LB_USER_ID" primaryKey="true" required="true" type="INTEGER"/>
+        <column name="LENDING_DATE" primaryKey="true" required="true" type="TIMESTAMP"/>
         <column default="CURRENT_TIMESTAMP" name="R_TIME"
             required="true" type="TIMESTAMP"/>
         <column default="CURRENT_TIMESTAMP" name="U_TIME"
@@ -215,19 +211,15 @@
             size="50" type="VARCHAR"/>
         <column default="default-user" name="U_USER" required="true"
             size="50" type="VARCHAR"/>
-        <foreign-key foreignTable="LIBRARY">
+        <foreign-key foreignTable="LIBRARY_USER">
             <reference foreign="LIBRARY_ID" local="LIBRARY_ID"/>
-        </foreign-key>
-        <foreign-key foreignTable="LB_USER">
             <reference foreign="LB_USER_ID" local="LB_USER_ID"/>
         </foreign-key>
-        <unique name="SQL061016042729160">
-            <unique-column name="LIBRARY_ID" position="1"/>
-            <unique-column name="LB_USER_ID" position="2"/>
-        </unique>
     </table>
     <table name="LENDING_COLLECTION">
-        <column name="LENDING_ID" primaryKey="true" required="true" type="INTEGER"/>
+        <column name="LIBRARY_ID" primaryKey="true" required="true" type="SMALLINT"/>
+        <column name="LB_USER_ID" primaryKey="true" required="true" type="INTEGER"/>
+        <column name="LENDING_DATE" primaryKey="true" required="true" type="TIMESTAMP"/>
         <column name="COLLECTION_ID" primaryKey="true" required="true" type="INTEGER"/>
         <column name="RETURN_LIMIT_DATE" required="true" type="TIMESTAMP"/>
         <column default="CURRENT_TIMESTAMP" name="R_TIME"
@@ -242,7 +234,9 @@
             <reference foreign="COLLECTION_ID" local="COLLECTION_ID"/>
         </foreign-key>
         <foreign-key foreignTable="LENDING">
-            <reference foreign="LENDING_ID" local="LENDING_ID"/>
+            <reference foreign="LIBRARY_ID" local="LIBRARY_ID"/>
+            <reference foreign="LB_USER_ID" local="LB_USER_ID"/>
+            <reference foreign="LENDING_DATE" local="LENDING_DATE"/>
         </foreign-key>
     </table>
     <table name="LIBRARY">
@@ -257,9 +251,27 @@
             size="50" type="VARCHAR"/>
         <column default="default-user" name="U_USER" required="true"
             size="50" type="VARCHAR"/>
-        <unique name="SQL061016042729590">
+        <unique name="SQL061022072025170">
             <unique-column name="LIBRARY_NAME" position="1"/>
         </unique>
+    </table>
+    <table name="LIBRARY_USER">
+        <column name="LIBRARY_ID" primaryKey="true" required="true" type="SMALLINT"/>
+        <column name="LB_USER_ID" primaryKey="true" required="true" type="INTEGER"/>
+        <column default="CURRENT_TIMESTAMP" name="R_TIME"
+            required="true" type="TIMESTAMP"/>
+        <column default="CURRENT_TIMESTAMP" name="U_TIME"
+            required="true" type="TIMESTAMP"/>
+        <column default="default-user" name="R_USER" required="true"
+            size="50" type="VARCHAR"/>
+        <column default="default-user" name="U_USER" required="true"
+            size="50" type="VARCHAR"/>
+        <foreign-key foreignTable="LIBRARY">
+            <reference foreign="LIBRARY_ID" local="LIBRARY_ID"/>
+        </foreign-key>
+        <foreign-key foreignTable="LB_USER">
+            <reference foreign="LB_USER_ID" local="LB_USER_ID"/>
+        </foreign-key>
     </table>
     <table name="NEXT_LIBRARY">
         <column name="LIBRARY_ID" primaryKey="true" required="true" type="SMALLINT"/>
