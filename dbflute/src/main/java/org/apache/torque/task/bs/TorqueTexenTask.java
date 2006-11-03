@@ -9,6 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.helper.TorqueBuildProperties;
 import org.apache.torque.helper.TorqueTaskUtil;
+import org.apache.torque.helper.properties.BasicProperties;
+import org.apache.velocity.app.Velocity;
 import org.apache.velocity.texen.ant.TexenTask;
 
 /**
@@ -29,6 +31,22 @@ public abstract class TorqueTexenTask extends TexenTask {
 
     public void setTargetDatabase(String v) {
         _targetDatabase = v;
+    }
+
+    protected void fireSuperExecute() {
+        // /----------------------------------------------
+        // Set up the encoding of templates from property.
+        // -----/
+        final String templateEncoding = getBasicProperties().getTemplateFileEncoding();
+        Velocity.setProperty("input.encoding", templateEncoding);
+
+        try {
+            super.execute();
+        } catch (Exception e) {
+            _log.info("/ * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+            _log.error("super#execute() threw the exception!", e);
+            _log.info("/ * * * * * * * * * /");
+        }
     }
 
     public void setContextProperties(String file) {
@@ -57,11 +75,18 @@ public abstract class TorqueTexenTask extends TexenTask {
             //   This property is used by You. 
             // -------/
             final Properties prop = TorqueTaskUtil.getBuildProperties(file, super.project);
-            TorqueBuildProperties.getInstance().setContextProperties(prop);
+            TorqueBuildProperties.getInstance().setProperties(prop);
 
         } catch (Exception e) {
             _log.warn("setContextProperties() threw the exception!!!", e);
         }
     }
 
+    protected TorqueBuildProperties getProperties() {
+        return TorqueBuildProperties.getInstance();
+    }
+
+    protected BasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
 }

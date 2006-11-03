@@ -863,21 +863,10 @@ targetdatabase = $targetDatabase
 
         #if ($database.isAvailableBehaviorGeneration())
           #if ($database.isTargetLanguageCSharp())
-            #set ($myBaseBhvInterfaceName = "")
-            #set ($myExtendedBhvInterfaceName = "")
-            #set ($myBaseBhvClassName = "")
-            #set ($myExtendedBhvClassName = "")
-            #if ($database.isAvailableBehaviorInterfacePrefixI())
-              #set ($myBaseBhvInterfaceName = "${glProjectPrefix}I${glBasePrefix}${table.JavaName}Bhv")
-              #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}I${table.JavaName}Bhv")
-              #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
-              #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}Bhv")
-            #else
-              #set ($myBaseBhvInterfaceName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
-              #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
-              #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
-              #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
-            #end
+            #set ($myBaseBhvInterfaceName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
+            #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
+            #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
+            #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
 
             #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
             $generator.parse("om/${glTargetLanguage}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
@@ -904,21 +893,10 @@ targetdatabase = $targetDatabase
 
         #if ($database.isAvailableBehaviorGeneration())
           #if ($database.isTargetLanguageCSharp())
-            #set ($myBaseBhvInterfaceName = "")
-            #set ($myExtendedBhvInterfaceName = "")
-            #set ($myBaseBhvClassName = "")
-            #set ($myExtendedBhvClassName = "")
-            #if ($database.isAvailableBehaviorInterfacePrefixI())
-              #set ($myBaseBhvInterfaceName = "${glProjectPrefix}I${glBasePrefix}${table.JavaName}Bhv")
-              #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}I${table.JavaName}Bhv")
-              #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
-              #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}Bhv")
-            #else
-              #set ($myBaseBhvInterfaceName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
-              #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
-              #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
-              #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
-            #end
+            #set ($myBaseBhvInterfaceName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
+            #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
+            #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
+            #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
 
             #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
             #if (!$files.file(${generator.OutputPath},$path).exists())

@@ -1,0 +1,33 @@
+#set ($myClassName = "${myBaseObjectClassName}")
+
+namespace ${myBaseEntityPackageName} {
+
+    /**
+     * The entity of ${table.Name}.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public class ${myClassName} {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+#foreach ($col in $table.Columns)
+        
+        /** The value of ${col.UncapitalisedJavaName}. */
+        protected ${col.JavaNative} _${col.UncapitalisedJavaName};
+#end
+
+        // =====================================================================================
+        //                                                                         Getter Setter
+        //                                                                         =============
+#foreach ($col in $table.Columns)
+
+        public ${col.JavaNative} ${col.JavaName} {
+            get { return _${col.UncapitalisedJavaName}; }
+            set { _${col.UncapitalisedJavaName} = value; }
+        }
+#end
+
+    }
+}

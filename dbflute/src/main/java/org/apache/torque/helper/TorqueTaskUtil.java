@@ -66,7 +66,7 @@ public final class TorqueTaskUtil {
                     prop.setProperty(key, value);
                 }
             }
-            TorqueBuildProperties.getInstance().setContextProperties(prop);
+            TorqueBuildProperties.getInstance().setProperties(prop);
 
             _log.debug("[Properties]: size=" + prop.size());
             for (final Iterator ite = prop.keySet().iterator(); ite.hasNext();) {

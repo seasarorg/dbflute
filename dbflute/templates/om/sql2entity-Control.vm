@@ -177,7 +177,7 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.debug("public void parseCustomizeEntity() {")
-    $database.debug("    final List<String> tableNameList = getCustomizeTableList();")
+    $database.debug("    final List<String> tableNameList = getTableList();")
     $database.debug("    for (String tableName : tableNameList) {")
     #foreach ($table in $database.TableList)
       #set ($myBaseObjectClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}${glBaseSuffixForEntity}")
@@ -193,20 +193,26 @@ targetdatabase = $targetDatabase
       ## Setup java directory.
       $database.setupJavaDir_for_baseCustomizeEntity()
 
-      $database.debug("        parseCustomizeBaseEntity(tableName); // ${myBaseObjectClassName}")
-      #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
+      #if ($database.isSql2EntityPlainEntity())
+        $database.debug("        parseCustomizeBaseEntity(tableName);     // ${myBaseObjectClassName}")
+        #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/bsentity/PlainBaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
+      #else
+        $database.debug("        parseCustomizeBaseEntity(tableName);     // ${myBaseObjectClassName}")
+        #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("        parseCustomizeDBMeta(tableName); // ${myDBMetaClassName}")
-      #set ( $path = "${strings.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
+        $database.debug("        parseCustomizeDBMeta(tableName);         // ${myDBMetaClassName}")
+        #set ( $path = "${strings.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
+      #end
 
       ## Setup java directory.
       $database.setupJavaDir_for_extendedCustomizeEntity()
 
       #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
       #if (!$files.file(${generator.OutputPath},$path).exists())
-        $database.debug("        parseArgumentExtendedEntity(tableName); // ${myExtendedObjectClassName}")
+        $database.debug("        parseCustomizeExtendedEntity(tableName); // ${myExtendedObjectClassName}")
         $generator.parse("om/${glTargetLanguage}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
       #end
 

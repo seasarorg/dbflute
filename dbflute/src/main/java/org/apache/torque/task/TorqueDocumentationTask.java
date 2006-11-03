@@ -13,9 +13,6 @@ public class TorqueDocumentationTask extends TorqueAbstractDbMetaTexenTask {
 
     private String _outputFormat;
 
-    public TorqueDocumentationTask() {
-    }
-
     public String getOutputFormat() {
         return _outputFormat;
     }
@@ -24,12 +21,6 @@ public class TorqueDocumentationTask extends TorqueAbstractDbMetaTexenTask {
         _outputFormat = v;
     }
 
-    /**
-     * Init control context. {Override}
-     * 
-     * @return Context. 
-     * @throws Exception
-     */
     public Context initControlContext() throws Exception {
         super.initControlContext();
         _context.put("outputFormat", _outputFormat);

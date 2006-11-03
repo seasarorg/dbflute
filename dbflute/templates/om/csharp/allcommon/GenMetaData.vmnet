@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections;
-using ${glPackageBaseCommonHelper};
 
 namespace ${glPackageBaseCommon} {
 
@@ -15,15 +14,10 @@ namespace ${glPackageBaseCommon} {
         /// <summary>Singleton instance.</summary>
         private static readonly ${myClassName} _instance = new ${myClassName}();
 
-        /// <summary>The helper of map-list-string.</summary>
-        protected ${glMapListStringName} _mapListString = new ${glMapListStringImplName}();
-
         /// <summary>
         /// Constructor
         /// </summary>
         private ${myClassName}() {
-            _mapListString = new ${glMapListStringImplName}();
-            _mapListString.Delimiter = ";";
         }
 
         /// <summary>
@@ -61,13 +55,12 @@ namespace ${glPackageBaseCommon} {
             return "SelectList";
         }
 
-
-
-
-
         // =========================================================================================
         //                                             Only when having generated, the effective one
         //                                             =============================================
+        // -------------------------------------------------------------------------------
+        //                                                                           Basic
+        //                                                                           -----
         /// <sumarry>
         /// Get the property-value of targetLanguage.
         /// </sumarry>
@@ -108,14 +101,9 @@ namespace ${glPackageBaseCommon} {
             return "${database.ClassAuthor}";
         }
 
-        /// <sumarry>
-        /// Is available entity lazy load?
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public bool IsAvailableEntityLazyLoad() {
-            return ${database.isAvailableEntityLazyLoad()};
-        }
-
+        // -------------------------------------------------------------------------------
+        //                                                                       Available
+        //                                                                       ---------
         /// <sumarry>
         /// Is java name of table same as db name? Answer is ${database.isJavaNameOfTableSameAsDbName()}!
         /// </sumarry>
@@ -133,11 +121,27 @@ namespace ${glPackageBaseCommon} {
         }
 
         /// <sumarry>
-        /// is available common-column-setup interceptor to behavior?
+        /// Is available behavior generation? Answer is ${database.isAvailableBehaviorGeneration()}!
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
+        public bool isAvailableBehaviorGeneration() {
+            return ${database.isAvailableBehaviorGeneration()};
+        }
+
+        /// <sumarry>
+        /// Is available common-column-setup interceptor to behavior? Answer is ${database.isAvailableCommonColumnSetupInterceptorToBehavior()}!
         /// </sumarry>
         /// <returns>The property-value.</returns>
         public bool IsAvailableCommonColumnSetupInterceptorToBehavior() {
             return ${database.isAvailableCommonColumnSetupInterceptorToBehavior()};
+        }
+
+        /// <sumarry>
+        /// Is available common-column-setup interceptor to dao? Answer is ${database.isAvailableCommonColumnSetupInterceptorToDao()}!
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
+        public bool IsAvailableCommonColumnSetupInterceptorToBehavior() {
+            return ${database.isAvailableCommonColumnSetupInterceptorToDao()};
         }
 
         /// <sumarry>
@@ -148,6 +152,9 @@ namespace ${glPackageBaseCommon} {
             return ${database.isAvailableGenerics()};
         }
 
+        // -------------------------------------------------------------------------------
+        //                                                                          Prefix
+        //                                                                          ------
         /// <sumarry>
         /// Get the property-value of projectPrefix.
         /// </sumarry>
@@ -164,161 +171,139 @@ namespace ${glPackageBaseCommon} {
             return "${database.BasePrefix}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of baseSuffixForEntity.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
-        public String GetBaseSuffixForEntity() {
-            return "${database.BaseSuffixForEntity}";
-        }
-
-    /// <sumarry>
-    /// Get the property-value of daoDiconNamespace.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        // -------------------------------------------------------------------------------
+        //                                                                        DaoDicon
+        //                                                                        --------
+        /// <sumarry>
+        /// Get the property-value of daoDiconNamespace.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetDaoDiconNamespace() {
             return "${database.DaoDiconNamespace}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of daoDiconPackageName.
-    /// </sumarry>
-    /// <returns>The property-value.</sumarry>
+        /// <sumarry>
+        /// Get the property-value of daoDiconPackageName.
+        /// </sumarry>
+        /// <returns>The property-value.</sumarry>
         public String GetDaoDiconPackageName() {
             return "${database.DaoDiconPackageName}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of daoDiconFileName.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of daoDiconFileName.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetDaoDiconFileName() {
             return "${database.DaoDiconFileName}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of j2eeDiconResourceName.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of j2eeDiconResourceName.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetJ2eeDiconResourceName() {
             return "${database.J2eeDiconResourceName}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of requiredTxComponentName.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of requiredTxComponentName.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetRequiredTxComponentName() {
             return "${database.requiredTxComponentName}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of baseCommonPackage.
-    ///
-    /// <returns>The property-value.</returns>
+        // -------------------------------------------------------------------------------
+        //                                                                         Package
+        //                                                                         -------
+        /// <sumarry>
+        /// Get the property-value of baseCommonPackage.
+        ///
+        /// <returns>The property-value.</returns>
         public String GetBaseCommonPackage() {
             return "${database.BaseCommonPackage}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of baseBehaviorPackage.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of baseBehaviorPackage.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetBaseBehaviorPackage() {
             return "${database.BaseBehaviorPackage}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of baseDaoPackage.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of baseDaoPackage.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetBaseDaoPackage() {
             return "${database.BaseDaoPackage}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of baseEntityPackage.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of baseEntityPackage.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetBaseEntityPackage() {
             return "${database.BaseEntityPackage}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of conditionBeanPackage.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of conditionBeanPackage.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetConditionBeanPackage() {
             return "${database.ConditionBeanPackage}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of extendedDaoPackage.
-    /// </sumarry>
-    /// <returns>The property-value.</retuns>
+        /// <sumarry>
+        /// Get the property-value of extendedDaoPackage.
+        /// </sumarry>
+        /// <returns>The property-value.</retuns>
         public String GetExtendedDaoPackage() {
             return "${database.ExtendedDaoPackage}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of extendedBehaviorPackage.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of extendedBehaviorPackage.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetExtendedBehaviorPackage() {
             return "${database.ExtendedBehaviorPackage}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of extendedEntityPackage.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of extendedEntityPackage.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetExtendedEntityPackage() {
             return "${database.ExtendedEntityPackage}";
         }
 
-    /// <sumarry>
-    /// Get the property-map of sequenceDefinitionMap.
-    /// </sumarry>
-    /// <returns>The property-map.</returns>
-        public System.Collections.IDictionary GetSequenceDefinitionMapAsString() {
-            String property = "${database.SequenceDefinitionMapAsStringRemovedLineSeparator}";
-            return _mapListString.generateMap(property);
-        }
-
-    /// <sumarry>
-    /// Get the property-map of IdentityDefinitionMap.
-    /// </sumarry>
-    /// <returns>The property-map.</returns>
-        public System.Collections.IDictionary GetIdentityDefinitionMapAsString() {
-            String property = "${database.IdentityDefinitionMapAsStringRemovedLineSeparator}";
-            return _mapListString.generateMap(property);
-        }
-
-    /// <sumarry>
-    /// Get the property-value of updateDateFieldName.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        // -------------------------------------------------------------------------------
+        //                                                                 Optimistic Lock
+        //                                                                 ---------------
+        /// <sumarry>
+        /// Get the property-value of updateDateFieldName.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetUpdateDateFieldName() {
             return "${database.UpdateDateFieldName}";
         }
 
-    /// <sumarry>
-    /// Get the property-value of versionNoFieldName.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
+        /// <sumarry>
+        /// Get the property-value of versionNoFieldName.
+        /// </sumarry>
+        /// <returns>The property-value.</returns>
         public String GetVersionNoFieldName() {
             return "${database.VersionNoFieldName}";
         }
 
-    /// <sumarry>
-    /// Get the property-map of commonColumnMapAsStringRemovedLineSeparator.
-    /// </sumarry>
-    /// <returns>The property-map.</returns>
-        public System.Collections.IDictionary GetCommonColumnMap() {
-            String property = "${database.CommonColumnMapAsStringRemovedLineSeparator}";
-            return _mapListString.generateMap(property);
-        }
 
+        // -------------------------------------------------------------------------------
+        //                                                                    Select Param
+        //                                                                    ------------
         /// <sumarry>
         /// Get the property-value of selectQueryTimeout.
         /// </sumarry>
@@ -327,6 +312,9 @@ namespace ${glPackageBaseCommon} {
             return ${database.SelectQueryTimeout};
         }
 
+        // -------------------------------------------------------------------------------
+        //                                                                         Extract
+        //                                                                         -------
         /**
          * Get the value of 'extractAcceptStartBrace'.
          *
@@ -361,23 +349,6 @@ namespace ${glPackageBaseCommon} {
          */
         public String GetExtractAcceptEqual() {
             return "${database.extractAcceptEqual}";
-        }
-
-    /// <sumarry>
-    /// Get the property-map of jdbcToJavaNativeMap.
-    /// </sumarry>
-    /// <returns>The property-map.</returns>
-        public System.Collections.IDictionary GetJdbcToJavaNativeMap() {
-            String property = "${database.JdbcToJavaNativeAsStringRemovedLineSeparator}";
-            return _mapListString.generateMap(property);
-        }
-
-    /// <sumarry>
-    /// Get the property-value of wildCard.
-    /// </sumarry>
-    /// <returns>The property-value.</returns>
-        public String GetWildCard() {
-            return "${database.WildCard}";
         }
     }
 }

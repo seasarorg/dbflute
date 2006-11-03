@@ -68,16 +68,16 @@ public final class GeneratedClassPackageProperties extends AbstractHelperPropert
     protected GeneratedClassPackageInfo _languageMetaData;
 
     protected GeneratedClassPackageInfo getPackageInfo() {
-        if (isTargetLanguageJava()) {
+        if (getBasicProperties().isTargetLanguageJava()) {
             if (_languageMetaData == null) {
                 _languageMetaData = new JavaPackageInfo();
             }
-        } else if (isTargetLanguageCSharp()) {
+        } else if (getBasicProperties().isTargetLanguageCSharp()) {
             if (_languageMetaData == null) {
                 _languageMetaData = new CSharpPackageInfo();
             }
         } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
+            String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
             throw new IllegalStateException(msg);
         }
         return _languageMetaData;

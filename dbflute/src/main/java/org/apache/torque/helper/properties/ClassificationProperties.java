@@ -23,12 +23,8 @@ import org.apache.torque.helper.stateless.NameHintUtil;
  */
 public final class ClassificationProperties extends AbstractHelperProperties {
 
-    /** Log-instance */
     private static final Log _log = LogFactory.getLog(ClassificationProperties.class);
 
-    /**
-     * Constructor.
-     */
     public ClassificationProperties(Properties prop) {
         super(prop);
     }
@@ -102,7 +98,7 @@ public final class ClassificationProperties extends AbstractHelperProperties {
                                 Statement stmt = null;
                                 ResultSet rs = null;
                                 try {
-                                    conn = getConnection();
+                                    conn =  getBasicProperties().getConnection();
                                     stmt = conn.createStatement();
                                     _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
                                     _log.debug("The classification sql: " + sb.toString());

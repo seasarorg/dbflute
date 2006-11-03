@@ -186,7 +186,7 @@ public class TorqueJDBCTransformTask extends Task {
 
     public void setContextProperties(String file) {
         final Properties prop = TorqueTaskUtil.getBuildProperties(file, super.project);
-        TorqueBuildProperties.getInstance().setContextProperties(prop);
+        TorqueBuildProperties.getInstance().setProperties(prop);
     }
 
     /**

@@ -37,6 +37,10 @@ public abstract class AbstractHelperProperties {
         _buildProperties = prop;
     }
 
+    protected Properties getProperties() {
+        return _buildProperties;
+    }
+
     // **********************************************************************************************
     //                                                                                       Delegate
     //                                                                                       ********
@@ -219,6 +223,14 @@ public abstract class AbstractHelperProperties {
         }
     }
 
+    protected BasicProperties getBasicProperties() {
+        return PropertiesHandler.getInstance().getBasicProperties(getProperties());
+    }
+
+    protected GeneratedClassPackageProperties getGeneratedClassPackageProperties() {
+        return PropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
+    }
+
     // **********************************************************************************************
     //                                                                                        Default
     //                                                                                        *******
@@ -241,86 +253,6 @@ public abstract class AbstractHelperProperties {
     public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
     public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
     public static final String DEFAULT_EMPTY_LIST_STRING = "list:{}";
-
-    // **********************************************************************************************
-    //                                                                                       Property
-    //                                                                                       ********
-    // ===============================================================================
-    //                                                            Properties - Project
-    //                                                            ====================
-    public String getProjectName() {
-        return stringProp("torque.project", "");
-    }
-
-    // ===============================================================================
-    //                                                           Properties - Database
-    //                                                           =====================
-    public String getDatabaseName() {
-        return stringProp("torque.database", "");
-    }
-
-    // ===============================================================================
-    //                                                            Properties - JavaDir
-    //                                                            ====================
-    public String getJavaDir() {
-        return stringProp("torque.java.dir", "");
-    }
-
-    public String getJavaLocation_for_gen() {
-        return stringProp("torque.java.location.for.gen", "");
-    }
-
-    public String getJavaLocation_for_main() {
-        return stringProp("torque.java.location.for.main", "");
-    }
-
-    // ===============================================================================
-    //                                                           Properties - Language
-    //                                                           =====================
-    public String getTargetLanguage() {
-        return stringProp("torque.targetLanguage", DEFAULT_targetLanguage);
-    }
-
-    public boolean isTargetLanguageJava() {
-        return JAVA_targetLanguage.equals(getTargetLanguage());
-    }
-
-    public boolean isTargetLanguageCSharp() {
-        return CSHARP_targetLanguage.equals(getTargetLanguage());
-    }
-
-
-    // ===============================================================================
-    //                                                      Properties - Database Info
-    //                                                      ==========================
-    public String getDatabaseDriver() {
-        return stringProp("torque.database.driver");
-    }
-
-    public String getDatabaseUri() {
-        return stringProp("torque.database.url");
-    }
-
-    public String getDatabaseUser() {
-        return stringProp("torque.database.user");
-    }
-
-    public String getDatabasePassword() {
-        return stringProp("torque.database.password");
-    }
-
-    public Connection getConnection() {
-        try {
-            Class.forName(getDatabaseDriver());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            return DriverManager.getConnection(getDatabaseUri(), getDatabaseUser(), getDatabasePassword());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     // **********************************************************************************************
     //                                                                                         Helper

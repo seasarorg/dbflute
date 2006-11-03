@@ -68,6 +68,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.helper.TorqueBuildProperties;
+import org.apache.torque.helper.properties.BasicProperties;
 import org.apache.torque.helper.stateful.FlMapListString;
 import org.apache.torque.helper.stateful.FlMapListStringImpl;
 import org.apache.torque.helper.stateless.FlPropertyUtil;
@@ -616,106 +617,100 @@ public class Database {
         return TorqueBuildProperties.getInstance();
     }
 
+    protected BasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
     // ===============================================================================
     //                                                            Properties - JavaDir
     //                                                            ====================
     public String getJavaDir() {
-        return getProperties().getJavaDir();
+        return getBasicProperties().getJavaDir();
     }
 
     // ===============================================================================
     //                                                           Properties - Language
     //                                                           =====================
     public String getTargetLanguage() {
-        return getProperties().getTargetLanguage();
+        return getBasicProperties().getTargetLanguage();
     }
 
     public boolean isTargetLanguageJava() {
-        return getProperties().isTargetLanguageJava();
+        return getBasicProperties().isTargetLanguageJava();
     }
 
     public boolean isTargetLanguageCSharp() {
-        return getProperties().isTargetLanguageCSharp();
+        return getBasicProperties().isTargetLanguageCSharp();
     }
 
     // ===============================================================================
     //                                                          Properties - Extension
     //                                                          ======================
     public String getTemplateFileExtension() {
-        return getProperties().getTemplateFileExtension();
+        return getBasicProperties().getTemplateFileExtension();
     }
 
     public String getClassFileExtension() {
-        return getProperties().getClassFileExtension();
+        return getBasicProperties().getClassFileExtension();
     }
 
     // ===============================================================================
     //                                                           Properties - Encoding
     //                                                           =====================
     public String getTemplateFileEncoding() {
-        return getProperties().getTemplateFileEncoding();
+        return getBasicProperties().getTemplateFileEncoding();
     }
 
     // ===============================================================================
     //                                                             Properties - Author
     //                                                             ===================
     public String getClassAuthor() {
-        return getProperties().getClassAuthor();
+        return getBasicProperties().getClassAuthor();
     }
 
     // ===============================================================================
     //                                                             Properties - SameAs
     //                                                             ===================
     public boolean isJavaNameOfTableSameAsDbName() {
-        return getProperties().isJavaNameOfTableSameAsDbName();
+        return getBasicProperties().isJavaNameOfTableSameAsDbName();
     }
 
     public boolean isJavaNameOfColumnSameAsDbName() {
-        return getProperties().isJavaNameOfColumnSameAsDbName();
+        return getBasicProperties().isJavaNameOfColumnSameAsDbName();
     }
 
     // ===============================================================================
     //                                                          Properties - Available
     //                                                          ======================
     public boolean isAvailableEntityLazyLoad() {
-        return getProperties().isAvailableEntityLazyLoad();
+        return getBasicProperties().isAvailableEntityLazyLoad();
     }
 
     public boolean isAvailableBehaviorGeneration() {
-        return getProperties().isAvailableBehaviorGeneration();
-    }
-
-    public boolean isAvailableBehaviorInterfacePrefixI() {
-        return getProperties().isAvailableBehaviorInterfacePrefixI();
+        return getBasicProperties().isAvailableBehaviorGeneration();
     }
 
     public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
-        return getProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
+        return getBasicProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
     }
 
     public boolean isAvailableCommonColumnSetupInterceptorToDao() {
-        return getProperties().isAvailableCommonColumnSetupInterceptorToDao();
+        return getBasicProperties().isAvailableCommonColumnSetupInterceptorToDao();
     }
 
     public boolean isAvailableGenerics() {
-        return getProperties().isAvailableGenerics();
+        return getBasicProperties().isAvailableGenerics();
     }
 
-    /**
-     * Filter generics-string.
-     * 
-     * @param genericsString Generics-string .
-     * @return Generics-string or empty-string.
-     */
     public String filterGenericsString(String genericsString) {
-        return getProperties().filterGenericsString(genericsString);
+        return getBasicProperties().filterGenericsString(genericsString);
     }
 
     // ===============================================================================
-    //                                          Properties - PrefixAndSuffix for Class
-    //                                          ======================================
+    //                                                             Properties - Prefix
+    //                                                             ===================
     public String getProjectPrefix() {
-        return getProperties().getProjectPrefix();
+        return getBasicProperties().getProjectPrefix();
     }
 
     public String getBasePrefix() {
@@ -727,88 +722,80 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                               Properties - DaoDicon Information
-    //                                               =================================
+    //                                                           Properties - DaoDicon
+    //                                                           =====================
     public String getDaoDiconNamespace() {
-        return getProperties().getDaoDiconNamespace();
+        return getProperties().getDaoDiconProperties().getDaoDiconNamespace();
     }
 
     public String getDaoDiconPackageName() {
-        return getProperties().getDaoDiconPackageName();
+        return getProperties().getDaoDiconProperties().getDaoDiconPackageName();
     }
 
     public String getDaoDiconFileName() {
-        return getProperties().getDaoDiconFileName();
+        return getProperties().getDaoDiconProperties().getDaoDiconFileName();
     }
 
     public String getJ2eeDiconResourceName() {
-        return getProperties().getJ2eeDiconResourceName();
+        return getProperties().getDaoDiconProperties().getJ2eeDiconResourceName();
     }
 
     public String getRequiredTxComponentName() {
-        return getProperties().getRequiredTxComponentName();
+        return getProperties().getDaoDiconProperties().getRequiredTxComponentName();
     }
 
     public String getRequiresNewTxComponentName() {
-        return getProperties().getRequiresNewTxComponentName();
+        return getProperties().getDaoDiconProperties().getRequiresNewTxComponentName();
     }
 
     public List<String> getDaoDiconOtherIncludePathList() {
-        return getProperties().getDaoDiconOtherIncludePathList();
+        return getProperties().getDaoDiconProperties().getDaoDiconOtherIncludePathList();
     }
 
     // ===============================================================================
     //                                            Properties - Generated Class Package
     //                                            ====================================
     public String getPackageBase() {
-        return getProperties().getPackageBase();
+        return getProperties().getGeneratedClassPackageProperties().getPackageBase();
     }
 
     public String getBaseCommonPackage() {
-        return getProperties().getBaseCommonPackage();
+        return getProperties().getGeneratedClassPackageProperties().getBaseCommonPackage();
     }
 
     public String getBaseBehaviorPackage() {
-        return getProperties().getBaseBehaviorPackage();
+        return getProperties().getGeneratedClassPackageProperties().getBaseBehaviorPackage();
     }
 
     public String getBaseDaoPackage() {
-        return getProperties().getBaseDaoPackage();
+        return getProperties().getGeneratedClassPackageProperties().getBaseDaoPackage();
     }
 
     public String getBaseEntityPackage() {
-        return getProperties().getBaseEntityPackage();
+        return getProperties().getGeneratedClassPackageProperties().getBaseEntityPackage();
     }
 
     public String getConditionBeanPackage() {
-        return getProperties().getConditionBeanPackage();
+        return getProperties().getGeneratedClassPackageProperties().getConditionBeanPackage();
     }
 
     public String getExtendedBehaviorPackage() {
-        return getProperties().getExtendedBehaviorPackage();
+        return getProperties().getGeneratedClassPackageProperties().getExtendedBehaviorPackage();
     }
 
     public String getExtendedDaoPackage() {
-        return getProperties().getExtendedDaoPackage();
+        return getProperties().getGeneratedClassPackageProperties().getExtendedDaoPackage();
     }
 
     public String getExtendedEntityPackage() {
-        return getProperties().getExtendedEntityPackage();
+        return getProperties().getGeneratedClassPackageProperties().getExtendedEntityPackage();
     }
 
     // ===============================================================================
     //                                              Properties - Sequence and Identity
     //                                              ==================================
-    public String getSequenceDefinitionMapAsStringRemovedLineSeparator() {
-        return getProperties().getSequenceDefinitionMapAsStringRemovedLineSeparator();
-    }
-
     public Map<String, Object> getSequenceDefinitionMap() {
         return getProperties().getSequenceDefinitionMap();
-    }
-
-    public String getIdentityDefinitionMapAsStringRemovedLineSeparator() {
-        return getProperties().getIdentityDefinitionMapAsStringRemovedLineSeparator();
     }
 
     public Map<String, Object> getIdentityDefinitionMap() {
@@ -819,21 +806,15 @@ public class Database {
     //                                                    Properties - Optimistic Lock
     //                                                    ============================
     public String getUpdateDateFieldName() {
-        return getProperties().getUpdateDateFieldName();
+        return getProperties().getOptimisticLockProperties().getUpdateDateFieldName();
     }
 
-    /**
-     * Is table out of sight?
-     * 
-     * @param tableName Table-name.
-     * @return Determination.
-     */
     public boolean isUpdateDateExceptTable(final String tableName) {
-        return getProperties().isUpdateDateExceptTable(tableName);
+        return getProperties().getOptimisticLockProperties().isUpdateDateExceptTable(tableName);
     }
 
     public String getVersionNoFieldName() {
-        return getProperties().getVersionNoFieldName();
+        return getProperties().getOptimisticLockProperties().getVersionNoFieldName();
     }
 
     // ===============================================================================
@@ -845,10 +826,6 @@ public class Database {
 
     public List<String> getCommonColumnNameList() {
         return getProperties().getCommonColumnNameList();
-    }
-
-    public String getCommonColumnMapAsStringRemovedLineSeparator() {
-        return getProperties().getCommonColumnMapAsStringRemovedLineSeparator();
     }
 
     // --------------------------------------
@@ -866,11 +843,6 @@ public class Database {
         return getProperties().getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(columnName);
     }
 
-    public String getCommonColumnSetupBeforeInsertInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getProperties()
-                .getCommonColumnSetupBeforeInsertInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation();
-    }
-
     // --------------------------------------
     //                                 update
     //                                 ------
@@ -884,11 +856,6 @@ public class Database {
 
     public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
         return getProperties().getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(columnName);
-    }
-
-    public String getCommonColumnSetupBeforeUpdateInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getProperties()
-                .getCommonColumnSetupBeforeUpdateInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
     // --------------------------------------
@@ -906,11 +873,6 @@ public class Database {
         return getProperties().getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(columnName);
     }
 
-    public String getCommonColumnSetupBeforeDeleteInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getProperties()
-                .getCommonColumnSetupBeforeDeleteInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation();
-    }
-
     // ===============================================================================
     //                                                     Properties - Logical-Delete
     //                                                     ===========================
@@ -922,10 +884,6 @@ public class Database {
         return getProperties().getLogicalDeleteColumnNameList();
     }
 
-    public String getLogicalDeleteColumnValueMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getProperties().getLogicalDeleteColumnValueMapAsStringRemovedLineSeparatorFilteredQuotation();
-    }
-
     // ===============================================================================
     //                                        Properties - Revival from Logical-Delete
     //                                        ========================================
@@ -935,10 +893,6 @@ public class Database {
 
     public List<String> getRevivalFromLogicalDeleteColumnNameList() {
         return getProperties().getRevivalFromLogicalDeleteColumnNameList();
-    }
-
-    public String getRevivalFromLogicalDeleteColumnValueMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getProperties().getRevivalFromLogicalDeleteColumnValueMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
     // ===============================================================================
@@ -1021,23 +975,6 @@ public class Database {
     // ===============================================================================
     //                                                       Properties - Select Param
     //                                                       =========================
-    // Abort!
-    //    public String getFetchPageDefaultFetchSize() {
-    //        return getProperties().getFetchPageDefaultFetchSize();
-    //    }
-    //
-    //    public boolean isAvailableUseAbsoluteWhenResultSetFetchNarrowing() {
-    //        return getProperties().isAvailableUseAbsoluteWhenResultSetFetchNarrowing();
-    //    }
-    //
-    //    public int getPageResultBeanDefaultPageGroupSize() {
-    //        return getProperties().getPageResultBeanDefaultPageGroupSize();
-    //    }
-    //
-    //    public int getPageResultBeanDefaultPageRangeSize() {
-    //        return getProperties().getPageResultBeanDefaultPageRangeSize();
-    //    }
-
     public String getSelectQueryTimeout() {
         return getProperties().getSelectQueryTimeout();
     }
@@ -1280,6 +1217,13 @@ public class Database {
     //                      ==========================================================
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
         return getProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
+    }
+
+    // ===============================================================================
+    //                                                         Properties - sql2entity  
+    //                                                         =======================
+    public boolean isSql2EntityPlainEntity() {
+        return getProperties().getSql2EntityProperties().isPlainEntity();
     }
 
     // **********************************************************************************************
@@ -1551,6 +1495,9 @@ public class Database {
         FileUtil.mkdir(Generator.getInstance().getOutputPath() + "/" + packagePath);
     }
 
+    // ===============================================================================
+    //                                                                         JavaDir
+    //                                                                         =======
     public void setupJavaDir_for_genMetaData() {
         setupJavaDir_for_extended();
     }
@@ -1608,7 +1555,7 @@ public class Database {
     public void setupJavaDir_for_extendedCustomizeDao() {
         setupJavaDir_for_extended();
     }
-    
+
     public void setupJavaDir_for_baseCustomizeEntity() {
         setupJavaDir_for_extended();
     }
@@ -1656,7 +1603,7 @@ public class Database {
             throw new IllegalStateException(msg);
         }
     }
-    
+
     public void setupJavaDir_for_extended_cbean() {
         if (isTargetLanguageJava()) {
             setupJavaDir_for_main();
@@ -1673,44 +1620,10 @@ public class Database {
     }
 
     protected void setupJavaDir_for_main() {
-        final String fileSeparator = "/";
-        final String packageBase = getJavaDir();
-        final String javaLocation = getProperties().getJavaLocation_for_main();
-        String outputPath = "";
-        if (packageBase != null && packageBase.endsWith(fileSeparator)) {
-            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = packageBase + javaLocation.substring(fileSeparator.length());
-            } else {
-                outputPath = packageBase + javaLocation;
-            }
-        } else {
-            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = packageBase + javaLocation;
-            } else {
-                outputPath = packageBase + fileSeparator + javaLocation;
-            }
-        }
-        Generator.getInstance().setOutputPath(outputPath);
+        Generator.getInstance().setOutputPath(getBasicProperties().getJavaDir_for_main());
     }
 
     protected void setupJavaDir_for_gen() {
-        final String fileSeparator = "/";
-        final String packageBase = getJavaDir();
-        final String javaLocation = getProperties().getJavaLocation_for_gen();
-        String outputPath = "";
-        if (packageBase != null && packageBase.endsWith(fileSeparator)) {
-            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = packageBase + javaLocation.substring(fileSeparator.length());
-            } else {
-                outputPath = packageBase + javaLocation;
-            }
-        } else {
-            if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = packageBase + javaLocation;
-            } else {
-                outputPath = packageBase + fileSeparator + javaLocation;
-            }
-        }
-        Generator.getInstance().setOutputPath(outputPath);
+        Generator.getInstance().setOutputPath(getBasicProperties().getJavaDir_for_gen());
     }
 }

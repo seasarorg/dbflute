@@ -2,11 +2,6 @@ package ${glPackageBaseCommon};
 
 #set ($myClassName = "${glGenMetaDataClassName}")
 
-import java.util.Map;
-
-import ${glPackageBaseCommonHelper}.${glMapListStringName};
-import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
-
 /**
  * The sigleton class that has generate-meta-data(GenMetaData).
  * 
@@ -17,15 +12,10 @@ public class ${myClassName} {
     /** Singleton instance. */
     private static final ${myClassName} _instance = new ${myClassName}();
 
-    /** The helper of map-list-string. */
-    protected ${glMapListStringName} _mapListString = new ${glMapListStringImplName}();
-
     /**
      * Constructor.
      */
     private ${myClassName}() {
-        _mapListString = new ${glMapListStringImplName}();
-        _mapListString.setDelimiter(";");
     }
 
     /**
@@ -97,6 +87,9 @@ public class ${myClassName} {
     // =========================================================================================
     //                                             Only when having generated, the effective one
     //                                             =============================================
+    // -------------------------------------------------------------------------------
+    //                                                                           Basic
+    //                                                                           -----
     /**
      * Get the property-value of targetLanguage.
      *
@@ -142,15 +135,9 @@ public class ${myClassName} {
         return "${database.ClassAuthor}";
     }
 
-    /**
-     * Is available entity lazy load?
-     *
-     * @return The property-value.
-     */
-    public boolean isAvailableEntityLazyLoad() {
-        return ${database.isAvailableEntityLazyLoad()};
-    }
-
+    // -------------------------------------------------------------------------------
+    //                                                                       Available
+    //                                                                       ---------
     /**
      * Is java name of table same as db name? Answer is ${database.isJavaNameOfTableSameAsDbName()}!
      *
@@ -170,12 +157,30 @@ public class ${myClassName} {
     }
 
     /**
-     * is available common-column-setup interceptor to behavior?
+     * Is available behavior generation? Answer is ${database.isAvailableBehaviorGeneration()}!
+     *
+     * @return The property-value.
+     */
+    public boolean isAvailableBehaviorGeneration() {
+        return ${database.isAvailableBehaviorGeneration()};
+    }
+
+    /**
+     * Is available common-column-setup interceptor to behavior? Answer is ${database.isAvailableCommonColumnSetupInterceptorToBehavior()}!
      *
      * @return The property-value.
      */
     public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
         return ${database.isAvailableCommonColumnSetupInterceptorToBehavior()};
+    }
+
+    /**
+     * Is available common-column-setup interceptor to dao? Answer is ${database.isAvailableCommonColumnSetupInterceptorToDao()}!
+     *
+     * @return The property-value.
+     */
+    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
+        return ${database.isAvailableCommonColumnSetupInterceptorToDao()};
     }
 
     /**
@@ -187,6 +192,9 @@ public class ${myClassName} {
         return ${database.isAvailableGenerics()};
     }
 
+    // -------------------------------------------------------------------------------
+    //                                                                          Prefix
+    //                                                                          ------
     /**
      * Get the property-value of projectPrefix.
      *
@@ -205,18 +213,9 @@ public class ${myClassName} {
         return "${database.BasePrefix}";
     }
 
-    /**
-     * Get the property-value of baseSuffixForEntity.
-     *
-     * @return The property-value.
-     */
-    public String getBaseSuffixForEntity() {
-        return "${database.BaseSuffixForEntity}";
-    }
-
     // -------------------------------------------------------------------------------
-    //                                                            DaoDicon Information
-    //                                                            --------------------
+    //                                                                        DaoDicon
+    //                                                                        --------
     /**
      * Get the property-value of daoDiconNamespace.
      *
@@ -263,8 +262,8 @@ public class ${myClassName} {
     }
 
     // -------------------------------------------------------------------------------
-    //                                                               EntityDao Package
-    //                                                               -----------------
+    //                                                                         Package
+    //                                                                         -------
     /**
      * Get the property-value of baseCommonPackage.
      *
@@ -337,26 +336,9 @@ public class ${myClassName} {
         return "${database.ExtendedEntityPackage}";
     }
 
-    /**
-     * Get the property-map of sequenceDefinitionMap.
-     *
-     * @return The property-map.
-     */
-    public Map${database.filterGenericsString('String, Object')} getSequenceDefinitionMapAsString() {
-        final String property = "${database.SequenceDefinitionMapAsStringRemovedLineSeparator}";
-        return _mapListString.generateMap(property);
-    }
-
-    /**
-     * Get the property-map of IdentityDefinitionMap.
-     *
-     * @return The property-map.
-     */
-    public Map${database.filterGenericsString('String, Object')} getIdentityDefinitionMapAsString() {
-        final String property = "${database.IdentityDefinitionMapAsStringRemovedLineSeparator}";
-        return _mapListString.generateMap(property);
-    }
-
+    // -------------------------------------------------------------------------------
+    //                                                                 Optimistic Lock
+    //                                                                 ---------------
     /**
      * Get the property-value of updateDateFieldName.
      *
@@ -375,16 +357,9 @@ public class ${myClassName} {
         return "${database.VersionNoFieldName}";
     }
 
-    /**
-     * Get the property-map of commonColumnMapAsStringRemovedLineSeparator.
-     *
-     * @return The property-map.
-     */
-    public Map${database.filterGenericsString('String, Object')} getCommonColumnMap() {
-        final String property = "${database.CommonColumnMapAsStringRemovedLineSeparator}";
-        return _mapListString.generateMap(property);
-    }
-
+    // -------------------------------------------------------------------------------
+    //                                                                    Select Param
+    //                                                                    ------------
     /**
      * Get the property-value of selectQueryTimeout.
      *
@@ -394,6 +369,9 @@ public class ${myClassName} {
         return ${database.SelectQueryTimeout};
     }
 
+    // -------------------------------------------------------------------------------
+    //                                                                         Extract
+    //                                                                         -------
     /**
      * Get the value of 'extractAcceptStartBrace'.
      *
@@ -428,24 +406,5 @@ public class ${myClassName} {
      */
     public String getExtractAcceptEqual() {
         return "${database.extractAcceptEqual}";
-    }
-
-    /**
-     * Get the property-map of jdbcToJavaNativeMap.
-     *
-     * @return The property-map.
-     */
-    public Map${database.filterGenericsString('String, Object')} getJdbcToJavaNativeMap() {
-        final String property = "${database.JdbcToJavaNativeAsStringRemovedLineSeparator}";
-        return _mapListString.generateMap(property);
-    }
-
-    /**
-     * Get the property-value of wildCard.
-     *
-     * @return The property-value.
-     */
-    public String getWildCard() {
-        return "${database.WildCard}";
     }
 }

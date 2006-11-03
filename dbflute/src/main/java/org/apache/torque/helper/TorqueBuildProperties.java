@@ -2,12 +2,9 @@ package org.apache.torque.helper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +15,15 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.helper.properties.AdditionalForeignKeyProperties;
+import org.apache.torque.helper.properties.BasicProperties;
 import org.apache.torque.helper.properties.ClassificationProperties;
+import org.apache.torque.helper.properties.DaoDiconProperties;
 import org.apache.torque.helper.properties.GeneratedClassPackageProperties;
+import org.apache.torque.helper.properties.OptimisticLockProperties;
+import org.apache.torque.helper.properties.PropertiesHandler;
+import org.apache.torque.helper.properties.SelectParamProperties;
+import org.apache.torque.helper.properties.Sql2EntityProperties;
 import org.apache.torque.helper.stateless.FlPropertyUtil;
 import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyBooleanFormatException;
 import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyIntegerFormatException;
@@ -59,10 +63,10 @@ public final class TorqueBuildProperties {
     /**
      * Set context-properties.
      * 
-     * @param contextProperties Context-properties.
+     * @param value Context-properties.
      */
-    final public void setContextProperties(Properties contextProperties) {
-        _buildProperties = contextProperties;
+    final public void setProperties(Properties value) {
+        _buildProperties = value;
     }
 
     /**
@@ -70,7 +74,7 @@ public final class TorqueBuildProperties {
      * 
      * @return Context-properties.
      */
-    final public Properties getContextProperties() {
+    final public Properties getProperties() {
         return _buildProperties;
     }
 
@@ -259,275 +263,40 @@ public final class TorqueBuildProperties {
     // **********************************************************************************************
     //                                                                                        Default
     //                                                                                        *******
-
-    public static final String JAVA_targetLanguage = "java";
-    public static final String CSHARP_targetLanguage = "csharp";
-    public static final String DEFAULT_targetLanguage = JAVA_targetLanguage;
-
-    public static final String JAVA_templateFileExtension = "vm";
-    public static final String CSHARP_templateFileExtension = "vmnet";
-    public static final String DEFAULT_templateFileExtension = JAVA_templateFileExtension;
-
-    public static final String JAVA_classFileExtension = "java";
-    public static final String CSHARP_classFileExtension = "cs";
-    public static final String DEFAULT_classFileExtension = JAVA_classFileExtension;
-
-    public static final String DEFAULT_templateFileEncoding = "Windows-31J";
-
     public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
     public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
     public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
     public static final String DEFAULT_EMPTY_LIST_STRING = "list:{}";
 
     // **********************************************************************************************
+    //                                                                                        Handler
+    //                                                                                        *******
+    public PropertiesHandler getHandler() {
+        return PropertiesHandler.getInstance();
+    }
+
+    // **********************************************************************************************
     //                                                                                       Property
     //                                                                                       ********
     // ===============================================================================
-    //                                                            Properties - Project
-    //                                                            ====================
-    public String getProjectName() {
-        return stringProp("torque.project", "");
+    //                                                              Properties - Basic
+    //                                                              ==================
+    public BasicProperties getBasicProperties() {
+        return getHandler().getBasicProperties(getProperties());
     }
 
     // ===============================================================================
-    //                                                           Properties - Database
+    //                                                           Properties - DaoDicon
     //                                                           =====================
-    public String getDatabaseName() {
-        return stringProp("torque.database", "");
-    }
-
-    // ===============================================================================
-    //                                                            Properties - JavaDir
-    //                                                            ====================
-    public String getJavaDir() {
-        return stringProp("torque.java.dir", "");
-    }
-
-    public String getJavaLocation_for_gen() {
-        return stringProp("torque.java.location.for.gen", "");
-    }
-
-    public String getJavaLocation_for_main() {
-        return stringProp("torque.java.location.for.main", "");
-    }
-
-    // ===============================================================================
-    //                                                           Properties - Language
-    //                                                           =====================
-    public String getTargetLanguage() {
-        return stringProp("torque.targetLanguage", DEFAULT_targetLanguage);
-    }
-
-    public boolean isTargetLanguageJava() {
-        return JAVA_targetLanguage.equals(getTargetLanguage());
-    }
-
-    public boolean isTargetLanguageCSharp() {
-        return CSHARP_targetLanguage.equals(getTargetLanguage());
-    }
-
-    // ===============================================================================
-    //                                                          Properties - Extension
-    //                                                          ======================
-    public String getTemplateFileExtension() {
-        if (JAVA_targetLanguage.equalsIgnoreCase(getTargetLanguage())) {
-            return JAVA_templateFileExtension;
-        } else if (CSHARP_targetLanguage.equalsIgnoreCase(getTargetLanguage())) {
-            return CSHARP_templateFileExtension;
-        } else {
-            return DEFAULT_templateFileExtension;
-        }
-    }
-
-    public String getClassFileExtension() {
-        if (JAVA_targetLanguage.equalsIgnoreCase(getTargetLanguage())) {
-            return JAVA_classFileExtension;
-        } else if (CSHARP_targetLanguage.equalsIgnoreCase(getTargetLanguage())) {
-            return CSHARP_classFileExtension;
-        } else {
-            return DEFAULT_classFileExtension;
-        }
-    }
-
-    // ===============================================================================
-    //                                                           Properties - Encoding
-    //                                                           =====================
-    public String getTemplateFileEncoding() {
-        return stringProp("torque.templateFileEncoding", DEFAULT_templateFileEncoding);
-    }
-
-    // ===============================================================================
-    //                                                             Properties - Author
-    //                                                             ===================
-    public String getClassAuthor() {
-        return stringProp("torque.classAuthor", "AutoGenerator");
-    }
-
-    // ===============================================================================
-    //                                                             Properties - SameAs
-    //                                                             ===================
-    public boolean isJavaNameOfTableSameAsDbName() {
-        return booleanProp("torque.isJavaNameOfTableSameAsDbName", false);
-    }
-
-    public boolean isJavaNameOfColumnSameAsDbName() {
-        return booleanProp("torque.isJavaNameOfColumnSameAsDbName", false);
-    }
-
-    // ===============================================================================
-    //                                                          Properties - Available
-    //                                                          ======================
-    public boolean isAvailableEntityLazyLoad() {
-        return booleanProp("torque.isAvailableEntityLazyLoad", false);
-    }
-
-    public boolean isAvailableBehaviorGeneration() {
-        return booleanProp("torque.isAvailableBehaviorGeneration", false);
-    }
-
-    public boolean isAvailableBehaviorInterfacePrefixI() {
-        return booleanProp("torque.isAvailableBehaviorInterfacePrefixI", false);
-    }
-
-    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
-        return booleanProp("torque.isAvailableCommonColumnSetupInterceptorToBehavior", false);
-    }
-
-    public boolean isAvailableCommonColumnSetupInterceptorToDao() {
-        return booleanProp("torque.isAvailableCommonColumnSetupInterceptorToDao", false);
-    }
-
-    public boolean isAvailableGenerics() {
-        return booleanProp("torque.isAvailableGenerics", true);
-    }
-
-    /**
-     * Filter generics-string.
-     * 
-     * @param genericsString Generics-string .
-     * @return Generics-string or empty-string.
-     */
-    public String filterGenericsString(String genericsString) {
-        if (isAvailableGenerics()) {
-            return "<" + genericsString + ">";
-        } else {
-            return "";
-        }
-    }
-
-    // ===============================================================================
-    //                                          Properties - PrefixAndSuffix for Class
-    //                                          ======================================
-    public String getProjectPrefix() {
-        return stringProp("torque.projectPrefix", "");
-    }
-
-    // ===============================================================================
-    //                                               Properties - DaoDicon Information
-    //                                               =================================
-    public String getDaoDiconNamespace() {
-        return stringProp("torque.daoDiconNamespace", "dao");
-    }
-
-    public String getDaoDiconPackageName() {
-        return stringProp("torque.daoDiconPackageName", "");
-    }
-
-    public String getDaoDiconFileName() {
-        return stringProp("torque.daoDiconFileName", "dao.dicon");
-    }
-
-    public String getJ2eeDiconResourceName() {
-        return stringProp("torque.j2eeDiconResourceName", "j2ee.dicon");
-    }
-
-    public String getRequiredTxComponentName() {
-        String defaultValue = null;
-        if (isTargetLanguageJava()) {
-            defaultValue = "requiredTx";
-        } else if (isTargetLanguageCSharp()) {
-            defaultValue = "LocalRequiredTx";
-        } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
-        return stringProp("torque.requiredTxComponentName", defaultValue);
-    }
-
-    public String getRequiresNewTxComponentName() {
-        String defaultValue = null;
-        if (isTargetLanguageJava()) {
-            defaultValue = "requiresNewTx";
-        } else if (isTargetLanguageCSharp()) {
-            defaultValue = "LocalRequiresNewTx";
-        } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
-        return stringProp("torque.requiresNewTxComponentName", defaultValue);
-    }
-
-    public static final String KEY_daoDiconOtherIncludeDefinitionMap = "daoDiconOtherIncludeDefinitionMap";
-    protected Map<String, Object> _daoDiconOtherIncludeDefinitionMap;
-
-    public Map<String, Object> getDaoDiconOtherIncludeDefinitionMap() {
-        if (_daoDiconOtherIncludeDefinitionMap == null) {
-            _daoDiconOtherIncludeDefinitionMap = mapProp("torque." + KEY_daoDiconOtherIncludeDefinitionMap,
-                    DEFAULT_EMPTY_MAP);
-        }
-        return _daoDiconOtherIncludeDefinitionMap;
-    }
-
-    public List<String> getDaoDiconOtherIncludePathList() {
-        return new ArrayList<String>(getDaoDiconOtherIncludeDefinitionMap().keySet());
+    public DaoDiconProperties getDaoDiconProperties() {
+        return getHandler().getDaoDiconProperties(getProperties());
     }
 
     // ===============================================================================
     //                                            Properties - Generated Class Package
     //                                            ====================================
-    protected GeneratedClassPackageProperties _generatedClassPackage;
-
-    protected GeneratedClassPackageProperties getGeneratedClassPackageProperties() {
-        if (_generatedClassPackage == null) {
-            _generatedClassPackage = new GeneratedClassPackageProperties(_buildProperties);
-        }
-        return _generatedClassPackage;
-    }
-
-    public String getPackageBase() {
-        return getGeneratedClassPackageProperties().getPackageBase();
-    }
-
-    public String getBaseCommonPackage() {
-        return getGeneratedClassPackageProperties().getBaseCommonPackage();
-    }
-
-    public String getBaseBehaviorPackage() {
-        return getGeneratedClassPackageProperties().getBaseBehaviorPackage();
-    }
-
-    public String getBaseDaoPackage() {
-        return getGeneratedClassPackageProperties().getBaseDaoPackage();
-    }
-
-    public String getBaseEntityPackage() {
-        return getGeneratedClassPackageProperties().getBaseEntityPackage();
-    }
-
-    public String getConditionBeanPackage() {
-        return getGeneratedClassPackageProperties().getConditionBeanPackage();
-    }
-
-    public String getExtendedBehaviorPackage() {
-        return getGeneratedClassPackageProperties().getExtendedBehaviorPackage();
-    }
-
-    public String getExtendedDaoPackage() {
-        return getGeneratedClassPackageProperties().getExtendedDaoPackage();
-    }
-
-    public String getExtendedEntityPackage() {
-        return getGeneratedClassPackageProperties().getExtendedEntityPackage();
+    public GeneratedClassPackageProperties getGeneratedClassPackageProperties() {
+        return getHandler().getGeneratedClassPackageProperties(getProperties());
     }
 
     // ===============================================================================
@@ -558,72 +327,11 @@ public final class TorqueBuildProperties {
         return _identityDefinitionMap;
     }
 
-    public String getIdentityDefinitionMapAsStringRemovedLineSeparator() {
-        final String property = stringProp("torque." + KEY_identityDefinitionMap, DEFAULT_EMPTY_MAP_STRING);
-        return removeNewLine(property);
-    }
-
     // ===============================================================================
     //                                                    Properties - Optimistic Lock
     //                                                    ============================
-    public String getUpdateDateFieldName() {
-        return stringProp("torque.updateDateFieldName", "");
-    }
-
-    public List<Object> getUpdateDateExceptTableList() {
-        return listProp("torque.updateDateExceptTableList", DEFAULT_EMPTY_LIST);
-    }
-
-    /**
-     * Is table out of sight?
-     * 
-     * @param tableName Table-name.
-     * @return Determination.
-     */
-    public boolean isUpdateDateExceptTable(final String tableName) {
-        if (tableName == null) {
-            throw new NullPointerException("Argument[tableName] is required.");
-        }
-
-        final List exceptList = getUpdateDateExceptTableList();
-        if (exceptList == null) {
-            throw new IllegalStateException("getUpdateDateExceptTableList() must not return null: + " + tableName);
-        }
-
-        for (final Iterator ite = exceptList.iterator(); ite.hasNext();) {
-            final String tableHint = (String) ite.next();
-            if (isHitTableHint(tableName, tableHint)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected boolean isHitTableHint(String tableName, String tableHint) {
-        // TODO: I want to refactor this judgement logic for hint someday.
-        final String prefixMark = "prefix:";
-        final String suffixMark = "suffix:";
-
-        if (tableHint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
-            final String pureTableHint = tableHint.substring(prefixMark.length(), tableHint.length());
-            if (tableName.toLowerCase().startsWith(pureTableHint.toLowerCase())) {
-                return true;
-            }
-        } else if (tableHint.toLowerCase().startsWith(suffixMark.toLowerCase())) {
-            final String pureTableHint = tableHint.substring(suffixMark.length(), tableHint.length());
-            if (tableName.toLowerCase().endsWith(pureTableHint.toLowerCase())) {
-                return true;
-            }
-        } else {
-            if (tableName.equalsIgnoreCase(tableHint)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public String getVersionNoFieldName() {
-        return stringProp("torque.versionNoFieldName", "");
+    public OptimisticLockProperties getOptimisticLockProperties() {
+        return getHandler().getOptimisticLockProperties(getProperties());
     }
 
     // ===============================================================================
@@ -647,11 +355,6 @@ public final class TorqueBuildProperties {
             _commonColumnNameList = new ArrayList<String>(commonColumnMap.keySet());
         }
         return _commonColumnNameList;
-    }
-
-    public String getCommonColumnMapAsStringRemovedLineSeparator() {
-        final String property = stringProp("torque." + KEY_commonColumnMap, DEFAULT_EMPTY_MAP_STRING);
-        return removeNewLine(property);
     }
 
     // --------------------------------------
@@ -683,12 +386,6 @@ public final class TorqueBuildProperties {
         return (String) map.get(columnName);
     }
 
-    public String getCommonColumnSetupBeforeInsertInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        final String key = "torque." + KEY_commonColumnSetupBeforeInsertInterceptorLogicMap;
-        final String property = stringProp(key, DEFAULT_EMPTY_MAP_STRING);
-        return filterDoubleQuotation(removeNewLine(property));
-    }
-
     // --------------------------------------
     //                                 update
     //                                 ------
@@ -716,12 +413,6 @@ public final class TorqueBuildProperties {
     public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
         final Map map = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
         return (String) map.get(columnName);
-    }
-
-    public String getCommonColumnSetupBeforeUpdateInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        final String key = "torque." + KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap;
-        final String property = stringProp(key, DEFAULT_EMPTY_MAP_STRING);
-        return filterDoubleQuotation(removeNewLine(property));
     }
 
     // --------------------------------------
@@ -753,12 +444,6 @@ public final class TorqueBuildProperties {
         return (String) map.get(columnName);
     }
 
-    public String getCommonColumnSetupBeforeDeleteInterceptorLogicMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        final String key = "torque." + KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap;
-        final String property = stringProp(key, DEFAULT_EMPTY_MAP_STRING);
-        return filterDoubleQuotation(removeNewLine(property));
-    }
-
     // ===============================================================================
     //                                                     Properties - Logical-Delete
     //                                                     ===========================
@@ -782,11 +467,6 @@ public final class TorqueBuildProperties {
         return _logicalDeleteColumnNameList;
     }
 
-    public String getLogicalDeleteColumnValueMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        final String property = stringProp("torque." + KEY_logicalDeleteColumnValueMap, DEFAULT_EMPTY_MAP_STRING);
-        return filterDoubleQuotation(removeNewLine(property));
-    }
-
     // ===============================================================================
     //                                        Properties - Revival from Logical-Delete
     //                                        ========================================
@@ -808,12 +488,6 @@ public final class TorqueBuildProperties {
             _revivalFromLogicalDeleteColumnNameList = new ArrayList<String>(getLogicalDeleteColumnValueMap().keySet());
         }
         return _revivalFromLogicalDeleteColumnNameList;
-    }
-
-    public String getRevivalFromLogicalDeleteColumnValueMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        final String property = stringProp("torque." + KEY_revivalFromLogicalDeleteColumnValueMap,
-                DEFAULT_EMPTY_MAP_STRING);
-        return filterDoubleQuotation(removeNewLine(property));
     }
 
     // ===============================================================================
@@ -907,42 +581,28 @@ public final class TorqueBuildProperties {
     // ===============================================================================
     //                                                       Properties - Select Param
     //                                                       =========================
-    // Abort!
-    //
-    //    public String getFetchPageDefaultFetchSize() {
-    //        return stringProp("torque.fetchPageDefaultFetchSize", "20");
-    //    }
-    //
-    //    public boolean isAvailableUseAbsoluteWhenResultSetFetchNarrowing() {
-    //        return booleanProp("torque.isAvailableUseAbsoluteWhenResultSetFetchNarrowing", true);
-    //    }
-    //
-    //    public int getPageResultBeanDefaultPageGroupSize() {
-    //        return intProp("torque.pageResultBeanDefaultPageGroupSize", 10);
-    //    }
-    //
-    //    public int getPageResultBeanDefaultPageRangeSize() {
-    //        return intProp("torque.pageResultBeanDefaultPageRangeSize", 10);
-    //    }
+    protected SelectParamProperties getSelectParamProperties() {
+        return getHandler().getSelectParamProperties(getProperties());
+    }
 
     public String getSelectQueryTimeout() {
-        return stringProp("torque.selectQueryTimeout", "-1");
+        return getSelectParamProperties().getSelectQueryTimeout();
     }
 
     public boolean isSelectQueryTimeoutValid() {
-        return !getSelectQueryTimeout().startsWith("-");
+        return getSelectParamProperties().isSelectQueryTimeoutValid();
     }
 
     public String getStatementResultSetType() {
-        return stringProp("torque.statementResultSetType", "");
+        return getSelectParamProperties().getStatementResultSetType();
     }
 
     public String getStatementResultSetConcurrency() {
-        return stringProp("torque.statementResultSetConcurrency", "");
+        return getSelectParamProperties().getStatementResultSetConcurrency();
     }
 
     public boolean isStatementResultSetTypeValid() {
-        return getStatementResultSetType().trim().length() != 0;
+        return getSelectParamProperties().isStatementResultSetTypeValid();
     }
 
     // ===============================================================================
@@ -1067,89 +727,30 @@ public final class TorqueBuildProperties {
     }
 
     // ===============================================================================
-    //                                                Properties - AdditinalForeignKey
-    //                                                ================================
-    public static final String KEY_additionalForeignKeyMap = "additionalForeignKeyMap";
-    protected Map<String, Map<String, String>> _additionalForeignKeyMap;
+    //                                               Properties - AdditionalForeignKey
+    //                                               =================================
+    protected AdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
+        return getHandler().getAdditionalForeignKeyProperties(getProperties());
+    }
 
     public Map<String, Map<String, String>> getAdditionalForeignKeyMap() {
-        if (_additionalForeignKeyMap == null) {
-            _additionalForeignKeyMap = new LinkedHashMap<String, Map<String, String>>();
-            final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalForeignKeyMap, DEFAULT_EMPTY_MAP);
-            final Set fisrtKeySet = generatedMap.keySet();
-            for (Object foreignName : fisrtKeySet) {
-                final Object firstValue = generatedMap.get(foreignName);
-                if (!(firstValue instanceof Map)) {
-                    String msg = "The value type should be Map: tableName=" + foreignName + " property=CustomizeDao";
-                    msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
-                    throw new IllegalStateException(msg);
-                }
-                final Map ForeignDefinitionMap = (Map) firstValue;
-                Set secondKeySet = ForeignDefinitionMap.keySet();
-                final Map<String, String> genericForeignDefinitiontMap = new LinkedHashMap<String, String>();
-                for (Object componentName : secondKeySet) {
-                    final Object secondValue = ForeignDefinitionMap.get(componentName);
-                    if (secondValue == null) {
-                        continue;
-                    }
-                    if (!(componentName instanceof String)) {
-                        String msg = "The key type should be String: foreignName=" + foreignName
-                                + " property=AdditionalForeignKey";
-                        msg = msg + " actualType=" + componentName.getClass() + " actualKey=" + componentName;
-                        throw new IllegalStateException(msg);
-                    }
-                    if (!(secondValue instanceof String)) {
-                        String msg = "The value type should be String: foreignName=" + foreignName
-                                + " property=AdditionalForeignKey";
-                        msg = msg + " actualType=" + secondValue.getClass() + " actualValue=" + secondValue;
-                        throw new IllegalStateException(msg);
-                    }
-                    genericForeignDefinitiontMap.put((String) componentName, (String) secondValue);
-                }
-                _additionalForeignKeyMap.put((String) foreignName, genericForeignDefinitiontMap);
-            }
-        }
-        return _additionalForeignKeyMap;
+        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyMap();
     }
 
     public String getAdditionalForeignKeyComponentLocalTableName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("localTableName");
+        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyComponentLocalTableName(foreignName);
     }
 
     public String getAdditionalForeignKeyComponentForeignTableName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("foreignTableName");
-    }
-
-    protected String getAdditionalForeignKeyComponentLocalColumnName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("localColumnName");
+        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyComponentForeignTableName(foreignName);
     }
 
     public List<String> getAdditionalForeignKeyComponentLocalColumnNameList(String foreignName) {
-        final String property = getAdditionalForeignKeyComponentLocalColumnName(foreignName);
-        final List<String> localColumnNameList = new ArrayList<String>();
-        final StringTokenizer st = new StringTokenizer(property, "/");
-        while (st.hasMoreElements()) {
-            localColumnNameList.add(st.nextToken());
-        }
-        return localColumnNameList;
-    }
-
-    protected String getAdditionalForeignKeyComponentForeignColumnName(String foreignName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        return componentMap.get("foreignColumnName");
+        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyComponentLocalColumnNameList(foreignName);
     }
 
     public List<String> getAdditionalForeignKeyComponentForeignColumnNameList(String foreignName) {
-        final String property = getAdditionalForeignKeyComponentForeignColumnName(foreignName);
-        final List<String> foreignColumnNameList = new ArrayList<String>();
-        final StringTokenizer st = new StringTokenizer(property, "/");
-        while (st.hasMoreElements()) {
-            foreignColumnNameList.add(st.nextToken());
-        }
-        return foreignColumnNameList;
+        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyComponentForeignColumnNameList(foreignName);
     }
 
     // ===============================================================================
@@ -1437,7 +1038,7 @@ public final class TorqueBuildProperties {
 
     public TableExceptInformation getTableExceptInformation() {
         if (_tableExceptInformation == null) {
-            if ("mssql".equals(getDatabaseName())) {
+            if ("mssql".equals(getBasicProperties().getDatabaseName())) {
                 _tableExceptInformation = new TableExceptSQLServer();
             } else {
                 _tableExceptInformation = new TableExceptDefault();
@@ -1528,16 +1129,16 @@ public final class TorqueBuildProperties {
     protected LanguageMetaData _languageMetaData;
 
     protected LanguageMetaData getLanguageMetaData() {
-        if (isTargetLanguageJava()) {
+        if (getBasicProperties().isTargetLanguageJava()) {
             if (_languageMetaData == null) {
                 _languageMetaData = new JavaMetaData();
             }
-        } else if (isTargetLanguageCSharp()) {
+        } else if (getBasicProperties().isTargetLanguageCSharp()) {
             if (_languageMetaData == null) {
                 _languageMetaData = new CSharpMetaData();
             }
         } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
+            String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
             throw new IllegalStateException(msg);
         }
         return _languageMetaData;
@@ -1723,6 +1324,13 @@ public final class TorqueBuildProperties {
         } else {
             return false;
         }
+    }
+
+    // ===============================================================================
+    //                                            Properties - sql2EntityDefinitionMap
+    //                                            ====================================
+    public Sql2EntityProperties getSql2EntityProperties() {
+        return getHandler().getSql2EntityProperties(getProperties());
     }
 
     // **********************************************************************************************

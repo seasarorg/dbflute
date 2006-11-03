@@ -1,6 +1,6 @@
+package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
-package ${myBaseEntityPackageName};
 #if (${table.hasAllCommonColumn()})
 
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
@@ -164,11 +164,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /**
      * Set the value of ${col.UncapitalisedJavaName}.
      * 
-     * @param v The value of ${col.UncapitalisedJavaName}. (Nullable)
+     * @param ${col.UncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
      */
-    public void set${col.JavaName}(${col.JavaNative} v) {
+    public void set${col.JavaName}(${col.JavaNative} ${col.UncapitalisedJavaName}) {
         _isSetterInvoked${col.JavaName} = true;
-        _${col.UncapitalisedJavaName} = v;
+        _${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
 #end
 

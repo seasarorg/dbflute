@@ -434,11 +434,7 @@ namespace ${glPackageExtendedBhv} {
     #set ($reffererTable = $refferer.Table)
     #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
     #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
-    #if ($database.isAvailableBehaviorInterfacePrefixI())
-      #set ($reffererBhvClassName = "I${reffererEntityClassName}Bhv")
-    #else
-      #set ($reffererBhvClassName = "${reffererEntityClassName}Bhv")
-    #end
+    #set ($reffererBhvClassName = "${reffererEntityClassName}Bhv")
     #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
     #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
     #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")

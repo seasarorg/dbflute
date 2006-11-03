@@ -1,0 +1,44 @@
+package ${myBaseEntityPackageName};
+#set ($myClassName = "${myBaseObjectClassName}")
+
+/**
+ * The entity of ${table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+#foreach ($col in $table.Columns)
+    
+    /** The value of ${col.UncapitalisedJavaName}. */
+    protected ${col.JavaNative} _${col.UncapitalisedJavaName};
+#end
+
+    // =====================================================================================
+    //                                                                         Getter Setter
+    //                                                                         =============
+#foreach ($col in $table.Columns)
+
+    /**
+     * Get the value of ${col.UncapitalisedJavaName}.
+     * 
+     * @return The value of ${col.UncapitalisedJavaName}. (Nullable)
+     */
+    public ${col.JavaNative} get${col.JavaName}() {
+        return _${col.UncapitalisedJavaName};
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName}.
+     * 
+     * @param ${col.UncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
+     */
+    public void set${col.JavaName}(${col.JavaNative} ${col.UncapitalisedJavaName}) {
+        _${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
+    }
+#end
+
+}

@@ -73,7 +73,6 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
-import org.apache.torque.helper.TorqueBuildProperties;
 import org.apache.torque.helper.jdbc.RunnerInformation;
 import org.apache.torque.helper.jdbc.SqlFileFireMan;
 import org.apache.torque.helper.jdbc.SqlFileGetter;
@@ -82,15 +81,8 @@ import org.apache.torque.helper.jdbc.SqlFileRunnerBase;
 import org.apache.torque.helper.jdbc.SqlFileRunnerExecute.SQLRuntimeException;
 import org.apache.torque.task.bs.TorqueTexenTask;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 
-/**
- * This class generates an XML schema of an existing database from JDBC metadata..
- * <p>
- * @author mkubo
- * @version $Revision$ $Date$
- */
 public class TorqueSql2EntityTask extends TorqueTexenTask {
 
     private static final Log _log = LogFactory.getLog(TorqueSql2EntityTask.class);
@@ -98,53 +90,29 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
     // =========================================================================================
     //                                                                                 Attribute
     //                                                                                 =========
-    /** DB driver. */
     protected String _driver = null;
 
-    /** DB url. */
     protected String _url = null;
 
-    /** User name. */
     protected String _userId = null;
 
-    /** Password */
     protected String _password = null;
 
     // =========================================================================================
     //                                                                                  Accessor
     //                                                                                  ========
-    /**
-     * Set the JDBC driver to be used.
-     *
-     * @param driver driver class name
-     */
     public void setDriver(String driver) {
         this._driver = driver;
     }
 
-    /**
-     * Set the DB connection url.
-     *
-     * @param url connection url
-     */
     public void setUrl(String url) {
         this._url = url;
     }
 
-    /**
-     * Set the user name for the DB connection.
-     *
-     * @param userId database user
-     */
     public void setUserId(String userId) {
         this._userId = userId;
     }
 
-    /**
-     * Set the password for the DB connection.
-     *
-     * @param password database password
-     */
     public void setPassword(String password) {
         this._password = password;
     }
@@ -154,15 +122,11 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
     //                                                                                  ========
     protected final Map<String, Map<String, String>> _entityInfoMap = new LinkedHashMap<String, Map<String, String>>();
     protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
+    protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
 
     // =========================================================================================
     //                                                                                   Execute
     //                                                                                   =======
-    /**
-     * Load the sql file and then execute it.
-     *
-     * @throws BuildException
-     */
     public void execute() throws BuildException {
         final RunnerInformation runInfo = new RunnerInformation();
         runInfo.setDriver(_driver);
@@ -174,74 +138,34 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
         final SqlFileFireMan fireMan = new SqlFileFireMan();
         fireMan.execute(runner, getSqlFileList());
 
-        // /----------------------------------------------
-        // Set up the encoding of templates from property.
-        // -----/
-        final String templateEncoding = TorqueBuildProperties.getInstance().getTemplateFileEncoding();
-        Velocity.setProperty("input.encoding", templateEncoding);
+        fireSuperExecute();
 
-        try {
-            super.execute();
-        } catch (Exception e) {
-            _log.error("/ * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-            _log.error("super#execute() threw the exception!", e);
-            _log.error("/ * * * * * * * * * /");
+        final Set<String> entityNameSet = _exceptionInfoMap.keySet();
+        final StringBuilder sb = new StringBuilder();
+        final String lineSeparator = System.getProperty("line.separator");
+        for (String entityName : entityNameSet) {
+            final String exceptionInfo = _exceptionInfoMap.get(entityName);
+
+            sb.append(lineSeparator);
+            sb.append("[" + entityName + "]");
+            sb.append(exceptionInfo);
         }
+        _log.warn(sb.toString());
     }
 
-    public Context initControlContext() throws Exception {
-        final Database db = new Database();
-        final Map<String, Map<String, String>> entityInfoMap = _entityInfoMap;
-        final Set<String> entityNameSet = entityInfoMap.keySet();
-        for (String entityName : entityNameSet) {
-            final Map<String, String> columnJdbcTypeMap = entityInfoMap.get(entityName);
-
-            final Table tbl = new Table();
-            tbl.setName(entityName);
-            tbl.setJavaNameConvertOff();
-            db.addTable(tbl);
-            
-            final Set<String> columnNameSet = columnJdbcTypeMap.keySet();
-            for (String columnName : columnNameSet) {
-                final Column col = new Column();
-                col.setName(columnName);
-
-                final String jdbcType = columnJdbcTypeMap.get(columnName);
-                col.setTorqueType(TypeMap.getTorqueType(jdbcType));
-
-                tbl.addColumn(col);
-            }
-        }
-        final String databaseType = TorqueBuildProperties.getInstance().getDatabaseName();
-        final AppData appData = new AppData(databaseType, null);
-        appData.addDatabase(db);
-
-        VelocityContext context = new VelocityContext();
-        final List<AppData> dataModels = new ArrayList<AppData>();
-        dataModels.add(appData);
-        context.put("dataModels", dataModels);
-        context.put("targetDatabase", getTargetDatabase());
-        return context;
+    protected List<File> getSqlFileList() {
+        final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
+        return new SqlFileGetter().getSqlFileList(sqlDirectory);
     }
 
     protected SqlFileRunner getSqlFileRunner(RunnerInformation runInfo) {
         return new SqlFileRunnerBase(runInfo) {
             protected void execSQL(Statement statement, String sql) {
+                final String entityName = getEntityName(sql);
+                if (entityName == null) {
+                    return;
+                }
                 try {
-                    final String entityName;
-                    {
-                        String tmp = sql;
-                        final int startIndex = tmp.indexOf("--#");
-                        if (startIndex < 0) {
-                            return;
-                        }
-                        tmp = tmp.substring(startIndex + "--#".length());
-                        if (tmp.indexOf("#") < 0) {
-                            return;
-                        }
-                        entityName = tmp.substring(0, tmp.indexOf("#"));
-                    }
-
                     final ResultSet rs = statement.executeQuery(sql);
                     _goodSqlCount++;
 
@@ -259,16 +183,67 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
                     if (!_runInfo.isErrorContinue()) {
                         throw new SQLRuntimeException(msg, e);
                     }
-                    _log.warn(msg, e);
-                    _log.warn("" + System.getProperty("line.separator"));
+                    _exceptionInfoMap.put(entityName, e.getMessage() + System.getProperty("line.separator") + sql);
                 }
             }
         };
     }
 
-    protected List<File> getSqlFileList() {
-        final String sqlDirectory = "./playsql/testsql";// TODO: ;
-        return new SqlFileGetter().getSqlFileList(sqlDirectory);
+    protected String getEntityName(final String sql) {
+        final String startMark = "--#";
+        final String endMark = "#--";
+        final String entityName;
+        {
+            String tmp = sql;
+            final int startIndex = tmp.indexOf(startMark);
+            if (startIndex < 0) {
+                return null;
+            }
+            tmp = tmp.substring(startIndex + startMark.length());
+            if (tmp.indexOf(endMark) < 0) {
+                return null;
+            }
+            entityName = tmp.substring(0, tmp.indexOf(endMark)).trim();
+        }
+        return entityName;
+    }
+
+    // =========================================================================================
+    //                                                                                   Context
+    //                                                                                   =======
+    public Context initControlContext() throws Exception {
+        final Database db = new Database();
+        final Map<String, Map<String, String>> entityInfoMap = _entityInfoMap;
+        final Set<String> entityNameSet = entityInfoMap.keySet();
+        for (String entityName : entityNameSet) {
+            final Map<String, String> columnJdbcTypeMap = entityInfoMap.get(entityName);
+
+            final Table tbl = new Table();
+            tbl.setName(entityName);
+            tbl.setJavaNameConvertOff();
+            db.addTable(tbl);
+
+            final Set<String> columnNameSet = columnJdbcTypeMap.keySet();
+            for (String columnName : columnNameSet) {
+                final Column col = new Column();
+                col.setName(columnName);
+
+                final String jdbcType = columnJdbcTypeMap.get(columnName);
+                col.setTorqueType(TypeMap.getTorqueType(jdbcType));
+
+                tbl.addColumn(col);
+            }
+        }
+        final String databaseType = getBasicProperties().getDatabaseName();
+        final AppData appData = new AppData(databaseType, null);
+        appData.addDatabase(db);
+
+        VelocityContext context = new VelocityContext();
+        final List<AppData> dataModels = new ArrayList<AppData>();
+        dataModels.add(appData);
+        context.put("dataModels", dataModels);
+        context.put("targetDatabase", getTargetDatabase());
+        return context;
     }
 
 }

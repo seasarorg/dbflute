@@ -165,19 +165,6 @@ public abstract class TorqueAbstractDbMetaTexenTask extends TorqueTexenTask {
     }
 
     public void execute() throws BuildException {
-        // /----------------------------------------------
-        // Set up the encoding of templates from property.
-        // -----/
-        final String templateEncoding = TorqueBuildProperties.getInstance().getTemplateFileEncoding();
-        Velocity.setProperty("input.encoding", templateEncoding);
-
-        try {
-            super.execute();
-        } catch (Exception e) {
-            _log.error("/ * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-            _log.error("super#execute() threw the exception!", e);
-            _log.error("/ * * * * * * * * * /");
-        }
+        fireSuperExecute();
     }
-
 }

@@ -215,13 +215,8 @@ namespace ${glPackageBaseCommon} {
             if (_bhvCacheMap == null) {
                 _bhvCacheMap = new System.Collections.Generic.Dictionary<Type, ${glBehaviorReadableInterfaceName}>();
       #foreach ($table in $database.Tables)
-        #if ($database.isAvailableBehaviorInterfacePrefixI())
-
-                _bhvCacheMap.Add(typeof(${glPackageExtendedBhv}.I${glProjectPrefix}${table.JavaName}Bhv), this.${table.JavaName}Bhv);
-        #else
 
                 _bhvCacheMap.Add(typeof(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv), this.${table.JavaName}Bhv);
-        #end
       #end
 
             }
@@ -232,33 +227,19 @@ namespace ${glPackageBaseCommon} {
             if (_daoBhvMap == null) {
                 _daoBhvMap = new System.Collections.Generic.Dictionary<Type, Type>();
       #foreach ($table in $database.Tables)
-        #if ($database.isAvailableBehaviorInterfacePrefixI())
-
-                _daoBhvMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), typeof(${glPackageExtendedBhv}.I${glProjectPrefix}${table.JavaName}Bhv));
-        #else
 
                 _daoBhvMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), typeof(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv));
-        #end
       #end
 
             }
         }
       #foreach ($table in $database.Tables)
-        #if ($database.isAvailableBehaviorInterfacePrefixI())
-
-        protected ${glPackageExtendedBhv}.I${glProjectPrefix}${table.JavaName}Bhv _${table.UncapitalisedJavaName}Bhv;
-        public ${glPackageExtendedBhv}.I${glProjectPrefix}${table.JavaName}Bhv ${table.JavaName}Bhv {
-            get { return _${table.UncapitalisedJavaName}Bhv; }
-            set { _${table.UncapitalisedJavaName}Bhv = value; }
-        }
-        #else
 
         protected ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv _${table.UncapitalisedJavaName}Bhv;
         public ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv ${table.JavaName}Bhv {
             get { return _${table.UncapitalisedJavaName}Bhv; }
             set { _${table.UncapitalisedJavaName}Bhv = value; }
         }
-        #end
       #end
     #end
 
