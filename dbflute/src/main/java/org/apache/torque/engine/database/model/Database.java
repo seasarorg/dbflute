@@ -752,6 +752,22 @@ public class Database {
         return getProperties().getDaoDiconProperties().getDaoDiconOtherIncludePathList();
     }
 
+    public Map<String, Map<String, String>> getOriginalDaoComponentMap() {
+        return getProperties().getDaoDiconProperties().getOriginalDaoComponentMap();
+    }
+
+    public List<String> getOriginalDaoComponentComponentNameList() {
+        return getProperties().getDaoDiconProperties().getOriginalDaoComponentComponentNameList();
+    }
+
+    public String getOriginalDaoComponentClassName(String componentName) {
+        return getProperties().getDaoDiconProperties().getOriginalDaoComponentClassName(componentName);
+    }
+
+    public boolean isDaoComponent(String componentName) {
+        return getProperties().getDaoDiconProperties().isDaoComponent(componentName);
+    }
+
     // ===============================================================================
     //                                            Properties - Generated Class Package
     //                                            ====================================
@@ -1129,21 +1145,6 @@ public class Database {
 
     public List<String> getArgumentBeanRelatedSqlParameterSqlParameterNameList(String argumentBeanName) {
         return getProperties().getArgumentBeanRelatedSqlParameterSqlParameterNameList(argumentBeanName);
-    }
-
-    // ===============================================================================
-    //                                                   Properties - OriginalBehavior
-    //                                                   =============================
-    public Map<String, Map<String, String>> getOriginalDaoComponentMap() {
-        return getProperties().getOriginalDaoComponentMap();
-    }
-
-    public List<String> getOriginalDaoComponentComponentNameList() {
-        return getProperties().getOriginalDaoComponentComponentNameList();
-    }
-
-    public String getOriginalDaoComponentClassName(String componentName) {
-        return getProperties().getOriginalDaoComponentClassName(componentName);
     }
 
     // ===============================================================================

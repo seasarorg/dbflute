@@ -179,7 +179,7 @@ public class ${myClassName} {
      *
      * @return The property-value.
      */
-    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
+    public boolean isAvailableCommonColumnSetupInterceptorToDao() {
         return ${database.isAvailableCommonColumnSetupInterceptorToDao()};
     }
 

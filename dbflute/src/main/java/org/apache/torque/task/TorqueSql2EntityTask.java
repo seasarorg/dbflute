@@ -64,6 +64,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -123,6 +124,7 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
     protected final Map<String, Map<String, String>> _entityInfoMap = new LinkedHashMap<String, Map<String, String>>();
     protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
+    protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
 
     // =========================================================================================
     //                                                                                   Execute
@@ -160,52 +162,136 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
 
     protected SqlFileRunner getSqlFileRunner(RunnerInformation runInfo) {
         return new SqlFileRunnerBase(runInfo) {
+            protected String filterSql(String sql) {
+                return removeBeginEndComment(sql);
+            }
+
             protected void execSQL(Statement statement, String sql) {
                 final String entityName = getEntityName(sql);
                 if (entityName == null) {
                     return;
                 }
+                ResultSet rs = null;
                 try {
-                    final ResultSet rs = statement.executeQuery(sql);
+                    rs = statement.executeQuery(sql);
                     _goodSqlCount++;
 
                     final Map<String, String> columnJdbcTypeMap = new LinkedHashMap<String, String>();
                     final ResultSetMetaData md = rs.getMetaData();
                     for (int i = 1; i <= md.getColumnCount(); i++) {
                         final String columnName = md.getColumnName(i);
+                        if (columnName == null || columnName.trim().length() == 0) {
+                            String msg = "The columnName is invalid: " + columnName;
+                            msg = msg + " sql=" + sql;
+                            throw new IllegalArgumentException(msg);
+                        }
                         final String columnTypeName = md.getColumnTypeName(i);
+                        if (columnTypeName == null || columnTypeName.trim().length() == 0) {
+                            String msg = "The columnTypeName is invalid: " + columnTypeName;
+                            msg = msg + " columnName=" + columnName + " sql=" + sql;
+                            throw new IllegalArgumentException(msg);
+                        }
                         columnJdbcTypeMap.put(columnName, columnTypeName);
                     }
 
                     _entityInfoMap.put(entityName, columnJdbcTypeMap);
+                    _primaryKeyMap.put(entityName, getPrimaryKeyColumnNameList(sql));
                 } catch (SQLException e) {
                     String msg = "Failed to execute: " + sql;
                     if (!_runInfo.isErrorContinue()) {
                         throw new SQLRuntimeException(msg, e);
                     }
                     _exceptionInfoMap.put(entityName, e.getMessage() + System.getProperty("line.separator") + sql);
+                } finally {
+                    if (rs != null) {
+                        try {
+                            rs.close();
+                        } catch (SQLException ignored) {
+                            _log.warn("rs.close() threw the exception!", ignored);
+                        }
+                    }
                 }
+            }
+            
+            @Override
+            protected void traceSql(String sql) {
+                _log.info("{SQL}" + System.getProperty("line.separator") + sql);
             }
         };
     }
 
+    protected String removeBeginEndComment(final String sql) {
+        if (sql == null || sql.trim().length() == 0) {
+            String msg = "The sql is invalid: " + sql;
+            throw new IllegalArgumentException(msg);
+        }
+        final String beginMark = "/*";
+        final String endMark = "*/";
+        final StringBuilder sb = new StringBuilder();
+        String tmp = sql;
+        while (true) {
+            if (tmp.indexOf(beginMark) < 0) {
+                sb.append(tmp);
+                break;
+            }
+            if (tmp.indexOf(endMark) < 0) {
+                sb.append(tmp);
+                _log.warn("Wrong comment is here. Begin-mark exists but End-mark doesn't: " + sql);
+                break;
+            }
+            if (tmp.indexOf(beginMark) > tmp.indexOf(endMark)) {
+                final int borderIndex = tmp.indexOf(endMark) + endMark.length();
+                sb.append(tmp.substring(0, borderIndex));
+                tmp = tmp.substring(borderIndex);
+                _log.warn("Wrong comment is here. End-mark is beginning before Begin-mark: " + sql);
+                continue;
+            }
+            sb.append(tmp.substring(0, tmp.indexOf(beginMark)));
+            tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
+        }
+        return sb.toString();
+    }
+
     protected String getEntityName(final String sql) {
-        final String startMark = "--#";
-        final String endMark = "#--";
-        final String entityName;
+        if (sql == null || sql.trim().length() == 0) {
+            String msg = "The sql is invalid: " + sql;
+            throw new IllegalArgumentException(msg);
+        }
+        return getStringBetweenBeginEndMark(sql, "--#", "#--");
+    }
+
+    protected List<String> getPrimaryKeyColumnNameList(final String sql) {
+        if (sql == null || sql.trim().length() == 0) {
+            String msg = "The sql is invalid: " + sql;
+            throw new IllegalArgumentException(msg);
+        }
+        final List<String> retLs = new ArrayList<String>();
+        final String primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "--*", "*--");
+        if (primaryKeyColumnNameSeparatedString != null && primaryKeyColumnNameSeparatedString.trim().length() != 0) {
+            final StringTokenizer st = new StringTokenizer(primaryKeyColumnNameSeparatedString, ",;/\t");
+            while (st.hasMoreTokens()) {
+                final String nextToken = st.nextToken();
+                retLs.add(nextToken.trim());
+            }
+        }
+        return retLs;
+    }
+
+    protected String getStringBetweenBeginEndMark(final String targetStr, final String beginMark, final String endMark) {
+        final String ret;
         {
-            String tmp = sql;
-            final int startIndex = tmp.indexOf(startMark);
+            String tmp = targetStr;
+            final int startIndex = tmp.indexOf(beginMark);
             if (startIndex < 0) {
                 return null;
             }
-            tmp = tmp.substring(startIndex + startMark.length());
+            tmp = tmp.substring(startIndex + beginMark.length());
             if (tmp.indexOf(endMark) < 0) {
                 return null;
             }
-            entityName = tmp.substring(0, tmp.indexOf(endMark)).trim();
+            ret = tmp.substring(0, tmp.indexOf(endMark)).trim();
         }
-        return entityName;
+        return ret;
     }
 
     // =========================================================================================
@@ -220,19 +306,38 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
 
             final Table tbl = new Table();
             tbl.setName(entityName);
-            tbl.setJavaNameConvertOff();
+            tbl.setupNeedsJavaNameConvertFalse();
             db.addTable(tbl);
+            _log.debug(entityName + " --> " + tbl.getName() + " : " + tbl.getJavaName() + " : "
+                    + tbl.getUncapitalisedJavaName());
 
             final Set<String> columnNameSet = columnJdbcTypeMap.keySet();
+
             for (String columnName : columnNameSet) {
                 final Column col = new Column();
-                col.setName(columnName);
+
+                if (needsConvert(columnName)) {
+                    col.setName(columnName);
+                } else {
+                    col.setupNeedsJavaNameConvertFalse();
+                    if (columnName.length() > 1) {
+                        col.setName(columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
+                    } else {
+                        col.setName(columnName.toUpperCase());
+                    }
+                }
 
                 final String jdbcType = columnJdbcTypeMap.get(columnName);
                 col.setTorqueType(TypeMap.getTorqueType(jdbcType));
 
+                final List<String> primaryKeyList = _primaryKeyMap.get(entityName);
+                col.setPrimaryKey(primaryKeyList.contains(columnName));
+
                 tbl.addColumn(col);
+                _log.debug("   " + (col.isPrimaryKey() ? "*" : " ") + columnName + " --> " + col.getName() + " : "
+                        + col.getJavaName() + " : " + col.getUncapitalisedJavaName());
             }
+            _log.debug("");
         }
         final String databaseType = getBasicProperties().getDatabaseName();
         final AppData appData = new AppData(databaseType, null);
@@ -246,4 +351,21 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
         return context;
     }
 
+    protected boolean needsConvert(String columnName) {
+        if (columnName == null || columnName.trim().length() == 0) {
+            String msg = "The columnName is invalid: " + columnName;
+            throw new IllegalArgumentException(msg);
+        }
+        if (columnName.indexOf("_") < 0) {
+            final char[] columnCharArray = columnName.toCharArray();
+            for (char c : columnCharArray) {
+                if (!Character.isUpperCase(c)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return true;
+        }
+    }
 }

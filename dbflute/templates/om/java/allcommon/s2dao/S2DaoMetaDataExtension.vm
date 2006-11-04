@@ -1,13 +1,32 @@
 package ${glPackageBaseCommonS2Dao};
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
+import org.seasar.dao.ResultSetHandlerFactory;
+import org.seasar.dao.dbms.DbmsManager;
+import org.seasar.dao.impl.BeanArrayMetaDataResultSetHandler;
+import org.seasar.dao.impl.BeanListMetaDataResultSetHandler;
+import org.seasar.dao.impl.BeanMetaDataImpl;
+import org.seasar.dao.impl.BeanMetaDataResultSetHandler;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.impl.ObjectResultSetHandler;
+import org.seasar.extension.jdbc.util.ConnectionUtil;
+import org.seasar.extension.jdbc.util.DataSourceUtil;
+
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glSelectResourceInterfaceName};
@@ -189,4 +208,131 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected ${glSelectDynamicCommand} new${glSelectDynamicCommand}(ResultSetHandler handler) {
         return new ${glSelectDynamicCommand}(dataSource, statementFactory, handler, resultSetFactory);
     }
+
+    protected void setupSelectMethodByManual(Method method, String sql) {
+        final BeanMetaData beanMetaData = buildBeanMetaData(method, this.dbms, this.dataSource);
+        final ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(beanMetaData);
+        SelectDynamicCommand cmd = createSelectDynamicCommand(factory.createResultSetHandler(method));
+        cmd.setSql(sql);
+        cmd.setArgNames(this.annotationReader.getArgNames(method));
+        cmd.setArgTypes(method.getParameterTypes());
+        this.sqlCommands.put(method.getName(), cmd);
+    }
+
+    protected BeanMetaData buildBeanMetaData(Method method, Dbms dbInfo, DataSource ds) {
+        final BeanMetaDataImpl beanMetaDataImpl = new BeanMetaDataImpl();
+        final Connection con = DataSourceUtil.getConnection(ds);
+        try {
+            DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
+            beanMetaDataImpl.setBeanClass(getBeanClass4SelectMethodByManual(method));
+            beanMetaDataImpl.setDatabaseMetaData(dbMetaData);
+            beanMetaDataImpl.setDbms(dbInfo);
+            beanMetaDataImpl.setAnnotationReaderFactory(getAnnotationReaderFactory());
+            beanMetaDataImpl.setValueTypeFactory(getValueTypeFactory());
+            beanMetaDataImpl.initialize();
+        } finally {
+            ConnectionUtil.close(con);
+        }
+        return beanMetaDataImpl;
+    }
+
+    protected Class getBeanClass4SelectMethodByManual(Method method) {
+        if (java.util.List.class.isAssignableFrom(method.getReturnType())) {
+            final Class elementType = MethodUtil.getElementTypeOfListFromReturnMethod(method);
+            if (elementType != null) {
+                return elementType;
+            } else {
+                return getBeanClass();
+            }
+        } else {
+            if (method.getReturnType().isArray()) {
+                if (method.getReturnType().isAssignableFrom(Array.newInstance(getBeanClass(), 0).getClass())) {
+                    return getBeanClass();
+                } else {
+                    return method.getReturnType();
+                }
+            } else {
+                return method.getReturnType();
+            }
+        }
+    }
+    
+    protected static class MethodUtil {
+        public static Class getElementTypeOfListFromReturnMethod(Method method) {
+            return ReflectionUtil.getElementTypeOfListFromReturnType(method);
+        }
+    }
+#if ($database.isAvailableGenerics())
+
+    protected static class ReflectionUtil {
+        public static Class<?> getElementTypeOfList(final Type parameterizedList) {
+            if (!(parameterizedList instanceof ParameterizedType)) {
+                return null;
+            }
+
+            final ParameterizedType parameterizedType = ParameterizedType.class.cast(parameterizedList);
+            final Type rawType = parameterizedType.getRawType();
+            if (!(rawType instanceof Class)) {
+                return null;
+            }
+
+            final Class<?> rawClass = Class.class.cast(rawType);
+            if (!rawClass.isAssignableFrom(List.class)) {
+                return null;
+            }
+
+            final Type[] actualTypeArgument = parameterizedType.getActualTypeArguments();
+            if (actualTypeArgument == null || actualTypeArgument.length != 1) {
+                return null;
+            }
+            if (!(actualTypeArgument[0] instanceof Class)) {
+                return null;
+            }
+
+            return Class.class.cast(actualTypeArgument[0]);
+        }
+
+        public static Class<?> getElementTypeOfListFromParameterType(final Method method, final int parameterPosition) {
+            final Type[] parameterTypes = method.getGenericParameterTypes();
+            return getElementTypeOfList(parameterTypes[parameterPosition]);
+        }
+
+        public static Class<?> getElementTypeOfListFromReturnType(final Method method) {
+            return getElementTypeOfList(method.getGenericReturnType());
+        }
+    }
+#else
+
+    protected static class ReflectionUtil {
+        public static Class getElementTypeOfListFromReturnType(final Method method) {
+            return null;
+        }
+    }
+#end
+
+    protected static class ResultSetHandlerFactoryExtension implements ResultSetHandlerFactory {
+        final BeanMetaData beanMetaData;
+
+        public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData) {
+            this.beanMetaData = beanMetaData;
+        }
+
+        public ResultSetHandler createResultSetHandler(final Method method) {
+            final Class beanClass = beanMetaData.getBeanClass();
+            if (List.class.isAssignableFrom(method.getReturnType())) {
+                return new BeanListMetaDataResultSetHandler(beanMetaData);
+            } else if (isBeanClassAssignable(beanClass, method.getReturnType())) {
+                return new BeanMetaDataResultSetHandler(beanMetaData);
+            } else if (method.getReturnType().isAssignableFrom(Array.newInstance(beanClass, 0).getClass())) {
+                return new BeanArrayMetaDataResultSetHandler(beanMetaData);
+            } else {
+                return new ObjectResultSetHandler();
+            }
+        }
+
+        private boolean isBeanClassAssignable(Class beanClass, Class clazz) {
+            return beanClass.isAssignableFrom(clazz) || clazz.isAssignableFrom(beanClass);
+        }
+    }
+
 }

@@ -61,6 +61,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
@@ -228,18 +229,35 @@ public class Column {
         _description = newDescription;
     }
 
+    // -----------------------------------------------------
+    //                                              JavaName
+    //                                              --------
+    protected boolean _needsJavaNameConvert = true;
+
+    public void setupNeedsJavaNameConvertFalse() {
+        _needsJavaNameConvert = false;
+    }
+
+    public boolean needsJavaNameConvert() {
+        return _needsJavaNameConvert;
+    }
+
     public String getJavaName() {
         if (_javaName == null) {
-            _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
+            if (needsJavaNameConvert()) {
+                _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
+            } else {
+                _javaName = getName();
+            }
         }
         return _javaName;
     }
-    
+
     /**
      * Get variable name to use in Java sources (= uncapitalised java name)
      */
     public String getUncapitalisedJavaName() {
-        return getDatabaseChecked().convertUncapitalisedJavaNameByJdbcNameAsColumn(getName());
+        return StringUtils.uncapitalise(getJavaName());
     }
 
     /**
@@ -466,7 +484,6 @@ public class Column {
         return !getReferrers().isEmpty();
     }
 
-    
     /**
      * Adds the foreign key from another table that refers to this column.
      */
@@ -486,16 +503,16 @@ public class Column {
         }
         return _referrers;
     }
-    
+
     protected java.util.List<ForeignKey> _singleKeyRefferrers = null;
-    
+
     /**
      * Adds the foreign key from another table that refers to this column.
      */
     public boolean hasSingleKeyReferrer() {
         return !getSingleKeyReferrers().isEmpty();
     }
-    
+
     /**
      * Get list of references to this column.
      */
@@ -530,7 +547,7 @@ public class Column {
         sb.delete(0, ", ".length());
         return sb.toString();
     }
-    
+
     public String getReferrerCommaStringWithHtmlHref() {
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
@@ -594,7 +611,7 @@ public class Column {
         }
         return db;
     }
-    
+
     // =========================================================================================
     //                                                                                toString()
     //                                                                                ==========
@@ -868,11 +885,11 @@ public class Column {
     public boolean hasClassification() {
         return getTable().getDatabase().hasClassification(getTableName(), getName());
     }
-    
+
     public boolean hasClassificationName() {
         return getTable().getDatabase().hasClassificationName(getTableName(), getName());
     }
-    
+
     public boolean hasClassificationAlias() {
         return getTable().getDatabase().hasClassificationAlias(getTableName(), getName());
     }
@@ -906,7 +923,8 @@ public class Column {
             // It gives priority to auto-increment information of JDBC.
             return true;
         } else {
-            return getTable().isUseIdentity() && getUncapitalisedJavaName().equals(getTable().getIdentityPropertyName());
+            return getTable().isUseIdentity()
+                    && getUncapitalisedJavaName().equals(getTable().getIdentityPropertyName());
         }
     }
 }

@@ -68,8 +68,9 @@ public abstract class SqlFileRunnerBase implements SqlFileRunner {
             statement = newStatement(connection);
             for (String sql : sqlList) {
                 _totalSqlCount++;
-                _log.info(sql);
-                execSQL(statement, sql);
+                final String realSql = filterSql(sql);
+                traceSql(sql);
+                execSQL(statement, realSql);
             }
             if (!_runInfo.isAutoCommit()) {
                 if (_runInfo.isRollbackOnly()) {
@@ -119,6 +120,14 @@ public abstract class SqlFileRunnerBase implements SqlFileRunner {
         _log.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
         _log.info(_goodSqlCount + " of " + _totalSqlCount + " SQL statements executed successfully.");
         _log.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+    }
+
+    protected void traceSql(String sql) {
+        _log.info(sql);
+    }
+
+    protected String filterSql(String sql) {
+        return sql;
     }
 
     protected FileReader newFileReader() {
@@ -205,13 +214,14 @@ public abstract class SqlFileRunnerBase implements SqlFileRunner {
             String line = "";
             while ((line = in.readLine()) != null) {
                 line = line.trim();
-                sql = (sql + " " + line).trim();
 
                 // SQL defines "--" as a comment to EOL
                 // and in Oracle it may contain a hint
                 // so we cannot just remove it, instead we must end it
                 if (line.indexOf("--") >= 0) {
-                    sql = sql + "\n";
+                    sql = sql + line + "\n";
+                } else {
+                    sql = sql + " " + line;
                 }
 
                 if (sql.endsWith(_runInfo.getDelimiter())) {
@@ -230,7 +240,7 @@ public abstract class SqlFileRunnerBase implements SqlFileRunner {
                 }
             }
             if (sql.trim().length() != 0) {
-                sqlList.add(sql);// for Last Sql
+                sqlList.add(sql.trim());// for Last Sql
             }
         } catch (IOException e) {
             throw new IORuntimeException("Threw the exception!", e);

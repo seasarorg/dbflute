@@ -190,6 +190,13 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     protected void setupDaoCacheMap() {
         if (_daoCacheMap == null) {
             _daoCacheMap = new java.util.HashMap${database.filterGenericsString(${mapGenericDefinition})}();
+#foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
+  #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
+  #if ($database.isDaoComponent($componentName))
+
+            _daoCacheMap.put(${className}.class, get${database.initCap($componentName)}());
+  #end
+#end
 #foreach ($table in $database.Tables)
 
             _daoCacheMap.put(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao.class, get${table.JavaName}Dao());
@@ -201,6 +208,19 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
 
         }
     }
+#foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
+  #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
+  #if ($database.isDaoComponent($componentName))
+
+    protected ${className} _${componentName};
+    public void set${database.initCap($componentName)}(${className} dao) {
+        _${componentName} = dao;
+    }
+    public ${className} get${database.initCap($componentName)}() {
+        return _${componentName};
+    }
+  #end
+#end
 #foreach ($table in $database.Tables)
 
     protected ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;

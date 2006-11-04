@@ -71,17 +71,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.transform.DTDResolver;
-import org.apache.torque.helper.TorqueBuildProperties;
-import org.apache.torque.helper.TorqueTaskUtil;
+import org.apache.torque.task.bs.TorqueTask;
 import org.apache.xerces.dom.DocumentImpl;
 import org.apache.xerces.dom.DocumentTypeImpl;
 import org.apache.xml.serialize.Method;
@@ -95,7 +92,7 @@ import org.w3c.dom.Element;
  * @author mkubo
  * @version $Revision$ $Date$
  */
-public class TorqueJDBCTransformTask extends Task {
+public class TorqueJDBCTransformTask extends TorqueTask {
 
     public static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
 
@@ -182,20 +179,6 @@ public class TorqueJDBCTransformTask extends Task {
 
     public boolean isSameJavaName() {
         return this._isSameJavaName;
-    }
-
-    public void setContextProperties(String file) {
-        final Properties prop = TorqueTaskUtil.getBuildProperties(file, super.project);
-        TorqueBuildProperties.getInstance().setProperties(prop);
-    }
-
-    /**
-     * Get context-properties for Torque.
-     * 
-     * @return Context-properties.
-     */
-    public TorqueBuildProperties getProperties() {
-        return TorqueBuildProperties.getInstance();
     }
 
     public List<String> getTableExceptList() {

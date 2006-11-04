@@ -902,35 +902,6 @@ public final class TorqueBuildProperties {
     }
 
     // ===============================================================================
-    //                                               Properties - OriginalDaoComponent
-    //                                               =================================
-    public static final String KEY_originalDaoComponentMap = "originalDaoComponentMap";
-    protected Map<String, Map<String, String>> _originalDaoComponentMap;
-
-    public Map<String, Map<String, String>> getOriginalDaoComponentMap() {
-        if (_originalDaoComponentMap == null) {
-            _originalDaoComponentMap = new LinkedHashMap<String, Map<String, String>>();
-
-            final Map<String, Object> generatedMap = mapProp("torque." + KEY_originalDaoComponentMap, DEFAULT_EMPTY_MAP);
-            final Set<String> keySet = generatedMap.keySet();
-            for (String key : keySet) {
-                final Map<String, String> aspectDefinition = (Map<String, String>) generatedMap.get(key);
-                _originalDaoComponentMap.put(key, aspectDefinition);
-            }
-        }
-        return _originalDaoComponentMap;
-    }
-
-    public List<String> getOriginalDaoComponentComponentNameList() {
-        return new ArrayList<String>(getOriginalDaoComponentMap().keySet());
-    }
-
-    public String getOriginalDaoComponentClassName(String componentName) {
-        final Map<String, String> aspectDefinition = getOriginalDaoComponentMap().get(componentName);
-        return aspectDefinition.get("className");
-    }
-
-    // ===============================================================================
     //                                             Properties - OriginalBehaviorAspect
     //                                             ===================================
     public static final String KEY_originalBehaviorAspectMap = "originalBehaviorAspectMap";

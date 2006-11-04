@@ -58,14 +58,14 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
 import org.apache.torque.helper.TorqueBuildProperties;
 import org.apache.torque.helper.jdbc.RunnerInformation;
 import org.apache.torque.helper.jdbc.SqlFileFireMan;
 import org.apache.torque.helper.jdbc.SqlFileGetter;
 import org.apache.torque.helper.jdbc.SqlFileRunnerExecute;
+import org.apache.torque.task.bs.TorqueTask;
 
-public class TorqueInvokeSqlDirectoryTask extends Task {
+public class TorqueInvokeSqlDirectoryTask extends TorqueTask {
 
     // =========================================================================================
     //                                                                                 Attribute

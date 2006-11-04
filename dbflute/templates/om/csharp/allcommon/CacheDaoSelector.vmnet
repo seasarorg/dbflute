@@ -181,6 +181,13 @@ namespace ${glPackageBaseCommon} {
         protected void SetupDaoCacheMap() {
             if (_daoCacheMap == null) {
                 _daoCacheMap = new System.Collections.Generic.Dictionary<Type, ${glDaoReadableInterfaceName}>();
+    #foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
+      #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
+      #if ($database.isDaoComponent($componentName))
+
+                _daoCacheMap.Add(typeof(${className}), this.${database.initCap($componentName)});
+      #end
+    #end
     #foreach ($table in $database.Tables)
 
                 _daoCacheMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), this.${table.JavaName}Dao);
@@ -192,6 +199,17 @@ namespace ${glPackageBaseCommon} {
 
             }
         }
+    #foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
+      #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
+      #if ($database.isDaoComponent($componentName))
+
+        protected ${className} _${componentName};
+        public ${className} ${database.initCap($componentName)} {
+            get { return _${componentName}; }
+            set { _${componentName} = value; }
+        }
+      #end
+    #end
     #foreach ($table in $database.Tables)
 
         protected ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;

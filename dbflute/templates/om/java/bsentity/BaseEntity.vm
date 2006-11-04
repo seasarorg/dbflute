@@ -1099,8 +1099,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         final String endBrace = "}";
         final String delimiter = ";";
         final String equal = "=";
-        final String primaryKeyMapString = extractPrimaryKeyMapString(startBrace, endBrace, delimiter, equal);
         final String columnValueMapString = extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
-        return "[PK] " + primaryKeyMapString + " [ALL] " + columnValueMapString;
+        return getClass().getName() + " " + columnValueMapString;
     }
 }

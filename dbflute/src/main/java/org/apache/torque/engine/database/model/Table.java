@@ -385,15 +385,6 @@ public class Table implements IDMethod {
         return names;
     }
 
-    protected boolean _isJavaNameConvert = true;
-
-    public void setJavaNameConvertOff() {
-        _isJavaNameConvert = false;
-    }
-
-    public boolean isJavaNameConvert() {
-        return _isJavaNameConvert;
-    }
 
     // ============================================================================
     //                                                                     Referrer
@@ -756,6 +747,9 @@ public class Table implements IDMethod {
         return unique;
     }
 
+    // -----------------------------------------------------
+    //                                             TableName
+    //                                             ---------
     /**
      * Get the name of the Table
      */
@@ -770,6 +764,9 @@ public class Table implements IDMethod {
         _name = newName;
     }
 
+    // -----------------------------------------------------
+    //                                           Description
+    //                                           -----------
     /**
      * Get the description for the Table
      */
@@ -786,12 +783,25 @@ public class Table implements IDMethod {
         _description = newDescription;
     }
 
+    // -----------------------------------------------------
+    //                                              JavaName
+    //                                              --------
+    protected boolean _needsJavaNameConvert = true;
+
+    public void setupNeedsJavaNameConvertFalse() {
+        _needsJavaNameConvert = false;
+    }
+
+    public boolean needsJavaNameConvert() {
+        return _needsJavaNameConvert;
+    }
+    
     /**
      * Get name to use in Java sources
      */
     public String getJavaName() {
         if (_javaName == null) {
-            if (isJavaNameConvert()) {
+            if (needsJavaNameConvert()) {
                 _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
             } else {
                 _javaName = getName();
@@ -804,7 +814,7 @@ public class Table implements IDMethod {
      * Get variable name to use in Java sources (= uncapitalised java name)
      */
     public String getUncapitalisedJavaName() {
-        return getDatabase().convertUncapitalisedJavaNameByJdbcNameAsTable(getName());
+        return StringUtils.uncapitalise(getJavaName());
     }
 
     /**
@@ -821,6 +831,9 @@ public class Table implements IDMethod {
         this._javaName = javaName;
     }
 
+    // -----------------------------------------------------
+    //                                              IDMethod
+    //                                              --------
     /**
      * Get the method for generating pk's
      */
@@ -839,6 +852,9 @@ public class Table implements IDMethod {
         this._idMethod = idMethod;
     }
 
+    // -----------------------------------------------------
+    //                                               SkipSql
+    //                                               -------
     /**
      * Skip generating sql for this table (in the event it should
      * not be created from scratch).
@@ -856,6 +872,9 @@ public class Table implements IDMethod {
         this._skipSql = v;
     }
 
+    // -----------------------------------------------------
+    //                                                 Alias
+    //                                                 -----
     /**
      * JavaName of om object this entry references.
      * @return value of external.

@@ -49,17 +49,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             return invocation.proceed();
         }
 
-        if (_log.isDebugEnabled()) {
-            final String invokeName = getShortClassName(method.getDeclaringClass()) + "." + method.getName();
-            final int length = invokeName.length();
-            final StringBuffer sb = new StringBuffer();
-            for (int i=0; i < length; i++) {
-                sb.append("=");
-            }
-            _log.debug("/=====================================================" + sb.toString() + "==");
-            _log.debug("                                                      " + invokeName + "()");
-            _log.debug("                                                      " + sb.toString() + "=/");
-        }
+        traceMethod(invocation);
 
         final org.seasar.dao.SqlCommand cmd;
         {
@@ -91,7 +81,51 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         final long after = System.currentTimeMillis();
 
         final Class retType = method.getReturnType();
+        assertRetType(retType, ret);
+        traceReturn(invocation, retType, ret, before, after);
 
+        if (retType.isPrimitive()) {
+            return org.seasar.framework.util.NumberConversionUtil.convertPrimitiveWrapper(retType, ret);
+        } else if (Number.class.isAssignableFrom(retType)) {
+            return org.seasar.framework.util.NumberConversionUtil.convertNumber(retType, ret);
+        } else {
+            return ret;
+        }
+    }
+
+    protected void traceMethod(MethodInvocation invocation) {
+        if (_log.isDebugEnabled()) {
+            final java.lang.reflect.Method method = invocation.getMethod();
+            final String invokeName = getShortClassName(method.getDeclaringClass()) + "." + method.getName();
+            final int length = invokeName.length();
+            final StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < length; i++) {
+                sb.append("=");
+            }
+            _log.debug("/=====================================================" + sb.toString() + "==");
+            _log.debug("                                                      " + invokeName + "()");
+            _log.debug("                                                      " + sb.toString() + "=/");
+        }
+    }
+
+    protected void assertRetType(Class retType, Object ret) {
+        if (java.util.List.class.isAssignableFrom(retType)) {
+            if (ret != null && !(ret instanceof java.util.List)) {
+                String msg = "The retType is difference from actual return: ";
+                msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
+                throw new IllegalStateException(msg);
+            }
+        } else if (LdEntity.class.isAssignableFrom(retType)) {
+            if (ret != null && !(ret instanceof LdEntity)) {
+                String msg = "The retType is difference from actual return: ";
+                msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
+                throw new IllegalStateException(msg);
+            }
+        }
+    }
+
+    protected void traceReturn(MethodInvocation invocation, Class retType, Object ret, long before, long after)
+            throws Throwable {
         if (_log.isDebugEnabled()) {
             try {
                 final String daoResultPrefix = "===========/ [" + getPerformanceView(after - before) + " - ";
@@ -99,18 +133,18 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                     if (ret == null) {
                         _log.debug(daoResultPrefix + "Selected count: null]");
                     } else {
-                        final java.util.List ls = (java.util.List)ret;
+                        final java.util.List ls = (java.util.List) ret;
                         if (ls.isEmpty()) {
                             _log.debug(daoResultPrefix + "Selected count: 0]");
                         } else {
                             _log.debug(daoResultPrefix + "Selected count: " + ls.size() + " first=" + ls.get(0) + "]");
                         }
                     }
-                } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
+                } else if (LdEntity.class.isAssignableFrom(retType)) {
                     if (ret == null) {
                         _log.debug(daoResultPrefix + "Selected entity: null" + "]");
                     } else {
-                        final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ret;
+                        final LdEntity entity = (LdEntity) ret;
                         _log.debug(daoResultPrefix + "Selected entity: " + entity + "]");
                     }
                 } else {
@@ -122,19 +156,12 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 }
                 _log.debug(" ");
             } catch (Exception e) {
-                String msg = "Result object debug threw the exception: methodName=" + method.getName() + " retType=" + retType;
+                String msg = "Result object debug threw the exception: methodName=";
+                msg = msg + invocation.getMethod().getName() + " retType=" + retType;
                 msg = msg + " ret=" + ret;
                 _log.warn(msg, e);
                 throw e;
             }
-        }
-
-        if (retType.isPrimitive()) {
-            return org.seasar.framework.util.NumberConversionUtil.convertPrimitiveWrapper(retType, ret);
-        } else if (Number.class.isAssignableFrom(retType)) {
-            return org.seasar.framework.util.NumberConversionUtil.convertNumber(retType, ret);
-        } else {
-            return ret;
         }
     }
 
