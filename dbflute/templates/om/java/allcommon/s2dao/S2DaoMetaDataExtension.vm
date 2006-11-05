@@ -220,6 +220,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected BeanMetaData buildBeanMetaData(Method method, Dbms dbInfo, DataSource ds) {
+        final Class beanClass4SelectMethodByManual = getBeanClass4SelectMethodByManual(method);
+        if (beanClass4SelectMethodByManual.equals(getBeanClass())) {
+            return getBeanMetaData();
+        }
         final BeanMetaDataImpl beanMetaDataImpl = new BeanMetaDataImpl();
         final Connection con = DataSourceUtil.getConnection(ds);
         try {

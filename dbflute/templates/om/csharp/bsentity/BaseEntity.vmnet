@@ -156,7 +156,7 @@ namespace ${myExtendedEntityPackageName} {
         }
 
         // =====================================================================================
-        //                                                                              Property
+        //                                                                              Accessor
         //                                                                              ========
         #region Property
 #foreach ($col in $table.Columns)

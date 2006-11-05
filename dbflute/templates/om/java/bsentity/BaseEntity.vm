@@ -148,8 +148,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     // =====================================================================================
-    //                                                                         Getter Setter
-    //                                                                         =============
+    //                                                                              Accessor
+    //                                                                              ========
 #foreach ($col in $table.Columns)
 
     /**

@@ -68,20 +68,20 @@ public final class BasicProperties extends AbstractHelperProperties {
 
     public String getJavaDir_for_gen() {
         final String fileSeparator = "/";
-        final String packageBase = getJavaDir();
+        final String javaDirBase = getJavaDir();
         final String javaLocation = getJavaLocation_for_gen();
         String outputPath = "";
-        if (packageBase != null && packageBase.endsWith(fileSeparator)) {
+        if (javaDirBase != null && javaDirBase.endsWith(fileSeparator)) {
             if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = packageBase + javaLocation.substring(fileSeparator.length());
+                outputPath = javaDirBase + javaLocation.substring(fileSeparator.length());
             } else {
-                outputPath = packageBase + javaLocation;
+                outputPath = javaDirBase + javaLocation;
             }
         } else {
             if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = packageBase + javaLocation;
+                outputPath = javaDirBase + javaLocation;
             } else {
-                outputPath = packageBase + fileSeparator + javaLocation;
+                outputPath = javaDirBase + fileSeparator + javaLocation;
             }
         }
         return outputPath;
@@ -89,20 +89,20 @@ public final class BasicProperties extends AbstractHelperProperties {
 
     public String getJavaDir_for_main() {
         final String fileSeparator = "/";
-        final String packageBase = getJavaDir();
+        final String javaDirBase = getJavaDir();
         final String javaLocation = getJavaLocation_for_main();
         String outputPath = "";
-        if (packageBase != null && packageBase.endsWith(fileSeparator)) {
+        if (javaDirBase != null && javaDirBase.endsWith(fileSeparator)) {
             if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = packageBase + javaLocation.substring(fileSeparator.length());
+                outputPath = javaDirBase + javaLocation.substring(fileSeparator.length());
             } else {
-                outputPath = packageBase + javaLocation;
+                outputPath = javaDirBase + javaLocation;
             }
         } else {
             if (javaLocation != null && javaLocation.startsWith(fileSeparator)) {
-                outputPath = packageBase + javaLocation;
+                outputPath = javaDirBase + javaLocation;
             } else {
-                outputPath = packageBase + fileSeparator + javaLocation;
+                outputPath = javaDirBase + fileSeparator + javaLocation;
             }
         }
         return outputPath;
@@ -157,7 +157,7 @@ public final class BasicProperties extends AbstractHelperProperties {
     //                                                             Properties - Author
     //                                                             ===================
     public String getClassAuthor() {
-        return stringProp("torque.classAuthor", "AutoGenerator");
+        return stringProp("torque.classAuthor", "DBFlute(AutoGenerator)");
     }
     
     // ===============================================================================

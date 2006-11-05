@@ -68,10 +68,10 @@
         <foreign-key foreignTable="LB_USER">
             <reference foreign="LB_USER_ID" local="LB_USER_ID"/>
         </foreign-key>
-        <unique name="SQL061022072024620">
+        <unique name="SQL061104052156840">
             <unique-column name="LB_USER_ID" position="1"/>
         </unique>
-        <unique name="SQL061022072025760">
+        <unique name="SQL061104052157040">
             <unique-column name="LB_USER_ID" position="1"/>
         </unique>
     </table>
@@ -104,7 +104,7 @@
         <foreign-key foreignTable="GENRE">
             <reference foreign="GENRE_CODE" local="GENRE_CODE"/>
         </foreign-key>
-        <unique name="SQL061022072024770">
+        <unique name="SQL061104052156850">
             <unique-column name="ISBN_NO" position="1"/>
         </unique>
     </table>
@@ -128,7 +128,7 @@
         <foreign-key foreignTable="BOOK">
             <reference foreign="BOOK_ID" local="BOOK_ID"/>
         </foreign-key>
-        <unique name="SQL061022072024920">
+        <unique name="SQL061104052156890">
             <unique-column name="LIBRARY_ID" position="1"/>
             <unique-column name="BOOK_ID" position="2"/>
         </unique>
@@ -251,7 +251,7 @@
             size="50" type="VARCHAR"/>
         <column default="default-user" name="U_USER" required="true"
             size="50" type="VARCHAR"/>
-        <unique name="SQL061022072025170">
+        <unique name="SQL061104052156900">
             <unique-column name="LIBRARY_NAME" position="1"/>
         </unique>
     </table>

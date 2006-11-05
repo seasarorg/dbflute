@@ -6,7 +6,10 @@ package ${myBaseEntityPackageName};
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} {
+public class ${myClassName} implements java.io.Serializable {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // =====================================================================================
     //                                                                             Attribute
@@ -18,8 +21,8 @@ public class ${myClassName} {
 #end
 
     // =====================================================================================
-    //                                                                         Getter Setter
-    //                                                                         =============
+    //                                                                              Accessor
+    //                                                                              ========
 #foreach ($col in $table.Columns)
 
     /**

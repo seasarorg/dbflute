@@ -1227,6 +1227,18 @@ public class Database {
         return getProperties().getSql2EntityProperties().isPlainEntity();
     }
 
+    public String getSql2EntityBaseEntityPackage() {
+        return getProperties().getSql2EntityProperties().getBaseEntityPackage();
+    }
+    
+    public String getSql2EntityDBMetaPackage() {
+        return getProperties().getSql2EntityProperties().getDBMetaPackage();
+    }
+
+    public String getSql2EntityExtendedEntityPackage() {
+        return getProperties().getSql2EntityProperties().getExtendedEntityPackage();
+    }
+
     // **********************************************************************************************
     //                                                                             Hard code property
     //                                                                             ******************
@@ -1557,14 +1569,6 @@ public class Database {
         setupJavaDir_for_extended();
     }
 
-    public void setupJavaDir_for_baseCustomizeEntity() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_extendedCustomizeEntity() {
-        setupJavaDir_for_extended();
-    }
-
     public void setupJavaDir_for_baseSqlParameter() {
         setupJavaDir_for_extended();
     }
@@ -1620,6 +1624,13 @@ public class Database {
         setupJavaDir_for_main();
     }
 
+    public void setupJavaDir_for_sql2entity() {
+        Generator.getInstance().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
+    }
+    
+    // --------------------------------------------
+    //                                  Basic Setup
+    //                                  -----------
     protected void setupJavaDir_for_main() {
         Generator.getInstance().setOutputPath(getBasicProperties().getJavaDir_for_main());
     }

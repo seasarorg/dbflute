@@ -19,8 +19,8 @@ namespace ${myBaseEntityPackageName} {
 #end
 
         // =====================================================================================
-        //                                                                         Getter Setter
-        //                                                                         =============
+        //                                                                              Accessor
+        //                                                                              ========
 #foreach ($col in $table.Columns)
 
         public ${col.JavaNative} ${col.JavaName} {
