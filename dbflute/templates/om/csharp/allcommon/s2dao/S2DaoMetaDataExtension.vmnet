@@ -37,6 +37,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             IDataReaderFactory dataReaderFactory, IDatabaseMetaData dbMetaData)
             : base(daoType, dataSource, commandFactory, dataReaderFactory, dbMetaData) {}
 
+        // =====================================================================================
+        //                                                                ConditionBean Override
+        //                                                                ======================
         /**
          * This method overrides the method that is declared at super.
          * 
@@ -199,6 +202,56 @@ namespace ${glPackageBaseCommonS2Dao} {
          */
         protected ${glSelectDynamicCommand} New${glSelectDynamicCommand}(IDataReaderHandler handler) {
             return new ${glSelectDynamicCommand}(dataSource, commandFactory, handler, dataReaderFactory);
+        }
+
+        // =====================================================================================
+        //                                                                     ByManual Override
+        //                                                                     =================
+        protected override void SetupSelectMethodByManual(MethodInfo mi, string sql) {
+            IBeanMetaData myMetaData = BuildBeanMetaData(mi, dbMetaData, dbms);
+            SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler(mi, myMetaData));
+            cmd.Sql = sql;
+            cmd.ArgNames = MethodUtil.GetParameterNames(mi);
+            cmd.ArgTypes = MethodUtil.GetParameterTypes(mi);
+            sqlCommands[mi.Name] = cmd;
+        }
+
+       protected IBeanMetaData BuildBeanMetaData(MethodInfo mi, IDatabaseMetaData databaseMetaData, Seasar.Dao.IDbms dbInfo) {
+           Type beanClass4SelectMethodByManual = GetBeanClass4SelectMethodByManual(mi);
+           if (beanClass4SelectMethodByManual.Equals(beanType)) {
+               return beanMetaData;
+           }
+           return new BeanMetaDataImpl(beanClass4SelectMethodByManual, databaseMetaData, dbInfo);
+       }
+
+       protected Type GetBeanClass4SelectMethodByManual(MethodInfo mi) {
+            Type retType = mi.ReturnType;
+           if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
+               return retType.GetGenericArguments()[0];
+           } else if (retType.IsArray) {
+               return beanType;
+           } else {
+               return retType;
+           }
+       }
+
+        protected virtual IDataReaderHandler CreateDataReaderHandler(MethodInfo mi, IBeanMetaData myMetaData) {
+            Type retType = mi.ReturnType;
+
+            if (retType.IsArray) {
+                return new BeanArrayMetaDataDataReaderHandler(myMetaData);
+            } else if (!retType.IsGenericType && typeof(IList).IsAssignableFrom(retType)) {
+                return new BeanListMetaDataDataReaderHandler(myMetaData);
+            } else if (IsBeanTypeAssignable(retType)) {
+                return new BeanMetaDataDataReaderHandler(myMetaData);
+            } else if (Array.CreateInstance(beanType, 0).GetType().IsAssignableFrom(retType)) {
+                return new BeanArrayMetaDataDataReaderHandler(myMetaData);
+            } else if(retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>))
+                || retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.List<>)))) {
+                return new BeanGenericListMetaDataDataReaderHandler(myMetaData);
+            } else {
+                return new ObjectDataReaderHandler();
+            }
         }
     }
 }

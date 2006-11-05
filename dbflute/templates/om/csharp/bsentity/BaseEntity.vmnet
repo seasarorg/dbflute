@@ -843,10 +843,9 @@ namespace ${myExtendedEntityPackageName} {
         }
 
         // =====================================================================================
-        //                                                                 Basic-Override Method
-        //                                                                 =====================
-        #region Basic-Override Method
-
+        //                                                                        Basic Override
+        //                                                                        ==============
+        #region Basic Override Method
 #if ($table.hasPrimaryKey())
     
         /// <summary>
@@ -856,16 +855,20 @@ namespace ${myExtendedEntityPackageName} {
         /// <param name="other">Other entity.</param>
         /// <returns>Comparing result.</returns>
         public override bool Equals(Object other) {
-            if (!(other is $myClassName)) {
-                return false;
-            }
             if (other == null) {
                 return false;
             }
-            String thisMap = ExtractPrimaryKeyMapString();
-            String otherMap = (($myClassName)other).ExtractPrimaryKeyMapString();
+            if (!(other is $myClassName)) {
+                return false;
+            }
+  #foreach ($col in $table.PrimaryKey)
 
-            return thisMap.Equals(otherMap);
+            if (this.${col.JavaName} == null || !this.${col.JavaName}.Equals(otherEntity.${col.JavaName})) {
+                return false;
+            }
+  #end
+
+            return true;
         }
 
         /// <summary>
@@ -890,7 +893,7 @@ namespace ${myExtendedEntityPackageName} {
             return result;
         }
 #else
-    
+
         /// <summary>
         /// ${database.OverrideComment}
         /// If the all-column value of the other is same as this one, returns true.
@@ -898,16 +901,20 @@ namespace ${myExtendedEntityPackageName} {
         /// <param name="other">Other entity.</param>
         /// <returns>Comparing result.</returns>
         public override bool Equals(Object other) {
-            if (!(other is $myClassName)) {
-                return false;
-            }
             if (other == null) {
                 return false;
             }
-            String thisMap = ExtractColumnValueMapString();
-            String otherMap = (($myClassName)other).ExtractColumnValueMapString();
+            if (!(other is $myClassName)) {
+                return false;
+            }
+  #foreach ($col in $table.Columns)
 
-            return thisMap.Equals(otherMap);
+            if (this.${col.JavaName} == null || !this.${col.JavaName}.Equals(otherEntity.${col.JavaName})) {
+                return false;
+            }
+  #end
+
+            return true;
         }
 
         /// <summary>
@@ -938,7 +945,16 @@ namespace ${myExtendedEntityPackageName} {
         /// </summary>
         /// <returns>Column-map. (NotNull)</returns>
         public override String ToString() {
-            return "[PK] " + ExtractPrimaryKeyMapString() + " [ALL] " + ExtractColumnValueMapString();
+            String delimiter = ",";
+            StringBuilder sb = new StringBuilder();
+#foreach ($col in $table.Columns)
+
+            sb.Append(delimiter).Append(this.${col.JavaName});
+#end
+
+            sb.Remove(0, delimiter.Length);
+            sb.Insert(0, "{").Append("}");
+            return sb.ToString();
         }
 
         #endregion

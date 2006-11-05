@@ -1007,10 +1007,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     // =====================================================================================
-    //                                                                 Basic-Override Method
-    //                                                                 =====================
+    //                                                                        Basic Override
+    //                                                                        ==============
 #if ($table.hasPrimaryKey())
-    
+
     /**
      * ${database.OverrideComment}
      * If the primary-key of the other is same as this one, returns true.
@@ -1019,16 +1019,21 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Comparing result.
      */
     public boolean equals(Object other) {
-        if (!(other instanceof $myClassName)) {
-            return false;
-        }
         if (other == null) {
             return false;
         }
-        final String thisMapString = extractPrimaryKeyMapString();
-        final String otherMapString = (($myClassName)other).extractPrimaryKeyMapString();
+        if (!(other instanceof $myClassName)) {
+            return false;
+        }
+        final $myClassName otherEntity = ($myClassName)other;
+  #foreach ($col in $table.PrimaryKey)
 
-        return thisMapString.equals(otherMapString);
+        if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
+            return false;
+        }
+  #end
+
+        return true;
     }
 
     /**
@@ -1042,14 +1047,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #foreach ($col in $table.PrimaryKey)
 
         if (this.get${col.JavaName}() != null) {
-            result = result + this.get${col.JavaName}().hashCode();
+            result = result + get${col.JavaName}().hashCode();
         }
   #end
 
         return result;
     }
 #else
-    
+
     /**
      * ${database.OverrideComment}
      * If the all-column value of the other is same as this one, returns true.
@@ -1058,16 +1063,21 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Comparing result. If other is null, returns false.
      */
     public boolean equals(Object other) {
-        if (!(other instanceof $myClassName)) {
-            return false;
-        }
         if (other == null) {
             return false;
         }
-        final String thisMapString = extractColumnValueMapString();
-        final String otherMapString = (($myClassName)other).extractColumnValueMapString();
+        if (!(other instanceof $myClassName)) {
+            return false;
+        }
+        final $myClassName otherEntity = ($myClassName)other;
+  #foreach ($col in $table.Columns)
 
-        return thisMapString.equals(otherMapString);
+        if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
+            return false;
+        }
+  #end
+
+        return true;
     }
 
     /**
@@ -1095,11 +1105,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Column-value map-string. (NotNull)
      */
     public String toString() {
-        final String startBrace = "{";
-        final String endBrace = "}";
-        final String delimiter = ";";
-        final String equal = "=";
-        final String columnValueMapString = extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
-        return getClass().getName() + " " + columnValueMapString;
+        final String delimiter = ",";
+        final StringBuffer sb = new StringBuffer();
+#foreach ($col in $table.Columns)
+
+        sb.append(delimiter).append(get${col.JavaName}());
+#end
+
+        sb.delete(0, delimiter.length());
+        sb.insert(0, "{").append("}");
+        return sb.toString();
     }
 }

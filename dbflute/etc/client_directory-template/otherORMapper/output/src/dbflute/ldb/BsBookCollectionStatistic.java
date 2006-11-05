@@ -81,4 +81,66 @@ public class BsBookCollectionStatistic implements java.io.Serializable {
         _collectionCount = collectionCount;
     }
 
+    // =====================================================================================
+    //                                                                        Basic Override
+    //                                                                        ==============
+
+    /**
+     * This method overrides the method that is declared at super.
+     * If the primary-key of the other is same as this one, returns true.
+     * 
+     * @param other Other entity.
+     * @return Comparing result.
+     */
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof BsBookCollectionStatistic)) {
+            return false;
+        }
+        final BsBookCollectionStatistic otherEntity = (BsBookCollectionStatistic)other;
+  
+        if (getBookId() == null || !getBookId().equals(otherEntity.getBookId())) {
+            return false;
+        }
+  
+        return true;
+    }
+
+    /**
+     * This method overrides the method that is declared at super.
+     * Calculates hash-code from primary-key.
+     * 
+     * @return Hash-code from primary-keys.
+     */
+    public int hashCode() {
+        int result = 0;
+  
+        if (this.getBookId() != null) {
+            result = result + getBookId().hashCode();
+        }
+  
+        return result;
+    }
+
+    /**
+     * This method overrides the method that is declared at super.
+     * 
+     * @return Column-value map-string. (NotNull)
+     */
+    public String toString() {
+        final String delimiter = ",";
+        final StringBuffer sb = new StringBuffer();
+
+        sb.append(delimiter).append(getBookId());
+
+        sb.append(delimiter).append(getBookName());
+
+        sb.append(delimiter).append(getCollectionCount());
+
+        sb.delete(0, delimiter.length());
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
 }

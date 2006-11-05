@@ -44,6 +44,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     public ${glDaoMetaDataExtension}() {
     }
 
+    // =====================================================================================
+    //                                                                ConditionBean Override
+    //                                                                ======================
     /**
      * This method overrides the method that is declared at super.
      * 
@@ -209,6 +212,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return new ${glSelectDynamicCommand}(dataSource, statementFactory, handler, resultSetFactory);
     }
 
+    // =====================================================================================
+    //                                                                     ByManual Override
+    //                                                                     =================
     protected void setupSelectMethodByManual(Method method, String sql) {
         final BeanMetaData beanMetaData = buildBeanMetaData(method, this.dbms, this.dataSource);
         final ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(beanMetaData);
@@ -241,23 +247,18 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected Class getBeanClass4SelectMethodByManual(Method method) {
-        if (java.util.List.class.isAssignableFrom(method.getReturnType())) {
+        final Class retType = method.getReturnType();
+        if (java.util.List.class.isAssignableFrom(retType)) {
             final Class elementType = MethodUtil.getElementTypeOfListFromReturnMethod(method);
             if (elementType != null) {
                 return elementType;
             } else {
                 return getBeanClass();
             }
+        } else if (retType.isArray()) {
+            return getBeanClass();
         } else {
-            if (method.getReturnType().isArray()) {
-                if (method.getReturnType().isAssignableFrom(Array.newInstance(getBeanClass(), 0).getClass())) {
-                    return getBeanClass();
-                } else {
-                    return method.getReturnType();
-                }
-            } else {
-                return method.getReturnType();
-            }
+            return retType;
         }
     }
     
