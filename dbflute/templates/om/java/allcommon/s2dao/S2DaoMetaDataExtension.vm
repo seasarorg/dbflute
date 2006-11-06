@@ -256,7 +256,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 return getBeanClass();
             }
         } else if (retType.isArray()) {
-            return getBeanClass();
+            return retType.getComponentType();
         } else {
             return retType;
         }

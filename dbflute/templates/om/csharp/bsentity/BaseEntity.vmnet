@@ -861,6 +861,7 @@ namespace ${myExtendedEntityPackageName} {
             if (!(other is $myClassName)) {
                 return false;
             }
+            $myClassName otherEntity = ($myClassName)other;
   #foreach ($col in $table.PrimaryKey)
 
             if (this.${col.JavaName} == null || !this.${col.JavaName}.Equals(otherEntity.${col.JavaName})) {
@@ -907,6 +908,7 @@ namespace ${myExtendedEntityPackageName} {
             if (!(other is $myClassName)) {
                 return false;
             }
+            $myClassName otherEntity = ($myClassName)other;
   #foreach ($col in $table.Columns)
 
             if (this.${col.JavaName} == null || !this.${col.JavaName}.Equals(otherEntity.${col.JavaName})) {

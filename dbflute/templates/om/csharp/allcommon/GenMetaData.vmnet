@@ -140,7 +140,7 @@ namespace ${glPackageBaseCommon} {
         /// Is available common-column-setup interceptor to dao? Answer is ${database.isAvailableCommonColumnSetupInterceptorToDao()}!
         /// </sumarry>
         /// <returns>The property-value.</returns>
-        public bool IsAvailableCommonColumnSetupInterceptorToBehavior() {
+        public bool IsAvailableCommonColumnSetupInterceptorToDao() {
             return ${database.isAvailableCommonColumnSetupInterceptorToDao()};
         }
 

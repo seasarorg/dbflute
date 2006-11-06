@@ -225,11 +225,13 @@ namespace ${glPackageBaseCommonS2Dao} {
        }
 
        protected Type GetBeanClass4SelectMethodByManual(MethodInfo mi) {
-            Type retType = mi.ReturnType;
+           Type retType = mi.ReturnType;
            if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
                return retType.GetGenericArguments()[0];
-           } else if (retType.IsArray) {
+           } else if (!retType.IsGenericType && typeof(System.Collections.IList).IsAssignableFrom(retType)) {
                return beanType;
+           } else if (retType.IsArray) {
+               return retType.GetElementType();
            } else {
                return retType;
            }
