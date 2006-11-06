@@ -121,7 +121,7 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
     // =========================================================================================
     //                                                                                  MetaInfo
     //                                                                                  ========
-    protected final Map<String, Map<String, String>> _entityInfoMap = new LinkedHashMap<String, Map<String, String>>();
+    protected final Map<String, Map<String, Integer>> _entityInfoMap = new LinkedHashMap<String, Map<String, Integer>>();
     protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
@@ -176,7 +176,7 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
                     rs = statement.executeQuery(sql);
                     _goodSqlCount++;
 
-                    final Map<String, String> columnJdbcTypeMap = new LinkedHashMap<String, String>();
+                    final Map<String, Integer> columnJdbcTypeMap = new LinkedHashMap<String, Integer>();
                     final ResultSetMetaData md = rs.getMetaData();
                     for (int i = 1; i <= md.getColumnCount(); i++) {
                         final String columnName = md.getColumnName(i);
@@ -185,13 +185,8 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
                             msg = msg + " sql=" + sql;
                             throw new IllegalArgumentException(msg);
                         }
-                        final String columnTypeName = md.getColumnTypeName(i);
-                        if (columnTypeName == null || columnTypeName.trim().length() == 0) {
-                            String msg = "The columnTypeName is invalid: " + columnTypeName;
-                            msg = msg + " columnName=" + columnName + " sql=" + sql;
-                            throw new IllegalArgumentException(msg);
-                        }
-                        columnJdbcTypeMap.put(columnName, columnTypeName);
+                        final int columnType = md.getColumnType(i);
+                        columnJdbcTypeMap.put(columnName, columnType);
                     }
 
                     _entityInfoMap.put(entityName, columnJdbcTypeMap);
@@ -299,10 +294,10 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
     //                                                                                   =======
     public Context initControlContext() throws Exception {
         final Database db = new Database();
-        final Map<String, Map<String, String>> entityInfoMap = _entityInfoMap;
+        final Map<String, Map<String, Integer>> entityInfoMap = _entityInfoMap;
         final Set<String> entityNameSet = entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
-            final Map<String, String> columnJdbcTypeMap = entityInfoMap.get(entityName);
+            final Map<String, Integer> columnJdbcTypeMap = entityInfoMap.get(entityName);
 
             final Table tbl = new Table();
             tbl.setName(entityName);
@@ -327,7 +322,7 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
                     }
                 }
 
-                final String jdbcType = columnJdbcTypeMap.get(columnName);
+                final Integer jdbcType = columnJdbcTypeMap.get(columnName);
                 col.setTorqueType(TypeMap.getTorqueType(jdbcType));
 
                 final List<String> primaryKeyList = _primaryKeyMap.get(entityName);
