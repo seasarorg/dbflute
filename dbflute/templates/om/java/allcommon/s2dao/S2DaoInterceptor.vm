@@ -237,7 +237,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             return ${glAttachedCBArgsVariableName};
         }
 
-        ${glConditionBeanContextName}.setConditionBeanOnThread(${glAttachedCBArgsVariableName});
         ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(${glAttachedCBArgsVariableName});
         final String sql;
         {
@@ -255,9 +254,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (Nullable)
      */
     public void postprocessConditionBean(MethodInvocation invocation, ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-            ${glConditionBeanContextName}.clearConditionBeanOnThread();
-        }
         if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             ${glFetchNarrowingBeanContextName}.clearFetchNarrowingBeanOnThread();
         }

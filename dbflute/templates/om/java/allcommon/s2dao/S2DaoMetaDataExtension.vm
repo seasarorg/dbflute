@@ -14,7 +14,6 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.ResultSetHandlerFactory;
-import org.seasar.dao.dbms.DbmsManager;
 import org.seasar.dao.impl.BeanArrayMetaDataResultSetHandler;
 import org.seasar.dao.impl.BeanListMetaDataResultSetHandler;
 import org.seasar.dao.impl.BeanMetaDataImpl;

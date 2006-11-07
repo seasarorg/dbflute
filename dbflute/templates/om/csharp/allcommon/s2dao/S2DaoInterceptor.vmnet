@@ -211,7 +211,6 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
                 dynamicCommand.Sql = "select count(*) from (" + sql + ") base";
             } else {
-                ${glConditionBeanContextName}.SetConditionBeanOnThread(${glAttachedCBArgsVariableName});
                 ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread(${glAttachedCBArgsVariableName});
                 String sql;
                 {
@@ -236,9 +235,6 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @param ${glAttachedCBArgsVariableName} Condition-bean. (Nullable)
          */
         public void PostprocessConditionBean(Seasar.Framework.Aop.IMethodInvocation invocation, ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
-                ${glConditionBeanContextName}.ClearConditionBeanOnThread();
-            }
             if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
                 ${glFetchNarrowingBeanContextName}.ClearFetchNarrowingBeanOnThread();
             }
