@@ -115,8 +115,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
                 throw new IllegalStateException(msg);
             }
-        } else if (LdEntity.class.isAssignableFrom(retType)) {
-            if (ret != null && !(ret instanceof LdEntity)) {
+        } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
+            if (ret != null && !(ret instanceof ${glEntityInterfaceName})) {
                 String msg = "The retType is difference from actual return: ";
                 msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
                 throw new IllegalStateException(msg);
@@ -140,11 +140,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                             _log.debug(daoResultPrefix + "Selected count: " + ls.size() + " first=" + ls.get(0) + "]");
                         }
                     }
-                } else if (LdEntity.class.isAssignableFrom(retType)) {
+                } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
                     if (ret == null) {
                         _log.debug(daoResultPrefix + "Selected entity: null" + "]");
                     } else {
-                        final LdEntity entity = (LdEntity) ret;
+                        final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) ret;
                         _log.debug(daoResultPrefix + "Selected entity: " + entity + "]");
                     }
                 } else {
