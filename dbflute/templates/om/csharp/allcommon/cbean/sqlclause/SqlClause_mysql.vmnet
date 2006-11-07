@@ -1,0 +1,97 @@
+#set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
+
+using System;
+using System.Collections;
+using System.Text;
+
+namespace ${glPackageBaseCommonSqlClause} {
+
+    /// <summary>
+    /// SqlClause for Apache Derby.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public class ${myClassName} : ${glSqlClauseAbstractName} {
+
+	    /** String of fetch-scope as sql-suffix. */
+	    protected String _fetchScopeSqlSuffix = "";
+
+	    /** String of lock as sql-suffix. */
+	    protected String _lockSqlSuffix = "";
+
+        /**
+         * Constructor.
+         * 
+         * @param tableName Table name. (NotNull)
+         **/
+        public ${myClassName}(String tableName)
+            : base(tableName) {}
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoFetchFirst() {
+            DoFetchPage();
+        }
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoFetchPage() {
+            _fetchScopeSqlSuffix = " limit " + this.PageStartIndex + ", " + this.FetchSize;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoClearFetchPageClause() {
+            _fetchScopeSqlSuffix = "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public override ${glSqlClauseInterfaceName} LockForUpdate() {
+            _lockSqlSuffix = " for update";
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Select-hint. (NotNull)
+         */
+        protected override String CreateSelectHint() {
+            return "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+         */
+        protected override String CreateFromBaseTableHint() {
+            return "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return From-hint. (NotNull)
+         */
+        protected override String CreateFromHint() {
+            return "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Sql-suffix. (NotNull)
+         */
+        protected override String CreateSqlSuffix() {
+            return _fetchScopeSqlSuffix + _lockSqlSuffix;
+        }
+    }
+}
