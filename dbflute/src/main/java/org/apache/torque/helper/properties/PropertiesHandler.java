@@ -71,6 +71,16 @@ public final class PropertiesHandler {
         }
         return _additionalForeignKeyProperties;
     }
+    
+    protected OtherProperties _otherProperties;
+
+    public OtherProperties getOtherProperties(Properties prop) {
+        if (_otherProperties == null) {
+            _otherProperties = new OtherProperties(prop);
+        }
+        return _otherProperties;
+    }
+    
     protected Sql2EntityProperties _sql2EntityProperties;
 
     public Sql2EntityProperties getSql2EntityProperties(Properties prop) {

@@ -602,7 +602,7 @@ public class TorqueJDBCTransformTask extends TorqueTask {
      * @throws SQLException
      */
     protected Collection getForeignKeys(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        Hashtable<String, Object[]> fks = new Hashtable<String, Object[]>();
+        final Hashtable<String, Object[]> fks = new Hashtable<String, Object[]>();
         ResultSet foreignKeys = null;
         try {
             foreignKeys = dbMeta.getImportedKeys(null, _dbSchema, tableName);
@@ -616,9 +616,9 @@ public class TorqueJDBCTransformTask extends TorqueTask {
                 Object[] fk = (Object[]) fks.get(fkName);
                 List<String[]> refs;
                 if (fk == null) {
+                    refs = new ArrayList<String[]>();
                     fk = new Object[2];
                     fk[0] = refTableName; //referenced table name
-                    refs = new ArrayList<String[]>();
                     fk[1] = refs;
                     fks.put(fkName, fk);
                 } else {
@@ -634,7 +634,35 @@ public class TorqueJDBCTransformTask extends TorqueTask {
                 foreignKeys.close();
             }
         }
-        return fks.values();
+        
+        return filterSameForeignKey(fks).values();
+    }
+    
+    protected Map<String, Object[]> filterSameForeignKey(Map<String, Object[]> fks) {
+        final Map<String, Object[]> retFksMap = new LinkedHashMap<String, Object[]>();
+        final Map<Map<String, Object>, Object> checkMap = new LinkedHashMap<Map<String, Object>, Object>();
+        final Set<String> foreignKeyNameSet = fks.keySet();
+        for (String foreinKeyName : foreignKeyNameSet) {
+            final Object[] objArray = fks.get(foreinKeyName);
+            final String refTableName = (String)objArray[0];
+            final List<String[]> refs = (List<String[]>)objArray[1];
+            final Map<String, Object> checkKeyMap = new LinkedHashMap<String, Object>();
+            checkKeyMap.put(refTableName, new Object());
+            for (String[] oneColumnElement : refs) {
+                checkKeyMap.put("localColumn:" + oneColumnElement[0], new Object());
+                checkKeyMap.put("foreignColumn:" + oneColumnElement[1], new Object());
+            }
+            if (checkMap.containsKey(checkKeyMap)) {
+                String msg = "A structural one of the same row already exists.";
+                msg = msg + "The skipped foreign-key name is " + foreinKeyName + ".";
+                msg = msg + " The columns are " + checkKeyMap + ".";
+                _log.warn(msg);
+            } else {
+                checkMap.put(checkKeyMap, new Object());
+                retFksMap.put(foreinKeyName, objArray);
+            }
+        }
+        return retFksMap;
     }
 
     /**

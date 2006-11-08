@@ -232,6 +232,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                return beanType;
            } else if (retType.IsArray) {
                return retType.GetElementType();
+           } else if (ValueTypes.GetValueType(retType) != ValueTypes.OBJECT) {
+               return beanType;
            } else {
                return retType;
            }

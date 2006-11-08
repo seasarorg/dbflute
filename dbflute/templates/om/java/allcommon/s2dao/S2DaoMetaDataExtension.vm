@@ -25,6 +25,7 @@ import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.impl.ObjectResultSetHandler;
+import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.extension.jdbc.util.DataSourceUtil;
 
@@ -258,6 +259,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         } else if (retType.isArray()) {
             return retType.getComponentType();
+        } else if (retType.isPrimitive() || !ValueTypes.getValueType(retType).equals(ValueTypes.OBJECT)) {
+            return getBeanClass();
         } else {
             return retType;
         }

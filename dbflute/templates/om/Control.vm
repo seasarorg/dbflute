@@ -891,38 +891,44 @@ targetdatabase = $targetDatabase
         ## Setup java directory for extended.
         $database.setupJavaDir_for_extended()
 
-        #if ($database.isAvailableBehaviorGeneration())
-          #if ($database.isTargetLanguageCSharp())
-            #set ($myBaseBhvInterfaceName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
-            #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
-            #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
-            #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
+        #if (!$database.isStopGenerateExtendedBhv())
+          #if ($database.isAvailableBehaviorGeneration())
+            #if ($database.isTargetLanguageCSharp())
+              #set ($myBaseBhvInterfaceName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
+              #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
+              #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
+              #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
 
-            #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
-            #if (!$files.file(${generator.OutputPath},$path).exists())
-              $generator.parse("om/${glTargetLanguage}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
-            #end
+              #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
+              #if (!$files.file(${generator.OutputPath},$path).exists())
+                $generator.parse("om/${glTargetLanguage}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+              #end
 
-            #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvInterfaceName}.${glClassFileExtension}" )
-            #if (!$files.file(${generator.OutputPath},$path).exists())
-              $generator.parse("om/${glTargetLanguage}/exbhv/IExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
-            #end
-          #else
-            #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
-            #if (!$files.file(${generator.OutputPath},$path).exists())
-              $generator.parse("om/${glTargetLanguage}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+              #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvInterfaceName}.${glClassFileExtension}" )
+              #if (!$files.file(${generator.OutputPath},$path).exists())
+                $generator.parse("om/${glTargetLanguage}/exbhv/IExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+              #end
+            #else
+              #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
+              #if (!$files.file(${generator.OutputPath},$path).exists())
+                $generator.parse("om/${glTargetLanguage}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+              #end
             #end
           #end
         #end
 
-        #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedDao})}${myExtendedDaoClassName}.${glClassFileExtension}" )
-        #if (!$files.file(${generator.OutputPath},$path).exists())
-          $generator.parse("om/${glTargetLanguage}/exdao/ExtendedDao.${glTemplateFileExtension}", $path, "table", $table)
+        #if (!$database.isStopGenerateExtendedDao())
+          #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedDao})}${myExtendedDaoClassName}.${glClassFileExtension}" )
+          #if (!$files.file(${generator.OutputPath},$path).exists())
+            $generator.parse("om/${glTargetLanguage}/exdao/ExtendedDao.${glTemplateFileExtension}", $path, "table", $table)
+          #end
         #end
 
-        #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedEntity})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-        #if (!$files.file(${generator.OutputPath},$path).exists())
-          $generator.parse("om/${glTargetLanguage}/exentity/ExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+        #if (!$database.isStopGenerateExtendedEntity())
+          #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedEntity})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+          #if (!$files.file(${generator.OutputPath},$path).exists())
+            $generator.parse("om/${glTargetLanguage}/exentity/ExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+          #end
         #end
 
         ## Setup java directory for base-cbean.

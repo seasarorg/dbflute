@@ -21,6 +21,7 @@ import org.apache.torque.helper.properties.ClassificationProperties;
 import org.apache.torque.helper.properties.DaoDiconProperties;
 import org.apache.torque.helper.properties.GeneratedClassPackageProperties;
 import org.apache.torque.helper.properties.OptimisticLockProperties;
+import org.apache.torque.helper.properties.OtherProperties;
 import org.apache.torque.helper.properties.PropertiesHandler;
 import org.apache.torque.helper.properties.SelectParamProperties;
 import org.apache.torque.helper.properties.Sql2EntityProperties;
@@ -954,6 +955,13 @@ public final class TorqueBuildProperties {
 
     public String getExtractAcceptEqual() {
         return stringProp("torque.extractAcceptEqual", "@=");
+    }
+    
+    // ===============================================================================
+    //                                                              Properties - Other
+    //                                                              ==================
+    public OtherProperties getOtherProperties() {
+        return getHandler().getOtherProperties(getProperties());
     }
 
     // ===============================================================================

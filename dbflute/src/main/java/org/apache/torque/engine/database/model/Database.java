@@ -1187,6 +1187,21 @@ public class Database {
     }
 
     // ===============================================================================
+    //                                                              Properties - Other
+    //                                                              ==================
+    public boolean isStopGenerateExtendedBhv() {
+        return getProperties().getOtherProperties().isStopGenerateExtendedBhv();
+    }
+    
+    public boolean isStopGenerateExtendedDao() {
+        return getProperties().getOtherProperties().isStopGenerateExtendedDao();
+    }
+
+    public boolean isStopGenerateExtendedEntity() {
+        return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
+    }
+    
+    // ===============================================================================
     //                                        Properties - jdbcToJavaNative (Internal)
     //                                        ===============-========================
     public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
