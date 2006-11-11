@@ -9,6 +9,7 @@ import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 
 import ${glPackageCQ}.*;
+import ${glPackageNss}.*;
 
 /**
  * The condition-bean of ${table.Name}.
@@ -346,67 +347,104 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                          Setup Select
     //                                                                          ============
   #foreach ($foreignKeys in $table.ForeignKeys)
+    #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
+    #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
+    #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${foreignKeys.foreignTable.javaName}Nss")
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ForeignTable    = [${foreignKeys.foreignTable.Name}]
-    //   ForeignProperty = [${foreignKeys.foreignPropertyName}]
+    //   ForeignTable    = [${foreignKeys.foreignTable.name}]
+    //   ForeignProperty = [${tmpPropertyName}]
     // * * * * * * * * */
 
-    /** Mark of select for ${foreignKeys.foreignPropertyName} */
-    protected String _select${foreignKeys.foreignPropertyNameInitCap};
+    /** Is select for ${tmpPropertyName}? */
+    protected boolean _isSelect${tmpPropertyNameInitCap};
+    /** Nest select setupper for ${tmpPropertyName}. */
+    protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     /**
-     * Get mark of select for ${foreignKeys.foreignPropertyName}.
+     * Is select for ${tmpPropertyName}? {For Internal}
      * 
-     * @return Mark of select. (If null, this foreign entity is out of select.)
+     * @return Determination.
      */
-    public String get${foreignKeys.foreignPropertyNameInitCap}_isSelect() {
-        return _select${foreignKeys.foreignPropertyNameInitCap};
+    public boolean isSelect${tmpPropertyNameInitCap}() {
+        return _isSelect${tmpPropertyNameInitCap};
     }
     /**
-     * Set up select for ${foreignKeys.foreignPropertyName}.
-     * If you invoke this, this foreign entity is target of select.
+     * Get nest select setupper for ${tmpPropertyName}. {For Internal}
+     * 
+     * @return Nest select setupper. (NotNull)
      */
-    public void setupSelect_${foreignKeys.foreignPropertyNameInitCap}() {
-        // For setting outer join.
-        query().query${foreignKeys.foreignPropertyNameInitCap}();
-
-        // Set dummy string that means this foreign entity is target of select.
-        _select${foreignKeys.foreignPropertyNameInitCap} = "dummy";
-
-        limitSelect_Off();
+    public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
+        if (_nss${tmpPropertyNameInitCap} == null) {
+            _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null);// for Dummy
+        }
+        return _nss${tmpPropertyNameInitCap};
     }
+    /**
+     * Set up select for ${tmpPropertyName}.
+     * If you invoke this, this foreign entity is target of select.
+     * 
+     * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
+     */
+    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
+        query().query${tmpPropertyNameInitCap}();// For setting outer join.
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
+            _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
+        }
+        _isSelect${tmpPropertyNameInitCap} = true;
+        limitSelect_Off();
+        return _nss${tmpPropertyNameInitCap};
+    }
+
   #end
 
   #foreach ($refferer in $table.Referrers)
     #if (${refferer.isOneToOne()})
+      #set ($tmpPropertyName = "${refferer.ReffererPropertyNameAsOne}")
+      #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
+      #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${refferer.table.javaName}Nss")
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   RefferTable    = [${refferer.Table.Name}]
-    //   RefferProperty = [${refferer.ReffererPropertyNameAsOne}]
+    //   RefferTable    = [${refferer.table.name}]
+    //   RefferProperty = [${tmpPropertyName}]
     // * * * * * * * * */
 
-    /** Mark of select for ${refferer.ReffererPropertyNameAsOne} */
-    protected String _select${refferer.ReffererPropertyNameInitCapAsOne};
+    /** Is select for ${tmpPropertyName}? */
+    protected boolean _isSelect${tmpPropertyNameInitCap};
+    /** Nest select setupper for ${tmpPropertyName}. */
+    protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     /**
-     * Get mark of select for ${refferer.ReffererPropertyNameAsOne}.
+     * Is select for ${tmpPropertyName}? {For Internal}
      * 
-     * @return Mark of select. (If null, this refferer entity is out of select.)
+     * @return Determination.
      */
-    public String get${refferer.ReffererPropertyNameInitCapAsOne}_isSelect() {
-        return _select${refferer.ReffererPropertyNameInitCapAsOne};
+    public boolean isSelect${tmpPropertyNameInitCap}() {
+        return _isSelect${tmpPropertyNameInitCap};
     }
     /**
-     * Set up select for ${refferer.ReffererPropertyNameAsOne}.
-     * If you invoke this, this refferer entity is target of select.
+     * Get nest select setupper for ${tmpPropertyName}. {For Internal}
+     * 
+     * @return Nest select setupper. (NotNull)
      */
-    public void setupSelect_${refferer.ReffererPropertyNameInitCapAsOne}() {
-        // For setting outer join.
-        query().query${refferer.ReffererPropertyNameInitCapAsOne}();
-
-        // Set dummy string that means this refferer entity is target of select.
-        _select${refferer.ReffererPropertyNameInitCapAsOne} = "dummy";
-
+    public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
+        if (_nss${tmpPropertyNameInitCap} == null) {
+            _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null);// for Dummy
+        }
+        return _nss${tmpPropertyNameInitCap};
+    }
+    /**
+     * Set up select for ${tmpPropertyName}.
+     * If you invoke this, this foreign entity is target of select.
+     * 
+     * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
+     */
+    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
+        query().query${tmpPropertyNameInitCap}();// For setting outer join.
+        if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
+            _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
+        }
+        _isSelect${tmpPropertyNameInitCap} = true;
         limitSelect_Off();
+        return _nss${tmpPropertyNameInitCap};
     }
     #end
   #end

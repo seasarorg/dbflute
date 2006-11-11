@@ -356,7 +356,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
     /// <returns>Foreign condition-query as interface.</returns>
     public ${glConditionQueryInterfaceName} getForeignConditionQuery(String foreignPropertyName) {
-        final String methodName = "Query" + foreignPropertyName.substring(0, 1) + foreignPropertyName.substring(1);
+        final String methodName = "query" + foreignPropertyName.substring(0, 1) + foreignPropertyName.substring(1);
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, null);

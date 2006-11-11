@@ -145,12 +145,16 @@ public final class BasicProperties extends AbstractHelperProperties {
             return DEFAULT_classFileExtension;
         }
     }
-    
+
     // ===============================================================================
     //                                                           Properties - Encoding
     //                                                           =====================
     public String getTemplateFileEncoding() {
         return stringProp("torque.templateFileEncoding", DEFAULT_templateFileEncoding);
+    }
+
+    public String getSourceFileEncoding() {
+        return stringProp("torque.sourceFileEncoding", DEFAULT_sourceFileEncoding);
     }
 
     // ===============================================================================
@@ -159,7 +163,7 @@ public final class BasicProperties extends AbstractHelperProperties {
     public String getClassAuthor() {
         return stringProp("torque.classAuthor", "DBFlute(AutoGenerator)");
     }
-    
+
     // ===============================================================================
     //                                                             Properties - SameAs
     //                                                             ===================
@@ -170,7 +174,7 @@ public final class BasicProperties extends AbstractHelperProperties {
     public boolean isJavaNameOfColumnSameAsDbName() {
         return booleanProp("torque.isJavaNameOfColumnSameAsDbName", false);
     }
-    
+
     // ===============================================================================
     //                                                          Properties - Available
     //                                                          ======================
@@ -201,14 +205,14 @@ public final class BasicProperties extends AbstractHelperProperties {
             return "";
         }
     }
-    
+
     // ===============================================================================
     //                                                             Properties - Prefix
     //                                                             ===================
     public String getProjectPrefix() {
         return stringProp("torque.projectPrefix", "");
     }
-    
+
     // ===============================================================================
     //                                                      Properties - Database Info
     //                                                      ==========================

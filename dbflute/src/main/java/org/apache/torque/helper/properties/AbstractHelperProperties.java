@@ -247,7 +247,8 @@ public abstract class AbstractHelperProperties {
     public static final String CSHARP_classFileExtension = "cs";
     public static final String DEFAULT_classFileExtension = JAVA_classFileExtension;
 
-    public static final String DEFAULT_templateFileEncoding = "Windows-31J";
+    public static final String DEFAULT_templateFileEncoding = "UTF-8";
+    public static final String DEFAULT_sourceFileEncoding = "UTF-8";
 
     public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
     public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();

@@ -153,6 +153,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCB = "${database.conditionBeanPackage}.bs")
     #set ($glPackageCB = "${database.conditionBeanPackage}")
     #set ($glPackageCQ = "${database.conditionBeanPackage}.cq")
+    #set ($glPackageNss = "${database.conditionBeanPackage}.nss")
     #set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
     #set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
     #set ($glPackageBaseSqlParameterBean = "${database.SqlParameterBeanPackage}.bsparam")
@@ -800,6 +801,9 @@ targetdatabase = $targetDatabase
     #set ($path = $strings.getPackageAsPath(${glPackageCQ}))
     $database.makeDirectory($path)
 
+    #set ($path = $strings.getPackageAsPath(${glPackageNss}))
+    $database.makeDirectory($path)
+
     ## Setup java directory for cbean.
     $database.setupJavaDir_for_extended_cbean()
 
@@ -849,6 +853,7 @@ targetdatabase = $targetDatabase
         #set ($myBaseConditionBeanClassName = "${myBaseObjectClassName}${glConditionBeanInitialName}")
         #set ($myConditionBeanClassName = "${myExtendedObjectClassName}${glConditionBeanInitialName}")
         #set ($myConditionQueryClassName = "${myExtendedObjectClassName}${glConditionQueryInitialName}")
+        #set ($myNestSelectSetupperClassName = "${myExtendedObjectClassName}Nss")
 
         #set ($myDBMetaClassName = "${glProjectPrefix}${table.JavaName}Dbm")
         #set ($myDBMetaPackageName = "${glPackageBaseDBMeta}")
@@ -940,6 +945,10 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/cbean/ConditionQueryImpl.${glTemplateFileExtension}", $path, "table", $table)
 
+        #if ($database.isTargetLanguageJava())
+          #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
+          $generator.parse("om/${glTargetLanguage}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
+        #end
         ## Setup java directory for extended-cbean.
         $database.setupJavaDir_for_extended_cbean()
 

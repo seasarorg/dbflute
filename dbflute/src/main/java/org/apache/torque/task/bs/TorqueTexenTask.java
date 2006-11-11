@@ -11,6 +11,7 @@ import org.apache.torque.helper.TorqueBuildProperties;
 import org.apache.torque.helper.TorqueTaskUtil;
 import org.apache.torque.helper.properties.BasicProperties;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.ant.TexenTask;
 
 /**
@@ -37,8 +38,8 @@ public abstract class TorqueTexenTask extends TexenTask {
         // /----------------------------------------------
         // Set up the encoding of templates from property.
         // -----/
-        final String templateEncoding = getBasicProperties().getTemplateFileEncoding();
-        Velocity.setProperty("input.encoding", templateEncoding);
+        setInputEncoding(getBasicProperties().getTemplateFileEncoding());
+        setOutputEncoding(getBasicProperties().getSourceFileEncoding());
 
         try {
             super.execute();

@@ -170,8 +170,8 @@ public class ForeignKey {
     /**
      * Adds a new reference entry to the foreign key
      *
-     * @param local name of the local column
-     * @param foreign name of the foreign column
+     * @param localColumnNameList Name list  of the local column
+     * @param foreignColumnNameList Name list of the foreign column
      */
     public void addReference(List<String> localColumnNameList, List<String> foreignColumnNameList) {
         _localColumns.addAll(localColumnNameList);

@@ -1,0 +1,72 @@
+package ${glPackageNss};
+
+#set ($myClassName = "${myNestSelectSetupperClassName}")
+
+import ${glPackageCQ}.${myConditionQueryClassName};
+
+
+/**
+ * The nest select setupper.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    /** Base query. */
+    protected ${myConditionQueryClassName} _query;
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor.
+     * 
+     * @param query Base query. (NotNull)
+     */
+    public ${myClassName}(${myConditionQueryClassName} query) {
+        _query = query;
+    }
+
+    public ${myConditionQueryClassName} query() {
+        return _query;
+    }
+
+    public boolean hasConditionQuery() {
+        return _query != null;
+    }
+
+#foreach ($foreignKeys in $table.ForeignKeys)
+  #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
+
+    protected boolean _isSelect${tmpPropertyNameInitCap};
+    public boolean isSelect${tmpPropertyNameInitCap}() {
+        return _isSelect${tmpPropertyNameInitCap};
+    }
+    public void with${tmpPropertyNameInitCap}() {
+        assertConditionQuery();
+        query().query${tmpPropertyNameInitCap}();
+        _isSelect${tmpPropertyNameInitCap} = true;
+    }
+#end
+#foreach ($refferer in $table.Referrers)
+  #if (${refferer.isOneToOne()})
+    #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
+
+    protected boolean _isSelect${tmpPropertyNameInitCap};
+    public boolean isSelect${tmpPropertyNameInitCap}() {
+        return _isSelect${tmpPropertyNameInitCap};
+    }
+    public void with${tmpPropertyNameInitCap}() {
+        assertConditionQuery();
+        query().query${tmpPropertyNameInitCap}();
+        _isSelect${tmpPropertyNameInitCap} = true;
+    }
+  #end
+#end
+    protected void assertConditionQuery() {
+        if (!hasConditionQuery()) {
+            String msg = "The query should not be null.";
+            throw new IllegalStateException(msg);
+        }
+    }
+}

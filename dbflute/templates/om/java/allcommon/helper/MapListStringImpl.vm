@@ -183,7 +183,7 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
                 return;
             }
 
-            // *** この時点で残りの文字列はマップ要素のキー値で始まる。 ***
+            // *** Now, _remainderString should starts with the key of the map. ***
 
             final int equalIndex = _remainderString.indexOf(_equal);
             assertEqualIndex(_remainderString, equalIndex, _topString, currentMap);
@@ -191,7 +191,7 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
             removePrefixTargetIndexPlus(equalIndex, _equal.length());
             removeBothSideSpaceAndTabAndNewLine();
 
-            // *** この時点で残りの文字列はマップ要素のバリュー値で始まる。 ***
+            // *** Now, _remainderString should starts with the value of the map. ***
 
             if (isStartsWithMapPrefix(_remainderString)) {
                 removePrefixMapMarkAndStartBrace();
@@ -215,18 +215,20 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
             final int endBraceIndex = _remainderString.indexOf(_endBrace);
             assertEndBracekIndex(_remainderString, endBraceIndex, _topString, currentMap);
 
-            // デリミタが存在して、かつ、デリミタが中括弧閉じよりも近い場合、
-            // 現在の残りの文字列の先頭からデリミタまでがマップバリューとなる。→ ex) value1,key2=value2}
+            // If delimiter exists and delimiter is closer than end brace, 
+            // Everything from the head of the present remainder string to the delimiter becomes map value.
+            //   ex) value1,key2=value2}
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) {
                 final String mapValue = _remainderString.substring(0, delimiterIndex);
                 currentMap.put(mapKey, filterMapListValue(mapValue));
 
-                // デリミタ以降にマップ要素が続くので、デリミタを飛ばしてコンティニュー！
+                // Because the map element continues since the delimiter, skip the delimiter and continue the loop.
                 removePrefixTargetIndexPlus(delimiterIndex, _delimiter.length());
                 continue;
             }
 
-            // 現在の残りの文字列の先頭から中括弧閉じまでがマップバリューとなる。→ ex) value1}, key2=value2}
+            // Everything from the head of the present remainder string to the delimiter becomes map value.
+            //   ex) value1}, key2=value2}
             final String mapValue = _remainderString.substring(0, endBraceIndex);
             currentMap.put(mapKey, filterMapListValue(mapValue));
 
@@ -913,9 +915,9 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
     /**
      * Get count that target string exist in the base string.
      * 
-     * @param targetString 対象文字列
-     * @param delimiter デリミタ
-     * @return 残りの文字列に含まれているデリミタの数
+     * @param targetString Target string.
+     * @param delimiter Delimiter
+     * @return Delimiter count that _remainderString contains.
      */
     protected int getDelimiterCount(String targetString, String delimiter) {
         int result = 0;
