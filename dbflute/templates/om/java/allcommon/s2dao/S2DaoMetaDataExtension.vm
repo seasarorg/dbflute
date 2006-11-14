@@ -107,7 +107,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 if (${glConditionBeanContextName}.isTheTypeConditionBean(argTypes[0])) {
                     final String sqlNormal = getSelectClause(getBeanMetaData());
                     final String sqlPKOnly = getSelectClausePKOnly(getBeanMetaData());
-                    final ${glSelectDynamicCommand} dynamicCommand = new${glSelectDynamicCommand}(handler);
+                    final ${glSelectDynamicCommand} dynamicCommand = newMySelectDynamicCommand(handler);
                     sql = sqlNormal;
                     cmd = dynamicCommand;
                     dynamicCommand.setSelectClause(sqlNormal);
@@ -172,36 +172,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         sb.append(sbMySelectList);
 
         setupRelationSelectClause(sb, beanMetaData, "", "", 1);
-
-//        for (int i = 0; i < beanMetaData.getRelationPropertyTypeSize(); ++i) {
-//            final StringBuffer sbYourSelectList = new StringBuffer(100);
-//            final RelationPropertyType rpt = beanMetaData.getRelationPropertyType(i);
-//            if (rpt == null) {
-//                String msg = "The beanMetaData.GetRelationPropertyType(" + i + ") returned null";
-//                msg = msg + ": beanMetaData.getTableName()=" + beanMetaData.getTableName();
-//                msg = msg + ": beanMetaData.getRelationPropertyTypeSize()=" + beanMetaData.getRelationPropertyTypeSize();
-//                throw new IllegalStateException(msg);
-//            }
-//
-//            final BeanMetaData relationBmd = rpt.getBeanMetaData();
-//            final String ifComment = "/*IF dto." + rpt.getPropertyName() + "_isSelect != null*/";
-//            final String endComment = "/*END*/";
-//            for (int j = 0; j < relationBmd.getPropertyTypeSize(); ++j) {
-//                final PropertyType pt = relationBmd.getPropertyType(j);
-//                if (pt.isPersistent()) {
-//                    final String columnName = pt.getColumnName();
-//
-//                    if (sbMySelectList.length() != 0 || sbYourSelectList.length() != 0) {
-//                        sbYourSelectList.append(", ");
-//                    }
-//                    sbYourSelectList.append(rpt.getPropertyName()).append(".").append(columnName);
-//                    sbYourSelectList.append(" AS ");
-//                    sbYourSelectList.append(pt.getColumnName()).append("_").append(rpt.getRelationNo());
-//                }
-//            }
-//            sb.append(ifComment).append(sbYourSelectList).append(endComment);
-//        }
-
         return sb.toString();
     }
 
@@ -275,7 +245,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      * @return Select dynamic command. (NotNull)
      */
     protected SelectDynamicCommand createSelectDynamicCommand(ResultSetHandler handler) {
-        return new${glSelectDynamicCommand}(handler);
+        return newMySelectDynamicCommand(handler);
     }
 
     /**
@@ -284,7 +254,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      * @param handler ResultSetHandler
      * @return My select dynamic command. (NotNull)
      */
-    protected ${glSelectDynamicCommand} new${glSelectDynamicCommand}(ResultSetHandler handler) {
+    protected ${glSelectDynamicCommand} newMySelectDynamicCommand(ResultSetHandler handler) {
         return new ${glSelectDynamicCommand}(dataSource, statementFactory, handler, resultSetFactory);
     }
 

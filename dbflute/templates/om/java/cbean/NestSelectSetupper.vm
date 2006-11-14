@@ -27,6 +27,9 @@ public class ${myClassName} {
         _query = query;
     }
 
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
     public ${myConditionQueryClassName} query() {
         return _query;
     }
@@ -35,6 +38,9 @@ public class ${myClassName} {
         return _query != null;
     }
 
+    // =====================================================================================
+    //                                                                           SetupSelect
+    //                                                                           ===========
 #foreach ($foreignKeys in $table.ForeignKeys)
   #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
 
@@ -63,6 +69,10 @@ public class ${myClassName} {
     }
   #end
 #end
+
+    // =====================================================================================
+    //                                                                                Helper
+    //                                                                                ======
     protected void assertConditionQuery() {
         if (!hasConditionQuery()) {
             String msg = "The query should not be null.";

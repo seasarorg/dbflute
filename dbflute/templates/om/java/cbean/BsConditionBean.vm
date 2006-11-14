@@ -381,7 +381,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
     /**
      * Set up select for ${tmpPropertyName}.
-     * If you invoke this, this foreign entity is target of select.
+     * If you invoke this, this entity is target of select.
      * 
      * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
      */
@@ -394,9 +394,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         limitSelect_Off();
         return _nss${tmpPropertyNameInitCap};
     }
-
   #end
-
   #foreach ($refferer in $table.Referrers)
     #if (${refferer.isOneToOne()})
       #set ($tmpPropertyName = "${refferer.ReffererPropertyNameAsOne}")
@@ -433,7 +431,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
     /**
      * Set up select for ${tmpPropertyName}.
-     * If you invoke this, this foreign entity is target of select.
+     * If you invoke this, this entity is target of select.
      * 
      * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
      */

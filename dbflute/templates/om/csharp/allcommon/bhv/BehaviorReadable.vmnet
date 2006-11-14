@@ -264,7 +264,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// Invoke select-page by callback.
         /// </summary>
         /// <param name="callback">Callback. (NotNull)</param>
-        PagingResultBean InvokeSelectPage(SelectPageCallback callback);
+        ${glPagingResultBeanName} InvokeSelectPage(SelectPageCallback callback);
     }
 
     public class SelectPageSimpleInvoker : SelectPageInvoker {
@@ -281,7 +281,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// Invoke select-page by callback.
         /// </summary>
         /// <param name="callback">Callback. (NotNull)</param>
-        public PagingResultBean InvokeSelectPage(SelectPageCallback callback) {
+        public ${glPagingResultBeanName} InvokeSelectPage(SelectPageCallback callback) {
             AssertObjectNotNull("callback", callback);
             int allRecordCount = callback.SelectCountIgnoreFetchScope();
             System.Collections.IList selectedList = callback.SelectList();

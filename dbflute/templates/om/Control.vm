@@ -945,10 +945,9 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/cbean/ConditionQueryImpl.${glTemplateFileExtension}", $path, "table", $table)
 
-        #if ($database.isTargetLanguageJava())
-          #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
-          $generator.parse("om/${glTargetLanguage}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
-        #end
+        #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
+
         ## Setup java directory for extended-cbean.
         $database.setupJavaDir_for_extended_cbean()
 

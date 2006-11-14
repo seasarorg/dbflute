@@ -8,6 +8,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonHelper};
 
 using ${glPackageCQ};
+using ${glPackageNss};
 
 namespace ${glPackageBaseCB} {
 
@@ -90,16 +91,40 @@ namespace ${glPackageBaseCB} {
                 throw new ArgumentOutOfRangeException(msg + ": primaryKeyMap --> " + primaryKeyMap);
             }
             {
-                String value = (String)primaryKeyMap["${col.Name}"];
+                Object obj = primaryKeyMap["${col.Name}"];
+                if (obj == null) {
+                    Query().Set${col.JavaName}_Equal(null);
+                } else {
+                    if (obj is ${col.JavaNative}) {
+                        Query().Set${col.JavaName}_Equal((${col.JavaNative})obj);
+                    } else {
+                        if (!(obj is String)) {
+                            String msg = "The value should be ${col.JavaNative} or String: ";
+                            msg = msg + "valueType=" + obj.GetType() + " value=" + obj;
+                            throw new SystemException(msg);
+                        }
+                        String value = (String)obj;
     #if ($col.isJavaNativeStringObject())
 
-                Query().Set${col.JavaName}_Equal(value);
-    #else
-
-                Query().Set${col.JavaName}_Equal(${col.JavaNative}.Parse(value));
-    #end
-
+                        Query().Set${col.JavaName}_Equal(value);
+                    }
+                }
             }
+    #else
+      #if (${col.isJavaNativeBinaryObject()})
+
+                        Query().Set${col.JavaName}_Equal(null);// Binary as String is out of target.
+                    }
+                }
+            }
+      #else
+
+                        Query().Set${col.JavaName}_Equal(${col.JavaNative}.Parse(value));
+                    }
+                }
+            }
+      #end
+    #end
   #end
 
             return this;
@@ -111,16 +136,40 @@ namespace ${glPackageBaseCB} {
                 throw new ArgumentOutOfRangeException(msg + ": primaryKeyMap --> " + primaryKeyMap);
             }
             {
-                String value = (String)primaryKeyMap["${col.Name}"];
+                Object obj = primaryKeyMap["${col.Name}"];
+                if (obj == null) {
+                    Query().Set${col.JavaName}_Equal(null);
+                } else {
+                    if (obj is ${col.JavaNative}) {
+                        Query().Set${col.JavaName}_Equal((${col.JavaNative})obj);
+                    } else {
+                        if (!(obj is String)) {
+                            String msg = "The value should be ${col.JavaNative} or String: ";
+                            msg = msg + "valueType=" + obj.GetType() + " value=" + obj;
+                            throw new SystemException(msg);
+                        }
+                        String value = (String)obj;
     #if ($col.isJavaNativeStringObject())
 
-                Query().Set${col.JavaName}_Equal(value);
-    #else
-
-                Query().Set${col.JavaName}_Equal(${col.JavaNative}.Parse(value));
-    #end
-
+                        Query().Set${col.JavaName}_Equal(value);
+                    }
+                }
             }
+    #else
+      #if (${col.isJavaNativeBinaryObject()})
+
+                        Query().Set${col.JavaName}_Equal(null);// Binary as String is out of target.
+                    }
+                }
+            }
+      #else
+
+                        Query().Set${col.JavaName}_Equal(${col.JavaNative}.Parse(value));
+                    }
+                }
+            }
+      #end
+    #end
   #end
 
             return this;
@@ -266,71 +315,104 @@ namespace ${glPackageBaseCB} {
             return this;
         }
 
-  #foreach ($foreignKeys in $table.ForeignKeys)
-    
+#foreach ($foreignKeys in $table.ForeignKeys)
+  #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
+  #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
+  #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${foreignKeys.foreignTable.javaName}Nss")
+
         // /* * * * * * * * * * * * * * * * * * * * * * *
         //   ForeignTable    = [${foreignKeys.foreignTable.Name}]
-        //   ForeignProperty = [${foreignKeys.foreignPropertyName}]
+        //   ForeignProperty = [${tmpPropertyName}]
         // * * * * * * * * */
 
-        /// <summary> Mark of select for ${foreignKeys.foreignPropertyName}</summary>
-        protected String _select${foreignKeys.foreignPropertyNameInitCap};
-
+        /// <summary>Is select for ${tmpPropertyName}?</summary>
+        protected bool _isSelect${tmpPropertyNameInitCap};
+        /// <summary>Nest select setupper for ${tmpPropertyName}.</summary>
+        protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
         /// <summary>
-        /// Get mark of select for ${foreignKeys.foreignPropertyName}.
+        /// Is select for ${tmpPropertyName}?
         /// </summary>
-        /// <returns>Mark of select. (If null, this foreign entity is out of select.)</returns>
-        public String ${foreignKeys.foreignPropertyNameInitCap}_isSelect {
-            get { return _select${foreignKeys.foreignPropertyNameInitCap}; }
+        /// <returns>Determination.</returns>
+        public bool IsSelect${tmpPropertyNameInitCap} {
+            get { return _isSelect${tmpPropertyNameInitCap}; }
         }
         /// <summary>
-        /// Set up select for ${foreignKeys.foreignPropertyName}.
-        /// If you invoke this, this foreign entity is target of select.
+        /// Get nest select setupper for ${tmpPropertyName}. {For Internal}
         /// </summary>
-        public void SetupSelect_${foreignKeys.foreignPropertyNameInitCap}() {
-            // For setting outer join.
-            Query().Query${foreignKeys.foreignPropertyNameInitCap}();
-
+        /// <returns>Nest select setupper. (NotNull)</returns>
+        public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} {
+            get {
+                if (_nss${tmpPropertyNameInitCap} == null) {
+                    _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null);// for Dummy
+                }
+                return _nss${tmpPropertyNameInitCap};
+            }
+        }
+        /// <summary>
+        /// Set up select for ${tmpPropertyName}.
+        /// If you invoke this, this entity is target of select.
+        /// </summary>
+        public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
+            Query().Query${tmpPropertyNameInitCap}();// For setting outer join.
+            if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
+                _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
+            }
             // Set dummy string that means this foreign entity is target of select.
-            _select${foreignKeys.foreignPropertyNameInitCap} = "dummy";
-
+            _isSelect${tmpPropertyNameInitCap} = true;
             LimitSelect_Off();
+            return _nss${tmpPropertyNameInitCap};
         }
-  #end
-
-  #foreach ($refferer in $table.Referrers)
-    #if (${refferer.isOneToOne()})
+#end
+#foreach ($refferer in $table.Referrers)
+  #if (${refferer.isOneToOne()})
+    #set ($tmpPropertyName = "${refferer.ReffererPropertyNameAsOne}")
+    #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
+    #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${refferer.table.javaName}Nss")
 
         // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
         //   RefferTable    = [${refferer.Table.Name}]
-        //   RefferProperty = [${refferer.ReffererPropertyNameAsOne}]
+        //   RefferProperty = [${tmpPropertyName}]
         // * * * * * * * * */
 
-        /** Mark of select for ${refferer.ReffererPropertyNameAsOne} */
-        protected String _select${refferer.ReffererPropertyNameInitCapAsOne};
-        /**
-         * Get mark of select for ${refferer.ReffererPropertyNameAsOne}.
-         * 
-         * @return Mark of select. (If null, this refferer entity is out of select.)
-         */
-        public String ${refferer.ReffererPropertyNameInitCapAsOne}_isSelect {
-            get { return _select${refferer.ReffererPropertyNameInitCapAsOne}; }
+        /// <summary> Is select for ${tmpPropertyName}?</summary>
+        protected bool _isSelect${tmpPropertyNameInitCap};
+        /// <summary>Nest select setupper for ${tmpPropertyName}.</summary>
+        protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+        /// <summary>
+        /// Is select for ${tmpPropertyName}?
+        /// </summary>
+        /// <returns>Determination.</returns>
+        public bool IsSelect${tmpPropertyNameInitCap} {
+            get { return _isSelect${tmpPropertyNameInitCap}; }
         }
-        /**
-         * Set up select for ${refferer.ReffererPropertyNameAsOne}.
-         * If you invoke this, this refferer entity is target of select.
-         */
-        public void SetupSelect_${refferer.ReffererPropertyNameInitCapAsOne}() {
-            // For setting outer join.
-            Query().Query${refferer.ReffererPropertyNameInitCapAsOne}();
-
-            // Set dummy string that means this refferer entity is target of select.
-            _select${refferer.ReffererPropertyNameInitCapAsOne} = "dummy";
-
+        /// <summary>
+        /// Get nest select setupper for ${tmpPropertyName}. {For Internal}
+        /// </summary>
+        /// <returns>Nest select setupper. (NotNull)</returns>
+        public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} {
+            get {
+                if (_nss${tmpPropertyNameInitCap} == null) {
+                    _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null);// for Dummy
+                }
+                return _nss${tmpPropertyNameInitCap};
+            }
+        }
+        /// <summary>
+        /// Set up select for ${tmpPropertyName}.
+        /// If you invoke this, this entity is target of select.
+        /// </summary>
+        public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
+            Query().Query${tmpPropertyNameInitCap}();// For setting outer join.
+            if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
+                _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
+            }
+            // Set dummy string that means this foreign entity is target of select.
+            _isSelect${tmpPropertyNameInitCap} = true;
             LimitSelect_Off();
+            return _nss${tmpPropertyNameInitCap};
         }
-    #end
   #end
+#end
 
         // =====================================================================================
         //                                                                 Basic-Override Method

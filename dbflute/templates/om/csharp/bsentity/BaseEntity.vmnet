@@ -1,3 +1,4 @@
+
 #set ($myClassName = "${myExtendedObjectClassName}")
 
 using System;
@@ -563,34 +564,82 @@ namespace ${myExtendedEntityPackageName} {
                 _${col.UncapitalisedJavaName} = null;
                 _isSetterInvoked${col.JavaName} = false;
             } else {
-                String value = (String)primaryKeyMap["${col.Name}"];
+                Object obj = primaryKeyMap["${col.Name}"];
+                if (obj == null) {
+                    ${col.JavaName} = null;
+                } else {
+                    if (obj is ${col.JavaNative}) {
+                        ${col.JavaName} = (${col.JavaNative})obj;
+                    } else {
+                        if (!(obj is String)) {
+                            String msg = "The value should be ${col.JavaNative} or String: ";
+                            msg = msg + "valueType=" + obj.GetType() + " value=" + obj;
+                            throw new SystemException(msg);
+                        }
+                        String value = (String)obj;
     #if ($col.isJavaNativeStringObject())
 
-                ${col.JavaName} = value;
-    #else
-
-                ${col.JavaName} = ${col.JavaNative}.Parse(value);
-    #end
-
+                        ${col.JavaName} = value;
+                    }
+                }
             }
+    #else
+      #if (${col.isJavaNativeBinaryObject()})
+
+                        ${col.JavaName} = null;// Binary as String is out of target.
+                    }
+                }
+            }
+      #else
+
+                        ${col.JavaName} = ${col.JavaNative}.Parse(value);
+                    }
+                }
+            }
+      #end
+    #end
   #end
 #else
   #foreach ($col in $table.Columns)
 
-            if (!primaryKeyMap.ContainsKey("${col.Name}")) {
-                String msg = "The primaryKeyMap must have the value of ${col.Name}";
-                throw new ArgumentOutOfRangeException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+            if (!primaryKeyMap.ContainsKey("${col.Name}") || primaryKeyMap["${col.Name}"] == null) {
+                _${col.UncapitalisedJavaName} = null;
+                _isSetterInvoked${col.JavaName} = false;
             } else {
-                String value = (String)primaryKeyMap["${col.Name}"];
+                Object obj = primaryKeyMap["${col.Name}"];
+                if (obj == null) {
+                    ${col.JavaName} = null;
+                } else {
+                    if (obj is ${col.JavaNative}) {
+                        ${col.JavaName} = (${col.JavaNative})obj;
+                    } else {
+                        if (!(obj is String)) {
+                            String msg = "The value should be ${col.JavaNative} or String: ";
+                            msg = msg + "valueType=" + obj.GetType() + " value=" + obj;
+                            throw new SystemException(msg);
+                        }
+                        String value = (String)obj;
     #if ($col.isJavaNativeStringObject())
 
-                ${col.JavaName} = value;
-    #else
-
-                ${col.JavaName} = ${col.JavaNative}.Parse(value);
-    #end
-
+                        ${col.JavaName} = value;
+                    }
+                }
             }
+    #else
+      #if (${col.isJavaNativeBinaryObject()})
+
+                        ${col.JavaName} = null;// Binary as String is out of target.
+                    }
+                }
+            }
+      #else
+
+                        ${col.JavaName} = ${col.JavaNative}.Parse(value);
+                    }
+                }
+            }
+      #end
+    #end
   #end
 #end
 
@@ -636,23 +685,46 @@ namespace ${myExtendedEntityPackageName} {
                 String msg = "The argument[columnValueMap] should not be empty.";
                 throw new ArgumentOutOfRangeException(msg);
             }
-
   #foreach ($col in $table.Columns)
 
             if (!columnValueMap.ContainsKey("${col.Name}") || columnValueMap["${col.Name}"] == null) {
                 _${col.UncapitalisedJavaName} = null;
                 _isSetterInvoked${col.JavaName} = false;
             } else {
-                String value = (String)columnValueMap["${col.Name}"];
+                Object obj = columnValueMap["${col.Name}"];
+                if (obj == null) {
+                    ${col.JavaName} = null;
+                } else {
+                    if (obj is ${col.JavaNative}) {
+                        ${col.JavaName} = (${col.JavaNative})obj;
+                    } else {
+                        if (!(obj is String)) {
+                            String msg = "The value should be ${col.JavaNative} or String: ";
+                            msg = msg + "valueType=" + obj.GetType() + " value=" + obj;
+                            throw new SystemException(msg);
+                        }
+                        String value = (String)obj;
     #if ($col.isJavaNativeStringObject())
 
-                ${col.JavaName} = value;
-    #else
-
-                ${col.JavaName} = ${col.JavaNative}.Parse(value);
-    #end
-
+                        ${col.JavaName} = value;
+                    }
+                }
             }
+    #else
+      #if (${col.isJavaNativeBinaryObject()})
+
+                        ${col.JavaName} = null;// Binary as String is out of target.
+                    }
+                }
+            }
+      #else
+
+                        ${col.JavaName} = ${col.JavaNative}.Parse(value);
+                    }
+                }
+            }
+      #end
+    #end
   #end
 
         }

@@ -350,7 +350,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         /// </summary>
         /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
         /// <returns>Foreign DBMeta. (NotNull)</returns>
-        abstract public DBMeta GetForeignDBMeta(String foreignPropertyName);
+        abstract public ${glDBMetaInterfaceName} GetForeignDBMeta(String foreignPropertyName);
 
         // =====================================================================================
         //                                                                         Determination

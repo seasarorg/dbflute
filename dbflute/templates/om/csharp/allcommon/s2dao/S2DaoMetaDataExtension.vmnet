@@ -1,10 +1,12 @@
 
 using System;
-using System.Reflection;
 using System.Collections;
+using System.Data;
 using System.Text;
+using System.Reflection;
 
 using Seasar.Dao;
+using Seasar.Dao.Attrs;
 using Seasar.Dao.Dbms;
 using Seasar.Dao.Impl;
 using Seasar.Extension.ADO;
@@ -17,34 +19,19 @@ using ${glPackageBaseCommonCBean};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
-    /**
-     * My-DaoMetaDataImpl.
-     * Overrides original class 'DaoMetaDataImpl'.
-     * 
-     * @author ${database.ClassAuthor}
-     */
     public class ${glDaoMetaDataExtension} : Seasar.Dao.Impl.DaoMetaDataImpl {
 
-        /**
-         * Constructor.
-         * 
-         * @param daoType DAO-Type
-         * @param dataSource DataSource
-         * @param statementFactory StatementFactory
-         * @param resultSetFactory ResultSetFactory
-         */
         public ${glDaoMetaDataExtension}(Type daoType, IDataSource dataSource,ICommandFactory commandFactory,
             IDataReaderFactory dataReaderFactory, IDatabaseMetaData dbMetaData)
             : base(daoType, dataSource, commandFactory, dataReaderFactory, dbMetaData) {}
 
+        protected override IBeanMetaData CreateBeanMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms)  {
+            return new BeanMetaDataExtension(beanType, dbMetaData, dbms, false);
+        }
+
         // =====================================================================================
         //                                                                ConditionBean Override
         //                                                                ======================
-        /**
-         * This method overrides the method that is declared at super.
-         * 
-         * @param methodInfo Method-information instance. (NotNull)
-         */
         protected override void SetupSelectMethodByAuto(MethodInfo methodInfo) {
             String query = annotationReader.GetQuery(methodInfo.Name);
             IDataReaderHandler handler = CreateDataReaderHandler(methodInfo);
@@ -60,7 +47,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     argNames = new String[] { "dto" };
                     // /----------------------------------------------------- [MyExtension]
                     if (${glConditionBeanContextName}.IsTheTypeConditionBean(argTypes[0])) {
-                        ${glSelectDynamicCommand} dynamicCommand = New${glSelectDynamicCommand}(handler);
+                        ${glSelectDynamicCommand} dynamicCommand = NewMySelectDynamicCommand(handler);
                         String sqlNormal = GetSelectClause();
                         String sqlPKOnly = GetSelectClausePKOnly();
                         sql = sqlNormal;
@@ -104,12 +91,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             sqlCommands[methodInfo.Name] = cmd;
         }
 
-        /**
-         * Get select clause PK only.
-         * 
-         * @param beanMetaData BeanMetaData. (NotNull)
-         * @return Select clause PK only. (NotNull)
-         */
         protected String GetSelectClausePKOnly() {
             StringBuilder sb = new StringBuilder(100);
             sb.Append("select/*$dto.SelectHint*/ ");
@@ -155,6 +136,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             sb.Append(sbMySelectList);
 
+            SetupRelationSelectClause(sb, beanMetaData, "", "", 1);
+            return sb.ToString();
+        }
+
+        protected void SetupRelationSelectClause(StringBuilder sb, IBeanMetaData baseBmd, String judgeProp, String preNoSuffix, int cqNestNo) {
             for (int i = 0; i < beanMetaData.RelationPropertyTypeSize; ++i) {
                 StringBuilder sbYourSelectList = new StringBuilder(100);
                 IRelationPropertyType rpt = beanMetaData.GetRelationPropertyType(i);
@@ -165,42 +151,35 @@ namespace ${glPackageBaseCommonS2Dao} {
                     throw new SystemException(msg);
                 }
 
-                IBeanMetaData bmd = rpt.BeanMetaData;
-
-                String ifComment = "/*IF dto." + rpt.PropertyName + "_isSelect != null*/";
+                IBeanMetaData relationBmd = rpt.BeanMetaData;
+                String initCapPropertyName = rpt.PropertyName;
+                String ifComment = "/*IF dto." + judgeProp + "IsSelect" + initCapPropertyName + "*/";
                 String endComment = "/*END*/";
-                for (int j = 0; j < bmd.PropertyTypeSize; ++j) {
-                    IPropertyType pt = bmd.GetPropertyType(j);
+                for (int j = 0; j < relationBmd.PropertyTypeSize; ++j) {
+                    IPropertyType pt = relationBmd.GetPropertyType(j);
                     if (pt.IsPersistent) {
                         String columnName = pt.ColumnName;
-
-                        if (sbMySelectList.Length != 0 || sbYourSelectList.Length != 0) {
-                            sbYourSelectList.Append(", ");
-                        }
+                        sbYourSelectList.Append(", ");
                         sbYourSelectList.Append(rpt.PropertyName).Append(".").Append(columnName);
                         sbYourSelectList.Append(" AS ");
                         sbYourSelectList.Append(pt.ColumnName).Append("_").Append(rpt.RelationNo);
                     }
                 }
+	            if (relationBmd.RelationPropertyTypeSize > 0) {
+	                String nssString = "Nss" + initCapPropertyName + ".";
+	                String nextPreNoSuffix = preNoSuffix + "_" + rpt.RelationNo;
+	                int nextCQNestNo = cqNestNo + 1;
+	                SetupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo);
+	            }
                 sb.Append(ifComment).Append(sbYourSelectList).Append(endComment);
             }
-
-            return sb.ToString();
         }
 
         protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler drh) {
-            return NewS2DaoSelectDynamicCommand(drh);
+            return NewMySelectDynamicCommand(drh);
         }
 
-        /**
-         * New my select dynamic command.
-         * <p>
-         * Override super.setupSelectMethodByAuto().
-         * 
-         * @param handler ResultSetHandler
-         * @return My select dynamic command. (NotNull)
-         */
-        protected ${glSelectDynamicCommand} New${glSelectDynamicCommand}(IDataReaderHandler handler) {
+        protected ${glSelectDynamicCommand} NewMySelectDynamicCommand(IDataReaderHandler handler) {
             return new ${glSelectDynamicCommand}(dataSource, commandFactory, handler, dataReaderFactory);
         }
 
@@ -216,46 +195,200 @@ namespace ${glPackageBaseCommonS2Dao} {
             sqlCommands[mi.Name] = cmd;
         }
 
-       protected IBeanMetaData BuildBeanMetaData(MethodInfo mi, IDatabaseMetaData databaseMetaData, Seasar.Dao.IDbms dbInfo) {
-           Type beanClass4SelectMethodByManual = GetBeanClass4SelectMethodByManual(mi);
-           if (beanClass4SelectMethodByManual.Equals(beanType)) {
-               return beanMetaData;
-           }
-           return new BeanMetaDataImpl(beanClass4SelectMethodByManual, databaseMetaData, dbInfo);
-       }
-
-       protected Type GetBeanClass4SelectMethodByManual(MethodInfo mi) {
-           Type retType = mi.ReturnType;
-           if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
-               return retType.GetGenericArguments()[0];
-           } else if (!retType.IsGenericType && typeof(System.Collections.IList).IsAssignableFrom(retType)) {
-               return beanType;
-           } else if (retType.IsArray) {
-               return retType.GetElementType();
-           } else if (ValueTypes.GetValueType(retType) != ValueTypes.OBJECT) {
-               return beanType;
-           } else {
-               return retType;
-           }
-       }
-
-        protected virtual IDataReaderHandler CreateDataReaderHandler(MethodInfo mi, IBeanMetaData myMetaData) {
-            Type retType = mi.ReturnType;
-
-            if (retType.IsArray) {
-                return new BeanArrayMetaDataDataReaderHandler(myMetaData);
-            } else if (!retType.IsGenericType && typeof(IList).IsAssignableFrom(retType)) {
-                return new BeanListMetaDataDataReaderHandler(myMetaData);
-            } else if (IsBeanTypeAssignable(retType)) {
-                return new BeanMetaDataDataReaderHandler(myMetaData);
-            } else if (Array.CreateInstance(beanType, 0).GetType().IsAssignableFrom(retType)) {
-                return new BeanArrayMetaDataDataReaderHandler(myMetaData);
-            } else if(retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>))
-                || retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.List<>)))) {
-                return new BeanGenericListMetaDataDataReaderHandler(myMetaData);
-            } else {
-                return new ObjectDataReaderHandler();
+        protected IBeanMetaData BuildBeanMetaData(MethodInfo mi, IDatabaseMetaData databaseMetaData, Seasar.Dao.IDbms dbInfo) {
+            Type beanClass4SelectMethodByManual = GetBeanClass4SelectMethodByManual(mi);
+            if (beanClass4SelectMethodByManual.Equals(beanType)) {
+                return beanMetaData;
             }
+            return new BeanMetaDataImpl(beanClass4SelectMethodByManual, databaseMetaData, dbInfo);
+        }
+
+        protected Type GetBeanClass4SelectMethodByManual(MethodInfo mi) {
+            Type retType = mi.ReturnType;
+            if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
+                return retType.GetGenericArguments()[0];
+            } else if (!retType.IsGenericType && typeof(System.Collections.IList).IsAssignableFrom(retType)) {
+                return beanType;
+            } else if (retType.IsArray) {
+                return retType.GetElementType();
+            } else if (ValueTypes.GetValueType(retType) != ValueTypes.OBJECT) {
+                return beanType;
+            } else {
+                return retType;
+            }
+        }
+
+        // =====================================================================================
+        //                                                                ReaderHandler Override
+        //                                                                ======================
+        protected override BeanListMetaDataDataReaderHandler CreateBeanListMetaDataDataReaderHandler(IBeanMetaData bmd) {
+            return new BeanListMetaDataDataReaderHandlerExtension(bmd);
+        }
+
+        protected override BeanMetaDataDataReaderHandler CreateBeanMetaDataDataReaderHandler(IBeanMetaData bmd) {
+            return new BeanMetaDataDataReaderHandlerExtension(bmd);
+        }
+
+        protected override BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) {
+            return new BeanArrayMetaDataDataReaderHandlerExtension(bmd);
+        }
+
+        protected override BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) {
+            return new BeanGenericListMetaDataDataReaderHandlerExtension(bmd);
+        }
+
+        protected override ObjectDataReaderHandler CreateObjectDataReaderHandler() {
+            return new ObjectDataReaderHandler();
+        }
+    }
+
+    // =====================================================================================
+    //                                                                       Extension Class
+    //                                                                       ===============
+    public class BeanListMetaDataDataReaderHandlerExtension : BeanListMetaDataDataReaderHandler {
+        public BeanListMetaDataDataReaderHandlerExtension(IBeanMetaData beanMetaData)
+            : base(beanMetaData) {
+        }
+        protected RelationRowCreator _creator = new RelationRowCreator();
+        protected override object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
+            return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
+        }
+    }
+    public class BeanMetaDataDataReaderHandlerExtension : BeanMetaDataDataReaderHandler {
+        public BeanMetaDataDataReaderHandlerExtension(IBeanMetaData beanMetaData)
+            : base(beanMetaData) {
+        }
+        protected RelationRowCreator _creator = new RelationRowCreator();
+        protected object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
+            return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
+        }
+    }
+    public class BeanArrayMetaDataDataReaderHandlerExtension : BeanArrayMetaDataDataReaderHandler {
+        public BeanArrayMetaDataDataReaderHandlerExtension(IBeanMetaData beanMetaData)
+            : base(beanMetaData) {
+        }
+        protected RelationRowCreator _creator = new RelationRowCreator();
+        protected object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
+            return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
+        }
+    }
+    public class BeanGenericListMetaDataDataReaderHandlerExtension : BeanGenericListMetaDataDataReaderHandler {
+        public BeanGenericListMetaDataDataReaderHandlerExtension(IBeanMetaData beanMetaData)
+            : base(beanMetaData) {
+        }
+        protected RelationRowCreator _creator = new RelationRowCreator();
+        protected object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
+            return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
+        }
+    }
+
+    public class BeanMetaDataExtension : BeanMetaDataImpl {
+        public BeanMetaDataExtension(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms, bool relation)
+            : base(beanType, dbMetaData, dbms, relation) {
+        }
+        protected int _nestNo;
+        public int NestNo {
+            get { return _nestNo; }
+            set { _nestNo = value; }
+        }
+        protected override IRelationPropertyType CreateRelationPropertyType(PropertyInfo propertyInfo,
+            RelnoAttribute relnoAttr, string[] myKeys, string[] yourKeys,
+            IDatabaseMetaData dbMetaData, IDbms dbms) {
+            return new RelationPropertyTypeExtension(propertyInfo, relnoAttr.Relno, myKeys, yourKeys, dbMetaData, dbms, this.NestNo);
+        }
+    }
+
+    public class RelationPropertyTypeExtension : RelationPropertyTypeImpl {
+        protected int _nestNo;
+        public int NestNo {
+            get { return _nestNo; }
+            set { _nestNo = value; }
+        }
+        public RelationPropertyTypeExtension(PropertyInfo propertyInfo, int relationNo,
+            string[] myKeys, string[] yourKeys, IDatabaseMetaData dbMetaData, IDbms dbms, int nestNo)
+            : base(propertyInfo, relationNo, myKeys, yourKeys, dbMetaData, dbms) {
+            _nestNo = nestNo;
+        }
+        protected override IBeanMetaData CreateBeanMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
+            BeanMetaDataExtension bmd = null;
+            if (this.NestNo > 0) {
+                bmd = new BeanMetaDataExtension(beanType, dbMetaData, dbms, true);
+            } else {
+                bmd = new BeanMetaDataExtension(beanType, dbMetaData, dbms, false);
+            }
+            bmd.NestNo = this.NestNo + 1;
+            return bmd;
+        }
+    }
+
+    public class RelationRowCreator {
+        public virtual object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt,
+                              IList columnNames, Hashtable relKeyValues, String preNoSuffix) {
+            object row = null;
+            IBeanMetaData bmd = rpt.BeanMetaData;
+            for (int i = 0; i < rpt.KeySize; ++i) {
+                string columnName = rpt.GetMyKey(i);
+                if (columnNames.Contains(columnName))
+                {
+                    if (row == null) row = CreateRelationRow(rpt);
+                    if (relKeyValues != null && relKeyValues.ContainsKey(columnName))
+                    {
+                        object value = relKeyValues[columnName];
+                        IPropertyType pt = bmd.GetPropertyTypeByColumnName(rpt.GetYourKey(i));
+                        PropertyInfo pi = pt.PropertyInfo;
+                        if (value != null) pi.SetValue(row, value, null);
+                    }
+                }
+                continue;
+            }
+            String relationNoSuffix = BuildRelationNoSuffix(preNoSuffix, rpt.RelationNo);
+            int existColumn = 0;
+            for (int i = 0; i < bmd.PropertyTypeSize; ++i) {
+                IPropertyType pt = bmd.GetPropertyType(i);
+                string columnName = pt.ColumnName + relationNoSuffix;
+                if (!columnNames.Contains(columnName)) continue;
+                existColumn++;
+                if (row == null) row = CreateRelationRow(rpt);
+                object value = null;
+                PropertyInfo pi = pt.PropertyInfo;
+                if (relKeyValues != null && relKeyValues.ContainsKey(columnName)) {
+                    value = relKeyValues[columnName];
+                } else {
+                    IValueType valueType = pt.ValueType;
+                    value = valueType.GetValue(reader, columnName);
+                }
+                if (value != null) pi.SetValue(row, value, null);
+            }
+            if (existColumn == 0) {
+                return null;
+            }
+            if (rpt.BeanMetaData.RelationPropertyTypeSize > 0) {
+                CreateParentRelationRow(reader, rpt.BeanMetaData, columnNames, relationNoSuffix, row);
+            }
+            return row;
+        }
+
+        protected virtual void CreateParentRelationRow(IDataReader reader, IBeanMetaData parentBmd, IList columnNames, String relationNoSuffix, Object row) {
+            for (int i = 0; i < parentBmd.RelationPropertyTypeSize; ++i) {
+                IRelationPropertyType parentParentRpt = parentBmd.GetRelationPropertyType(i);
+                if (parentParentRpt == null) {
+                    continue;
+                }
+                Object relationRow = CreateRelationRow(reader, parentParentRpt, columnNames, null, relationNoSuffix);
+                if (relationRow != null) {
+                    IPropertyType pt = parentBmd.GetRelationPropertyType(i);
+                    PropertyInfo pi = pt.PropertyInfo;
+                    pi.SetValue(row, relationRow, null);
+                }
+            }
+        }
+
+        protected virtual object CreateRelationRow(IRelationPropertyType rpt) {
+            return ClassUtil.NewInstance(rpt.PropertyInfo.PropertyType);
+        }
+
+        protected virtual String BuildRelationNoSuffix(String preNoSuffix, int relationNo) {
+            return preNoSuffix + "_" + relationNo;
         }
     }
 }

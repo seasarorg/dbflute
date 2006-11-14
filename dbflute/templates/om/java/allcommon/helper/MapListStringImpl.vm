@@ -232,7 +232,7 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
             final String mapValue = _remainderString.substring(0, endBraceIndex);
             currentMap.put(mapKey, filterMapListValue(mapValue));
 
-            // 現状のマップ要素解析は終了とするためリターン！with クロージング処理
+            // Analyzing map is over. So closing and return.
             closingByEndBraceIndex(endBraceIndex);
             return;
         }
@@ -249,7 +249,7 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
                 return;
             }
 
-            // *** この時点で残りの文字列はリスト要素のバリュー値で始まる。 ***
+            // *** Now, _remainderString should starts with the value of the list. ***
 
             if (isStartsWithMapPrefix(_remainderString)) {
                 removePrefixMapMarkAndStartBrace();
@@ -273,22 +273,24 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
             final int endBraceIndex = _remainderString.indexOf(_endBrace);
             assertEndBraceIndex(_remainderString, endBraceIndex, _topString, currentList);
 
-            // デリミタが存在して、かつ、デリミタが中括弧閉じよりも近い場合、
-            // 現在の残りの文字列の先頭からデリミタまでがリストバリューとなる。→ ex) value1,value2,value3}
+            // If delimiter exists and delimiter is closer than end brace, 
+            // Everything from the head of the present remainder string to the delimiter becomes list value.
+            //   ex) value1,value2,value3}
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) {
                 final String listValue = _remainderString.substring(0, delimiterIndex);
                 currentList.add(filterMapListValue(listValue));
 
-                // デリミタ以降にリスト要素が続くので、デリミタを飛ばしてコンティニュー！
+                // Because the list element continues since the delimiter, skip the delimiter and continue the loop.
                 removePrefixTargetIndexPlus(delimiterIndex, _delimiter.length());
                 continue;
             }
 
-            // 現在の残りの文字列の先頭から中括弧閉じまでがリストバリューとなる。→ ex) value1}, value2, }
+            // Everything from the head of the present remainder string to the delimiter becomes list value.
+            //   ex) value1}, value2, }
             final String listValue = _remainderString.substring(0, endBraceIndex);
             currentList.add(filterMapListValue(listValue));
 
-            // 現状のマップ要素解析は終了とするためリターン！with クロージング処理
+            // Analyzing list is over. So closing and return.
             closingByEndBraceIndex(endBraceIndex);
             return;
         }
