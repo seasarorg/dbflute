@@ -26,7 +26,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             : base(daoType, dataSource, commandFactory, dataReaderFactory, dbMetaData) {}
 
         protected override IBeanMetaData CreateBeanMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms)  {
-            return new BeanMetaDataExtension(beanType, dbMetaData, dbms, false);
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanType, false);
+            bmdExt.Initialize(dbMetaData, dbms);
+            return bmdExt;
         }
 
         // =====================================================================================
@@ -112,12 +114,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             return sb.ToString();
         }
 
-        /**
-         * Get select clause.
-         * 
-         * @param beanMetaData BeanMetaData. (NotNull)
-         * @return Select clause. (NotNull)
-         */
         protected String GetSelectClause() {
             StringBuilder sb = new StringBuilder(100);
             sb.Append("select/*$dto.SelectHint*/ ");
@@ -141,13 +137,13 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected void SetupRelationSelectClause(StringBuilder sb, IBeanMetaData baseBmd, String judgeProp, String preNoSuffix, int cqNestNo) {
-            for (int i = 0; i < beanMetaData.RelationPropertyTypeSize; ++i) {
+            for (int i = 0; i < baseBmd.RelationPropertyTypeSize; ++i) {
                 StringBuilder sbYourSelectList = new StringBuilder(100);
-                IRelationPropertyType rpt = beanMetaData.GetRelationPropertyType(i);
+                IRelationPropertyType rpt = baseBmd.GetRelationPropertyType(i);
                 if (rpt == null) {
-                    String msg = "The beanMetaData.GetRelationPropertyType(" + i + ") returned null";
-                    msg = msg + ": beanMetaData.TableName=" + beanMetaData.TableName;
-                    msg = msg + ": beanMetaData.RelationPropertyTypeSize=" + beanMetaData.RelationPropertyTypeSize;
+                    String msg = "The baseBmd.GetRelationPropertyType(" + i + ") returned null";
+                    msg = msg + ": baseBmd.TableName=" + baseBmd.TableName;
+                    msg = msg + ": baseBmd.RelationPropertyTypeSize=" + baseBmd.RelationPropertyTypeSize;
                     throw new SystemException(msg);
                 }
 
@@ -157,12 +153,13 @@ namespace ${glPackageBaseCommonS2Dao} {
                 String endComment = "/*END*/";
                 for (int j = 0; j < relationBmd.PropertyTypeSize; ++j) {
                     IPropertyType pt = relationBmd.GetPropertyType(j);
+                    String tableAliasName = rpt.PropertyName + (cqNestNo > 1 ? "_n" + cqNestNo : "");
                     if (pt.IsPersistent) {
                         String columnName = pt.ColumnName;
                         sbYourSelectList.Append(", ");
-                        sbYourSelectList.Append(rpt.PropertyName).Append(".").Append(columnName);
+                        sbYourSelectList.Append(tableAliasName).Append(".").Append(columnName);
                         sbYourSelectList.Append(" AS ");
-                        sbYourSelectList.Append(pt.ColumnName).Append("_").Append(rpt.RelationNo);
+                        sbYourSelectList.Append(pt.ColumnName).Append(preNoSuffix).Append("_").Append(rpt.RelationNo);
                     }
                 }
 	            if (relationBmd.RelationPropertyTypeSize > 0) {
@@ -259,7 +256,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             : base(beanMetaData) {
         }
         protected RelationRowCreator _creator = new RelationRowCreator();
-        protected object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
+        protected override object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
             return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
         }
     }
@@ -268,7 +265,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             : base(beanMetaData) {
         }
         protected RelationRowCreator _creator = new RelationRowCreator();
-        protected object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
+        protected override object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
             return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
         }
     }
@@ -277,47 +274,29 @@ namespace ${glPackageBaseCommonS2Dao} {
             : base(beanMetaData) {
         }
         protected RelationRowCreator _creator = new RelationRowCreator();
-        protected object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
+        protected override object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
             return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
         }
     }
 
     public class BeanMetaDataExtension : BeanMetaDataImpl {
-        public BeanMetaDataExtension(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms, bool relation)
-            : base(beanType, dbMetaData, dbms, relation) {
+        public BeanMetaDataExtension(Type beanType, bool relation)
+            : base(beanType, relation) {
         }
         protected int _nestNo;
         public int NestNo {
             get { return _nestNo; }
             set { _nestNo = value; }
         }
-        protected override IRelationPropertyType CreateRelationPropertyType(PropertyInfo propertyInfo,
-            RelnoAttribute relnoAttr, string[] myKeys, string[] yourKeys,
-            IDatabaseMetaData dbMetaData, IDbms dbms) {
-            return new RelationPropertyTypeExtension(propertyInfo, relnoAttr.Relno, myKeys, yourKeys, dbMetaData, dbms, this.NestNo);
-        }
-    }
-
-    public class RelationPropertyTypeExtension : RelationPropertyTypeImpl {
-        protected int _nestNo;
-        public int NestNo {
-            get { return _nestNo; }
-            set { _nestNo = value; }
-        }
-        public RelationPropertyTypeExtension(PropertyInfo propertyInfo, int relationNo,
-            string[] myKeys, string[] yourKeys, IDatabaseMetaData dbMetaData, IDbms dbms, int nestNo)
-            : base(propertyInfo, relationNo, myKeys, yourKeys, dbMetaData, dbms) {
-            _nestNo = nestNo;
-        }
-        protected override IBeanMetaData CreateBeanMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
-            BeanMetaDataExtension bmd = null;
+        protected override IBeanMetaData CreateRelationBeanMetaData(PropertyInfo propertyInfo, IDatabaseMetaData dbMetaData, IDbms dbms) {
+            bool isRelation = false;
             if (this.NestNo > 0) {
-                bmd = new BeanMetaDataExtension(beanType, dbMetaData, dbms, true);
-            } else {
-                bmd = new BeanMetaDataExtension(beanType, dbMetaData, dbms, false);
+                isRelation = true;
             }
-            bmd.NestNo = this.NestNo + 1;
-            return bmd;
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(propertyInfo.PropertyType, isRelation);
+            bmdExt.NestNo = this.NestNo + 1;
+            bmdExt.Initialize(dbMetaData, dbms);
+            return bmdExt;
         }
     }
 

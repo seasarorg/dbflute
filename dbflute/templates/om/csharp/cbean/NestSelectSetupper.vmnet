@@ -37,8 +37,8 @@ namespace ${glPackageNss} {
       #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
 
         protected bool _isSelect${tmpPropertyNameInitCap};
-        public bool IsSelect${tmpPropertyNameInitCap}() {
-            return _isSelect${tmpPropertyNameInitCap};
+        public bool IsSelect${tmpPropertyNameInitCap} {
+            get { return _isSelect${tmpPropertyNameInitCap}; }
         }
         public void With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
@@ -51,8 +51,8 @@ namespace ${glPackageNss} {
         #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
 
         protected bool _isSelect${tmpPropertyNameInitCap};
-        public bool IsSelect${tmpPropertyNameInitCap}() {
-            return _isSelect${tmpPropertyNameInitCap};
+        public bool IsSelect${tmpPropertyNameInitCap} {
+            get { return _isSelect${tmpPropertyNameInitCap}; }
         }
         public void With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();

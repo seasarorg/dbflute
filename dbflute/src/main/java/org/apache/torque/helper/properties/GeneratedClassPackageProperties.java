@@ -138,35 +138,35 @@ public final class GeneratedClassPackageProperties extends AbstractHelperPropert
 
     public static class CSharpPackageInfo implements GeneratedClassPackageInfo {
         public String getBaseCommonPackage() {
-            return "Allcommon";
+            return "allcommon";
         }
 
         public String getBaseBehaviorPackage() {
-            return "Bsbhv";
+            return "bsbhv";
         }
 
         public String getBaseDaoPackage() {
-            return "Bsdao";
+            return "bsdao";
         }
 
         public String getBaseEntityPackage() {
-            return "Bsentity";
+            return "bsentity";
         }
 
         public String getConditionBeanPackage() {
-            return "Cbean";
+            return "cbean";
         }
 
         public String getExtendedBehaviorPackage() {
-            return "Exbhv";
+            return "exbhv";
         }
 
         public String getExtendedDaoPackage() {
-            return "Exdao";
+            return "exdao";
         }
 
         public String getExtendedEntityPackage() {
-            return "Exentity";
+            return "exentity";
         }
     }
 }
