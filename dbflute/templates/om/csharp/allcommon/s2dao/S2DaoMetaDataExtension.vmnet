@@ -197,7 +197,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (beanClass4SelectMethodByManual.Equals(beanType)) {
                 return beanMetaData;
             }
-            return new BeanMetaDataImpl(beanClass4SelectMethodByManual, databaseMetaData, dbInfo);
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanClass4SelectMethodByManual, false);
+            bmdExt.Initialize(databaseMetaData, dbInfo);
+            return bmdExt;
         }
 
         protected Type GetBeanClass4SelectMethodByManual(MethodInfo mi) {

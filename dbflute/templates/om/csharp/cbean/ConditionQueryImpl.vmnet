@@ -427,7 +427,8 @@ namespace ${glPackageCQ} {
         /// </summary>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-            return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+            String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+            return Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${col.JavaNative}.Parse(code));
         }
 
         /// <summary>
@@ -435,7 +436,8 @@ namespace ${glPackageCQ} {
         /// </summary>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} Set${tmpJavaName}_Equal_${classificationMap.get('name')}_AsInline() {
-            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+            String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+            return RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${col.JavaNative}.Parse(code));
         }
         #end
       #end

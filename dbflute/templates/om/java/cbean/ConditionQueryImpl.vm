@@ -29,7 +29,7 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @param aliasName My alias name. (NotNull)
      * @param nestLevel Nest level.
      */
-    public ${myClassName}(${glConditionQueryAbstractName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
 
@@ -506,7 +506,8 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @return this. (NotNull)
      */
     public ${myClassName} set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        final String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(code));
     }
 
     /**
@@ -515,7 +516,8 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @return this. (NotNull)
      */
     public ${myClassName} set${tmpJavaName}_Equal_${classificationMap.get('name')}_AsInline() {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        final String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(code));
     }
         #end
       #end

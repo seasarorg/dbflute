@@ -217,8 +217,15 @@ namespace ${myExtendedEntityPackageName} {
         /// </summary>
         public void Classify${col.JavaName}${classificationMap.get('name')}() {
             String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        #if (${col.isJavaNativeStringObject()})
+
             ${col.JavaName} = code;
         }
+        #else
+
+            ${col.JavaName} = ${col.JavaNative}.Parse(code);
+        }
+        #end
       #else
 
         /// <summary>
@@ -226,7 +233,15 @@ namespace ${myExtendedEntityPackageName} {
         /// </summary>
         public void Classify${col.JavaName}_${classificationMap.get('name')}() {
             String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        #if (${col.isJavaNativeStringObject()})
+
             ${col.JavaName} = code;
+        }
+        #else
+
+            ${col.JavaName} = ${col.JavaNative}.Parse(code);
+        }
+        #end
         }
       #end
     #end

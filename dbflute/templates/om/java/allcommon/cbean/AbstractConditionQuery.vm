@@ -34,7 +34,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected final int _nestLevel;
 
     /** Child query. */
-    protected final ${myClassName} _childQuery;
+    protected final ${glConditionQueryInterfaceName} _childQuery;
 
     // =====================================================================================
     //                                                                           Constructor
@@ -47,7 +47,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param aliasName My alias name. (NotNull)
      * @param nestLevel Nest level.
      */
-    public ${myClassName}(${myClassName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
         _childQuery = childQuery;
         _sqlClause = sqlClause;
         _aliasName = aliasName;

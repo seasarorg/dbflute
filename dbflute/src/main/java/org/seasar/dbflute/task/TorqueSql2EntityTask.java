@@ -1,58 +1,19 @@
-package org.apache.torque.task;
-
-/* ====================================================================
- * The Apache Software License, Version 1.1
+/*
+ * Copyright 2004-2006 the Seasar Foundation and the Others.
  *
- * Copyright (c) 2001-2003 The Apache Software Foundation.  All rights
- * reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The names "Apache" and "Apache Software Foundation" and
- *    "Apache Turbine" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache",
- *    "Apache Turbine", nor may "Apache" appear in their name, without
- *    prior written permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
  */
+package org.seasar.dbflute.task;
 
 import java.io.File;
 import java.sql.ResultSet;
@@ -122,6 +83,7 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
     //                                                                                  MetaInfo
     //                                                                                  ========
     protected final Map<String, Map<String, Integer>> _entityInfoMap = new LinkedHashMap<String, Map<String, Integer>>();
+    protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
     protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
@@ -141,18 +103,44 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
         fireMan.execute(runner, getSqlFileList());
 
         fireSuperExecute();
+        showMethodDefinitionCandidate();
+        handleException();
+    }
 
-        final Set<String> entityNameSet = _exceptionInfoMap.keySet();
-        final StringBuilder sb = new StringBuilder();
-        final String lineSeparator = System.getProperty("line.separator");
+    protected void showMethodDefinitionCandidate() {
+        _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+        _log.info("                         Method Definition Candidate");
+        _log.info("                        _/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+        final Set<String> entityNameSet = _entitySqlFileMap.keySet();
         for (String entityName : entityNameSet) {
-            final String exceptionInfo = _exceptionInfoMap.get(entityName);
+            final File sqlFile = _entitySqlFileMap.get(entityName);
+            final String sqlFileName = sqlFile.getName();
+            try {
+                if (sqlFileName.indexOf("_") < 0) {
+                    continue;
+                }
+                if (sqlFileName.indexOf(".") < 0) {
+                    continue;
+                }
 
-            sb.append(lineSeparator);
-            sb.append("[" + entityName + "]");
-            sb.append(exceptionInfo);
+                final String daoName = sqlFileName.substring(0, sqlFileName.indexOf("_"));
+                final String remainderString = sqlFileName.substring(sqlFileName.indexOf("_") + 1);
+                if (remainderString.indexOf(".") < 0) {
+                    continue;
+                }
+                final String methodName;
+                if (remainderString.indexOf("_") < 0) {
+                    methodName = remainderString.substring(0, remainderString.indexOf("."));
+                } else {
+                    methodName = remainderString.substring(0, remainderString.indexOf("_"));
+                }
+                _log.info("[" + daoName + "]");
+                _log.info("public java.util.List<" + entityName + "> " + methodName + "();");
+                _log.info(" ");
+            } catch (Exception e) {
+                _log.warn("showMethodDefinition() threw exception at " + sqlFileName, e);
+            }
         }
-        _log.warn(sb.toString());
     }
 
     protected List<File> getSqlFileList() {
@@ -190,6 +178,7 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
                     }
 
                     _entityInfoMap.put(entityName, columnJdbcTypeMap);
+                    _entitySqlFileMap.put(entityName, _srcFile);
                     _primaryKeyMap.put(entityName, getPrimaryKeyColumnNameList(sql));
                 } catch (SQLException e) {
                     String msg = "Failed to execute: " + sql;
@@ -207,12 +196,26 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
                     }
                 }
             }
-            
+
             @Override
             protected void traceSql(String sql) {
                 _log.info("{SQL}" + System.getProperty("line.separator") + sql);
             }
         };
+    }
+
+    protected void handleException() {
+        final Set<String> entityNameSet = _exceptionInfoMap.keySet();
+        final StringBuilder sb = new StringBuilder();
+        final String lineSeparator = System.getProperty("line.separator");
+        for (String entityName : entityNameSet) {
+            final String exceptionInfo = _exceptionInfoMap.get(entityName);
+
+            sb.append(lineSeparator);
+            sb.append("[" + entityName + "]");
+            sb.append(exceptionInfo);
+        }
+        _log.warn(sb.toString());
     }
 
     protected String removeBeginEndComment(final String sql) {

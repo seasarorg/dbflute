@@ -34,7 +34,16 @@ public final class DaoDiconProperties extends AbstractHelperProperties {
     }
 
     public String getJ2eeDiconResourceName() {
-        return stringProp("torque.j2eeDiconResourceName", "j2ee.dicon");
+        String defaultValue = null;
+        if (getBasicProperties().isTargetLanguageJava()) {
+            defaultValue = "j2ee.dicon";
+        } else if (getBasicProperties().isTargetLanguageCSharp()) {
+            defaultValue = "ado.dicon";
+        } else {
+            String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
+            throw new IllegalStateException(msg);
+        }
+        return stringProp("torque.j2eeDiconResourceName", defaultValue);
     }
 
     public String getRequiredTxComponentName() {

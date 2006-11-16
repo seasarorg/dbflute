@@ -276,7 +276,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (beanClass4SelectMethodByManual.equals(getBeanClass())) {
             return getBeanMetaData();
         }
-        final BeanMetaDataImpl beanMetaDataImpl = new BeanMetaDataImpl();
+        final BeanMetaDataImpl beanMetaDataImpl = new BeanMetaDataExtension();
         final Connection con = DataSourceUtil.getConnection(ds);
         try {
             DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
