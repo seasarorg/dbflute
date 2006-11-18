@@ -41,7 +41,7 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
      */
     public ${glDaoReadableInterfaceName} getRDao(${glEntityInterfaceName} entity) {
         assertObjectNotNull("entity", entity);
-        return getRDao(entity.getDBMeta().getDaoType());
+        return getRDao(getDaoType(entity.getDBMeta()));
     }
 
     /**
@@ -53,7 +53,7 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     public ${glDaoReadableInterfaceName} getRDao(String tableMultiName) {
         assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
-        return getRDao(dbmeta.getDaoType());
+        return getRDao(getDaoType(dbmeta));
     }
 
     /**
@@ -84,7 +84,7 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
      * @param tableMultiName Table multi-name. (NotNull)
      * @return Dao-writable. (NotNull)
      */
-    public ${glDaoReadableInterfaceName} getWDao(String tableMultiName) {
+    public ${glDaoWritableInterfaceName} getWDao(String tableMultiName) {
         assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
         return (${glDaoWritableInterfaceName})getRDao(tableMultiName);
     }
@@ -176,12 +176,22 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
             String msg = "The daoBhvMap has not been initialized yet!";
             throw new IllegalStateException(msg);
         }
-        final Class daoType = dbmeta.getDaoType();
-        if (daoType == null) {
-            String msg = "The dbmeta.getDaoType() should not return null: dbmeta=" + dbmeta;
+        return (Class)_daoBhvMap.get(getDaoType(dbmeta));
+    }
+
+    protected Class getDaoType(${glDBMetaInterfaceName} dbmeta) {
+        final String daoTypeName = dbmeta.getDaoTypeName();
+        if (daoTypeName == null) {
+            String msg = "The dbmeta.getDaoTypeName() should not return null: dbmeta=" + dbmeta;
             throw new IllegalStateException(msg);
         }
-        return (Class)_daoBhvMap.get(dbmeta.getDaoType());
+        final Class daoType;
+        try {
+            daoType = Class.forName(daoTypeName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("The class does not exist: " + daoTypeName, e);
+        }
+        return daoType;
     }
 #end
 #set ($mapGenericDefinition = "Class, ${glDaoReadableInterfaceName}")

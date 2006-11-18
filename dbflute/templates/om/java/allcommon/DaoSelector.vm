@@ -58,7 +58,7 @@ public interface ${glDaoSelectorInterfaceName} {
      * @param tableMultiName Table multi-name. (NotNull)
      * @return Dao-writable. (NotNull)
      */
-    public ${glDaoReadableInterfaceName} getWDao(String tableMultiName);
+    public ${glDaoWritableInterfaceName} getWDao(String tableMultiName);
 #if ($database.isAvailableBehaviorGeneration())
 
 	/**

@@ -3,6 +3,7 @@
 package ${glPackageBaseBhv};
 
 import ${glPackageBaseCommon}.*;
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
@@ -123,6 +124,27 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return getMyDao();
     }
 #end
+
+    // =====================================================================================
+    //                                                                          New Instance
+    //                                                                          ============
+    /**
+     * New condition-bean.
+     * 
+     * @return Condition-bean. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} newConditionBean() {
+        return newMyConditionBean();
+    }
+
+    /**
+     * New my condition-bean.
+     * 
+     * @return My condition-bean. (NotNull)
+     */
+    public ${myConditionBeanClassName} newMyConditionBean() {
+        return new ${myConditionBeanClassName}();
+    }
 
     // =====================================================================================
     //                                                                       Delegate Method
@@ -374,7 +396,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${myExtendedObjectClassName} selectForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
         assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = getMyDBMeta().newMyConditionBean();
+        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
         ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
         final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(${glAttachedCBArgsVariableName});
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
@@ -398,7 +420,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${myExtendedObjectClassName} selectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
         assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = getMyDBMeta().newMyConditionBean();
+        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
         ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString).lockForUpdate();
         final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(${glAttachedCBArgsVariableName});
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
@@ -434,7 +456,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
      * 
      *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
-     *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.getMyDBMeta().newMyConditionBean();
+     *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
      *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls);
@@ -459,7 +481,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
      * 
      *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
-     *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.getMyDBMeta().newMyConditionBean();
+     *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
      *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
      *     final ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition = new ReffererCondition${refferer.ReffererPropertyNameInitCap}() {
@@ -489,7 +511,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             pkMyEntityMap.put(entity.get${table.getPrimaryKeyJavaNameAsOne()}(), entity);
         }
         final ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})getDaoSelector().getRBhv(${reffererBhvClassName}.class);
-        final ${reffererCBClassName} ${glAttachedCBArgsVariableName} = reffererBhv.getMyDBMeta().newMyConditionBean();
+        final ${reffererCBClassName} ${glAttachedCBArgsVariableName} = reffererBhv.newMyConditionBean();
         ${glAttachedCBArgsVariableName}.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
         ${glAttachedCBArgsVariableName}.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
         reffererCondition.setup(${glAttachedCBArgsVariableName});

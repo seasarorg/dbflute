@@ -3,7 +3,6 @@ package ${glPackageBaseCommonDBMeta};
 #set ($myClassName = "${glDBMetaInterfaceName}")
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 
 /**
  * The interface of dbmeta.
@@ -189,28 +188,38 @@ public interface ${myClassName} {
     public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameCapPropNameMap();
 
     // =====================================================================================
+    //                                                                      Type Name Getter
+    //                                                                      ================
+    /**
+     * Get the type-name of entity.
+     * 
+     * @return The type-name of entity. (NotNull)
+     */ 
+    public String getEntityTypeName();
+
+    /**
+     * Get the type-name of condition-bean.
+     * 
+     * @return The type-name of condition-bean. (Nullable: If the condition-bean does not exist)
+     */ 
+    public String getConditionBeanTypeName();
+
+    /**
+     * Get the type-name of dao.
+     * 
+     * @return The type-name of dao. (Nullable: If the dao does not exist)
+     */ 
+    public String getDaoTypeName();
+
+    // =====================================================================================
     //                                                                           Type Getter
     //                                                                           ===========
-    /**
-     * Get the type of dao.
-     * 
-     * @return The type of dao. (NotNull)
-     */ 
-    public Class getDaoType();
-
     /**
      * Get the type of entity.
      * 
      * @return The type of entity. (NotNull)
      */ 
     public Class getEntityType();
-
-    /**
-     * Get the type of condition-bean.
-     * 
-     * @return The type of condition-bean. (NotNull)
-     */ 
-    public Class getConditionBeanType();
 
     // =====================================================================================
     //                                                                       Instance Getter
@@ -222,24 +231,9 @@ public interface ${myClassName} {
      */ 
     public ${glEntityInterfaceName} newEntity();
 
-    /**
-     * New the instance of condition-bean.
-     * 
-     * @return The instance of condition-bean. (NotNull)
-     */ 
-    public ${glConditionBeanInterfaceName} newConditionBean();
-
     // =====================================================================================
     //                                                                         Entity Method
     //                                                                         =============
-    /**
-     * Get entity setter method by multi-name.
-     * 
-     * @param multiName Multi-name. (NotNull)
-     * @return Entity setter method of entity. (NotNull)
-     */ 
-    public java.lang.reflect.Method getEntitySetterMethodByMultiName(String multiName);
-
     /**
      * Get entity getter method by multi-name.
      * 
@@ -247,6 +241,14 @@ public interface ${myClassName} {
      * @return Entity getter method of entity. (NotNull)
      */ 
     public java.lang.reflect.Method getEntityGetterMethodByMultiName(String multiName);
+
+    /**
+     * Get entity setter method by multi-name.
+     * 
+     * @param multiName Multi-name. (NotNull)
+     * @return Entity setter method of entity. (NotNull)
+     */ 
+    public java.lang.reflect.Method getEntitySetterMethodByMultiName(String multiName);
 
     // =====================================================================================
     //                                                                        Foreign DBMeta

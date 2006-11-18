@@ -83,6 +83,16 @@ public interface ${glBehaviorReadableInterfaceName} {
     public void setDaoSelector(${glDaoSelectorInterfaceName} value);
 
     // =====================================================================================
+    //                                                                          New Instance
+    //                                                                          ============
+    /**
+     * New condition-bean.
+     * 
+     * @return Condition-bean. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} newConditionBean();
+
+    // =====================================================================================
     //                                                                       Delegate Method
     //                                                                       ===============
     /**

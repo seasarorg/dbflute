@@ -24,5 +24,8 @@
 	<classpathentry kind="lib" path="lib/forCompile/xmlParserAPIs-2.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/village-2.0-dev-20030825.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/forCompile/s2-dao-1.0.39.jar"/>
+	<classpathentry kind="lib" path="lib/forCompile/s2-extension-2.3.12.jar"/>
+	<classpathentry kind="lib" path="lib/forCompile/s2-framework-2.3.12.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

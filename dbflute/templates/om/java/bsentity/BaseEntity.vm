@@ -13,13 +13,6 @@ import ${myDBMetaPackageName}.${myDBMetaClassName};
 
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
-#if (${database.isAvailableEntityLazyLoad()})
-  #if (${table.hasRelation()})
-
-import ${glPackageBaseCommon}.${glLazyLoadContainerClassName};
-import ${myExtendedDaoPackageName}.*;
-  #end
-#end
 
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
@@ -350,42 +343,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
     /** The entity of foreign table. */
     protected ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
-  #if (${database.isAvailableEntityLazyLoad()})
-
-    /**
-     * Get the entity of foreign table.
-     * 
-     * @return The entity of foreign table.
-     */
-    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignPropertyNameInitCap}() {
-        if (${foreignVariableName} != null) {
-            return ${foreignVariableName};
-        }
-  #foreach ($columnName in $foreignKeys.LocalColumns)
-    #set ($localColumn = $table.getColumn($columnName))
-
-        if (_${localColumn.UncapitalisedJavaName} == null) {
-            return null;
-        }
-  #end
-
-        // [LazyLoad] - If the target instance does not exist, lazyload the instance and return it.
-        final ${foreignDaoClassName} dao = (${foreignDaoClassName})${glLazyLoadContainerClassName}.getInstance().getDaoInstance(${foreignDaoClassName}.class);
-        final ${glPackageCB}.${parentCBClassName} ${glAttachedCBArgsVariableName} = new ${glPackageCB}.${parentCBClassName}();
-        ${glAttachedCBArgsVariableName}.query().${foreignKeys.getForeignTableBeanSetupString("_Equal")};
-        ${foreignVariableName} = dao.selectEntity(${glAttachedCBArgsVariableName});
-        return $foreignVariableName;
-    }
-
-    /**
-     * Get the entity of foreign table without lazyload.
-     * 
-     * @return The entity of foreign table.
-     */
-    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignPropertyNameInitCap}WithoutLazy() {
-        return ${foreignVariableName};
-    }
-  #else
 
     /**
      * Get the entity of foreign table without lazyload.
@@ -395,7 +352,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignPropertyNameInitCap}() {
         return ${foreignVariableName};
     }
-  #end
 
     /**
      * Set the entity of foreign table.
@@ -442,110 +398,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
     /** The list of refferer table. */
     protected java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} $reffererVariableName;
-  #if (${database.isAvailableEntityLazyLoad()})
-
-    /**
-     * Get the list of refferer table.
-     * If it's not loaded yet and its primary keys are invalid, returns null.
-     * 
-     * @return The list of refferer table. (Nullable)
-     */
-    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.ReffererPropertyNameInitCap}() {
-        if (${reffererVariableName} != null) {
-            return ${reffererVariableName};
-        }
-    #foreach ($col in $table.PrimaryKey)
-
-        if (_${col.UncapitalisedJavaName} == null) {
-            return null;
-        }
-    #end
-
-        // [LazyLoad] - If the target instance does not exist, lazyload the instance and return it.
-        final ${reffererDaoClassName} dao = (${reffererDaoClassName})${glLazyLoadContainerClassName}.getInstance().getDaoInstance(${reffererDaoClassName}.class);
-        final ${glPackageCB}.${reffererCBClassName} ${glAttachedCBArgsVariableName} = new ${glPackageCB}.${reffererCBClassName}();
-        ${glAttachedCBArgsVariableName}.query().${refferer.getChildrenTableBeanSetupString("_Equal")};
-        ${reffererVariableName} = dao.selectList(${glAttachedCBArgsVariableName});
-        return $reffererVariableName;
-    }
-
-    /**
-     * Get the list of refferer table without lazyload.
-     * If it's not loaded yet, returns null.
-     * 
-     * @return The list of refferer table. (Nullable)
-     */
-    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.ReffererPropertyNameInitCap}WithoutLazy() {
-        return ${reffererVariableName};
-    }
-
-    /**
-     * Set the list of refferer table.
-     * 
-     * @param value The list of refferer table. (Nullable)
-     */
-    public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} value) {
-        ${reffererVariableName} = value;
-    }
-    #if (${refferer.isOneToOne()})
-
-    /**
-     * Get the entity of refferer table as one.
-     * If it's not loaded yet and its primary keys are invalid, returns null.
-     * If the size of the refferer table list is zero, throws the exception.
-     * 
-     * @return The entity of refferer table. (Nullable)
-     */
-    public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}() {
-        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}();
-        if (ls == null || ls.isEmpty()) {
-            return null;
-        }
-        if (ls.size() > 1) {
-            String msg = "The size of the list must be one because this relation is 'one-to-one'";
-            msg = msg + ": list=" + ls + ": toString()=" + toString();
-            throw new IllegalStateException(msg);
-        }
-        return (${reffererEntityLongClassName})ls.get(0);
-    }
-
-    /**
-     * Get the entity of refferer table as one without lazyload.
-     * If it's not loaded yet, returns null.
-     * If the size of the refferer list is zero, throws the exception.
-     * 
-     * @return The entity of refferer table. (Nullable)
-     */
-    public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}WithoutLazy() {
-        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}WithoutLazy();
-        if (ls == null || ls.isEmpty()) {
-            return null;
-        }
-        if (ls.size() > 1) {
-            String msg = "The size of the list must be one because this relation is 'one-to-one'";
-            msg = msg + ": list=" + ls + ": toString()=" + toString();
-            throw new IllegalStateException(msg);
-        }
-        return (${reffererEntityLongClassName})ls.get(0);
-    }
-
-    /**
-     * Set the entity of refferer table as one.
-     * 
-     * @param entity The entity of refferer table. (Nullable)
-     */
-    public void set${refferer.ReffererPropertyNameInitCapAsOne}(${reffererEntityLongClassName} entity) {
-        if (entity == null) {
-            ${reffererVariableName} = null;
-            return;
-        }
-        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = new java.util.ArrayList${database.filterGenericsString(${reffererEntityLongClassName})}();
-        ls.add(entity);
-        ${reffererVariableName} = ls;
-    }
-
-    #end
-  #else
 
     /**
      * Get the list of refferer table without lazyload.
@@ -565,7 +417,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} value) {
         ${reffererVariableName} = value;
     }
-    #if (${refferer.isOneToOne()})
+  #if (${refferer.isOneToOne()})
 
     /**
      * Get the entity of refferer table as one without lazyload.
@@ -601,7 +453,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         ls.add(entity);
         ${reffererVariableName} = ls;
     }
-    #end
   #end
 #end
 

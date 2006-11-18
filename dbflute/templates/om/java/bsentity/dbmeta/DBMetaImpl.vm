@@ -3,19 +3,9 @@ package ${myDBMetaPackageName};
 #set ($myClassName = "${myDBMetaClassName}")
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
-import ${myExtendedEntityPackageName}.*;
-#if (${isExistDao})
-
-import ${myExtendedDaoPackageName}.*;
-#end
-
-#if (${isExistConditionBean})
-
-import ${glPackageCB}.*;
-#end
+import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 
 /**
  * The dbmeta of ${table.Name}. (Singleton)
@@ -52,17 +42,7 @@ import ${glPackageCB}.*;
 public class ${myClassName} extends ${glDBMetaAbstractName} {
 
     /** The type of entity. */
-    public static final Class ENTITY_TYPE = ${myExtendedObjectClassName}.class;
-#if (${isExistDao})
-
-    /** The type of entity. */
-    public static final Class DAO_TYPE = ${myExtendedDaoClassName}.class;
-#end
-#if (${isExistConditionBean})
-
-    /** The type of condition-bean. */
-    public static final Class CONDITION_BEAN_TYPE = ${myConditionBeanClassName}.class;
-#end
+    protected static final Class ENTITY_TYPE = ${myExtendedObjectClassName}.class;
 
     /** Singleton instance. */
     private static final ${myClassName} _instance = new ${myClassName}();
@@ -297,10 +277,63 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return _uncapPropNameCapPropNameMap;
     }
 
+    // =====================================================================================
+    //                                                                      Type Name Getter
+    //                                                                      ================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type-name of entity. (NotNull)
+     */ 
+    public String getEntityTypeName() {
+        return "${myExtendedEntityPackageName}.${myExtendedObjectClassName}";
+    }
+#if ($isExistConditionBean)
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type-name of condition-bean. (NotNull)
+     */ 
+    public String getConditionBeanTypeName() {
+        return "${myConditionBeanClassName}.${myConditionBeanClassName}";
+    }
+#else
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type-name of condition-bean. (Nullable: If the condition-bean does not exist)
+     */ 
+    public String getConditionBeanTypeName() {
+        return null;
+    }
+#end
+#if ($isExistDao)
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type-name of dao. (NotNull)
+     */ 
+    public String getDaoTypeName() {
+        return "${myExtendedDaoPackageName}.${myExtendedDaoClassName}";
+    }
+#else
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type-name of dao. (Nullable: If the dao does not exist)
+     */ 
+    public String getDaoTypeName() {
+        return null;
+    }
+#end
 
     // =====================================================================================
-    //                                                                          Class Getter
-    //                                                                          ============
+    //                                                                           Type Getter
+    //                                                                           ===========
     /**
      * ${database.ImplementComment}
      * 
@@ -308,38 +341,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */ 
     public Class getEntityType() {
         return ENTITY_TYPE;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The type of dao. (NotNull)
-     */ 
-    public Class getDaoType() {
-#if (${isExistDao})
-
-        return DAO_TYPE;
-#else
-
-        String msg = "The entity does not have dao. So this method is invalid.";
-        throw new IllegalStateException(msg + " dbmeta=" + toString());
-#end
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The type of condition-bean. (NotNull)
-     */ 
-    public Class getConditionBeanType() {
-#if (${isExistConditionBean})
-
-        return CONDITION_BEAN_TYPE;
-#else
-
-        String msg = "The entity does not have condition-bean. So this method is invalid.";
-        throw new IllegalStateException(msg + " dbmeta=" + toString());
-#end
     }
 
     // =====================================================================================
@@ -363,61 +364,48 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return new ${myExtendedObjectClassName}();
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The type of condition-bean. (NotNull)
-     */ 
-    public ${glConditionBeanInterfaceName} newConditionBean() {
-#if (${isExistConditionBean})
-
-        return newMyConditionBean();
-#else
-
-        String msg = "The entity does not have condition-bean. So this method is invalid.";
-        throw new IllegalStateException(msg + " dbmeta=" + toString());
-#end
-    }
-#if (${isExistConditionBean})
-
-    /**
-     * New the instance of my condition-bean.
-     * 
-     * @return The instance of condition-bean. (NotNull)
-     */ 
-    public ${myConditionBeanClassName} newMyConditionBean() {
-        return new ${myConditionBeanClassName}();
-    }
-#end
-
     // =====================================================================================
     //                                                                         Entity Method
     //                                                                         =============
 #foreach ($col in $table.Columns)
 
     /** The getter method of ${col.UncapitalisedJavaName}. */
-    public static final java.lang.reflect.Method ENTITY_GETTER_METHOD_${col.JavaName};
-    static {
-        try {
-            ENTITY_GETTER_METHOD_${col.JavaName} = ENTITY_TYPE.getMethod("get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, null);
-        } catch (NoSuchMethodException e) {
-            String msg = "The method doen not exist: methodName=" + "get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName} + " argsType=${col.JavaNative}";
-            throw new RuntimeException(msg, e);
-        }
-    }
+    protected static final java.lang.reflect.Method ENTITY_GETTER_METHOD_${col.JavaName} = getGetterMethod("get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
 
     /** <summary>The setter method of ${col.UncapitalisedJavaName}. */
-    public static final java.lang.reflect.Method ENTITY_SETTER_METHOD_${col.JavaName};
-    static {
+    protected static final java.lang.reflect.Method ENTITY_SETTER_METHOD_${col.JavaName} = getSetterMethod("set" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, ${col.JavaNative}.class);
+#end
+
+    /**
+     * Get getter method.
+     * 
+     * @param methodName The method name. (NotNull)
+     * @return The getter method. (NotNull)
+     */
+    protected static java.lang.reflect.Method getGetterMethod(String methodName) {
         try {
-            ENTITY_SETTER_METHOD_${col.JavaName} = ENTITY_TYPE.getMethod("set" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, new Class[]{${col.JavaNative}.class});
+            return ENTITY_TYPE.getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
-            String msg = "The method doen not exist: methodName=" + "get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName} + " argsType=${col.JavaNative}";
+            String msg = "The method doen not exist: methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
     }
 
-#end
+    /**
+     * Get setter method.
+     * 
+     * @param methodName The method name. (NotNull)
+     * @param type Argument type. (NotNull)
+     * @return The getter method. (NotNull)
+     */
+    protected static java.lang.reflect.Method getSetterMethod(String methodName, Class type) {
+        try {
+            return ENTITY_TYPE.getMethod(methodName, new Class[]{type});
+        } catch (NoSuchMethodException e) {
+            String msg = "The method doen not exist: methodName=" + methodName + " argsType=" + type;
+            throw new RuntimeException(msg, e);
+        }
+    }
 
 #foreach ($col in $table.Columns)
 
@@ -453,14 +441,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName, null);
+            method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
             String msg = "The multiName is not found: multiName=" + multiName;
             msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (java.lang.reflect.Method)method.invoke(this, null);
+            return (java.lang.reflect.Method)method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -481,14 +469,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName, null);
+            method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
             String msg = "The multiName is not found: multiName=" + multiName;
             msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (java.lang.reflect.Method)method.invoke(this, null);
+            return (java.lang.reflect.Method)method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -511,14 +499,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName, null);
+            method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
             String msg = "The foreignPropertyName is not found: foreignPropertyName=" + foreignPropertyName;
             msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (${glDBMetaInterfaceName})method.invoke(this, null);
+            return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
