@@ -316,7 +316,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     public ${glEntityInterfaceName} readForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
         assertObjectNotNull("primaryKeyMapString", primaryKeyMapString);
         final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = newConditionBean();
-        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString).lockForUpdate();
+        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
+        ${glAttachedCBArgsVariableName}.lockForUpdate();
         final ${glEntityInterfaceName} currentEntity = delegateReadEntity(${glAttachedCBArgsVariableName});
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;

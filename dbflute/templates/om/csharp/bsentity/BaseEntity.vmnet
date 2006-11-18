@@ -242,7 +242,6 @@ namespace ${myExtendedEntityPackageName} {
             ${col.JavaName} = ${col.JavaNative}.Parse(code);
         }
         #end
-        }
       #end
     #end
   #end

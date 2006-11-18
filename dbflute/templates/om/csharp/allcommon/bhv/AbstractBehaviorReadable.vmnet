@@ -340,7 +340,8 @@ namespace ${glPackageBaseCommonBhv} {
         public ${glEntityInterfaceName} ReadForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
             ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
-            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString).LockForUpdate();
+            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString);
+            ${glAttachedCBArgsVariableName}.LockForUpdate();
             ${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
             AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
             return currentEntity;

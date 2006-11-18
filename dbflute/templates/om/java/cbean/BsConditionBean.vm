@@ -62,9 +62,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * ${database.ImplementComment}
      * 
      * @param primaryKeyMap Primary key map. (NotNull and NotEmpty)
-     * @return Instance of query. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
+    public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
         if (primaryKeyMap == null) {
             String msg = "The argument[primaryKeyMap] must not be null.";
             throw new IllegalArgumentException(msg);
@@ -85,112 +84,55 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
             if (obj instanceof ${col.JavaNative}) {
                 query().set${col.JavaName}_Equal((${col.JavaNative})obj);
             } else {
-                if (!(obj instanceof String)) {
-                    String msg = "The value should be ${col.JavaNative} or String: ";
-                    msg = msg + "valueType=" + (obj != null ? obj.getClass() : null) + " value=" + obj;
-                    throw new IllegalArgumentException(msg);
-                }
     #if ($col.isJavaNativeStringObject())
 
+                checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
                 query().set${col.JavaName}_Equal((String)obj);
+            }
+        }
     #else
       #if ($col.isJavaNativeDateObject())
 
-                String value = (String)obj;
-                if (value != null) {
-                    try {
-                        query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value));
-                    } catch (java.text.ParseException e) {
-                        String msg = "query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    } catch (RuntimeException e) {
-                        String msg = "query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    }
-                }
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
-
-                set${col.JavaName}(null);// Binary as String is out of target.
-        #else
-
-                String value = (String)obj;
-                if (value != null) {
-                    try {
-                        query().set${col.JavaName}_Equal(new ${col.JavaNative}(value));
-                    } catch (RuntimeException e) {
-                        String msg = "query().set${col.JavaName}_Equal(new ${col.JavaNative}(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    }
-                }
-        #end
-      #end
-    #end
-
-            }
-        }
-  #end
-
-        return this;
-#else
-  #foreach ($col in $table.Columns)
-
-        if (!primaryKeyMap.containsKey("${col.Name}")) {
-            String msg = "The primaryKeyMap must have the value of ${col.Name}";
-            throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
-        }
-        {
-            final Object obj = primaryKeyMap.get("${col.Name}");
-            if (obj == null) {
-                query().set${col.JavaName}_Equal(null);
-            } else {
                 if (obj instanceof ${col.JavaNative}) {
                     query().set${col.JavaName}_Equal((${col.JavaNative})obj);
                 } else {
-                    if (!(obj instanceof String)) {
-                        String msg = "The value should be ${col.JavaNative} or String: ";
-                        msg = msg + "valueType=" + obj.getClass() + " value=" + obj;
-                        throw new IllegalArgumentException(msg);
-                    }
-    #if ($col.isJavaNativeStringObject())
-
-                    query().set${col.JavaName}_Equal((String)obj);
-    #else
-      #if ($col.isJavaNativeDateObject())
-
-                    final String value = (String)obj;
-                    try {
-                        query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value));
-                    } catch (java.text.ParseException e) {
-                        String msg = "query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    } catch (RuntimeException e) {
-                        String msg = "query().set${col.JavaName}_Equal((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    }
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
-
-                    set${col.JavaName}(null);// Binary as String is out of target.
-        #else
-
-                    final String value = (String)obj;
-                    try {
-                        query().set${col.JavaName}_Equal(new ${col.JavaNative}(value));
-                    } catch (RuntimeException e) {
-                        String msg = "query().set${col.JavaName}_Equal(new ${col.JavaNative}(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    }
-        #end
-      #end
-    #end
-
+                    checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
+                    query().set${col.JavaName}_Equal((${col.JavaNative})parseDate((String)obj));
                 }
             }
         }
-  #end
+      #else
+        #if (${col.isJavaNativeBinaryObject()})
 
-        return this;
+                if (obj instanceof ${col.JavaNative}) {
+                    query().set${col.JavaName}_Equal((${col.JavaNative})obj);
+                } else {
+                    query().set${col.JavaName}_Equal(null);// Binary as String is out of target.
+                }
+            }
+        }
+        #else
+
+                if (obj instanceof ${col.JavaNative}) {
+                    query().set${col.JavaName}_Equal((${col.JavaNative})obj);
+                } else {
+                    try {
+                        query().set${col.JavaName}_Equal(new ${col.JavaNative}((String)obj));
+                    } catch (RuntimeException e) {
+                        String msg = "set${col.JavaName}(new ${col.JavaNative}((String)obj))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + obj + "]", e);
+                    }
+                }
+            }
+        }
+        #end
+      #end
+    #end
+  #end
+#else
+
+        String msg = "This table has no primary-keys: " + getTableDbName();
+        throw new IllegalStateException(msg);
 #end
 
     }
@@ -199,9 +141,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * ${database.ImplementComment}
      * 
      * @param primaryKeyMapString Primary-key map. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} acceptPrimaryKeyMapString(String primaryKeyMapString) {
+    public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
         if (primaryKeyMapString == null) {
             String msg = "The argument[primaryKeyMapString] must not be null.";
             throw new IllegalArgumentException(msg);
@@ -221,7 +162,30 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         mapListString.setStartBrace(MAP_STRING_START_BRACE);
         mapListString.setEndBrace(MAP_STRING_END_BRACE);
         mapListString.setEqual(MAP_STRING_EQUAL);
-        return acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+        acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+    }
+
+    protected void checkTypeString(Object value, String propertyName, String typeName) {
+        if (value == null) {
+            throw new IllegalArgumentException("The value should not be null: " + propertyName);
+        }
+        if (!(value instanceof String)) {
+            String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
+            msg = msg + "valueType=" + value.getClass() + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected java.util.Date parseDate(String value) {
+        try {
+            return java.text.DateFormat.getDateTimeInstance().parse(value);
+        } catch (java.text.ParseException e) {
+            String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+        } catch (RuntimeException e) {
+            String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
+            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+        }
     }
 
     // =====================================================================================

@@ -26,15 +26,13 @@ namespace ${glPackageBaseCommonCBean} {
         /// Accept primary key map.
         /// </summary>
         /// <param name="primaryKeyMap">Primary key map. (NotNull and NotEmpty)</param>
-        /// <returns>this. (NotNull)</returns>
-        ${glConditionBeanInterfaceName} AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
+        void AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
 
         /// <summary>
         /// Accept primary key map-string. Delimiter is atmark and semicolon {@;}.
         /// </summary>
         /// <param name="primaryKeyMapString">Primary key map-string. (NotNull and NotEmpty)</param>
-        /// <returns>this. (NotNull)</returns>
-        ${glConditionBeanInterfaceName} AcceptPrimaryKeyMapString(String primaryKeyMapString);
+        void AcceptPrimaryKeyMapString(String primaryKeyMapString);
 
         // =====================================================================================
         //                                                                             SqlClause

@@ -181,7 +181,8 @@ namespace ${glPackageBaseCommonBhv} {
         public int ModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
-            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString()).LockForUpdate();
+            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
+            ${glAttachedCBArgsVariableName}.LockForUpdate();
             ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
             AssertRecordHasNotBeenDeleted(currentEntity, entity.ExtractPrimaryKeyMapString());
             MergeEntity(entity, currentEntity);

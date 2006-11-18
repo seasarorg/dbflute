@@ -50,15 +50,13 @@ namespace ${glPackageBaseCommonCBean} {
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="primaryKeyMap">Primary key map. (NotNull and NotEmpty)</param>
-        /// <returns>this. (NotNull)</returns>
-        abstract public ${glConditionBeanInterfaceName} AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
+        abstract public void AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="primaryKeyMapString">Primary key map-string. (NotNull and NotEmpty)</param>
-        /// <returns>this. (NotNull)</returns>
-        abstract public ${glConditionBeanInterfaceName} AcceptPrimaryKeyMapString(String primaryKeyMapString);
+        abstract public void AcceptPrimaryKeyMapString(String primaryKeyMapString);
 
         // =====================================================================================
         //                                                                             SqlClause

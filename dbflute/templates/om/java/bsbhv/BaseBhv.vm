@@ -421,7 +421,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${myExtendedObjectClassName} selectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
         assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
         final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
-        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString).lockForUpdate();
+        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
+        ${glAttachedCBArgsVariableName}.lockForUpdate();
         final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(${glAttachedCBArgsVariableName});
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;

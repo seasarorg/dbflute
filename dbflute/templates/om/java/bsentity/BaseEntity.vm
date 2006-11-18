@@ -486,41 +486,55 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
                 _${col.UncapitalisedJavaName} = null;
                 _isSetterInvoked${col.JavaName} = false;
             } else {
+    #if ($col.isJavaNativeStringObject())
+
+                checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
+                set${col.JavaName}((String)obj);
+            }
+        }
+    #else
+      #if ($col.isJavaNativeDateObject())
+
                 if (obj instanceof ${col.JavaNative}) {
                     set${col.JavaName}((${col.JavaNative})obj);
                 } else {
                     checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-    #if ($col.isJavaNativeStringObject())
-
-                    set${col.JavaName}((String)obj);
-    #else
-      #if ($col.isJavaNativeDateObject())
-
                     set${col.JavaName}((${col.JavaNative})parseDate((String)obj));
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
-
-                    set${col.JavaName}(null);// Binary as String is out of target.
-        #else
-
-                    final String value = (String)obj;
-                    try {
-                        set${col.JavaName}(new ${col.JavaNative}(value));
-                    } catch (RuntimeException e) {
-                        String msg = "set${col.JavaName}(new ${col.JavaNative}(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    }
-        #end
-      #end
-    #end
-
                 }
             }
         }
+      #else
+        #if (${col.isJavaNativeBinaryObject()})
+
+                if (obj instanceof ${col.JavaNative}) {
+                    set${col.JavaName}((${col.JavaNative})obj);
+                } else {
+                    set${col.JavaName}(null);// Binary as String is out of target.
+                }
+            }
+        }
+        #else
+
+                if (obj instanceof ${col.JavaNative}) {
+                    set${col.JavaName}((${col.JavaNative})obj);
+                } else {
+                    try {
+                        set${col.JavaName}(new ${col.JavaNative}((String)obj));
+                    } catch (RuntimeException e) {
+                        String msg = "set${col.JavaName}(new ${col.JavaNative}((String)obj))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + obj + "]", e);
+                    }
+                }
+            }
+        }
+        #end
+      #end
+    #end
   #end
 #else
 
-        acceptColumnValueMap(primaryKeyMap);
+        String msg = "This table has no primary-keys: " + getTableDbName();
+        throw new IllegalStateException(msg);
 #end
 
     }
@@ -572,40 +586,52 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         {
             final Object obj = columnValueMap.get("${col.Name}");
             if (obj == null) {
-                _${col.UncapitalisedJavaName} = null;
-                _isSetterInvoked${col.JavaName} = false;
+                _${col.UncapitalisedJavaName} = null; _isSetterInvoked${col.JavaName} = false;
             } else {
+    #if ($col.isJavaNativeStringObject())
+
+                checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
+                set${col.JavaName}((String)obj);
+            }
+        }
+    #else
+      #if ($col.isJavaNativeDateObject())
+
                 if (obj instanceof ${col.JavaNative}) {
                     set${col.JavaName}((${col.JavaNative})obj);
                 } else {
                     checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-    #if ($col.isJavaNativeStringObject())
-
-                    set${col.JavaName}((String)obj);
-    #else
-      #if ($col.isJavaNativeDateObject())
-
                     set${col.JavaName}((${col.JavaNative})parseDate((String)obj));
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
-
-                    set${col.JavaName}(null);// Binary as String is out of target.
-        #else
-
-                    final String value = (String)obj;
-                    try {
-                        set${col.JavaName}(new ${col.JavaNative}(value));
-                    } catch (RuntimeException e) {
-                        String msg = "set${col.JavaName}(new ${col.JavaNative}(value))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-                    }
-        #end
-      #end
-    #end
-
                 }
             }
         }
+      #else
+        #if (${col.isJavaNativeBinaryObject()})
+
+                if (obj instanceof ${col.JavaNative}) {
+                    set${col.JavaName}((${col.JavaNative})obj);
+                } else {
+                    set${col.JavaName}(null);// Binary as String is out of target.
+                }
+            }
+        }
+        #else
+
+                if (obj instanceof ${col.JavaNative}) {
+                    set${col.JavaName}((${col.JavaNative})obj);
+                } else {
+                    try {
+                        set${col.JavaName}(new ${col.JavaNative}((String)obj));
+                    } catch (RuntimeException e) {
+                        String msg = "set${col.JavaName}(new ${col.JavaNative}((String)obj))";
+                        throw new RuntimeException(msg + " threw the exception: value=[" + obj + "]", e);
+                    }
+                }
+            }
+        }
+        #end
+      #end
+    #end
   #end
 
     }

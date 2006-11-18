@@ -471,7 +471,8 @@ namespace ${glPackageExtendedBhv} {
         public ${myExtendedObjectClassName} SelectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
             ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = NewMyConditionBean();
-            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString).LockForUpdate();
+            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString);
+            ${glAttachedCBArgsVariableName}.LockForUpdate();
             ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = this.Self.DelegateSelectEntity(${glAttachedCBArgsVariableName});
             AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
             return currentEntity;

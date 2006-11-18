@@ -57,17 +57,15 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * Accept primary-key map-string.
      * 
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
+    public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
 
     /**
      * Accept primary-key map-string. Delimiter is at-mark and semicolon.
      * 
      * @param primaryKeyMapString Primary-key map. (NotNull and NotEmpty)
-     * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} acceptPrimaryKeyMapString(String primaryKeyMapString);
+    public void acceptPrimaryKeyMapString(String primaryKeyMapString);
 
     // =====================================================================================
     //                                                                               OrderBy
