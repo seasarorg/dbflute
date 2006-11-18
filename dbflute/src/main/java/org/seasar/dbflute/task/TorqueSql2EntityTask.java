@@ -154,17 +154,17 @@ public class TorqueSql2EntityTask extends TorqueTexenTask {
         return new SqlFileRunnerBase(runInfo) {
             protected String filterSql(String sql) {
                 
-                // TODO: メソッドの引数をなんとしても取る！でも型が取れないなぁ！
-                final SqlTokenizerImpl tokenizer = new SqlTokenizerImpl(sql);
-                while (true) {
-                    final int result = tokenizer.next();
-                    if (result == SqlTokenizer.EOF) {
-                        break;
-                    }
-                    if (tokenizer.getTokenType() == SqlTokenizer.COMMENT) {
-                        System.out.println("***: " + tokenizer.getToken());
-                    }
-                }
+//                // TODO: メソッドの引数をなんとしても取る！でも型が取れないなぁ！
+//                final SqlTokenizerImpl tokenizer = new SqlTokenizerImpl(sql);
+//                while (true) {
+//                    final int result = tokenizer.next();
+//                    if (result == SqlTokenizer.EOF) {
+//                        break;
+//                    }
+//                    if (tokenizer.getTokenType() == SqlTokenizer.COMMENT) {
+//                        System.out.println("***: " + tokenizer.getToken());
+//                    }
+//                }
                 
                 return removeBeginEndComment(sql);
             }

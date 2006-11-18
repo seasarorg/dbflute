@@ -12,13 +12,6 @@ using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonHelper};
 using ${myDBMetaPackageName};
 
-#if (${database.isAvailableEntityLazyLoad()})
-  #if (${table.hasRelation()})
-
-using ${myExtendedDaoPackageName};
-  #end
-#end
-
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
   #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
@@ -410,35 +403,9 @@ namespace ${myExtendedEntityPackageName} {
         /// </summary>
         [Seasar.Dao.Attrs.Relno(${foreignKeysIndex}), Seasar.Dao.Attrs.Relkeys("$foreignKeys.RelationKeysCommaString")]
         public ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignKeys.foreignPropertyNameInitCap} {
-  #if (${database.isAvailableEntityLazyLoad()})
-
-            get {
-                if (${foreignVariableName} != null) {
-                    return ${foreignVariableName};
-                }
-    #foreach ($columnName in $foreignKeys.LocalColumns)
-      #set ($localColumn = $table.getColumn($columnName))
-
-                if (_${localColumn.UncapitalisedJavaName} == null) {
-                    return null;
-                }
-    #end
-
-                // [LazyLoad] - If the target instance does not exist, lazyload the instance and return it.
-                ${foreignDaoClassName} dao = (${foreignDaoClassName})${glLazyLoadContainerClassName}.GetInstance().GetDaoInstance(typeof(${foreignDaoClassName}));
-                ${glPackageCB}.${parentCBClassName} ${glAttachedCBArgsVariableName} = new ${glPackageCB}.${parentCBClassName}();
-                ${glAttachedCBArgsVariableName}.Query().${foreignKeys.getForeignTableBeanSetupString("_Equal", "Set")};
-                ${foreignVariableName} = dao.SelectEntity(${glAttachedCBArgsVariableName});
-                return $foreignVariableName;
-            }
-            set { ${foreignVariableName} = value; }
-        }
-  #else
-
             get { return ${foreignVariableName}; }
             set { ${foreignVariableName} = value; }
         }
-  #end
   #set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
 
@@ -477,37 +444,6 @@ namespace ${myExtendedEntityPackageName} {
         /// Property of ${refferer.ReffererPropertyName} as the list of refferer table.
         /// </summary>
         public System.Collections.IList ${refferer.ReffererPropertyNameInitCap} {
-  #if (${database.isAvailableEntityLazyLoad()})
-
-            get {
-                if (${reffererVariableName} != null) {
-                    return ${reffererVariableName};
-                }
-    #foreach ($col in $table.PrimaryKey)
-
-                if (_${col.UncapitalisedJavaName} == null) {
-                    return null;
-                }
-    #end
-
-                // [LazyLoad] - If the target instance does not exist, lazyload the instance and return it.
-                ${reffererDaoClassName} dao = (${reffererDaoClassName})${glLazyLoadContainerClassName}.GetInstance().GetDaoInstance(typeof(${reffererDaoClassName}));
-                ${glPackageCB}.${reffererCBClassName} ${glAttachedCBArgsVariableName} = new ${glPackageCB}.${reffererCBClassName}();
-                ${glAttachedCBArgsVariableName}.Query().${refferer.getChildrenTableBeanSetupString("_Equal", "Set")};
-                ${glAttachedCBArgsVariableName}.AddOrderBy_PK_Asc();
-                ${reffererVariableName} = dao.SelectList(${glAttachedCBArgsVariableName});
-                return $reffererVariableName;
-            }
-            set {
-                if (value == null) {
-                    ${reffererVariableName} = null;
-                } else {
-                    ${reffererVariableName} = value;
-                }
-            }
-        }
-  #else
-
             get { return ${reffererVariableName}; }
             set {
                 if (value == null) {
@@ -517,7 +453,6 @@ namespace ${myExtendedEntityPackageName} {
                 }
             }
         }
-  #end
   #if (${refferer.isOneToOne()})
 
         /// <summary>

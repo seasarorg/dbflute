@@ -302,17 +302,16 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
      * @return Is return?
      */
     protected boolean initializeAtLoopBeginning() {
-        // 先頭のデリミタは全て除去する。
-        //   - 戻り値は内部的に必ずトリムされる。
+        // Remove prefix delimiter. (Result string is always trimmed.)
         removePrefixAllDelimiter();
 
-        // 残りの文字列が空文字ならば、全ての解析が終了なのでリターン！
+        // If the remainder string is empty-string, Analyzing is over!
         if (_remainderString.equals("")) {
             return true;
         }
 
-        // 残りの文字列が中括弧閉じで始まるならば、現状のマップ要素解析が終了なのでリターン！
-        //   - その時に中括弧閉じを除去する。
+        // If the remainder string starts with end-brace, Analyzing current map is over!
+        // And then remove the end-brace.
         if (isStartsWithEndBrace(_remainderString)) {
             removePrefixEndBrace();
             return true;
@@ -326,7 +325,7 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
      * @return Is return?
      */
     protected boolean closingAfterParseNestMapList() {
-        // 中括弧閉じで始まっている場合、それを除去して残りの文字列として設定する。
+        // If the remainder string starts with end-brace, remove it and return true.
         if (isStartsWithEndBrace(_remainderString)) {
             removePrefixEndBrace();
             return true;
@@ -340,7 +339,7 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
      * @param endBraceIndex End-brace index.
      */
     protected void closingByEndBraceIndex(int endBraceIndex) {
-        // 残りの文字列の先頭から解析済みのバリューと中括弧閉じを除去する。
+        // Remove the value that was finished analyzing and end-brace.
         _remainderString = _remainderString.substring(endBraceIndex);
         removePrefixEndBrace();
     }
