@@ -1,4 +1,4 @@
-package org.apache.torque.helper.jdbc;
+package org.seasar.dbflute.helper.jdbc;
 
 import java.io.File;
 import java.io.FileFilter;

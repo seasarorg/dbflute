@@ -35,17 +35,17 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
-import org.apache.torque.helper.jdbc.RunnerInformation;
-import org.apache.torque.helper.jdbc.SqlFileFireMan;
-import org.apache.torque.helper.jdbc.SqlFileGetter;
-import org.apache.torque.helper.jdbc.SqlFileRunner;
-import org.apache.torque.helper.jdbc.SqlFileRunnerBase;
-import org.apache.torque.helper.jdbc.SqlFileRunnerExecute.SQLRuntimeException;
 import org.apache.torque.task.bs.TorqueTexenTask;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dao.SqlTokenizer;
 import org.seasar.dao.parser.SqlTokenizerImpl;
+import org.seasar.dbflute.helper.jdbc.RunnerInformation;
+import org.seasar.dbflute.helper.jdbc.SqlFileFireMan;
+import org.seasar.dbflute.helper.jdbc.SqlFileGetter;
+import org.seasar.dbflute.helper.jdbc.SqlFileRunner;
+import org.seasar.dbflute.helper.jdbc.SqlFileRunnerBase;
+import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute.SQLRuntimeException;
 
 public class TorqueSql2EntityTask extends TorqueTexenTask {
 

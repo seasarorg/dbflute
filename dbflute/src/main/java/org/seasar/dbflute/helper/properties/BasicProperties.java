@@ -1,4 +1,4 @@
-package org.apache.torque.helper.properties;
+package org.seasar.dbflute.helper.properties;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -1,4 +1,4 @@
-package org.apache.torque.helper.jdbc;
+package org.seasar.dbflute.helper.jdbc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,8 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.helper.TorqueBuildProperties;
-import org.apache.torque.helper.jdbc.SqlFileRunnerExecute.IORuntimeException;
 import org.apache.torque.helper.stateless.FlClassUtil;
+import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute.IORuntimeException;
 
 public abstract class SqlFileRunnerBase implements SqlFileRunner {
 

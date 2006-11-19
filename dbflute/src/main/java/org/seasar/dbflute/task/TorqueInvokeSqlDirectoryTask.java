@@ -72,11 +72,11 @@ import java.util.List;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.helper.TorqueBuildProperties;
-import org.apache.torque.helper.jdbc.RunnerInformation;
-import org.apache.torque.helper.jdbc.SqlFileFireMan;
-import org.apache.torque.helper.jdbc.SqlFileGetter;
-import org.apache.torque.helper.jdbc.SqlFileRunnerExecute;
 import org.apache.torque.task.bs.TorqueTask;
+import org.seasar.dbflute.helper.jdbc.RunnerInformation;
+import org.seasar.dbflute.helper.jdbc.SqlFileFireMan;
+import org.seasar.dbflute.helper.jdbc.SqlFileGetter;
+import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute;
 
 public class TorqueInvokeSqlDirectoryTask extends TorqueTask {
 

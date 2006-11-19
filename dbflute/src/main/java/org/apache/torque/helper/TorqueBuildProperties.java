@@ -15,20 +15,20 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.apache.torque.helper.properties.AdditionalForeignKeyProperties;
-import org.apache.torque.helper.properties.BasicProperties;
-import org.apache.torque.helper.properties.ClassificationProperties;
-import org.apache.torque.helper.properties.DaoDiconProperties;
-import org.apache.torque.helper.properties.GeneratedClassPackageProperties;
-import org.apache.torque.helper.properties.OptimisticLockProperties;
-import org.apache.torque.helper.properties.OtherProperties;
-import org.apache.torque.helper.properties.PropertiesHandler;
-import org.apache.torque.helper.properties.SelectParamProperties;
-import org.apache.torque.helper.properties.Sql2EntityProperties;
 import org.apache.torque.helper.stateless.FlPropertyUtil;
 import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyBooleanFormatException;
 import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyIntegerFormatException;
 import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyNotFoundException;
+import org.seasar.dbflute.helper.properties.AdditionalForeignKeyProperties;
+import org.seasar.dbflute.helper.properties.BasicProperties;
+import org.seasar.dbflute.helper.properties.ClassificationProperties;
+import org.seasar.dbflute.helper.properties.DaoDiconProperties;
+import org.seasar.dbflute.helper.properties.GeneratedClassPackageProperties;
+import org.seasar.dbflute.helper.properties.OptimisticLockProperties;
+import org.seasar.dbflute.helper.properties.OtherProperties;
+import org.seasar.dbflute.helper.properties.PropertiesHandler;
+import org.seasar.dbflute.helper.properties.SelectParamProperties;
+import org.seasar.dbflute.helper.properties.Sql2EntityProperties;
 
 /**
  * Build properties for Torque.

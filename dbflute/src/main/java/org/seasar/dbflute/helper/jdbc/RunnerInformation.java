@@ -1,4 +1,4 @@
-package org.apache.torque.helper.jdbc;
+package org.seasar.dbflute.helper.jdbc;
 
 public class RunnerInformation {
     protected String _driver;

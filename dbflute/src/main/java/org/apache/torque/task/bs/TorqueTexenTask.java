@@ -9,10 +9,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.helper.TorqueBuildProperties;
 import org.apache.torque.helper.TorqueTaskUtil;
-import org.apache.torque.helper.properties.BasicProperties;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.ant.TexenTask;
+import org.seasar.dbflute.helper.properties.BasicProperties;
 
 /**
  * Abstract DB meta texen task for Torque.
