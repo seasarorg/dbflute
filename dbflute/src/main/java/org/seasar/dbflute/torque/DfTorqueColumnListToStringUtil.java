@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.apache.torque.engine.database.model.Column;
 
-public class TorqueColumnListToStringUtil {
+public class DfTorqueColumnListToStringUtil {
 
     public static String getColumnArgsString(List columnList) {
         validateColumnList(columnList);

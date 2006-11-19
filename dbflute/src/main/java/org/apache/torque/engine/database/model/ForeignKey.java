@@ -61,7 +61,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.torque.TorqueColumnListToStringUtil;
+import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -620,7 +620,7 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getLocalColumnNameCommaString() {
-        return TorqueColumnListToStringUtil.getColumnNameCommaString(getLocalColumns());
+        return DfTorqueColumnListToStringUtil.getColumnNameCommaString(getLocalColumns());
     }
 
     /**

@@ -21,8 +21,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.texen.ant.TexenTask;
-import org.seasar.dbflute.TorqueBuildProperties;
-import org.seasar.dbflute.torque.AntTaskUtil;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
  * Abstract DB meta texen task for Torque.

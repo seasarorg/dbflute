@@ -21,12 +21,12 @@ import java.util.List;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.task.bs.TorqueTask;
-import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.RunnerInformation;
 import org.seasar.dbflute.helper.jdbc.SqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute;
 
-public class TorqueInvokeReplaceSchemaTask extends TorqueTask {
+public class DfInvokeReplaceSchemaTask extends TorqueTask {
 
     // =========================================================================================
     //                                                                                 Attribute
@@ -96,16 +96,16 @@ public class TorqueInvokeReplaceSchemaTask extends TorqueTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
-        runInfo.setAutoCommit(TorqueBuildProperties.getInstance().isInvokeReplaceSchemaAutoCommit());
-        runInfo.setErrorContinue(TorqueBuildProperties.getInstance().isInvokeReplaceSchemaErrorContinue());
-        runInfo.setRollbackOnly(TorqueBuildProperties.getInstance().isInvokeReplaceSchemaRollbackOnly());
+        runInfo.setAutoCommit(DfBuildProperties.getInstance().isInvokeReplaceSchemaAutoCommit());
+        runInfo.setErrorContinue(DfBuildProperties.getInstance().isInvokeReplaceSchemaErrorContinue());
+        runInfo.setRollbackOnly(DfBuildProperties.getInstance().isInvokeReplaceSchemaRollbackOnly());
 
         final SqlFileFireMan fireMan = new SqlFileFireMan();
         fireMan.execute(new SqlFileRunnerExecute(runInfo), getSqlFileList());
     }
 
     protected List<File> getSqlFileList() {
-        final String sqlFile = TorqueBuildProperties.getInstance().getInvokeReplaceSchemaSqlFile();
+        final String sqlFile = DfBuildProperties.getInstance().getInvokeReplaceSchemaSqlFile();
         final List<File> fileList = new ArrayList<File>();
         fileList.add(new File(sqlFile));
         return fileList;

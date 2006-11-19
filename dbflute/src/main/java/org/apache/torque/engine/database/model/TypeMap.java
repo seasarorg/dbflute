@@ -61,7 +61,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.DfBuildProperties;
 
 /**
  * A class that maps JDBC types to their corresponding
@@ -172,7 +172,7 @@ public class TypeMap {
     /** JDBCToJavaNativeMap from Property. */
     protected static final Map<String, Object> _propertyOfJDBCToJavaNativeMap;
     static {
-        _propertyOfJDBCToJavaNativeMap = TorqueBuildProperties.getInstance().getJdbcToJavaNative();
+        _propertyOfJDBCToJavaNativeMap = DfBuildProperties.getInstance().getJdbcToJavaNative();
     }
 
     /**

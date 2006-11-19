@@ -58,7 +58,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
-import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.DfBuildProperties;
 
 /**
  * A <code>NameGenerator</code> implementation for Java-esque names.
@@ -133,7 +133,7 @@ public class JavaNameGenerator implements NameGenerator
         while (tok.hasMoreTokens())
         {
             String namePart = ((String) tok.nextElement());
-            if (TorqueBuildProperties.getInstance().isAvailableToLowerInGeneratorUnderscoreMethod()) {
+            if (DfBuildProperties.getInstance().isAvailableToLowerInGeneratorUnderscoreMethod()) {
                 namePart = namePart.toLowerCase();
             }
             name.append(StringUtils.capitalise(namePart));

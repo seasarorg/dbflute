@@ -68,8 +68,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
-import org.seasar.dbflute.TorqueBuildProperties;
-import org.seasar.dbflute.torque.TorqueColumnListToStringUtil;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
 
@@ -1299,7 +1299,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyArgsString() {
-        return TorqueColumnListToStringUtil.getColumnArgsString(getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnArgsString(getPrimaryKey());
     }
 
     /**
@@ -1328,7 +1328,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyArgsSetupString() {
-        return TorqueColumnListToStringUtil.getColumnArgsSetupString(null, getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnArgsSetupString(null, getPrimaryKey());
     }
 
     /**
@@ -1338,7 +1338,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyArgsSetupString(String beanName) {
-        return TorqueColumnListToStringUtil.getColumnArgsSetupString(beanName, getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnArgsSetupString(beanName, getPrimaryKey());
     }
 
     /**
@@ -1348,7 +1348,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyArgsSetupStringCSharp() {
-        return TorqueColumnListToStringUtil.getColumnArgsSetupStringCSharp(null, getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnArgsSetupStringCSharp(null, getPrimaryKey());
     }
 
     /**
@@ -1358,7 +1358,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyArgsSetupStringCSharp(String beanName) {
-        return TorqueColumnListToStringUtil.getColumnArgsSetupStringCSharp(beanName, getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnArgsSetupStringCSharp(beanName, getPrimaryKey());
     }
 
     /**
@@ -1368,7 +1368,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyNameCommaString() {
-        return TorqueColumnListToStringUtil.getColumnNameCommaString(getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1378,7 +1378,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyUncapitalisedJavaNameCommaString() {
-        return TorqueColumnListToStringUtil.getColumnUncapitalisedJavaNameCommaString(getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnUncapitalisedJavaNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1388,7 +1388,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyJavaNameCommaString() {
-        return TorqueColumnListToStringUtil.getColumnJavaNameCommaString(getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnJavaNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1398,7 +1398,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyGetterCommaString() {
-        return TorqueColumnListToStringUtil.getColumnGetterCommaString(getPrimaryKey());
+        return DfTorqueColumnListToStringUtil.getColumnGetterCommaString(getPrimaryKey());
     }
 
     /**
@@ -1408,7 +1408,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyOrderByAscString() {
-        return TorqueColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "asc");
+        return DfTorqueColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "asc");
     }
 
     /**
@@ -1418,7 +1418,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyOrderByDescString() {
-        return TorqueColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "desc");
+        return DfTorqueColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "desc");
     }
 
     /**
@@ -1428,7 +1428,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyDispValueString() {
-        return TorqueColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "get");
+        return DfTorqueColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "get");
     }
 
     /**
@@ -1438,7 +1438,7 @@ public class Table implements IDMethod {
      * @return Generated-String.
      */
     public String getPrimaryKeyDispValueStringByGetterInitCap() {
-        return TorqueColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "Get");
+        return DfTorqueColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "Get");
     }
 
     /**
@@ -1642,8 +1642,8 @@ public class Table implements IDMethod {
     // **********************************************************************************************
     //                                                                                     Properties
     //                                                                                     **********
-    protected TorqueBuildProperties getProperties() {
-        return TorqueBuildProperties.getInstance();
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
     }
 
     // ===============================================================================

@@ -69,7 +69,7 @@ import org.apache.tools.ant.util.FileUtils;
 import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.util.FileUtil;
-import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.mapstring.DfMapListString;
 import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 import org.seasar.dbflute.properties.BasicProperties;
@@ -613,8 +613,8 @@ public class Database {
     //                                                                                     Properties
     //                                                                                     **********
 
-    protected TorqueBuildProperties getProperties() {
-        return TorqueBuildProperties.getInstance();
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
     }
 
     protected BasicProperties getBasicProperties() {

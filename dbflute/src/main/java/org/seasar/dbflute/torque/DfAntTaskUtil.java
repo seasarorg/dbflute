@@ -26,17 +26,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.DfBuildProperties;
 
 /**
  * Torque task utility.
  * 
  * @author mkubo
  */
-public final class AntTaskUtil {
+public final class DfAntTaskUtil {
 
     /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(AntTaskUtil.class);
+    private static final Log _log = LogFactory.getLog(DfAntTaskUtil.class);
 
     /**
      * Get the property object that saves 'build-properties'.
@@ -82,7 +82,7 @@ public final class AntTaskUtil {
                     prop.setProperty(key, value);
                 }
             }
-            TorqueBuildProperties.getInstance().setProperties(prop);
+            DfBuildProperties.getInstance().setProperties(prop);
 
             _log.debug("[Properties]: size=" + prop.size());
             for (final Iterator ite = prop.keySet().iterator(); ite.hasNext();) {

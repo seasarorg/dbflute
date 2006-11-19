@@ -20,7 +20,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
-import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute.IORuntimeException;
 import org.seasar.dbflute.util.DfClassUtil;
 
@@ -257,7 +257,7 @@ public abstract class SqlFileRunnerBase implements SqlFileRunner {
     }
 
     public DelimiterChanger newDelimterChanger() {
-        final String databaseName = TorqueBuildProperties.getInstance().stringProp("torque.database");
+        final String databaseName = DfBuildProperties.getInstance().stringProp("torque.database");
         final String className = DelimiterChanger.class.getName() + "_" + databaseName;
         DelimiterChanger changer = null;
         try {

@@ -20,13 +20,13 @@ import java.util.List;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.task.bs.TorqueTask;
-import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.RunnerInformation;
 import org.seasar.dbflute.helper.jdbc.SqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.SqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute;
 
-public class TorqueInvokeSqlDirectoryTask extends TorqueTask {
+public class DfInvokeSqlDirectoryTask extends TorqueTask {
 
     // =========================================================================================
     //                                                                                 Attribute
@@ -96,16 +96,16 @@ public class TorqueInvokeSqlDirectoryTask extends TorqueTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
-        runInfo.setAutoCommit(TorqueBuildProperties.getInstance().isInvokeSqlDirectoryAutoCommit());
-        runInfo.setErrorContinue(TorqueBuildProperties.getInstance().isInvokeSqlDirectoryErrorContinue());
-        runInfo.setRollbackOnly(TorqueBuildProperties.getInstance().isInvokeSqlDirectoryRollbackOnly());
+        runInfo.setAutoCommit(DfBuildProperties.getInstance().isInvokeSqlDirectoryAutoCommit());
+        runInfo.setErrorContinue(DfBuildProperties.getInstance().isInvokeSqlDirectoryErrorContinue());
+        runInfo.setRollbackOnly(DfBuildProperties.getInstance().isInvokeSqlDirectoryRollbackOnly());
 
         final SqlFileFireMan fireMan = new SqlFileFireMan();
         fireMan.execute(new SqlFileRunnerExecute(runInfo), getSqlFileList());
     }
 
     protected List<File> getSqlFileList() {
-        final String sqlDirectory = TorqueBuildProperties.getInstance().getInvokeSqlDirectorySqlDirectory();
+        final String sqlDirectory = DfBuildProperties.getInstance().getInvokeSqlDirectorySqlDirectory();
         return new SqlFileGetter().getSqlFileList(sqlDirectory);
     }
 }

@@ -50,13 +50,13 @@ import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
  * 
  * @author mkubo
  */
-public final class TorqueBuildProperties {
+public final class DfBuildProperties {
 
     /** Log-instance */
-    private static final Log _log = LogFactory.getLog(TorqueBuildProperties.class);
+    private static final Log _log = LogFactory.getLog(DfBuildProperties.class);
 
     /** Singleton-instance. */
-    private static final TorqueBuildProperties _instance = new TorqueBuildProperties();
+    private static final DfBuildProperties _instance = new DfBuildProperties();
 
     /** TorqueContextProperties */
     private Properties _buildProperties;
@@ -64,7 +64,7 @@ public final class TorqueBuildProperties {
     /**
      * Constructor.
      */
-    private TorqueBuildProperties() {
+    private DfBuildProperties() {
     }
 
     /**
@@ -72,7 +72,7 @@ public final class TorqueBuildProperties {
      * 
      * @return Singleton-Instance. (NotNull)
      */
-    public synchronized static TorqueBuildProperties getInstance() {
+    public synchronized static DfBuildProperties getInstance() {
         return _instance;
     }
 

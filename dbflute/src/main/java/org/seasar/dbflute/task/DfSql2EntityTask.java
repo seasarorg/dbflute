@@ -47,9 +47,9 @@ import org.seasar.dbflute.helper.jdbc.SqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerBase;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute.SQLRuntimeException;
 
-public class TorqueSql2EntityTask extends TorqueTexenTask {
+public class DfSql2EntityTask extends TorqueTexenTask {
 
-    private static final Log _log = LogFactory.getLog(TorqueSql2EntityTask.class);
+    private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 
     // =========================================================================================
     //                                                                                 Attribute
