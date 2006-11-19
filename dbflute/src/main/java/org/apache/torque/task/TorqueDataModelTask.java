@@ -2,7 +2,7 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.task.bs.TorqueAbstractDbMetaTexenTask;
+import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
  * Data-model task for Torque.
@@ -12,7 +12,7 @@ import org.apache.torque.task.bs.TorqueAbstractDbMetaTexenTask;
  * 
  * @author Modified by mkubo
  */
-public class TorqueDataModelTask extends TorqueAbstractDbMetaTexenTask {
+public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
 
     public static final Log _log = LogFactory.getLog(TorqueDataModelTask.class);
 }

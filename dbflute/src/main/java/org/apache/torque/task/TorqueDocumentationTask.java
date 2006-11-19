@@ -1,15 +1,15 @@
 package org.apache.torque.task;
 
-import org.apache.torque.task.bs.TorqueAbstractDbMetaTexenTask;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
  * Documentation task for Torque.
  * 
  * @author Modified by mkubo
  */
-public class TorqueDocumentationTask extends TorqueAbstractDbMetaTexenTask {
+public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     private String _outputFormat;
 

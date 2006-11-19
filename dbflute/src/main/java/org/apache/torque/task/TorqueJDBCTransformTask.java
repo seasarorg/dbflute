@@ -78,12 +78,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.transform.DTDResolver;
-import org.apache.torque.task.bs.TorqueTask;
 import org.apache.xerces.dom.DocumentImpl;
 import org.apache.xerces.dom.DocumentTypeImpl;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
 
 /**
@@ -92,7 +92,7 @@ import org.w3c.dom.Element;
  * @author mkubo
  * @version $Revision$ $Date$
  */
-public class TorqueJDBCTransformTask extends TorqueTask {
+public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     public static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
 

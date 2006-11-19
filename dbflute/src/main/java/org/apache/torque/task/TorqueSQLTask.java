@@ -6,15 +6,15 @@ import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.transform.XmlToAppData;
-import org.apache.torque.task.bs.TorqueAbstractDbMetaTexenTask;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
  * An extended Texen task used for ???
  *
  * @author Modified by mkubo
  */
-public class TorqueSQLTask extends TorqueAbstractDbMetaTexenTask {
+public class TorqueSQLTask extends DfAbstractDbMetaTexenTask {
     private String _database;
     private String _suffix;
     private String _idTableXMLFile;

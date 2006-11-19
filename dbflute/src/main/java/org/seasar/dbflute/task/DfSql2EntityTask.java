@@ -35,7 +35,6 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
-import org.apache.torque.task.bs.TorqueTexenTask;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dao.SqlTokenizer;
@@ -46,8 +45,9 @@ import org.seasar.dbflute.helper.jdbc.SqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerBase;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute.SQLRuntimeException;
+import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 
-public class DfSql2EntityTask extends TorqueTexenTask {
+public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 

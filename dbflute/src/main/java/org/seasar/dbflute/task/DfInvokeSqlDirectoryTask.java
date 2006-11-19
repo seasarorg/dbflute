@@ -19,14 +19,14 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.torque.task.bs.TorqueTask;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.RunnerInformation;
 import org.seasar.dbflute.helper.jdbc.SqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.SqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute;
+import org.seasar.dbflute.task.bs.DfAbstractTask;
 
-public class DfInvokeSqlDirectoryTask extends TorqueTask {
+public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
 
     // =========================================================================================
     //                                                                                 Attribute
