@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.jdbc;
+package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,20 +21,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute.IORuntimeException;
+import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.IORuntimeException;
 import org.seasar.dbflute.util.DfClassUtil;
 
-public abstract class SqlFileRunnerBase implements SqlFileRunner {
+public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
     /** Log instance. */
-    private static Log _log = LogFactory.getLog(SqlFileRunnerBase.class);
+    private static Log _log = LogFactory.getLog(DfSqlFileRunnerBase.class);
 
-    protected final RunnerInformation _runInfo;
+    protected final DfRunnerInformation _runInfo;
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
     protected File _srcFile;
 
-    public SqlFileRunnerBase(RunnerInformation runInfo) {
+    public DfSqlFileRunnerBase(DfRunnerInformation runInfo) {
         _runInfo = runInfo;
     }
 

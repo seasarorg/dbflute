@@ -22,15 +22,15 @@ import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
  * 
  * @author mkubo
  */
-public final class BasicProperties extends AbstractHelperProperties {
+public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     /** Log-instance */
-    private static final Log _log = LogFactory.getLog(BasicProperties.class);
+    private static final Log _log = LogFactory.getLog(DfBasicProperties.class);
 
     /**
      * Constructor.
      */
-    public BasicProperties(Properties prop) {
+    public DfBasicProperties(Properties prop) {
         super(prop);
     }
 

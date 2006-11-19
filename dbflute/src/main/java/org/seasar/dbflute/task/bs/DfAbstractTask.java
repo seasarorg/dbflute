@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.BasicProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
@@ -42,7 +42,7 @@ public abstract class DfAbstractTask extends Task {
         return DfBuildProperties.getInstance();
     }
 
-    protected BasicProperties getBasicProperties() {
+    protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
 }

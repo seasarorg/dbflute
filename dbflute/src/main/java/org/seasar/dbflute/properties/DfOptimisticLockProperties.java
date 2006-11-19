@@ -11,14 +11,14 @@ import org.seasar.dbflute.util.DfNameHintUtil;
  * 
  * @author mkubo
  */
-public final class OptimisticLockProperties extends AbstractHelperProperties {
+public final class DfOptimisticLockProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
 
     /**
      * Constructor.
      */
-    public OptimisticLockProperties(Properties prop) {
+    public DfOptimisticLockProperties(Properties prop) {
         super(prop);
     }
 

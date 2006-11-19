@@ -1,17 +1,18 @@
-package org.seasar.dbflute.helper.jdbc;
+package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 
-public class SqlFileRunnerExecute extends SqlFileRunnerBase {
+public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
 
     /** Log instance. */
-    private static Log _log = LogFactory.getLog(SqlFileRunnerExecute.class);
+    private static Log _log = LogFactory.getLog(DfSqlFileRunnerExecute.class);
 
-    public SqlFileRunnerExecute(RunnerInformation runInfo) {
+    public DfSqlFileRunnerExecute(DfRunnerInformation runInfo) {
         super(runInfo);
     }
 

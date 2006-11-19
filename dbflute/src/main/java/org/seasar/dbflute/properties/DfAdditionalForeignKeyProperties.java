@@ -13,14 +13,14 @@ import java.util.StringTokenizer;
  * 
  * @author mkubo
  */
-public final class AdditionalForeignKeyProperties extends AbstractHelperProperties {
+public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
 
     /**
      * Constructor.
      */
-    public AdditionalForeignKeyProperties(Properties prop) {
+    public DfAdditionalForeignKeyProperties(Properties prop) {
         super(prop);
     }
 

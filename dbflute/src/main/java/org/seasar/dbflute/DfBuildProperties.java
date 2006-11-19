@@ -30,16 +30,16 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.properties.AdditionalForeignKeyProperties;
-import org.seasar.dbflute.properties.BasicProperties;
-import org.seasar.dbflute.properties.ClassificationProperties;
-import org.seasar.dbflute.properties.DaoDiconProperties;
-import org.seasar.dbflute.properties.GeneratedClassPackageProperties;
-import org.seasar.dbflute.properties.OptimisticLockProperties;
-import org.seasar.dbflute.properties.OtherProperties;
-import org.seasar.dbflute.properties.PropertiesHandler;
-import org.seasar.dbflute.properties.SelectParamProperties;
-import org.seasar.dbflute.properties.Sql2EntityProperties;
+import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfDaoDiconProperties;
+import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
+import org.seasar.dbflute.properties.DfOptimisticLockProperties;
+import org.seasar.dbflute.properties.DfOtherProperties;
+import org.seasar.dbflute.properties.DfPropertiesHandler;
+import org.seasar.dbflute.properties.DfSelectParamProperties;
+import org.seasar.dbflute.properties.DfSql2EntityProperties;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
@@ -287,8 +287,8 @@ public final class DfBuildProperties {
     // **********************************************************************************************
     //                                                                                        Handler
     //                                                                                        *******
-    public PropertiesHandler getHandler() {
-        return PropertiesHandler.getInstance();
+    public DfPropertiesHandler getHandler() {
+        return DfPropertiesHandler.getInstance();
     }
 
     // **********************************************************************************************
@@ -297,21 +297,21 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                                              Properties - Basic
     //                                                              ==================
-    public BasicProperties getBasicProperties() {
+    public DfBasicProperties getBasicProperties() {
         return getHandler().getBasicProperties(getProperties());
     }
 
     // ===============================================================================
     //                                                           Properties - DaoDicon
     //                                                           =====================
-    public DaoDiconProperties getDaoDiconProperties() {
+    public DfDaoDiconProperties getDaoDiconProperties() {
         return getHandler().getDaoDiconProperties(getProperties());
     }
 
     // ===============================================================================
     //                                            Properties - Generated Class Package
     //                                            ====================================
-    public GeneratedClassPackageProperties getGeneratedClassPackageProperties() {
+    public DfGeneratedClassPackageProperties getGeneratedClassPackageProperties() {
         return getHandler().getGeneratedClassPackageProperties(getProperties());
     }
 
@@ -346,7 +346,7 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                                    Properties - Optimistic Lock
     //                                                    ============================
-    public OptimisticLockProperties getOptimisticLockProperties() {
+    public DfOptimisticLockProperties getOptimisticLockProperties() {
         return getHandler().getOptimisticLockProperties(getProperties());
     }
 
@@ -512,11 +512,11 @@ public final class DfBuildProperties {
     // --------------------------------------
     //                             Definition
     //                             ----------
-    protected ClassificationProperties _classificationProperties;
+    protected DfClassificationProperties _classificationProperties;
 
-    protected ClassificationProperties getClassificationProperties() {
+    protected DfClassificationProperties getClassificationProperties() {
         if (_classificationProperties == null) {
-            _classificationProperties = new ClassificationProperties(_buildProperties);
+            _classificationProperties = new DfClassificationProperties(_buildProperties);
         }
         return _classificationProperties;
     }
@@ -597,7 +597,7 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                                       Properties - Select Param
     //                                                       =========================
-    protected SelectParamProperties getSelectParamProperties() {
+    protected DfSelectParamProperties getSelectParamProperties() {
         return getHandler().getSelectParamProperties(getProperties());
     }
 
@@ -745,7 +745,7 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                               Properties - AdditionalForeignKey
     //                                               =================================
-    protected AdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
+    protected DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
         return getHandler().getAdditionalForeignKeyProperties(getProperties());
     }
 
@@ -975,7 +975,7 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                                              Properties - Other
     //                                                              ==================
-    public OtherProperties getOtherProperties() {
+    public DfOtherProperties getOtherProperties() {
         return getHandler().getOtherProperties(getProperties());
     }
 
@@ -1323,7 +1323,7 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                            Properties - sql2EntityDefinitionMap
     //                                            ====================================
-    public Sql2EntityProperties getSql2EntityProperties() {
+    public DfSql2EntityProperties getSql2EntityProperties() {
         return getHandler().getSql2EntityProperties(getProperties());
     }
 

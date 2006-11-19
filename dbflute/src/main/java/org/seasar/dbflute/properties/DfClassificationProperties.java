@@ -21,11 +21,11 @@ import org.seasar.dbflute.util.DfNameHintUtil;
  * 
  * @author mkubo
  */
-public final class ClassificationProperties extends AbstractHelperProperties {
+public final class DfClassificationProperties extends DfAbstractHelperProperties {
 
-    private static final Log _log = LogFactory.getLog(ClassificationProperties.class);
+    private static final Log _log = LogFactory.getLog(DfClassificationProperties.class);
 
-    public ClassificationProperties(Properties prop) {
+    public DfClassificationProperties(Properties prop) {
         super(prop);
     }
 

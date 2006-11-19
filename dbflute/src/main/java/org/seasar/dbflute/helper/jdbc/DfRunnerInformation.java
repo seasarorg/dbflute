@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.jdbc;
 
-public class RunnerInformation {
+public class DfRunnerInformation {
     protected String _driver;
     protected String _url;
     protected String _user;

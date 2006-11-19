@@ -1,11 +1,11 @@
-package org.seasar.dbflute.helper.jdbc;
+package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SqlFileGetter {
+public class DfSqlFileGetter {
     private final FileFilter _sqlFileFileter = new FileFilter() {
         public boolean accept(File file) {
             return file.getName().toLowerCase().endsWith(".sql");

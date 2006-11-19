@@ -26,7 +26,7 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.BasicProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
@@ -102,7 +102,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return DfBuildProperties.getInstance();
     }
 
-    protected BasicProperties getBasicProperties() {
+    protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
 }

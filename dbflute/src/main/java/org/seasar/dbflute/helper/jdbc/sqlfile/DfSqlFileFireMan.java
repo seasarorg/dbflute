@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.jdbc;
+package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,17 +8,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 
-public class SqlFileFireMan {
+public class DfSqlFileFireMan {
 
     /** Log instance. */
-    private static Log _log = LogFactory.getLog(SqlFileFireMan.class);
+    private static Log _log = LogFactory.getLog(DfSqlFileFireMan.class);
 
     /**
      * Load the sql file and then execute it.
      *
      * @throws BuildException
      */
-    public void execute(SqlFileRunner runner, List<File> fileList) throws BuildException {
+    public void execute(DfSqlFileRunner runner, List<File> fileList) throws BuildException {
         try {
             _log.debug("/************************************************************************************");
 

@@ -9,14 +9,14 @@ import java.util.Properties;
  * 
  * @author mkubo
  */
-public final class Sql2EntityProperties extends AbstractHelperProperties {
+public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
 
     /**
      * Constructor.
      */
-    public Sql2EntityProperties(Properties prop) {
+    public DfSql2EntityProperties(Properties prop) {
         super(prop);
     }
 
@@ -30,7 +30,7 @@ public final class Sql2EntityProperties extends AbstractHelperProperties {
         if (_sql2EntityDefinitionMap == null) {
             final Map<String, Object> sql2EntityDefaultMap = new LinkedHashMap<String, Object>();
 
-            final GeneratedClassPackageProperties packageProp = new GeneratedClassPackageProperties(getProperties());
+            final DfGeneratedClassPackageProperties packageProp = new DfGeneratedClassPackageProperties(getProperties());
             getBasicProperties().getJavaLocation_for_main();
             packageProp.getExtendedDaoPackage();
 

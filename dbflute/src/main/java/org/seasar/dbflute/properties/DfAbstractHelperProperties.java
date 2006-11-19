@@ -22,10 +22,10 @@ import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
  * 
  * @author mkubo
  */
-public abstract class AbstractHelperProperties {
+public abstract class DfAbstractHelperProperties {
 
     /** Log-instance */
-    private static final Log _log = LogFactory.getLog(AbstractHelperProperties.class);
+    private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
 
     /** TorqueContextProperties */
     protected Properties _buildProperties;
@@ -33,7 +33,7 @@ public abstract class AbstractHelperProperties {
     /**
      * Constructor.
      */
-    public AbstractHelperProperties(Properties prop) {
+    public DfAbstractHelperProperties(Properties prop) {
         _buildProperties = prop;
     }
 
@@ -223,12 +223,12 @@ public abstract class AbstractHelperProperties {
         }
     }
 
-    protected BasicProperties getBasicProperties() {
-        return PropertiesHandler.getInstance().getBasicProperties(getProperties());
+    protected DfBasicProperties getBasicProperties() {
+        return DfPropertiesHandler.getInstance().getBasicProperties(getProperties());
     }
 
-    protected GeneratedClassPackageProperties getGeneratedClassPackageProperties() {
-        return PropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
+    protected DfGeneratedClassPackageProperties getGeneratedClassPackageProperties() {
+        return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
     }
 
     // **********************************************************************************************

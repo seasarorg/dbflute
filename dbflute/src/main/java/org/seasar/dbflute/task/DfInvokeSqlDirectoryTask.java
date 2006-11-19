@@ -20,10 +20,10 @@ import java.util.List;
 
 import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.RunnerInformation;
-import org.seasar.dbflute.helper.jdbc.SqlFileFireMan;
-import org.seasar.dbflute.helper.jdbc.SqlFileGetter;
-import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute;
+import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
 public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
@@ -91,7 +91,7 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
      * @throws BuildException
      */
     public void execute() throws BuildException {
-        final RunnerInformation runInfo = new RunnerInformation();
+        final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
@@ -100,12 +100,12 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
         runInfo.setErrorContinue(DfBuildProperties.getInstance().isInvokeSqlDirectoryErrorContinue());
         runInfo.setRollbackOnly(DfBuildProperties.getInstance().isInvokeSqlDirectoryRollbackOnly());
 
-        final SqlFileFireMan fireMan = new SqlFileFireMan();
-        fireMan.execute(new SqlFileRunnerExecute(runInfo), getSqlFileList());
+        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
+        fireMan.execute(new DfSqlFileRunnerExecute(runInfo), getSqlFileList());
     }
 
     protected List<File> getSqlFileList() {
         final String sqlDirectory = DfBuildProperties.getInstance().getInvokeSqlDirectorySqlDirectory();
-        return new SqlFileGetter().getSqlFileList(sqlDirectory);
+        return new DfSqlFileGetter().getSqlFileList(sqlDirectory);
     }
 }

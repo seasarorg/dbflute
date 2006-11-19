@@ -7,14 +7,14 @@ import java.util.Properties;
  * 
  * @author mkubo
  */
-public final class OtherProperties extends AbstractHelperProperties {
+public final class DfOtherProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
 
     /**
      * Constructor.
      */
-    public OtherProperties(Properties prop) {
+    public DfOtherProperties(Properties prop) {
         super(prop);
     }
 

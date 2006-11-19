@@ -7,14 +7,14 @@ import java.util.Properties;
  * 
  * @author mkubo
  */
-public final class SelectParamProperties extends AbstractHelperProperties {
+public final class DfSelectParamProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
 
     /**
      * Constructor.
      */
-    public SelectParamProperties(Properties prop) {
+    public DfSelectParamProperties(Properties prop) {
         super(prop);
     }
 

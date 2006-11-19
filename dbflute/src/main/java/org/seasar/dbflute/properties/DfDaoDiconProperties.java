@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-public final class DaoDiconProperties extends AbstractHelperProperties {
+public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
 
     /**
      * Constructor.
      */
-    public DaoDiconProperties(Properties prop) {
+    public DfDaoDiconProperties(Properties prop) {
         super(prop);
     }
 

@@ -39,12 +39,12 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dao.SqlTokenizer;
 import org.seasar.dao.parser.SqlTokenizerImpl;
-import org.seasar.dbflute.helper.jdbc.RunnerInformation;
-import org.seasar.dbflute.helper.jdbc.SqlFileFireMan;
-import org.seasar.dbflute.helper.jdbc.SqlFileGetter;
-import org.seasar.dbflute.helper.jdbc.SqlFileRunner;
-import org.seasar.dbflute.helper.jdbc.SqlFileRunnerBase;
-import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute.SQLRuntimeException;
+import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.SQLRuntimeException;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 
 public class DfSql2EntityTask extends DfAbstractTexenTask {
@@ -94,14 +94,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                                   Execute
     //                                                                                   =======
     public void execute() throws BuildException {
-        final RunnerInformation runInfo = new RunnerInformation();
+        final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
 
-        final SqlFileRunner runner = getSqlFileRunner(runInfo);
-        final SqlFileFireMan fireMan = new SqlFileFireMan();
+        final DfSqlFileRunner runner = getSqlFileRunner(runInfo);
+        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.execute(runner, getSqlFileList());
 
         fireSuperExecute();
@@ -147,11 +147,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected List<File> getSqlFileList() {
         final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
-        return new SqlFileGetter().getSqlFileList(sqlDirectory);
+        return new DfSqlFileGetter().getSqlFileList(sqlDirectory);
     }
 
-    protected SqlFileRunner getSqlFileRunner(RunnerInformation runInfo) {
-        return new SqlFileRunnerBase(runInfo) {
+    protected DfSqlFileRunner getSqlFileRunner(DfRunnerInformation runInfo) {
+        return new DfSqlFileRunnerBase(runInfo) {
             protected String filterSql(String sql) {
                 
 //                // TODO: メソッドの引数をなんとしても取る！でも型が取れないなぁ！

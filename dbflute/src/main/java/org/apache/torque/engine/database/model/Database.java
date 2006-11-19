@@ -72,7 +72,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.mapstring.DfMapListString;
 import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
-import org.seasar.dbflute.properties.BasicProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
 
@@ -617,7 +617,7 @@ public class Database {
         return DfBuildProperties.getInstance();
     }
 
-    protected BasicProperties getBasicProperties() {
+    protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
 
