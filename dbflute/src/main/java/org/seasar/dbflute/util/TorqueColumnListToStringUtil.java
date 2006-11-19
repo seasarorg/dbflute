@@ -1,4 +1,4 @@
-package org.apache.torque.helper;
+package org.seasar.dbflute.util;
 
 import java.util.Iterator;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.apache.torque.helper;
+package org.seasar.dbflute;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,10 +15,6 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.apache.torque.helper.stateless.FlPropertyUtil;
-import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyBooleanFormatException;
-import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyIntegerFormatException;
-import org.apache.torque.helper.stateless.FlPropertyUtil.PropertyNotFoundException;
 import org.seasar.dbflute.helper.properties.AdditionalForeignKeyProperties;
 import org.seasar.dbflute.helper.properties.BasicProperties;
 import org.seasar.dbflute.helper.properties.ClassificationProperties;
@@ -29,6 +25,10 @@ import org.seasar.dbflute.helper.properties.OtherProperties;
 import org.seasar.dbflute.helper.properties.PropertiesHandler;
 import org.seasar.dbflute.helper.properties.SelectParamProperties;
 import org.seasar.dbflute.helper.properties.Sql2EntityProperties;
+import org.seasar.dbflute.util.FlPropertyUtil;
+import org.seasar.dbflute.util.FlPropertyUtil.PropertyBooleanFormatException;
+import org.seasar.dbflute.util.FlPropertyUtil.PropertyIntegerFormatException;
+import org.seasar.dbflute.util.FlPropertyUtil.PropertyNotFoundException;
 
 /**
  * Build properties for Torque.

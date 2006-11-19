@@ -5,9 +5,9 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
-import org.apache.torque.helper.TorqueBuildProperties;
-import org.apache.torque.helper.TorqueTaskUtil;
+import org.seasar.dbflute.TorqueBuildProperties;
 import org.seasar.dbflute.helper.properties.BasicProperties;
+import org.seasar.dbflute.util.TorqueTaskUtil;
 
 /**
  * Abstract DB meta texen task for Torque.

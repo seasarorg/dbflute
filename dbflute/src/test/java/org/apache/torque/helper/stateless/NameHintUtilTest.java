@@ -13,6 +13,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.apache.velocity.util.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.seasar.dbflute.util.NameHintUtil;
 
 
 public class NameHintUtilTest {

@@ -1,4 +1,4 @@
-package org.apache.torque.helper.stateless;
+package org.seasar.dbflute.util;
 
 import java.io.File;
 import java.lang.reflect.Constructor;

@@ -1,4 +1,4 @@
-package org.apache.torque.helper.stateful;
+package org.seasar.dbflute.helper.mapstring;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

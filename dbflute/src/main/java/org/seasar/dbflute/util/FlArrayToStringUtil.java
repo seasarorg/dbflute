@@ -1,4 +1,4 @@
-package org.apache.torque.helper.stateless;
+package org.seasar.dbflute.util;
 
 /**
  * Array to String Utility.

@@ -14,7 +14,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.apache.torque.helper.stateless.NameHintUtil;
+import org.seasar.dbflute.util.NameHintUtil;
 
 /**
  * Build properties for Torque.

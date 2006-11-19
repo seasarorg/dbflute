@@ -7,12 +7,12 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.helper.TorqueBuildProperties;
-import org.apache.torque.helper.TorqueTaskUtil;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.ant.TexenTask;
+import org.seasar.dbflute.TorqueBuildProperties;
 import org.seasar.dbflute.helper.properties.BasicProperties;
+import org.seasar.dbflute.util.TorqueTaskUtil;
 
 /**
  * Abstract DB meta texen task for Torque.

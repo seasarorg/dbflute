@@ -1,4 +1,4 @@
-package org.apache.torque.helper.stateless;
+package org.seasar.dbflute.util;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.torque.helper.stateful.FlMapListString;
-import org.apache.torque.helper.stateful.FlMapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.FlMapListString;
+import org.seasar.dbflute.helper.mapstring.FlMapListStringImpl;
 
 /**
  * Property Utility.

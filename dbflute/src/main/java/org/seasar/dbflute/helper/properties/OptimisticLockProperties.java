@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.torque.helper.stateless.NameHintUtil;
+import org.seasar.dbflute.util.NameHintUtil;
 
 /**
  * Build properties for Torque.

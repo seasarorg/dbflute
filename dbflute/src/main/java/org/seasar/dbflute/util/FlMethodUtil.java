@@ -1,4 +1,4 @@
-package org.apache.torque.helper.stateless;
+package org.seasar.dbflute.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -72,8 +72,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.torque.helper.TorqueBuildProperties;
 import org.apache.torque.task.bs.TorqueTask;
+import org.seasar.dbflute.TorqueBuildProperties;
 import org.seasar.dbflute.helper.jdbc.RunnerInformation;
 import org.seasar.dbflute.helper.jdbc.SqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute;

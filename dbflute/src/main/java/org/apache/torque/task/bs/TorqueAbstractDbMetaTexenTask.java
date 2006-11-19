@@ -17,12 +17,12 @@ import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.transform.XmlToAppData;
-import org.apache.torque.helper.TorqueBuildProperties;
-import org.apache.torque.helper.TorqueTaskUtil;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.texen.ant.TexenTask;
+import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.util.TorqueTaskUtil;
 
 /**
  * Abstract DB meta texen task for Torque.

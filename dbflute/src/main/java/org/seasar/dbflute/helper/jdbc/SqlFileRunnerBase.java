@@ -20,9 +20,9 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
-import org.apache.torque.helper.TorqueBuildProperties;
-import org.apache.torque.helper.stateless.FlClassUtil;
+import org.seasar.dbflute.TorqueBuildProperties;
 import org.seasar.dbflute.helper.jdbc.SqlFileRunnerExecute.IORuntimeException;
+import org.seasar.dbflute.util.FlClassUtil;
 
 public abstract class SqlFileRunnerBase implements SqlFileRunner {
 

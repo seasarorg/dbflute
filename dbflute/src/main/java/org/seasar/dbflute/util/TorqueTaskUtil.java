@@ -1,4 +1,4 @@
-package org.apache.torque.helper;
+package org.seasar.dbflute.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.seasar.dbflute.TorqueBuildProperties;
 
 /**
  * Torque task utility.

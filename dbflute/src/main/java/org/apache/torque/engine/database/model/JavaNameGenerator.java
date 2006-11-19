@@ -58,7 +58,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.torque.helper.TorqueBuildProperties;
+import org.seasar.dbflute.TorqueBuildProperties;
 
 /**
  * A <code>NameGenerator</code> implementation for Java-esque names.

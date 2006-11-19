@@ -67,13 +67,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.apache.torque.engine.EngineException;
-import org.apache.torque.helper.TorqueBuildProperties;
-import org.apache.torque.helper.stateful.FlMapListString;
-import org.apache.torque.helper.stateful.FlMapListStringImpl;
-import org.apache.torque.helper.stateless.FlPropertyUtil;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.util.FileUtil;
+import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.helper.mapstring.FlMapListString;
+import org.seasar.dbflute.helper.mapstring.FlMapListStringImpl;
 import org.seasar.dbflute.helper.properties.BasicProperties;
+import org.seasar.dbflute.util.FlPropertyUtil;
 import org.xml.sax.Attributes;
 
 /**
