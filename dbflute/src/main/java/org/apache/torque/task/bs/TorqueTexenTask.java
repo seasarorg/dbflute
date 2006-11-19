@@ -12,7 +12,7 @@ import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.TorqueBuildProperties;
 import org.seasar.dbflute.helper.properties.BasicProperties;
-import org.seasar.dbflute.util.TorqueTaskUtil;
+import org.seasar.dbflute.torque.TorqueTaskUtil;
 
 /**
  * Abstract DB meta texen task for Torque.

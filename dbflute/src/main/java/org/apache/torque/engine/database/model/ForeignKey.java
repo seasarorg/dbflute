@@ -61,7 +61,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.util.TorqueColumnListToStringUtil;
+import org.seasar.dbflute.torque.TorqueColumnListToStringUtil;
 import org.xml.sax.Attributes;
 
 /**

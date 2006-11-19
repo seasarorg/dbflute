@@ -69,8 +69,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.seasar.dbflute.TorqueBuildProperties;
+import org.seasar.dbflute.torque.TorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.FlPropertyUtil;
-import org.seasar.dbflute.util.TorqueColumnListToStringUtil;
 import org.xml.sax.Attributes;
 
 /**

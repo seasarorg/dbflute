@@ -1,4 +1,4 @@
-package org.seasar.dbflute.util;
+package org.seasar.dbflute.torque;
 
 import java.util.Iterator;
 import java.util.List;
