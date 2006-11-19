@@ -60,9 +60,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -83,6 +81,11 @@ import org.apache.xerces.dom.DocumentTypeImpl;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
 
@@ -106,6 +109,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     public static final int IDX_COLUMN_DEFAULT_VALUE = 4;
 
+    // ==============================================================================
+    //                                                                      Attribute
+    //                                                                      =========
+    // ------------------------------------
+    //                        Database Info
+    //                        -------------
     /** Name of XML database schema produced. */
     protected String _xmlSchema;
 
@@ -124,6 +133,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /** DB schema to use. */
     protected String _dbSchema;
 
+    /** Is same java name? */
+    protected boolean _isSameJavaName;
+    
+    // ------------------------------------
+    //                        Document Info
+    //                        -------------
     /** DOM document produced. */
     protected DocumentImpl _doc;
 
@@ -133,18 +148,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /** Hashtable to track what table a column belongs to. */
     protected Hashtable<String, String> _columnTableMap;
 
-    /** Is same java name? */
-    protected boolean _isSameJavaName;
-
-    /** List for except table. */
-    protected List _tableExceptList;
-
-    /** List for target table. */
-    protected List _tableTargetList;
+    // ------------------------------------
+    //                              Handler
+    //                              -------
+    protected DfTableNameHandler _tableNameHandler = new DfTableNameHandler();
+    protected DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
+    protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler();
+    protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
 
     // ==============================================================================
-    //                                                                  Getter Setter
-    //                                                                  =============
+    //                                                                       Accessor
+    //                                                                       ========
     public String getDbSchema() {
         return _dbSchema;
     }
@@ -179,17 +194,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     public boolean isSameJavaName() {
         return this._isSameJavaName;
-    }
-
-    public List<String> getTableExceptList() {
-        return getProperties().getTableExceptList();
-    }
-
-    public List getTableTargetList() {
-        if (_tableTargetList == null) {
-            _tableTargetList = getProperties().listProp("torque.table.target.list", new ArrayList<Object>());
-        }
-        return _tableTargetList;
     }
 
     // ==============================================================================
@@ -235,7 +239,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             _log.error("JDBCToXMLSchema failed: ", e);
             throw new BuildException(e);
         }
-        _log.debug("------------------------------------------------------- [Torque - JDBCToXMLSchema] Finish!");
+        _log.info("------------------------------------------------------- [Torque - JDBCToXMLSchema] Finish!");
     }
 
     /**
@@ -424,140 +428,32 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
-     * <p>
+     * 
      * @param dbMeta JDBC metadata.
      * @param tableName Table from which to retrieve PK information.
      * @return A list of the primary key parts for <code>tableName</code>.
      * @throws SQLException
      */
     protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        final List<String> primaryKeyColumnNameList = new ArrayList<String>();
-        ResultSet parts = null;
-        try {
-            parts = getPrimaryKeyResultSetFromDBMeta(dbMeta, tableName);
-            while (parts.next()) {
-                primaryKeyColumnNameList.add(getPrimaryKeyColumnNameFromDBMeta(parts));
-            }
-        } finally {
-            if (parts != null) {
-                parts.close();
-            }
-        }
-        return primaryKeyColumnNameList;
+        return _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, _dbSchema, tableName);
     }
 
-    protected ResultSet getPrimaryKeyResultSetFromDBMeta(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        return dbMeta.getPrimaryKeys(null, _dbSchema, tableName);
-    }
-
-    protected String getPrimaryKeyColumnNameFromDBMeta(ResultSet resultSet) throws SQLException {
-        return resultSet.getString(4);
-    }
-
-    // {WEBから抜粋}
-    // 
-    //テーブルのインデックスと統計情報の記述を取得します。 NON_UNIQUE、TYPE、INDEX_NAME、ORDINAL_POSITION の順に並べます。
-    //インデックス列の記述には以下のカラムがあります。
-    //
-    //   1. TABLE_CAT String => テーブル カタログ (null の場合もあります)。
-    //   2. TABLE_SCHEM String => テーブル スキーマ (null の場合もあります)。
-    //   3. TABLE_NAME String => テーブル名。
-    //   4. NON_UNIQUE boolean => 一意でないインデックスを許可するかどうか。TYPE が tableIndexStatistic の場合は false。
-    //   5. INDEX_QUALIFIER String => インデックス カタログ (null の場合もあります)。TYPE が tableIndexStatistic の場合は null。
-    //   6. INDEX_NAME String => インデックス名。TYPE が tableIndexStatistic の場合は null。
-    //   7. TYPE short => インデックス タイプ。
-    //          * tableIndexStatistic - テーブルのインデックス記述と共に返されるテーブルの統計情報を識別。
-    //          * tableIndexClustered - クラスタ化されたインデックス。
-    //          * tableIndexHashed - ハッシュ化されたインデックス。
-    //          * tableIndexOther - ほかの形式のインデックス。 
-    //   8. ORDINAL_POSITION short => インデックス内の列の連番。TYPE が tableIndexStatistic の場合は 0。
-    //   9. COLUMN_NAME String => 列名。TYPE が tableIndexStatistic の場合は null。
-    //  10. ASC_OR_DESC String => 列のソート順。"A" => 昇順。"D" => 降順。ソート順をサポートしていない場合は null。TYPE が tableIndexStatistic の場合は null。
-    //  11. CARDINALITY int => TYPE が tableIndexStatistic の場合は、テーブル内の行数。そのほかの場合は、インデックス内の一意の値の数。
-    //  12. PAGES int => TYPE が tableIndexStatistic の場合は、テーブルのページ数。そのほかの場合は、現在のインデックスのページ数。
-    //  13. FILTER_CONDITION String => フィルタがある場合は、そのフィルタの状態 (null の場合もあります)。 
-    //
+    /**
+     * Get unique column name list.
+     * 
+     * @param dbMeta
+     * @param tableName
+     * @return Unique column name list.
+     * @throws SQLException
+     */
     protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta, String tableName)
             throws SQLException {
-        final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMeta, tableName);
-        final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
-
-        ResultSet parts = null;
-        try {
-            parts = dbMeta.getIndexInfo(null, _dbSchema, tableName, true, true);
-            while (parts.next()) {
-                final boolean isNonUnique;
-                {
-                    final String nonUnique = parts.getString(4);
-                    isNonUnique = (nonUnique != null && nonUnique.equals("true") ? true : false);
-                }
-                if (isNonUnique) {
-                    continue;
-                }
-                
-                final String indexType;
-                {
-                    indexType = parts.getString(7);
-                }
-
-                final String columnName = parts.getString(9);
-                if (columnName == null || columnName.trim().length() == 0) {
-                    continue;
-                }
-
-                if (primaryColumnNameList.contains(columnName)) {
-                    continue;
-                }
-                
-                final String indexName = parts.getString(6);
-                final Integer ordinalPosition;
-                {
-                    final String ordinalPositionString = parts.getString(8);
-                    if (ordinalPositionString == null) {
-                        String msg = "The unique columnName should have ordinal-position but null: ";
-                        msg = msg + " columnName=" + columnName + " indexType=" + indexType;
-                        _log.warn(msg);
-                        continue;
-                    }
-                    try {
-                        ordinalPosition = Integer.parseInt(ordinalPositionString);
-                    } catch (NumberFormatException e) {
-                        String msg = "The unique column should have ordinal-position as number but: ";
-                        msg = msg + ordinalPositionString + " columnName=" + columnName + " indexType=" + indexType;
-                        _log.warn(msg);
-                        continue;
-                    }
-                }
-
-                if (uniqueMap.containsKey(indexName)) {
-                    final Map<Integer, String> uniqueElementMap = uniqueMap.get(indexName);
-                    uniqueElementMap.put(ordinalPosition, columnName);
-                } else {
-                    final Map<Integer, String> uniqueElementMap = new LinkedHashMap<Integer, String>();
-                    uniqueElementMap.put(ordinalPosition, columnName);
-                    uniqueMap.put(indexName, uniqueElementMap);
-                }
-            }
-        } finally {
-            if (parts != null) {
-                parts.close();
-            }
-        }
-        return uniqueMap;
+        return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, _dbSchema, tableName);
     }
-
-    protected ResultSet getUniqueIndexInfoResultSetFromDBMeta(DatabaseMetaData dbMeta, String tableName)
-            throws SQLException {
-        return dbMeta.getIndexInfo(null, _dbSchema, tableName, true, true);
-    }
-
-    //    protected String getPrimaryKeyColumnNameFromDBMeta(ResultSet resultSet) throws SQLException {
-    //        return resultSet.getString(4);
-    //    }
 
     /**
      * Get auto-increment column name.
-     * <p>
+     * 
      * @param dbMeta JDBC metadata.
      * @param tableName Table from which to retrieve PK information.
      * @param primaryKeyColumnName Primary-key column-name.
@@ -567,30 +463,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected boolean isAutoIncrementColumn(DatabaseMetaData dbMeta, String tableName, String primaryKeyColumnName,
             Connection conn) throws SQLException {
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT " + primaryKeyColumnName + " FROM " + tableName);
-            final ResultSetMetaData md = rs.getMetaData();
-
-            for (int i = 1; i <= md.getColumnCount(); i++) {
-                final String currentColumnName = md.getColumnName(i);
-                if (primaryKeyColumnName.equals(currentColumnName)) {
-                    return md.isAutoIncrement(i);
-                }
-            }
-        } finally {
-            if (stmt != null) {
-                stmt.close();
-            }
-            if (rs != null) {
-                rs.close();
-            }
-        }
-        String msg = "The primaryKeyColumnName is not found in the table: ";
-        msg = msg + tableName + " - " + primaryKeyColumnName;
-        throw new RuntimeException(msg);
+        return _autoIncrementHandler.isAutoIncrementColumn(dbMeta, tableName, primaryKeyColumnName, conn);
     }
 
     /**
@@ -602,74 +475,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     protected Collection getForeignKeys(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        final Hashtable<String, Object[]> fks = new Hashtable<String, Object[]>();
-        ResultSet foreignKeys = null;
-        try {
-            foreignKeys = dbMeta.getImportedKeys(null, _dbSchema, tableName);
-            while (foreignKeys.next()) {
-                String refTableName = foreignKeys.getString(3);
-                
-                if (isTableExcept(refTableName)) {
-                    continue;
-                }
-                
-                String fkName = foreignKeys.getString(12);
-                // if FK has no name - make it up (use tablename instead)
-                if (fkName == null) {
-                    fkName = refTableName;
-                }
-                Object[] fk = (Object[]) fks.get(fkName);
-                List<String[]> refs;
-                if (fk == null) {
-                    refs = new ArrayList<String[]>();
-                    fk = new Object[2];
-                    fk[0] = refTableName; //referenced table name
-                    fk[1] = refs;
-                    fks.put(fkName, fk);
-                } else {
-                    refs = (List<String[]>) fk[1];
-                }
-                String[] ref = new String[2];
-                ref[0] = foreignKeys.getString(8); //local column
-                ref[1] = foreignKeys.getString(4); //foreign column
-                refs.add(ref);
-            }
-        } finally {
-            if (foreignKeys != null) {
-                foreignKeys.close();
-            }
-        }
-        
-        return filterSameForeignKey(fks).values();
+        return _foreignKeyHandler.getForeignKeys(dbMeta, _dbSchema, tableName);
     }
     
-    protected Map<String, Object[]> filterSameForeignKey(Map<String, Object[]> fks) {
-        final Map<String, Object[]> retFksMap = new LinkedHashMap<String, Object[]>();
-        final Map<Map<String, Object>, Object> checkMap = new LinkedHashMap<Map<String, Object>, Object>();
-        final Set<String> foreignKeyNameSet = fks.keySet();
-        for (String foreinKeyName : foreignKeyNameSet) {
-            final Object[] objArray = fks.get(foreinKeyName);
-            final String refTableName = (String)objArray[0];
-            final List<String[]> refs = (List<String[]>)objArray[1];
-            final Map<String, Object> checkKeyMap = new LinkedHashMap<String, Object>();
-            checkKeyMap.put(refTableName, new Object());
-            for (String[] oneColumnElement : refs) {
-                checkKeyMap.put("localColumn:" + oneColumnElement[0], new Object());
-                checkKeyMap.put("foreignColumn:" + oneColumnElement[1], new Object());
-            }
-            if (checkMap.containsKey(checkKeyMap)) {
-                String msg = "A structural one of the same row already exists.";
-                msg = msg + "The skipped foreign-key name is " + foreinKeyName + ".";
-                msg = msg + " The columns are " + checkKeyMap + ".";
-                _log.warn(msg);
-            } else {
-                checkMap.put(checkKeyMap, new Object());
-                retFksMap.put(foreinKeyName, objArray);
-            }
-        }
-        return retFksMap;
-    }
-
     /**
      * Get all the table names in the current database that are not
      * system tables.
@@ -679,130 +487,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        // /---------------------------------------------------- [My Extension]
-        // Get DatabaseTypes from ContextProperties.
-        // These are the entity types we want from the database
-        final String[] types = getDatabaseTypeStringArray();
-        logDatabaseTypes(types);
-        // -------------------/
-
-        final List<String> tables = new ArrayList<String>();
-        ResultSet resultSet = null;
-        try {
-            resultSet = dbMeta.getTables(null, _dbSchema, "%", types);
-            while (resultSet.next()) {
-                final String tableName = resultSet.getString(3);
-                // final String databaseType = resultSet.getString(4);
-
-                if (isTableExcept(tableName)) {
-                    _log.debug("$ isTableExcept(" + tableName + ") == true");
-                    continue;
-                }
-                tables.add(tableName);
-            }
-        } finally {
-            if (resultSet != null) {
-                resultSet.close();
-            }
-        }
-        return tables;
-    }
-
-    /**
-     * Get database-type-string-array.
-     * 
-     * @return Database-type-string-array.
-     */
-    protected String[] getDatabaseTypeStringArray() {
-        final List<Object> defaultList = new ArrayList<Object>();
-        defaultList.add("TABLE");
-        defaultList.add("VIEW");
-        final List ls = getProperties().listProp("torque.database.type.list", defaultList);
-        final String[] result = new String[ls.size()];
-        for (int i = 0; i < ls.size(); i++) {
-            result[i] = (String) ls.get(i);
-        }
-        return result;
-    }
-
-    /**
-     * Log database-types. {This is a mere helper method.}
-     * 
-     * @param types Database-types. (NotNull)
-     */
-    protected void logDatabaseTypes(String[] types) {
-        String typeString = "";
-        for (int i = 0; i < types.length; i++) {
-            if (i == 0) {
-                typeString = types[i];
-            } else {
-                typeString = typeString + " - " + types[i];
-            }
-        }
-        _log.info("$ DatabaseTypes are '" + typeString + "'");
-    }
-
-    /**
-     * Is table out of sight?
-     * 
-     * @param tableName Table-name.
-     * @return Determination.
-     */
-    public boolean isTableExcept(final String tableName) {
-        if (tableName == null) {
-            throw new NullPointerException("Argument[tableName] is required.");
-        }
-
-        final List targetList = getTableTargetList();
-        if (targetList == null) {
-            throw new IllegalStateException("getTableTargetList() must not return null: + " + tableName);
-        }
-
-        if (!targetList.isEmpty()) {
-            for (final Iterator ite = targetList.iterator(); ite.hasNext();) {
-                final String targetTableHint = (String) ite.next();
-                if (isHitTableHint(tableName, targetTableHint)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        final List exceptList = getTableExceptList();
-        if (exceptList == null) {
-            throw new IllegalStateException("getTableExceptList() must not return null: + " + tableName);
-        }
-
-        for (final Iterator ite = exceptList.iterator(); ite.hasNext();) {
-            final String tableHint = (String) ite.next();
-            if (isHitTableHint(tableName, tableHint)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected boolean isHitTableHint(String tableName, String tableHint) {
-        // TODO: I want to refactor this judgement logic for hint someday.
-        final String prefixMark = "prefix:";
-        final String suffixMark = "suffix:";
-
-        if (tableHint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
-            final String pureTableHint = tableHint.substring(prefixMark.length(), tableHint.length());
-            if (tableName.toLowerCase().startsWith(pureTableHint.toLowerCase())) {
-                return true;
-            }
-        } else if (tableHint.toLowerCase().startsWith(suffixMark.toLowerCase())) {
-            final String pureTableHint = tableHint.substring(suffixMark.length(), tableHint.length());
-            if (tableName.toLowerCase().endsWith(pureTableHint.toLowerCase())) {
-                return true;
-            }
-        } else {
-            if (tableName.equalsIgnoreCase(tableHint)) {
-                return true;
-            }
-        }
-        return false;
+        return _tableNameHandler.getTableNames(dbMeta, _dbSchema);
     }
 
     /**
@@ -821,31 +506,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List getColumns(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        final List<List<Object>> columns = new ArrayList<List<Object>>();
-        ResultSet columnResultSet = null;
-        try {
-            columnResultSet = dbMeta.getColumns(null, _dbSchema, tableName, null);
-            while (columnResultSet.next()) {
-                final String name = columnResultSet.getString(4);
-                final Integer sqlType = new Integer(columnResultSet.getString(5));
-                final Integer size = new Integer(columnResultSet.getInt(7));
-                final Integer nullType = new Integer(columnResultSet.getInt(11));
-                final String defValue = columnResultSet.getString(13);
-
-                final List<Object> col = new ArrayList<Object>(5);
-                col.add(name);
-                col.add(sqlType);
-                col.add(size);
-                col.add(nullType);
-                col.add(defValue);
-                columns.add(col);
-            }
-        } finally {
-            if (columnResultSet != null) {
-                columnResultSet.close();
-            }
-        }
-        return columns;
+        return _columnHandler.getColumns(dbMeta, _dbSchema, tableName);
     }
-
 }
