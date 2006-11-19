@@ -86,15 +86,15 @@
   <taskdef
     name="torque-invoke-replace-schema"
     classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.TorqueInvokeReplaceSchemaTask"/>
+    classname="org.seasar.dbflute.task.DfInvokeReplaceSchemaTask"/>
   <taskdef
     name="torque-invoke-sql-directory"
     classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.TorqueInvokeSqlDirectoryTask"/>
+    classname="org.seasar.dbflute.task.DfInvokeSqlDirectoryTask"/>
   <taskdef
     name="torque-sql2entity"
     classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.TorqueSql2EntityTask"/>
+    classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
 
   <!-- ================================================================ -->
   <!-- M A I N  T A R G E T                                             -->
