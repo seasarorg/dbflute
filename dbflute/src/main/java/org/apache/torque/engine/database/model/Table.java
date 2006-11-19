@@ -70,7 +70,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.seasar.dbflute.TorqueBuildProperties;
 import org.seasar.dbflute.torque.TorqueColumnListToStringUtil;
-import org.seasar.dbflute.util.FlPropertyUtil;
+import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -1686,7 +1686,7 @@ public class Table implements IDMethod {
             return "";
         }
         String result = getDatabase().getSequenceNextSql();
-        result = FlPropertyUtil.convertAll(result, "$$sequenceName$$", sequenceName);
+        result = DfPropertyUtil.convertAll(result, "$$sequenceName$$", sequenceName);
         return result;
     }
 

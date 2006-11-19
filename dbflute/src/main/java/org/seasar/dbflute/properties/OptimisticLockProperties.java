@@ -1,10 +1,10 @@
-package org.seasar.dbflute.helper.properties;
+package org.seasar.dbflute.properties;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.seasar.dbflute.util.NameHintUtil;
+import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
  * Build properties for Torque.
@@ -45,7 +45,7 @@ public final class OptimisticLockProperties extends AbstractHelperProperties {
 
         for (final Iterator ite = exceptList.iterator(); ite.hasNext();) {
             final String tableHint = (String) ite.next();
-            if (NameHintUtil.isHitByTheHint(tableName, tableHint)) {
+            if (DfNameHintUtil.isHitByTheHint(tableName, tableHint)) {
                 return true;
             }
         }

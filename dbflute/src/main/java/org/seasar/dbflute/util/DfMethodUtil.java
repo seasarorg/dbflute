@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
  * 
  * @author kubo
  */
-public class FlMethodUtil {
+public class DfMethodUtil {
 
     // ========================================================================================
     //                                                                Getter Setter Name Method

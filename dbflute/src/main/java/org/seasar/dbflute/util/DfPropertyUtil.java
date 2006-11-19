@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.mapstring.FlMapListString;
-import org.seasar.dbflute.helper.mapstring.FlMapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.DfMapListString;
+import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 
 /**
  * Property Utility.
@@ -22,7 +22,7 @@ import org.seasar.dbflute.helper.mapstring.FlMapListStringImpl;
  * 
  * @author mkubo
  */
-public class FlPropertyUtil {
+public class DfPropertyUtil {
 
     //========================================================================================
     //																				PropGetter
@@ -108,23 +108,23 @@ public class FlPropertyUtil {
     }
 
     public static List<Object> listProp(Properties prop, String key) {
-        final FlMapListString mapListString = new FlMapListStringImpl();
+        final DfMapListString mapListString = new DfMapListStringImpl();
         return mapListString.generateList(stringProp(prop, key));
     }
 
     public static List<Object> listProp(Properties prop, String key, String delimiter) {
-        final FlMapListString mapListString = new FlMapListStringImpl();
+        final DfMapListString mapListString = new DfMapListStringImpl();
         mapListString.setDelimiter(delimiter);
         return mapListString.generateList(stringProp(prop, key));
     }
 
     public static Map<String, Object> mapProp(Properties prop, String key) {
-        final FlMapListString mapListString = new FlMapListStringImpl();
+        final DfMapListString mapListString = new DfMapListStringImpl();
         return mapListString.generateMap(stringProp(prop, key));
     }
 
     public static Map<String, Object> mapProp(Properties prop, String key, String delimiter) {
-        final FlMapListString mapListString = new FlMapListStringImpl();
+        final DfMapListString mapListString = new DfMapListStringImpl();
         mapListString.setDelimiter(delimiter);
         return mapListString.generateMap(stringProp(prop, key));
     }

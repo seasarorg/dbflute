@@ -6,7 +6,7 @@ package org.seasar.dbflute.util;
  * @author kubo
  * @version $Revision$ $Date$ 
  */
-public class FlArrayToStringUtil {
+public class DfArrayToStringUtil {
 
     /**
      * Žw’è‚³‚ê‚½Class-Class”z—ñ‚ðPackage‚Ì–³‚¢Class–¼‚Å

@@ -1,6 +1,6 @@
 package org.seasar.dbflute.util;
 
-public class NameHintUtil {
+public class DfNameHintUtil {
 
     public static final String PREFIX_MARK = "prefix:";
     public static final String SUFFIX_MARK = "suffix:";

@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.properties;
+package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

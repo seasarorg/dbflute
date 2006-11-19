@@ -70,10 +70,10 @@ import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.TorqueBuildProperties;
-import org.seasar.dbflute.helper.mapstring.FlMapListString;
-import org.seasar.dbflute.helper.mapstring.FlMapListStringImpl;
-import org.seasar.dbflute.helper.properties.BasicProperties;
-import org.seasar.dbflute.util.FlPropertyUtil;
+import org.seasar.dbflute.helper.mapstring.DfMapListString;
+import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
+import org.seasar.dbflute.properties.BasicProperties;
+import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -1275,7 +1275,7 @@ public class Database {
                     + "; interbase     =   map:{daoGenDbName=Interbase;    wildCard=%; sequenceNextSql=select gen_id($$sequenceName$$, 1) from RDB$DATABASE    } "
                     + "; default       =   map:{daoGenDbName=Default;      wildCard=%; sequenceNextSql=Unsupported                                              } "
                     + "}";
-            final FlMapListString mapListString = new FlMapListStringImpl();
+            final DfMapListString mapListString = new DfMapListStringImpl();
             mapListString.setDelimiter(";");
             _databaseDefinitionMap = mapListString.generateMap(definition);
         }
@@ -1445,9 +1445,9 @@ public class Database {
     }
 
     public String filterInvokingLogic(String logic) {
-        String tmp = FlPropertyUtil.convertAll(logic, "$$Semicolon$$", ";");
-        tmp = FlPropertyUtil.convertAll(tmp, "$$StartBrace$$", "{");
-        tmp = FlPropertyUtil.convertAll(tmp, "$$EndBrace$$", "}");
+        String tmp = DfPropertyUtil.convertAll(logic, "$$Semicolon$$", ";");
+        tmp = DfPropertyUtil.convertAll(tmp, "$$StartBrace$$", "{");
+        tmp = DfPropertyUtil.convertAll(tmp, "$$EndBrace$$", "}");
         return tmp;
     }
 

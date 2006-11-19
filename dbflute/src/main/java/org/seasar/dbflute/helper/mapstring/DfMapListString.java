@@ -15,7 +15,7 @@ import java.util.Map;
  * </pre>
  * @author jflute
  */
-public interface FlMapListString {
+public interface DfMapListString {
 
     public static final String DEFAULT_MAP_MARK = "map:";
 

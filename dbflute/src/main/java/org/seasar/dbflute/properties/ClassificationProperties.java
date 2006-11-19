@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.properties;
+package org.seasar.dbflute.properties;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -14,7 +14,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.util.NameHintUtil;
+import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
  * Build properties for Torque.
@@ -295,7 +295,7 @@ public final class ClassificationProperties extends AbstractHelperProperties {
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
             for (String columnNameHint : columnClassificationMapKeySet) {
-                if (NameHintUtil.isHitByTheHint(columnName, columnNameHint)) {
+                if (DfNameHintUtil.isHitByTheHint(columnName, columnNameHint)) {
                     return true;
                 }
             }
@@ -314,7 +314,7 @@ public final class ClassificationProperties extends AbstractHelperProperties {
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
             for (String columnNameHint : columnClassificationMapKeySet) {
-                if (NameHintUtil.isHitByTheHint(columnName, columnNameHint)) {
+                if (DfNameHintUtil.isHitByTheHint(columnName, columnNameHint)) {
                     return columnClassificationMap.get(columnNameHint);
                 }
             }

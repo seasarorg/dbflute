@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.properties;
+package org.seasar.dbflute.properties;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,11 +11,11 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.util.FlPropertyUtil;
-import org.seasar.dbflute.util.NameHintUtil;
-import org.seasar.dbflute.util.FlPropertyUtil.PropertyBooleanFormatException;
-import org.seasar.dbflute.util.FlPropertyUtil.PropertyIntegerFormatException;
-import org.seasar.dbflute.util.FlPropertyUtil.PropertyNotFoundException;
+import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.dbflute.util.DfNameHintUtil;
+import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
+import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
+import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 
 /**
  * Build properties for Torque.
@@ -52,7 +52,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected String stringProp(String key) {
         try {
-            return FlPropertyUtil.stringProp(_buildProperties, key);
+            return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -68,7 +68,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected String stringProp(String key, String defaultValue) {
         try {
-            return FlPropertyUtil.stringProp(_buildProperties, key);
+            return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
         } catch (RuntimeException e) {
@@ -85,7 +85,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected boolean booleanProp(String key) {
         try {
-            return FlPropertyUtil.booleanProp(_buildProperties, key);
+            return DfPropertyUtil.booleanProp(_buildProperties, key);
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#booleanProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -101,7 +101,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected boolean booleanProp(String key, boolean defaultValue) {
         try {
-            return FlPropertyUtil.booleanProp(_buildProperties, key);
+            return DfPropertyUtil.booleanProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
         } catch (PropertyBooleanFormatException e) {
@@ -120,7 +120,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected int intProp(String key) {
         try {
-            return FlPropertyUtil.intProp(_buildProperties, key);
+            return DfPropertyUtil.intProp(_buildProperties, key);
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -136,7 +136,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected int intProp(String key, int defaultValue) {
         try {
-            return FlPropertyUtil.intProp(_buildProperties, key);
+            return DfPropertyUtil.intProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
         } catch (PropertyIntegerFormatException e) {
@@ -155,7 +155,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected List<Object> listProp(String key) {
         try {
-            return FlPropertyUtil.listProp(_buildProperties, key, ";");
+            return DfPropertyUtil.listProp(_buildProperties, key, ";");
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -171,7 +171,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected List<Object> listProp(String key, List<Object> defaultValue) {
         try {
-            final List<Object> result = FlPropertyUtil.listProp(_buildProperties, key, ";");
+            final List<Object> result = DfPropertyUtil.listProp(_buildProperties, key, ";");
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -193,7 +193,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected Map<String, Object> mapProp(String key) {
         try {
-            return FlPropertyUtil.mapProp(_buildProperties, key, ";");
+            return DfPropertyUtil.mapProp(_buildProperties, key, ";");
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -209,7 +209,7 @@ public abstract class AbstractHelperProperties {
      */
     final protected Map<String, Object> mapProp(String key, Map<String, Object> defaultValue) {
         try {
-            final Map<String, Object> result = FlPropertyUtil.mapProp(_buildProperties, key, ";");
+            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, ";");
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -263,11 +263,11 @@ public abstract class AbstractHelperProperties {
     //                                                                          String
     //                                                                          ======
     public String filterDoubleQuotation(String str) {
-        return FlPropertyUtil.convertAll(str, "\"", "'");
+        return DfPropertyUtil.convertAll(str, "\"", "'");
     }
 
     public String removeNewLine(String str) {
-        return FlPropertyUtil.removeAll(str, System.getProperty("line.separator"));
+        return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
     }
 
 }

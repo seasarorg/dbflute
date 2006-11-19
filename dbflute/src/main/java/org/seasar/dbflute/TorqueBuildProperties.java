@@ -1,3 +1,18 @@
+/*
+ * Copyright 2004-2006 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute;
 
 import java.sql.Connection;
@@ -15,20 +30,20 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.helper.properties.AdditionalForeignKeyProperties;
-import org.seasar.dbflute.helper.properties.BasicProperties;
-import org.seasar.dbflute.helper.properties.ClassificationProperties;
-import org.seasar.dbflute.helper.properties.DaoDiconProperties;
-import org.seasar.dbflute.helper.properties.GeneratedClassPackageProperties;
-import org.seasar.dbflute.helper.properties.OptimisticLockProperties;
-import org.seasar.dbflute.helper.properties.OtherProperties;
-import org.seasar.dbflute.helper.properties.PropertiesHandler;
-import org.seasar.dbflute.helper.properties.SelectParamProperties;
-import org.seasar.dbflute.helper.properties.Sql2EntityProperties;
-import org.seasar.dbflute.util.FlPropertyUtil;
-import org.seasar.dbflute.util.FlPropertyUtil.PropertyBooleanFormatException;
-import org.seasar.dbflute.util.FlPropertyUtil.PropertyIntegerFormatException;
-import org.seasar.dbflute.util.FlPropertyUtil.PropertyNotFoundException;
+import org.seasar.dbflute.properties.AdditionalForeignKeyProperties;
+import org.seasar.dbflute.properties.BasicProperties;
+import org.seasar.dbflute.properties.ClassificationProperties;
+import org.seasar.dbflute.properties.DaoDiconProperties;
+import org.seasar.dbflute.properties.GeneratedClassPackageProperties;
+import org.seasar.dbflute.properties.OptimisticLockProperties;
+import org.seasar.dbflute.properties.OtherProperties;
+import org.seasar.dbflute.properties.PropertiesHandler;
+import org.seasar.dbflute.properties.SelectParamProperties;
+import org.seasar.dbflute.properties.Sql2EntityProperties;
+import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
+import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
+import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 
 /**
  * Build properties for Torque.
@@ -90,7 +105,7 @@ public final class TorqueBuildProperties {
      */
     final public String stringProp(String key) {
         try {
-            return FlPropertyUtil.stringProp(_buildProperties, key);
+            return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -106,7 +121,7 @@ public final class TorqueBuildProperties {
      */
     final public String stringProp(String key, String defaultValue) {
         try {
-            return FlPropertyUtil.stringProp(_buildProperties, key);
+            return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
         } catch (RuntimeException e) {
@@ -123,7 +138,7 @@ public final class TorqueBuildProperties {
      */
     final public boolean booleanProp(String key) {
         try {
-            return FlPropertyUtil.booleanProp(_buildProperties, key);
+            return DfPropertyUtil.booleanProp(_buildProperties, key);
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#booleanProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -139,7 +154,7 @@ public final class TorqueBuildProperties {
      */
     final public boolean booleanProp(String key, boolean defaultValue) {
         try {
-            return FlPropertyUtil.booleanProp(_buildProperties, key);
+            return DfPropertyUtil.booleanProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
         } catch (PropertyBooleanFormatException e) {
@@ -158,7 +173,7 @@ public final class TorqueBuildProperties {
      */
     final public int intProp(String key) {
         try {
-            return FlPropertyUtil.intProp(_buildProperties, key);
+            return DfPropertyUtil.intProp(_buildProperties, key);
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -174,7 +189,7 @@ public final class TorqueBuildProperties {
      */
     final public int intProp(String key, int defaultValue) {
         try {
-            return FlPropertyUtil.intProp(_buildProperties, key);
+            return DfPropertyUtil.intProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
         } catch (PropertyIntegerFormatException e) {
@@ -193,7 +208,7 @@ public final class TorqueBuildProperties {
      */
     final public List<Object> listProp(String key) {
         try {
-            return FlPropertyUtil.listProp(_buildProperties, key, ";");
+            return DfPropertyUtil.listProp(_buildProperties, key, ";");
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -209,7 +224,7 @@ public final class TorqueBuildProperties {
      */
     final public List<Object> listProp(String key, List<Object> defaultValue) {
         try {
-            final List<Object> result = FlPropertyUtil.listProp(_buildProperties, key, ";");
+            final List<Object> result = DfPropertyUtil.listProp(_buildProperties, key, ";");
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -231,7 +246,7 @@ public final class TorqueBuildProperties {
      */
     final public Map<String, Object> mapProp(String key) {
         try {
-            return FlPropertyUtil.mapProp(_buildProperties, key, ";");
+            return DfPropertyUtil.mapProp(_buildProperties, key, ";");
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -247,7 +262,7 @@ public final class TorqueBuildProperties {
      */
     final public Map<String, Object> mapProp(String key, Map<String, Object> defaultValue) {
         try {
-            final Map<String, Object> result = FlPropertyUtil.mapProp(_buildProperties, key, ";");
+            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, ";");
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -1320,11 +1335,11 @@ public final class TorqueBuildProperties {
     //                                                                          String
     //                                                                          ======
     public String filterDoubleQuotation(String str) {
-        return FlPropertyUtil.convertAll(str, "\"", "'");
+        return DfPropertyUtil.convertAll(str, "\"", "'");
     }
 
     public String removeNewLine(String str) {
-        return FlPropertyUtil.removeAll(str, System.getProperty("line.separator"));
+        return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
     }
 
 }

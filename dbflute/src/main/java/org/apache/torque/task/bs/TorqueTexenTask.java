@@ -11,8 +11,8 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.TorqueBuildProperties;
-import org.seasar.dbflute.helper.properties.BasicProperties;
-import org.seasar.dbflute.torque.TorqueTaskUtil;
+import org.seasar.dbflute.properties.BasicProperties;
+import org.seasar.dbflute.torque.AntTaskUtil;
 
 /**
  * Abstract DB meta texen task for Torque.
@@ -75,7 +75,7 @@ public abstract class TorqueTexenTask extends TexenTask {
             // Initialize torque properties as Properties and set up singleton class that saves 'build.properties'.
             //   This property is used by You. 
             // -------/
-            final Properties prop = TorqueTaskUtil.getBuildProperties(file, super.project);
+            final Properties prop = AntTaskUtil.getBuildProperties(file, super.project);
             TorqueBuildProperties.getInstance().setProperties(prop);
 
         } catch (Exception e) {

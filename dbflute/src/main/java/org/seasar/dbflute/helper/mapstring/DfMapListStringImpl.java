@@ -18,7 +18,7 @@ import java.util.Map;
  * 
  * @author jflute
  */
-public class FlMapListStringImpl implements FlMapListString {
+public class DfMapListStringImpl implements DfMapListString {
 
     /** Line separator. */
     public static final String NEW_LINE = System.getProperty("line.separator");
@@ -47,7 +47,7 @@ public class FlMapListStringImpl implements FlMapListString {
     /** Remainder string. */
     protected String _remainderString;
 
-    public FlMapListStringImpl() {
+    public DfMapListStringImpl() {
         _mapMark = DEFAULT_MAP_MARK;
         _listMark = DEFAULT_LIST_MARK;
         _delimiter = DEFAULT_DELIMITER;
@@ -56,7 +56,7 @@ public class FlMapListStringImpl implements FlMapListString {
         _equal = DEFAULT_EQUAL;
     }
 
-    public FlMapListStringImpl(String mapMark, String listMark, String delimiter) {
+    public DfMapListStringImpl(String mapMark, String listMark, String delimiter) {
         _mapMark = mapMark;
         _listMark = listMark;
         _delimiter = delimiter;
@@ -65,7 +65,7 @@ public class FlMapListStringImpl implements FlMapListString {
         _equal = DEFAULT_EQUAL;
     }
 
-    public FlMapListStringImpl(String mapMark, String listMark, String delimiter, String startBrace, String endBrace,
+    public DfMapListStringImpl(String mapMark, String listMark, String delimiter, String startBrace, String endBrace,
             String equal) {
         _mapMark = mapMark;
         _listMark = listMark;

@@ -13,7 +13,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.apache.velocity.util.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.util.NameHintUtil;
+import org.seasar.dbflute.util.DfNameHintUtil;
 
 
 public class NameHintUtilTest {
@@ -30,10 +30,10 @@ public class NameHintUtilTest {
             e1.printStackTrace();
         }
         
-        Assert.assertTrue(NameHintUtil.isHitByTheHint("XXX_YN", NameHintUtil.SUFFIX_MARK + "_YN"));
-        Assert.assertTrue(NameHintUtil.isHitByTheHint("L_XXX", NameHintUtil.PREFIX_MARK + "L_"));
-        Assert.assertTrue(NameHintUtil.isHitByTheHint("XXX", "XXX"));
-        Assert.assertFalse(NameHintUtil.isHitByTheHint("XXX_YN", NameHintUtil.PREFIX_MARK + "_YN"));
-        Assert.assertFalse(NameHintUtil.isHitByTheHint("L_XXX", NameHintUtil.SUFFIX_MARK + "L_"));
+        Assert.assertTrue(DfNameHintUtil.isHitByTheHint("XXX_YN", DfNameHintUtil.SUFFIX_MARK + "_YN"));
+        Assert.assertTrue(DfNameHintUtil.isHitByTheHint("L_XXX", DfNameHintUtil.PREFIX_MARK + "L_"));
+        Assert.assertTrue(DfNameHintUtil.isHitByTheHint("XXX", "XXX"));
+        Assert.assertFalse(DfNameHintUtil.isHitByTheHint("XXX_YN", DfNameHintUtil.PREFIX_MARK + "_YN"));
+        Assert.assertFalse(DfNameHintUtil.isHitByTheHint("L_XXX", DfNameHintUtil.SUFFIX_MARK + "L_"));
     }       
 }
