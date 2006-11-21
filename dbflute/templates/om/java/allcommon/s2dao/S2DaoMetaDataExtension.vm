@@ -2,8 +2,12 @@ package ${glPackageBaseCommonS2Dao};
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+#if ($database.isAvailableGenerics())
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+#end
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;

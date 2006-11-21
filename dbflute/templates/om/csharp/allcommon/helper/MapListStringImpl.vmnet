@@ -216,7 +216,7 @@ namespace ${glPackageBaseCommonHelper}
                     return;
                 }
 
-                // *** この時点で残りの文字列はマップ要素のキー値で始まる。 ***
+                // *** Now, _remainderString should starts with the key of the map. ***
 
                 int equalIndex = _remainderString.IndexOf(_equal);
                 assertEqualIndex(_remainderString, equalIndex, _topString, currentMap);
@@ -224,7 +224,7 @@ namespace ${glPackageBaseCommonHelper}
                 removePrefixTargetIndexPlus(equalIndex, _equal.Length);
                 removeBothSideSpaceAndTabAndNewLine();
 
-                // *** この時点で残りの文字列はマップ要素のバリュー値で始まる。 ***
+                // *** Now, _remainderString should starts with the value of the map. ***
 
                 if (isStartsWithMapPrefix(_remainderString))
                 {
@@ -252,23 +252,25 @@ namespace ${glPackageBaseCommonHelper}
                 int endBraceIndex = _remainderString.IndexOf(_endBrace);
                 assertEndBracekIndex(_remainderString, endBraceIndex, _topString, currentMap);
 
-                // デリミタが存在して、かつ、デリミタが中括弧閉じよりも近い場合、
-                // 現在の残りの文字列の先頭からデリミタまでがマップバリューとなる。→ ex) value1,key2=value2}
+                // If delimiter exists and delimiter is closer than end brace, 
+                // Everything from the head of the present remainder string to the delimiter becomes map value.
+                //   ex) value1,key2=value2}
                 if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex)
                 {
                     string mapValue = _remainderString.Substring(0, delimiterIndex);
                     currentMap.Add(mapKey, filterMapListValue(mapValue));
 
-                    // デリミタ以降にマップ要素が続くので、デリミタを飛ばしてコンティニュー！
+                    // Because the map element continues since the delimiter, skip the delimiter and continue the loop.
                     removePrefixTargetIndexPlus(delimiterIndex, _delimiter.Length);
                     continue;
                 }
 
-                // 現在の残りの文字列の先頭から中括弧閉じまでがマップバリューとなる。→ ex) value1}, key2=value2}
+                // Everything from the head of the present remainder string to the delimiter becomes map value.
+                //   ex) value1}, key2=value2}
                 string mapValue2 = _remainderString.Substring(0, endBraceIndex);
                 currentMap.Add(mapKey, filterMapListValue(mapValue2));
 
-                // 現状のマップ要素解析は終了とするためリターン！with クロージング処理
+                // Analyzing map is over. So closing and return.
                 closingByEndBraceIndex(endBraceIndex);
                 return;
             }
@@ -283,7 +285,7 @@ namespace ${glPackageBaseCommonHelper}
                     return;
                 }
 
-                // *** この時点で残りの文字列はリスト要素のバリュー値で始まる。 ***
+                // *** Now, _remainderString should starts with the value of the list. ***
 
                 if (isStartsWithMapPrefix(_remainderString))
                 {
@@ -311,23 +313,25 @@ namespace ${glPackageBaseCommonHelper}
                 int endBraceIndex = _remainderString.IndexOf(_endBrace);
                 assertEndBraceIndex(_remainderString, endBraceIndex, _topString, currentList);
 
-                // デリミタが存在して、かつ、デリミタが中括弧閉じよりも近い場合、
-                // 現在の残りの文字列の先頭からデリミタまでがリストバリューとなる。→ ex) value1,value2,value3}
+                // If delimiter exists and delimiter is closer than end brace, 
+                // Everything from the head of the present remainder string to the delimiter becomes list value.
+                //   ex) value1,value2,value3}
                 if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex)
                 {
                     string listValue = _remainderString.Substring(0, delimiterIndex);
                     currentList.Add(filterMapListValue(listValue));
 
-                    // デリミタ以降にリスト要素が続くので、デリミタを飛ばしてコンティニュー！
+                    // Because the list element continues since the delimiter, skip the delimiter and continue the loop.
                     removePrefixTargetIndexPlus(delimiterIndex, _delimiter.Length);
                     continue;
                 }
 
-                // 現在の残りの文字列の先頭から中括弧閉じまでがリストバリューとなる。→ ex) value1}, value2, }
+                // Everything from the head of the present remainder string to the delimiter becomes list value.
+                //   ex) value1}, value2, }
                 string listValue2 = _remainderString.Substring(0, endBraceIndex);
                 currentList.Add(filterMapListValue(listValue2));
 
-                // 現状のマップ要素解析は終了とするためリターン！with クロージング処理
+                // Analyzing list is over. So closing and return.
                 closingByEndBraceIndex(endBraceIndex);
                 return;
             }
@@ -338,17 +342,17 @@ namespace ${glPackageBaseCommonHelper}
          */
         protected bool initializeAtLoopBeginning()
         {
-            // 先頭のデリミタは全て除去する。
-            //   - 戻り値は内部的に必ずトリムされる。
+            // Remove prefix delimiter. (Result string is always trimmed.)
             removePrefixAllDelimiter();
 
-            // 残りの文字列が空文字ならば、全ての解析が終了なのでリターン！
+            // If the remainder string is empty-string, Analyzing is over!
             if (_remainderString.Equals(""))
             {
                 return true;
             }
 
-            // 残りの文字列が中括弧閉じで始まるならば、現状のマップ要素解析が終了なのでリターン！
+            // If the remainder string starts with end-brace, Analyzing current map is over!
+            // And then remove the end-brace.
             if (isStartsWithEndBrace(_remainderString))
             {
                 removePrefixEndBrace();
@@ -362,7 +366,7 @@ namespace ${glPackageBaseCommonHelper}
          */
         protected bool closingAfterParseNestMapList()
         {
-            // 中括弧閉じで始まっている場合、それを除去して残りの文字列として設定する。
+            // If the remainder string starts with end-brace, remove it and return true.
             if (isStartsWithEndBrace(_remainderString))
             {
                 removePrefixEndBrace();
@@ -373,7 +377,7 @@ namespace ${glPackageBaseCommonHelper}
 
         protected void closingByEndBraceIndex(int endBraceIndex)
         {
-            // 残りの文字列の先頭から解析済みのバリューと中括弧閉じを除去する。
+            // Remove the value that was finished analyzing and end-brace.
             _remainderString = _remainderString.Substring(endBraceIndex);
             removePrefixEndBrace();
         }

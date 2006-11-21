@@ -467,12 +467,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ls Entity list of main table. (NotNull)
      */
     public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls) {
-        final ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition = new ReffererCondition${refferer.ReffererPropertyNameInitCap}() {
+        final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
             public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName}) {
                 ${glAttachedCBArgsVariableName}.addOrderBy_PK_Asc();// Default OrderBy for Refferer.
             }
         };
-        load${refferer.ReffererPropertyNameInitCap}(ls, reffererCondition);
+        load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
     }
 
     /**
@@ -485,21 +485,21 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
      *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
-     *     final ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition = new ReffererCondition${refferer.ReffererPropertyNameInitCap}() {
+     *     final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
      *         public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName}) {
      *             ${glAttachedCBArgsVariableName}.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
      *         }
      *     };
-     *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls, reffererCondition);
+     *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
      * 
      * </pre>
      * 
      * @param ls Entity list of main table. (NotNull)
-     * @param reffererCondition Refferer condition instance for registering refferer condition. (NotNull)
+     * @param cbSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
      */
-    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition) {
+    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ${reffererBhvClassName}.CBSetupper cbSetupper) {
         assertObjectNotNull("ls", ls);
-        assertObjectNotNull("reffererCondition", reffererCondition);
+        assertObjectNotNull("cbSetupper", cbSetupper);
         if (ls.isEmpty()) {
             return;
         }
@@ -515,7 +515,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         final ${reffererCBClassName} ${glAttachedCBArgsVariableName} = reffererBhv.newMyConditionBean();
         ${glAttachedCBArgsVariableName}.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
         ${glAttachedCBArgsVariableName}.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-        reffererCondition.setup(${glAttachedCBArgsVariableName});
+        cbSetupper.setup(${glAttachedCBArgsVariableName});
         final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.delegateSelectList(${glAttachedCBArgsVariableName});
 
         final java.util.Map${database.filterGenericsString(${genericPKChildListMap})} pkReffererListMap;
@@ -540,14 +540,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * The interface of refferer condition for ${refferer.ReffererPropertyName}.
+     * 
+     * @deprecated Not for public use in the future. Please use ${reffererBhvClassName}.CBSetupper.
      */
-    public static interface ReffererCondition${refferer.ReffererPropertyNameInitCap} {
-        /**
-         * Set up refferer condition.
-         * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean for refferer. (NotNull)
-         */
-        public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName});
+    public static interface ReffererCondition${refferer.ReffererPropertyNameInitCap} extends ${reffererBhvClassName}.CBSetupper {
     }
   #end
 #end
@@ -785,4 +781,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 #end
 
+    // =====================================================================================
+    //                                                                            CBSetupper
+    //                                                                            ==========
+    /**
+     * The interface of condition-bean setupper.
+     */
+    public static interface CBSetupper {
+        /**
+         * Set up condition.
+         * 
+         * @param cb Condition-bean. (NotNull)
+         */
+        public void setup(${myConditionBeanClassName} cb);
+    }
 }

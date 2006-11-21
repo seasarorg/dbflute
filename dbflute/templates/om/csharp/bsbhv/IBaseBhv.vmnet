@@ -251,48 +251,19 @@ namespace ${glPackageExtendedBhv} {
         //   ReffererProperty = [${refferer.ReffererPropertyName}]
         // * * * * * * * * */
 
-        /**
-         * Load refferer of ${refferer.ReffererPropertyName}.
-         * 
-         * Default refferer order-by is 'primary-key asc'.
-         * <pre>
-         *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
-         * 
-         *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
-         *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
-         *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
-         *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
-         *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls);
-         * 
-         * </pre>
-         * 
-         * @param ls Entity list of main table. (NotNull)
-         */
+        /// <summary>
+        /// Load refferer of ${refferer.ReffererPropertyName}.
+        /// Default refferer condition is 'primary-key asc'.
+        /// </summary>
+        /// <param name="ls">Entity list of main table. (NotNull)</param>
         void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.IList ls);
 
-        /**
-         * Load refferer of ${refferer.ReffererPropertyName}.
-         * 
-         * <pre>
-         *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
-         * 
-         *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
-         *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
-         *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
-         *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
-         *     final ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition = new ReffererCondition${refferer.ReffererPropertyNameInitCap}() {
-         *         public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName}) {
-         *             ${glAttachedCBArgsVariableName}.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-         *         }
-         *     };
-         *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls, reffererCondition);
-         * 
-         * </pre>
-         * 
-         * @param ls Entity list of main table. (NotNull)
-         * @param reffererCondition Refferer order-by instance for registering refferer order-by. (NotNull)
-         */
-        void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.IList ls, ${table.JavaName}ReffererCondition${refferer.ReffererPropertyNameInitCap} reffererCondition);
+        /// <summary>
+        /// Load refferer of ${refferer.ReffererPropertyName}.
+        /// </summary>
+        /// <param name="ls">Entity list of main table. (NotNull)</param>
+        /// <param name="cbSetupper">Refferer condition-bean setupper instance for registering refferer condition. (NotNull)</param>
+        void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.IList ls, ${reffererTable.JavaName}CBSetupper cbSetupper);
   #end
 
         #endregion
@@ -429,6 +400,30 @@ namespace ${glPackageExtendedBhv} {
         #endregion
     }
 
+    /// <summary>
+    /// The interface of CBSetupper.
+    /// </summary>
+    public interface ${table.JavaName}CBSetupper {
+        /// <summary>
+        /// Set up condition.
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        void Setup(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+    }
+
+    /// <summary>
+    /// The implementation of CBSetupper. {order by PK Asc}
+    /// </summary>
+    public class ${table.JavaName}CBSetupperPKAsc : ${table.JavaName}CBSetupper {
+        /// <summary>
+        /// Set up condition.
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        public void Setup(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+            ${glAttachedCBArgsVariableName}.AddOrderBy_PK_Asc();
+        }
+    }
+
 #if (${table.hasOnlyOnePrimaryKey()})
   #foreach ($refferer in $table.Referrers)
     #set ($reffererTable = $refferer.Table)
@@ -440,16 +435,8 @@ namespace ${glPackageExtendedBhv} {
     #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
     #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List${database.filterGenericsString(${reffererEntityClassName})}")
 
-    /**
-     * The interface of refferer order-by for ${refferer.ReffererPropertyName}.
-     */
-    public interface ${table.JavaName}ReffererCondition${refferer.ReffererPropertyNameInitCap} {
-        /**
-         * Set up refferer order-by.
-         * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean for refferer. (NotNull)
-         */
-        void Setup(${reffererCBClassName} ${glAttachedCBArgsVariableName});
+    [Obsolete("This class is deprecated. Please use ${reffererTable.JavaName}CBSetupper.")]
+    public interface ${table.JavaName}ReffererCondition${refferer.ReffererPropertyNameInitCap} : ${reffererTable.JavaName}CBSetupper {
     }
   #end
 #end

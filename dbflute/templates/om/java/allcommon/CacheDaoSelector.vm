@@ -178,6 +178,7 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
         }
         return (Class)_daoBhvMap.get(getDaoType(dbmeta));
     }
+#end
 
     protected Class getDaoType(${glDBMetaInterfaceName} dbmeta) {
         final String daoTypeName = dbmeta.getDaoTypeName();
@@ -193,7 +194,6 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
         }
         return daoType;
     }
-#end
 #set ($mapGenericDefinition = "Class, ${glDaoReadableInterfaceName}")
 
     protected java.util.Map${database.filterGenericsString(${mapGenericDefinition})} _daoCacheMap;
