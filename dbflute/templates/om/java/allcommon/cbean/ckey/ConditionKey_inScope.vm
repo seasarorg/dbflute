@@ -24,9 +24,10 @@ public class ${myClassName} extends ${glConditionKeyName} {
      * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
+     * @param callerName Caller name. (NotNull)
      * @return Determination.
      */
-    public boolean isValidRegistration(${glConditionValueName} conditionValue, Object value) {
+    public boolean isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
         if (value == null) {
             return false;
         }

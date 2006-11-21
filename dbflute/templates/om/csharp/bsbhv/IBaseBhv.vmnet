@@ -403,7 +403,7 @@ namespace ${glPackageExtendedBhv} {
     /// <summary>
     /// The interface of CBSetupper.
     /// </summary>
-    public interface ${table.JavaName}CBSetupper {
+    public interface ${table.JavaName}CBSetupper : SimpleCBSetupper {
         /// <summary>
         /// Set up condition.
         /// </summary>

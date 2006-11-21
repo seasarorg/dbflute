@@ -26,8 +26,10 @@ namespace ${glPackageBaseCommonCKey} {
          * 
          * @param conditionValue Condition value. (NotNull)
          * @param value Value. (NotNull)
+         * @param callerName Caller name. (NotNull)
+         * @return Determination.
          */
-        public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value) {
+        public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
             if (value == null || isNullableTypeNull(value)) {
                 return false;
             }

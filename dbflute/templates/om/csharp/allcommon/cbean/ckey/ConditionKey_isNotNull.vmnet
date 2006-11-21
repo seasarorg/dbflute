@@ -29,8 +29,10 @@ namespace ${glPackageBaseCommonCKey} {
          * 
          * @param conditionValue Condition value. (NotNull)
          * @param value Value. (NotNull)
+         * @param callerName Caller name. (NotNull)
+         * @return Determination.
          */
-        public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value) {
+        public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
             Object valueObject = conditionValue.IsNotNull;
             if (valueObject != null) {
                 _log.Warn("The value has already registered at " + _conditionKey + ": " + valueObject + " = " + value);

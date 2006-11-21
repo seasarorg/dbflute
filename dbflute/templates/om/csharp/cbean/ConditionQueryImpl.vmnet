@@ -793,7 +793,7 @@ namespace ${glPackageCQ} {
         /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
         /// <returns>this. (NotNull)</returns>
         protected ${myClassName} Register${tmpJavaName}(${glConditionKeyName} key, Object value) {
-            if (key.IsValidRegistration(this.${tmpJavaName}, value)) {
+            if (key.IsValidRegistration(this.${tmpJavaName}, value, key.GetConditionKey() + " of " + GetRealAliasName() + ".${tmpJavaName}")) {
                 key.SetupConditionValue(this.${tmpJavaName}, value, GetLocation(J_${col.JavaName}, key));// If C#, CapProp!
                 GetSqlClause().RegisterWhereClause(GetRealColumnName(COL_${col.Name}), key, this.${tmpJavaName});
             }
@@ -807,7 +807,7 @@ namespace ${glPackageCQ} {
         /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
         /// <returns>this. (NotNull)</returns>
         protected ${myClassName} RegisterInline${tmpJavaName}(${glConditionKeyName} key, Object value) {
-            if (key.IsValidRegistration(this.${tmpJavaName}, value)) {
+            if (key.IsValidRegistration(this.${tmpJavaName}, value, key.GetConditionKey() + " of " + GetRealAliasName() + ".${tmpJavaName}")) {
                 key.SetupConditionValue(this.${tmpJavaName}, value, GetLocation(J_${col.JavaName}, key));// If C#, CapProp!
                 if (IsBaseQuery(this)) {
                     GetSqlClause().RegisterBaseTableInlineWhereClause(COL_${col.Name}, key, this.${tmpJavaName});

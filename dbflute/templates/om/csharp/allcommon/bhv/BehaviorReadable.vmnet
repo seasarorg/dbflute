@@ -322,4 +322,10 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
     }
+
+    /// <summary>
+    /// The marker interface of simple condition-bean setupper.
+    /// </summary>
+    public interface SimpleCBSetupper {
+    }
 }

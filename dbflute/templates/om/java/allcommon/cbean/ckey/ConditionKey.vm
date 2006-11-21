@@ -79,9 +79,10 @@ public abstract class ${myClassName} {
      * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
+     * @param callerName Caller name. (NotNull)
      * @return Determination.
      */
-    abstract public boolean isValidRegistration(${glConditionValueName} conditionValue, Object value);
+    abstract public boolean isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName);
 
     /**
      * Add where clause.

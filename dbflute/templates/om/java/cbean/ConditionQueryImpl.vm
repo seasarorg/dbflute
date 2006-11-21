@@ -1010,7 +1010,7 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @return this. (NotNull)
      */
     protected ${myClassName} register${tmpJavaName}(${glConditionKeyName} key, Object value) {
-        if (key.isValidRegistration(get${tmpJavaName}(), value)) {
+        if (key.isValidRegistration(get${tmpJavaName}(), value, key.getConditionKey() + " of " + getRealAliasName() + ".${tmpJavaName}")) {
             key.setupConditionValue(get${tmpJavaName}(), value, getLocation(UJ_${col.UncapitalisedJavaName}, key));// If Java, UncapProp!
             getSqlClause().registerWhereClause(getRealColumnName(COL_${col.Name}), key, get${tmpJavaName}());
         }
@@ -1025,7 +1025,7 @@ public class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @return this. (NotNull)
      */
     protected ${myClassName} registerInline${tmpJavaName}(${glConditionKeyName} key, Object value) {
-        if (key.isValidRegistration(get${tmpJavaName}(), value)) {
+        if (key.isValidRegistration(get${tmpJavaName}(), value, key.getConditionKey() + " of " + getRealAliasName() + ".${tmpJavaName}")) {
             key.setupConditionValue(get${tmpJavaName}(), value, getLocation(UJ_${col.UncapitalisedJavaName}, key));// If Java, UncapProp!
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(COL_${col.Name}, key, get${tmpJavaName}());
