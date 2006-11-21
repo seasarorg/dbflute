@@ -787,7 +787,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * The interface of condition-bean setupper.
      */
-    public static interface CBSetupper {
+    public static interface CBSetupper extends SimpleCBSetupper {
         /**
          * Set up condition.
          * 

@@ -328,4 +328,10 @@ public interface ${glBehaviorReadableInterfaceName} {
             }
         }
     }
+
+    /**
+     * The marker interface of simple condition-bean setupper.
+     */
+    public static interface SimpleCBSetupper {
+    }
 }
