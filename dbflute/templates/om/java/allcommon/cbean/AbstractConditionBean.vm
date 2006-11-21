@@ -315,6 +315,83 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // =====================================================================================
+    //                                                                          Limit Select
+    //                                                                          ============
+    /** Is limit-select PK only? */
+    protected boolean _isLimitSelectPKOnly;
+
+    /**
+     * Is limit-select PK only?
+     * 
+     * @return Determination.
+     */
+    public boolean isLimitSelect_PKOnly() {
+        return _isLimitSelectPKOnly;
+    }
+
+    /**
+     * Limit select PK only.
+     *
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} limitSelect_PKOnly() {
+        _isLimitSelectPKOnly = true;
+        return this;
+    }
+
+    /**
+     * Limit select off.
+     *
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} limitSelect_Off() {
+        _isLimitSelectPKOnly = false;
+        return this;
+    }
+    // ------------------------------
+    //                   for Internal
+    //                   ------------
+    /**
+     * Set up various things for select-count-ignore-fetch-scope.
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} setupSelectCountIgnoreFetchScope() {
+        _isSelectCountIgnoreFetchScope = true;
+        getSqlClause().ignoreOrderBy();
+        getSqlClause().ignoreFetchScope();
+        return this;
+    }
+
+    /**
+     * Do after-care for select-count-ignore-fetch-scope.
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} afterCareSelectCountIgnoreFetchScope() {
+        _isSelectCountIgnoreFetchScope = false;
+        getSqlClause().makeOrderByEffective();
+        getSqlClause().makeFetchScopeEffective();
+        return this;
+    }
+
+    /** Is set up various things for select-count-ignore-fetch-scope? */
+    protected boolean _isSelectCountIgnoreFetchScope;
+
+    /**
+     * Is set up various things for select-count-ignore-fetch-scope?
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return Determination.
+     */
+    public boolean isSelectCountIgnoreFetchScope() {
+        return _isSelectCountIgnoreFetchScope;
+    }
+
+
+    // =====================================================================================
     //                                                                               Advance
     //                                                                               =======
     /**

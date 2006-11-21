@@ -1,5 +1,8 @@
 package ${glPackageBaseCommonS2Dao};
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 #if ($database.isSelectQueryTimeoutValid())
 
@@ -14,6 +17,9 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.impl.BasicSelectHandler;
 
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+
 /**
  * My-SelectDynamicCommand.
  * Overrides original class 'SelectDynamicCommand'.
@@ -27,17 +33,17 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
 #end
 
-    /** Select clause. */
-    private String _selectClause;
-
-    /** Select clause PK only. */
-    private String _selectClausePKOnly;
-
     /** Result-set handler. */
     private ResultSetHandler resultSetHandler;
 
     /** Result-set factory. */
     private ResultSetFactory resultSetFactory;
+
+    /** Cache of select clause command. */
+    protected ${glSelectDynamicCommand} _selectClauseCommand;
+
+    /** Cache of select clause PK-only command. */
+    protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
 
     /**
      * Constructor.
@@ -57,13 +63,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         this.resultSetFactory = resultSetFactory;
     }
 
-    /**
-     * Get select clause.
-     * 
-     * @return Select clause. (Nullable)
-     */
-    public String getSelectClause() {
-        return _selectClause;
+    public CommandContext doApply(Object[] args) {
+        return apply(args);
     }
 
     /**
@@ -73,17 +74,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      * @return this. (NotNull)
      */
     public ${glSelectDynamicCommand} setSelectClause(String value) {
-        _selectClause = value;
+        _selectClauseCommand = createMySelectDynamicCommand();
+        _selectClauseCommand.setSql(value);
         return this;
-    }
-
-    /**
-     * Get select clause PK only.
-     * 
-     * @return Select clause PK only. (Nullable)
-     */
-    public String getSelectClausePKOnly() {
-        return _selectClausePKOnly;
     }
 
     /**
@@ -93,12 +86,75 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      * @return this. (NotNull)
      */
     public ${glSelectDynamicCommand} setSelectClausePKOnly(String value) {
-        _selectClausePKOnly = value;
+        _selectClausePKOnlyCommand = createMySelectDynamicCommand();
+        _selectClausePKOnlyCommand.setSql(value);
         return this;
     }
 
+    protected ${glSelectDynamicCommand} createMySelectDynamicCommand() {
+        return new ${glSelectDynamicCommand}(getDataSource(), getStatementFactory(), resultSetHandler, resultSetFactory);
+    }
+
     public Object execute(Object[] args) {
-        CommandContext ctx = apply(args);
+        if (!${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+            return super.execute(args);
+        }
+        assertSelectClauseCommand();
+        final List<Object> bindVariableList = new ArrayList<Object>();
+        final List<Class> bindVariableTypeList = new ArrayList<Class>();
+
+        final StringBuffer sb = new StringBuffer();
+        sb.append(setupRealSelectClause(args, bindVariableList, bindVariableTypeList));
+        sb.append(" ");
+        sb.append(setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList));
+
+        BasicSelectHandler selectHandler = createBasicSelectHandler(sb.toString());
+        selectHandler.setFetchSize(-1);
+
+        return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
+    }
+
+    protected String setupRealSelectClause(Object[] args, List<Object> bindVariableList,
+            List<Class> bindVariableTypeList) {
+        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        if (cb.isSelectCountIgnoreFetchScope()) {
+            return "select count(*)";
+        }
+        final String realSelectClause;
+        {
+            final CommandContext ctx;
+            if (cb.isLimitSelect_PKOnly()) {
+                ctx = _selectClausePKOnlyCommand.doApply(args);
+            } else {
+                ctx = _selectClauseCommand.doApply(args);
+            }
+            realSelectClause = ctx.getSql();
+            final Object[] bindVariables = ctx.getBindVariables();
+            addBindVariableList(bindVariableList, bindVariables);
+            final Class[] bindVariableTypes = ctx.getBindVariableTypes();
+            addBindVariableTypeList(bindVariableTypeList, bindVariableTypes);
+        }
+        return realSelectClause;
+    }
+
+    protected String setupRealFromWhereClause(Object[] args, List<Object> bindVariableList,
+            List<Class> bindVariableTypeList) {
+        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final String realFromWhereClause;
+        {
+            final ${glSelectDynamicCommand} fromWhereCommand = createMySelectDynamicCommand();
+            fromWhereCommand.setSql(cb.getSqlClause().getClause());
+            CommandContext ctx = fromWhereCommand.doApply(args);
+            realFromWhereClause = ctx.getSql();
+            final Object[] bindVariables = ctx.getBindVariables();
+            addBindVariableList(bindVariableList, bindVariables);
+            final Class[] bindVariableTypes = ctx.getBindVariableTypes();
+            addBindVariableTypeList(bindVariableTypeList, bindVariableTypes);
+        }
+        return realFromWhereClause;
+    }
+
+    protected BasicSelectHandler createBasicSelectHandler(String realSql) {
 #if ($database.isSelectQueryTimeoutValid())
 
         final StatementFactory statementFactoryReal = getStatementFactory();
@@ -120,18 +176,39 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                 return statementFactoryReal.createCallableStatement(arg0, arg1);
             }
         };
-        BasicSelectHandler selectHandler = new BasicSelectHandler(
-                getDataSource(), ctx.getSql(), resultSetHandler,
-                statementFactoryWrapper, resultSetFactory);
+        return new BasicSelectHandler(getDataSource(), realSql, resultSetHandler, statementFactoryWrapper, resultSetFactory);
 #else
 
-        BasicSelectHandler selectHandler = new BasicSelectHandler(
-                getDataSource(), ctx.getSql(), resultSetHandler,
-                getStatementFactory(), resultSetFactory);
+        return new BasicSelectHandler(getDataSource(), realSql, resultSetHandler, getStatementFactory(), resultSetFactory);
 #end
 
-        selectHandler.setFetchSize(-1);
-        return selectHandler.execute(ctx.getBindVariables(), ctx
-                .getBindVariableTypes());
+    }
+
+    protected Class[] toClassArray(List<Class> bindVariableTypeList) {
+        final Class[] bindVariableTypesArray = new Class[bindVariableTypeList.size()];
+        for (int i = 0; i < bindVariableTypeList.size(); i++) {
+            final Class bindVariableType = (Class) bindVariableTypeList.get(i);
+            bindVariableTypesArray[i] = bindVariableType;
+        }
+        return bindVariableTypesArray;
+    }
+
+    protected void assertSelectClauseCommand() {
+        if (_selectClauseCommand == null) {
+            String msg = "Select clause command should not be null.";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void addBindVariableList(List<Object> bindVariableList, Object[] bindVariables) {
+        for (Object bindVariable : bindVariables) {
+            bindVariableList.add(bindVariable);
+        }
+    }
+
+    protected void addBindVariableTypeList(List<Class> bindVariableTypeList, Class[] bindVariableTypes) {
+        for (Class bindVariableType : bindVariableTypes) {
+            bindVariableTypeList.add(bindVariableType);
+        }
     }
 }

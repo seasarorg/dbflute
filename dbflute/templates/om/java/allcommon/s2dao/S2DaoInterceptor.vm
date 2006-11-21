@@ -207,43 +207,13 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             return null;
         }
 
-        final ${glSelectDynamicCommand} dynamicCommand = (${glSelectDynamicCommand})cmd;
-        final String selectClause;
-        if (${glAttachedCBArgsVariableName}.isLimitSelect_PKOnly()) {
-            selectClause = dynamicCommand.getSelectClausePKOnly();
-        } else {
-            selectClause = dynamicCommand.getSelectClause();
-        }
-        if (selectClause == null || selectClause.trim().length() == 0) {// The argument is condition-bean, but this method use outer-sql-file...
-            ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(${glAttachedCBArgsVariableName});
-            return null;
-        }
-
         if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
-            // It changes temporarily.
-            //   for NG-sql: select count(*) from (select * from Xxx order by xxx) base;
-            ${glAttachedCBArgsVariableName}.getSqlClause().ignoreOrderBy();
-
-            // It changes temporarily.
-            //   SelectCount with fetch-narrowing is unsupported at DaoGen-Framework.
-            ${glAttachedCBArgsVariableName}.getSqlClause().ignoreFetchScope();
-
-            final String sql;
-            {
-                final String fromWhereOrderByClause = ${glAttachedCBArgsVariableName}.getSqlClause().getClause();
-                sql = selectClause + fromWhereOrderByClause;
-            }
-            dynamicCommand.setSql("select count(*) from (" + sql + ") base");
-            return ${glAttachedCBArgsVariableName};
+            ${glAttachedCBArgsVariableName}.setupSelectCountIgnoreFetchScope();
+        } else {
+            ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         }
 
-        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(${glAttachedCBArgsVariableName});
-        final String sql;
-        {
-            final String fromWhereOrderByClause = ${glAttachedCBArgsVariableName}.getSqlClause().getClause();
-            sql = selectClause + fromWhereOrderByClause;
-        }
-        dynamicCommand.setSql(sql);
+        ${glConditionBeanContextName}.setConditionBeanOnThread(cb);
         return ${glAttachedCBArgsVariableName};
     }
 
@@ -257,13 +227,15 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             ${glFetchNarrowingBeanContextName}.clearFetchNarrowingBeanOnThread();
         }
+        if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+            ${glConditionBeanContextName}.clearConditionBeanOnThread();
+        }
 
         if (${glAttachedCBArgsVariableName} == null) {
             return;
         }
         if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
-            ${glAttachedCBArgsVariableName}.getSqlClause().makeOrderByEffective();// It returns it.
-            ${glAttachedCBArgsVariableName}.getSqlClause().makeFetchScopeEffective();// It returns it.
+            ${glAttachedCBArgsVariableName}.afterCareSelectCountIgnoreFetchScope();
         }
     }
 

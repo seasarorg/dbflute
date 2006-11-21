@@ -98,13 +98,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                          Limit Select
     //                                                                          ============
     /**
-     * Is limit-select PK only?
-     * 
-     * @return Determination.
-     */
-    public boolean isLimitSelect_PKOnly();
-
-    /**
      * Limit select PK only.
      *
      * @return this. (NotNull)
@@ -117,6 +110,40 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} limitSelect_Off();
+
+    /**
+     * Is limit-select PK only?
+     * 
+     * @return Determination.
+     */
+    public boolean isLimitSelect_PKOnly();
+
+    // ------------------------------
+    //                   for Internal
+    //                   ------------
+    /**
+     * Set up various things for select-count-ignore-fetch-scope.
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} setupSelectCountIgnoreFetchScope();
+
+    /**
+     * Do after-care for select-count-ignore-fetch-scope.
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} afterCareSelectCountIgnoreFetchScope();
+
+    /**
+     * Is set up various things for select-count-ignore-fetch-scope?
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return Determination.
+     */
+    public boolean isSelectCountIgnoreFetchScope();
 
     // =====================================================================================
     //                                                                               Advance

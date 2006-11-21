@@ -273,41 +273,6 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     // =====================================================================================
-    //                                                                          Limit Select
-    //                                                                          ============
-    /** Is limit-select PK only? */
-    protected boolean _isLimitSelectPKOnly;
-
-    /**
-     * Is limit-select PK only?
-     * 
-     * @return Determination.
-     */
-    public boolean isLimitSelect_PKOnly() {
-        return _isLimitSelectPKOnly;
-    }
-
-    /**
-     * Limit select PK only.
-     *
-     * @return this. (NotNull)
-     */
-    public ${glConditionBeanInterfaceName} limitSelect_PKOnly() {
-        _isLimitSelectPKOnly = true;
-        return this;
-    }
-
-    /**
-     * Limit select off.
-     *
-     * @return this. (NotNull)
-     */
-    public ${glConditionBeanInterfaceName} limitSelect_Off() {
-        _isLimitSelectPKOnly = false;
-        return this;
-    }
-
-    // =====================================================================================
     //                                                                          Setup Select
     //                                                                          ============
   #foreach ($foreignKeys in $table.ForeignKeys)
