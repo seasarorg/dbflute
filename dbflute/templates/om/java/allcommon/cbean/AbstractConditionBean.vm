@@ -4,6 +4,8 @@ package ${glPackageBaseCommonCBean};
 
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonHelper}.${glMapListStringName};
+import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName}${database.DaoGenDbName};
@@ -32,6 +34,61 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     public ${glSqlClauseName} getSqlClause() {
         return _sqlClause;
+    }
+
+    // =====================================================================================
+    //                                                                    Accept Primary-Key
+    //                                                                    ==================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param primaryKeyMapString Primary-key map. (NotNull and NotEmpty)
+     */
+    public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
+        if (primaryKeyMapString == null) {
+            String msg = "The argument[primaryKeyMapString] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+        final String suffix = MAP_STRING_END_BRACE;
+        if (!primaryKeyMapString.trim().startsWith(prefix)) {
+            primaryKeyMapString = prefix + primaryKeyMapString;
+        }
+        if (!primaryKeyMapString.trim().endsWith(suffix)) {
+            primaryKeyMapString = primaryKeyMapString + suffix;
+        }
+        ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+        mapListString.setMapMark(MAP_STRING_MAP_MARK);
+        mapListString.setListMark(MAP_STRING_LIST_MARK);
+        mapListString.setDelimiter(MAP_STRING_DELIMITER);
+        mapListString.setStartBrace(MAP_STRING_START_BRACE);
+        mapListString.setEndBrace(MAP_STRING_END_BRACE);
+        mapListString.setEqual(MAP_STRING_EQUAL);
+        acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+    }
+
+    protected void checkTypeString(Object value, String propertyName, String typeName) {
+        if (value == null) {
+            throw new IllegalArgumentException("The value should not be null: " + propertyName);
+        }
+        if (!(value instanceof String)) {
+            String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
+            msg = msg + "valueType=" + value.getClass() + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected java.util.Date parseDateString(Object value, String propertyName, String typeName) {
+        checkTypeString(value, propertyName, typeName);
+        try {
+            return java.text.DateFormat.getDateTimeInstance().parse((String)value);
+        } catch (java.text.ParseException e) {
+            String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
+            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+        } catch (RuntimeException e) {
+            String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
+            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+        }
     }
 
     // =====================================================================================

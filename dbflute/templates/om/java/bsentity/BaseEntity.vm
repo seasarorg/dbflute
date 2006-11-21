@@ -11,9 +11,6 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${myDBMetaPackageName}.${myDBMetaClassName};
 
-import ${glPackageBaseCommonHelper}.${glMapListStringName};
-import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
-
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
   #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
@@ -498,8 +495,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
                 if (obj instanceof ${col.JavaNative}) {
                     set${col.JavaName}((${col.JavaNative})obj);
                 } else {
-                    checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-                    set${col.JavaName}((${col.JavaNative})parseDate((String)obj));
+                    set${col.JavaName}((${col.JavaNative})parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}"));
                 }
             }
         }
@@ -545,26 +541,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param primaryKeyMapString Primary-key map-string. (NotNull and NotEmpty)
      */
     public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
-        if (primaryKeyMapString == null) {
-            String msg = "The argument[primaryKeyMapString] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
-        final String suffix = MAP_STRING_END_BRACE;
-        if (!primaryKeyMapString.trim().startsWith(prefix)) {
-            primaryKeyMapString = prefix + primaryKeyMapString;
-        }
-        if (!primaryKeyMapString.trim().endsWith(suffix)) {
-            primaryKeyMapString = primaryKeyMapString + suffix;
-        }
-        ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
-        mapListString.setMapMark(MAP_STRING_MAP_MARK);
-        mapListString.setListMark(MAP_STRING_LIST_MARK);
-        mapListString.setStartBrace(MAP_STRING_START_BRACE);
-        mapListString.setEndBrace(MAP_STRING_END_BRACE);
-        mapListString.setEqual(MAP_STRING_EQUAL);
-        mapListString.setDelimiter(MAP_STRING_DELIMITER);
-        acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+        MapStringUtil.acceptPrimaryKeyMapString(primaryKeyMapString, this);
     }
 
     /**
@@ -600,8 +577,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
                 if (obj instanceof ${col.JavaNative}) {
                     set${col.JavaName}((${col.JavaNative})obj);
                 } else {
-                    checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-                    set${col.JavaName}((${col.JavaNative})parseDate((String)obj));
+                    set${col.JavaName}((${col.JavaNative})parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}"));
                 }
             }
         }
@@ -642,49 +618,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param columnValueMapString Column-value map-string. (NotNull and NotEmpty)
      */
     public void acceptColumnValueMapString(String columnValueMapString) {
-        if (columnValueMapString == null) {
-            String msg = "The argument[columnValueMapString] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
-        final String suffix = MAP_STRING_END_BRACE;
-        if (!columnValueMapString.trim().startsWith(prefix)) {
-            columnValueMapString = prefix + columnValueMapString;
-        }
-        if (!columnValueMapString.trim().endsWith(suffix)) {
-            columnValueMapString = columnValueMapString + suffix;
-        }
-        ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
-        mapListString.setMapMark(MAP_STRING_MAP_MARK);
-        mapListString.setListMark(MAP_STRING_LIST_MARK);
-        mapListString.setStartBrace(MAP_STRING_START_BRACE);
-        mapListString.setEndBrace(MAP_STRING_END_BRACE);
-        mapListString.setEqual(MAP_STRING_EQUAL);
-        mapListString.setDelimiter(MAP_STRING_DELIMITER);
-        acceptColumnValueMap(mapListString.generateMap(columnValueMapString));
+        MapStringUtil.acceptColumnValueMapString(columnValueMapString, this);
     }
 
     protected void checkTypeString(Object value, String propertyName, String typeName) {
-        if (value == null) {
-            throw new IllegalArgumentException("The value should not be null: " + propertyName);
-        }
-        if (!(value instanceof String)) {
-            String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
-            msg = msg + "valueType=" + value.getClass() + " value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
+        MapStringUtil.checkTypeString(value, propertyName, typeName);
     }
 
-    protected java.util.Date parseDate(String value) {
-        try {
-            return java.text.DateFormat.getDateTimeInstance().parse(value);
-        } catch (java.text.ParseException e) {
-            String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-        } catch (RuntimeException e) {
-            String msg = "set${col.JavaName}((${col.JavaNative})java.text.DateFormat.getDateTimeInstance().parse(value))";
-            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-        }
+    protected java.util.Date parseDateString(Object value, String propertyName, String typeName) {
+        return MapStringUtil.parseDateString(value, propertyName, typeName);
     }
 
     // =====================================================================================
@@ -696,11 +638,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Primary-key map-string. (NotNull)
      */
     public String extractPrimaryKeyMapString() {
-        final String startBrace = MAP_STRING_START_BRACE;
-        final String endBrace = MAP_STRING_END_BRACE;
-        final String delimiter = MAP_STRING_DELIMITER;
-        final String equal = MAP_STRING_EQUAL;
-        return extractPrimaryKeyMapString(startBrace, endBrace, delimiter, equal);
+        return MapStringUtil.extractPrimaryKeyMapString(this);
     }
 
     /**
@@ -745,11 +683,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Column-value map-string. (NotNull)
      */
     public String extractColumnValueMapString() {
-        final String startBrace = MAP_STRING_START_BRACE;
-        final String endBrace = MAP_STRING_END_BRACE;
-        final String delimiter = MAP_STRING_DELIMITER;
-        final String equal = MAP_STRING_EQUAL;
-        return extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
+        return MapStringUtil.extractColumnValueMapString(this);
     }
 
     /**
