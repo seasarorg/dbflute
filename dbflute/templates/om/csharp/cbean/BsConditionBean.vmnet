@@ -275,41 +275,6 @@ namespace ${glPackageBaseCB} {
             get { return this.ConditionQuery; }
         }
 
-        // =====================================================================================
-        //                                                                          Limit Select
-        //                                                                          ============
-        /** Is limit-select PK only? */
-        protected bool _isLimitSelectPKOnly;
-
-        /**
-         * Is limit-select PK only?
-         * 
-         * @return Determination.
-         */
-        public override bool IsLimitSelect_PKOnly() {
-            return _isLimitSelectPKOnly;
-        }
-
-        /**
-         * Limit select PK only.
-         *
-         * @return this. (NotNull)
-         */
-        public override ${glConditionBeanInterfaceName} LimitSelect_PKOnly() {
-            _isLimitSelectPKOnly = true;
-            return this;
-        }
-
-        /**
-         * Limit select off.
-         *
-         * @return this. (NotNull)
-         */
-        public override ${glConditionBeanInterfaceName} LimitSelect_Off() {
-            _isLimitSelectPKOnly = false;
-            return this;
-        }
-
 #foreach ($foreignKeys in $table.ForeignKeys)
   #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
   #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")

@@ -437,6 +437,7 @@ namespace ${glPackageExtendedBhv} {
 
     [Obsolete("This class is deprecated. Please use ${reffererTable.JavaName}CBSetupper.")]
     public interface ${table.JavaName}ReffererCondition${refferer.ReffererPropertyNameInitCap} : ${reffererTable.JavaName}CBSetupper {
+        new void Setup(${reffererCBClassName} ${glAttachedCBArgsVariableName});
     }
   #end
 #end

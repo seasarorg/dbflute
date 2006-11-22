@@ -208,26 +208,37 @@ namespace ${glPackageBaseCommonCBean} {
         // =====================================================================================
         //                                                                          Limit Select
         //                                                                          ============
+        /** Is limit-select PK only? */
+        protected bool _isLimitSelectPKOnly;
+
         /**
          * Is limit-select PK only?
          * 
          * @return Determination.
          */
-        abstract public bool IsLimitSelect_PKOnly();
+        public bool IsLimitSelect_PKOnly() {
+            return _isLimitSelectPKOnly;
+        }
 
         /**
          * Limit select PK only.
          *
          * @return this. (NotNull)
          */
-        abstract public ${glConditionBeanInterfaceName} LimitSelect_PKOnly();
+        public ${glConditionBeanInterfaceName} LimitSelect_PKOnly() {
+            _isLimitSelectPKOnly = true;
+            return this;
+        }
 
         /**
          * Limit select off.
          *
          * @return this. (NotNull)
          */
-        abstract public ${glConditionBeanInterfaceName} LimitSelect_Off();
+        public ${glConditionBeanInterfaceName} LimitSelect_Off() {
+            _isLimitSelectPKOnly = false;
+            return this;
+        }
 
         // =====================================================================================
         //                                                                               OrderBy
@@ -430,6 +441,48 @@ namespace ${glPackageBaseCommonCBean} {
         public Object ArgumentBean {
             get { return _argumentBean; }
             set { _argumentBean = value; }
+        }
+
+	    // ------------------------------
+	    //                   for Internal
+	    //                   ------------
+	    /**
+	     * Set up various things for select-count-ignore-fetch-scope.
+	     * This method is for INTERNAL. Don't invoke this!
+	     * 
+	     * @return this. (NotNull)
+	     */
+	    public ${glConditionBeanInterfaceName} SetupSelectCountIgnoreFetchScope() {
+	        _isSelectCountIgnoreFetchScope = true;
+	        this.SqlClause.IgnoreOrderBy();
+	        this.SqlClause.IgnoreFetchScope();
+	        return this;
+		}
+
+	    /**
+	     * Do after-care for select-count-ignore-fetch-scope.
+	     * This method is for INTERNAL. Don't invoke this!
+	     * 
+	     * @return this. (NotNull)
+	     */
+	    public ${glConditionBeanInterfaceName} AfterCareSelectCountIgnoreFetchScope() {
+	        _isSelectCountIgnoreFetchScope = false;
+	        this.SqlClause.MakeOrderByEffective();
+	        this.SqlClause.MakeFetchScopeEffective();
+	        return this;
+		}
+
+	    /** Is set up various things for select-count-ignore-fetch-scope? */
+	    protected bool _isSelectCountIgnoreFetchScope;
+
+	    /**
+	     * Is set up various things for select-count-ignore-fetch-scope?
+	     * This method is for INTERNAL. Don't invoke this!
+	     * 
+	     * @return Determination.
+	     */
+	    public bool IsSelectCountIgnoreFetchScope() {
+            return _isSelectCountIgnoreFetchScope;
         }
     }
 }

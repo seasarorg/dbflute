@@ -113,5 +113,32 @@ namespace ${glPackageBaseCommonCBean} {
 	     * @return this. (NotNUll)
 	     */
         $glConditionBeanInterfaceName LockForUpdate();
+
+	    // ------------------------------
+	    //                   for Internal
+	    //                   ------------
+	    /**
+	     * Set up various things for select-count-ignore-fetch-scope.
+	     * This method is for INTERNAL. Don't invoke this!
+	     * 
+	     * @return this. (NotNull)
+	     */
+	    ${glConditionBeanInterfaceName} SetupSelectCountIgnoreFetchScope();
+
+	    /**
+	     * Do after-care for select-count-ignore-fetch-scope.
+	     * This method is for INTERNAL. Don't invoke this!
+	     * 
+	     * @return this. (NotNull)
+	     */
+	    ${glConditionBeanInterfaceName} AfterCareSelectCountIgnoreFetchScope();
+
+	    /**
+	     * Is set up various things for select-count-ignore-fetch-scope?
+	     * This method is for INTERNAL. Don't invoke this!
+	     * 
+	     * @return Determination.
+	     */
+	    bool IsSelectCountIgnoreFetchScope();
     }
 }

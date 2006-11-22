@@ -56,6 +56,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                         cmd = dynamicCommand;
                         dynamicCommand.SetSelectClause(sqlNormal);
                         dynamicCommand.SetSelectClausePKOnly(sqlPKOnly);
+                        dynamicCommand.ArgNames4Nest = argNames;// Oops!
+                        dynamicCommand.ArgTypes4Nest = argTypes;// Oops!
                     } else {
                         if (typeof(${glSelectResourceInterfaceName}).IsAssignableFrom(argTypes[0])) {
                             String msg = "If the first argument type is select-resource(and not condition-bean), ";

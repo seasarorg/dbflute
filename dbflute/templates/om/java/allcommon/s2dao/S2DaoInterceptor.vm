@@ -179,6 +179,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @return Condition-bean. (Nullable)
      */
     protected ${glConditionBeanInterfaceName} preprocessConditionBean(MethodInvocation invocation, org.seasar.dao.SqlCommand cmd) {
+        clearThreadLocal();
+
         final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName};
         {
             final Object[] args = invocation.getArguments();
@@ -224,18 +226,19 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (Nullable)
      */
     public void postprocessConditionBean(MethodInvocation invocation, ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        clearThreadLocal();
+
+        if (${glAttachedCBArgsVariableName} != null && isSelectCountIgnoreFetchScopeMethod(invocation)) {
+            ${glAttachedCBArgsVariableName}.afterCareSelectCountIgnoreFetchScope();
+        }
+    }
+
+    protected void clearThreadLocal() {
         if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             ${glFetchNarrowingBeanContextName}.clearFetchNarrowingBeanOnThread();
         }
         if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
             ${glConditionBeanContextName}.clearConditionBeanOnThread();
-        }
-
-        if (${glAttachedCBArgsVariableName} == null) {
-            return;
-        }
-        if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
-            ${glAttachedCBArgsVariableName}.afterCareSelectCountIgnoreFetchScope();
         }
     }
 

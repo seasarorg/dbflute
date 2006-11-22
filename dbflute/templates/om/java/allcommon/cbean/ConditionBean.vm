@@ -118,6 +118,19 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public boolean isLimitSelect_PKOnly();
 
+    // =====================================================================================
+    //                                                                               Advance
+    //                                                                               =======
+    /**
+     * Lock for update.
+     * 
+     * If you invoke this, your SQL lock target records for update.
+     * It depends whether this method supports this on the database type.
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} lockForUpdate();
+
     // ------------------------------
     //                   for Internal
     //                   ------------
@@ -144,17 +157,4 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * @return Determination.
      */
     public boolean isSelectCountIgnoreFetchScope();
-
-    // =====================================================================================
-    //                                                                               Advance
-    //                                                                               =======
-    /**
-     * Lock for update.
-     * 
-     * If you invoke this, your SQL lock target records for update.
-     * It depends whether this method supports this on the database type.
-     * 
-     * @return this. (NotNull)
-     */
-    public ${glConditionBeanInterfaceName} lockForUpdate();
 }

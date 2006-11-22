@@ -163,6 +163,8 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @return Condition-bean. (Nullable)
          */
         protected ${glConditionBeanInterfaceName} PreprocessConditionBean(Seasar.Framework.Aop.IMethodInvocation invocation, Seasar.Dao.ISqlCommand cmd) {
+            ClearThreadLocal();
+
             Object[] args = invocation.Arguments;
             if (args == null || !(args.Length >= 1)) {
                 return null;
@@ -188,44 +190,14 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return null;
             }
 
-            ${glSelectDynamicCommand} dynamicCommand = (${glSelectDynamicCommand})cmd;
-            if (dynamicCommand.GetSelectClause() == null) {// The argument is condition-bean, but this method using outer-file-sql...
-                ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})args[0]);
-                return null;
-            }
+	        if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+	            ${glAttachedCBArgsVariableName}.SetupSelectCountIgnoreFetchScope();
+	        } else {
+	            ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread(cb);
+	        }
 
-            if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
-                // It changes temporarily.
-                //   for NG-sql: select count(*) from (select * from Xxx order by xxx) base;
-                ${glAttachedCBArgsVariableName}.SqlClause.IgnoreOrderBy();
-
-                // It changes temporarily.
-                //   SelectCount with fetch-narrowing is unsupported at DaoGen-Framework.
-                ${glAttachedCBArgsVariableName}.SqlClause.IgnoreFetchScope();
-
-                String sql;
-                {
-                    String fromWhereOrderByClause = ${glAttachedCBArgsVariableName}.GetClause();
-                    String selectClause = dynamicCommand.GetSelectClause();
-                    sql = selectClause + fromWhereOrderByClause;
-                }
-                dynamicCommand.Sql = "select count(*) from (" + sql + ") base";
-            } else {
-                ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread(${glAttachedCBArgsVariableName});
-                String sql;
-                {
-                    String fromWhereOrderByClause = ${glAttachedCBArgsVariableName}.GetClause();
-                    String selectClause = null;
-                    if (${glAttachedCBArgsVariableName}.IsLimitSelect_PKOnly()) {
-                        selectClause = dynamicCommand.GetSelectClausePKOnly();
-                    } else {
-                        selectClause = dynamicCommand.GetSelectClause();
-                    }
-                    sql = selectClause + fromWhereOrderByClause;
-                }
-                dynamicCommand.Sql = sql;
-            }
-            return ${glAttachedCBArgsVariableName};
+	        ${glConditionBeanContextName}.SetConditionBeanOnThread(cb);
+	        return ${glAttachedCBArgsVariableName};
         }
 
         /**
@@ -235,9 +207,7 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @param ${glAttachedCBArgsVariableName} Condition-bean. (Nullable)
          */
         public void PostprocessConditionBean(Seasar.Framework.Aop.IMethodInvocation invocation, ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
-                ${glFetchNarrowingBeanContextName}.ClearFetchNarrowingBeanOnThread();
-            }
+            ClearThreadLocal();
 
             if (${glAttachedCBArgsVariableName} == null) {
                 return;
@@ -246,6 +216,15 @@ namespace ${glPackageBaseCommonS2Dao} {
                 ${glAttachedCBArgsVariableName}.SqlClause.MakeOrderByEffective();// It returns it.
                 ${glAttachedCBArgsVariableName}.SqlClause.MakeFetchScopeEffective();// It returns it.
             }
+        }
+
+        protected void ClearThreadLocal() {
+            if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
+                ${glFetchNarrowingBeanContextName}.ClearFetchNarrowingBeanOnThread();
+            }
+	        if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
+	            ${glConditionBeanContextName}.ClearConditionBeanOnThread();
+	        }
         }
 
         /**
