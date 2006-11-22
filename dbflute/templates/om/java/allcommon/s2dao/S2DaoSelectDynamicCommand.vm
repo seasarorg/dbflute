@@ -164,6 +164,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         final String realFromWhereClause;
         {
             final ${glSelectDynamicCommand} fromWhereCommand = createMySelectDynamicCommand();
+            fromWhereCommand.setArgNames(getArgNames());
+            fromWhereCommand.setArgTypes(getArgTypes());
             fromWhereCommand.setSql(cb.getSqlClause().getClause());
             CommandContext ctx = fromWhereCommand.doApply(args);
             realFromWhereClause = ctx.getSql();

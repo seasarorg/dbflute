@@ -26,11 +26,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         private IDataReaderHandler dataReaderHandler;
         private IDataReaderFactory dataReaderFactory;
 
-	    /** Cache of select clause command. */
-	    protected ${glSelectDynamicCommand} _selectClauseCommand;
+        /** Cache of select clause command. */
+        protected ${glSelectDynamicCommand} _selectClauseCommand;
 
-	    /** Cache of select clause PK-only command. */
-	    protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
+        /** Cache of select clause PK-only command. */
+        protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
 
         /**
          * Constructor.
@@ -47,15 +47,15 @@ namespace ${glPackageBaseCommonS2Dao} {
                 this.dataReaderFactory = dataReaderFactory;
         }
 
-	    /**
-	     * Do apply. {for delegating to apply()}
-	     * 
-	     * @param args Arguments. (NotNull)
-	     * @return Command context. (NotNull)
-	     */
-	    public ICommandContext DoApply(Object[] args) {
-	        return Apply(args);
-	    }
+        /**
+         * Do apply. {for delegating to apply()}
+         * 
+         * @param args Arguments. (NotNull)
+         * @return Command context. (NotNull)
+         */
+        public ICommandContext DoApply(Object[] args) {
+            return Apply(args);
+        }
 
         /**
          * Set select clause.
@@ -64,8 +64,8 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @return this. (NotNull)
          */
         public ${glSelectDynamicCommand} SetSelectClause(String value) {
-	        _selectClauseCommand = CreateMySelectDynamicCommand();
-	        _selectClauseCommand.Sql = value;
+            _selectClauseCommand = CreateMySelectDynamicCommand();
+            _selectClauseCommand.Sql = value;
             return this;
         }
 
@@ -76,14 +76,14 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @return this. (NotNull)
          */
         public ${glSelectDynamicCommand} SetSelectClausePKOnly(String value) {
-	        _selectClausePKOnlyCommand = CreateMySelectDynamicCommand();
-	        _selectClausePKOnlyCommand.Sql = value;
+            _selectClausePKOnlyCommand = CreateMySelectDynamicCommand();
+            _selectClausePKOnlyCommand.Sql = value;
             return this;
         }
 
-	    protected ${glSelectDynamicCommand} CreateMySelectDynamicCommand() {
-	        return new ${glSelectDynamicCommand}(DataSource, CommandFactory, dataReaderHandler, dataReaderFactory);
-	    }
+        protected ${glSelectDynamicCommand} CreateMySelectDynamicCommand() {
+            return new ${glSelectDynamicCommand}(DataSource, CommandFactory, dataReaderHandler, dataReaderFactory);
+        }
 
         public string[] ArgNames4Nest {
             set {
@@ -108,18 +108,18 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         public override object Execute(object[] args) {
-	        if (!${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
-	            return base.Execute(args);
-	        }
-	        AssertSelectClauseCommand();
-	        IList<Object> bindVariableList = new List<Object>();
-	        IList<Type> bindVariableTypeList = new List<Type>();
-	        IList<String> bindVariableNameList = new List<String>();
+            if (!${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
+                return base.Execute(args);
+            }
+            AssertSelectClauseCommand();
+            IList<Object> bindVariableList = new List<Object>();
+            IList<Type> bindVariableTypeList = new List<Type>();
+            IList<String> bindVariableNameList = new List<String>();
 
-	        StringBuilder sb = new StringBuilder();
-	        sb.Append(SetupRealSelectClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
-	        sb.Append(" ");
-	        sb.Append(SetupRealFromWhereClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
+            StringBuilder sb = new StringBuilder();
+            sb.Append(SetupRealSelectClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
+            sb.Append(" ");
+            sb.Append(SetupRealFromWhereClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
 
             BasicSelectHandler selectHandler = CreateBasicSelectHandler(sb.ToString());
 #if ($database.isSelectQueryTimeoutValid())
@@ -140,74 +140,76 @@ namespace ${glPackageBaseCommonS2Dao} {
             return selectHandler.Execute(bindVariableArray, bindVariableTypeArray, bindVariableNameArray);
         }
 
-	    protected String SetupRealSelectClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
-	        ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
-	        if (cb.IsSelectCountIgnoreFetchScope()) {
-	            return "select count(*)";
-	        }
-	        String realSelectClause;
-	        {
-	            ICommandContext ctx;
-	            if (cb.IsLimitSelect_PKOnly()) {
-	                ctx = _selectClausePKOnlyCommand.DoApply(args);
-	            } else {
-	                ctx = _selectClauseCommand.DoApply(args);
-	            }
-	            realSelectClause = ctx.Sql;
-	            AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
-	        }
-	        return realSelectClause;
-	    }
+        protected String SetupRealSelectClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
+            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            if (cb.IsSelectCountIgnoreFetchScope()) {
+                return "select count(*)";
+            }
+            String realSelectClause;
+            {
+                ICommandContext ctx;
+                if (cb.IsLimitSelect_PKOnly()) {
+                    ctx = _selectClausePKOnlyCommand.DoApply(args);
+                } else {
+                    ctx = _selectClauseCommand.DoApply(args);
+                }
+                realSelectClause = ctx.Sql;
+                AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
+            }
+            return realSelectClause;
+        }
 
-	    protected String SetupRealFromWhereClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
-	        ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
-	        String realFromWhereClause;
-	        {
-	            ${glSelectDynamicCommand} fromWhereCommand = CreateMySelectDynamicCommand();
-	            fromWhereCommand.Sql = cb.GetClause();
-	            ICommandContext ctx = fromWhereCommand.DoApply(args);
-	            realFromWhereClause = ctx.Sql;
-	            AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
-	        }
-	        return realFromWhereClause;
-	    }
+        protected String SetupRealFromWhereClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
+            ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+            String realFromWhereClause;
+            {
+                ${glSelectDynamicCommand} fromWhereCommand = CreateMySelectDynamicCommand();
+                fromWhereCommand.ArgNames = this.ArgNames;
+                fromWhereCommand.ArgTypes = this.ArgTypes;
+                fromWhereCommand.Sql = cb.GetClause();
+                ICommandContext ctx = fromWhereCommand.DoApply(args);
+                realFromWhereClause = ctx.Sql;
+                AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
+            }
+            return realFromWhereClause;
+        }
 
-    	protected BasicSelectHandler CreateBasicSelectHandler(String realSql) {
-        	return new BasicSelectHandler(DataSource, realSql, dataReaderHandler, CommandFactory, dataReaderFactory);
-    	}
+        protected BasicSelectHandler CreateBasicSelectHandler(String realSql) {
+            return new BasicSelectHandler(DataSource, realSql, dataReaderHandler, CommandFactory, dataReaderFactory);
+        }
 
-	    protected void AddBindVariableInfo(ICommandContext ctx, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
-	        Object[] bindVariables = ctx.BindVariables;
-	        AddBindVariableList(bindVariableList, bindVariables);
-	        Type[] bindVariableTypes = ctx.BindVariableTypes;
-	        AddBindVariableTypeList(bindVariableTypeList, bindVariableTypes);
-	        String[] bindVariableNames = ctx.BindVariableNames;
-	        AddBindVariableNameList(bindVariableNameList, bindVariableNames);
-	    }
+        protected void AddBindVariableInfo(ICommandContext ctx, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
+            Object[] bindVariables = ctx.BindVariables;
+            AddBindVariableList(bindVariableList, bindVariables);
+            Type[] bindVariableTypes = ctx.BindVariableTypes;
+            AddBindVariableTypeList(bindVariableTypeList, bindVariableTypes);
+            String[] bindVariableNames = ctx.BindVariableNames;
+            AddBindVariableNameList(bindVariableNameList, bindVariableNames);
+        }
 
-	    protected void AddBindVariableList(IList<Object> bindVariableList, Object[] bindVariables) {
-	        for (int i=0; i < bindVariables.Length; i++) {
-	            bindVariableList.Add(bindVariables[i]);
-	        }
-	    }
+        protected void AddBindVariableList(IList<Object> bindVariableList, Object[] bindVariables) {
+            for (int i=0; i < bindVariables.Length; i++) {
+                bindVariableList.Add(bindVariables[i]);
+            }
+        }
 
-	    protected void AddBindVariableTypeList(IList<Type> bindVariableTypeList, Type[] bindVariableTypes) {
-	        for (int i=0; i < bindVariableTypes.Length; i++) {
-	            bindVariableTypeList.Add(bindVariableTypes[i]);
-	        }
-	    }
+        protected void AddBindVariableTypeList(IList<Type> bindVariableTypeList, Type[] bindVariableTypes) {
+            for (int i=0; i < bindVariableTypes.Length; i++) {
+                bindVariableTypeList.Add(bindVariableTypes[i]);
+            }
+        }
 
-	    protected void AddBindVariableNameList(IList<String> bindVariableNameList, String[] bindVariableNames) {
-	        for (int i=0; i < bindVariableNames.Length; i++) {
-	            bindVariableNameList.Add(bindVariableNames[i]);
-	        }
-	    }
+        protected void AddBindVariableNameList(IList<String> bindVariableNameList, String[] bindVariableNames) {
+            for (int i=0; i < bindVariableNames.Length; i++) {
+                bindVariableNameList.Add(bindVariableNames[i]);
+            }
+        }
 
-	    protected void AssertSelectClauseCommand() {
-	        if (_selectClauseCommand == null) {
-	            String msg = "Select clause command should not be null.";
-	            throw new SystemException(msg);
-	        }
-	    }
+        protected void AssertSelectClauseCommand() {
+            if (_selectClauseCommand == null) {
+                String msg = "Select clause command should not be null.";
+                throw new SystemException(msg);
+            }
+        }
     }
 }
