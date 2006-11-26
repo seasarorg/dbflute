@@ -1,6 +1,5 @@
 package ${glPackageBaseCommonS2Dao};
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 #if ($database.isAvailableGenerics())
 
@@ -12,41 +11,29 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.sql.DataSource;
 
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
+import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.ResultSetHandlerFactory;
-import org.seasar.dao.dbms.DbmsManager;
-import org.seasar.dao.impl.BeanArrayMetaDataResultSetHandler;
-import org.seasar.dao.impl.BeanListMetaDataResultSetHandler;
-import org.seasar.dao.impl.BeanMetaDataImpl;
-import org.seasar.dao.impl.BeanMetaDataResultSetHandler;
 import org.seasar.dao.impl.DaoMetaDataImpl;
-import org.seasar.dao.impl.RelationPropertyTypeImpl;
+import org.seasar.dao.impl.RelationRowCreatorImpl;
 import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.impl.ObjectResultSetHandler;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.extension.jdbc.util.DataSourceUtil;
-import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
-import org.seasar.framework.beans.factory.BeanDescFactory;
-import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBean}.${glSelectResourceInterfaceName};
 
 /**
  * DaoMetaDataImpl for DaoGen.
@@ -61,94 +48,41 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     public ${glDaoMetaDataExtension}() {
     }
 
-    public void initialize() {
-        Class daoClass = getDaoClass();
-        daoInterface = getDaoInterface(daoClass);
-        daoBeanDesc = BeanDescFactory.getBeanDesc(daoClass);
-        annotationReader = getAnnotationReaderFactory().createDaoAnnotationReader(daoBeanDesc);
-        setBeanClass(annotationReader.getBeanClass());
-        Connection con = DataSourceUtil.getConnection(dataSource);
-        try {
-            DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
-            dbms = DbmsManager.getDbms(dbMetaData);
-            BeanMetaDataImpl beanMetaDataImpl = new BeanMetaDataExtension();
-            beanMetaDataImpl.setBeanClass(getBeanClass());
-            beanMetaDataImpl.setDatabaseMetaData(dbMetaData);
-            beanMetaDataImpl.setDbms(dbms);
-            beanMetaDataImpl.setAnnotationReaderFactory(getAnnotationReaderFactory());
-            beanMetaDataImpl.setValueTypeFactory(getValueTypeFactory());
-            beanMetaDataImpl.initialize();
-            this.beanMetaData = beanMetaDataImpl;
-        } finally {
-            ConnectionUtil.close(con);
-        }
-        resultSetHandlerFactory = new ResultSetHandlerFactoryExtension(beanMetaData);
-        setupSqlCommand();
+    // =====================================================================================
+    //                                                      ResultSetHandlerFactory Override
+    //                                                      ================================
+
+    protected ResultSetHandlerFactory createResultSetHandlerFactory(final BeanMetaData beanMetaData) {
+        return new ResultSetHandlerFactoryExtension(beanMetaData);
     }
 
     // =====================================================================================
     //                                                                ConditionBean Override
     //                                                                ======================
-    /**
-     * This method overrides the method that is declared at super.
-     * 
-     * @param method Method instance. (NotNull)
-     */
-    protected void setupSelectMethodByAuto(Method method) {
-        String query = annotationReader.getQuery(method);
-        ResultSetHandler handler = createResultSetHandler(method);
-        SelectDynamicCommand cmd = null;
-        String[] argNames = annotationReader.getArgNames(method);
-        Class[] argTypes = method.getParameterTypes();
-        if (query != null && !startsWithOrderBy(query)) {
-            cmd = createSelectDynamicCommand(handler, query);
-        } else {
-            cmd = createSelectDynamicCommand(handler);
-            String sql = null;
-            if (argNames.length == 0 && argTypes.length == 1) {
-                argNames = new String[] { "dto" };
-                // /----------------------------------------------------- [MyExtension]
-                if (${glConditionBeanContextName}.isTheTypeConditionBean(argTypes[0])) {
-                    final String sqlNormal = getSelectClause(getBeanMetaData());
-                    final String sqlPKOnly = getSelectClausePKOnly(getBeanMetaData());
-                    final ${glSelectDynamicCommand} dynamicCommand = newMySelectDynamicCommand(handler);
-                    sql = sqlNormal;
-                    cmd = dynamicCommand;
-                    dynamicCommand.setSelectClause(sqlNormal);
-                    dynamicCommand.setSelectClausePKOnly(sqlPKOnly);
-                } else {
-                    if (${glSelectResourceInterfaceName}.class.isAssignableFrom(argTypes[0])) {
-                        String msg = "If the first argument type is select-resource(and not condition-bean), ";
-                        msg = msg + "the method should not use auto-select-sql.";
-                        msg = msg + " (Do you want to use outer-file-sql? Please check your sql-file-name and build-action!)";
-                        msg = msg + ": dao=" + method.getDeclaringClass() + " method=" + method.getName() + "()";
-                        msg = msg + " firstArgument=" + argTypes[0] + " argTypes.length=" + argTypes.length;
-                        throw new IllegalStateException(msg);
-                    }
-                    sql = createAutoSelectSqlByDto(argTypes[0]);
-                }
-                // -----------/
-            } else {
-                // /----------------------------------------------------- [MyExtension]
-                if (argTypes.length > 1 && ${glSelectResourceInterfaceName}.class.isAssignableFrom(argTypes[0])) {
-                    String msg = "If the number of argument is more than 1 and the first argument type is select-resource, ";
-                    msg = msg + "the method should not use auto-select-sql.";
-                    msg = msg + " (Do you want to use outer-file-sql? Please check your sql-file-name and build-action!)";
-                    msg = msg + ": dao=" + method.getDeclaringClass() + " method=" + method.getName() + "()";
-                    msg = msg + " firstArgument=" + argTypes[0] + " argTypes.length=" + argTypes.length;
-                    throw new IllegalStateException(msg);
-                }
-                // -----------/
-                sql = createAutoSelectSql(argNames);
-            }
-            if (query != null) {
-                sql = sql + " " + query;
-            }
-            cmd.setSql(sql);
+
+    protected SelectDynamicCommand setupNonQuerySelectMethodByDto(Method method, ResultSetHandler handler, String[] argNames, String query) {
+        Class[] types = method.getParameterTypes();
+        Class clazz = types[0];
+        if (!${glConditionBeanContextName}.isTheTypeConditionBean(clazz)) {
+            return super.setupNonQuerySelectMethodByDto(method, handler, argNames, query);
         }
+        // /----------------------------------------------------- [MyExtension]
+        argNames = new String[] { "dto" };
+        final String sqlNormal = getSelectClause(getBeanMetaData());
+        final String sqlPKOnly = getSelectClausePKOnly(getBeanMetaData());
+        final ${glSelectDynamicCommand} dynamicCommand = newMySelectDynamicCommand(handler);
+        String sql = sqlNormal;
+        final SelectDynamicCommand cmd = dynamicCommand;
+        dynamicCommand.setSelectClause(sqlNormal);
+        dynamicCommand.setSelectClausePKOnly(sqlPKOnly);
+        // -----------/
+        if (query != null) {
+            sql = sql + " " + query;
+        }
+        cmd.setSql(sql);
         cmd.setArgNames(argNames);
-        cmd.setArgTypes(method.getParameterTypes());
-        sqlCommands.put(method.getName(), cmd);
+        cmd.setArgTypes(types);
+        return cmd;
     }
 
     /**
@@ -280,20 +214,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (beanClass4SelectMethodByManual.equals(getBeanClass())) {
             return getBeanMetaData();
         }
-        final BeanMetaDataImpl beanMetaDataImpl = new BeanMetaDataExtension();
         final Connection con = DataSourceUtil.getConnection(ds);
         try {
-            DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
-            beanMetaDataImpl.setBeanClass(getBeanClass4SelectMethodByManual(method));
-            beanMetaDataImpl.setDatabaseMetaData(dbMetaData);
-            beanMetaDataImpl.setDbms(dbInfo);
-            beanMetaDataImpl.setAnnotationReaderFactory(getAnnotationReaderFactory());
-            beanMetaDataImpl.setValueTypeFactory(getValueTypeFactory());
-            beanMetaDataImpl.initialize();
+            final DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
+            return this.beanMetaDataFactory.createBeanMetaData(dbMetaData, getBeanClass4SelectMethodByManual(method));
         } finally {
             ConnectionUtil.close(con);
         }
-        return beanMetaDataImpl;
     }
 
     protected Class getBeanClass4SelectMethodByManual(Method method) {
@@ -367,199 +294,67 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 #end
 
-    protected static class BeanMetaDataExtension extends BeanMetaDataImpl {
-	    private int _nestNo;
-	    public void setNestNo(int value) {
-	        _nestNo = value;
-	    }
-	    protected RelationPropertyType createRelationPropertyType(
-	            BeanDesc beanDesc, PropertyDesc propertyDesc,
-	            DatabaseMetaData dbMetaData, Dbms dbms) {
-	        String[] myKeys = new String[0];
-	        String[] yourKeys = new String[0];
-	        int relno = beanAnnotationReader.getRelationNo(propertyDesc);
-	        String relkeys = beanAnnotationReader.getRelationKey(propertyDesc);
-	        if (relkeys != null) {
-	            StringTokenizer st = new StringTokenizer(relkeys, " \t\n\r\f,");
-	            List myKeyList = new ArrayList();
-	            List yourKeyList = new ArrayList();
-	            while (st.hasMoreTokens()) {
-	                String token = st.nextToken();
-	                int index = token.indexOf(':');
-	                if (index > 0) {
-	                    myKeyList.add(token.substring(0, index));
-	                    yourKeyList.add(token.substring(index + 1));
-	                } else {
-	                    myKeyList.add(token);
-	                    yourKeyList.add(token);
-	                }
-	            }
-	            myKeys = (String[]) myKeyList.toArray(new String[myKeyList.size()]);
-	            yourKeys = (String[]) yourKeyList.toArray(new String[yourKeyList
-	                    .size()]);
-	        }
-	        Class beanClass = propertyDesc.getPropertyType();
-
-	        // /======================================================= {Modify}
-	        BeanMetaDataExtension beanMetaData = new BeanMetaDataExtension();
-	        // ==============/
-
-	        beanMetaData.setBeanClass(beanClass);
-	        beanMetaData.setDatabaseMetaData(dbMetaData);
-	        beanMetaData.setDbms(dbms);
-	        beanMetaData.setAnnotationReaderFactory(getAnnotationReaderFactory());
-	        beanMetaData.setValueTypeFactory(getValueTypeFactory());
-
-	        // /======================================================= {Modify}
-	        if (_nestNo > 0) {
-	            beanMetaData.setRelation(true);
-	        } else {
-	            beanMetaData.setRelation(false);
-	        }
-	        final int nestNo = _nestNo + 1;
-	        beanMetaData.setNestNo(nestNo);
-	        // ==============/
-
-	        beanMetaData.initialize();
-	        RelationPropertyType rpt = new RelationPropertyTypeImpl(propertyDesc,
-	                relno, myKeys, yourKeys, beanMetaData);
-	        return rpt;
-	    }
-    }
-
-    protected static class ResultSetHandlerFactoryExtension implements ResultSetHandlerFactory {
-        final BeanMetaData beanMetaData;
-
+    protected static class ResultSetHandlerFactoryExtension extends ResultSetHandlerFactoryImpl {
         public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData) {
-            this.beanMetaData = beanMetaData;
+            super(beanMetaData);
         }
 
-        public ResultSetHandler createResultSetHandler(final Method method) {
-            final Class beanClass = beanMetaData.getBeanClass();
-            if (List.class.isAssignableFrom(method.getReturnType())) {
-                return new BeanListMetaDataResultSetHandler(beanMetaData) {
-                    protected Object createRelationRow(ResultSet rs, RelationPropertyType rpt,
-                            Set columnNames, Map relKeyValues) throws SQLException {
-                        return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
-                    }
-				    protected Object createRelationRow(ResultSet rs, RelationPropertyType rpt,
-				            Set columnNames, Map relKeyValues, String preNoSuffix) throws SQLException {
-				        return delegateCreateRelationRow(rs, rpt, columnNames, relKeyValues, preNoSuffix);
-				    }
-                };
-            } else if (isBeanClassAssignable(beanClass, method.getReturnType())) {
-                return new BeanMetaDataResultSetHandler(beanMetaData) {
-                    protected Object createRelationRow(ResultSet rs, RelationPropertyType rpt,
-                            Set columnNames, Map relKeyValues) throws SQLException {
-                        return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
-                    }
-				    protected Object createRelationRow(ResultSet rs, RelationPropertyType rpt,
-				            Set columnNames, Map relKeyValues, String preNoSuffix) throws SQLException {
-				        return delegateCreateRelationRow(rs, rpt, columnNames, relKeyValues, preNoSuffix);
-				    }
-                };
-            } else if (method.getReturnType().isAssignableFrom(Array.newInstance(beanClass, 0).getClass())) {
-                return new BeanArrayMetaDataResultSetHandler(beanMetaData) {
-                    protected Object createRelationRow(ResultSet rs, RelationPropertyType rpt,
-                            Set columnNames, Map relKeyValues) throws SQLException {
-                        return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
-                    }
-				    protected Object createRelationRow(ResultSet rs, RelationPropertyType rpt,
-				            Set columnNames, Map relKeyValues, String preNoSuffix) throws SQLException {
-				        return delegateCreateRelationRow(rs, rpt, columnNames, relKeyValues, preNoSuffix);
-				    }
-                };
-            } else {
-                return new ObjectResultSetHandler();
+        protected RelationRowCreator createRelationRowCreator() {
+            return new RelationRowCreatorExtension();
+        }
+    }
+
+    protected static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
+        public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues)
+                throws SQLException {
+            return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
+        }
+
+        public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues,
+                String preRelationNoSuffix) throws SQLException {
+            final Object row = setupRelationKeyValue(rpt, columnNames, relKeyValues);
+            return setupRelationAllValue(row, rs, rpt, columnNames, relKeyValues, preRelationNoSuffix);
+        }
+
+        protected Object setupRelationAllValue(Object row, ResultSet rs, RelationPropertyType rpt, Set columnNames,
+                Map relKeyValues, String preRelationNoSuffix) throws SQLException {
+            final String relationNoSuffix = preRelationNoSuffix + "_" + rpt.getRelationNo();
+            final BeanMetaData bmd = rpt.getBeanMetaData();
+            int existColumn = 0;
+            for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
+                final PropertyType pt = bmd.getPropertyType(i);
+                final String columnName = pt.getColumnName() + relationNoSuffix;
+                if (!columnNames.contains(columnName)) {
+                    continue;
+                }
+                existColumn++;
+                if (row == null) {
+                    row = createRelationRow(rpt);
+                }
+                registerRelationValue(row, rs, rpt, pt, columnName, relKeyValues);
+            }
+            if (existColumn == 0) {
+                return null;
+            }
+            if (rpt.getBeanMetaData().getRelationPropertyTypeSize() != 0) {
+                createParentRelationRow(rs, rpt.getBeanMetaData(), columnNames, relationNoSuffix, row);
+            }
+            return row;
+        }
+
+        protected void createParentRelationRow(ResultSet rs, BeanMetaData parentBmd, Set columnNames,
+                String relationNoSuffix, Object row) throws SQLException {
+            for (int i = 0; i < parentBmd.getRelationPropertyTypeSize(); ++i) {
+                RelationPropertyType parentParentRpt = parentBmd.getRelationPropertyType(i);
+                if (parentParentRpt == null) {
+                    continue;
+                }
+                Object relationRow = createRelationRow(rs, parentParentRpt, columnNames, null, relationNoSuffix);
+                if (relationRow != null) {
+                    PropertyDesc pd = parentParentRpt.getPropertyDesc();
+                    pd.setValue(row, relationRow);
+                }
             }
         }
-
-	    protected Object delegateCreateRelationRow(ResultSet rs, RelationPropertyType rpt,
-	            Set columnNames, Map relKeyValues, String preNoSuffix)
-	            throws SQLException {
-	        Object row = null;
-	        BeanMetaData bmd = rpt.getBeanMetaData();
-	        for (int i = 0; i < rpt.getKeySize(); ++i) {
-	            String columnName = rpt.getMyKey(i);
-	            if (columnNames.contains(columnName)) {
-	                if (row == null) {
-	                    row = createRelationRow(rpt);
-	                }
-	                if (relKeyValues != null
-	                        && relKeyValues.containsKey(columnName)) {
-	                    Object value = relKeyValues.get(columnName);
-	                    PropertyType pt = bmd.getPropertyTypeByColumnName(rpt
-	                            .getYourKey(i));
-	                    PropertyDesc pd = pt.getPropertyDesc();
-	                    if (value != null) {
-	                        pd.setValue(row, value);
-	                    }
-	                }
-	            }
-	            continue;
-	        }
-	        final String relationNoSuffix = buildRelationNoSuffix(preNoSuffix, rpt
-	                .getRelationNo());
-	        int existColumn = 0;
-	        for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
-	            PropertyType pt = bmd.getPropertyType(i);
-	            String columnName = pt.getColumnName() + relationNoSuffix;
-	            if (!columnNames.contains(columnName)) {
-	                continue;
-	            }
-	            existColumn++;
-	            if (row == null) {
-	                row = createRelationRow(rpt);
-	            }
-	            Object value = null;
-	            if (relKeyValues != null && relKeyValues.containsKey(columnName)) {
-	                value = relKeyValues.get(columnName);
-	            } else {
-	                ValueType valueType = pt.getValueType();
-	                value = valueType.getValue(rs, columnName);
-	            }
-	            PropertyDesc pd = pt.getPropertyDesc();
-	            if (value != null) {
-	                pd.setValue(row, value);
-	            }
-	        }
-
-	        if (existColumn == 0) {
-	            return null;
-	        }
-
-	        if (rpt.getBeanMetaData().getRelationPropertyTypeSize() != 0) {
-	            createParentRelationRow(rs, rpt.getBeanMetaData(), columnNames, relationNoSuffix, row);
-	        }
-	        return row;
-	    }
-
-        protected Object createRelationRow(RelationPropertyType rpt) {
-            return ClassUtil.newInstance(rpt.getPropertyDesc().getPropertyType());
-        }
-
-	    protected void createParentRelationRow(ResultSet rs, BeanMetaData parentBmd, Set columnNames,
-	            String relationNoSuffix, Object row) throws SQLException {
-	        for (int i = 0; i < parentBmd.getRelationPropertyTypeSize(); ++i) {
-	            RelationPropertyType parentParentRpt = parentBmd.getRelationPropertyType(i);
-	            if (parentParentRpt == null) {
-	                continue;
-	            }
-	            Object relationRow = delegateCreateRelationRow(rs, parentParentRpt, columnNames, null, relationNoSuffix);
-	            if (relationRow != null) {
-	                PropertyDesc pd = parentParentRpt.getPropertyDesc();
-	                pd.setValue(row, relationRow);
-	            }
-	        }
-	    }
-
-	    private String buildRelationNoSuffix(String preNoSuffix, int relationNo) {
-	        return preNoSuffix + "_" + relationNo;
-	    }
-
-        private boolean isBeanClassAssignable(Class beanClass, Class clazz) {
-            return beanClass.isAssignableFrom(clazz) || clazz.isAssignableFrom(beanClass);
-        }
     }
-
 }
