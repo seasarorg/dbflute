@@ -35,11 +35,14 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         return new ${glDaoMetaDataExtension}();
     }
 
-    protected BeanMetaDataFactoryImpl newBeanMetaDataFactoryImpl() {
-        return new BeanMetaDataFactoryImpl() {
+    protected BeanMetaDataFactory getBeanMetaDataFactory() {
+        final BeanMetaDataFactoryImpl factory = new BeanMetaDataFactoryImpl() {
             protected int getLimitRelationNestLevel() {
                 return 2;
             }
         };
+        factory.setAnnotationReaderFactory(this.annotationReaderFactory);
+        factory.setValueTypeFactory(this.valueTypeFactory);
+        return factory;
     }
 }
