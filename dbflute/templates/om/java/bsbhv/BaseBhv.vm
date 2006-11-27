@@ -241,6 +241,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Update one entity. (Delegate-Method)
+     * {modified only}
      * 
      * @param entity Entity. (NotNull)
      * @return Updated count.
@@ -249,7 +250,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
-        return getMyDao().update(entity);
+        return getMyDao().updateModifiedOnly(entity);
     }
 
     /**
@@ -556,6 +557,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Insert or update after select-for-update.
+     * {update: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @return Updated count.
@@ -568,13 +570,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         final String mapString = entity.extractPrimaryKeyMapString();
         ${myExtendedObjectClassName} currentEntity = null;
         try {
-            currentEntity = selectForUpdateByPKMapStringWithDeletedCheck(mapString);
+            selectForUpdateByPKMapStringWithDeletedCheck(mapString);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
             return delegateInsert(entity);
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        mergeEntity(entity, currentEntity);
-        return delegateUpdate(currentEntity);
+        return delegateUpdate(entity);
     }
 
     /**
@@ -583,6 +584,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     public int updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -596,6 +598,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param sourceEntity Source entity. (NotNull)
      * @param destinationEntity Destination entity. (NotNull)
+     * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     protected void mergeEntity(${glEntityInterfaceName} sourceEntity, ${glEntityInterfaceName} destinationEntity) {
         assertEntityNotNull(sourceEntity);
@@ -624,6 +627,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // @param primaryKey Primary-keys. (NotNull)
     // @return Updated count.
     // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+    // @deprecated
     // 
     public int logicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -638,6 +642,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated
      */
     public int logicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString) {
         assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
@@ -651,6 +656,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Set up 'revival from logical-delete' value.
      * 
      * @param entity Entity having primary-key value. (NotNull)
+     * @deprecated
      */
     protected void setupLogicalDeleteValue(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -672,6 +678,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Filter 'logical-delete' entity.
      * 
      * @param entity Entity. (NotNull)
+     * @deprecated
      */
     protected void filterLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
     }
@@ -686,6 +693,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // @param primaryKey Primary-keys. (NotNull)
     // @return Updated count.
     // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated
     // 
     public int revivalFromLogicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -700,6 +708,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated
      */
     public int revivalFromLogicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString) {
         assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
@@ -713,6 +722,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Set up 'revival from logical-delete' value.
      * 
      * @param entity Entity having primary-key value. (NotNull)
+     * @deprecated
      */
     protected void setupRevivalFromLogicalDeleteValue(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -734,6 +744,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Filter 'revival from logical-delete' entity.
      * 
      * @param entity Entity. (NotNull)
+     * @deprecated
      */
     protected void filterRevivalFromLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
     }

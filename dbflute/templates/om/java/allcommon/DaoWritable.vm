@@ -26,6 +26,14 @@ public interface ${glDaoWritableInterfaceName} extends ${glDaoReadableInterfaceN
     public int modify(${glEntityInterfaceName} entity);
 
     /**
+     * Update one entity that the type is entity-interface. (modified only)
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Updated count.
+     */
+    public int modifyModifiedOnly(${glEntityInterfaceName} entity);
+
+    /**
      * Delete one entity that the type is entity-interface.
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)

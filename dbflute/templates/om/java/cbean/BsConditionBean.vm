@@ -94,7 +94,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
                 if (obj instanceof ${col.JavaNative}) {
                     query().set${col.JavaName}_Equal((${col.JavaNative})obj);
                 } else {
-                    query().set${col.JavaName}_Equal((${col.JavaNative})parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}"));
+                    query().set${col.JavaName}_Equal(new ${col.JavaNative}(parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
                 }
             }
         }

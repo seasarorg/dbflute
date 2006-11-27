@@ -77,6 +77,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
+    /** Entity modified properties. (for S2Dao) */
+    protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
+
 #foreach ($col in $table.Columns)
     
     /** The value of ${col.UncapitalisedJavaName}. */
@@ -158,6 +161,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public void set${col.JavaName}(${col.JavaNative} ${col.UncapitalisedJavaName}) {
         _isSetterInvoked${col.JavaName} = true;
+        _modifiedProperties.addPropertyName("${col.JavaBeansRulePropertyName}");
         _${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
 #end
@@ -171,6 +175,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * Has the setter of ${col.UncapitalisedJavaName} been invoked?
      * 
      * @return Determination.
+     * @deprecated Please use modified-properties.
      */
     public boolean isSetterInvoked${col.JavaName}() {
         return _isSetterInvoked${col.JavaName};
@@ -480,8 +485,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         {
             final Object obj = primaryKeyMap.get("${col.Name}");
             if (obj == null) {
-                _${col.UncapitalisedJavaName} = null;
-                _isSetterInvoked${col.JavaName} = false;
+                _${col.UncapitalisedJavaName} = null; _isSetterInvoked${col.JavaName} = false; _modifiedProperties.remove("${col.JavaBeansRulePropertyName}");
             } else {
     #if ($col.isJavaNativeStringObject())
 
@@ -495,7 +499,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
                 if (obj instanceof ${col.JavaNative}) {
                     set${col.JavaName}((${col.JavaNative})obj);
                 } else {
-                    set${col.JavaName}((${col.JavaNative})parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}"));
+                    set${col.JavaName}(new ${col.JavaNative}(parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
                 }
             }
         }
@@ -563,7 +567,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         {
             final Object obj = columnValueMap.get("${col.Name}");
             if (obj == null) {
-                _${col.UncapitalisedJavaName} = null; _isSetterInvoked${col.JavaName} = false;
+                _${col.UncapitalisedJavaName} = null; _isSetterInvoked${col.JavaName} = false; _modifiedProperties.remove("${col.JavaBeansRulePropertyName}");
             } else {
     #if ($col.isJavaNativeStringObject())
 
@@ -577,7 +581,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
                 if (obj instanceof ${col.JavaNative}) {
                     set${col.JavaName}((${col.JavaNative})obj);
                 } else {
-                    set${col.JavaName}((${col.JavaNative})parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}"));
+                    set${col.JavaName}(new ${col.JavaNative}(parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
                 }
             }
         }
@@ -625,7 +629,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         MapStringUtil.checkTypeString(value, propertyName, typeName);
     }
 
-    protected java.util.Date parseDateString(Object value, String propertyName, String typeName) {
+    protected long parseDateString(Object value, String propertyName, String typeName) {
         return MapStringUtil.parseDateString(value, propertyName, typeName);
     }
 
@@ -660,7 +664,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     #if ($col.isJavaNativeDateObject())
 
         sb.append(delimiter).append("${col.Name}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? java.text.DateFormat.getDateTimeInstance().format(_${col.UncapitalisedJavaName}) : ""));
+        sb.append((_${col.UncapitalisedJavaName} != null ? formatDate(_${col.UncapitalisedJavaName}) : ""));
     #else
 
         sb.append(delimiter).append("${col.Name}").append(equal);
@@ -703,7 +707,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     #if ($col.isJavaNativeDateObject())
 
         sb.append(delimiter).append("${col.Name}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? java.text.DateFormat.getDateTimeInstance().format(_${col.UncapitalisedJavaName}) : ""));
+        sb.append((_${col.UncapitalisedJavaName} != null ? formatDate(_${col.UncapitalisedJavaName}) : ""));
     #else
 
         sb.append(delimiter).append("${col.Name}").append(equal);
@@ -747,7 +751,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     #if ($col.isJavaNativeDateObject())
 
         sb.append(delimiter).append("${columnName}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? java.text.DateFormat.getDateTimeInstance().format(_${uncapitalisedJavaName}) : ""));
+        sb.append((_${col.UncapitalisedJavaName} != null ? formatDate(_${uncapitalisedJavaName}) : ""));
     #else
 
         sb.append(delimiter).append("${columnName}").append(equal);
@@ -798,6 +802,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 ##         }
 ## #end
 
+    protected String formatDate(java.util.Date value) {
+        return MapStringUtil.formatDate(value);
+    }
+
     // =====================================================================================
     //                                                                         Determination
     //                                                                         =============
@@ -815,6 +823,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #end
 
         return true;
+    }
+
+    // =====================================================================================
+    //                                                                   Modified Properties
+    //                                                                   ===================
+    public java.util.Set${database.filterGenericsString('String')} getModifiedPropertyNames() {
+        return _modifiedProperties.getPropertyNames();
+    }
+
+    protected EntityModifiedProperties newEntityModifiedProperties() {
+        return new EntityModifiedProperties();
     }
 
     // =====================================================================================

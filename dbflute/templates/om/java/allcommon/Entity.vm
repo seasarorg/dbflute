@@ -166,6 +166,55 @@ public interface ${glEntityInterfaceName} {
     public boolean hasPrimaryKeyValue();
 
     // =====================================================================================
+    //                                                                   Modified Properties
+    //                                                                   ===================
+    /**
+     * Get modified property names. (JavaBeansRule)
+     * 
+     * @return Modified property names. (NotNull)
+     */
+    public java.util.Set${database.filterGenericsString('String')} getModifiedPropertyNames();
+
+    public static class EntityModifiedProperties {
+        /** Set of properties. */
+        protected java.util.Set${database.filterGenericsString('String')} _propertiesSet = new java.util.LinkedHashSet${database.filterGenericsString('String')}();
+
+        /**
+         * Add property name. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (Nullable)
+         */
+        public void addPropertyName(String propertyName) {
+            _propertiesSet.add(propertyName);
+        }
+
+        /**
+         * Get the set of properties.
+         * 
+         * @return The set of properties. (NotNull)
+         */
+        public java.util.Set${database.filterGenericsString('String')} getPropertyNames() {
+            return _propertiesSet;
+        }
+
+        /**
+         * Clear the set of properties.
+         */
+        public void clear() {
+            _propertiesSet.clear();
+        }
+
+        /**
+         * Remove property name from the set. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (Nullable)
+         */
+        public void remove(String propertyName) {
+            _propertiesSet.remove(propertyName);
+        }
+    }
+
+    // =====================================================================================
     //                                                                            Util Class
     //                                                                            ==========
     public static class MapStringUtil {
@@ -242,10 +291,10 @@ public interface ${glEntityInterfaceName} {
             }
         }
 
-        public static java.util.Date parseDateString(Object value, String propertyName, String typeName) {
+        public static long parseDateString(Object value, String propertyName, String typeName) {
             checkTypeString(value, propertyName, typeName);
             try {
-                return java.text.DateFormat.getDateTimeInstance().parse((String)value);
+                return getDateFormat().parse((String)value).getTime();
             } catch (java.text.ParseException e) {
                 String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
                 throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
@@ -253,6 +302,14 @@ public interface ${glEntityInterfaceName} {
                 String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
                 throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
             }
+        }
+
+        public static String formatDate(java.util.Date value) {
+            return getDateFormat().format(value);
+        }
+
+        public static java.text.DateFormat getDateFormat() {
+            return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         }
     }
 }

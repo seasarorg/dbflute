@@ -62,6 +62,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * ${database.ImplementComment}
+     * {modified only}
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Updated count.
@@ -70,7 +71,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
-        return getDaoWritable().modify(entity);
+        return getDaoWritable().modifyModifiedOnly(entity);
     }
 
     /**
@@ -171,6 +172,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                                    ==================
     /**
      * Create or modify after select-for-update.
+     * {modify: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @return Updated count.
@@ -183,13 +185,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         final String mapString = entity.extractPrimaryKeyMapString();
         ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
         try {
-            currentEntity = readForUpdateByPKMapStringWithDeletedCheck(mapString);
+            readForUpdateByPKMapStringWithDeletedCheck(mapString);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
             return delegateCreate(entity);
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        mergeEntity(entity, currentEntity);
-        return delegateModify(currentEntity);
+        return delegateModify(entity);
     }
 
     /**
@@ -198,6 +199,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity having primary-key value. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     public int modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -212,6 +214,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * 
      * @param sourceEntity Source entity. (NotNull)
      * @param destinationEntity Destination entity. (NotNull)
+     * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     abstract protected void mergeEntity(${glEntityInterfaceName} sourceEntity, ${glEntityInterfaceName} destinationEntity);
 

@@ -213,8 +213,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return;
             }
             if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
-                ${glAttachedCBArgsVariableName}.SqlClause.MakeOrderByEffective();// It returns it.
-                ${glAttachedCBArgsVariableName}.SqlClause.MakeFetchScopeEffective();// It returns it.
+                ${glAttachedCBArgsVariableName}.AfterCareSelectCountIgnoreFetchScope();
             }
         }
 

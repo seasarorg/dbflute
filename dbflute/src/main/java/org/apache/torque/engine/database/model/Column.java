@@ -261,6 +261,14 @@ public class Column {
     }
 
     /**
+     * Get variable name to use in Java sources (= uncapitalised java name)
+     */
+    public String getJavaBeansRulePropertyName() {
+        final Database db = getTable().getDatabase();
+        return db.decapitalizePropertyName(db.convertJavaNameByJdbcNameAsTable(getName()));
+    }
+    
+    /**
      * Set name to use in Java sources
      */
     public void setJavaName(String javaName) {

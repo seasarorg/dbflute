@@ -27,6 +27,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
 
     /**
      * Modify entity. (Delegate-Method)
+     * {modified only}
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Updated count.
@@ -79,6 +80,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity.
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     public int modifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 

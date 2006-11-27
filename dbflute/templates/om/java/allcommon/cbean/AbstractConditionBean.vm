@@ -78,10 +78,10 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         }
     }
 
-    protected java.util.Date parseDateString(Object value, String propertyName, String typeName) {
+    protected long parseDateString(Object value, String propertyName, String typeName) {
         checkTypeString(value, propertyName, typeName);
         try {
-            return java.text.DateFormat.getDateTimeInstance().parse((String)value);
+            return getDateFormat().parse((String)value).getTime();
         } catch (java.text.ParseException e) {
             String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
             throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
@@ -89,6 +89,10 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
             String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
             throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
         }
+    }
+
+    protected java.text.DateFormat getDateFormat() {
+        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     }
 
     // =====================================================================================
