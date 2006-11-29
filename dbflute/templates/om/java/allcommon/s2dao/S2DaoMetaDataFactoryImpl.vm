@@ -3,6 +3,7 @@ package ${glPackageBaseCommonS2Dao};
 import javax.sql.DataSource;
 
 import org.seasar.dao.AnnotationReaderFactory;
+import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
 import org.seasar.dao.impl.DaoMetaDataFactoryImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;

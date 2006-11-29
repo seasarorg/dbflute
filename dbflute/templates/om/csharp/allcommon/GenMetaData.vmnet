@@ -199,11 +199,11 @@ namespace ${glPackageBaseCommon} {
         }
 
         /// <sumarry>
-        /// Get the property-value of j2eeDiconResourceName.
+        /// Get the property-value of jdbcDiconResourceName.
         /// </sumarry>
         /// <returns>The property-value.</returns>
-        public String GetJ2eeDiconResourceName() {
-            return "${database.J2eeDiconResourceName}";
+        public String GetJdbcDiconResourceName() {
+            return "${database.JdbcDiconResourceName}";
         }
 
         /// <sumarry>

@@ -736,8 +736,8 @@ public class Database {
         return getProperties().getDaoDiconProperties().getDaoDiconFileName();
     }
 
-    public String getJ2eeDiconResourceName() {
-        return getProperties().getDaoDiconProperties().getJ2eeDiconResourceName();
+    public String getJdbcDiconResourceName() {
+        return getProperties().getDaoDiconProperties().getJdbcDiconResourceName();
     }
 
     public String getRequiredTxComponentName() {

@@ -3,7 +3,7 @@
 	"http://www.seasar.org/dtd/components21.dtd">
 
 <components namespace="${glDaoDiconNamespace}">
-    <include path="${glJ2EEDiconResourceName}"/>
+    <include path="${glJdbcDiconResourceName}"/>
 #foreach ($includePath in $database.DaoDiconOtherIncludePathList)
 
     <include path="${includePath}"/>
@@ -11,8 +11,9 @@
 
 
     <!-- S2Dao component. -->
-	<component class="org.seasar.dao.impl.FieldAnnotationReaderFactory"/>
-	<component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
+    <component class="org.seasar.dao.impl.FieldAnnotationReaderFactory"/>
+    <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
+    <component class="org.seasar.dao.impl.BeanMetaDataFactoryImpl"/>
     <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataFactoryImpl}"/>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
 

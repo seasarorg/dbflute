@@ -3,7 +3,7 @@
 "http://www.seasar.org/dtd/components21.dtd">
 
 <components namespace="${glDaoDiconNamespace}">
-    <include path="${glJ2EEDiconResourceName}"/>
+    <include path="${glJdbcDiconResourceName}"/>
 
 #foreach ($includePath in $database.DaoDiconOtherIncludePathList)
 

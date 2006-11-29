@@ -244,12 +244,12 @@ public class ${myClassName} {
     }
 
     /**
-     * Get the property-value of j2eeDiconResourceName.
+     * Get the property-value of jdbcDiconResourceName.
      *
      * @return The property-value.
      */
-    public String getJ2eeDiconResourceName() {
-        return "${database.J2eeDiconResourceName}";
+    public String getJdbcDiconResourceName() {
+        return "${database.JdbcDiconResourceName}";
     }
 
     /**

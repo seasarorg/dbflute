@@ -39,7 +39,7 @@ targetdatabase = $targetDatabase
     #set ($glDaoDiconNamespace = "${database.DaoDiconNamespace}")
     #set ($glDaoDiconPackageName = "${database.DaoDiconPackageName}")
     #set ($glDaoDiconFileName = "${database.DaoDiconFileName}")
-    #set ($glJ2EEDiconResourceName = "${database.J2eeDiconResourceName}")
+    #set ($glJdbcDiconResourceName = "${database.JdbcDiconResourceName}")
 
     ## [Common-Behavior]
     #set ($glBehaviorReadableAbstractName = "${glProjectPrefix}AbstractBehaviorReadable")

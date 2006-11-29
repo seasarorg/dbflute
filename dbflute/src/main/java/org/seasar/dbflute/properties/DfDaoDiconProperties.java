@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
+
 public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
@@ -33,17 +35,21 @@ public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
         return stringProp("torque.daoDiconFileName", "dao.dicon");
     }
 
-    public String getJ2eeDiconResourceName() {
-        String defaultValue = null;
-        if (getBasicProperties().isTargetLanguageJava()) {
-            defaultValue = "j2ee.dicon";
-        } else if (getBasicProperties().isTargetLanguageCSharp()) {
-            defaultValue = "ado.dicon";
-        } else {
-            String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
-            throw new IllegalStateException(msg);
+    public String getJdbcDiconResourceName() {
+        try {
+            return stringProp("torque.jdbcDiconResourceName");
+        } catch (PropertyNotFoundException e) {
+            String defaultValue = null;
+            if (getBasicProperties().isTargetLanguageJava()) {
+                defaultValue = "jdbc.dicon";
+            } else if (getBasicProperties().isTargetLanguageCSharp()) {
+                defaultValue = "ado.dicon";
+            } else {
+                String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
+                throw new IllegalStateException(msg);
+            }
+            return stringProp("torque.j2eeDiconResourceName", defaultValue);
         }
-        return stringProp("torque.j2eeDiconResourceName", defaultValue);
     }
 
     public String getRequiredTxComponentName() {
