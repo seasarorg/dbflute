@@ -528,7 +528,9 @@ namespace ${glPackageExtendedBhv} {
             System.Collections.IList pkList = new System.Collections.ArrayList();
             foreach (${myExtendedObjectClassName} entity in ls) {
                 pkList.Add(entity.${table.getPrimaryKeyJavaNameAsOne()});
-                pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
+                if (pkMyEntityMap.Contains(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
+                    pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
+                }
             }
             ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})this.DaoSelector.GetRBhv(typeof(${reffererBhvClassName}));
             ${reffererCBClassName} ${glAttachedCBArgsVariableName} = reffererBhv.NewMyConditionBean();
