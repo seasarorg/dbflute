@@ -36,9 +36,10 @@ public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
     }
 
     public String getJdbcDiconResourceName() {
-        try {
-            return stringProp("torque.jdbcDiconResourceName");
-        } catch (PropertyNotFoundException e) {
+        final String prop = stringProp("torque.jdbcDiconResourceName", null);
+        if (prop != null) {
+            return prop;
+        } else {
             String defaultValue = null;
             if (getBasicProperties().isTargetLanguageJava()) {
                 defaultValue = "jdbc.dicon";

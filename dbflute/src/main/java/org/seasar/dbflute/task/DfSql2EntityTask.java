@@ -270,7 +270,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             String msg = "The sql is invalid: " + sql;
             throw new IllegalArgumentException(msg);
         }
-        return getStringBetweenBeginEndMark(sql, "--#", "#--");
+        final String betweenBeginEndMark = getStringBetweenBeginEndMark(sql, "--#", "#");
+        if (betweenBeginEndMark != null) {
+            return betweenBeginEndMark;
+        } else {
+            // TODO: Oops! Temporary modification for MySQL. 
+            return getStringBetweenBeginEndMark(sql, "-- #", "#");
+        }
     }
 
     protected List<String> getPrimaryKeyColumnNameList(final String sql) {
@@ -279,7 +285,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             throw new IllegalArgumentException(msg);
         }
         final List<String> retLs = new ArrayList<String>();
-        final String primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "--*", "*--");
+        final String primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "--*", "*");
         if (primaryKeyColumnNameSeparatedString != null && primaryKeyColumnNameSeparatedString.trim().length() != 0) {
             final StringTokenizer st = new StringTokenizer(primaryKeyColumnNameSeparatedString, ",;/\t");
             while (st.hasMoreTokens()) {
