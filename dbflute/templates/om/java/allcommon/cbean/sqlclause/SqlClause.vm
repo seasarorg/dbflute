@@ -86,6 +86,8 @@ public interface ${myClassName} {
     // =====================================================================================
     //                                                                  IncludedSelectColumn
     //                                                                  ====================
+    public void makeIncludedSelectColumnEffective();
+    public void ignoreIncludedSelectColumn();
     public void registerIncludedSelectColumn(String aliasName, String realColumnName);
 
     // =====================================================================================

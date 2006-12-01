@@ -482,6 +482,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     public ${glConditionBeanInterfaceName} setupSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = true;
+        getSqlClause().ignoreIncludedSelectColumn();
         getSqlClause().ignoreOrderBy();
         getSqlClause().ignoreFetchScope();
         return this;
@@ -495,6 +496,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     public ${glConditionBeanInterfaceName} afterCareSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = false;
+        getSqlClause().makeIncludedSelectColumnEffective();
         getSqlClause().makeOrderByEffective();
         getSqlClause().makeFetchScopeEffective();
         return this;

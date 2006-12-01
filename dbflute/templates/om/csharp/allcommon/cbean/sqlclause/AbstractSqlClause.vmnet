@@ -40,6 +40,9 @@ namespace ${glPackageBaseCommonSqlClause} {
         /** Order by clause. */
         protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
 
+        /** Is incoluded-select-column effective? Default value is false. */
+        protected bool _isIncludedSelectColumnEffective = false;
+
         /** Is order-by effective? Default value is false. */
         protected bool _isOrderByEffective = false;
 
@@ -81,7 +84,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          */
         public String GetClause() {
             StringBuilder sb = new StringBuilder(128);
-            if (_includedSelectColumnMap.Count != 0) {
+            if (_isIncludedSelectColumnEffective && _includedSelectColumnMap.Count != 0) {
                 sb.Append(" ").Append(GetIncludedSelectColumnClause());
             }
             sb.Append(" ");
@@ -240,6 +243,13 @@ namespace ${glPackageBaseCommonSqlClause} {
         // =====================================================================================
         //                                                                  IncludedSelectColumn
         //                                                                  ====================
+        public void MakeIncludedSelectColumnEffective() {
+            _isIncludedSelectColumnEffective = true;
+        }
+
+        public void IgnoreIncludedSelectColumn() {
+            _isIncludedSelectColumnEffective = false;
+        }
         public void RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
             _includedSelectColumnMap.Add(aliasName, realColumnName);
         }

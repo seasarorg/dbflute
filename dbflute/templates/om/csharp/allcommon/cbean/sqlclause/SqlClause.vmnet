@@ -84,6 +84,8 @@ namespace ${glPackageBaseCommonSqlClause} {
         // =====================================================================================
         //                                                                  IncludedSelectColumn
         //                                                                  ====================
+        void MakeIncludedSelectColumnEffective();
+        void IgnoreIncludedSelectColumn();
         void RegisterIncludedSelectColumn(String aliasName, String realColumnName);
 
         // =====================================================================================
