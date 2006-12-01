@@ -18,10 +18,13 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.ResultSetHandlerFactory;
+import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
+import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.RelationRowCreatorImpl;
 import org.seasar.dao.impl.SelectDynamicCommand;
@@ -30,6 +33,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.extension.jdbc.util.DataSourceUtil;
+import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.util.StringUtil;
 
@@ -200,7 +204,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                                     ByManual Override
     //                                                                     =================
     protected void setupSelectMethodByManual(Method method, String sql) {
-        final BeanMetaData beanMetaData = buildBeanMetaData(method, this.dbms, this.dataSource);
+        final BeanMetaData beanMetaData = buildBeanMetaData(method, this.dataSource);
         final ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(beanMetaData);
         SelectDynamicCommand cmd = createSelectDynamicCommand(factory.createResultSetHandler(method));
         cmd.setSql(sql);
@@ -209,21 +213,39 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         this.sqlCommands.put(method.getName(), cmd);
     }
 
-    protected BeanMetaData buildBeanMetaData(Method method, Dbms dbInfo, DataSource ds) {
-        final Class beanClass4SelectMethodByManual = getBeanClass4SelectMethodByManual(method);
+    protected BeanMetaData buildBeanMetaData(Method method, DataSource ds) {
+        final Class beanClass4SelectMethodByManual = getOriginalBeanClass(method);
         if (beanClass4SelectMethodByManual.equals(getBeanClass())) {
             return getBeanMetaData();
         }
         final Connection con = DataSourceUtil.getConnection(ds);
         try {
             final DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
-            return this.beanMetaDataFactory.createBeanMetaData(dbMetaData, getBeanClass4SelectMethodByManual(method));
+            return createOriginalBmdFactory().createBeanMetaData(dbMetaData, getOriginalBeanClass(method));
         } finally {
             ConnectionUtil.close(con);
         }
     }
 
-    protected Class getBeanClass4SelectMethodByManual(Method method) {
+    protected BeanMetaDataFactory createOriginalBmdFactory() {
+        final BeanMetaDataFactoryImpl originalBmdFactory = new BeanMetaDataFactoryImpl() {
+            protected BeanMetaDataImpl newBeanMetaDataImpl() {
+                return new BeanMetaDataImpl() {
+                    protected void setupDatabaseMetaData(BeanDesc beanDesc, DatabaseMetaData dbMetaData, Dbms dbms) {
+                        // Nothing.
+                    }
+                };
+            }
+            protected int getLimitRelationNestLevel() {
+                return 2;
+            }
+        };
+        originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
+        originalBmdFactory.setValueTypeFactory(this.valueTypeFactory);
+        return originalBmdFactory;
+    }
+
+    protected Class getOriginalBeanClass(Method method) {
         final Class retType = method.getReturnType();
         if (java.util.List.class.isAssignableFrom(retType)) {
             final Class elementType = MethodUtil.getElementTypeOfListFromReturnMethod(method);

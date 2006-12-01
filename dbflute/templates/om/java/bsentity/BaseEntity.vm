@@ -145,6 +145,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                              ========
 #foreach ($col in $table.Columns)
 
+    /** Column-Annotation for S2Dao */
+    public static final String ${col.JavaBeansRulePropertyName}_COLUMN = "${col.Name}";
+
     /**
      * Get the value of ${col.UncapitalisedJavaName}.
      * 
