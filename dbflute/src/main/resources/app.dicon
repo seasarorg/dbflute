@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="Shift_JIS"?>
+<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container//EN"
+"http://www.seasar.org/dtd/components.dtd">
+<components>
+
+	<component class="org.seasar.dbflute.config.DfAdditionalForeignKeyConfig">
+		<property name="additionalForeignKey">
+			#{
+			"key1" : #{"key11" : "value1;1"}
+			, "key2" : {"green", "red", "blue"}, "key3" : "value3"
+			}
+		</property>
+	</component>
+	
+	<component class="org.seasar.dbflute.config.DfDatabaseConfig">
+		<property name="databaseBaseInfo">
+            #{
+                  "derby"     : #{"daoGenDbName": "Derby"     , "wildCard": "%", "sequenceNextSql": "Unsupported"}
+                , "firebird"  : #{"daoGenDbName": "Firebird"  , "wildCard": "%", "sequenceNextSql": "select gen_id($$sequenceName$$, 1) from RDB$DATABASE"}
+                , "oracle"    : #{"daoGenDbName": "Oracle"    , "wildCard": "%", "sequenceNextSql": "select $$sequenceName$$.nextval from dual"}
+                , "mysql"     : #{"daoGenDbName": "MySql"     , "wildCard": "%", "sequenceNextSql": "Unsupported"}
+                , "postgresql": #{"daoGenDbName": "PostgreSql", "wildCard": "%", "sequenceNextSql": "sequenceNextSql=select nextval ('$$sequenceName$$')"}
+                , "mssql"     : #{"daoGenDbName": "SqlServer" , "wildCard": "%", "sequenceNextSql": "Unsupported"}
+                , "db2"       : #{"daoGenDbName": "Db2"       , "wildCard": "%", "sequenceNextSql": "values nextval for $$sequenceName$$"}
+                , "interbase" : #{"daoGenDbName": "Interbase" , "wildCard": "%", "sequenceNextSql": "select gen_id($$sequenceName$$, 1) from RDB$DATABASE"}
+                , "default"   : #{"daoGenDbName": "Default"   , "wildCard": "%", "sequenceNextSql": "Unsupported"}
+            }
+		</property>
+	</component>
+
+</components>

@@ -32,7 +32,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         super(dataSource, statementFactory, resultSetFactory, readerFactory);
     }
 
-    protected DaoMetaDataImpl newDaoMetaDataImpl() {
+    protected DaoMetaDataImpl createDaoMetaDataImpl() {
         return new ${glDaoMetaDataExtension}();
     }
 
@@ -44,6 +44,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         };
         factory.setAnnotationReaderFactory(this.annotationReaderFactory);
         factory.setValueTypeFactory(this.valueTypeFactory);
+        factory.setDataSource(this.dataSource);
         return factory;
     }
 }

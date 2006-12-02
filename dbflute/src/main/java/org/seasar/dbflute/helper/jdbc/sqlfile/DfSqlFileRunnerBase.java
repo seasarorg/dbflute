@@ -23,7 +23,7 @@ import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.IORuntimeException;
-import org.seasar.dbflute.util.DfClassUtil;
+import org.seasar.framework.util.ClassUtil;
 
 public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
@@ -262,7 +262,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         final String className = DelimiterChanger.class.getName() + "_" + databaseName;
         DelimiterChanger changer = null;
         try {
-            changer = (DelimiterChanger) DfClassUtil.newInstance(className);
+            changer = (DelimiterChanger) ClassUtil.newInstance(className);
         } catch (RuntimeException ignore) {
             String msg = "The database has no delimiter changer: databaseName=";
             _log.debug(msg + databaseName + " className=" + className + " ignore=" + ignore);

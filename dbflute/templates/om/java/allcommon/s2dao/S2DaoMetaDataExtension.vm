@@ -218,18 +218,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (beanClass4SelectMethodByManual.equals(getBeanClass())) {
             return getBeanMetaData();
         }
-        final Connection con = DataSourceUtil.getConnection(ds);
-        try {
-            final DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
-            return createOriginalBmdFactory().createBeanMetaData(dbMetaData, getOriginalBeanClass(method));
-        } finally {
-            ConnectionUtil.close(con);
-        }
+        return createOriginalBmdFactory().createBeanMetaData(getOriginalBeanClass(method));
     }
 
     protected BeanMetaDataFactory createOriginalBmdFactory() {
         final BeanMetaDataFactoryImpl originalBmdFactory = new BeanMetaDataFactoryImpl() {
-            protected BeanMetaDataImpl newBeanMetaDataImpl() {
+            protected BeanMetaDataImpl createBeanMetaDataImpl() {
                 return new BeanMetaDataImpl() {
                     protected void setupDatabaseMetaData(BeanDesc beanDesc, DatabaseMetaData dbMetaData, Dbms dbms) {
                         // Nothing.
@@ -242,6 +236,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         };
         originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
         originalBmdFactory.setValueTypeFactory(this.valueTypeFactory);
+        originalBmdFactory.setDataSource(this.dataSource);
         return originalBmdFactory;
     }
 

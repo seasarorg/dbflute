@@ -3,19 +3,10 @@ package org.seasar.dbflute.properties;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.util.DfPropertyUtil;
-import org.seasar.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
-import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
-import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 
 /**
  * Build properties for Torque.

@@ -57,6 +57,7 @@ package org.apache.torque.engine.database.model;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1191,7 +1192,7 @@ public class Database {
     public boolean isStopGenerateExtendedBhv() {
         return getProperties().getOtherProperties().isStopGenerateExtendedBhv();
     }
-    
+
     public boolean isStopGenerateExtendedDao() {
         return getProperties().getOtherProperties().isStopGenerateExtendedDao();
     }
@@ -1199,7 +1200,7 @@ public class Database {
     public boolean isStopGenerateExtendedEntity() {
         return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
     }
-    
+
     // ===============================================================================
     //                                        Properties - jdbcToJavaNative (Internal)
     //                                        ===============-========================
@@ -1244,7 +1245,7 @@ public class Database {
     public String getSql2EntityBaseEntityPackage() {
         return getProperties().getSql2EntityProperties().getBaseEntityPackage();
     }
-    
+
     public String getSql2EntityDBMetaPackage() {
         return getProperties().getSql2EntityProperties().getDBMetaPackage();
     }
@@ -1259,10 +1260,11 @@ public class Database {
     // ==================================================================
     //                                         databaseInfoMap (Internal)
     //                                         ==========================
-    protected Map<String, Object> _databaseDefinitionMap;
+    protected Map<String, Map<String, String>> _databaseDefinitionMap;
 
-    public Map<String, Object> getDatabaseDefinitionMap() {
+    public Map<String, Map<String, String>> getDatabaseDefinitionMap() {
         if (_databaseDefinitionMap == null) {
+            _databaseDefinitionMap = new LinkedHashMap<String, Map<String, String>>();
             final String definition = "map:{ "
                     + "derby           =   map:{daoGenDbName=Derby;        wildCard=%; sequenceNextSql=Unsupported                                              } "
                     + "; firebird      =   map:{daoGenDbName=Firebird;     wildCard=%; sequenceNextSql=select gen_id($$sequenceName$$, 1) from RDB$DATABASE    } "
@@ -1276,19 +1278,30 @@ public class Database {
                     + "}";
             final DfMapListString mapListString = new DfMapListStringImpl();
             mapListString.setDelimiter(";");
-            _databaseDefinitionMap = mapListString.generateMap(definition);
+            final Map<String, Object> databaseDefinitionMap = mapListString.generateMap(definition);
+            final Set<String> keySet = databaseDefinitionMap.keySet();
+            for (String key : keySet) {
+                final Map<String, String> value = (Map<String, String>) databaseDefinitionMap.get(key);
+                _databaseDefinitionMap.put(key, value);
+            }
         }
         return _databaseDefinitionMap;
     }
 
-    protected Map<String, Object> _databaseInfoMap;
+//        public Map<String, Map<String, String>> getDatabaseDefinitionMap() {
+//            SingletonS2ContainerFactory.init();
+//            DfDatabaseConfig config = (DfDatabaseConfig)SingletonS2ContainerFactory.getContainer().getComponent(DfDatabaseConfig.class);
+//            return config.getDatabaseBaseInfo();
+//        }
 
-    public Map<String, Object> getDatabaseInfoMap() {
+    protected Map<String, String> _databaseInfoMap;
+
+    public Map<String, String> getDatabaseInfoMap() {
         if (_databaseInfoMap == null) {
-            final Map<String, Object> databaseDefinitionMap = getDatabaseDefinitionMap();
-            Map<String, Object> databaseInfoMap = (Map<String, Object>) databaseDefinitionMap.get(getDatabaseType());
+            final Map<String, Map<String, String>> databaseDefinitionMap = getDatabaseDefinitionMap();
+            Map<String, String> databaseInfoMap = databaseDefinitionMap.get(getDatabaseType());
             if (databaseInfoMap == null) {
-                databaseInfoMap = (Map<String, Object>) databaseDefinitionMap.get("default");
+                databaseInfoMap = databaseDefinitionMap.get("default");
                 if (databaseInfoMap == null) {
                     String msg = "The property[databaseDefinitionMap] doesn't have the database[";
                     throw new IllegalStateException(msg + getDatabaseType() + "] and default-database.");
@@ -1641,7 +1654,7 @@ public class Database {
     public void setupJavaDir_for_sql2entity() {
         Generator.getInstance().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
     }
-    
+
     // --------------------------------------------
     //                                  Basic Setup
     //                                  -----------

@@ -22,8 +22,6 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -92,7 +90,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             // -------/
             final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
             DfBuildProperties.getInstance().setProperties(prop);
-
         } catch (Exception e) {
             _log.warn("setContextProperties() threw the exception!!!", e);
         }

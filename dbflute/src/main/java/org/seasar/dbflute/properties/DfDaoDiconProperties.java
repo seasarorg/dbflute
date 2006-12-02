@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
-
 public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);

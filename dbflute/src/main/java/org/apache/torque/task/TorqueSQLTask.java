@@ -54,8 +54,12 @@ package org.apache.torque.task;
  * <http://www.apache.org/>.
  */
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Iterator;
+import java.util.Properties;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
