@@ -65,7 +65,6 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.util.FileUtils;
 import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.util.FileUtil;

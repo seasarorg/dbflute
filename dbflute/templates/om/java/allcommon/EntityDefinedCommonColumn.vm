@@ -31,6 +31,7 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
      * Has the setter of ${uncapitalisedJavaName} been invoked?
      * 
      * @return Determination.
+     * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     public boolean isSetterInvoked${javaName}();
   #if (${database.isAllClassificationColumn($columnName)})

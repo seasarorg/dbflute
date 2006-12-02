@@ -65,6 +65,7 @@ import org.apache.commons.lang.exception.NestableException;
  */
 public class EngineException extends NestableException
 {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new <code>EngineException</code> without specified detail

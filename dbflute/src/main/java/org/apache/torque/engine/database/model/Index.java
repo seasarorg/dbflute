@@ -107,7 +107,10 @@ public class Index {
         this();
         setTable(table);
         if (indexColumns.size() > 0) {
-            this._indexColumns = indexColumns;
+            this._indexColumns = new ArrayList<String>(3);
+            for (Object object : indexColumns) {
+                _indexColumns.add((String)object);
+            }
             createName();
 
             if (log.isDebugEnabled()) {

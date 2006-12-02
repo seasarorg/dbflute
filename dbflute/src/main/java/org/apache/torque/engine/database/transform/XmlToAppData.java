@@ -66,7 +66,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -113,7 +112,7 @@ public class XmlToAppData extends DefaultHandler {
     private Vector<String> alreadyReadFiles;
 
     /** this is the stack to store parsing data */
-    private Stack parsingStack = new Stack();
+    private Stack<ParseStackElement> parsingStack = new Stack<ParseStackElement>();
 
     static {
         saxFactory = SAXParserFactory.newInstance();

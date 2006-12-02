@@ -88,14 +88,14 @@ public class NameFactory
      * The cache of <code>NameGenerator</code> algorithms in use for
      * name generation, keyed by fully qualified class name.
      */
-    private Hashtable algorithms;
+    private Hashtable<String, NameGenerator> algorithms;
 
     /**
      * Creates a new instance with storage for algorithm implementations.
      */
     protected NameFactory()
     {
-        algorithms = new Hashtable(5);
+        algorithms = new Hashtable<String, NameGenerator>(5);
     }
 
     /**

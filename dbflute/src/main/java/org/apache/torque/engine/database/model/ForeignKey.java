@@ -334,8 +334,8 @@ public class ForeignKey {
      *
      * @return table mapping foreign names to local names
      */
-    public Hashtable getLocalForeignMapping() {
-        final Hashtable resultHash = new Hashtable();
+    public Hashtable<String, String> getLocalForeignMapping() {
+        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
         for (int i = 0; i < _localColumns.size(); i++) {
             resultHash.put(_localColumns.get(i), _foreignColumns.get(i));
         }
@@ -348,8 +348,8 @@ public class ForeignKey {
      *
      * @return table mapping local names to foreign names
      */
-    public Hashtable getForeignLocalMapping() {
-        final Hashtable resultHash = new Hashtable();
+    public Hashtable<String, String> getForeignLocalMapping() {
+        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
         for (int i = 0; i < _localColumns.size(); i++) {
             resultHash.put(_foreignColumns.get(i), _localColumns.get(i));
         }

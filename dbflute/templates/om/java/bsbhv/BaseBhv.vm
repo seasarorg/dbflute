@@ -627,7 +627,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // @param primaryKey Primary-keys. (NotNull)
     // @return Updated count.
     // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-    // @deprecated
+    // @deprecated Not for public use in the future. 
     // 
     public int logicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -642,7 +642,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated
+     * @deprecated Not for public use in the future. 
      */
     public int logicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString) {
         assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
@@ -656,7 +656,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Set up 'revival from logical-delete' value.
      * 
      * @param entity Entity having primary-key value. (NotNull)
-     * @deprecated
+     * @deprecated Not for public use in the future. 
      */
     protected void setupLogicalDeleteValue(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -678,7 +678,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Filter 'logical-delete' entity.
      * 
      * @param entity Entity. (NotNull)
-     * @deprecated
+     * @deprecated Not for public use in the future. 
      */
     protected void filterLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
     }
@@ -693,7 +693,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // @param primaryKey Primary-keys. (NotNull)
     // @return Updated count.
     // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated
+     * @deprecated Not for public use in the future. 
     // 
     public int revivalFromLogicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -708,7 +708,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated
+     * @deprecated Not for public use in the future. 
      */
     public int revivalFromLogicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString) {
         assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
@@ -722,7 +722,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Set up 'revival from logical-delete' value.
      * 
      * @param entity Entity having primary-key value. (NotNull)
-     * @deprecated
+     * @deprecated Not for public use in the future. 
      */
     protected void setupRevivalFromLogicalDeleteValue(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -744,7 +744,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Filter 'revival from logical-delete' entity.
      * 
      * @param entity Entity. (NotNull)
-     * @deprecated
+     * @deprecated Not for public use in the future. 
      */
     protected void filterRevivalFromLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
     }

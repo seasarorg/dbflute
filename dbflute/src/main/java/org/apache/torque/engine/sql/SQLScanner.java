@@ -83,7 +83,7 @@ public class SQLScanner
         boolean inComment = false;
         boolean inCommentSlashStar = false;
         boolean inCommentDash = false;
-        tokens = new ArrayList();
+        tokens = new ArrayList<Token>();
         readChar();
         while(chr != -1) 
         {
@@ -149,19 +149,19 @@ public class SQLScanner
         return tokens;
     }
 
-    private static final String WHITE = "\f\r\t\n ";
-    private static final String ALFA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final String NUMER = "0123456789";
-    private static final String ALFANUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final String SPECIAL = ";(),'";
-    private static final char COMMENT_POUND = 35;
-    private static final char COMMENT_SLASH = 47;
-    private static final char COMMENT_STAR = 42;
-    private static final char COMMENT_DASH = 45;
+//    private static final String WHITE = "\f\r\t\n ";
+//    private static final String ALFA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//    private static final String NUMER = "0123456789";
+//    private static final String ALFANUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+//    private static final String SPECIAL = ";(),'";
+//    private static final char COMMENT_POUND = 35;
+//    private static final char COMMENT_SLASH = 47;
+//    private static final char COMMENT_STAR = 42;
+//    private static final char COMMENT_DASH = 45;
     private Reader in;
     private int chr;
     private String token;
-    private List tokens;
+    private List<Token> tokens;
     private int line;
     private int col;
 }

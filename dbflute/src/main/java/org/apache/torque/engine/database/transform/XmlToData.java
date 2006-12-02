@@ -94,7 +94,7 @@ public class XmlToData extends DefaultHandler implements EntityResolver
     /** Logging class from commons.logging */
     private static Log log = LogFactory.getLog(XmlToData.class);
     private Database database;
-    private List data;
+    private List<DataRow> data;
     private String dtdFileName;
     private File dtdFile;
     private InputSource dataDTD;
@@ -125,7 +125,7 @@ public class XmlToData extends DefaultHandler implements EntityResolver
     public List parseFile(String xmlFile)
             throws Exception
     {
-        data = new ArrayList();
+        data = new ArrayList<DataRow>();
 
         SAXParser parser = saxFactory.newSAXParser();
 
@@ -164,7 +164,7 @@ public class XmlToData extends DefaultHandler implements EntityResolver
                 {
                     throw new SAXException("Table '" + rawName + "' unknown");
                 }
-                List columnValues = new ArrayList();
+                List<ColumnValue> columnValues = new ArrayList<ColumnValue>();
                 for (int i = 0; i < attributes.getLength(); i++)
                 {
                     Column col = table

@@ -39,6 +39,11 @@ public interface ${myClassName} {
      */
     public String getSelectHint();
 
+    /**
+     * Get included-select-column clause. This is an internal method.
+     * 
+     * @return Included-select-column clause. {select ... , [included-select-column clause] from table...} (NotNull)
+     */
     public String getIncludedSelectColumnClause();
 
     /**
@@ -86,8 +91,22 @@ public interface ${myClassName} {
     // =====================================================================================
     //                                                                  IncludedSelectColumn
     //                                                                  ====================
+    /**
+     * Make included-select-column effective.
+     */
     public void makeIncludedSelectColumnEffective();
+
+    /**
+     * Ignore included-select-column.
+     */
     public void ignoreIncludedSelectColumn();
+
+    /**
+     * Register included-select-column.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @param realColumnName Real column name. (NotNull)
+     */
     public void registerIncludedSelectColumn(String aliasName, String realColumnName);
 
     // =====================================================================================
@@ -99,7 +118,6 @@ public interface ${myClassName} {
      * @param joinTableName Join table name(outer join [joinTableName]). (NotNull)
      * @param aliasName Alias name of join table. (NotNull and Unique per invoking method.)
      * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
-     * @return this. (NotNull)
      */
     public void registerOuterJoin(String joinTableName, String aliasName, Map${database.filterGenericsString('String, String')} joinOnMap);
 
@@ -112,7 +130,6 @@ public interface ${myClassName} {
      * @param columnFullName Column-full-name([table-name].[column-name]). (NotNull)
      * @param key Condition key. (NotNull)
      * @param value Condition value. (NotNull)
-     * @return this. (NotNull)
      */
     public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value);
 
@@ -120,7 +137,6 @@ public interface ${myClassName} {
      * Register where clause.
      * 
      * @param clause Where-clause. (NotNull)
-     * @return this. (NotNull)
      */
     public void registerWhereClause(String clause);
 

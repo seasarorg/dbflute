@@ -105,6 +105,11 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return createSelectHint();
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Included-select-column clause. {select ... , [included-select-column clause] from table...} (NotNull)
+     */
     public String getIncludedSelectColumnClause() {
         final StringBuffer sb = new StringBuffer();
         int count = 0;
@@ -227,14 +232,26 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // =====================================================================================
     //                                                                  IncludedSelectColumn
     //                                                                  ====================
+    /**
+     * Make included-select-column effective.
+     */
     public void makeIncludedSelectColumnEffective() {
         _isIncludedSelectColumnEffective = true;
     }
 
+    /**
+     * Ignore included-select-column.
+     */
     public void ignoreIncludedSelectColumn() {
         _isIncludedSelectColumnEffective = false;
     }
 
+    /**
+     * Register included-select-column.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @param realColumnName Real column name. (NotNull)
+     */
     public void registerIncludedSelectColumn(String aliasName, String realColumnName) {
         _isIncludedSelectColumnEffective = true;
         _includedSelectColumnMap.put(aliasName, realColumnName);
@@ -249,7 +266,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      * @param joinTableName Join table name(outer join [joinTableName]). (NotNull)
      * @param aliasName Alias name of join table. (NotNull and Unique per invoking method.)
      * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
-     * @return this. (NotNull)
      */
     public void registerOuterJoin(String joinTableName, String aliasName, java.util.Map${database.filterGenericsString('String, String')} joinOnMap) {
         assertAlreadyOuterJoin(aliasName);
@@ -296,7 +312,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      * Assert whether the alias name have already registered in outer join.
      * 
      * @param aliasName Alias name.
-     * @return this.
      */
     protected void assertAlreadyOuterJoin(String aliasName) {
         if (_outerJoinMap.containsKey(aliasName)) {
@@ -310,7 +325,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      * 
      * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
      * @param aliasName Alias name.
-     * @return this.
      */
     protected void assertJoinOnMapNotEmpty(java.util.Map${database.filterGenericsString('String, String')} joinOnMap, String aliasName) {
         if (joinOnMap.isEmpty()) {

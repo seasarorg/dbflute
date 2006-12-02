@@ -55,7 +55,6 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -1129,7 +1128,7 @@ public class Table implements IDMethod {
     /**
      * Returns true if the table contains a specified column
      *
-     * @param col the column
+     * @param columnNameList the list of column name.
      * @return true if the table contains the column
      */
     public boolean containsColumn(List<String> columnNameList) {

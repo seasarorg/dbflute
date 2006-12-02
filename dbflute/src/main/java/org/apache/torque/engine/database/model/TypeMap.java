@@ -56,7 +56,6 @@ package org.apache.torque.engine.database.model;
 
 import java.sql.Types;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
