@@ -8,6 +8,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.seasar.dbflute.DfConfigProvider;
+import org.seasar.dbflute.config.DfAdditionalForeignKeyConfig;
+
 /**
  * Build properties for Torque.
  * 
@@ -31,6 +34,11 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     protected Map<String, Map<String, String>> _additionalForeignKeyMap;
 
     public Map<String, Map<String, String>> getAdditionalForeignKeyMap() {
+        final DfAdditionalForeignKeyConfig config = (DfAdditionalForeignKeyConfig) getConfig(DfAdditionalForeignKeyConfig.class);
+        if (config != null) {
+            return config.getAdditionalForeignKey();
+        }
+
         if (_additionalForeignKeyMap == null) {
             _additionalForeignKeyMap = new LinkedHashMap<String, Map<String, String>>();
             final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalForeignKeyMap, DEFAULT_EMPTY_MAP);

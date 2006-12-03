@@ -1,4 +1,4 @@
-package org.seasar.dbflute.util.config;
+package org.seasar.dbflute.config;
 
 import java.util.Map;
 

@@ -57,7 +57,6 @@ package org.apache.torque.engine.database.model;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -70,8 +69,8 @@ import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.mapstring.DfMapListString;
-import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
+import org.seasar.dbflute.DfDBFluteProvider;
+import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
@@ -1263,36 +1262,9 @@ public class Database {
     protected Map<String, Map<String, String>> _databaseDefinitionMap;
 
     public Map<String, Map<String, String>> getDatabaseDefinitionMap() {
-        if (_databaseDefinitionMap == null) {
-            _databaseDefinitionMap = new LinkedHashMap<String, Map<String, String>>();
-            final String definition = "map:{ "
-                    + "derby           =   map:{daoGenDbName=Derby;        wildCard=%; sequenceNextSql=Unsupported                                              } "
-                    + "; firebird      =   map:{daoGenDbName=Firebird;     wildCard=%; sequenceNextSql=select gen_id($$sequenceName$$, 1) from RDB$DATABASE    } "
-                    + "; oracle        =   map:{daoGenDbName=Oracle;       wildCard=%; sequenceNextSql=select $$sequenceName$$.nextval from dual               } "
-                    + "; mysql         =   map:{daoGenDbName=MySql;        wildCard=%; sequenceNextSql=Unsupported                                              } "
-                    + "; postgresql    =   map:{daoGenDbName=PostgreSql;   wildCard=%; sequenceNextSql=select nextval ('$$sequenceName$$')                     } "
-                    + "; mssql         =   map:{daoGenDbName=SqlServer;    wildCard=%; sequenceNextSql=Unsupported                                              } "
-                    + "; db2           =   map:{daoGenDbName=Db2;          wildCard=%; sequenceNextSql=values nextval for $$sequenceName$$                     } "
-                    + "; interbase     =   map:{daoGenDbName=Interbase;    wildCard=%; sequenceNextSql=select gen_id($$sequenceName$$, 1) from RDB$DATABASE    } "
-                    + "; default       =   map:{daoGenDbName=Default;      wildCard=%; sequenceNextSql=Unsupported                                              } "
-                    + "}";
-            final DfMapListString mapListString = new DfMapListStringImpl();
-            mapListString.setDelimiter(";");
-            final Map<String, Object> databaseDefinitionMap = mapListString.generateMap(definition);
-            final Set<String> keySet = databaseDefinitionMap.keySet();
-            for (String key : keySet) {
-                final Map<String, String> value = (Map<String, String>) databaseDefinitionMap.get(key);
-                _databaseDefinitionMap.put(key, value);
-            }
-        }
-        return _databaseDefinitionMap;
+        final DfDatabaseConfig config = (DfDatabaseConfig) DfDBFluteProvider.getComponent(DfDatabaseConfig.class);
+        return config.analyzeDatabaseBaseInfo();
     }
-
-//        public Map<String, Map<String, String>> getDatabaseDefinitionMap() {
-//            SingletonS2ContainerFactory.init();
-//            DfDatabaseConfig config = (DfDatabaseConfig)SingletonS2ContainerFactory.getContainer().getComponent(DfDatabaseConfig.class);
-//            return config.getDatabaseBaseInfo();
-//        }
 
     protected Map<String, String> _databaseInfoMap;
 

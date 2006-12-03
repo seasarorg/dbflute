@@ -8,6 +8,8 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DfConfigProvider;
+import org.seasar.dbflute.config.DfAdditionalForeignKeyConfig;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
@@ -226,7 +228,14 @@ public abstract class DfAbstractHelperProperties {
     protected DfGeneratedClassPackageProperties getGeneratedClassPackageProperties() {
         return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
     }
-
+    
+    // **********************************************************************************************
+    //                                                                                         Config
+    //                                                                                         ******
+    protected Object getConfig(Class type) {
+        return DfConfigProvider.getComponent(type);
+    }
+    
     // **********************************************************************************************
     //                                                                                        Default
     //                                                                                        *******

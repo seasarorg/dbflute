@@ -17,15 +17,19 @@ package org.seasar.dbflute.task.bs;
 
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tools.ant.BuildException;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
+import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
 /**
  * Abstract DB meta texen task for Torque.
@@ -90,6 +94,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             // -------/
             final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
             DfBuildProperties.getInstance().setProperties(prop);
+
         } catch (Exception e) {
             _log.warn("setContextProperties() threw the exception!!!", e);
         }

@@ -3,17 +3,22 @@
 "http://www.seasar.org/dtd/components.dtd">
 <components>
 
-	<component class="org.seasar.dbflute.config.DfAdditionalForeignKeyConfig">
-		<property name="additionalForeignKey">
-			#{
-			"key1" : #{"key11" : "value1;1"}
-			, "key2" : {"green", "red", "blue"}, "key3" : "value3"
-			}
-		</property>
-	</component>
-	
 	<component class="org.seasar.dbflute.config.DfDatabaseConfig">
-		<property name="databaseBaseInfo">
+		<property name="databaseBaseInfo">"
+            map:{
+                ; derby     =map:{daoGenDbName=Derby      ; wildCard=% ; sequenceNextSql=Unsupported}
+                ; firebird  =map:{daoGenDbName=Firebird   ; wildCard=% ; sequenceNextSql=select gen_id($$sequenceName$$, 1) from RDB$DATABASE}
+                ; oracle    =map:{daoGenDbName=Oracle     ; wildCard=% ; sequenceNextSql=select $$sequenceName$$.nextval from dual}
+                ; mysql     =map:{daoGenDbName=MySql      ; wildCard=% ; sequenceNextSql=Unsupported}
+                ; postgresql=map:{daoGenDbName=PostgreSql ; wildCard=% ; sequenceNextSql=sequenceNextSql=select nextval ('$$sequenceName$$')}
+                ; mssql     =map:{daoGenDbName=SqlServer  ; wildCard=% ; sequenceNextSql=Unsupported}
+                ; db2       =map:{daoGenDbName=Db2        ; wildCard=% ; sequenceNextSql=values nextval for $$sequenceName$$}
+                ; interbase =map:{daoGenDbName=Interbase  ; wildCard=% ; sequenceNextSql=select gen_id($$sequenceName$$, 1) from RDB$DATABASE}
+                ; default   =map:{daoGenDbName=Default    ; wildCard=% ; sequenceNextSql=Unsupported}
+            }
+		"</property>
+		
+		<property name="databaseBaseInfoOgnlTest">
             #{
                   "derby"     : #{"daoGenDbName": "Derby"     , "wildCard": "%", "sequenceNextSql": "Unsupported"}
                 , "firebird"  : #{"daoGenDbName": "Firebird"  , "wildCard": "%", "sequenceNextSql": "select gen_id($$sequenceName$$, 1) from RDB$DATABASE"}
@@ -26,6 +31,7 @@
                 , "default"   : #{"daoGenDbName": "Default"   , "wildCard": "%", "sequenceNextSql": "Unsupported"}
             }
 		</property>
+		
 	</component>
 
 </components>
