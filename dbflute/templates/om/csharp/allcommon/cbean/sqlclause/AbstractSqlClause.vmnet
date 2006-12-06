@@ -679,7 +679,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          */
         public ${glSqlClauseInterfaceName} MakeFetchScopeEffective() {
             _isFetchScopeEffective = true;
-            if (this.FetchPageNumber > 0) {
+            if (this.FetchSize > 0 && this.FetchPageNumber > 0) {
                 FetchPage(this.FetchPageNumber);
             }
             return this;

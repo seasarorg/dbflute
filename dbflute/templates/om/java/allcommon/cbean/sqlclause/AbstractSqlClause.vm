@@ -696,7 +696,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      */
     public ${glSqlClauseInterfaceName} makeFetchScopeEffective() {
         _isFetchScopeEffective = true;
-        if (getFetchPageNumber() > 0) {
+        if (getFetchSize() > 0 && getFetchPageNumber() > 0) {
             fetchPage(getFetchPageNumber());
         }
         return this;

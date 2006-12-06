@@ -181,16 +181,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     /**
-     * Create select-dynamic-command. (Override)
-     * 
-     * @param handler ResultSetHandler
-     * @return Select dynamic command. (NotNull)
-     */
-    protected SelectDynamicCommand createSelectDynamicCommand(ResultSetHandler handler) {
-        return newMySelectDynamicCommand(handler);
-    }
-
-    /**
      * New my select dynamic command.
      * 
      * @param handler ResultSetHandler

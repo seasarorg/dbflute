@@ -164,18 +164,14 @@ namespace ${glPackageBaseCommonS2Dao} {
                         sbYourSelectList.Append(pt.ColumnName).Append(preNoSuffix).Append("_").Append(rpt.RelationNo);
                     }
                 }
-	            if (relationBmd.RelationPropertyTypeSize > 0) {
-	                String nssString = "Nss" + initCapPropertyName + ".";
-	                String nextPreNoSuffix = preNoSuffix + "_" + rpt.RelationNo;
-	                int nextCQNestNo = cqNestNo + 1;
-	                SetupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo);
-	            }
+                if (relationBmd.RelationPropertyTypeSize > 0) {
+                    String nssString = "Nss" + initCapPropertyName + ".";
+                    String nextPreNoSuffix = preNoSuffix + "_" + rpt.RelationNo;
+                    int nextCQNestNo = cqNestNo + 1;
+                    SetupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo);
+                }
                 sb.Append(ifComment).Append(sbYourSelectList).Append(endComment);
             }
-        }
-
-        protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler drh) {
-            return NewMySelectDynamicCommand(drh);
         }
 
         protected ${glSelectDynamicCommand} NewMySelectDynamicCommand(IDataReaderHandler handler) {
