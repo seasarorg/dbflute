@@ -250,7 +250,9 @@ namespace ${glPackageBaseCommonSqlClause} {
         public void IgnoreIncludedSelectColumn() {
             _isIncludedSelectColumnEffective = false;
         }
+
         public void RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
+            _isIncludedSelectColumnEffective = true;
             _includedSelectColumnMap.Add(aliasName, realColumnName);
         }
 
