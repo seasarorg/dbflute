@@ -33,4 +33,7 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
         return booleanProp("torque.isStopGenerateExtendedEntity", false);
     }
 
+    public boolean isVersionAfter1040() {
+        return booleanProp("torque.isVersionAfter1040", true);
+    }
 }

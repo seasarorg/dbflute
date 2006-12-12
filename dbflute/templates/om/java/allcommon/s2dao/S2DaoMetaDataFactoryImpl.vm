@@ -1,6 +1,7 @@
 package ${glPackageBaseCommonS2Dao};
 
 import javax.sql.DataSource;
+#if ($database.isVersionAfter1040())
 
 import org.seasar.dao.AnnotationReaderFactory;
 import org.seasar.dao.BeanMetaDataFactory;
@@ -9,6 +10,15 @@ import org.seasar.dao.impl.DaoMetaDataFactoryImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.StatementFactory;
+#else
+
+import org.seasar.dao.AnnotationReaderFactory;
+import org.seasar.dao.DaoMetaData;
+import org.seasar.dao.impl.DaoMetaDataFactoryImpl;
+import org.seasar.dao.impl.DaoMetaDataImpl;
+import org.seasar.extension.jdbc.ResultSetFactory;
+import org.seasar.extension.jdbc.StatementFactory;
+#end
 
 /**
  * DaoMetaDataFactoryImpl for DaoGen.
@@ -31,6 +41,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             AnnotationReaderFactory readerFactory) {
         super(dataSource, statementFactory, resultSetFactory, readerFactory);
     }
+#if ($database.isVersionAfter1040())
 
     protected DaoMetaDataImpl createDaoMetaDataImpl() {
         return new ${glDaoMetaDataExtension}();
@@ -47,4 +58,40 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         factory.setDataSource(this.dataSource);
         return factory;
     }
+#else
+
+    /**
+     * Create data meta data.
+     * 
+     * @param daoClass Dao class
+     * @return Data meta data.
+     */
+    protected DaoMetaData createDaoMetaData(Class daoClass) {
+        DaoMetaDataImpl daoMetaData = new ${glDaoMetaDataExtension}();
+        daoMetaData.setDaoClass(daoClass);
+        daoMetaData.setDataSource(dataSource);
+        daoMetaData.setStatementFactory(statementFactory);
+        daoMetaData.setResultSetFactory(resultSetFactory);
+        daoMetaData.setAnnotationReaderFactory(annotationReaderFactory);
+        daoMetaData.setValueTypeFactory(valueTypeFactory);
+        if (sqlFileEncoding != null) {
+            daoMetaData.setSqlFileEncoding(sqlFileEncoding);
+        }
+        if (daoSuffixes != null) {
+            daoMetaData.setDaoSuffixes(daoSuffixes);
+        }
+        if (insertPrefixes != null) {
+            daoMetaData.setInsertPrefixes(insertPrefixes);
+        }
+        if (updatePrefixes != null) {
+            daoMetaData.setUpdatePrefixes(updatePrefixes);
+        }
+        if (deletePrefixes != null) {
+            daoMetaData.setDeletePrefixes(deletePrefixes);
+        }
+        daoMetaData.initialize();
+        return daoMetaData;
+    }
+#end
+
 }

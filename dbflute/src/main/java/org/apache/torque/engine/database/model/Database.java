@@ -1199,6 +1199,10 @@ public class Database {
     public boolean isStopGenerateExtendedEntity() {
         return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
     }
+    
+    public boolean isVersionAfter1040() {
+        return getProperties().getOtherProperties().isVersionAfter1040();
+    }
 
     // ===============================================================================
     //                                        Properties - jdbcToJavaNative (Internal)
