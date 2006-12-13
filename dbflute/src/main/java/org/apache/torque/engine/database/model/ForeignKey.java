@@ -55,9 +55,11 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -109,6 +111,25 @@ public class ForeignKey {
      */
     public Table getTable() {
         return _baseTable;
+    }
+
+    /**
+     * TODO: To write Detail Comment.
+     * 
+     * @return Determination.
+     */
+    public boolean isForeignColumnsSameAsForeignTablePrimaryKeys() {
+        final List<String> foreginTablePrimaryKeyNameList = new ArrayList<String>();
+        {
+            final Table fkTable = _baseTable.getDatabase().getTable(_foreignTableName);
+            final List<Column> foreignTablePrimaryKeyList = fkTable.getPrimaryKey();
+            for (Column column : foreignTablePrimaryKeyList) {
+                foreginTablePrimaryKeyNameList.add(column.getName());
+            }
+        }
+        final Set<String> foreginTablePrimaryKeyNameSet = new HashSet<String>(foreginTablePrimaryKeyNameList);
+        final Set<String> foreignColumnsSet = new HashSet<String>(_foreignColumns);
+        return foreginTablePrimaryKeyNameSet.equals(foreignColumnsSet);
     }
 
     /**
@@ -218,16 +239,17 @@ public class ForeignKey {
     public List<String> getLocalColumns() {
         return _localColumns;
     }
-    
+
     public String getLocalColumnNameAsOne() {
         if (getLocalColumns().size() != 1) {
-            String msg = "This method is for only-one foreign-key: getForeignColumns().size()=" + getLocalColumns().size();
+            String msg = "This method is for only-one foreign-key: getForeignColumns().size()="
+                    + getLocalColumns().size();
             msg = msg + " baseTable=" + getTable().getName() + " foreignTable=" + getForeignTable().getName();
             throw new IllegalStateException(msg);
         }
         return getLocalColumns().get(0);
     }
-    
+
     /**
      * Returns the list of local column names. You should not edit this List.
      * 
@@ -272,22 +294,22 @@ public class ForeignKey {
     public List<String> getForeignColumns() {
         return _foreignColumns;
     }
-    
+
     public String getForeignColumnNameAsOne() {
         if (getForeignColumns().size() != 1) {
-            String msg = "This method is for only-one foreign-key: getForeignColumns().size()=" + getForeignColumns().size();
+            String msg = "This method is for only-one foreign-key: getForeignColumns().size()="
+                    + getForeignColumns().size();
             msg = msg + " baseTable=" + getTable().getName() + " foreignTable=" + getForeignTable().getName();
             throw new IllegalStateException(msg);
         }
         return getForeignColumns().get(0);
     }
-    
+
     public String getForeignColumnJavaNameAsOne() {
         final String columnName = getForeignColumnNameAsOne();
         final Table foreignTable = getForeignTable();
         return foreignTable.getColumn(columnName).getJavaName();
     }
-    
 
     /**
      * Returns the list of foreign column objects. You should not edit this List.
@@ -535,7 +557,7 @@ public class ForeignKey {
             return getTable().getUncapitalisedJavaName() + result + "List";
         }
     }
-    
+
     /**
      * Get thr value of refferer property name.
      * 
@@ -544,7 +566,7 @@ public class ForeignKey {
     public String getReffererPropertyNameAsOne() {
         return getReffererPropertyNameAsOne(false);
     }
-    
+
     /**
      * Get the value of foreign property name.
      * 
@@ -553,7 +575,7 @@ public class ForeignKey {
     public String getReffererJavaBeansRulePropertyNameAsOne() {
         return getReffererPropertyNameAsOne(true);
     }
-    
+
     /**
      * Get thr value of refferer property name.
      * 
@@ -613,7 +635,7 @@ public class ForeignKey {
         final String reffererPropertyName = getReffererPropertyNameAsOne();
         return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
     }
-    
+
     /**
      * Returns comma-string for local column name.
      * 
@@ -738,7 +760,7 @@ public class ForeignKey {
             final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
             final String foreignName = foreignCol.getName();
             final String localName = localCol.getName();
-            
+
             if ("".equals(result)) {
                 result = foreignName + ":" + localName;
             } else {

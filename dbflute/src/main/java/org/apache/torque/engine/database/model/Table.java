@@ -394,6 +394,9 @@ public class Table implements IDMethod {
      * @param fk A foreign key refering to this table
      */
     public void addReferrer(ForeignKey fk) {
+        if (!fk.isForeignColumnsSameAsForeignTablePrimaryKeys()) {
+            return;
+        }
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
