@@ -205,6 +205,10 @@ public class TorqueDataDumpTask extends DfAbstractDbMetaTexenTask {
         _databasePassword = v;
     }
 
+    protected boolean isUseDataSource() {
+        return false;
+    }
+    
     /**
      * Initializes initial context
      *

@@ -106,6 +106,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     public static final int IDX_COLUMN_DEFAULT_VALUE = 4;
 
+    protected boolean isUseDataSource() {
+        return false;
+    }
+    
     // ==============================================================================
     //                                                                      Attribute
     //                                                                      =========
@@ -196,12 +200,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ==============================================================================
     //                                                                    Main Method
     //                                                                    ===========
-    /**
-     * Execute task.
-     * 
-     * @throws BuildException
-     */
-    public void execute() throws BuildException {
+    @Override
+    protected void doExecute() {
         _log.info("------------------------------------------------------- [Torque - JDBCToXMLSchema] Start!");
         _log.info("Your DB settings are:");
         _log.info("  driver : " + _dbDriver);

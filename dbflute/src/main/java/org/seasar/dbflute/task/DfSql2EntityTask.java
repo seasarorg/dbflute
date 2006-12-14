@@ -29,7 +29,6 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -50,36 +49,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 
     // =========================================================================================
-    //                                                                                 Attribute
-    //                                                                                 =========
-    protected String _driver = null;
-
-    protected String _url = null;
-
-    protected String _userId = null;
-
-    protected String _password = null;
-
-    // =========================================================================================
-    //                                                                                  Accessor
-    //                                                                                  ========
-    public void setDriver(String driver) {
-        this._driver = driver;
-    }
-
-    public void setUrl(String url) {
-        this._url = url;
-    }
-
-    public void setUserId(String userId) {
-        this._userId = userId;
-    }
-
-    public void setPassword(String password) {
-        this._password = password;
-    }
-
-    // =========================================================================================
     //                                                                                  MetaInfo
     //                                                                                  ========
     protected final Map<String, Map<String, Integer>> _entityInfoMap = new LinkedHashMap<String, Map<String, Integer>>();
@@ -88,10 +57,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
 
+    protected boolean isUseDataSource() {
+        return true;
+    }
+
     // =========================================================================================
     //                                                                                   Execute
     //                                                                                   =======
-    public void execute() throws BuildException {
+    @Override
+    protected void doExecute() {
+        setupDataSource();
+
         final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
         runInfo.setUrl(_url);
@@ -149,21 +125,21 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected DfSqlFileRunner getSqlFileRunner(DfRunnerInformation runInfo) {
-        return new DfSqlFileRunnerBase(runInfo) {
+        return new DfSqlFileRunnerBase(runInfo, getDataSource()) {
             protected String filterSql(String sql) {
-                
-//                // TODO: メソッドの引数をなんとしても取る！でも型が取れないなぁ！
-//                final SqlTokenizerImpl tokenizer = new SqlTokenizerImpl(sql);
-//                while (true) {
-//                    final int result = tokenizer.next();
-//                    if (result == SqlTokenizer.EOF) {
-//                        break;
-//                    }
-//                    if (tokenizer.getTokenType() == SqlTokenizer.COMMENT) {
-//                        System.out.println("***: " + tokenizer.getToken());
-//                    }
-//                }
-                
+
+                //                // TODO: メソッドの引数をなんとしても取る！でも型が取れないなぁ！
+                //                final SqlTokenizerImpl tokenizer = new SqlTokenizerImpl(sql);
+                //                while (true) {
+                //                    final int result = tokenizer.next();
+                //                    if (result == SqlTokenizer.EOF) {
+                //                        break;
+                //                    }
+                //                    if (tokenizer.getTokenType() == SqlTokenizer.COMMENT) {
+                //                        System.out.println("***: " + tokenizer.getToken());
+                //                    }
+                //                }
+
                 return removeBeginEndComment(sql);
             }
 

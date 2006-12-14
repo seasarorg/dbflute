@@ -10,12 +10,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,9 +34,11 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
     protected File _srcFile;
+    protected DataSource _dataSource;
 
-    public DfSqlFileRunnerBase(DfRunnerInformation runInfo) {
+    public DfSqlFileRunnerBase(DfRunnerInformation runInfo, DataSource dataSource) {
         _runInfo = runInfo;
+        _dataSource = dataSource;
     }
 
     public void setSrc(File src) {
@@ -65,7 +67,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             reader = (_runInfo.isEncodingNull()) ? newFileReader() : newInputStreamReader();
             final List<String> sqlList = extractSqlList(reader);
 
-            connection = newConnection();
+            connection = getConnection();
             statement = newStatement(connection);
             for (String sql : sqlList) {
                 _totalSqlCount++;
@@ -73,7 +75,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 traceSql(sql);
                 execSQL(statement, realSql);
             }
-            if (!_runInfo.isAutoCommit()) {
+            if (!connection.getAutoCommit()) {
                 if (_runInfo.isRollbackOnly()) {
                     connection.rollback();
                 } else {
@@ -83,12 +85,12 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         } catch (SQLException e) {
             throw new BuildException("Transaction#runTransaction() threw the exception!", e);
         } finally {
-            if (!_runInfo.isAutoCommit() && connection != null) {
-                try {
+            try {
+                if (connection != null && !connection.getAutoCommit()) {
                     connection.rollback();
-                } catch (SQLException ignore) {
-                    _log.warn("Connection#rollback() threw the exception!", ignore);
                 }
+            } catch (SQLException ignore) {
+                _log.warn("Connection#rollback() threw the exception!", ignore);
             }
             try {
                 if (statement != null) {
@@ -149,45 +151,14 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
     }
 
-    protected Connection newConnection() {
-        Connection connection = null;
-        final Driver driverInstance = newDriver();
-        final Properties dbInfoProp = new Properties();
-        dbInfoProp.put("user", _runInfo.getUser());
-        dbInfoProp.put("password", _runInfo.getPassword());
+    protected Connection getConnection() {
         try {
-            connection = driverInstance.connect(_runInfo.getUrl(), dbInfoProp);
-        } catch (SQLException e) {
-            throw new BuildException("Driver#connect() threw the exception: _url=" + _runInfo.getUrl(), e);
-        }
-        if (connection == null) {
-            throw new BuildException("Driver doesn't understand the URL: _url=" + _runInfo.getUrl());
-        }
-        try {
+            final Connection connection = _dataSource.getConnection();
             connection.setAutoCommit(_runInfo.isAutoCommit());
+            return connection;
         } catch (SQLException e) {
-            String msg = "Connection#setAutoCommit() threw the exception: _autocommit=";
-            throw new BuildException(msg + _runInfo.isAutoCommit(), e);
+            throw new RuntimeException("getDataSource().getConnection() threw the exception!", e);
         }
-        return connection;
-    }
-
-    protected Driver newDriver() {
-        final Driver driverInstance;
-        try {
-            final Class dc = Class.forName(_runInfo.getDriver());
-            driverInstance = (Driver) dc.newInstance();
-        } catch (ClassNotFoundException e) {
-            String msg = "Class Not Found: JDBC driver " + _runInfo.getDriver() + " could not be loaded.";
-            throw new BuildException(msg, e);
-        } catch (IllegalAccessException e) {
-            String msg = "Illegal Access: JDBC driver " + _runInfo.getDriver() + " could not be loaded.";
-            throw new BuildException(msg, e);
-        } catch (InstantiationException e) {
-            String msg = "Instantiation Exception: JDBC driver " + _runInfo.getDriver() + " could not be loaded.";
-            throw new BuildException(msg, e);
-        }
-        return driverInstance;
     }
 
     protected Statement newStatement(Connection connection) {

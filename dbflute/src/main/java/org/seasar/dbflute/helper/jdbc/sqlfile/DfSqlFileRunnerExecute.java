@@ -3,6 +3,8 @@ package org.seasar.dbflute.helper.jdbc.sqlfile;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
@@ -12,8 +14,8 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     /** Log instance. */
     private static Log _log = LogFactory.getLog(DfSqlFileRunnerExecute.class);
 
-    public DfSqlFileRunnerExecute(DfRunnerInformation runInfo) {
-        super(runInfo);
+    public DfSqlFileRunnerExecute(DfRunnerInformation runInfo, DataSource dataSource) {
+        super(runInfo, dataSource);
     }
 
     /**

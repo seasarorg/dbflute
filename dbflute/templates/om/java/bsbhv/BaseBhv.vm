@@ -381,6 +381,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
 #if ($table.hasPrimaryKey())
 
+    public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        return selectByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+    }
+
+    // @deprecated Please use selectByPKValueWithDeletedCheck().
     public ${myExtendedObjectClassName} selectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
@@ -389,11 +396,28 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     /**
+     * Select with deleted check.
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull)
+     * @return Entity that is selected from database. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public ${myExtendedObjectClassName} selectByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
+        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
+        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
+        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
+        final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(${glAttachedCBArgsVariableName});
+        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
+        return currentEntity;
+    }
+
+    /**
      * Select for read only with deleted check.
      * 
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      * @return Entity that is selected from database by select-for-read-only. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated Please use selectByPKMapStringWithDeletedCheck().
      */
     public ${myExtendedObjectClassName} selectForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
         assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
@@ -556,6 +580,30 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.isWritable())
 
     /**
+     * Insert or update after select.
+     * {update: modified only}
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @return Updated count.
+     */
+    public int insertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            return delegateInsert(entity);
+        }
+        final String mapString = entity.extractPrimaryKeyMapString();
+        ${myExtendedObjectClassName} currentEntity = null;
+        try {
+            currentEntity = selectByPKMapStringWithDeletedCheck(mapString);
+        } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+            return delegateInsert(entity);
+        }
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        mergeEntity(entity, currentEntity);
+        return delegateUpdate(entity);
+    }
+
+    /**
      * Insert or update after select-for-update.
      * {update: modified only}
      * 
@@ -570,12 +618,27 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         final String mapString = entity.extractPrimaryKeyMapString();
         ${myExtendedObjectClassName} currentEntity = null;
         try {
-            selectForUpdateByPKMapStringWithDeletedCheck(mapString);
+            currentEntity = selectForUpdateByPKMapStringWithDeletedCheck(mapString);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
             return delegateInsert(entity);
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        mergeEntity(entity, currentEntity);
         return delegateUpdate(entity);
+    }
+
+    /**
+     * Update after select.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int updateAfterSelect(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        final ${myExtendedObjectClassName} currentEntity = selectByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        mergeEntity(entity, currentEntity);
+        return delegateUpdate(currentEntity);
     }
 
     /**
@@ -584,7 +647,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     public int updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -598,7 +660,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param sourceEntity Source entity. (NotNull)
      * @param destinationEntity Destination entity. (NotNull)
-     * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     protected void mergeEntity(${glEntityInterfaceName} sourceEntity, ${glEntityInterfaceName} destinationEntity) {
         assertEntityNotNull(sourceEntity);

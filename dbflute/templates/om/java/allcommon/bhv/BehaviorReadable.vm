@@ -185,11 +185,21 @@ public interface ${glBehaviorReadableInterfaceName} {
     public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
 
     /**
+     * Read by primary-key map-string with deleted check.
+     * 
+     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
+     * @return Entity that is read from database. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public ${glEntityInterfaceName} readByPKMapStringWithDeletedCheck(String primaryKeyMapString);
+
+    /**
      * Read for read only by primary-key map-string with deleted check.
      * 
      * @param primaryKeyMapString Primary-Key map-string. (NotNull)
      * @return Entity that is read from database by select-for-read-only. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated Please use readByPKMapStringWithDeletedCheck().
      */
     public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
 

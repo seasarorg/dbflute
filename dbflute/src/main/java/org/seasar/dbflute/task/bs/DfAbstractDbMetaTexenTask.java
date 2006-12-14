@@ -173,7 +173,8 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
         return name;
     }
 
-    public void execute() throws BuildException {
+    @Override
+    protected void doExecute() {
         fireSuperExecute();
     }
 }

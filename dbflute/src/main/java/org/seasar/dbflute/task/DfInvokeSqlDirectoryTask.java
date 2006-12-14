@@ -24,62 +24,17 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
 public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
 
     // =========================================================================================
-    //                                                                                 Attribute
-    //                                                                                 =========
-    /** DB driver. */
-    protected String _driver = null;
-
-    /** DB url. */
-    protected String _url = null;
-
-    /** User name. */
-    protected String _userId = null;
-
-    /** Password */
-    protected String _password = null;
-
-    // =========================================================================================
-    //                                                                                  Accessor
-    //                                                                                  ========
-    /**
-     * Set the JDBC driver to be used.
-     *
-     * @param driver driver class name
-     */
-    public void setDriver(String driver) {
-        this._driver = driver;
-    }
-
-    /**
-     * Set the DB connection url.
-     *
-     * @param url connection url
-     */
-    public void setUrl(String url) {
-        this._url = url;
-    }
-
-    /**
-     * Set the user name for the DB connection.
-     *
-     * @param userId database user
-     */
-    public void setUserId(String userId) {
-        this._userId = userId;
-    }
-
-    /**
-     * Set the password for the DB connection.
-     *
-     * @param password database password
-     */
-    public void setPassword(String password) {
-        this._password = password;
+    //                                                                                DataSource
+    //                                                                                ==========
+    @Override
+    protected boolean isUseDataSource() {
+        return true;
     }
 
     // =========================================================================================
@@ -90,22 +45,50 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
      *
      * @throws BuildException
      */
-    public void execute() throws BuildException {
+    @Override
+    protected void doExecute() {
+        final DfRunnerInformation runInfo = createRunnerInformation();
+        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
+        fireMan.execute(getSqlFileRunner(runInfo), getSqlFileList());
+    }
+
+    protected DfRunnerInformation createRunnerInformation() {
         final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
-        runInfo.setAutoCommit(DfBuildProperties.getInstance().isInvokeSqlDirectoryAutoCommit());
-        runInfo.setErrorContinue(DfBuildProperties.getInstance().isInvokeSqlDirectoryErrorContinue());
-        runInfo.setRollbackOnly(DfBuildProperties.getInstance().isInvokeSqlDirectoryRollbackOnly());
+        runInfo.setAutoCommit(isAutoCommit());
+        runInfo.setErrorContinue(isErrorContinue());
+        runInfo.setRollbackOnly(isRollbackOnly());
+        return runInfo;
+    }
 
-        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        fireMan.execute(new DfSqlFileRunnerExecute(runInfo), getSqlFileList());
+    protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
+        return new DfSqlFileRunnerExecute(runInfo, getDataSource());
     }
 
     protected List<File> getSqlFileList() {
-        final String sqlDirectory = DfBuildProperties.getInstance().getInvokeSqlDirectorySqlDirectory();
-        return new DfSqlFileGetter().getSqlFileList(sqlDirectory);
+        return new DfSqlFileGetter().getSqlFileList(getSqlDirectory());
+    }
+
+    protected String getSqlDirectory() {
+        return getMyProperties().getInvokeSqlDirectorySqlDirectory();
+    }
+
+    protected boolean isAutoCommit() {
+        return getMyProperties().isInvokeSqlDirectoryAutoCommit();
+    }
+
+    protected boolean isErrorContinue() {
+        return getMyProperties().isInvokeSqlDirectoryErrorContinue();
+    }
+
+    protected boolean isRollbackOnly() {
+        return getMyProperties().isInvokeSqlDirectoryRollbackOnly();
+    }
+
+    protected DfInvokeSqlDirectoryProperties getMyProperties() {
+        return DfBuildProperties.getInstance().getInvokeSqlDirectoryProperties();
     }
 }

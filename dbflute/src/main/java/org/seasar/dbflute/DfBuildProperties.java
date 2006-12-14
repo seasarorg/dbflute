@@ -35,6 +35,8 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDaoDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
+import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfPropertiesHandler;
@@ -971,7 +973,7 @@ public final class DfBuildProperties {
     public String getExtractAcceptEqual() {
         return stringProp("torque.extractAcceptEqual", "@=");
     }
-    
+
     // ===============================================================================
     //                                                              Properties - Other
     //                                                              ==================
@@ -1233,91 +1235,15 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                   Properties - invokeReplaceSchemaDefinitionMap
     //                                   =============================================
-    public static final String KEY_invokeReplaceSchemaDefinitionMap = "invokeReplaceSchemaDefinitionMap";
-    protected Map<String, Object> _invokeReplaceSchemaDefinitionMap;
-
-    public Map<String, Object> getInvokeReplaceSchemaDefinitionMap() {
-        if (_invokeReplaceSchemaDefinitionMap == null) {
-            _invokeReplaceSchemaDefinitionMap = mapProp("torque." + KEY_invokeReplaceSchemaDefinitionMap,
-                    DEFAULT_EMPTY_MAP);
-        }
-        return _invokeReplaceSchemaDefinitionMap;
-    }
-
-    public String getInvokeReplaceSchemaSqlFile() {
-        return (String) getInvokeReplaceSchemaDefinitionMap().get("sqlFile");
-    }
-
-    public boolean isInvokeReplaceSchemaAutoCommit() {
-        final String isAutoCommitString = (String) getInvokeReplaceSchemaDefinitionMap().get("isAutoCommit");
-        if (isAutoCommitString != null && isAutoCommitString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isInvokeReplaceSchemaRollbackOnly() {
-        final String isRollbackOnlyString = (String) getInvokeReplaceSchemaDefinitionMap().get("isRollbackOnly");
-        if (isRollbackOnlyString != null && isRollbackOnlyString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isInvokeReplaceSchemaErrorContinue() {
-        final String isErrorContinueString = (String) getInvokeReplaceSchemaDefinitionMap().get("isErrorContinue");
-        if (isErrorContinueString != null && isErrorContinueString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
+    public DfReplaceSchemaProperties getInvokeReplaceSchemaProperties() {
+        return getHandler().getReplaceSchemaProperties(getProperties());
     }
 
     // ===============================================================================
     //                                    Properties - invokeSqlDirectoryDefinitionMap
     //                                    ============================================
-    public static final String KEY_invokeSqlDirectoryDefinitionMap = "invokeSqlDirectoryDefinitionMap";
-    protected Map<String, Object> _invokeSqlDirectoryDefinitionMap;
-
-    public Map<String, Object> getInvokeSqlDirectoryDefinitionMap() {
-        if (_invokeSqlDirectoryDefinitionMap == null) {
-            _invokeSqlDirectoryDefinitionMap = mapProp("torque." + KEY_invokeSqlDirectoryDefinitionMap,
-                    DEFAULT_EMPTY_MAP);
-        }
-        return _invokeSqlDirectoryDefinitionMap;
-    }
-
-    public String getInvokeSqlDirectorySqlDirectory() {
-        return (String) getInvokeSqlDirectoryDefinitionMap().get("sqlDirectory");
-    }
-
-    public boolean isInvokeSqlDirectoryAutoCommit() {
-        final String isAutoCommitString = (String) getInvokeSqlDirectoryDefinitionMap().get("isAutoCommit");
-        if (isAutoCommitString != null && isAutoCommitString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isInvokeSqlDirectoryRollbackOnly() {
-        final String isRollbackOnlyString = (String) getInvokeSqlDirectoryDefinitionMap().get("isRollbackOnly");
-        if (isRollbackOnlyString != null && isRollbackOnlyString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isInvokeSqlDirectoryErrorContinue() {
-        final String isErrorContinueString = (String) getInvokeSqlDirectoryDefinitionMap().get("isErrorContinue");
-        if (isErrorContinueString != null && isErrorContinueString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
+    public DfInvokeSqlDirectoryProperties getInvokeSqlDirectoryProperties() {
+        return getHandler().getInvokeSqlDirectoryProperties(getProperties());
     }
 
     // ===============================================================================

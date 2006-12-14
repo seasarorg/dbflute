@@ -92,6 +92,14 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get("localColumnName");
     }
+    
+    protected Map<String, String> getAdditionalForeignKeyComponentForeignCondition(String foreignName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+        final String foreignCondition = componentMap.get("foreignCondition");
+        
+        // TODO: Ç≥Ç†Ç«Ç§Ç∑ÇÈÅH
+        return null;
+    }
 
     public List<String> getAdditionalForeignKeyComponentLocalColumnNameList(String foreignName) {
         final String property = getAdditionalForeignKeyComponentLocalColumnName(foreignName);

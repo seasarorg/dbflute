@@ -69,4 +69,8 @@ import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
 
     public static final Log _log = LogFactory.getLog(TorqueDataModelTask.class);
+
+    protected boolean isUseDataSource() {
+        return false;
+    }
 }

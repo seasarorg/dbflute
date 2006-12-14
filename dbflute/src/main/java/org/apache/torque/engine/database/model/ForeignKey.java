@@ -84,6 +84,8 @@ public class ForeignKey {
     private List<String> _localColumns = new ArrayList<String>(3);
 
     private List<String> _foreignColumns = new ArrayList<String>(3);
+    
+    private String _foreignPropertyNamePrefix;
 
     /**
      * Imports foreign key from an XML specification
@@ -113,6 +115,10 @@ public class ForeignKey {
         return _baseTable;
     }
 
+    public void setForeignPropertyNamePrefix(String propertyNamePrefix) {
+        _foreignPropertyNamePrefix = propertyNamePrefix;
+    }
+    
     /**
      * TODO: To write Detail Comment.
      * 
@@ -499,6 +505,9 @@ public class ForeignKey {
             } else {
                 result = getForeignTable().getUncapitalisedJavaName() + result;
             }
+            if (_foreignPropertyNamePrefix != null) {
+                result = _foreignPropertyNamePrefix + result;
+            }
 
             return result;
         } catch (RuntimeException e) {
@@ -790,4 +799,6 @@ public class ForeignKey {
         result.append("    </foreign-key>\n");
         return result.toString();
     }
+
+
 }

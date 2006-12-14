@@ -35,7 +35,7 @@ public final class DfPropertiesHandler {
         }
         return _daoDiconProperties;
     }
-    
+
     protected DfGeneratedClassPackageProperties _generatedClassPackageProperties;
 
     public DfGeneratedClassPackageProperties getGeneratedClassPackageProperties(Properties prop) {
@@ -44,7 +44,7 @@ public final class DfPropertiesHandler {
         }
         return _generatedClassPackageProperties;
     }
-    
+
     protected DfOptimisticLockProperties _optimisticLockProperties;
 
     public DfOptimisticLockProperties getOptimisticLockProperties(Properties prop) {
@@ -53,7 +53,7 @@ public final class DfPropertiesHandler {
         }
         return _optimisticLockProperties;
     }
-    
+
     protected DfSelectParamProperties _selectParamProperties;
 
     public DfSelectParamProperties getSelectParamProperties(Properties prop) {
@@ -62,7 +62,7 @@ public final class DfPropertiesHandler {
         }
         return _selectParamProperties;
     }
-    
+
     protected DfAdditionalForeignKeyProperties _additionalForeignKeyProperties;
 
     public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties(Properties prop) {
@@ -71,7 +71,7 @@ public final class DfPropertiesHandler {
         }
         return _additionalForeignKeyProperties;
     }
-    
+
     protected DfOtherProperties _otherProperties;
 
     public DfOtherProperties getOtherProperties(Properties prop) {
@@ -80,7 +80,7 @@ public final class DfPropertiesHandler {
         }
         return _otherProperties;
     }
-    
+
     protected DfSql2EntityProperties _sql2EntityProperties;
 
     public DfSql2EntityProperties getSql2EntityProperties(Properties prop) {
@@ -88,5 +88,23 @@ public final class DfPropertiesHandler {
             _sql2EntityProperties = new DfSql2EntityProperties(prop);
         }
         return _sql2EntityProperties;
+    }
+
+    protected DfReplaceSchemaProperties _replaceSchemaPropertiess;
+
+    public DfReplaceSchemaProperties getReplaceSchemaProperties(Properties prop) {
+        if (_replaceSchemaPropertiess == null) {
+            _replaceSchemaPropertiess = new DfReplaceSchemaProperties(prop);
+        }
+        return _replaceSchemaPropertiess;
+    }
+
+    protected DfInvokeSqlDirectoryProperties _invokeSqlDirectoryProperties;
+
+    public DfInvokeSqlDirectoryProperties getInvokeSqlDirectoryProperties(Properties prop) {
+        if (_invokeSqlDirectoryProperties == null) {
+            _invokeSqlDirectoryProperties = new DfInvokeSqlDirectoryProperties(prop);
+        }
+        return _invokeSqlDirectoryProperties;
     }
 }

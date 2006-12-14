@@ -79,9 +79,13 @@
     classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueSQLTask"/>
   <taskdef
-    name="torque-invoke-replace-schema"
+    name="torque-replace-schema"
     classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.DfInvokeReplaceSchemaTask"/>
+    classname="org.seasar.dbflute.task.DfReplaceSchemaTask"/>
+  <taskdef
+    name="torque-outside-sql-test"
+    classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
   <taskdef
     name="torque-invoke-sql-directory"
     classpathref="torque-classpath"
@@ -236,11 +240,11 @@
   <!-- **************************************************************************************************** -->
   <!--                                                                                              PlaySQL -->
   <!--                                                                                              ******* -->
-  <target name="invoke-replace-schema" description="==> invoke replace-schema">
+  <target name="replace-schema" description="==> replace-schema">
 
     <echo message="+-----------------------------------------------+"/>
     <echo message="|                                               |"/>
-    <echo message="| Invoke replace-schema !                       |"/>
+    <echo message="| Replace-Schema !                              |"/>
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
     	
@@ -252,15 +256,40 @@
     <echo message="password = ${torque.database.password}"/>
     <echo message="+-----------------+"/>
   	
-    <torque-invoke-replace-schema
+    <torque-replace-schema
       contextProperties="${torque.contextProperties}"
       driver="${torque.database.driver}"
       url="${torque.database.url}"
       userId="${torque.database.user}"
       password="${torque.database.password}">
-    </torque-invoke-replace-schema>
+    </torque-replace-schema>
   </target>
+
+  <target name="outside-sql-test" description="==> outside-sql-test">
+
+    <echo message="+-----------------------------------------------+"/>
+    <echo message="|                                               |"/>
+    <echo message="| Outside-Sql Test !                            |"/>
+    <echo message="|                                               |"/>
+    <echo message="+-----------------------------------------------+"/>
+  	
+    <echo message=" "/>
+    <echo message="+-------------------------------------------------------------------------------+"/>
+    <echo message="driver   = ${torque.database.driver}"/>
+    <echo message="url      = ${torque.database.url}"/>
+    <echo message="userId   = ${torque.database.user}"/>
+    <echo message="password = ${torque.database.password}"/>
+    <echo message="+-----------------+"/>
 	
+    <torque-outside-sql-test
+      contextProperties="${torque.contextProperties}"
+      driver="${torque.database.driver}"
+      url="${torque.database.url}"
+      userId="${torque.database.user}"
+      password="${torque.database.password}">
+    </torque-outside-sql-test>
+  </target>
+
   <target name="invoke-sql-directory" description="==> invoke sql-directory">
 
     <echo message="+-----------------------------------------------+"/>

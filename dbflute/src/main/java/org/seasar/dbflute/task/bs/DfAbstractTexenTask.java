@@ -17,19 +17,20 @@ package org.seasar.dbflute.task.bs;
 
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.BuildException;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.config.DfDatabaseConfig;
+import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceCreator;
+import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
+import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
-import org.seasar.framework.container.factory.SingletonS2ContainerFactory;
 
 /**
  * Abstract DB meta texen task for Torque.
@@ -41,7 +42,63 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     /** Log instance. */
     public static final Log _log = LogFactory.getLog(DfAbstractTexenTask.class);
 
-    private String _targetDatabase;
+    // =========================================================================================
+    //                                                                                 Attribute
+    //                                                                                 =========
+    protected String _targetDatabase;
+
+    /** DB driver. */
+    protected String _driver = null;
+
+    /** DB url. */
+    protected String _url = null;
+
+    /** User name. */
+    protected String _userId = null;
+
+    /** Password */
+    protected String _password = null;
+
+    protected DfDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
+
+    // =========================================================================================
+    //                                                                                  Accessor
+    //                                                                                  ========
+    /**
+     * Set the JDBC driver to be used.
+     *
+     * @param driver driver class name
+     */
+    public void setDriver(String driver) {
+        this._driver = driver;
+    }
+
+    /**
+     * Set the DB connection url.
+     *
+     * @param url connection url
+     */
+    public void setUrl(String url) {
+        this._url = url;
+    }
+
+    /**
+     * Set the user name for the DB connection.
+     *
+     * @param userId database user
+     */
+    public void setUserId(String userId) {
+        this._userId = userId;
+    }
+
+    /**
+     * Set the password for the DB connection.
+     *
+     * @param password database password
+     */
+    public void setPassword(String password) {
+        this._password = password;
+    }
 
     public String getTargetDatabase() {
         return _targetDatabase;
@@ -50,6 +107,24 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     public void setTargetDatabase(String v) {
         _targetDatabase = v;
     }
+
+    @Override
+    final public void execute() {
+        try {
+            if (isUseDataSource()) {
+                setupDataSource();
+            }
+            doExecute();
+            if (isUseDataSource()) {
+                closingDataSource();
+            }
+        } catch (RuntimeException e) {
+            _log.error("execute() threw the exception!", e);
+            throw e;
+        }
+    }
+
+    abstract protected void doExecute();
 
     protected void fireSuperExecute() {
         // /----------------------------------------------
@@ -65,6 +140,26 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             _log.error("super#execute() threw the exception!", e);
             _log.info("/ * * * * * * * * * /");
         }
+    }
+
+    abstract protected boolean isUseDataSource();
+
+    protected void setupDataSource() {
+        _dataSourceCreator.setUserId(_userId);
+        _dataSourceCreator.setPassword(_password);
+        _dataSourceCreator.setDriver(_driver);
+        _dataSourceCreator.setUrl(_url);
+        _dataSourceCreator.setAutoCommit(true);
+        _dataSourceCreator.create();
+    }
+
+    protected void closingDataSource() {
+        _dataSourceCreator.commit();
+        _dataSourceCreator.destroy();
+    }
+
+    protected DataSource getDataSource() {
+        return DfDataSourceContext.getDataSource();
     }
 
     public void setContextProperties(String file) {

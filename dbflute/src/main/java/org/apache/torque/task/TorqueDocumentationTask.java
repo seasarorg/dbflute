@@ -75,6 +75,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _outputFormat = v;
     }
 
+    protected boolean isUseDataSource() {
+        return false;
+    }
+
     public Context initControlContext() throws Exception {
         super.initControlContext();
         _context.put("outputFormat", _outputFormat);

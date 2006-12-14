@@ -106,6 +106,10 @@ public class TorqueSQLTask extends DfAbstractDbMetaTexenTask {
         return _idTableXMLFile;
     }
 
+    protected boolean isUseDataSource() {
+        return false;
+    }
+
     public Context initControlContext() throws Exception {
         super.initControlContext();
         try {

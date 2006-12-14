@@ -8,7 +8,7 @@ rem nnnnnnnnnn/
 set MY_PROPERTIES_PATH=build-%MY_PROJECT_NAME%.properties
 
 rem /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-rem Execute {JDBC}.
+rem Execute {JDBC and Document}.
 rem nnnnnnnnnn/
 call %DBFLUTE_HOME%\etc\cmd\_df-jdbc.cmd %MY_PROPERTIES_PATH%
 
