@@ -39,8 +39,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public boolean isReplaceSchemaAutoCommit() {
-        final String isAutoCommitString = (String) getReplaceSchemaDefinitionMap().get("isAutoCommit");
-        if (isAutoCommitString != null && isAutoCommitString.equalsIgnoreCase("true")) {
+        final String propString = (String) getReplaceSchemaDefinitionMap().get("isAutoCommit");
+        if (propString == null) {
+            return false;
+        }
+        if (propString != null && propString.equalsIgnoreCase("true")) {
             return true;
         } else {
             return false;
@@ -48,8 +51,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public boolean isReplaceSchemaRollbackOnly() {
-        final String isRollbackOnlyString = (String) getReplaceSchemaDefinitionMap().get("isRollbackOnly");
-        if (isRollbackOnlyString != null && isRollbackOnlyString.equalsIgnoreCase("true")) {
+        final String propString = (String) getReplaceSchemaDefinitionMap().get("isRollbackOnly");
+        if (propString == null) {
+            return false;
+        }
+        if (propString != null && propString.equalsIgnoreCase("true")) {
             return true;
         } else {
             return false;
@@ -57,8 +63,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public boolean isReplaceSchemaErrorContinue() {
-        final String isErrorContinueString = (String) getReplaceSchemaDefinitionMap().get("isErrorContinue");
-        if (isErrorContinueString != null && isErrorContinueString.equalsIgnoreCase("true")) {
+        final String propString = (String) getReplaceSchemaDefinitionMap().get("isErrorContinue");
+        if (propString == null) {
+            return true;
+        }
+        if (propString != null && propString.equalsIgnoreCase("true")) {
             return true;
         } else {
             return false;

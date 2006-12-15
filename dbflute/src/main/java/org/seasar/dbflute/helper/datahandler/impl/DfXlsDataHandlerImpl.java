@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -21,7 +22,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     public List<DataSet> readSeveralData(String dataDirectoryName) {
         final List<File> xlsList = getXlsList(dataDirectoryName);
-        final ArrayList<DataSet> ls = new ArrayList<DataSet>();
+        final List<DataSet> ls = new ArrayList<DataSet>();
         for (File file : xlsList) {
             final XlsReader xlsReader = new XlsReader(file);
             ls.add(xlsReader.read());
@@ -43,7 +44,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     public List<File> getXlsList(String dataDirectoryName) {
-        List<File> _xlsList = new ArrayList<File>();
+        TreeSet<File> xlsTreeSet = new TreeSet<File>();
         final File dir = new File(dataDirectoryName);
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -52,8 +53,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         };
         final File[] listFiles = dir.listFiles(filter);
         for (File file : listFiles) {
-            _xlsList.add(file);
+            xlsTreeSet.add(file);
         }
-        return _xlsList;
+        return new ArrayList<File>(xlsTreeSet);
     }
 }

@@ -666,9 +666,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityNotNull(destinationEntity);
         final ${myExtendedObjectClassName} sourceMyEntity = (${myExtendedObjectClassName})sourceEntity;
         final ${myExtendedObjectClassName} destinationMyEntity = (${myExtendedObjectClassName})destinationEntity;
+        final java.util.Set${database.filterGenericsString('String')} names = sourceMyEntity.getModifiedPropertyNames();
   #foreach ($col in $table.Columns)
 
-        if (sourceMyEntity.isSetterInvoked${col.JavaName}()) {
+        if (names.contains("${col.UncapitalisedJavaName}")) {
             destinationMyEntity.set${col.JavaName}(sourceMyEntity.get${col.JavaName}());
         }
   #end
