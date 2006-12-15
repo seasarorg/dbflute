@@ -205,8 +205,22 @@ namespace ${glPackageExtendedBhv} {
         ${glPagingResultBeanName} SelectPageByPageNumber(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int fetchPageNumber);
     #if ($table.hasPrimaryKey())
 
+        ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
+      #if ($database.isMakeDeprecated())
+
+        [Obsolete("This class is deprecated. Please use SelectByPKMapStringWithDeletedCheck().")]
         ${myExtendedObjectClassName} SelectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
+      #end
     #end
+
+        /// <summary>
+        /// Select by primary-key map-string with deleted check.
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
+        /// <returns>Entity that is selected from database. (NotNull)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        ${myExtendedObjectClassName} SelectByPKMapStringWithDeletedCheck(String primaryKeyMapString);
+    #if ($database.isMakeDeprecated())
 
         /// <summary>
         /// Select for read only with deleted check.
@@ -214,11 +228,12 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        [Obsolete("This class is deprecated. Please use SelectByPKMapStringWithDeletedCheck().")]
         ${myExtendedObjectClassName} SelectForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-    #if ($table.hasPrimaryKey())
+    #end
+    #if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
 
         ${myExtendedObjectClassName} SelectForUpdateByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
-    #end
 
         /// <summary>
         /// Select for update with deleted check.
@@ -227,6 +242,8 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         ${myExtendedObjectClassName} SelectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString);
+    #end
+
         #endregion
 
 
@@ -268,12 +285,29 @@ namespace ${glPackageExtendedBhv} {
 
         #endregion
 #end
+    #if ($table.isWritable())
 
         // =====================================================================================
         //                                                                          Basic Update
         //                                                                          ============
         #region Basic Update
-    #if ($table.isWritable())
+
+        /// <summary>
+        /// Insert or update after select.
+        /// </summary>
+        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        int InsertOrUpdateAfterSelect(${myExtendedObjectClassName} entity);
+
+        /// <summary>
+        /// Update after select.
+        /// </summary>
+        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        int UpdateAfterSelect(${myExtendedObjectClassName} entity);
+      #if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
         /// Insert or update after select-for-update.
@@ -290,13 +324,36 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         int UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity);
+      #end
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                        Various Insert
+        //                                                                        ==============
+        #region Various Insert
+      #if ($table.isUseIdentity())
+        #if ($table.hasPrimaryKey())
+
+        int CopyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString});
+        #end
+
+        /// <summary>
+        /// Copy-Insert after select.
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary-Key map-string. (NotNull)</param>
+        /// <returns>Inserted count.</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        int CopyInsertByPKMapStringAfterSelect(String primaryKeyMapString);
+      #end
+
         #endregion
 
         // =====================================================================================
         //                                                                        Various Update
         //                                                                        ==============
         #region Various Update
-      #if ($table.hasLogicalDeleteColumn())
+      #if ($table.hasLogicalDeleteColumn() && $database.isMakeBehaviorForUpdate())
         #if ($table.hasPrimaryKey())
 
         // <summary>
@@ -376,28 +433,8 @@ namespace ${glPackageExtendedBhv} {
       #end
 
         #endregion
-
-        // =====================================================================================
-        //                                                                        Various Insert
-        //                                                                        ==============
-        #region Various Insert
-      #if ($table.isUseIdentity())
-        #if ($table.hasPrimaryKey())
-
-        int CopyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString});
-        #end
-
-        /// <summary>
-        /// Copy-Insert after select.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-Key map-string. (NotNull)</param>
-        /// <returns>Inserted count.</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        int CopyInsertByPKMapStringAfterSelect(String primaryKeyMapString);
-      #end
     #end
 
-        #endregion
     }
 
     /// <summary>

@@ -329,6 +329,7 @@ namespace ${glPackageBaseCommonDBMeta} {
          * @return The instance of condition-bean. (NotNull)
          */
         abstract public ${glConditionBeanInterfaceName} NewConditionBean();
+#if ($database.isMakeDeprecated())
 
         // =====================================================================================
         //                                                                   Entity PropertyInfo
@@ -339,8 +340,10 @@ namespace ${glPackageBaseCommonDBMeta} {
         /// </summary>
         /// <param name="multiName">Multi-name. (NotNull)</param>
         /// <returns>Entity property-info. (NotNull)</returns>
+        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
         abstract public System.Reflection.PropertyInfo GetEntityPropertyInfoByMultiName(String multiName);
         #endregion
+#end
 
         // =====================================================================================
         //                                                                        Foreign DBMeta

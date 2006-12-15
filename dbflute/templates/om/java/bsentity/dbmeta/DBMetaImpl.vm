@@ -363,16 +363,25 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public ${myExtendedObjectClassName} newMyEntity() {
         return new ${myExtendedObjectClassName}();
     }
+#if ($database.isMakeDeprecated())
 
     // =====================================================================================
     //                                                                         Entity Method
     //                                                                         =============
 #foreach ($col in $table.Columns)
 
-    /** The getter method of ${col.UncapitalisedJavaName}. */
+    /**
+     * The getter method of ${col.UncapitalisedJavaName}.
+     * 
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
+     */
     protected static final java.lang.reflect.Method ENTITY_GETTER_METHOD_${col.JavaName} = getGetterMethod("get" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
 
-    /** <summary>The setter method of ${col.UncapitalisedJavaName}. */
+    /** 
+     * The setter method of ${col.UncapitalisedJavaName}.
+     * 
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
+     */
     protected static final java.lang.reflect.Method ENTITY_SETTER_METHOD_${col.JavaName} = getSetterMethod("set" + COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, ${col.JavaNative}.class);
 #end
 
@@ -381,6 +390,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * 
      * @param methodName The method name. (NotNull)
      * @return The getter method. (NotNull)
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
      */
     protected static java.lang.reflect.Method getGetterMethod(String methodName) {
         try {
@@ -397,6 +407,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @param methodName The method name. (NotNull)
      * @param type Argument type. (NotNull)
      * @return The getter method. (NotNull)
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
      */
     protected static java.lang.reflect.Method getSetterMethod(String methodName, Class type) {
         try {
@@ -413,6 +424,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * ${database.ImplementComment}
      * 
      * @return The getter method of ${col.UncapitalisedJavaName}. (NotNull)
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
      */
     public java.lang.reflect.Method getEntityGetterMethod_${col.JavaName}() {
         return ENTITY_GETTER_METHOD_${col.JavaName};
@@ -422,6 +434,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * ${database.ImplementComment}
      * 
      * @return The setter method of ${col.UncapitalisedJavaName}. (NotNull)
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
      */
     public java.lang.reflect.Method getEntitySetterMethod_${col.JavaName}() {
         return ENTITY_SETTER_METHOD_${col.JavaName};
@@ -433,6 +446,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * 
      * @param multiName Multi-name. (NotNull)
      * @return Entity getter method of entity. (NotNull)
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
      */ 
     public java.lang.reflect.Method getEntityGetterMethodByMultiName(String multiName) {
         assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
@@ -461,6 +475,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * 
      * @param multiName Multi-name. (NotNull)
      * @return Entity setter method of entity. (NotNull)
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
      */ 
     public java.lang.reflect.Method getEntitySetterMethodByMultiName(String multiName) {
         assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
@@ -483,6 +498,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
             throw new RuntimeException(e.getCause());
         }
     }
+#end
 
     // =====================================================================================
     //                                                                        Foreign DBMeta

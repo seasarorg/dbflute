@@ -394,6 +394,7 @@ namespace ${myDBMetaPackageName} {
             return new ${myConditionBeanClassName}();
         }
 #end
+#if ($database.isMakeDeprecated())
 
         // =====================================================================================
         //                                                                          PropertyInfo
@@ -403,6 +404,7 @@ namespace ${myDBMetaPackageName} {
 #foreach ($col in $table.Columns)
 
         /// <summary>The entity property-info of ${col.UncapitalisedJavaName}.</summary>
+        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
         public static readonly PropertyInfo ENTITY_PROPERTY_INFO_${col.JavaName} = ENTITY_TYPE.GetProperty(COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
 #end
 
@@ -412,6 +414,7 @@ namespace ${myDBMetaPackageName} {
         /// ${database.ImplementComment}
         /// </summary>
         /// <returns>The entity property-info of ${col.UncapitalisedJavaName}.</returns>
+        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
         public PropertyInfo GetEntityPropertyInfo_${col.JavaName}() {
             return ENTITY_PROPERTY_INFO_${col.JavaName};
         }
@@ -422,6 +425,7 @@ namespace ${myDBMetaPackageName} {
         /// </summary>
         /// <param name="multiName">Multi-name. (NotNull)</param>
         /// <returns>Entity property-info. (NotNull)</returns>
+        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
         public override PropertyInfo GetEntityPropertyInfoByMultiName(String multiName) {
             String propertyName = GetCapPropNameByDbName(GetDbNameByMultiName(multiName));
             MethodInfo method = this.GetType().GetMethod("GetEntityPropertyInfo_" + propertyName);
@@ -429,6 +433,7 @@ namespace ${myDBMetaPackageName} {
         }
 
         #endregion
+#end
 
         // =====================================================================================
         //                                                                        Foreign DBMeta

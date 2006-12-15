@@ -717,7 +717,7 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         public int CopyInsertByPKMapStringAfterSelect(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${myExtendedObjectClassName} currentEntity = SelectForReadOnlyByPKMapStringWithDeletedCheck(primaryKeyMapString);
+            ${myExtendedObjectClassName} currentEntity = SelectByPKMapStringWithDeletedCheck(primaryKeyMapString);
             FilterCopyInsertEntity(currentEntity);
             return this.Self.DelegateInsert(currentEntity);
         }
@@ -899,5 +899,6 @@ namespace ${glPackageExtendedBhv} {
 
         #endregion
     #end
+
     }
 }

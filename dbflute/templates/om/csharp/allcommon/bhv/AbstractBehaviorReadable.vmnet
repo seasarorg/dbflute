@@ -320,8 +320,25 @@ namespace ${glPackageBaseCommonBhv} {
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
+        /// <returns>Entity that is read from database. (NotNull)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        public ${glEntityInterfaceName} ReadByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
+            AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
+            ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
+            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString);
+            ${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
+            AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
+            return currentEntity;
+        }
+    #if ($database.isMakeDeprecated())
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Entity that is read from database by select-for-read-only. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        [Obsolete("This class is deprecated. Please use ReadByPKMapStringWithDeletedCheck().")]
         public ${glEntityInterfaceName} ReadForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
             AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
             ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
@@ -330,6 +347,8 @@ namespace ${glPackageBaseCommonBhv} {
             AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
             return currentEntity;
         }
+    #end
+    #if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
         /// ${database.ImplementComment}
@@ -346,6 +365,8 @@ namespace ${glPackageBaseCommonBhv} {
             AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
             return currentEntity;
         }
+    #end
+
         #endregion
 
         // =====================================================================================

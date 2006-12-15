@@ -87,6 +87,24 @@ namespace ${glPackageBaseCommonBhv} {
         #region Basic Update
 
         /// <summary>
+        /// Create or modify after select.
+        /// </summary>
+        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        int CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+        /**
+        /// Modify after select.
+         * 
+         * @param entity Entity.
+         * @return Updated count.
+         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+         */
+        int ModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+#if ($database.isMakeBehaviorForUpdate())
+
+        /// <summary>
         /// Create or modify after select-for-update.
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
@@ -100,6 +118,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <returns>Updated count.</returns>
         /// <exception cref="MspadminBiz.Dao.Allcommon.exception.RecordHasAlreadyBeenDeletedException"></exception>
         int ModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+#end
 
         /// <summary>
         /// Reflect(insert or update) from separated-file.

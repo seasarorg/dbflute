@@ -230,6 +230,7 @@ public interface ${myClassName} {
      * @return The instance of entity. (NotNull)
      */ 
     public ${glEntityInterfaceName} newEntity();
+#if ($database.isMakeDeprecated())
 
     // =====================================================================================
     //                                                                         Entity Method
@@ -239,6 +240,7 @@ public interface ${myClassName} {
      * 
      * @param multiName Multi-name. (NotNull)
      * @return Entity getter method of entity. (NotNull)
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
      */ 
     public java.lang.reflect.Method getEntityGetterMethodByMultiName(String multiName);
 
@@ -247,8 +249,10 @@ public interface ${myClassName} {
      * 
      * @param multiName Multi-name. (NotNull)
      * @return Entity setter method of entity. (NotNull)
+     * @deprecated There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}
      */ 
     public java.lang.reflect.Method getEntitySetterMethodByMultiName(String multiName);
+#end
 
     // =====================================================================================
     //                                                                        Foreign DBMeta

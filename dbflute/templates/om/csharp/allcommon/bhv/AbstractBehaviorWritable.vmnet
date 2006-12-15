@@ -147,29 +147,69 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                          Basic Update
         //                                                                          ============
         #region Basic Update
-
-	    /// <summary>
-	    /// ${database.ImplementComment}
-	    /// </summary>
-	    /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-	    /// <returns>Updated count.</returns>
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-	    public int CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-	        AssertEntityNotNull(entity);
+        public int CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
                 return this.SelfWritable.DelegateCreate(entity);
             }
-	        String mapString = entity.ExtractPrimaryKeyMapString();
-	        ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
-	        try {
-	            currentEntity = ReadForUpdateByPKMapStringWithDeletedCheck(mapString);
-	        } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-	            return this.SelfWritable.DelegateCreate(entity);
-	        }
-	        AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-	        MergeEntity(entity, currentEntity);
-	        return this.SelfWritable.DelegateModify(currentEntity);
-	    }
+            String mapString = entity.ExtractPrimaryKeyMapString();
+            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
+            try {
+                currentEntity = ReadByPKMapStringWithDeletedCheck(mapString);
+            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
+                return this.SelfWritable.DelegateCreate(entity);
+            }
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            MergeEntity(entity, currentEntity);
+            return this.SelfWritable.DelegateModify(currentEntity);
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param entity Entity.
+         * @return Updated count.
+         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+         */
+        public int ModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
+            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
+            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
+            AssertRecordHasNotBeenDeleted(currentEntity, entity.ExtractPrimaryKeyMapString());
+            MergeEntity(entity, currentEntity);
+            return this.SelfWritable.DelegateModify(currentEntity);
+        }
+#if ($database.isMakeBehaviorForUpdate())
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        public int CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            if (!entity.HasPrimaryKeyValue) {
+                return this.SelfWritable.DelegateCreate(entity);
+            }
+            String mapString = entity.ExtractPrimaryKeyMapString();
+            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
+            try {
+                currentEntity = ReadForUpdateByPKMapStringWithDeletedCheck(mapString);
+            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
+                return this.SelfWritable.DelegateCreate(entity);
+            }
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            MergeEntity(entity, currentEntity);
+            return this.SelfWritable.DelegateModify(currentEntity);
+        }
 
         /**
          * ${database.ImplementComment}
@@ -188,6 +228,7 @@ namespace ${glPackageBaseCommonBhv} {
             MergeEntity(entity, currentEntity);
             return this.SelfWritable.DelegateModify(currentEntity);
         }
+#end
 
         /**
          * Merge entity.
@@ -275,7 +316,7 @@ namespace ${glPackageBaseCommonBhv} {
                             String lineString = reader.ReadLine();
                             if (lineString == null) {
                                 if (entityList.Count > 0) {
-                                    ReflectAfterSelectForUpdateNew(entityList, isErrorContinue, exceptionList);
+                                    ReflectAfterSelectNew(entityList, isErrorContinue, exceptionList);
                                     entityList.Clear();
                                 }
                                 break;
@@ -291,7 +332,7 @@ namespace ${glPackageBaseCommonBhv} {
                             entityList.Add(entity);
 
                             if (entityList.Count == batchCount) {
-                                ReflectAfterSelectForUpdateNew(entityList, isErrorContinue, exceptionList);
+                                ReflectAfterSelectNew(entityList, isErrorContinue, exceptionList);
                                 entityList.Clear();
                             }
                         }
@@ -316,12 +357,12 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="entityList">The list of entity that is reflection target. (NotNull)</param>
         /// <param name="isErrorContinue">If true, this method continue in spite of throwing the exception.</param>
         /// <returns>The list of InsertOrUpdateExceptionResult. (NotNull)</returns>
-        public void ReflectAfterSelectForUpdateNew(System.Collections.Generic.IList<${glEntityInterfaceName}> entityList,
+        public void ReflectAfterSelectNew(System.Collections.Generic.IList<${glEntityInterfaceName}> entityList,
                 bool isErrorContinue, System.Collections.Generic.IList<OneEntityExceptionResult> exceptionList) {
 
             foreach(${glEntityInterfaceName} entity in entityList) {
                 try {
-                    CreateOrModifyAfterSelectForUpdate(entity);
+                    CreateOrModifyAfterSelect(entity);
                 } catch (System.Exception e) {
                     if (isErrorContinue) {
                         OneEntityExceptionResult result = new OneEntityExceptionResult();

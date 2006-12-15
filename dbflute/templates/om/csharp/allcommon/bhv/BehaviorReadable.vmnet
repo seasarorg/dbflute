@@ -144,13 +144,24 @@ namespace ${glPackageBaseCommonBhv} {
         ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchPageNumber);
 
         /// <summary>
+        /// Read by primary-key map-string with deleted check.
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
+        /// <returns>Entity that is read from database by select-for-read-only. (NotNull)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        ${glEntityInterfaceName} ReadByPKMapStringWithDeletedCheck(String primaryKeyMapString);
+    #if ($database.isMakeDeprecated())
+
+        /// <summary>
         /// Read for read only by primary-key map-string with deleted check.
         /// </summary>
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         /// <returns>Entity that is read from database by select-for-read-only. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        [Obsolete("This class is deprecated. Please use ReadByPKMapStringWithDeletedCheck().")]
         ${glEntityInterfaceName} ReadForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-
+    #end
+    #if ($database.isMakeBehaviorForUpdate())
         /// <summary>
         /// Read for update by primary-key map-string with deleted check.
         /// </summary>
@@ -158,6 +169,8 @@ namespace ${glPackageBaseCommonBhv} {
         /// <returns>Entity that is read from database by select-for-update. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         ${glEntityInterfaceName} ReadForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString);
+    #end
+
         #endregion
     }
 
