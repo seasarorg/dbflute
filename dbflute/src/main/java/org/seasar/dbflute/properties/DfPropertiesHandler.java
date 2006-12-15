@@ -80,6 +80,16 @@ public final class DfPropertiesHandler {
         }
         return _otherProperties;
     }
+    
+    protected DfSourceReductionProperties _sourceReductionProperties;
+
+    public DfSourceReductionProperties getSourceReductionProperties(Properties prop) {
+        if (_sourceReductionProperties == null) {
+            _sourceReductionProperties = new DfSourceReductionProperties(prop);
+        }
+        return _sourceReductionProperties;
+    }
+    
 
     protected DfSql2EntityProperties _sql2EntityProperties;
 

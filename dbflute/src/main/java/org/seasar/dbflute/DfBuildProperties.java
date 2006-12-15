@@ -35,12 +35,13 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDaoDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
-import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfPropertiesHandler;
+import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
+import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
@@ -975,6 +976,13 @@ public final class DfBuildProperties {
     }
 
     // ===============================================================================
+    //                                                   Properties - Source Reduction
+    //                                                   =============================
+    public DfSourceReductionProperties getSourceReductionProperties() {
+        return getHandler().getSourceReductionProperties(getProperties());
+    }
+
+    // ===============================================================================
     //                                                              Properties - Other
     //                                                              ==================
     public DfOtherProperties getOtherProperties() {
@@ -1267,5 +1275,4 @@ public final class DfBuildProperties {
     public String removeNewLine(String str) {
         return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
     }
-
 }

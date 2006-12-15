@@ -75,14 +75,6 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
     public int createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
-     * Create or modify after select-for-update.
-     * 
-     * @param entity Entity. This must contain primary-key value at least. (NotNull)
-     * @return Updated count.
-     */
-    public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-
-    /**
      * Modify after select.
      * 
      * @param entity Entity.
@@ -90,6 +82,15 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public int modifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+#if ($database.isMakeBehaviorForUpdate())
+
+    /**
+     * Create or modify after select-for-update.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @return Updated count.
+     */
+    public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
      * Modify after select-for-update.
@@ -99,6 +100,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public int modifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+#end
 
     /**
      * Reflect(insert or update) from separated-file.

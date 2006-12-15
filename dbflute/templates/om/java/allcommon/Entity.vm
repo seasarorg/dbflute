@@ -217,6 +217,9 @@ public interface ${glEntityInterfaceName} {
     // =====================================================================================
     //                                                                            Util Class
     //                                                                            ==========
+    /**
+     * This class is for Internal. Don't use this!
+     */
     public static class MapStringUtil {
         public static void acceptPrimaryKeyMapString(String primaryKeyMapString, ${glEntityInterfaceName} entity) {
             if (primaryKeyMapString == null) {
@@ -312,4 +315,37 @@ public interface ${glEntityInterfaceName} {
             return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         }
     }
+
+    /**
+     * This class is for Internal. Don't use this!
+     */
+    public static class MapAssertUtil {
+        public static void assertPrimaryKeyMapNotNullAndNotEmpty(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
+            if (primaryKeyMap == null) {
+                String msg = "The argument[primaryKeyMap] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            if (primaryKeyMap.isEmpty()) {
+                String msg = "The argument[primaryKeyMap] should not be empty.";
+                throw new IllegalArgumentException(msg);
+            }
+        }
+        public static void assertColumnExistingInPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap, String columnName) {
+            if (!primaryKeyMap.containsKey(columnName)) {
+                String msg = "The primaryKeyMap must have the value of " + columnName;
+                throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+            }
+        }
+        public static void assertColumnValueMapNotNullAndNotEmpty(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
+            if (columnValueMap == null) {
+                String msg = "The argument[columnValueMap] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            if (columnValueMap.isEmpty()) {
+                String msg = "The argument[columnValueMap] should not be empty.";
+                throw new IllegalArgumentException(msg);
+            }
+        }
+    }
+
 }

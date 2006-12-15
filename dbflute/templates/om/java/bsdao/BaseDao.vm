@@ -142,7 +142,6 @@ public interface ${myClassName} extends ${InterfaceName} {
      * 
      * @param entity Entity. (NotNull)
      * @return Updated count.
-     * @deprecated Please use updateModifiedOnly().
      */
     public int update(${myExtendedObjectClassName} entity);
 

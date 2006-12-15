@@ -305,6 +305,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;
     }
+#if ($database.isMakeDeprecated())
 
     /**
      * ${database.ImplementComment}
@@ -322,6 +323,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;
     }
+#end
 
     /**
      * ${database.ImplementComment}

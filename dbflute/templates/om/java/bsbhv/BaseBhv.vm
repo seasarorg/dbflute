@@ -363,7 +363,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // =====================================================================================
     //                                                                        Various Select
     //                                                                        ==============
-
     /**
      * Select list after checking count(ignore fetch scope).
      * 
@@ -376,7 +375,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final int selectedCount = delegateSelectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
         assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());
-        return new ResultBeanBuilder${database.filterGenericsString(${myExtendedObjectClassName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateSelectList(${glAttachedCBArgsVariableName}));
+        return selectList(${glAttachedCBArgsVariableName});
     }
 
 #if ($table.hasPrimaryKey())
@@ -386,6 +385,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         ${table.getPrimaryKeyArgsSetupString('entity')}
         return selectByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
     }
+  #if ($database.isMakeDeprecated())
 
     // @deprecated Please use selectByPKValueWithDeletedCheck().
     public ${myExtendedObjectClassName} selectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
@@ -393,6 +393,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         ${table.getPrimaryKeyArgsSetupString('entity')}
         return selectForReadOnlyByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
     }
+  #end
 #end
 
     /**
@@ -410,6 +411,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;
     }
+#if ($database.isMakeDeprecated())
 
     /**
      * Select for read only with deleted check.
@@ -427,14 +429,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;
     }
-#if ($table.hasPrimaryKey())
+#end
+#if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
 
     public ${myExtendedObjectClassName} selectForUpdateByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
-        return selectForReadOnlyByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        return selectForUpdateByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
     }
-#end
 
     /**
      * Select for update with deleted check.
@@ -452,7 +454,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
         return currentEntity;
     }
-
+#end
 #if (${table.hasOnlyOnePrimaryKey()})
 
     // =====================================================================================
@@ -562,6 +564,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             entity.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(entity.get${table.getPrimaryKeyJavaNameAsOne()}()));
         }
     }
+    #if ($database.isMakeDeprecated())
 
     /**
      * The interface of refferer condition for ${refferer.ReffererPropertyName}.
@@ -570,15 +573,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public static interface ReffererCondition${refferer.ReffererPropertyNameInitCap} extends ${reffererBhvClassName}.CBSetupper {
     }
+    #end
   #end
 #end
+#if ($table.isWritable())
 
     // =====================================================================================
     //                                                                          Basic Update
     //                                                                          ============
-
-#if ($table.isWritable())
-
     /**
      * Insert or update after select.
      * {update: modified only}
@@ -602,6 +604,21 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         mergeEntity(entity, currentEntity);
         return delegateUpdate(entity);
     }
+
+    /**
+     * Update after select.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int updateAfterSelect(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        final ${myExtendedObjectClassName} currentEntity = selectByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        mergeEntity(entity, currentEntity);
+        return delegateUpdate(currentEntity);
+    }
+  #if ($database.isMakeBehaviorForUpdate())
 
     /**
      * Insert or update after select-for-update.
@@ -628,20 +645,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Update after select.
-     * 
-     * @param entity Entity. This must contain primary-key value at least. (NotNull)
-     * @return Updated count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public int updateAfterSelect(${myExtendedObjectClassName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${myExtendedObjectClassName} currentEntity = selectByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
-        mergeEntity(entity, currentEntity);
-        return delegateUpdate(currentEntity);
-    }
-
-    /**
      * Update after select-for-update.
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
@@ -654,6 +657,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         mergeEntity(entity, currentEntity);
         return delegateUpdate(currentEntity);
     }
+  #end
 
     /**
      * ${database.ImplementComment}
@@ -677,10 +681,52 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     // =====================================================================================
+    //                                                                        Various Insert
+    //                                                                        ==============
+  #if ($table.isUseIdentity())
+    #if ($table.hasPrimaryKey())
+
+    // 
+    // Copy-insert.
+    // 
+    // @param primaryKey Primary-keys. (NotNull)
+    // @return Inserted count.
+    // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+    // 
+    public int copyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        return copyInsertByPKMapStringAfterSelect(entity.extractPrimaryKeyMapString());
+    }
+    #end
+
+    /**
+     * Copy-insert after select.
+     * 
+     * @param primaryKeyMapString Primary-key map-string. (NotNull)
+     * @return Inserted count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int copyInsertByPKMapStringAfterSelect(String primaryKeyMapString) {
+        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
+        final ${myExtendedObjectClassName} currentEntity = selectByPKMapStringWithDeletedCheck(primaryKeyMapString);
+        filterCopyInsertEntity(currentEntity);
+        return delegateInsert(currentEntity);
+    }
+
+    /**
+     * Filter 'copy-insert' entity.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    protected void filterCopyInsertEntity(${myExtendedObjectClassName} entity) {
+    }
+  #end
+
+    // =====================================================================================
     //                                                                        Various Update
     //                                                                        ==============
-
-  #if ($table.hasLogicalDeleteColumn())
+  #if ($table.hasLogicalDeleteColumn() && $database.isMakeBehaviorForUpdate())
     #if ($table.hasPrimaryKey())
 
     // 
@@ -745,8 +791,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void filterLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
     }
   #end
-
-  #if ($table.hasRevivalFromLogicalDeleteColumn())
+  #if ($table.hasRevivalFromLogicalDeleteColumn() && $database.isMakeBehaviorForUpdate())
     #if ($table.hasPrimaryKey())
 
     // 
@@ -810,47 +855,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     protected void filterRevivalFromLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
     }
-  #end
-
-  #if ($table.isUseIdentity())
-    #if ($table.hasPrimaryKey())
-
-    // 
-    // Copy-insert after select-for-update.
-    // 
-    // @param primaryKey Primary-keys. (NotNull)
-    // @return Inserted count.
-    // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-    // 
-    public int copyInsertByPKValueAfterSelectForReadOnly(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        return copyInsertByPKMapStringAfterSelectForReadOnly(entity.extractPrimaryKeyMapString());
-    }
-    #end
-
-    /**
-     * Copy-insert after select for read only.
-     * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @return Inserted count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public int copyInsertByPKMapStringAfterSelectForReadOnly(String primaryKeyMapString) {
-        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myExtendedObjectClassName} currentEntity = selectForReadOnlyByPKMapStringWithDeletedCheck(primaryKeyMapString);
-        filterCopyInsertEntity(currentEntity);
-        return delegateInsert(currentEntity);
-    }
-
-    /**
-     * Filter 'copy-insert' entity.
-     * 
-     * @param entity Entity. (NotNull)
-     */
-    protected void filterCopyInsertEntity(${myExtendedObjectClassName} entity) {
-    }
-
   #end
 #end
 

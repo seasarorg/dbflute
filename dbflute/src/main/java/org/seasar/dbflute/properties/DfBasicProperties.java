@@ -235,4 +235,5 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             throw new RuntimeException(e);
         }
     }
+
 }

@@ -689,6 +689,7 @@ public class Database {
         return getBasicProperties().isAvailableBehaviorGeneration();
     }
 
+    
     public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
         return getBasicProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
     }
@@ -1184,6 +1185,17 @@ public class Database {
     public String getExtractAcceptEqual() {
         return getProperties().getExtractAcceptEqual();
     }
+    
+    // ===============================================================================
+    //                                                   Properties - Source Reduction
+    //                                                   =============================
+    public boolean isMakeDeprecated() {
+        return getProperties().getSourceReductionProperties().isMakeDeprecated();
+    }
+    
+    public boolean isMakeBehaviorForUpdate() {
+        return getProperties().getSourceReductionProperties().isMakeBehaviorForUpdate();
+    }
 
     // ===============================================================================
     //                                                              Properties - Other
@@ -1203,7 +1215,7 @@ public class Database {
     public boolean isVersionAfter1040() {
         return getProperties().getOtherProperties().isVersionAfter1040();
     }
-
+    
     // ===============================================================================
     //                                        Properties - jdbcToJavaNative (Internal)
     //                                        ===============-========================

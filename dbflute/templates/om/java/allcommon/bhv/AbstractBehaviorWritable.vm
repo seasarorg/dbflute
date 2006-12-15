@@ -195,6 +195,21 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Entity having primary-key value. (NotNull)
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int modifyAfterSelect(${glEntityInterfaceName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        final ${glEntityInterfaceName} currentEntity = readByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        mergeEntity(entity, currentEntity);
+        return delegateModify(currentEntity);
+    }
+#if ($database.isMakeBehaviorForUpdate())
+
+    /**
      * Create or modify after select-for-update.
      * {modify: modified only}
      * 
@@ -225,26 +240,13 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int modifyAfterSelect(${glEntityInterfaceName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${glEntityInterfaceName} currentEntity = readByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
-        mergeEntity(entity, currentEntity);
-        return delegateModify(currentEntity);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entity Entity having primary-key value. (NotNull)
-     * @return Updated count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
     public int modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${glEntityInterfaceName} currentEntity = readForUpdateByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
         mergeEntity(entity, currentEntity);
         return delegateModify(currentEntity);
     }
+#end
 
     /**
      * Merge entity.
@@ -298,7 +300,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                 final String lineString = br.readLine();
                 if (lineString == null) {
                     if (entityList.size() > 0) {
-                        final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} tmpList = reflectAfterSelectForUpdateNewTx(entityList, isErrorContinue);
+                        final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} tmpList = reflectAfterSelectNewTx(entityList, isErrorContinue);
                         exceptionList.addAll(tmpList);
                         entityList.clear();
                     }
@@ -315,7 +317,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                 entityList.add(entity);
 
                 if (entityList.size() == batchCount) {
-                    final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} tmpList = reflectAfterSelectForUpdateNewTx(entityList, isErrorContinue);
+                    final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} tmpList = reflectAfterSelectNewTx(entityList, isErrorContinue);
                     exceptionList.addAll(tmpList);
                     entityList.clear();
                 }
@@ -349,13 +351,13 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param isErrorContinue If true, this method continue in spite of throwing the exception.
      * @return The list of InsertOrUpdateExceptionResult. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('OneEntityExceptionResult')} reflectAfterSelectForUpdateNewTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList,
+    public java.util.List${database.filterGenericsString('OneEntityExceptionResult')} reflectAfterSelectNewTx(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList,
             boolean isErrorContinue) {
         final java.util.List${database.filterGenericsString('OneEntityExceptionResult')} exceptionList = new java.util.ArrayList${database.filterGenericsString('OneEntityExceptionResult')}();
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             try {
-                createOrModifyAfterSelectForUpdate(entity);
+                createOrModifyAfterSelect(entity);
             } catch (RuntimeException e) {
                 if (isErrorContinue) {
                     final OneEntityExceptionResult result = new OneEntityExceptionResult();

@@ -192,6 +192,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public ${glEntityInterfaceName} readByPKMapStringWithDeletedCheck(String primaryKeyMapString);
+#if ($database.isMakeDeprecated())
 
     /**
      * Read for read only by primary-key map-string with deleted check.
@@ -202,6 +203,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @deprecated Please use readByPKMapStringWithDeletedCheck().
      */
     public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
+#end
 
     /**
      * Read for update by primary-key map-string with deleted check.

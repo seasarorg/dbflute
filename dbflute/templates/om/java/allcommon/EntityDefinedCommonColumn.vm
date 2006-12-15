@@ -26,6 +26,7 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
      * @param v The value of ${uncapitalisedJavaName}.
      */
     public void set${javaName}(${javaNative} v);
+#if ($database.isGenerateDeprecated())
 
     /**
      * Has the setter of ${uncapitalisedJavaName} been invoked?
@@ -34,6 +35,7 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
      * @deprecated This method is out of date because S2Dao supported modified-properties.
      */
     public boolean isSetterInvoked${javaName}();
+#end
   #if (${database.isAllClassificationColumn($columnName)})
     #set ($classificationName = $database.getAllClassificationName($columnName))
     #set ($classificationList = $database.getClassificationMapList($classificationName))
