@@ -72,6 +72,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.DfDBFluteProvider;
 import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
 
@@ -507,100 +508,8 @@ public class Database {
     //                                                            AdditionalForeignKey
     //                                                            ====================
     public void initializeAdditionalForeignKey() {
-        _log.debug("/======================================");
-        _log.debug("...Initializing additional foreign key.");
-
-        final Map<String, Map<String, String>> additionalForeignKeyMap = getAdditionalForeignKeyMap();
-        final Set<String> tableNameKeySet = additionalForeignKeyMap.keySet();
-        for (String foreignName : tableNameKeySet) {
-
-            final String localTableName = getAdditionalForeignKeyComponentLocalTableName(foreignName);
-            final String foreignTableName = getAdditionalForeignKeyComponentForeignTableName(foreignName);
-            final List<String> localColumnNameList = getAdditionalForeignKeyComponentLocalColumnNameList(foreignName);
-            final List<String> foreignColumnNameList = getAdditionalForeignKeyComponentForeignColumnNameList(foreignName);
-
-            if (getTable(foreignTableName) == null) {
-                String msg = "Not found table by the foreignTableName: " + foreignTableName;
-                msg = msg + " additionalForeignKeyMap=" + additionalForeignKeyMap;
-                throw new IllegalStateException(msg);
-            }
-            if (!getTable(foreignTableName).containsColumn(foreignColumnNameList)) {
-                String msg = "Not found column by the foreignColumnNameList: " + foreignColumnNameList;
-                msg = msg + " of " + foreignTableName;
-                msg = msg + " additionalForeignKeyMap=" + additionalForeignKeyMap;
-                throw new IllegalStateException(msg);
-            }
-
-            // Commented out for View
-            //            if (!getTable(foreignTableName).getColumn(foreignColumnName).isPrimaryKey()) {
-            //                String msg = "Not primary key column by the foreignColumnName: " + foreignColumnName;
-            //                msg = msg + " foreignTableName=" + foreignTableName;
-            //                msg = msg + " additionalForeignKeyMap=" + additionalForeignKeyMap;
-            //                throw new IllegalStateException(msg);
-            //            }
-
-            _log.debug("    " + foreignName);
-            if (localTableName.equals("*")) {
-                final Table[] tableArray = getTables();
-                for (final Table table : tableArray) {
-                    if (!table.containsColumn(localColumnNameList)) {
-                        continue;
-                    }
-
-                    if (table.isExistForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList)) {
-                        String msg = "The foreign-key has already set up: ";
-                        _log.debug(msg + foreignTableName + " " + localColumnNameList + " " + foreignColumnNameList);
-                        continue;
-                    }
-
-                    final ForeignKey fk = new ForeignKey();
-                    fk.setForeignTableName(foreignTableName);
-                    fk.addReference(localColumnNameList, foreignColumnNameList);
-                    table.addForeignKey(fk);
-                    getTable(foreignTableName).addReferrer(fk);
-                    for (String foreignColumnName : foreignColumnNameList) {
-                        final Column foreignColumn = getTable(foreignTableName).getColumn(foreignColumnName);
-                        foreignColumn.addReferrer(fk);
-                    }
-
-                    String msg = "       Add foreign key " + table.getName() + "." + localColumnNameList;
-                    msg = msg + " - " + foreignTableName + "." + foreignColumnNameList;
-                    _log.debug(msg);
-                }
-            } else {
-                final Table table = getTable(localTableName);
-                if (table == null) {
-                    String msg = "Not found table by the localTableName: " + localTableName;
-                    throw new IllegalStateException(msg);
-                }
-                if (!table.containsColumn(localColumnNameList)) {
-                    String msg = "Not found column by the localColumnNameList: " + localColumnNameList;
-                    msg = msg + " of " + localTableName;
-                    msg = msg + " additionalForeignKeyMap=" + additionalForeignKeyMap;
-                    throw new IllegalStateException(msg);
-                }
-                if (table.isExistForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList)) {
-                    String msg = "The foreign-key has already set up: ";
-                    _log.debug(msg + foreignTableName + " " + localColumnNameList + " " + foreignColumnNameList);
-                    continue;
-                }
-
-                final ForeignKey fk = new ForeignKey();
-                fk.setForeignTableName(foreignTableName);
-                fk.addReference(localColumnNameList, foreignColumnNameList);
-                table.addForeignKey(fk);
-                getTable(foreignTableName).addReferrer(fk);
-                for (String foreignColumnName : foreignColumnNameList) {
-                    final Column foreignColumn = getTable(foreignTableName).getColumn(foreignColumnName);
-                    foreignColumn.addReferrer(fk);
-                }
-
-                String msg = "       Add foreign key " + table.getName() + "." + localColumnNameList;
-                msg = msg + " to " + foreignTableName + "." + foreignColumnNameList;
-                _log.debug(msg);
-            }
-        }
-        _log.debug("========/");
+        final DfAdditionalForeignKeyInitializer initializer = new DfAdditionalForeignKeyInitializer(this);
+        initializer.initializeAdditionalForeignKey();
     }
 
     public void initializeClassificationDeployment() {
@@ -689,7 +598,6 @@ public class Database {
         return getBasicProperties().isAvailableBehaviorGeneration();
     }
 
-    
     public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
         return getBasicProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
     }
@@ -1042,28 +950,28 @@ public class Database {
         return getProperties().isAvailableCustomizeDaoGeneration();
     }
 
-    // ===============================================================================
-    //                                                Properties - AdditinalForeignKey
-    //                                                ================================
-    public Map<String, Map<String, String>> getAdditionalForeignKeyMap() {
-        return getProperties().getAdditionalForeignKeyMap();
-    }
-
-    public String getAdditionalForeignKeyComponentLocalTableName(String foreignName) {
-        return getProperties().getAdditionalForeignKeyComponentLocalTableName(foreignName);
-    }
-
-    public String getAdditionalForeignKeyComponentForeignTableName(String foreignName) {
-        return getProperties().getAdditionalForeignKeyComponentForeignTableName(foreignName);
-    }
-
-    public List<String> getAdditionalForeignKeyComponentLocalColumnNameList(String foreignName) {
-        return getProperties().getAdditionalForeignKeyComponentLocalColumnNameList(foreignName);
-    }
-
-    public List<String> getAdditionalForeignKeyComponentForeignColumnNameList(String foreignName) {
-        return getProperties().getAdditionalForeignKeyComponentForeignColumnNameList(foreignName);
-    }
+    //    // ===============================================================================
+    //    //                                                Properties - AdditinalForeignKey
+    //    //                                                ================================
+    //    public Map<String, Map<String, String>> getAdditionalForeignKeyMap() {
+    //        return getProperties().getAdditionalForeignKeyMap();
+    //    }
+    //
+    //    public String getAdditionalForeignKeyComponentLocalTableName(String foreignName) {
+    //        return getProperties().getAdditionalForeignKeyComponentLocalTableName(foreignName);
+    //    }
+    //
+    //    public String getAdditionalForeignKeyComponentForeignTableName(String foreignName) {
+    //        return getProperties().getAdditionalForeignKeyComponentForeignTableName(foreignName);
+    //    }
+    //
+    //    public List<String> getAdditionalForeignKeyComponentLocalColumnNameList(String foreignName) {
+    //        return getProperties().getAdditionalForeignKeyComponentLocalColumnNameList(foreignName);
+    //    }
+    //
+    //    public List<String> getAdditionalForeignKeyComponentForeignColumnNameList(String foreignName) {
+    //        return getProperties().getAdditionalForeignKeyComponentForeignColumnNameList(foreignName);
+    //    }
 
     // ===============================================================================
     //                                                   Properties - SqlParameterBean
@@ -1185,14 +1093,14 @@ public class Database {
     public String getExtractAcceptEqual() {
         return getProperties().getExtractAcceptEqual();
     }
-    
+
     // ===============================================================================
     //                                                   Properties - Source Reduction
     //                                                   =============================
     public boolean isMakeDeprecated() {
         return getProperties().getSourceReductionProperties().isMakeDeprecated();
     }
-    
+
     public boolean isMakeBehaviorForUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorForUpdate();
     }
@@ -1211,11 +1119,11 @@ public class Database {
     public boolean isStopGenerateExtendedEntity() {
         return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
     }
-    
+
     public boolean isVersionAfter1040() {
         return getProperties().getOtherProperties().isVersionAfter1040();
     }
-    
+
     // ===============================================================================
     //                                        Properties - jdbcToJavaNative (Internal)
     //                                        ===============-========================

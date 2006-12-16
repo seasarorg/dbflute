@@ -748,28 +748,8 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                               Properties - AdditionalForeignKey
     //                                               =================================
-    protected DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
+    public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
         return getHandler().getAdditionalForeignKeyProperties(getProperties());
-    }
-
-    public Map<String, Map<String, String>> getAdditionalForeignKeyMap() {
-        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyMap();
-    }
-
-    public String getAdditionalForeignKeyComponentLocalTableName(String foreignName) {
-        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyComponentLocalTableName(foreignName);
-    }
-
-    public String getAdditionalForeignKeyComponentForeignTableName(String foreignName) {
-        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyComponentForeignTableName(foreignName);
-    }
-
-    public List<String> getAdditionalForeignKeyComponentLocalColumnNameList(String foreignName) {
-        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyComponentLocalColumnNameList(foreignName);
-    }
-
-    public List<String> getAdditionalForeignKeyComponentForeignColumnNameList(String foreignName) {
-        return getAdditionalForeignKeyProperties().getAdditionalForeignKeyComponentForeignColumnNameList(foreignName);
     }
 
     // ===============================================================================

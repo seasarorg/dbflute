@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.seasar.dbflute.DfConfigProvider;
 import org.seasar.dbflute.config.DfAdditionalForeignKeyConfig;
 
 /**
@@ -88,21 +87,24 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return componentMap.get("foreignTableName");
     }
 
-    protected String getAdditionalForeignKeyComponentLocalColumnName(String foreignName) {
+    protected String getComponentLocalColumnName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get("localColumnName");
     }
-    
-    protected Map<String, String> getAdditionalForeignKeyComponentForeignCondition(String foreignName) {
+
+    protected Map<String, String> getComponentForeignCondition(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         final String foreignCondition = componentMap.get("foreignCondition");
-        
+
         // TODO: Ç≥Ç†Ç«Ç§Ç∑ÇÈÅH
         return null;
     }
 
-    public List<String> getAdditionalForeignKeyComponentLocalColumnNameList(String foreignName) {
-        final String property = getAdditionalForeignKeyComponentLocalColumnName(foreignName);
+    public List<String> getComponentLocalColumnNameList(String foreignName) {
+        final String property = getComponentLocalColumnName(foreignName);
+        if (property == null || property.trim().length() == 0) {
+            return null;
+        }
         final List<String> localColumnNameList = new ArrayList<String>();
         final StringTokenizer st = new StringTokenizer(property, "/");
         while (st.hasMoreElements()) {
@@ -111,13 +113,16 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return localColumnNameList;
     }
 
-    protected String getAdditionalForeignKeyComponentForeignColumnName(String foreignName) {
+    protected String getComponentForeignColumnName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get("foreignColumnName");
     }
 
-    public List<String> getAdditionalForeignKeyComponentForeignColumnNameList(String foreignName) {
-        final String property = getAdditionalForeignKeyComponentForeignColumnName(foreignName);
+    public List<String> getComponentForeignColumnNameList(String foreignName) {
+        final String property = getComponentForeignColumnName(foreignName);
+        if (property == null || property.trim().length() == 0) {
+            return null;
+        }
         final List<String> foreignColumnNameList = new ArrayList<String>();
         final StringTokenizer st = new StringTokenizer(property, "/");
         while (st.hasMoreElements()) {
