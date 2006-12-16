@@ -66,7 +66,6 @@ public class DfAdditionalForeignKeyInitializer {
             assertForeignTableColumn(foreignTableName, foreignColumnNameList);
 
             final String localTableName = getComponentLocalTableName(foreignName);
-            assertLocalTable(localTableName);
 
             _log.debug("    " + foreignName);
             if (localTableName.equals("*")) {
@@ -100,6 +99,7 @@ public class DfAdditionalForeignKeyInitializer {
                     _log.debug(msg);
                 }
             } else {
+                assertLocalTable(localTableName);
                 final Table table = getTable(localTableName);
                 final List<String> localColumnNameList = getLocalColumnNameList(foreignName, foreignTableName,
                         foreignColumnNameList, localTableName, true);
@@ -130,7 +130,7 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected List<String> getForeignColumnNameList(String foreignName, final String foreignTableName) {
         List<String> foreignColumnNameList = getComponentForeignColumnNameList(foreignName);
-        if (foreignColumnNameList == null) {
+        if (foreignColumnNameList == null || foreignColumnNameList.isEmpty()) {
             foreignColumnNameList = new ArrayList<String>();
             final List<Column> foreignPrimaryKeyList = getTable(foreignTableName).getPrimaryKey();
             if (foreignPrimaryKeyList.isEmpty()) {
@@ -150,8 +150,9 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected List<String> getLocalColumnNameList(String foreignName, final String foreignTableName,
             List<String> foreignColumnNameList, final String localTableName, boolean isErrorNotFound) {
-        final List<String> localColumnNameList = getComponentLocalColumnNameList(foreignName);
+        List<String> localColumnNameList = getComponentLocalColumnNameList(foreignName);
         if (localColumnNameList == null || localColumnNameList.isEmpty()) {
+            localColumnNameList = new ArrayList<String>();
             for (String foreignColumnName : foreignColumnNameList) {
                 final Column column = getTable(localTableName).getColumn(foreignColumnName);
                 if (column == null) {
