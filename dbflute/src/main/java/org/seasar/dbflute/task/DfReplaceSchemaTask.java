@@ -26,6 +26,7 @@ import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
 import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.datahandler.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerMySQL;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
@@ -54,7 +55,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
      */
     @Override
     protected void doExecute() {
-        // TODO: In the future, clear schema by using information schema.
+        initializeSchema();
 
         final DfRunnerInformation runInfo = createRunnerInformation();
         fireSqlFile(runInfo);
@@ -62,6 +63,21 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromXls();
         writeDbFromSeparatedFile("tsv", "\t");
         writeDbFromSeparatedFile("csv", ",");
+    }
+
+    protected void initializeSchema() {
+        if (DfBuildProperties.getInstance().getBasicProperties().isDatabaseMySQL()) {
+            final DfSchemaInitializerMySQL initializer = createSchemaInitializerMySQL();
+            initializer.initializeSchema();
+        }
+
+        // TODO: Other DB
+    }
+
+    protected DfSchemaInitializerMySQL createSchemaInitializerMySQL() {
+        final DfSchemaInitializerMySQL initializer = new DfSchemaInitializerMySQL();
+        initializer.setDataSource(getDataSource());
+        return initializer;
     }
 
     protected DfRunnerInformation createRunnerInformation() {

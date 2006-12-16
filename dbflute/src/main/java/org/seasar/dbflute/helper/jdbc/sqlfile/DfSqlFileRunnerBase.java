@@ -89,15 +89,15 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 if (connection != null && !connection.getAutoCommit()) {
                     connection.rollback();
                 }
-            } catch (SQLException ignore) {
-                _log.warn("Connection#rollback() threw the exception!", ignore);
+            } catch (SQLException ignored) {
+                _log.warn("Connection#rollback() threw the exception!", ignored);
             }
             try {
                 if (statement != null) {
                     statement.close();
                 }
-            } catch (SQLException ignore) {
-                _log.warn("Statement#close() threw the exception!", ignore);
+            } catch (SQLException ignored) {
+                _log.warn("Statement#close() threw the exception!", ignored);
             } finally {
                 statement = null;
             }
@@ -105,8 +105,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 if (connection != null) {
                     connection.close();
                 }
-            } catch (SQLException ignore) {
-                _log.warn("Connection#close() threw the exception!", ignore);
+            } catch (SQLException ignored) {
+                _log.warn("Connection#close() threw the exception!", ignored);
             } finally {
                 connection = null;
             }
@@ -114,8 +114,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 if (reader != null) {
                     reader.close();
                 }
-            } catch (IOException ignore) {
-                _log.warn("Reader#close() threw the exception: " + reader, ignore);
+            } catch (IOException ignored) {
+                _log.warn("Reader#close() threw the exception: " + reader, ignored);
             } finally {
                 reader = null;
             }
