@@ -52,6 +52,7 @@ import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
  * Build properties for Torque.
  * 
  * @author mkubo
+ * @since
  */
 public final class DfBuildProperties {
 
@@ -967,38 +968,6 @@ public final class DfBuildProperties {
     //                                                              ==================
     public DfOtherProperties getOtherProperties() {
         return getHandler().getOtherProperties(getProperties());
-    }
-
-    // ===============================================================================
-    //                                                      Properties - Database Info
-    //                                                      ==========================
-    public String getDatabaseDriver() {
-        return stringProp("torque.database.driver");
-    }
-
-    public String getDatabaseUri() {
-        return stringProp("torque.database.url");
-    }
-
-    public String getDatabaseUser() {
-        return stringProp("torque.database.user");
-    }
-
-    public String getDatabasePassword() {
-        return stringProp("torque.database.password");
-    }
-
-    public Connection getConnection() {
-        try {
-            Class.forName(getDatabaseDriver());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            return DriverManager.getConnection(getDatabaseUri(), getDatabaseUser(), getDatabasePassword());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     // ===============================================================================

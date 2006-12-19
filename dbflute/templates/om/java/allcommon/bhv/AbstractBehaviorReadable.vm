@@ -84,6 +84,20 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      */
+    public int delegateReadCount(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCount", types);
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        return ((Integer)result).intValue();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @return Read count. (NotNull)
+     */
     public int delegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};

@@ -152,6 +152,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageExtendedCustomizeEntity = "${database.extendedEntityPackage}.customize" )
     #set ($glPackageBaseCB = "${database.conditionBeanPackage}.bs")
     #set ($glPackageCB = "${database.conditionBeanPackage}")
+    #set ($glPackageBaseCQ = "${database.conditionBeanPackage}.cq.bs")
     #set ($glPackageCQ = "${database.conditionBeanPackage}.cq")
     #set ($glPackageNss = "${database.conditionBeanPackage}.nss")
     #set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
@@ -798,6 +799,11 @@ targetdatabase = $targetDatabase
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCB}))
     $database.makeDirectory($path)
 
+    #if ($database.isJavaDirOnlyOne())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCQ}))
+      $database.makeDirectory($path)
+    #end
+
     #set ($path = $strings.getPackageAsPath(${glPackageCQ}))
     $database.makeDirectory($path)
 
@@ -852,6 +858,7 @@ targetdatabase = $targetDatabase
 
         #set ($myBaseConditionBeanClassName = "${myBaseObjectClassName}${glConditionBeanInitialName}")
         #set ($myConditionBeanClassName = "${myExtendedObjectClassName}${glConditionBeanInitialName}")
+        #set ($myBaseConditionQueryClassName = "${myBaseObjectClassName}${glConditionQueryInitialName}")
         #set ($myConditionQueryClassName = "${myExtendedObjectClassName}${glConditionQueryInitialName}")
         #set ($myNestSelectSetupperClassName = "${myExtendedObjectClassName}Nss")
 
@@ -942,8 +949,13 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/cbean/BsConditionBean.${glTemplateFileExtension}", $path, "table", $table)
 
-        #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glTargetLanguage}/cbean/ConditionQueryImpl.${glTemplateFileExtension}", $path, "table", $table)
+        #if ($database.isJavaDirOnlyOne())
+          #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCQ})}${myBaseConditionQueryClassName}.${glClassFileExtension}" )
+          $generator.parse("om/${glTargetLanguage}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+        #else
+          #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
+          $generator.parse("om/${glTargetLanguage}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+        #end
 
         #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
@@ -954,6 +966,13 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
         #if (!$files.file(${generator.OutputPath},$path).exists())
           $generator.parse("om/${glTargetLanguage}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
+        #end
+
+        #if ($database.isJavaDirOnlyOne())
+          #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
+          #if (!$files.file(${generator.OutputPath},$path).exists())
+            $generator.parse("om/${glTargetLanguage}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+          #end
         #end
       #end
     #end

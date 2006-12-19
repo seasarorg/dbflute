@@ -185,6 +185,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
      */
+    public int delegateSelectCount(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        return getMyDao().selectCount(${glAttachedCBArgsVariableName});
+    }
+
+    /**
+     * Select count ignore fetch scope by condition-bean. (Delegate-Method)
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Selected count. (NotNull)
+     */
     public int delegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
         assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
         return getMyDao().selectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
@@ -602,7 +613,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return delegateUpdate(entity);
+        return delegateUpdate(currentEntity);
     }
 
     /**

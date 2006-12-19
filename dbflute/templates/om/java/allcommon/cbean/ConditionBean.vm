@@ -140,6 +140,30 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * 
      * @return this. (NotNull)
      */
+    public ${glConditionBeanInterfaceName} setupSelectCount();
+
+    /**
+     * Do after-care for select-count-ignore-fetch-scope.
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} afterCareSelectCount();
+
+    /**
+     * Is set up various things for select-count-ignore-fetch-scope?
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return Determination.
+     */
+    public boolean isSelectCount();
+
+    /**
+     * Set up various things for select-count-ignore-fetch-scope.
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
     public ${glConditionBeanInterfaceName} setupSelectCountIgnoreFetchScope();
 
     /**

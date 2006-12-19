@@ -230,7 +230,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return delegateModify(entity);
+        return delegateModify(currentEntity);
     }
 
     /**

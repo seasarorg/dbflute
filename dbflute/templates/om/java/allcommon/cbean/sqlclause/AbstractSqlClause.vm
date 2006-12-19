@@ -681,6 +681,15 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
+     * @return Determiantion.
+     */
+    public boolean isFetchScopeEffective() {
+        return _isFetchScopeEffective;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} ignoreFetchScope() {

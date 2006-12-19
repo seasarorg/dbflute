@@ -212,6 +212,15 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
             ${glAttachedCBArgsVariableName}.setupSelectCountIgnoreFetchScope();
         } else {
+            if (isSelectCountMethod(invocation)) {
+                if (${glAttachedCBArgsVariableName}.getSqlClause().isFetchScopeEffective()) {
+                    String msg = "The condition-bean should not be effective about fetch scope when you invoke selectCount().";
+                    msg = msg + " Please use selectCountIngoreFetchScope(). The condition-bean: " + ${glAttachedCBArgsVariableName};
+                    throw new IllegalStateException(msg);
+                } else {
+                    ${glAttachedCBArgsVariableName}.setupSelectCount();
+                }
+            }
             ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         }
 
@@ -231,6 +240,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         if (${glAttachedCBArgsVariableName} != null && isSelectCountIgnoreFetchScopeMethod(invocation)) {
             ${glAttachedCBArgsVariableName}.afterCareSelectCountIgnoreFetchScope();
         }
+        if (${glAttachedCBArgsVariableName} != null && isSelectCountMethod(invocation)) {
+            ${glAttachedCBArgsVariableName}.afterCareSelectCount();
+        }
     }
 
     protected void clearThreadLocal() {
@@ -247,6 +259,21 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                         =============
     /**
      * Is select count method?
+     * 
+     * @param invocation Method invocation. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isSelectCountMethod(MethodInvocation invocation) {
+        final String name = invocation.getMethod().getName();
+        if (name.startsWith("readCount") || name.startsWith("selectCount")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Is select count ignore-fetch-scope method?
      * 
      * @param invocation Method invocation. (NotNull)
      * @return Determination.

@@ -1561,4 +1561,8 @@ public class Database {
     protected void setupJavaDir_for_gen() {
         Generator.getInstance().setOutputPath(getBasicProperties().getJavaDir_for_gen());
     }
+    
+    public boolean isJavaDirOnlyOne() {
+        return getBasicProperties().isJavaDirOnlyOne();
+    }
 }

@@ -79,6 +79,22 @@ public interface ${myClassName} extends ${InterfaceName} {
 
     /**
      * Select count by condition-bean.
+     * If the condition-bean is invoked fetchFirst() and fetchScope() and fetchPage(), throw exception.
+     * 
+     * <pre>
+     * Example)
+     *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
+     *   ${glAttachedCBArgsVariableName}.query().setXxx_GreaterEqual(new BigDecimal(14));
+     *   final int count = dao.selectCount(${glAttachedCBArgsVariableName});
+     * </pre>
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Selected count. (NotNull)
+     */
+    public int selectCount(${myAttachedCBArgsString});
+
+    /**
+     * Select count by condition-bean.
      * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
      * This select method generates SQL based on condition-bean.
      * <pre>

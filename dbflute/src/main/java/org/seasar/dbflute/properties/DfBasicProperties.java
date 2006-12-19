@@ -41,7 +41,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getDatabaseName() {
         return stringProp("torque.database", "");
     }
-    
+
     public boolean isDatabaseMySQL() {
         return getDatabaseName().equalsIgnoreCase("mysql");
     }
@@ -101,6 +101,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             }
         }
         return outputPath;
+    }
+
+    public boolean isJavaDirOnlyOne() {
+        return getJavaDir_for_gen().equals(getJavaDir_for_main());
     }
 
     // ===============================================================================

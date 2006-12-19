@@ -111,6 +111,15 @@ public interface ${glBehaviorReadableInterfaceName} {
 
     /**
      * Read count by condition-bean. (Delegate-Method)
+     * If the condition-bean is invoked fetchFirst() and fetchScope() and fetchPage(), throw exception.
+     * 
+     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @return Read count. (NotNull)
+     */
+    public int delegateReadCount(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+
+    /**
+     * Read count by condition-bean. (Delegate-Method)
      * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
      * 
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)

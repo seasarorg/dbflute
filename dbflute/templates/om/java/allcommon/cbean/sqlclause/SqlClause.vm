@@ -252,14 +252,21 @@ public interface ${myClassName} {
     public int getPageEndIndex();
 
     /**
-     * Ignore fetch-narrowing.
+     * Is fetch scope effective?
+     * 
+     * @return Determiantion.
+     */
+    public boolean isFetchScopeEffective();
+
+    /**
+     * Ignore fetch-scope.
      * 
      * @return this. (NotNull)
      */
     public ${myClassName} ignoreFetchScope();
 
     /**
-     * Make fetch-narrowing effective.
+     * Make fetch-scope effective.
      * 
      * @return this. (NotNull)
      */

@@ -475,6 +475,45 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     //                   for Internal
     //                   ------------
     /**
+     * Set up various things for select-count.
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} setupSelectCount() {
+        _isSelectCount = true;
+        getSqlClause().ignoreIncludedSelectColumn();
+        getSqlClause().ignoreOrderBy();
+        return this;
+    }
+
+    /**
+     * Do after-care for select-count.
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} afterCareSelectCount() {
+        _isSelectCount = false;
+        getSqlClause().makeIncludedSelectColumnEffective();
+        getSqlClause().makeOrderByEffective();
+        return this;
+    }
+
+    /** Is set up various things for select-count? */
+    protected boolean _isSelectCount;
+
+    /**
+     * Is set up various things for select-count?
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return Determination.
+     */
+    public boolean isSelectCount() {
+        return _isSelectCount;
+    }
+
+    /**
      * Set up various things for select-count-ignore-fetch-scope.
      * This method is for INTERNAL. Don't invoke this!
      * 
