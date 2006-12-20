@@ -1,7 +1,7 @@
 #set ($myClassName = "")
 #if ($database.isJavaDirOnlyOne())
 
-using ${glPackageCQ}
+using ${glPackageCQ};
   #set ($myClassName = "${myBaseConditionQueryClassName}")
 #else
   #set ($myClassName = "${myConditionQueryClassName}")
