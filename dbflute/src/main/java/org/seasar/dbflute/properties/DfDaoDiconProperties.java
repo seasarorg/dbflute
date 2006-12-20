@@ -22,7 +22,7 @@ public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
     //                                               Properties - DaoDicon Information
     //                                               =================================
     public String getDaoDiconNamespace() {
-        return stringProp("torque.daoDiconNamespace", "dao");
+        return stringProp("torque.daoDiconNamespace", "dbflute");
     }
 
     public String getDaoDiconPackageName() {
@@ -30,7 +30,7 @@ public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
     }
 
     public String getDaoDiconFileName() {
-        return stringProp("torque.daoDiconFileName", "dao.dicon");
+        return stringProp("torque.daoDiconFileName", "dbflute.dicon");
     }
 
     public String getJdbcDiconResourceName() {

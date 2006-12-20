@@ -152,7 +152,7 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
      * @return Determination.
      */
     public boolean isExistPrePage() {
-        return (_currentPageNumber > 1);
+        return (_allRecordCount > 0 && _currentPageNumber > 1);
     }
 
     /**
@@ -162,7 +162,7 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
      * @return Determination.
      */
     public boolean isExistNextPage() {
-        return (_currentPageNumber < getAllPageCount());
+        return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
     }
 
     // -------------------------------------------

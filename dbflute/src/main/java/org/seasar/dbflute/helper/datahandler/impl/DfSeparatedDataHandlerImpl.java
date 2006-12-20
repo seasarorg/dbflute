@@ -95,55 +95,67 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         if (columnMap.isEmpty()) {
             _log.warn("The tableName[" + tableName + "] was not found: ");
         }
+        String lineString = null;
+        String preContinueString = "";
+        List<String> valueList = new ArrayList<String>();
         List<String> columnNameList = null;
         try {
             fis = new java.io.FileInputStream(filename);
             ir = new java.io.InputStreamReader(fis, encoding);
             br = new java.io.BufferedReader(ir);
 
+            FirstLineInfo firstLineInfo = null;
             int count = -1;
             while (true) {
                 ++count;
 
-                final String lineString = br.readLine();
+                lineString = br.readLine();
                 if (lineString == null) {
                     break;
                 }
                 if (count == 0) {
-                    columnNameList = new ArrayList<String>();
-                    final String[] values = lineString.split(delimiter);
-                    for (String value : values) {
-                        addValueToList(columnNameList, value);
+                    firstLineInfo = getColumnNameList(delimiter, lineString);
+                    columnNameList = firstLineInfo.getColumnNameList();
+                    continue;
+                }
+                {
+                    // TODO: preContinueString + lineString に改行を入れる？
+                    final ValueLineInfo valueLineInfo = arrangeValueList(preContinueString + lineString, delimiter);
+                    final List<String> ls = valueLineInfo.getValueList();
+                    if (valueLineInfo.isContinueNextLine()) {
+                        preContinueString = ls.remove(ls.size() - 1);
+                        valueList.addAll(ls);
+                        continue;
                     }
-                    continue;
+                    valueList.addAll(ls);
                 }
-                final String[] values = lineString.split(delimiter);
-                final List<String> valueList = new ArrayList<String>();
-                for (String value : values) {
-                    addValueToList(valueList, value);
-                }
-                if (isDifferentColumnValueCount(columnNameList, valueList, lineString)) {
-                    String msg = "Value count should not be less than column name count:";
-                    msg = msg + " valueList=" + valueList.size() + " columnNameList=" + columnNameList.size();
-                    msg = msg + " lineString=" + lineString;
-                    _log.warn(msg);
-                    continue;
-                }
-
-                final String sql = buildSql(tableName, columnMap, columnNameList, valueList);
-                Statement statement = null;
                 try {
-                    statement = dataSource.getConnection().createStatement();
-                    _log.info(sql);
-                    statement.execute(sql);
-                } finally {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        } catch (SQLException ignored) {
-                            _log.info("statement.close() threw the exception!", ignored);
+                    if (isDifferentColumnValueCount(columnNameList, valueList, lineString)) {
+                        String msg = "{" + tableName + "} Value count should not be less than column name count:";
+                        msg = msg + " valueSize=" + valueList.size() + " columnNameSize=" + columnNameList.size();
+                        msg = msg + " lineString=" + lineString + " valueList=" + valueList;
+                        _log.warn(msg);
+                        continue;
+                    }
+
+                    final String sql = buildSql(tableName, columnMap, columnNameList, valueList);
+                    Statement statement = null;
+                    try {
+                        statement = dataSource.getConnection().createStatement();
+                        _log.info(sql);
+                        statement.execute(sql);
+                    } finally {
+                        if (statement != null) {
+                            try {
+                                statement.close();
+                            } catch (SQLException ignored) {
+                                _log.info("statement.close() threw the exception!", ignored);
+                            }
                         }
                     }
+                } finally {
+                    valueList.clear();
+                    preContinueString = "";
                 }
             }
         } catch (java.io.FileNotFoundException e) {
@@ -152,11 +164,13 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
             throw e;
         } catch (SQLException e) {
             String msg = "SQLException: filename=" + filename + " encoding=" + encoding;
-            msg = msg + " columnSet=" + columnMap.keySet() + " columnNameList=" + columnNameList;
+            msg = msg + " columnSet=" + columnMap.keySet() + " columnNameList=" + columnNameList + " lineString="
+                    + lineString;
             throw new RuntimeException(msg, e);
         } catch (RuntimeException e) {
             String msg = "RuntimeException: filename=" + filename + " encoding=" + encoding;
-            msg = msg + " columnSet=" + columnMap.keySet() + " columnNameList=" + columnNameList;
+            msg = msg + " columnSet=" + columnMap.keySet() + " columnNameList=" + columnNameList + " lineString="
+                    + lineString;
             throw new RuntimeException(msg, e);
         } finally {
             try {
@@ -173,6 +187,184 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                 _log.warn("File-close threw the exception: ", ignored);
             }
         }
+    }
+
+    protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
+        final List<String> valueList = new ArrayList<String>();
+        final String[] values = lineString.split(delimiter);
+        for (String value : values) {
+            valueList.add(value);
+        }
+        return arrangeValueList(valueList);
+    }
+
+    protected ValueLineInfo arrangeValueList(List<String> valueList) {
+        final ValueLineInfo valueLineInfo = new ValueLineInfo();
+        final ArrayList<String> resultList = new ArrayList<String>();
+        String preString = "";
+        for (int i = 0; i < valueList.size(); i++) {
+            final String value = valueList.get(i);
+            if (value == null) {
+                continue;
+            }
+            if (i == valueList.size() - 1) {// The last loop
+                if (preString.equals("")) {
+                    if (isFrontQOnly(value)) {
+                        valueLineInfo.setContinueNextLine(true);
+                        resultList.add(value);
+                        break;
+                    } else if (isRearQOnly(value)) {
+                        resultList.add(value);
+                        break;
+                    } else if (isNotBothQ(value)) {
+                        resultList.add(value);
+                        break;
+                    } else {
+                        resultList.add(removeDoubleQuotation(value));
+                    }
+                } else {
+                    if (isFrontQOnly(value)) {
+                        valueLineInfo.setContinueNextLine(true);
+                        resultList.add(preString + value);
+                        break;
+                    } else if (isRearQOnly(value)) {
+                        resultList.add(removeDoubleQuotation(preString + value));
+                        break;
+                    } else if (isNotBothQ(value)) {
+                        valueLineInfo.setContinueNextLine(true);
+                        resultList.add(preString + value);
+                        break;
+                    } else {
+                        resultList.add(removeDoubleQuotation(preString + value));
+                    }
+                }
+            }
+
+            if (preString.equals("")) {
+                if (isFrontQOnly(value)) {
+                    preString = value;
+                    continue;
+                } else if (isRearQOnly(value)) {
+                    preString = value;
+                    continue;
+                } else if (isNotBothQ(value)) {
+                    resultList.add(value);
+                } else {
+                    resultList.add(removeDoubleQuotation(value));
+                }
+            } else {
+                if (isFrontQOnly(value)) {
+                    // TODO: Delimiterをはさむべきかな？
+                    preString = preString + value;
+                    continue;
+                } else if (isRearQOnly(value)) {
+                    resultList.add(removeDoubleQuotation(preString + value));
+                } else if (isNotBothQ(value)) {
+                    preString = preString + value;
+                    continue;
+                } else {
+                    resultList.add(removeDoubleQuotation(preString + value));
+                }
+            }
+            preString = "";
+        }
+        valueLineInfo.setValueList(resultList);
+        return valueLineInfo;
+    }
+
+    protected boolean isNotBothQ(final String value) {
+        return !value.startsWith("\"") && !value.endsWith("\"");
+    }
+
+    protected boolean isRearQOnly(final String value) {
+        return !value.startsWith("\"") && value.endsWith("\"");
+    }
+
+    protected boolean isFrontQOnly(final String value) {
+        return value.startsWith("\"") && !value.endsWith("\"");
+    }
+
+    protected String removeDoubleQuotation(String value) {
+        if (!value.startsWith("\"") && !value.endsWith("\"")) {
+            return value;
+        }
+        if (value.startsWith("\"")) {
+            value = value.substring(1);
+        }
+        if (value.endsWith("\"")) {
+            value = value.substring(0, value.length() - 1);
+        }
+        return value;
+    }
+
+    protected String removeRightDoubleQuotation(String value) {
+        if (value.endsWith("\"")) {
+            value = value.substring(0, value.length() - 1);
+        }
+        return value;
+    }
+
+    public static class FirstLineInfo {
+        protected List<String> columnNameList;
+        protected boolean quotated;
+
+        public List<String> getColumnNameList() {
+            return columnNameList;
+        }
+
+        public void setColumnNameList(List<String> columnNameList) {
+            this.columnNameList = columnNameList;
+        }
+
+        public boolean isQuotated() {
+            return quotated;
+        }
+
+        public void setQuotated(boolean quotated) {
+            this.quotated = quotated;
+        }
+    }
+
+    public static class ValueLineInfo {
+        protected List<String> valueList;
+        protected boolean continueNextLine;
+
+        public List<String> getValueList() {
+            return valueList;
+        }
+
+        public void setValueList(List<String> valueList) {
+            this.valueList = valueList;
+        }
+
+        public boolean isContinueNextLine() {
+            return continueNextLine;
+        }
+
+        public void setContinueNextLine(boolean continueNextLine) {
+            this.continueNextLine = continueNextLine;
+        }
+    }
+
+    protected FirstLineInfo getColumnNameList(String delimiter, final String lineString) {
+        List<String> columnNameList;
+        columnNameList = new ArrayList<String>();
+        final String[] values = lineString.split(delimiter);
+        int count = 0;
+        boolean quotated = false;
+        for (String value : values) {
+            if (count == 0) {
+                if (value != null && value.startsWith("\"") && value.endsWith("\"")) {
+                    quotated = true;
+                }
+            }
+            addValueToList(columnNameList, value);
+            count++;
+        }
+        final FirstLineInfo firstLineInformation = new FirstLineInfo();
+        firstLineInformation.setColumnNameList(columnNameList);
+        firstLineInformation.setQuotated(quotated);
+        return firstLineInformation;
     }
 
     protected Map getColumnMap(String filename, DataSource dataSource) {

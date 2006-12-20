@@ -129,7 +129,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// </summary>
         /// <returns>Determination.</returns>
         public bool IsExistPrePage() {
-            return (_currentPageNumber > 1);
+            return (_allRecordCount > 0 && _currentPageNumber > 1);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// </summary>
         /// <returns>Determination.</returns>
         public bool IsExistNextPage() {
-            return (_currentPageNumber < this.AllPageCount);
+            return (_allRecordCount > 0 && _currentPageNumber < this.AllPageCount);
         }
 
         // -------------------------------------------
