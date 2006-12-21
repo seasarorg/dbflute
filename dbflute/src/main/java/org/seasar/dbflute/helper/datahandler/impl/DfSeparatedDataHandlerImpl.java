@@ -90,8 +90,11 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         java.io.InputStreamReader ir = null;
         java.io.BufferedReader br = null;
 
-        final String tableName = filename.substring(filename.lastIndexOf("/") + 1, filename.lastIndexOf("."));
-        final Map columnMap = getColumnMap(filename, dataSource);
+        String tableName = filename.substring(filename.lastIndexOf("/") + 1, filename.lastIndexOf("."));
+        if (tableName.indexOf("-") >= 0) {
+            tableName = tableName.substring(tableName.indexOf("-") + "-".length());
+        }
+        final Map columnMap = getColumnMap(tableName, dataSource);
         if (columnMap.isEmpty()) {
             _log.warn("The tableName[" + tableName + "] was not found: ");
         }
@@ -367,8 +370,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         return firstLineInformation;
     }
 
-    protected Map getColumnMap(String filename, DataSource dataSource) {
-        final String tableName = filename.substring(filename.lastIndexOf("/") + 1, filename.lastIndexOf("."));
+    protected Map getColumnMap(String tableName, DataSource dataSource) {
         final Connection connection;
         final DatabaseMetaData dbMetaData;
         try {

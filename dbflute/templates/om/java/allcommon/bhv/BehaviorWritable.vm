@@ -23,7 +23,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Inserted count.
      */
-    public int delegateCreate(${glEntityInterfaceName} entity);
+    public int callCreate(${glEntityInterfaceName} entity);
 
     /**
      * Modify entity. (Delegate-Method)
@@ -32,6 +32,58 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Updated count.
      */
+    public int callModify(${glEntityInterfaceName} entity);
+
+    /**
+     * Remove entity. (Delegate-Method)
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Deleted count.
+     */
+    public int callRemove(${glEntityInterfaceName} entity);
+
+    /**
+     * Create several entity-list. (Delegate-Method)
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Inserted count.
+     */
+    public int callCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Modify several entity-list. (Delegate-Method)
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Updated count.
+     */
+    public int callModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Remove several entity-list. (Delegate-Method)
+     * 
+     * @param entityList Entity-list that the type is entity-interface. (NotNull)
+     * @return Deleted count.
+     */
+    public int callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+#if ($database.isMakeDeprecated())
+
+    /**
+     * Create entity. (Delegate-Method)
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Inserted count.
+     * @deprecated Please use callCreate().
+     */
+    public int delegateCreate(${glEntityInterfaceName} entity);
+
+    /**
+     * Modify entity. (Delegate-Method)
+     * {modified only}
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Updated count.
+     * @deprecated Please use callModify().
+     */
     public int delegateModify(${glEntityInterfaceName} entity);
 
     /**
@@ -39,6 +91,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Deleted count.
+     * @deprecated Please use callRemove().
      */
     public int delegateRemove(${glEntityInterfaceName} entity);
 
@@ -47,6 +100,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * 
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Inserted count.
+     * @deprecated Please use callCreateList().
      */
     public int delegateCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
@@ -55,6 +109,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * 
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Updated count.
+     * @deprecated Please use callModifyList().
      */
     public int delegateModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
@@ -63,8 +118,10 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * 
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Deleted count.
+     * @deprecated Please use callRemoveList().
      */
     public int delegateRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+#end
 
     /**
      * Create or modify after select.

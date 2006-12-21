@@ -1239,15 +1239,15 @@ public class Database {
     }
 
     public String getColumnSetupBeforeInsertInterceptorToBehaviorPointcut() {
-        return "delegateInsert.*, delegateCreate.*, delegateAdd.*";
+        return "delegateInsert.*, delegateCreate.*, delegateAdd.*, callInsert.*, callCreate.*, callAdd.*";
     }
 
     public String getColumnSetupBeforeUpdateInterceptorToBehaviorPointcut() {
-        return "delegateUpdate.*, delegateModify.*, delegateStore.*";
+        return "delegateUpdate.*, delegateModify.*, delegateStore.*, callUpdate.*, callModify.*, callStore.*";
     }
 
     public String getColumnSetupBeforeDeleteInterceptorToBehaviorPointcut() {
-        return "delegateDelete.*, delegateRemove.*";
+        return "delegateDelete.*, delegateRemove.*, callDeletee.*, callRemove";
     }
 
     public String getColumnSetupBeforeInsertInterceptorToDaoPointcut() {
@@ -1512,7 +1512,7 @@ public class Database {
         if (isTargetLanguageJava()) {
             setupJavaDir_for_main();
         } else if (isTargetLanguageCSharp()) {
-            // partial‚Å‚à•Ê‚ÌProject‚¾‚Æƒ_ƒ‚¾‚Á‚½BBB(2006/08/11)
+            // partialï¿½Å‚ï¿½Ê‚ï¿½Projectï¿½ï¿½ï¿½Æƒ_ï¿½ï¿½ï¿½ï¿½ï¿½Bï¿½ï¿½Bï¿½Bï¿½B(2006/08/11)
             //            setupJavaDir_for_gen();
             setupJavaDir_for_main();
         } else {
