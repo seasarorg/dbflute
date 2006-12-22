@@ -23,7 +23,7 @@ public class DfSeparatedDataHandlerImplTest {
         final DfSeparatedDataHandler handler = new DfSeparatedDataHandlerImpl() {
             @Override
             public String toString() {
-                final ValueLineInfo valueLineInfo = arrangeValueList(valueList);
+                final ValueLineInfo valueLineInfo = arrangeValueList(valueList, "\t");
                 Assert.assertEquals(expectedValueList, valueLineInfo.getValueList());
                 return null;
             }
@@ -54,7 +54,7 @@ public class DfSeparatedDataHandlerImplTest {
         final DfSeparatedDataHandler handler = new DfSeparatedDataHandlerImpl() {
             @Override
             public String toString() {
-                final ValueLineInfo valueLineInfo = arrangeValueList(valueList);
+                final ValueLineInfo valueLineInfo = arrangeValueList(valueList, "\t");
                 Assert.assertEquals(expectedValueList, valueLineInfo.getValueList());
                 return null;
             }

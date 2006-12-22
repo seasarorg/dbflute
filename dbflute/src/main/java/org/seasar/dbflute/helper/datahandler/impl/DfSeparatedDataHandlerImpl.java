@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,8 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
 
-    public void writeSeveralData(String basePath, String typeName, String delimter, DataSource dataSource) {
+    public void writeSeveralData(String basePath, String typeName, String delimter, DataSource dataSource,
+            Map<String, Set<String>> notFoundColumnMap) {
         final File baseDir = new File(basePath);
         final String[] dataDirectoryElements = baseDir.list();
         final FilenameFilter filter = createFilenameFilter(typeName);
@@ -53,7 +55,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                 final String[] fileNameList = encodingNameDirectory.list(filter);
                 for (String fileName : fileNameList) {
                     final String fileNamePath = basePath + "/" + elementName + "/" + fileName;
-                    handler.writeData(fileNamePath, elementName, delimter, dataSource);
+                    handler.writeData(fileNamePath, elementName, delimter, dataSource, notFoundColumnMap);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -78,11 +80,12 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
      * @param filename Name of the file. (NotNull and NotEmpty)
      * @param encoding Encoding of the file. (NotNull and NotEmpty)
      * @param delimiter Delimiter of the file. (NotNull and NotEmpty)
+     * @param notFoundColumnMap Not found column map. (NotNUl)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void writeData(String filename, String encoding, String delimiter, DataSource dataSource)
-            throws java.io.FileNotFoundException, java.io.IOException {
+    public void writeData(String filename, String encoding, String delimiter, DataSource dataSource,
+            Map<String, Set<String>> notFoundColumnMap) throws java.io.FileNotFoundException, java.io.IOException {
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
         _log.info("writeData(" + filename + ", " + encoding + ")");
         _log.info("= = = = = = =/");
@@ -102,6 +105,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         String preContinueString = "";
         List<String> valueList = new ArrayList<String>();
         List<String> columnNameList = null;
+
         try {
             fis = new java.io.FileInputStream(filename);
             ir = new java.io.InputStreamReader(fis, encoding);
@@ -122,8 +126,14 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                     continue;
                 }
                 {
-                    // TODO: preContinueString + lineString に改行を入れる？
-                    final ValueLineInfo valueLineInfo = arrangeValueList(preContinueString + lineString, delimiter);
+                    final String realLineString;
+                    if (preContinueString.equals("")) {
+                        realLineString = lineString;
+                    } else {
+                        final String lineSeparator = System.getProperty("line.separator");
+                        realLineString = preContinueString + lineSeparator + lineString;
+                    }
+                    final ValueLineInfo valueLineInfo = arrangeValueList(realLineString, delimiter);
                     final List<String> ls = valueLineInfo.getValueList();
                     if (valueLineInfo.isContinueNextLine()) {
                         preContinueString = ls.remove(ls.size() - 1);
@@ -141,7 +151,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                         continue;
                     }
 
-                    final String sql = buildSql(tableName, columnMap, columnNameList, valueList);
+                    final String sql = buildSql(tableName, columnMap, columnNameList, valueList, notFoundColumnMap);
                     Statement statement = null;
                     try {
                         statement = dataSource.getConnection().createStatement();
@@ -198,10 +208,10 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         for (String value : values) {
             valueList.add(value);
         }
-        return arrangeValueList(valueList);
+        return arrangeValueList(valueList, delimiter);
     }
 
-    protected ValueLineInfo arrangeValueList(List<String> valueList) {
+    protected ValueLineInfo arrangeValueList(List<String> valueList, String delimiter) {
         final ValueLineInfo valueLineInfo = new ValueLineInfo();
         final ArrayList<String> resultList = new ArrayList<String>();
         String preString = "";
@@ -224,21 +234,23 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                         break;
                     } else {
                         resultList.add(removeDoubleQuotation(value));
+                        break;
                     }
                 } else {
                     if (isFrontQOnly(value)) {
                         valueLineInfo.setContinueNextLine(true);
-                        resultList.add(preString + value);
+                        resultList.add(connectPreString(preString, delimiter, value));
                         break;
                     } else if (isRearQOnly(value)) {
-                        resultList.add(removeDoubleQuotation(preString + value));
+                        resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                         break;
                     } else if (isNotBothQ(value)) {
                         valueLineInfo.setContinueNextLine(true);
-                        resultList.add(preString + value);
+                        resultList.add(connectPreString(preString, delimiter, value));
                         break;
                     } else {
-                        resultList.add(removeDoubleQuotation(preString + value));
+                        resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
+                        break;
                     }
                 }
             }
@@ -257,22 +269,29 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                 }
             } else {
                 if (isFrontQOnly(value)) {
-                    // TODO: Delimiterをはさむべきかな？
-                    preString = preString + value;
+                    preString = connectPreString(preString, delimiter, value);
                     continue;
                 } else if (isRearQOnly(value)) {
-                    resultList.add(removeDoubleQuotation(preString + value));
+                    resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                 } else if (isNotBothQ(value)) {
-                    preString = preString + value;
+                    preString = connectPreString(preString, delimiter, value);
                     continue;
                 } else {
-                    resultList.add(removeDoubleQuotation(preString + value));
+                    resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                 }
             }
             preString = "";
         }
         valueLineInfo.setValueList(resultList);
         return valueLineInfo;
+    }
+
+    protected String connectPreString(String preString, String delimiter, String value) {
+        if (preString.equals("")) {
+            return value;
+        } else {
+            return preString + delimiter + value;
+        }
     }
 
     protected boolean isNotBothQ(final String value) {
@@ -398,8 +417,10 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         return false;
     }
 
-    protected String buildSql(String tableName, Map columnMap, List<String> columnNameList, List<String> valueList) {
-        final Map<String, Object> columnValueMap = getColumnValueMap(tableName, columnNameList, columnMap, valueList);
+    protected String buildSql(String tableName, Map columnMap, List<String> columnNameList, List<String> valueList,
+            Map<String, Set<String>> notFoundColumnMap) {
+        final Map<String, Object> columnValueMap = getColumnValueMap(tableName, columnNameList, columnMap, valueList,
+                notFoundColumnMap);
         final StringBuilder sb = new StringBuilder();
         final Set<String> columnNameSet = columnValueMap.keySet();
         for (String columnName : columnNameSet) {
@@ -411,13 +432,18 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     }
 
     protected Map<String, Object> getColumnValueMap(String tableName, List<String> columnNameList, Map columnMap,
-            List<String> valueList) {
+            List<String> valueList, Map<String, Set<String>> notFoundColumnMap) {
         final Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
         int columnCount = -1;
         for (String columnName : columnNameList) {
             columnCount++;
             if (!columnMap.isEmpty() && !columnMap.containsKey(columnName)) {
-                _log.info("The column[" + columnName + "] was not found in the table[" + tableName + "]");
+                Set<String> notFoundColumnSet = notFoundColumnMap.get(tableName);
+                if (notFoundColumnSet == null) {
+                    notFoundColumnSet = new LinkedHashSet<String>();
+                    notFoundColumnMap.put(tableName, notFoundColumnSet);
+                }
+                notFoundColumnSet.add(columnName);
                 continue;
             }
             final String value;

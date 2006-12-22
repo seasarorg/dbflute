@@ -15,11 +15,15 @@
  */
 package org.seasar.dbflute.helper.datahandler;
 
+import java.util.Map;
+import java.util.Set;
+
 import javax.sql.DataSource;
 
 public interface DfSeparatedDataHandler {
 
-    public void writeSeveralData(String basePath, String typeName, String delimter, DataSource dataSource);
+    public void writeSeveralData(String basePath, String typeName, String delimter, DataSource dataSource,
+            Map<String, Set<String>> notFoundColumnMap);
 
     /**
      * Write data from separated-file.
@@ -27,9 +31,10 @@ public interface DfSeparatedDataHandler {
      * @param filename Name of the file. (NotNull and NotEmpty)
      * @param encoding Encoding of the file. (NotNull and NotEmpty)
      * @param delimiter Delimiter of the file. (NotNull and NotEmpty)
+     * @param notFoundColumnMap Not found column map. (NotNUl)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void writeData(String filename, String encoding, String delimiter, DataSource dataSource)
-            throws java.io.FileNotFoundException, java.io.IOException;
+    public void writeData(String filename, String encoding, String delimiter, DataSource dataSource,
+            Map<String, Set<String>> notFoundColumnMap) throws java.io.FileNotFoundException, java.io.IOException;
 }

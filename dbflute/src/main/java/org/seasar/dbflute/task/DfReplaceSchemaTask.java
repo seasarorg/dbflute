@@ -17,8 +17,13 @@ package org.seasar.dbflute.task;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
@@ -36,7 +41,8 @@ import org.seasar.dbflute.task.bs.DfAbstractTask;
 public class DfReplaceSchemaTask extends DfAbstractTask {
 
     /** Log instance. */
-    // private static final Log _log = LogFactory.getLog(DfInvokeReplaceSchemaTask.class);
+    private static final Log _log = LogFactory.getLog(DfReplaceSchemaTask.class);
+
     // =========================================================================================
     //                                                                                DataSource
     //                                                                                ==========
@@ -60,9 +66,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final DfRunnerInformation runInfo = createRunnerInformation();
         fireSqlFile(runInfo);
 
-        writeDbFromXls();
         writeDbFromSeparatedFile("tsv", "\t");
         writeDbFromSeparatedFile("csv", ",");
+        writeDbFromXls();
     }
 
     protected void initializeSchema() {
@@ -71,7 +77,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             initializer.initializeSchema();
         }
 
-        // TODO: Other DB
+        // TODO: Make initializeSchema for Other DB.
     }
 
     protected DfSchemaInitializerMySQL createSchemaInitializerMySQL() {
@@ -114,12 +120,31 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void writeDbFromSeparatedFile(String typeName, String delimter) {
+        Map<String, Set<String>> notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
         final DfSeparatedDataHandler handler = new DfSeparatedDataHandlerImpl();
-        handler.writeSeveralData(getDataDirectoryPath("tsv"), typeName, delimter, getDataSource());
+        handler.writeSeveralData(getDataDirectoryPath("tsv"), typeName, delimter, getDataSource(), notFoundColumnMap);
+        showNotFoundColumn(typeName, notFoundColumnMap);
+    }
+
+    protected void showNotFoundColumn(String typeName, Map<String, Set<String>> notFoundColumnMap) {
+        if (notFoundColumnMap.isEmpty()) {
+            return;
+        }
+        _log.warn("* * * * * * * * * * * * *");
+        _log.warn("Not Found Columns in " + typeName);
+        _log.warn("* * * * * * * * * * * * *");
+        final Set<String> notFoundColumnSet = notFoundColumnMap.keySet();
+        for (String tableName : notFoundColumnSet) {
+            _log.warn("[" + tableName + "]");
+            final Set<String> columnNameList = notFoundColumnMap.get(tableName);
+            for (String columnName : columnNameList) {
+                _log.warn("    " + columnName);
+            }
+            _log.warn(" ");
+        }
     }
 
     protected String getDataDirectoryPath(final String typeName) {
-        // TODO: env.txtÇ›ÇΩÇ¢Ç…maindataÇ∆Ç©êÿÇËë÷Ç¶ÇÁÇÍÇÈÇÊÇ§Ç…Ç∑ÇÈÅB
         return getSqlFileDirectoryName() + "/testdata/" + typeName;
     }
 
