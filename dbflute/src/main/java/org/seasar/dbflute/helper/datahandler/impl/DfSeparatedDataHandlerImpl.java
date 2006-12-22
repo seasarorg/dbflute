@@ -468,7 +468,11 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
             if (!isNumeric(sqlType)) {
                 sbValues.append(", ").append("'").append(value).append("'");
             } else {
-                sbValues.append(", ").append(value);
+                if (value == null || (value instanceof String && ((String) value).trim().length() == 0)) {
+                    sbValues.append(", ").append("null");
+                } else {
+                    sbValues.append(", ").append(value);
+                }
             }
         }
         sbValues.delete(0, ", ".length()).insert(0, " values(").append(");");
