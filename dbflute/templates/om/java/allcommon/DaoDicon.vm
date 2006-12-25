@@ -13,10 +13,14 @@
     <!-- S2Dao component. -->
     <component class="org.seasar.dao.impl.FieldAnnotationReaderFactory"/>
     <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
-    <component class="org.seasar.dao.impl.BeanMetaDataFactoryImpl"/>
     <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataFactoryImpl}"/>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
+#if ($database.isVersionAfter1040())
 
+    <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
+    <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
+    <component class="org.seasar.dao.impl.BeanEnhancerImpl"/>
+#end
 
     <!-- Common column setup interceptor. -->
     <component name="commonColumnSetupBeforeInsertInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeInsertInterceptor}"/>

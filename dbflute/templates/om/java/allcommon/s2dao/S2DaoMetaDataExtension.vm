@@ -9,7 +9,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 #end
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +18,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.seasar.dao.BeanEnhancer;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.Dbms;
@@ -33,8 +33,6 @@ import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.extension.jdbc.util.DataSourceUtil;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.util.StringUtil;
@@ -52,6 +50,16 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      * Constructor.
      */
     public ${glDaoMetaDataExtension}() {
+    }
+
+    protected BeanEnhancer beanEnhancer;
+
+    public BeanEnhancer getBeanEnhancer() {
+        return beanEnhancer;
+    }
+
+    public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
+        this.beanEnhancer = beanEnhancer;
     }
 
     // =====================================================================================
@@ -229,6 +237,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
         originalBmdFactory.setValueTypeFactory(this.valueTypeFactory);
         originalBmdFactory.setDataSource(this.dataSource);
+        originalBmdFactory.setDaoNamingConvention(this.daoNamingConvention);
+        originalBmdFactory.setBeanEnhancer(this.beanEnhancer);
         return originalBmdFactory;
     }
 

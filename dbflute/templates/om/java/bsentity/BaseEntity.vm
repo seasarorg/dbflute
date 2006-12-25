@@ -841,6 +841,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return new EntityModifiedProperties();
     }
 
+    /**
+     * Clear modified property names.
+     */
+    public void clearModifiedPropertyNames() {
+        _modifiedProperties.clear();
+    }
+
     // =====================================================================================
     //                                                                        Basic Override
     //                                                                        ==============

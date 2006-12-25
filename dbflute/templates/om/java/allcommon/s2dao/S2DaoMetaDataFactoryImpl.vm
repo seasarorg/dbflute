@@ -4,8 +4,7 @@ import javax.sql.DataSource;
 #if ($database.isVersionAfter1040())
 
 import org.seasar.dao.AnnotationReaderFactory;
-import org.seasar.dao.BeanMetaDataFactory;
-import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
+import org.seasar.dao.BeanEnhancer;
 import org.seasar.dao.impl.DaoMetaDataFactoryImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.extension.jdbc.ResultSetFactory;
@@ -21,7 +20,7 @@ import org.seasar.extension.jdbc.StatementFactory;
 #end
 
 /**
- * DaoMetaDataFactoryImpl for DaoGen.
+ * DaoMetaDataFactoryImpl for DBFlute.
  * 
  * @author ${database.ClassAuthor}
  */
@@ -43,20 +42,20 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     }
 #if ($database.isVersionAfter1040())
 
-    protected DaoMetaDataImpl createDaoMetaDataImpl() {
-        return new ${glDaoMetaDataExtension}();
+    protected BeanEnhancer beanEnhancer;
+
+    public BeanEnhancer getBeanEnhancer() {
+        return beanEnhancer;
     }
 
-    protected BeanMetaDataFactory getBeanMetaDataFactory() {
-        final BeanMetaDataFactoryImpl factory = new BeanMetaDataFactoryImpl() {
-            protected int getLimitRelationNestLevel() {
-                return 2;
-            }
-        };
-        factory.setAnnotationReaderFactory(this.annotationReaderFactory);
-        factory.setValueTypeFactory(this.valueTypeFactory);
-        factory.setDataSource(this.dataSource);
-        return factory;
+    public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
+        this.beanEnhancer = beanEnhancer;
+    }
+
+    protected DaoMetaDataImpl createDaoMetaDataImpl() {
+        ${glDaoMetaDataExtension} dmdExtension = new ${glDaoMetaDataExtension}();
+        dmdExtension.setBeanEnhancer(this.beanEnhancer);
+        return dmdExtension;
     }
 #else
 

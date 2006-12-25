@@ -681,6 +681,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityNotNull(destinationEntity);
         final ${myExtendedObjectClassName} sourceMyEntity = (${myExtendedObjectClassName})sourceEntity;
         final ${myExtendedObjectClassName} destinationMyEntity = (${myExtendedObjectClassName})destinationEntity;
+        destinationMyEntity.clearModifiedPropertyNames();
         final java.util.Set${database.filterGenericsString('String')} names = sourceMyEntity.getModifiedPropertyNames();
   #foreach ($col in $table.Columns)
 

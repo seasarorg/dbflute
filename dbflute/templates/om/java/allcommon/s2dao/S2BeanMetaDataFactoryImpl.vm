@@ -1,0 +1,14 @@
+package ${glPackageBaseCommonS2Dao};
+
+import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
+
+/**
+ * BeanMetaDataFactoryImpl for DBFlute.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
+    protected int getLimitRelationNestLevel() {
+        return 2;
+    }
+}

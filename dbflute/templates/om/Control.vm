@@ -115,6 +115,7 @@ targetdatabase = $targetDatabase
     #set ($glDaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
     #set ($glDaoMetaDataExtension = "${glProjectPrefix}S2DaoMetaDataExtension")
     #set ($glDaoMetaDataFactoryImpl = "${glProjectPrefix}S2DaoMetaDataFactoryImpl")
+    #set ($glBeanMetaDataFactoryImpl = "${glProjectPrefix}S2BeanMetaDataFactoryImpl")
     #set ($glDaoStatementFactory = "${glProjectPrefix}S2DaoStatementFactory")
     #set ($glFetchNarrowingResultSetFactory = "${glProjectPrefix}FetchNarrowingResultSetFactory")
     #set ($glFetchNarrowingResultSetWrapper = "${glProjectPrefix}FetchNarrowingResultSetWrapper")
@@ -606,6 +607,11 @@ targetdatabase = $targetDatabase
 
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glDaoMetaDataFactoryImpl}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/s2dao/S2DaoMetaDataFactoryImpl.${glTemplateFileExtension}",$path,"", "")
+
+    #if ($database.isTargetLanguageJava() && $database.isVersionAfter1040())
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glBeanMetaDataFactoryImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/s2dao/S2BeanMetaDataFactoryImpl.${glTemplateFileExtension}",$path,"", "")
+    #end
 
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glSelectDynamicCommand}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/s2dao/S2DaoSelectDynamicCommand.${glTemplateFileExtension}",$path,"", "")
