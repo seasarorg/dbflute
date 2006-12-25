@@ -222,16 +222,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected BeanMetaDataFactory createOriginalBmdFactory() {
-        final BeanMetaDataFactoryImpl originalBmdFactory = new BeanMetaDataFactoryImpl() {
+        final ${glBeanMetaDataFactoryImpl} originalBmdFactory = new ${glBeanMetaDataFactoryImpl}() {
             protected BeanMetaDataImpl createBeanMetaDataImpl() {
                 return new BeanMetaDataImpl() {
                     protected void setupDatabaseMetaData(BeanDesc beanDesc, DatabaseMetaData dbMetaData, Dbms dbms) {
                         // Nothing.
                     }
                 };
-            }
-            protected int getLimitRelationNestLevel() {
-                return 2;
             }
         };
         originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
