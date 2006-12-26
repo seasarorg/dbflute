@@ -17,14 +17,6 @@ public class DfInternalSqlBuilder {
     protected List<String> _appendDefaultColumnNameList;
     protected Map<String, String> _defaultValueMap;
 
-    public List<String> getAppendDefaultSysdateList() {
-        return _appendDefaultColumnNameList;
-    }
-
-    public void setAppendDefaultSysdateList(List<String> appendDefaultSysdateList) {
-        this._appendDefaultColumnNameList = appendDefaultSysdateList;
-    }
-
     public Map getColumnMap() {
         return _columnMap;
     }
@@ -63,6 +55,22 @@ public class DfInternalSqlBuilder {
 
     public void setValueList(List<String> valueList) {
         this._valueList = valueList;
+    }
+
+    public List<String> getAppendDefaultSysdateList() {
+        return _appendDefaultColumnNameList;
+    }
+
+    public Map<String, String> getDefaultValueMap() {
+        return _defaultValueMap;
+    }
+
+    public void setDefaultValueMap(Map<String, String> defaultValueMap) {
+        this._defaultValueMap = defaultValueMap;
+    }
+
+    public void setAppendDefaultSysdateList(List<String> appendDefaultSysdateList) {
+        this._appendDefaultColumnNameList = appendDefaultSysdateList;
     }
 
     public DfInternalSqlBuildingResult buildSql() {
@@ -115,7 +123,12 @@ public class DfInternalSqlBuilder {
         for (String columnName : columnNameSet) {
             if (_appendDefaultColumnNameList.contains(columnName)) {
                 sbValues.append(", ").append("?");
-                sqlBuildingResult.addBindParameters(new Timestamp(System.currentTimeMillis()));
+                final String defaultValue = getDefaultValue(columnName);
+                if (defaultValue.equalsIgnoreCase("sysdate")) {
+                    sqlBuildingResult.addBindParameters(new Timestamp(System.currentTimeMillis()));
+                } else {
+                    sqlBuildingResult.addBindParameters(defaultValue);
+                }
             } else {
                 final Object value = columnValueMap.get(columnName);
                 if (value == null || (value instanceof String && ((String) value).trim().length() == 0)) {
@@ -130,12 +143,15 @@ public class DfInternalSqlBuilder {
         return sbValues.toString();
     }
 
-    public Map<String, String> getDefaultValueMap() {
-        return _defaultValueMap;
-    }
-
-    public void setDefaultValueMap(Map<String, String> defaultValueMap) {
-        this._defaultValueMap = defaultValueMap;
+    private String getDefaultValue(String columnName) {
+        final Set<String> keySet = _defaultValueMap.keySet();
+        for (String key : keySet) {
+            if (key.toLowerCase().equals(columnName.toLowerCase())) {
+                return _defaultValueMap.get(key);
+            }
+        }
+        String msg = "defaultValueMap.get(columnName) returned null: ";
+        throw new IllegalStateException(msg + "columnName=" + columnName + " defaultValueMap=" + _defaultValueMap);
     }
 
 }

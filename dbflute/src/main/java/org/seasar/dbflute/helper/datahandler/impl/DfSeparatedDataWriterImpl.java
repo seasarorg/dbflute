@@ -183,12 +183,13 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     sqlBuilder.setValueList(valueList);
                     sqlBuilder.setNotFoundColumnMap(notFoundColumnMap);
                     sqlBuilder.setAppendDefaultSysdateList(appendDefaultColumnNameList);
+                    sqlBuilder.setDefaultValueMap(_defaultValueMap);
                     final DfInternalSqlBuildingResult sqlBuildingResult = sqlBuilder.buildSql();
                     PreparedStatement statement = null;
                     try {
                         final String sql = sqlBuildingResult.getSql();
                         final List<Object> bindParameters = sqlBuildingResult.getBindParameters();
-                        _log.info("insert into " + tableName + columnNameList + " values(" + bindParameters + ")");
+                        _log.info(getSql4Log(tableName, columnNameList, bindParameters));
                         statement = _dataSource.getConnection().prepareStatement(sql);
                         int bindCount = 1;
                         for (Object object : bindParameters) {
@@ -246,6 +247,14 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                 _log.warn("File-close threw the exception: ", ignored);
             }
         }
+    }
+
+    private String getSql4Log(String tableName, List<String> columnNameList, final List<Object> bindParameters) {
+        String columnNameString = columnNameList.toString();
+        columnNameString = columnNameString.substring(1, columnNameString.length() - 1);
+        String bindParameterString = bindParameters.toString();
+        bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
+        return "insert into " + tableName + "(" + columnNameString + ") values(" + bindParameterString + ")";
     }
 
     protected List<String> getAppendDefaultColumnNameList(FirstLineInfo firstLineInfo) {

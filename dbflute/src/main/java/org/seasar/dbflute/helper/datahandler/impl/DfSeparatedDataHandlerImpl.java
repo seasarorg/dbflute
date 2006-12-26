@@ -33,6 +33,7 @@ import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
+import org.seasar.framework.util.CaseInsensitiveMap;
 
 public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
@@ -113,7 +114,6 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
             }
         }
         final DfMapListStringImpl mapListString = new DfMapListStringImpl();
-        mapListString.setDelimiter(";");
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
         if (sb.toString().trim().length() != 0) {
             final Map<String, Object> map = mapListString.generateMap(sb.toString());
