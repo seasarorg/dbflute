@@ -7,7 +7,7 @@ import java.util.Map;
  * MapList-String.
  * <p>
  * <pre>
- * # ˆÈ‰º‚Ì‚æ‚¤‚È•¶š—ñ(ƒ}ƒbƒvƒŠƒXƒgƒXƒgƒŠƒ“ƒO)‚©‚ç‚ğƒ}ƒbƒv‚âƒŠƒXƒg‚Ì¶¬‚ğ’ñ‹Ÿ‚·‚éƒCƒ“ƒ^[ƒtƒF[ƒXB
+ * # ï¿½È‰ï¿½ï¿½Ì‚æ‚¤ï¿½È•ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½}ï¿½bï¿½vï¿½ï¿½ï¿½Xï¿½gï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½O)ï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½âƒŠï¿½Xï¿½gï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ñ‹Ÿ‚ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½^ï¿½[ï¿½tï¿½Fï¿½[ï¿½Xï¿½B
  * # 
  * #   ex) map:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
  * #   ex) list:{key1=value1,key2=list:{value21,value22,value23},key3=map:{key31=value31}}
@@ -21,7 +21,7 @@ public interface DfMapListString {
 
     public static final String DEFAULT_LIST_MARK = "list:";
 
-    public static final String DEFAULT_DELIMITER = ",";
+    public static final String DEFAULT_DELIMITER = ";";
 
     public static final String DEFAULT_START_BRACE = "{";
 

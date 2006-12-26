@@ -31,7 +31,7 @@ public interface ${glMapListStringName} {
     public static final String DEFAULT_END_BRACE = "}";
 
     /** Default of delimter. */
-    public static final String DEFAULT_DELIMITER = ",";
+    public static final String DEFAULT_DELIMITER = ";";
 
     /** Default of equal. */
     public static final String DEFAULT_EQUAL = "=";
