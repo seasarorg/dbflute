@@ -9,11 +9,11 @@ import java.util.Map;
  * MapList-String.
  * <p>
  * <pre>
- * # MapListStringƒCƒ“ƒ^[ƒtƒF[ƒX‚ÌƒVƒ“ƒvƒ‹ŽÀ‘•B
+ * # MapListStringï¿½Cï¿½ï¿½ï¿½^ï¿½[ï¿½tï¿½Fï¿½[ï¿½Xï¿½ÌƒVï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½B
  * #
- * # ƒ}ƒbƒvorƒŠƒXƒg‚Ìì¬‚ÍƒXƒe[ƒgƒŒƒX‚Å‚Í‚È‚¢‚½‚ßA‚ ‚éƒXƒŒƒbƒh‚ªì¬‚ðŽÀs’†‚É
- * # •ÊƒXƒŒƒbƒh‚ªì¬‚ðŽÀs‚µ‚½ê‡A‚»‚ÌƒXƒŒƒbƒh‚ÍŽÀs’†‚ÌƒXƒŒƒbƒh‚ªI—¹‚·‚é‚Ü‚Å
- * # ‘Ò‚½‚³‚éB
+ * # ï¿½}ï¿½bï¿½vorï¿½ï¿½ï¿½Xï¿½gï¿½Ìì¬ï¿½ÍƒXï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½Xï¿½Å‚Í‚È‚ï¿½ï¿½ï¿½ï¿½ßAï¿½ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½bï¿½hï¿½ï¿½ï¿½ì¬ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½
+ * # ï¿½ÊƒXï¿½ï¿½ï¿½bï¿½hï¿½ï¿½ï¿½ì¬ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½ï¿½ï¿½ÌƒXï¿½ï¿½ï¿½bï¿½hï¿½ÍŽsï¿½ï¿½ï¿½ÌƒXï¿½ï¿½ï¿½bï¿½hï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½
+ * # ï¿½Ò‚ï¿½ï¿½ï¿½ï¿½ï¿½B
  * </pre>
  * 
  * @author jflute
@@ -175,7 +175,7 @@ public class DfMapListStringImpl implements DfMapListString {
                 return;
             }
 
-            // *** ‚±‚ÌŽž“_‚ÅŽc‚è‚Ì•¶Žš—ñ‚Íƒ}ƒbƒv—v‘f‚ÌƒL[’l‚ÅŽn‚Ü‚éB ***
+            // *** ï¿½ï¿½ï¿½ÌŽï¿½ï¿½_ï¿½ÅŽcï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Íƒ}ï¿½bï¿½vï¿½vï¿½fï¿½ÌƒLï¿½[ï¿½lï¿½ÅŽnï¿½Ü‚ï¿½B ***
 
             final int equalIndex = _remainderString.indexOf(_equal);
             assertEqualIndex(_remainderString, equalIndex, _topString, currentMap);
@@ -183,7 +183,7 @@ public class DfMapListStringImpl implements DfMapListString {
             removePrefixTargetIndexPlusOne(equalIndex);
             removeBothSideSpaceAndTabAndNewLine();
 
-            // *** ‚±‚ÌŽž“_‚ÅŽc‚è‚Ì•¶Žš—ñ‚Íƒ}ƒbƒv—v‘f‚ÌƒoƒŠƒ…[’l‚ÅŽn‚Ü‚éB ***
+            // *** ï¿½ï¿½ï¿½ÌŽï¿½ï¿½_ï¿½ÅŽcï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Íƒ}ï¿½bï¿½vï¿½vï¿½fï¿½Ìƒoï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½lï¿½ÅŽnï¿½Ü‚ï¿½B ***
 
             if (isStartsWithMapPrefix(_remainderString)) {
                 removePrefixMapMarkAndStartBrace();
@@ -207,22 +207,22 @@ public class DfMapListStringImpl implements DfMapListString {
             final int endBraceIndex = _remainderString.indexOf(_endBrace);
             assertEndBracekIndex(_remainderString, endBraceIndex, _topString, currentMap);
 
-            // ƒfƒŠƒ~ƒ^‚ª‘¶Ý‚µ‚ÄA‚©‚ÂAƒfƒŠƒ~ƒ^‚ª’†Š‡ŒÊ•Â‚¶‚æ‚è‚à‹ß‚¢ê‡A
-            // Œ»Ý‚ÌŽc‚è‚Ì•¶Žš—ñ‚Ìæ“ª‚©‚çƒfƒŠƒ~ƒ^‚Ü‚Å‚ªƒ}ƒbƒvƒoƒŠƒ…[‚Æ‚È‚éB¨ ex) value1,key2=value2}
+            // ï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½Ý‚ï¿½ï¿½ÄAï¿½ï¿½ï¿½ÂAï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê•Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½ï¿½ê‡ï¿½A
+            // ï¿½ï¿½ï¿½Ý‚ÌŽcï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Ìæ“ªï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½Ü‚Å‚ï¿½ï¿½}ï¿½bï¿½vï¿½oï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Æ‚È‚ï¿½Bï¿½ï¿½ ex) value1,key2=value2}
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) {
                 final String mapValue = _remainderString.substring(0, delimiterIndex);
                 currentMap.put(mapKey, filterMapListValue(mapValue));
 
-                // ƒfƒŠƒ~ƒ^ˆÈ~‚Éƒ}ƒbƒv—v‘f‚ª‘±‚­‚Ì‚ÅAƒfƒŠƒ~ƒ^‚ð”ò‚Î‚µ‚ÄƒRƒ“ƒeƒBƒjƒ…[I
+                // ï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½È~ï¿½Éƒ}ï¿½bï¿½vï¿½vï¿½fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ÅAï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½ï¿½ï¿½Î‚ï¿½ï¿½ÄƒRï¿½ï¿½ï¿½eï¿½Bï¿½jï¿½ï¿½ï¿½[ï¿½I
                 removePrefixTargetIndexPlusOne(delimiterIndex);
                 continue;
             }
 
-            // Œ»Ý‚ÌŽc‚è‚Ì•¶Žš—ñ‚Ìæ“ª‚©‚ç’†Š‡ŒÊ•Â‚¶‚Ü‚Å‚ªƒ}ƒbƒvƒoƒŠƒ…[‚Æ‚È‚éB¨ ex) value1}, key2=value2}
+            // ï¿½ï¿½ï¿½Ý‚ÌŽcï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Ìæ“ªï¿½ï¿½ï¿½ç’†ï¿½ï¿½ï¿½Ê•Â‚ï¿½ï¿½Ü‚Å‚ï¿½ï¿½}ï¿½bï¿½vï¿½oï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Æ‚È‚ï¿½Bï¿½ï¿½ ex) value1}, key2=value2}
             final String mapValue = _remainderString.substring(0, endBraceIndex);
             currentMap.put(mapKey, filterMapListValue(mapValue));
 
-            // Œ»ó‚Ìƒ}ƒbƒv—v‘f‰ðÍ‚ÍI—¹‚Æ‚·‚é‚½‚ßƒŠƒ^[ƒ“Iwith ƒNƒ[ƒWƒ“ƒOˆ—
+            // ï¿½ï¿½ï¿½ï¿½Ìƒ}ï¿½bï¿½vï¿½vï¿½fï¿½ï¿½Í‚ÍIï¿½ï¿½ï¿½Æ‚ï¿½ï¿½é‚½ï¿½ßƒï¿½ï¿½^ï¿½[ï¿½ï¿½ï¿½Iwith ï¿½Nï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½
             closingByEndBraceIndex(endBraceIndex);
             return;
         }
@@ -234,7 +234,7 @@ public class DfMapListStringImpl implements DfMapListString {
                 return;
             }
 
-            // *** ‚±‚ÌŽž“_‚ÅŽc‚è‚Ì•¶Žš—ñ‚ÍƒŠƒXƒg—v‘f‚ÌƒoƒŠƒ…[’l‚ÅŽn‚Ü‚éB ***
+            // *** ï¿½ï¿½ï¿½ÌŽï¿½ï¿½_ï¿½ÅŽcï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Íƒï¿½ï¿½Xï¿½gï¿½vï¿½fï¿½Ìƒoï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½lï¿½ÅŽnï¿½Ü‚ï¿½B ***
 
             if (isStartsWithMapPrefix(_remainderString)) {
                 removePrefixMapMarkAndStartBrace();
@@ -258,22 +258,22 @@ public class DfMapListStringImpl implements DfMapListString {
             final int endBraceIndex = _remainderString.indexOf(_endBrace);
             assertEndBraceIndex(_remainderString, endBraceIndex, _topString, currentList);
 
-            // ƒfƒŠƒ~ƒ^‚ª‘¶Ý‚µ‚ÄA‚©‚ÂAƒfƒŠƒ~ƒ^‚ª’†Š‡ŒÊ•Â‚¶‚æ‚è‚à‹ß‚¢ê‡A
-            // Œ»Ý‚ÌŽc‚è‚Ì•¶Žš—ñ‚Ìæ“ª‚©‚çƒfƒŠƒ~ƒ^‚Ü‚Å‚ªƒŠƒXƒgƒoƒŠƒ…[‚Æ‚È‚éB¨ ex) value1,value2,value3}
+            // ï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½Ý‚ï¿½ï¿½ÄAï¿½ï¿½ï¿½ÂAï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê•Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½ï¿½ê‡ï¿½A
+            // ï¿½ï¿½ï¿½Ý‚ÌŽcï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Ìæ“ªï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½Ü‚Å‚ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½oï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Æ‚È‚ï¿½Bï¿½ï¿½ ex) value1,value2,value3}
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) {
                 final String listValue = _remainderString.substring(0, delimiterIndex);
                 currentList.add(filterMapListValue(listValue));
 
-                // ƒfƒŠƒ~ƒ^ˆÈ~‚ÉƒŠƒXƒg—v‘f‚ª‘±‚­‚Ì‚ÅAƒfƒŠƒ~ƒ^‚ð”ò‚Î‚µ‚ÄƒRƒ“ƒeƒBƒjƒ…[I
+                // ï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½È~ï¿½Éƒï¿½ï¿½Xï¿½gï¿½vï¿½fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ÅAï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½ï¿½ï¿½Î‚ï¿½ï¿½ÄƒRï¿½ï¿½ï¿½eï¿½Bï¿½jï¿½ï¿½ï¿½[ï¿½I
                 removePrefixTargetIndexPlusOne(delimiterIndex);
                 continue;
             }
 
-            // Œ»Ý‚ÌŽc‚è‚Ì•¶Žš—ñ‚Ìæ“ª‚©‚ç’†Š‡ŒÊ•Â‚¶‚Ü‚Å‚ªƒŠƒXƒgƒoƒŠƒ…[‚Æ‚È‚éB¨ ex) value1}, value2, }
+            // ï¿½ï¿½ï¿½Ý‚ÌŽcï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Ìæ“ªï¿½ï¿½ï¿½ç’†ï¿½ï¿½ï¿½Ê•Â‚ï¿½ï¿½Ü‚Å‚ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½oï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Æ‚È‚ï¿½Bï¿½ï¿½ ex) value1}, value2, }
             final String listValue = _remainderString.substring(0, endBraceIndex);
             currentList.add(filterMapListValue(listValue));
 
-            // Œ»ó‚Ìƒ}ƒbƒv—v‘f‰ðÍ‚ÍI—¹‚Æ‚·‚é‚½‚ßƒŠƒ^[ƒ“Iwith ƒNƒ[ƒWƒ“ƒOˆ—
+            // ï¿½ï¿½ï¿½ï¿½Ìƒ}ï¿½bï¿½vï¿½vï¿½fï¿½ï¿½Í‚ÍIï¿½ï¿½ï¿½Æ‚ï¿½ï¿½é‚½ï¿½ßƒï¿½ï¿½^ï¿½[ï¿½ï¿½ï¿½Iwith ï¿½Nï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½
             closingByEndBraceIndex(endBraceIndex);
             return;
         }
@@ -283,17 +283,17 @@ public class DfMapListStringImpl implements DfMapListString {
      * @return Is return?
      */
     protected boolean initializeAtLoopBeginning() {
-        // æ“ª‚ÌƒfƒŠƒ~ƒ^‚Í‘S‚Äœ‹Ž‚·‚éB
-        //   - –ß‚è’l‚Í“à•”“I‚É•K‚¸ƒgƒŠƒ€‚³‚ê‚éB
+        // ï¿½æ“ªï¿½Ìƒfï¿½ï¿½ï¿½~ï¿½^ï¿½Í‘Sï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+        //   - ï¿½ß‚ï¿½lï¿½Í“Õ”ï¿½Iï¿½É•Kï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
         removePrefixAllDelimiter();
 
-        // Žc‚è‚Ì•¶Žš—ñ‚ª‹ó•¶Žš‚È‚ç‚ÎA‘S‚Ä‚Ì‰ðÍ‚ªI—¹‚È‚Ì‚ÅƒŠƒ^[ƒ“I
+        // ï¿½cï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ñ‚ª‹ó•¶Žï¿½ï¿½È‚ï¿½ÎAï¿½Sï¿½Ä‚Ì‰ï¿½Í‚ï¿½ï¿½Iï¿½ï¿½ï¿½È‚Ì‚Åƒï¿½ï¿½^ï¿½[ï¿½ï¿½ï¿½I
         if (_remainderString.equals("")) {
             return true;
         }
 
-        // Žc‚è‚Ì•¶Žš—ñ‚ª’†Š‡ŒÊ•Â‚¶‚ÅŽn‚Ü‚é‚È‚ç‚ÎAŒ»ó‚Ìƒ}ƒbƒv—v‘f‰ðÍ‚ªI—¹‚È‚Ì‚ÅƒŠƒ^[ƒ“I
-        //   - ‚»‚ÌŽž‚É’†Š‡ŒÊ•Â‚¶‚ðœ‹Ž‚·‚éB
+        // ï¿½cï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ñ‚ª’ï¿½ï¿½ï¿½ï¿½Ê•Â‚ï¿½ï¿½ÅŽnï¿½Ü‚ï¿½È‚ï¿½ÎAï¿½ï¿½ï¿½ï¿½Ìƒ}ï¿½bï¿½vï¿½vï¿½fï¿½ï¿½Í‚ï¿½ï¿½Iï¿½ï¿½ï¿½È‚Ì‚Åƒï¿½ï¿½^ï¿½[ï¿½ï¿½ï¿½I
+        //   - ï¿½ï¿½ï¿½ÌŽï¿½ï¿½É’ï¿½ï¿½ï¿½ï¿½Ê•Â‚ï¿½ï¿½ïœ‹ï¿½ï¿½ï¿½ï¿½ï¿½B
         if (isStartsWithEndBrace(_remainderString)) {
             removePrefixEndBrace();
             return true;
@@ -305,7 +305,7 @@ public class DfMapListStringImpl implements DfMapListString {
      * @return Is return?
      */
     protected boolean closingAfterParseNestMapList() {
-        // ’†Š‡ŒÊ•Â‚¶‚ÅŽn‚Ü‚Á‚Ä‚¢‚éê‡A‚»‚ê‚ðœ‹Ž‚µ‚ÄŽc‚è‚Ì•¶Žš—ñ‚Æ‚µ‚ÄÝ’è‚·‚éB
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Ê•Â‚ï¿½ï¿½ÅŽnï¿½Ü‚BÄ‚ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½ï¿½ï¿½ï¿½ïœ‹ï¿½ï¿½ï¿½ï¿½ÄŽcï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ÄÝ’è‚·ï¿½ï¿½B
         if (isStartsWithEndBrace(_remainderString)) {
             removePrefixEndBrace();
             return true;
@@ -314,7 +314,7 @@ public class DfMapListStringImpl implements DfMapListString {
     }
 
     protected void closingByEndBraceIndex(int endBraceIndex) {
-        // Žc‚è‚Ì•¶Žš—ñ‚Ìæ“ª‚©‚ç‰ðÍÏ‚Ý‚ÌƒoƒŠƒ…[‚Æ’†Š‡ŒÊ•Â‚¶‚ðœ‹Ž‚·‚éB
+        // ï¿½cï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½Ìæ“ªï¿½ï¿½ï¿½ï¿½ï¿½ÍÏ‚Ý‚Ìƒoï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Æ’ï¿½ï¿½ï¿½ï¿½Ê•Â‚ï¿½ï¿½ïœ‹ï¿½ï¿½ï¿½ï¿½ï¿½B
         _remainderString = _remainderString.substring(endBraceIndex);
         removePrefixEndBrace();
     }
@@ -408,7 +408,7 @@ public class DfMapListStringImpl implements DfMapListString {
         }
         mapString = mapString.trim();
         if (!isStartsWithMapPrefix(mapString)) {
-            String msg = "Argument[mapString] must start with '" + _mapMark + "': ";
+            String msg = "Argument[mapString] must start with '" + _mapMark + _startBrace + "': ";
             throw new IllegalArgumentException(msg + "mapString=" + mapString);
         }
         if (!isEndsWithEndBrace(mapString)) {
@@ -708,9 +708,9 @@ public class DfMapListStringImpl implements DfMapListString {
     /**
      * Get count that target string exist in the base string.
      * 
-     * @param targetString ‘ÎÛ•¶Žš—ñ
-     * @param delimiter ƒfƒŠƒ~ƒ^
-     * @return Žc‚è‚Ì•¶Žš—ñ‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚éƒfƒŠƒ~ƒ^‚Ì”
+     * @param targetString ï¿½ÎÛ•ï¿½ï¿½ï¿½ï¿½ï¿½
+     * @param delimiter ï¿½fï¿½ï¿½ï¿½~ï¿½^
+     * @return ï¿½cï¿½ï¿½Ì•ï¿½ï¿½ï¿½ï¿½ï¿½ÉŠÜ‚Ü‚ï¿½Ä‚ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½~ï¿½^ï¿½Ìï¿½
      */
     protected int getDelimiterCount(String targetString, String delimiter) {
         int result = 0;

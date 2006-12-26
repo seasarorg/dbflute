@@ -15,7 +15,18 @@
  */
 package org.seasar.dbflute.helper.datahandler;
 
-public interface DfSeparatedDataHandler {
+import java.util.Map;
+import java.util.Set;
 
-    public DfSeparatedDataResultInfo writeSeveralData(DfSeparatedDataSeveralHandlingInfo info);
+public interface DfSeparatedDataWriter {
+
+    /**
+     * Write data from separated-file.
+     * 
+     * @param notFoundColumnMap Not found column map. (NotNUl)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public void writeData(Map<String, Set<String>> notFoundColumnMap) throws java.io.FileNotFoundException,
+            java.io.IOException;
 }

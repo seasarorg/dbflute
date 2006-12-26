@@ -467,7 +467,7 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
         }
         mapString = mapString.trim();
         if (!isStartsWithMapPrefix(mapString)) {
-            String msg = "Argument[mapString] must start with '" + _mapMark + "': ";
+            String msg = "Argument[mapString] must start with '" + _mapMark + _startBrace + "': ";
             throw new IllegalArgumentException(msg + "mapString=" + mapString);
         }
         if (!isEndsWithEndBrace(mapString)) {

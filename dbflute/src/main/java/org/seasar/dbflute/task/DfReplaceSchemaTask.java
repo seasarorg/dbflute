@@ -26,7 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
+import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
+import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
 import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.datahandler.impl.DfXlsDataHandlerImpl;
@@ -120,10 +121,15 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void writeDbFromSeparatedFile(String typeName, String delimter) {
-        Map<String, Set<String>> notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
-        final DfSeparatedDataHandler handler = new DfSeparatedDataHandlerImpl();
-        handler.writeSeveralData(getDataDirectoryPath("tsv"), typeName, delimter, getDataSource(), notFoundColumnMap);
-        showNotFoundColumn(typeName, notFoundColumnMap);
+        final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
+        handler.setDataSource(getDataSource());
+        final DfSeparatedDataSeveralHandlingInfo handlingInfo = new DfSeparatedDataSeveralHandlingInfo();
+        handlingInfo.setBasePath(getDataDirectoryPath("tsv"));
+        handlingInfo.setTypeName(typeName);
+        handlingInfo.setDelimter(delimter);
+        handlingInfo.setErrorContinue(true);
+        final DfSeparatedDataResultInfo resultInfo = handler.writeSeveralData(handlingInfo);
+        showNotFoundColumn(typeName, resultInfo.getNotFoundColumnMap());
     }
 
     protected void showNotFoundColumn(String typeName, Map<String, Set<String>> notFoundColumnMap) {

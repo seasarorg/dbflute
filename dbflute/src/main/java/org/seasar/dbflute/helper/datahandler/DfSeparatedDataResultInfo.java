@@ -15,7 +15,18 @@
  */
 package org.seasar.dbflute.helper.datahandler;
 
-public interface DfSeparatedDataHandler {
+import java.util.Map;
+import java.util.Set;
 
-    public DfSeparatedDataResultInfo writeSeveralData(DfSeparatedDataSeveralHandlingInfo info);
+public class DfSeparatedDataResultInfo {
+    protected Map<String, Set<String>> notFoundColumnMap;
+
+    public Map<String, Set<String>> getNotFoundColumnMap() {
+        return notFoundColumnMap;
+    }
+
+    public void setNotFoundColumnMap(Map<String, Set<String>> notFoundColumnMap) {
+        this.notFoundColumnMap = notFoundColumnMap;
+    }
+
 }
