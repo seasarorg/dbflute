@@ -356,25 +356,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
     }
 
-    // =====================================================================================
-    //                                                                        Various Select
-    //                                                                        ==============
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean.
-     * @param maxCount Max count.
-     * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-     */
-    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final int selectedCount = callReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
-        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());
-        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, callReadList(${glAttachedCBArgsVariableName}));
-    }
-
     /**
      * Assert that selected count has not exceeded max count.
      * 
@@ -389,58 +370,27 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
         }
     }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
-     * @return Entity that is read from database. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public ${glEntityInterfaceName} readByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-        assertObjectNotNull("primaryKeyMapString", primaryKeyMapString);
-        final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = newConditionBean();
-        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
-        final ${glEntityInterfaceName} currentEntity = callReadEntity(${glAttachedCBArgsVariableName});
-        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-        return currentEntity;
-    }
 #if ($database.isMakeDeprecated())
 
+    // =====================================================================================
+    //                                                                        Various Select
+    //                                                                        ==============
     /**
      * ${database.ImplementComment}
      * 
-     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
-     * @return Entity that is read from database. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated Please use readByPKMapStringWithDeletedCheck().
+     * @param ${glAttachedCBArgsVariableName} Condition-bean.
+     * @param maxCount Max count.
+     * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+     * @deprecated Please don't use this.
      */
-    public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-        assertObjectNotNull("primaryKeyMapString", primaryKeyMapString);
-        final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = newConditionBean();
-        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
-        final ${glEntityInterfaceName} currentEntity = callReadEntity(${glAttachedCBArgsVariableName});
-        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-        return currentEntity;
+    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
+        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+        final int selectedCount = callReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
+        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());
+        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, callReadList(${glAttachedCBArgsVariableName}));
     }
 #end
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
-     * @return Entity that is read from database by select-for-update. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public ${glEntityInterfaceName} readForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-        assertObjectNotNull("primaryKeyMapString", primaryKeyMapString);
-        final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = newConditionBean();
-        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
-        ${glAttachedCBArgsVariableName}.lockForUpdate();
-        final ${glEntityInterfaceName} currentEntity = callReadEntity(${glAttachedCBArgsVariableName});
-        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-        return currentEntity;
-    }
 
     // =====================================================================================
     //                                                                         Helper Method

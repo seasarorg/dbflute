@@ -182,45 +182,45 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Select count by condition-bean. (Delegate-Method)
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
      */
-    public int delegateSelectCount(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return getMyDao().selectCount(${glAttachedCBArgsVariableName});
+    public int delegateSelectCount(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return getMyDao().selectCount(cb);
     }
 
     /**
      * Select count ignore fetch scope by condition-bean. (Delegate-Method)
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
      */
-    public int delegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return getMyDao().selectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
+    public int delegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return getMyDao().selectCountIgnoreFetchScope(cb);
     }
 
     /**
      * Select entity by condition-bean. (Delegate-Method)
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Selected entity. If the select result is zero, it returns null. (Nullable)
      */
-    public ${myExtendedObjectClassName} delegateSelectEntity(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return getMyDao().selectEntity(${glAttachedCBArgsVariableName});
+    public ${myExtendedObjectClassName} delegateSelectEntity(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return getMyDao().selectEntity(cb);
     }
 
     /**
      * Select list by condition-bean. (Delegate-Method)
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateSelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return getMyDao().selectList(${glAttachedCBArgsVariableName});
+    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateSelectList(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return getMyDao().selectList(cb);
     }
 
 #if ($table.isUseSequence())
@@ -317,41 +317,41 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Select list.
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return List-result-bean. (NotNull)
      */
-    public ${glListResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return new ResultBeanBuilder${database.filterGenericsString(${myExtendedObjectClassName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, delegateSelectList(${glAttachedCBArgsVariableName}));
+    public ${glListResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectList(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return new ResultBeanBuilder${database.filterGenericsString(${myExtendedObjectClassName})}(this).buildListResultBean(cb, delegateSelectList(cb));
     }
 
     /**
      * Select page.
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Selected page as first page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return selectPage(${glAttachedCBArgsVariableName}, new SelectPageSimpleInvoker${database.filterGenericsString(${myExtendedObjectClassName})}(this));
+    public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return selectPage(cb, new SelectPageSimpleInvoker${database.filterGenericsString(${myExtendedObjectClassName})}(this));
     }
 
     /**
      * Select page.
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @param invoker Select-page-invoker (NotNull)
      * @return Selected page as first page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${myExtendedObjectClassName})} invoker) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+    public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} cb, SelectPageInvoker${database.filterGenericsString(${myExtendedObjectClassName})} invoker) {
+        assertConditionBeanNotNull(cb);
         final SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})}() {
-            public ${glPagingBeanInterfaceName} getPagingBean() { return ${glAttachedCBArgsVariableName}; }
+            public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
             public int selectCountIgnoreFetchScope() {
-                return delegateSelectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
+                return delegateSelectCountIgnoreFetchScope(cb);
             }
             public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectList() {
-                return delegateSelectList(${glAttachedCBArgsVariableName});
+                return delegateSelectList(cb);
             }
         };
         return invoker.invokeSelectPage(pageCallback);
@@ -360,85 +360,24 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Select entity by condition-bean with deleted check.
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Entity that is selected from database by select-for-update. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(${glAttachedCBArgsVariableName});
-        assertRecordHasNotBeenDeleted(currentEntity, ${glAttachedCBArgsVariableName}.toString());
+    public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(cb);
+        assertRecordHasNotBeenDeleted(currentEntity, cb.toString());
         return currentEntity;
     }
-
-    // =====================================================================================
-    //                                                                        Various Select
-    //                                                                        ==============
-    /**
-     * Select list after checking count(ignore fetch scope).
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @param maxCount Max count.
-     * @return List-result-bean. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-     */
-    public ${glListResultBeanName} selectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int maxCount) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final int selectedCount = delegateSelectCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
-        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());
-        return selectList(${glAttachedCBArgsVariableName});
-    }
-
 #if ($table.hasPrimaryKey())
 
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
-        return selectByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
-    }
-  #if ($database.isMakeDeprecated())
-
-    // @deprecated Please use selectByPKValueWithDeletedCheck().
-    public ${myExtendedObjectClassName} selectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        return selectForReadOnlyByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
-    }
-  #end
-#end
-
-    /**
-     * Select with deleted check.
-     * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @return Entity that is selected from database. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public ${myExtendedObjectClassName} selectByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
-        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
-        final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(${glAttachedCBArgsVariableName});
-        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-        return currentEntity;
-    }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Select for read only with deleted check.
-     * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @return Entity that is selected from database by select-for-read-only. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated Please use selectByPKMapStringWithDeletedCheck().
-     */
-    public ${myExtendedObjectClassName} selectForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
-        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
-        final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(${glAttachedCBArgsVariableName});
-        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-        return currentEntity;
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        return selectEntityWithDeletedCheck(cb);
     }
 #end
 #if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
@@ -446,25 +385,44 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${myExtendedObjectClassName} selectForUpdateByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
-        return selectForUpdateByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.lockForUpdate();
+        return selectEntityWithDeletedCheck(cb);
     }
+#end
+#if ($database.isMakeDeprecated())
 
     /**
-     * Select for update with deleted check.
+     * Select list after checking count(ignore fetch scope).
      * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @return Entity that is selected from database by select-for-update. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @param cb Condition-bean. (NotNull)
+     * @param maxCount Max count.
+     * @return List-result-bean. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+     * @deprecated Please don't use this.
      */
-    public ${myExtendedObjectClassName} selectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = newMyConditionBean();
-        ${glAttachedCBArgsVariableName}.acceptPrimaryKeyMapString(primaryKeyMapString);
-        ${glAttachedCBArgsVariableName}.lockForUpdate();
-        final ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(${glAttachedCBArgsVariableName});
-        assertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-        return currentEntity;
+    public ${glListResultBeanName} selectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} cb, int maxCount) {
+        assertConditionBeanNotNull(cb);
+        final int selectedCount = delegateSelectCountIgnoreFetchScope(cb);
+        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.toString());
+        return selectList(cb);
     }
+#end
+#if ($table.hasPrimaryKey())
+  #if ($database.isMakeDeprecated())
+
+    /**
+     * @deprecated Please use selectByPKValueWithDeletedCheck().
+     */
+    public ${myExtendedObjectClassName} selectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        return selectEntityWithDeletedCheck(cb);
+    }
+  #end
 #end
 #if (${table.hasOnlyOnePrimaryKey()})
 
@@ -495,8 +453,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
      * 
      *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
-     *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
-     *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
+     *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
+     *     cb.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls);
      * 
@@ -506,8 +464,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls) {
         final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
-            public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName}) {
-                ${glAttachedCBArgsVariableName}.addOrderBy_PK_Asc();// Default OrderBy for Refferer.
+            public void setup(${reffererCBClassName} cb) {
+                cb.addOrderBy_PK_Asc();// Default OrderBy for Refferer.
             }
         };
         load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
@@ -520,12 +478,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
      * 
      *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
-     *     final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = bhv.newMyConditionBean();
-     *     ${glAttachedCBArgsVariableName}.query().setXxx_Equal("xxx");
+     *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
+     *     cb.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
      *     final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
-     *         public void setup(${reffererCBClassName} ${glAttachedCBArgsVariableName}) {
-     *             ${glAttachedCBArgsVariableName}.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+     *         public void setup(${reffererCBClassName} cb) {
+     *             cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
      *         }
      *     };
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
@@ -550,11 +508,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             pkMyEntityMap.put(entity.get${table.getPrimaryKeyJavaNameAsOne()}(), entity);
         }
         final ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})getDaoSelector().getRBhv(${reffererBhvClassName}.class);
-        final ${reffererCBClassName} ${glAttachedCBArgsVariableName} = reffererBhv.newMyConditionBean();
-        ${glAttachedCBArgsVariableName}.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-        ${glAttachedCBArgsVariableName}.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-        cbSetupper.setup(${glAttachedCBArgsVariableName});
-        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.delegateSelectList(${glAttachedCBArgsVariableName});
+        final ${reffererCBClassName} cb = reffererBhv.newMyConditionBean();
+        cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+        cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+        cbSetupper.setup(cb);
+        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.delegateSelectList(cb);
 
         final java.util.Map${database.filterGenericsString(${genericPKChildListMap})} pkReffererListMap;
         pkReffererListMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKChildListMap})}();
@@ -604,10 +562,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         if (!entity.hasPrimaryKeyValue()) {
             return delegateInsert(entity);
         }
-        final String mapString = entity.extractPrimaryKeyMapString();
         ${myExtendedObjectClassName} currentEntity = null;
         try {
-            currentEntity = selectByPKMapStringWithDeletedCheck(mapString);
+            final ${myConditionBeanClassName} cb = newMyConditionBean();
+            cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+            currentEntity = selectEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
             return delegateInsert(entity);
         }
@@ -625,7 +584,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public int updateAfterSelect(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${myExtendedObjectClassName} currentEntity = selectByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         return delegateUpdate(currentEntity);
     }
@@ -643,10 +604,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         if (!entity.hasPrimaryKeyValue()) {
             return delegateInsert(entity);
         }
-        final String mapString = entity.extractPrimaryKeyMapString();
         ${myExtendedObjectClassName} currentEntity = null;
         try {
-            currentEntity = selectForUpdateByPKMapStringWithDeletedCheck(mapString);
+            final ${myConditionBeanClassName} cb = newMyConditionBean();
+            cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+            cb.lockForUpdate();
+            currentEntity = selectEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
             return delegateInsert(entity);
         }
@@ -664,7 +627,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public int updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${myExtendedObjectClassName} currentEntity = selectForUpdateByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.lockForUpdate();
+        final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         return delegateUpdate(currentEntity);
     }
@@ -708,23 +674,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public int copyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
-        return copyInsertByPKMapStringAfterSelect(entity.extractPrimaryKeyMapString());
-    }
-    #end
-
-    /**
-     * Copy-insert after select.
-     * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @return Inserted count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public int copyInsertByPKMapStringAfterSelect(String primaryKeyMapString) {
-        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myExtendedObjectClassName} currentEntity = selectByPKMapStringWithDeletedCheck(primaryKeyMapString);
-        filterCopyInsertEntity(currentEntity);
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         return delegateInsert(currentEntity);
     }
+    #end
 
     /**
      * Filter 'copy-insert' entity.

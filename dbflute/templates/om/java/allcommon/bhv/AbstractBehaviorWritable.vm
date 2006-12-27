@@ -3,6 +3,7 @@
 package ${glPackageBaseCommonBhv};
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
 
@@ -279,10 +280,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (!entity.hasPrimaryKeyValue()) {
             return callCreate(entity);
         }
-        final String mapString = entity.extractPrimaryKeyMapString();
         ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
         try {
-            currentEntity = readByPKMapStringWithDeletedCheck(mapString);
+            final ${glConditionBeanInterfaceName} cb = newConditionBean();
+            cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+            currentEntity = readEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
             return callCreate(entity);
         }
@@ -300,7 +302,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public int modifyAfterSelect(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${glEntityInterfaceName} currentEntity = readByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        final ${glConditionBeanInterfaceName} cb = newConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         return callModify(currentEntity);
     }
@@ -318,10 +322,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (!entity.hasPrimaryKeyValue()) {
             return callCreate(entity);
         }
-        final String mapString = entity.extractPrimaryKeyMapString();
         ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
         try {
-            currentEntity = readForUpdateByPKMapStringWithDeletedCheck(mapString);
+            final ${glConditionBeanInterfaceName} cb = newConditionBean();
+            cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+            cb.lockForUpdate();
+            currentEntity = readEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
             return callCreate(entity);
         }
@@ -339,7 +345,10 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public int modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${glEntityInterfaceName} currentEntity = readForUpdateByPKMapStringWithDeletedCheck(entity.extractPrimaryKeyMapString());
+        final ${glConditionBeanInterfaceName} cb = newConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.lockForUpdate();
+        final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         return callModify(currentEntity);
     }

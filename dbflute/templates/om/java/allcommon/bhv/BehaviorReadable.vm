@@ -235,6 +235,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+#if ($database.isMakeDeprecated())
 
     // =====================================================================================
     //                                                                        Various Select
@@ -248,36 +249,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
      */
     public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
-
-    /**
-     * Read by primary-key map-string with deleted check.
-     * 
-     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
-     * @return Entity that is read from database. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public ${glEntityInterfaceName} readByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Read for read only by primary-key map-string with deleted check.
-     * 
-     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
-     * @return Entity that is read from database by select-for-read-only. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated Please use readByPKMapStringWithDeletedCheck().
-     */
-    public ${glEntityInterfaceName} readForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
 #end
-
-    /**
-     * Read for update by primary-key map-string with deleted check.
-     * 
-     * @param primaryKeyMapString Primary-Key map-string. (NotNull)
-     * @return Entity that is read from database by select-for-update. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public ${glEntityInterfaceName} readForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString);
 
     /**
      * The interface of select-page callback.
