@@ -89,6 +89,15 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         }
     }
 
+    protected String getPmbeanPackageString() {
+        final String value = (String) getSql2EntityDefinitionMap().get("pmbeanPackageString");
+        if (value == null || value.trim().length() == 0) {
+            return null;
+        } else {
+            return value;
+        }
+    }
+
     public String getBaseEntityPackage() {
         final String packageString = getPackageString();
         if (packageString != null && packageString.trim().length() != 0) {
@@ -109,12 +118,42 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
     }
 
     public String getExtendedEntityPackage() {
-        final String packageString = getPackageString();
+        final String packageString = getPmbeanPackageString();
         if (packageString != null && packageString.trim().length() != 0) {
             return packageString;
         } else {
             final String defaultPackage = getGeneratedClassPackageProperties().getExtendedEntityPackage()
                     + ".customize";
+            if (defaultPackage != null && defaultPackage.trim().length() != 0) {
+                return defaultPackage;
+            } else {
+                String msg = "Both packageString in sql2entity-property and extendedEntityPackage are null.";
+                throw new IllegalStateException(msg);
+            }
+        }
+    }
+
+    public String getBaseParameterBeanPackage() {
+        final String packageString = getPmbeanPackageString();
+        if (packageString != null && packageString.trim().length() != 0) {
+            return packageString;
+        } else {
+            final String defaultPackage = getGeneratedClassPackageProperties().getBaseDaoPackage() + ".pmbean";
+            if (defaultPackage != null && defaultPackage.trim().length() != 0) {
+                return defaultPackage;
+            } else {
+                String msg = "Both packageString in sql2entity-property and baseEntityPackage are null.";
+                throw new IllegalStateException(msg);
+            }
+        }
+    }
+
+    public String getExtendedParameterBeanPackage() {
+        final String packageString = getPackageString();
+        if (packageString != null && packageString.trim().length() != 0) {
+            return packageString;
+        } else {
+            final String defaultPackage = getGeneratedClassPackageProperties().getExtendedDaoPackage() + ".pmbean";
             if (defaultPackage != null && defaultPackage.trim().length() != 0) {
                 return defaultPackage;
             } else {

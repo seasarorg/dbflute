@@ -55,6 +55,7 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -71,7 +72,9 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.DfDBFluteProvider;
 import org.seasar.dbflute.config.DfDatabaseConfig;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
@@ -84,7 +87,7 @@ import org.xml.sax.Attributes;
 public class Database {
 
     /** Log instance. */
-    public static final Log _log = LogFactory.getLog(Database.class);
+    private static final Log _log = LogFactory.getLog(Database.class);
 
     protected String _databaseType;
 
@@ -107,6 +110,9 @@ public class Database {
     protected Hashtable<String, Table> _tablesByJavaName = new Hashtable<String, Table>();
 
     protected boolean _isHeavyIndexing;
+
+    /** The meta data of parameter bean. */
+    protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
 
     /**
      * Load the database object from an xml tag.
@@ -219,6 +225,33 @@ public class Database {
         this._isHeavyIndexing = v;
     }
 
+    public void setAppData(AppData parent) {
+        _dbParent = parent;
+    }
+
+    public AppData getAppData() {
+        return _dbParent;
+    }
+
+    public String getDatabaseType() {
+        return _databaseType;
+    }
+
+    public void setDatabaseType(String databaseType) {
+        this._databaseType = databaseType;
+    }
+
+    public Map<String, DfParameterBeanMetaData> getPmbMetaDataMap() {
+        return _pmbMetaDataMap;
+    }
+
+    public void setPmbMetaDataMap(Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
+        _pmbMetaDataMap = pmbMetaDataMap;
+    }
+
+    // ===============================================================================
+    //                                                                           Table
+    //                                                                           =====
     /**
      * Return an array of all tables
      *
@@ -292,43 +325,6 @@ public class Database {
         _tablesByName.put(tbl.getName(), tbl);
         _tablesByJavaName.put(tbl.getJavaName(), tbl);
         tbl.setPackage(getPackage());
-    }
-
-    /**
-     * Set the parent of the database
-     *
-     * @param parent the parent
-     */
-    public void setAppData(AppData parent) {
-        _dbParent = parent;
-    }
-
-    /**
-     * Get the parent of the table
-     *
-     * @return the parent
-     */
-    public AppData getAppData() {
-        return _dbParent;
-    }
-
-    /**
-     * Get database-type.
-     *
-     * @return Database-type.
-     */
-    public String getDatabaseType() {
-        return _databaseType;
-    }
-
-    /**
-     * Set database-type.
-     * And Initialize db information.
-     * 
-     * @param databaseType Database-type.
-     */
-    public void setDatabaseType(String databaseType) {
-        this._databaseType = databaseType;
     }
 
     /**
@@ -458,6 +454,79 @@ public class Database {
 
         result.append("</database>");
         return result.toString();
+    }
+
+    // ===============================================================================
+    //                                                                  Parameter Bean
+    //                                                                  ==============
+    public boolean isExistPmbMetaData() {
+        return _pmbMetaDataMap != null && !_pmbMetaDataMap.isEmpty();
+    }
+
+    public Collection<DfParameterBeanMetaData> getPmbMetaDataList() {
+        if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
+            String msg = "The pmbMetaDataMap should not be null or empty.";
+            throw new IllegalStateException(msg);
+        }
+        return _pmbMetaDataMap.values();
+    }
+
+    public String getPmbMetaDataSuperClassDefinition(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
+            String msg = "The pmbMetaDataMap should not be null or empty: className=" + className;
+            throw new IllegalStateException(msg);
+        }
+        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        if (metaData == null) {
+            String msg = "The className has no meta data: className=" + className;
+            throw new IllegalStateException(msg);
+        }
+        final String superClassName = metaData.getSuperClassName();
+        if (superClassName == null || superClassName.trim().length() == 0) {
+            return "";
+        }
+        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
+        return languageDependencyInfo.getExtendsStringMark() + " " + superClassName + " ";
+    }
+
+    public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
+            String msg = "The pmbMetaDataMap should not be null or empty: className=" + className;
+            throw new IllegalStateException(msg);
+        }
+        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        if (metaData == null) {
+            String msg = "The className has no meta data: className=" + className;
+            throw new IllegalStateException(msg);
+        }
+        return metaData.getPropertyNameTypeMap();
+    }
+
+    public Set<String> getPmbMetaDataPropertySet(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        return getPmbMetaDataPropertyNameTypeMap(className).keySet();
+    }
+
+    public String getPmbMetaDataPropertyType(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassName(className);
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
+    }
+
+    protected void assertArgumentPmbMetaDataClassName(String className) {
+        if (className == null || className.trim().length() == 0) {
+            String msg = "The className should not be null or empty: [" + className + "]";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertArgumentPmbMetaDataPropertyName(String propertyName) {
+        if (propertyName == null || propertyName.trim().length() == 0) {
+            String msg = "The propertyName should not be null or empty: [" + propertyName + "]";
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     // ===============================================================================
@@ -950,29 +1019,6 @@ public class Database {
         return getProperties().isAvailableCustomizeDaoGeneration();
     }
 
-    //    // ===============================================================================
-    //    //                                                Properties - AdditinalForeignKey
-    //    //                                                ================================
-    //    public Map<String, Map<String, String>> getAdditionalForeignKeyMap() {
-    //        return getProperties().getAdditionalForeignKeyMap();
-    //    }
-    //
-    //    public String getAdditionalForeignKeyComponentLocalTableName(String foreignName) {
-    //        return getProperties().getAdditionalForeignKeyComponentLocalTableName(foreignName);
-    //    }
-    //
-    //    public String getAdditionalForeignKeyComponentForeignTableName(String foreignName) {
-    //        return getProperties().getAdditionalForeignKeyComponentForeignTableName(foreignName);
-    //    }
-    //
-    //    public List<String> getAdditionalForeignKeyComponentLocalColumnNameList(String foreignName) {
-    //        return getProperties().getAdditionalForeignKeyComponentLocalColumnNameList(foreignName);
-    //    }
-    //
-    //    public List<String> getAdditionalForeignKeyComponentForeignColumnNameList(String foreignName) {
-    //        return getProperties().getAdditionalForeignKeyComponentForeignColumnNameList(foreignName);
-    //    }
-
     // ===============================================================================
     //                                                   Properties - SqlParameterBean
     //                                                   =============================
@@ -1175,6 +1221,14 @@ public class Database {
 
     public String getSql2EntityExtendedEntityPackage() {
         return getProperties().getSql2EntityProperties().getExtendedEntityPackage();
+    }
+
+    public String getSql2EntityBaseParameterBeanPackage() {
+        return getProperties().getSql2EntityProperties().getBaseParameterBeanPackage();
+    }
+
+    public String getSql2EntityExtendedParameterBeanPackage() {
+        return getProperties().getSql2EntityProperties().getExtendedParameterBeanPackage();
     }
 
     // **********************************************************************************************
@@ -1455,25 +1509,11 @@ public class Database {
     }
 
     public void setupJavaDir_for_abstractCBean() {
-        if (isTargetLanguageJava()) {
-            setupJavaDir_for_gen();
-        } else if (isTargetLanguageCSharp()) {
-            setupJavaDir_for_gen();
-        } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
+        setupJavaDir_for_gen();
     }
 
     public void setupJavaDir_for_dbmetaInstanceHandler() {
-        if (isTargetLanguageJava()) {
-            setupJavaDir_for_gen();
-        } else if (isTargetLanguageCSharp()) {
-            setupJavaDir_for_gen();
-        } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
+        setupJavaDir_for_gen();
     }
 
     public void setupJavaDir_for_interceptor() {
@@ -1509,38 +1549,15 @@ public class Database {
     }
 
     public void setupJavaDir_for_base() {
-        if (isTargetLanguageJava()) {
-            setupJavaDir_for_main();
-        } else if (isTargetLanguageCSharp()) {
-            // partial�ł�ʂ�Project���ƃ_�����B��B�B�B(2006/08/11)
-            //            setupJavaDir_for_gen();
-            setupJavaDir_for_main();
-        } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
+        setupJavaDir_for_main();
     }
 
     public void setupJavaDir_for_base_cbean() {
-        if (isTargetLanguageJava()) {
-            setupJavaDir_for_gen();
-        } else if (isTargetLanguageCSharp()) {
-            setupJavaDir_for_gen();
-        } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
+        setupJavaDir_for_gen();
     }
 
     public void setupJavaDir_for_extended_cbean() {
-        if (isTargetLanguageJava()) {
-            setupJavaDir_for_main();
-        } else if (isTargetLanguageCSharp()) {
-            setupJavaDir_for_main();
-        } else {
-            String msg = "The language is unsupported: " + getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
+        setupJavaDir_for_main();
     }
 
     public void setupJavaDir_for_extended() {
@@ -1561,7 +1578,7 @@ public class Database {
     protected void setupJavaDir_for_gen() {
         Generator.getInstance().setOutputPath(getBasicProperties().getJavaDir_for_gen());
     }
-    
+
     public boolean isJavaDirOnlyOne() {
         return getBasicProperties().isJavaDirOnlyOne();
     }

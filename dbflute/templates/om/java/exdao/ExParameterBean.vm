@@ -1,0 +1,11 @@
+package ${glPackageExtendedParameterBean};
+
+#set ($myClassName = "${myExtendedParameterBeanClassName}")
+
+/**
+ * The parameter-bean of ${pmbClassName}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glPackageBaseParameterBean}.${myBaseParameterBeanClassName} {
+}

@@ -228,14 +228,14 @@ public abstract class DfAbstractHelperProperties {
     protected DfGeneratedClassPackageProperties getGeneratedClassPackageProperties() {
         return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
     }
-    
+
     // **********************************************************************************************
     //                                                                                         Config
     //                                                                                         ******
     protected Object getConfig(Class type) {
         return DfConfigProvider.getComponent(type);
     }
-    
+
     // **********************************************************************************************
     //                                                                                        Default
     //                                                                                        *******
@@ -243,14 +243,6 @@ public abstract class DfAbstractHelperProperties {
     public static final String JAVA_targetLanguage = "java";
     public static final String CSHARP_targetLanguage = "csharp";
     public static final String DEFAULT_targetLanguage = JAVA_targetLanguage;
-
-    public static final String JAVA_templateFileExtension = "vm";
-    public static final String CSHARP_templateFileExtension = "vmnet";
-    public static final String DEFAULT_templateFileExtension = JAVA_templateFileExtension;
-
-    public static final String JAVA_classFileExtension = "java";
-    public static final String CSHARP_classFileExtension = "cs";
-    public static final String DEFAULT_classFileExtension = JAVA_classFileExtension;
 
     public static final String DEFAULT_templateFileEncoding = "UTF-8";
     public static final String DEFAULT_sourceFileEncoding = "UTF-8";

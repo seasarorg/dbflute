@@ -108,6 +108,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         _targetDatabase = v;
     }
 
+    // =========================================================================================
+    //                                                                                      Main
+    //                                                                                      ====
     @Override
     final public void execute() {
         try {
@@ -195,11 +198,21 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         }
     }
 
+    // =========================================================================================
+    //                                                                                Properties
+    //                                                                                ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
+    }
+    
+    // =========================================================================================
+    //                                                                                    Helper
+    //                                                                                    ======
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 }

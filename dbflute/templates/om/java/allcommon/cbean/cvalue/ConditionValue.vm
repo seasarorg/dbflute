@@ -557,7 +557,7 @@ public class ${myClassName} {
 	    return resultList;
 	}
 
-	public static class SqlDateConversionUtil {
+	protected static class SqlDateConversionUtil {
 
 	    private SqlDateConversionUtil() {
 	    }
@@ -578,7 +578,7 @@ public class ${myClassName} {
 	    }
 	}
 
-	public static class DateConversionUtil {
+	protected static class DateConversionUtil {
 
 	    private DateConversionUtil() {
 	    }
@@ -703,7 +703,7 @@ public class ${myClassName} {
 	    }
 	}
 
-	public static class StringUtil {
+	protected static class StringUtil {
 
 	    public static final String[] EMPTY_STRINGS = new String[0];
 

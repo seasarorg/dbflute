@@ -1,0 +1,72 @@
+package ${glPackageBaseParameterBean};
+
+#set ($myClassName = "${myBaseParameterBeanClassName}")
+
+/**
+ * The parametaer-bean of ${pmbClassName}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+  #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+
+    /** The value of ${propertyName}. */
+    protected ${propertyType} _${propertyName};
+#end
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor.
+     */
+    public ${myClassName}() {
+    }
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+  #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+    /**
+     * Get the value of ${propertyName}.
+     * 
+     * @return The value of ${propertyName}.
+     */
+    public ${propertyType} get${database.initCap($propertyName)}() {
+        return _${propertyName};
+    }
+
+    /**
+     * Set the value of ${propertyName}.
+     * 
+     * @param value The value of ${propertyName}.
+     */
+    public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
+        _${propertyName} = ${propertyName};
+    }
+#end
+
+    // =====================================================================================
+    //                                                                 Basic Override Method
+    //                                                                 =====================
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return Property-string. (NotNull)
+     */
+    public String toString() {
+        final StringBuffer sb = new StringBuffer();
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+
+        sb.append(" ${propertyName}=").append(_${propertyName});
+#end
+
+        return sb.toString();
+    }
+}

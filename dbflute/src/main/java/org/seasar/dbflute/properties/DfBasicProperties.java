@@ -7,6 +7,9 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 
 /**
  * Build properties for Torque.
@@ -122,27 +125,31 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return CSHARP_targetLanguage.equals(getTargetLanguage());
     }
 
+    protected DfLanguageDependencyInfo _languageDependencyInfo;
+
+    public DfLanguageDependencyInfo getLanguageDependencyInfo() {
+        if (_languageDependencyInfo == null) {
+            if (isTargetLanguageJava()) {
+                _languageDependencyInfo = new DfLanguageDependencyInfoJava();
+            } else if (isTargetLanguageCSharp()) {
+                _languageDependencyInfo = new DfLanguageDependencyInfoCSharp();
+            } else {
+                String msg = "The language is supported: " + getTargetLanguage();
+                throw new IllegalStateException(msg);
+            }
+        }
+        return _languageDependencyInfo;
+    }
+
     // ===============================================================================
     //                                                          Properties - Extension
     //                                                          ======================
     public String getTemplateFileExtension() {
-        if (JAVA_targetLanguage.equalsIgnoreCase(getTargetLanguage())) {
-            return JAVA_templateFileExtension;
-        } else if (CSHARP_targetLanguage.equalsIgnoreCase(getTargetLanguage())) {
-            return CSHARP_templateFileExtension;
-        } else {
-            return DEFAULT_templateFileExtension;
-        }
+        return getLanguageDependencyInfo().getTemplateFileExtension();
     }
 
     public String getClassFileExtension() {
-        if (JAVA_targetLanguage.equalsIgnoreCase(getTargetLanguage())) {
-            return JAVA_classFileExtension;
-        } else if (CSHARP_targetLanguage.equalsIgnoreCase(getTargetLanguage())) {
-            return CSHARP_classFileExtension;
-        } else {
-            return DEFAULT_classFileExtension;
-        }
+        return getLanguageDependencyInfo().getClassFileExtension();
     }
 
     // ===============================================================================

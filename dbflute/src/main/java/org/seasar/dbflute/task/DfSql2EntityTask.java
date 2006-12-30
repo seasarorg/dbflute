@@ -42,7 +42,10 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.SQLRuntimeException;
+import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
+import org.seasar.dbflute.util.DfSqlStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 public class DfSql2EntityTask extends DfAbstractTexenTask {
 
@@ -52,6 +55,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                                  MetaInfo
     //                                                                                  ========
     protected final Map<String, Map<String, Integer>> _entityInfoMap = new LinkedHashMap<String, Map<String, Integer>>();
+    protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = new LinkedHashMap<String, DfParameterBeanMetaData>();
     protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
     protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
@@ -128,7 +132,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return new DfSqlFileRunnerBase(runInfo, getDataSource()) {
             protected String filterSql(String sql) {
 
-                //                // TODO: ÉÅÉ\ÉbÉhÇÃà¯êîÇÇ»ÇÒÇ∆ÇµÇƒÇ‡éÊÇÈÅIÇ≈Ç‡å^Ç™éÊÇÍÇ»Ç¢Ç»ÇüÅI
+                //                // TODO: ÔøΩÔøΩÔøΩ\ÔøΩbÔøΩhÔøΩÃàÔøΩÔøΩ»ÇÔøΩ∆ÇÔøΩÔøΩƒÇÔøΩÔøΩÔøΩIÔøΩ≈ÇÔøΩ^ÔøΩÔøΩÔøΩÔøΩÔøΩ»ÇÔøΩÔøΩ»ÇÔøΩÔøΩI
                 //                final SqlTokenizerImpl tokenizer = new SqlTokenizerImpl(sql);
                 //                while (true) {
                 //                    final int result = tokenizer.next();
@@ -144,10 +148,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
 
             protected void execSQL(Statement statement, String sql) {
-                final String entityName = getEntityName(sql);
-                if (entityName == null) {
+                if (!isTargetSql(sql)) {
                     return;
                 }
+
                 ResultSet rs = null;
                 try {
                     rs = statement.executeQuery(sql);
@@ -166,15 +170,25 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         columnJdbcTypeMap.put(columnName, columnType);
                     }
 
-                    _entityInfoMap.put(entityName, columnJdbcTypeMap);
-                    _entitySqlFileMap.put(entityName, _srcFile);
-                    _primaryKeyMap.put(entityName, getPrimaryKeyColumnNameList(sql));
+                    // for Customize Entity
+                    final String entityName = getEntityName(sql);
+                    if (entityName != null) {
+                        _entityInfoMap.put(entityName, columnJdbcTypeMap);
+                        _entitySqlFileMap.put(entityName, _srcFile);
+                        _primaryKeyMap.put(entityName, getPrimaryKeyColumnNameList(sql));
+                    }
+                    // for Parameter Bean
+                    final DfParameterBeanMetaData parameterBeanMetaData = getParameterBeanMetaData(sql);
+                    if (parameterBeanMetaData != null) {
+                        _pmbMetaDataMap.put(parameterBeanMetaData.getClassName(), parameterBeanMetaData);
+                    }
+
                 } catch (SQLException e) {
                     String msg = "Failed to execute: " + sql;
                     if (!_runInfo.isErrorContinue()) {
                         throw new SQLRuntimeException(msg, e);
                     }
-                    _exceptionInfoMap.put(entityName, e.getMessage() + System.getProperty("line.separator") + sql);
+                    _exceptionInfoMap.put(_srcFile.getName(), e.getMessage() + getLineSeparator() + sql);
                 } finally {
                     if (rs != null) {
                         try {
@@ -186,70 +200,111 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 }
             }
 
+            protected boolean isTargetSql(String sql) {
+                final String entityName = getEntityName(sql);
+                final String parameterBeanClassDefinition = getParameterBeanClassDefinition(sql);
+                return entityName != null || parameterBeanClassDefinition != null;
+            }
+
+            protected DfParameterBeanMetaData getParameterBeanMetaData(String sql) {
+                final String classDefinition = getParameterBeanClassDefinition(sql);
+                if (classDefinition == null) {
+                    return null;
+                }
+                final DfParameterBeanMetaData pmbMetaData = new DfParameterBeanMetaData();
+                {
+                    final String delimiter = "extends";
+                    final int idx = classDefinition.indexOf(delimiter);
+                    if (idx < 0) {
+                        pmbMetaData.setClassName(classDefinition);
+                    } else {
+                        final String className = classDefinition.substring(0, idx).trim();
+                        pmbMetaData.setClassName(className);
+                        final String superClassName = classDefinition.substring(idx + delimiter.length()).trim();
+                        pmbMetaData.setSuperClassName(superClassName);
+                        resolveSuperClassSimplePagingBean(pmbMetaData);
+                    }
+                }
+
+                final LinkedHashMap<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
+                pmbMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
+                final List<String> parameterBeanElement = getParameterBeanProperties(sql);
+                for (String element : parameterBeanElement) {
+                    final String delimiter = " ";
+                    final int idx = element.indexOf(delimiter);
+                    if (idx > 0) {
+                        final String typeName = element.substring(0, idx).trim();
+                        final String propertyName = element.substring(idx + delimiter.length()).trim();
+                        propertyNameTypeMap.put(propertyName, typeName);
+                    } else {
+                        String msg = "The parameter bean element should be [typeName propertyName].";
+                        msg = msg + " But: element=" + element;
+                        msg = msg + " srcFile=" + _srcFile;
+                        throw new IllegalStateException(msg);
+                    }
+                }
+                return pmbMetaData;
+            }
+
+            protected void resolveSuperClassSimplePagingBean(final DfParameterBeanMetaData pmbMetaData) {
+                if (pmbMetaData.getSuperClassName().equalsIgnoreCase("SPB")) {
+                    final DfGeneratedClassPackageProperties pkgProp = getProperties()
+                            .getGeneratedClassPackageProperties();
+                    final String baseCommonPackage = pkgProp.getBaseCommonPackage();
+                    final String projectPrefix = getBasicProperties().getProjectPrefix();
+                    pmbMetaData.setSuperClassName(baseCommonPackage + projectPrefix + ".cbean." + "SimplePagingBean");
+                }
+            }
+
             @Override
             protected void traceSql(String sql) {
-                _log.info("{SQL}" + System.getProperty("line.separator") + sql);
+                _log.info("{SQL}" + getLineSeparator() + sql);
             }
         };
     }
 
     protected void handleException() {
-        final Set<String> entityNameSet = _exceptionInfoMap.keySet();
+        final Set<String> nameSet = _exceptionInfoMap.keySet();
         final StringBuilder sb = new StringBuilder();
         final String lineSeparator = System.getProperty("line.separator");
-        for (String entityName : entityNameSet) {
-            final String exceptionInfo = _exceptionInfoMap.get(entityName);
+        for (String name : nameSet) {
+            final String exceptionInfo = _exceptionInfoMap.get(name);
 
             sb.append(lineSeparator);
-            sb.append("[" + entityName + "]");
+            sb.append("[" + name + "]");
             sb.append(exceptionInfo);
         }
         _log.warn(sb.toString());
     }
 
-    protected String removeBeginEndComment(final String sql) {
-        if (sql == null || sql.trim().length() == 0) {
-            String msg = "The sql is invalid: " + sql;
-            throw new IllegalArgumentException(msg);
-        }
-        final String beginMark = "/*";
-        final String endMark = "*/";
-        final StringBuilder sb = new StringBuilder();
-        String tmp = sql;
-        while (true) {
-            if (tmp.indexOf(beginMark) < 0) {
-                sb.append(tmp);
-                break;
-            }
-            if (tmp.indexOf(endMark) < 0) {
-                sb.append(tmp);
-                _log.warn("Wrong comment is here. Begin-mark exists but End-mark doesn't: " + sql);
-                break;
-            }
-            if (tmp.indexOf(beginMark) > tmp.indexOf(endMark)) {
-                final int borderIndex = tmp.indexOf(endMark) + endMark.length();
-                sb.append(tmp.substring(0, borderIndex));
-                tmp = tmp.substring(borderIndex);
-                _log.warn("Wrong comment is here. End-mark is beginning before Begin-mark: " + sql);
-                continue;
-            }
-            sb.append(tmp.substring(0, tmp.indexOf(beginMark)));
-            tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
-        }
-        return sb.toString();
+    protected String getEntityName(final String sql) {
+        return getTargetString(sql, "#");
     }
 
-    protected String getEntityName(final String sql) {
+    protected String getParameterBeanClassDefinition(final String sql) {
+        return getTargetString(sql, "!");
+    }
+
+    protected List<String> getParameterBeanProperties(final String sql) {
+        return getTargetList(sql, "!!");
+    }
+
+    protected String getTargetString(final String sql, final String mark) {
+        final List<String> targetList = getTargetList(sql, mark);
+        return !targetList.isEmpty() ? targetList.get(0) : null;
+    }
+
+    protected List<String> getTargetList(final String sql, final String mark) {
         if (sql == null || sql.trim().length() == 0) {
             String msg = "The sql is invalid: " + sql;
             throw new IllegalArgumentException(msg);
         }
-        final String betweenBeginEndMark = getStringBetweenBeginEndMark(sql, "--#", "#");
-        if (betweenBeginEndMark != null) {
-            return betweenBeginEndMark;
+        final List<String> betweenBeginEndMarkList = getListBetweenBeginEndMark(sql, "--" + mark, mark);
+        if (!betweenBeginEndMarkList.isEmpty()) {
+            return betweenBeginEndMarkList;
         } else {
             // TODO: Oops! Temporary modification for MySQL. 
-            return getStringBetweenBeginEndMark(sql, "-- #", "#");
+            return getListBetweenBeginEndMark(sql, "-- " + mark, mark);
         }
     }
 
@@ -270,21 +325,55 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return retLs;
     }
 
-    protected String getStringBetweenBeginEndMark(final String targetStr, final String beginMark, final String endMark) {
-        final String ret;
-        {
-            String tmp = targetStr;
-            final int startIndex = tmp.indexOf(beginMark);
-            if (startIndex < 0) {
-                return null;
-            }
-            tmp = tmp.substring(startIndex + beginMark.length());
-            if (tmp.indexOf(endMark) < 0) {
-                return null;
-            }
-            ret = tmp.substring(0, tmp.indexOf(endMark)).trim();
+    protected String getStringBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
+        return DfStringUtil.getStringBetweenBeginEndMark(targetStr, beginMark, endMark);
+    }
+
+    protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
+        return DfStringUtil.getListBetweenBeginEndMark(targetStr, beginMark, endMark);
+    }
+
+    protected String removeBeginEndComment(final String sql) {
+        return DfSqlStringUtil.removeBeginEndComment(sql);
+    }
+
+    public static class DfParameterBeanMetaData {
+        protected String className;
+        protected String superClassName;
+        protected Map<String, String> propertyNameTypeMap;
+
+        public String getClassName() {
+            return className;
         }
-        return ret;
+
+        public void setClassName(String className) {
+            this.className = className;
+        }
+
+        public String getSuperClassName() {
+            return superClassName;
+        }
+
+        public void setSuperClassName(String superClassName) {
+            this.superClassName = superClassName;
+        }
+
+        public Map<String, String> getPropertyNameTypeMap() {
+            return propertyNameTypeMap;
+        }
+
+        public void setPropertyNameTypeMap(Map<String, String> propertyNameTypeMap) {
+            this.propertyNameTypeMap = propertyNameTypeMap;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(className);
+            sb.append(", ").append(superClassName);
+            sb.append(", ").append(propertyNameTypeMap);
+            return sb.toString();
+        }
     }
 
     // =========================================================================================
@@ -292,10 +381,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                                   =======
     public Context initControlContext() throws Exception {
         final Database db = new Database();
-        final Map<String, Map<String, Integer>> entityInfoMap = _entityInfoMap;
-        final Set<String> entityNameSet = entityInfoMap.keySet();
+        db.setPmbMetaDataMap(_pmbMetaDataMap);
+
+        final Set<String> entityNameSet = _entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
-            final Map<String, Integer> columnJdbcTypeMap = entityInfoMap.get(entityName);
+            final Map<String, Integer> columnJdbcTypeMap = _entityInfoMap.get(entityName);
 
             final Table tbl = new Table();
             tbl.setName(entityName);
@@ -305,26 +395,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     + tbl.getUncapitalisedJavaName());
 
             final Set<String> columnNameSet = columnJdbcTypeMap.keySet();
-
             for (String columnName : columnNameSet) {
                 final Column col = new Column();
-
-                if (needsConvert(columnName)) {
-                    col.setName(columnName);
-                } else {
-                    col.setupNeedsJavaNameConvertFalse();
-                    if (columnName.length() > 1) {
-                        col.setName(columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
-                    } else {
-                        col.setName(columnName.toUpperCase());
-                    }
-                }
-
-                final Integer jdbcType = columnJdbcTypeMap.get(columnName);
-                col.setTorqueType(TypeMap.getTorqueType(jdbcType));
-
-                final List<String> primaryKeyList = _primaryKeyMap.get(entityName);
-                col.setPrimaryKey(primaryKeyList.contains(columnName));
+                setupColumnName(columnName, col);
+                setupTorqueType(columnJdbcTypeMap, columnName, col);
+                setupPrimaryKey(entityName, columnName, col);
 
                 tbl.addColumn(col);
                 _log.debug("   " + (col.isPrimaryKey() ? "*" : " ") + columnName + " --> " + col.getName() + " : "
@@ -336,6 +411,34 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final AppData appData = new AppData(databaseType, null);
         appData.addDatabase(db);
 
+        VelocityContext context = createVelocityContext(appData);
+        return context;
+    }
+
+    protected void setupColumnName(String columnName, final Column col) {
+        if (needsConvert(columnName)) {
+            col.setName(columnName);
+        } else {
+            col.setupNeedsJavaNameConvertFalse();
+            if (columnName.length() > 1) {
+                col.setName(columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
+            } else {
+                col.setName(columnName.toUpperCase());
+            }
+        }
+    }
+
+    protected void setupTorqueType(final Map<String, Integer> columnJdbcTypeMap, String columnName, final Column col) {
+        final Integer jdbcType = columnJdbcTypeMap.get(columnName);
+        col.setTorqueType(TypeMap.getTorqueType(jdbcType));
+    }
+
+    protected void setupPrimaryKey(String entityName, String columnName, final Column col) {
+        final List<String> primaryKeyList = _primaryKeyMap.get(entityName);
+        col.setPrimaryKey(primaryKeyList.contains(columnName));
+    }
+
+    protected VelocityContext createVelocityContext(final AppData appData) {
         VelocityContext context = new VelocityContext();
         final List<AppData> dataModels = new ArrayList<AppData>();
         dataModels.add(appData);

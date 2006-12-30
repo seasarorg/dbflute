@@ -64,10 +64,6 @@ targetdatabase = $targetDatabase
     #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
     #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
 
-    #set ($glPackageBaseCustomizeEntity = "${database.Sql2EntityBaseEntityPackage}" )
-    #set ($glPackageCustomizeDBMeta = "${database.Sql2EntityDBMetaPackage}")
-    #set ($glPackageExtendedCustomizeEntity = "${database.Sql2EntityExtendedEntityPackage}" )
-
     ## [Other]
     #set ($glConditionBeanInitialName = "CB")
     #set ($glConditionQueryInitialName = "CQ")
@@ -80,6 +76,10 @@ targetdatabase = $targetDatabase
     ##                                                                                 ---------------------
     ## Setup java directory.
     $database.setupJavaDir_for_sql2entity()
+
+    #set ($glPackageBaseCustomizeEntity = "${database.Sql2EntityBaseEntityPackage}" )
+    #set ($glPackageCustomizeDBMeta = "${database.Sql2EntityDBMetaPackage}")
+    #set ($glPackageExtendedCustomizeEntity = "${database.Sql2EntityExtendedEntityPackage}" )
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCustomizeEntity}))
     $database.makeDirectory($path)
@@ -107,11 +107,11 @@ targetdatabase = $targetDatabase
       #set ($isExistConditionBean = false)
 
       #if ($database.isSql2EntityPlainEntity())
-        $database.debug("        parseCustomizeBaseEntity(tableName);     // ${myBaseObjectClassName}")
+        $database.debug("        parseBaseCustomizeEntity(tableName);     // ${myBaseObjectClassName}")
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/bsentity/PlainBaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
       #else
-        $database.debug("        parseCustomizeBaseEntity(tableName);     // ${myBaseObjectClassName}")
+        $database.debug("        parseBaseCustomizeEntity(tableName);     // ${myBaseObjectClassName}")
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
 
@@ -122,12 +122,49 @@ targetdatabase = $targetDatabase
 
       #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
       #if (!$files.file(${generator.OutputPath},$path).exists())
-        $database.debug("        parseCustomizeExtendedEntity(tableName); // ${myExtendedObjectClassName}")
+        $database.debug("        parseExtendedCustomizeEntity(tableName); // ${myExtendedObjectClassName}")
         $generator.parse("om/${glTargetLanguage}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
       #end
 
     #end
     $database.debug("    }")
     $database.debug("}")
+
+    ## -----------------------------------------------------------------------------------------------------
+    ##                                                                                  Parse parameter bean
+    ##                                                                                  --------------------
+    #if ($database.isExistPmbMetaData())
+    $database.debug("public void parseParameterBean() {")
+    $database.debug("    final List<DfParameterBeanMetaData> parameterBeanList = getParameterBeanList();")
+    $database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanList) {")
+
+    #set ($glPackageBaseParameterBean = "${database.Sql2EntityBaseParameterBeanPackage}" )
+    #set ($glPackageExtendedParameterBean = "${database.Sql2EntityExtendedParameterBeanPackage}" )
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseParameterBean}))
+      $database.makeDirectory($path)
+      #set ($path = $strings.getPackageAsPath(${glPackageExtendedParameterBean}))
+      $database.makeDirectory($path)
+
+      #foreach ($pmbMetaData in $database.pmbMetaDataList)
+        #set ($pmbClassName = "$pmbMetaData.className")
+        #set ($pmbSuperClassName = "$pmbMetaData.superClassName")
+        #set ($myBaseParameterBeanClassName = "${glProjectPrefix}${glBasePrefix}${pmbClassName}")
+        #set ($myExtendedParameterBeanClassName = "${glProjectPrefix}${pmbClassName}")
+
+        $database.debug("        parseBaseParameterBean(parameterBean);     // ${myBaseParameterBeanClassName}")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseParameterBean})}${myBaseParameterBeanClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/bsdao/BsParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
+
+        #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedParameterBean})}${myExtendedParameterBeanClassName}.${glClassFileExtension}" )
+        #if (!$files.file(${generator.OutputPath},$path).exists())
+          $database.debug("        parseExtendedParameterBean(parameterBean); // ${myExtendedParameterBeanClassName}")
+          $generator.parse("om/${glTargetLanguage}/exdao/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
+        #end
+      #end
+    $database.debug("    }")
+    $database.debug("}")
+    #end
+
   #end
 #end
