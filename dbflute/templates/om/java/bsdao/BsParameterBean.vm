@@ -33,6 +33,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                              ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
   #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+
     /**
      * Get the value of ${propertyName}.
      * 

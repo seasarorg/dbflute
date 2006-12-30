@@ -252,7 +252,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             .getGeneratedClassPackageProperties();
                     final String baseCommonPackage = pkgProp.getBaseCommonPackage();
                     final String projectPrefix = getBasicProperties().getProjectPrefix();
-                    pmbMetaData.setSuperClassName(baseCommonPackage + projectPrefix + ".cbean." + "SimplePagingBean");
+                    pmbMetaData.setSuperClassName(baseCommonPackage + ".cbean." + projectPrefix + "SimplePagingBean");
                 }
             }
 
