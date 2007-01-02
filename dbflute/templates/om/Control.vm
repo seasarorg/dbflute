@@ -887,10 +887,10 @@ targetdatabase = $targetDatabase
             #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
 
             #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
-            $generator.parse("om/${glTargetLanguage}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+            $generator.parse("om/${glTargetLanguage}/bsbhv/BaseBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
 
             #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvInterfaceName}.${glClassFileExtension}" )
-            $generator.parse("om/${glTargetLanguage}/bsbhv/IBaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+            $generator.parse("om/${glTargetLanguage}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
           #else
             #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
             $generator.parse("om/${glTargetLanguage}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
@@ -919,12 +919,12 @@ targetdatabase = $targetDatabase
 
               #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
               #if (!$files.file(${generator.OutputPath},$path).exists())
-                $generator.parse("om/${glTargetLanguage}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+                $generator.parse("om/${glTargetLanguage}/exbhv/ExtendedBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
               #end
 
               #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvInterfaceName}.${glClassFileExtension}" )
               #if (!$files.file(${generator.OutputPath},$path).exists())
-                $generator.parse("om/${glTargetLanguage}/exbhv/IExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+                $generator.parse("om/${glTargetLanguage}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
               #end
             #else
               #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )

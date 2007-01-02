@@ -2,6 +2,9 @@ package org.seasar.dbflute.properties;
 
 import java.util.Properties;
 
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
+
 /**
  * Build properties for Torque.
  * 
@@ -65,108 +68,8 @@ public final class DfGeneratedClassPackageProperties extends DfAbstractHelperPro
         }
     }
 
-    protected GeneratedClassPackageInfo _languageMetaData;
-
-    protected GeneratedClassPackageInfo getPackageInfo() {
-        if (getBasicProperties().isTargetLanguageJava()) {
-            if (_languageMetaData == null) {
-                _languageMetaData = new JavaPackageInfo();
-            }
-        } else if (getBasicProperties().isTargetLanguageCSharp()) {
-            if (_languageMetaData == null) {
-                _languageMetaData = new CSharpPackageInfo();
-            }
-        } else {
-            String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
-        return _languageMetaData;
-    }
-
-    public static interface GeneratedClassPackageInfo {
-        public String getBaseCommonPackage();
-
-        public String getBaseBehaviorPackage();
-
-        public String getBaseDaoPackage();
-
-        public String getBaseEntityPackage();
-
-        public String getConditionBeanPackage();
-
-        public String getExtendedBehaviorPackage();
-
-        public String getExtendedDaoPackage();
-
-        public String getExtendedEntityPackage();
-    }
-
-    public static class JavaPackageInfo implements GeneratedClassPackageInfo {
-
-        public String getBaseCommonPackage() {
-            return "allcommon";
-        }
-
-        public String getBaseBehaviorPackage() {
-            return "bsbhv";
-        }
-
-        public String getBaseDaoPackage() {
-            return "bsdao";
-        }
-
-        public String getBaseEntityPackage() {
-            return "bsentity";
-        }
-
-        public String getConditionBeanPackage() {
-            return "cbean";
-        }
-
-        public String getExtendedBehaviorPackage() {
-            return "exbhv";
-        }
-
-        public String getExtendedDaoPackage() {
-            return "exdao";
-        }
-
-        public String getExtendedEntityPackage() {
-            return "exentity";
-        }
-    }
-
-    public static class CSharpPackageInfo implements GeneratedClassPackageInfo {
-        public String getBaseCommonPackage() {
-            return "allcommon";
-        }
-
-        public String getBaseBehaviorPackage() {
-            return "bsbhv";
-        }
-
-        public String getBaseDaoPackage() {
-            return "bsdao";
-        }
-
-        public String getBaseEntityPackage() {
-            return "bsentity";
-        }
-
-        public String getConditionBeanPackage() {
-            return "cbean";
-        }
-
-        public String getExtendedBehaviorPackage() {
-            return "exbhv";
-        }
-
-        public String getExtendedDaoPackage() {
-            return "exdao";
-        }
-
-        public String getExtendedEntityPackage() {
-            return "exentity";
-        }
+    protected DfGeneratedClassPackageDefault getPackageInfo() {
+        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
+        return languageDependencyInfo.getGeneratedClassPackageInfo();
     }
 }

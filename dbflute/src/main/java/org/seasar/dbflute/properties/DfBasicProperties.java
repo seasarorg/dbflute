@@ -149,7 +149,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getClassFileExtension() {
-        return getLanguageDependencyInfo().getClassFileExtension();
+        return getLanguageDependencyInfo().getGrammarInfo().getClassFileExtension();
     }
 
     // ===============================================================================

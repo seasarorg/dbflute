@@ -32,14 +32,29 @@ namespace ${glPackageBaseCommonBhv} {
         ${glDBMetaInterfaceName} DBMeta { get; }
 
         // =====================================================================================
-        //                                                                      Dao GetterSetter
-        //                                                                      ================
+        //                                                                          Dao Accessor
+        //                                                                          ============
         /**
          * Get dao-readable.
          * 
          * @return Dao-readable. (NotNull)
          */
         ${glDaoReadableInterfaceName} GetDaoReadable();
+
+        // =====================================================================================
+        //                                                                          New Instance
+        //                                                                          ============
+        /// <summary>
+        /// New entity.
+        /// </summary>
+        /// <returns>Entity. (NotNull)</returns>
+        ${glEntityInterfaceName} NewEntity();
+
+        /// <summary>
+        /// New condition-bean.
+        /// </summary>
+        /// <returns>Condition-bean. (NotNull)</returns>
+        ${glConditionBeanInterfaceName} NewConditionBean();
 
         // =====================================================================================
         //                                                                       Delegate-Method
@@ -55,26 +70,26 @@ namespace ${glPackageBaseCommonBhv} {
          * Read count by condition-bean. (Delegate-Method)
          * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+         * @param cb Condition-bean. (NotNull)
          * @return Read count. (NotNull)
          */
-        int DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        int DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
 
         /**
          * Read entity by condition-bean. (Delegate-Method)
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+         * @param cb Condition-bean. (NotNull)
          * @return Read entity. If the select result is zero, it returns null. (Nullable)
          */
-        ${glEntityInterfaceName} DelegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        ${glEntityInterfaceName} DelegateReadEntity(${glConditionBeanInterfaceName} cb);
 
         /**
          * Read list by condition-bean. (Delegate-Method)
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+         * @param cb Condition-bean. (NotNull)
          * @return Read list. If the select result is zero, it returns empty list. (NotNull)
          */
-        IList DelegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        IList DelegateReadList(${glConditionBeanInterfaceName} cb);
 
         // =====================================================================================
         //                                                                          Basic Select
@@ -84,93 +99,68 @@ namespace ${glPackageBaseCommonBhv} {
         /// <summary>
         /// Read list.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
-        ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker);
+        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker invoker);
 
         /// <summary>
         /// Read entity with deleted check.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Entity that is read from database. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}">If the result is nothing.</exception>
-        ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb);
         #endregion
 
         // =====================================================================================
         //                                                                        Various Select
         //                                                                        ==============
         #region Various Select
+    #if ($database.isMakeDeprecated())
+
         /**
          * Read list after checking count.
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean.
+         * @param cb Condition-bean.
          * @param maxCount Max count.
          * @return Read list. If the select result is zero, it returns empty list. (NotNull)
          * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
          */
-        ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
+        [Obsolete("This method is deprecated.")]
+        ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount);
+    #end
 
         /// <summary>
         /// Read page as first page.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <param name="fetchSize">Fetch-size.</param>
         /// <returns>Read page as first page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPageAsFirst(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchSize);
+        ${glPagingResultBeanName} ReadPageAsFirst(${glConditionBeanInterfaceName} cb, int fetchSize);
 
         /// <summary>
         /// Read page by page-number.
         /// If result-page is 'rb.getAllRecordCount > 0 && rb.getSelectedList().size() == 0', re-select as max-page.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <param name="fetchPageNumber">Fetch-page-number.</param>
         /// <returns>Read page as [fetchPageNumber] page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchPageNumber);
-
-        /// <summary>
-        /// Read by primary-key map-string with deleted check.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is read from database by select-for-read-only. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        ${glEntityInterfaceName} ReadByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-    #if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// Read for read only by primary-key map-string with deleted check.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is read from database by select-for-read-only. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        [Obsolete("This class is deprecated. Please use ReadByPKMapStringWithDeletedCheck().")]
-        ${glEntityInterfaceName} ReadForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-    #end
-    #if ($database.isMakeBehaviorForUpdate())
-        /// <summary>
-        /// Read for update by primary-key map-string with deleted check.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is read from database by select-for-update. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        ${glEntityInterfaceName} ReadForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-    #end
-
+        ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} cb, int fetchPageNumber);
         #endregion
     }
 
@@ -258,7 +248,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <summary>
         /// Build paging-result-bean.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Paging result bean. (NotNull)</returns>
         public ${glPagingResultBeanName} BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, System.Collections.IList selectedList) {
             ${glPagingResultBeanName} rb = new ${glPagingResultBeanName}();

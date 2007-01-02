@@ -59,8 +59,8 @@ public interface ${glBehaviorReadableInterfaceName} {
     public ${glDBMetaInterfaceName} getDBMeta();
 
     // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    //                                                                          Dao Accessor
+    //                                                                          ============
     /**
      * Get dao-readable.
      * 
@@ -85,6 +85,13 @@ public interface ${glBehaviorReadableInterfaceName} {
     // =====================================================================================
     //                                                                          New Instance
     //                                                                          ============
+    /**
+     * New entity.
+     * 
+     * @return Entity. (NotNull)
+     */
+    public ${glEntityInterfaceName} newEntity();
+
     /**
      * New condition-bean.
      * 

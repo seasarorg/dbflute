@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+
 public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
 
     //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
@@ -38,43 +40,23 @@ public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
         if (prop != null) {
             return prop;
         } else {
-            String defaultValue = null;
-            if (getBasicProperties().isTargetLanguageJava()) {
-                defaultValue = "jdbc.dicon";
-            } else if (getBasicProperties().isTargetLanguageCSharp()) {
-                defaultValue = "ado.dicon";
-            } else {
-                String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
-                throw new IllegalStateException(msg);
-            }
+            String defaultValue = getLanguageDependencyInfo().getDBFluteDiconDefault().getJdbcDiconResourceName();
             return stringProp("torque.j2eeDiconResourceName", defaultValue);
         }
     }
 
     public String getRequiredTxComponentName() {
-        String defaultValue = null;
-        if (getBasicProperties().isTargetLanguageJava()) {
-            defaultValue = "requiredTx";
-        } else if (getBasicProperties().isTargetLanguageCSharp()) {
-            defaultValue = "LocalRequiredTx";
-        } else {
-            String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
+        String defaultValue = getLanguageDependencyInfo().getDBFluteDiconDefault().getRequiredTxComponentName();
         return stringProp("torque.requiredTxComponentName", defaultValue);
     }
 
     public String getRequiresNewTxComponentName() {
-        String defaultValue = null;
-        if (getBasicProperties().isTargetLanguageJava()) {
-            defaultValue = "requiresNewTx";
-        } else if (getBasicProperties().isTargetLanguageCSharp()) {
-            defaultValue = "LocalRequiresNewTx";
-        } else {
-            String msg = "The language is unsupported: " + getBasicProperties().getTargetLanguage();
-            throw new IllegalStateException(msg);
-        }
+        String defaultValue = getLanguageDependencyInfo().getDBFluteDiconDefault().getRequiresNewTxComponentName();
         return stringProp("torque.requiresNewTxComponentName", defaultValue);
+    }
+
+    protected DfLanguageDependencyInfo getLanguageDependencyInfo() {
+        return getBasicProperties().getLanguageDependencyInfo();
     }
 
     public static final String KEY_daoDiconOtherIncludeDefinitionMap = "daoDiconOtherIncludeDefinitionMap";

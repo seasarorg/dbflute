@@ -39,8 +39,8 @@ namespace ${glPackageBaseCommonBhv} {
         #endregion
 
         // =====================================================================================
-        //                                                                            Dao Getter
-        //                                                                            ==========
+        //                                                                          Dao Accessor
+        //                                                                          ============
         #region Dao Getter
         /**
          * ${database.ImplementComment}
@@ -158,10 +158,11 @@ namespace ${glPackageBaseCommonBhv} {
             if (!entity.HasPrimaryKeyValue) {
                 return this.SelfWritable.DelegateCreate(entity);
             }
-            String mapString = entity.ExtractPrimaryKeyMapString();
             ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
             try {
-                currentEntity = ReadByPKMapStringWithDeletedCheck(mapString);
+                ${glConditionBeanInterfaceName} cb = NewConditionBean();
+                cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
+                currentEntity = ReadEntityWithDeletedCheck(cb);
             } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
                 return this.SelfWritable.DelegateCreate(entity);
             }
@@ -199,10 +200,12 @@ namespace ${glPackageBaseCommonBhv} {
             if (!entity.HasPrimaryKeyValue) {
                 return this.SelfWritable.DelegateCreate(entity);
             }
-            String mapString = entity.ExtractPrimaryKeyMapString();
             ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
             try {
-                currentEntity = ReadForUpdateByPKMapStringWithDeletedCheck(mapString);
+                ${glConditionBeanInterfaceName} cb = NewConditionBean();
+                cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
+                cb.LockForUpdate();
+                currentEntity = ReadEntityWithDeletedCheck(cb);
             } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
                 return this.SelfWritable.DelegateCreate(entity);
             }

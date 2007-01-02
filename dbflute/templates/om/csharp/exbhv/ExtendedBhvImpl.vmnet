@@ -1,4 +1,4 @@
-#set ($myClassName = "${myExtendedBhvInterfaceName}")
+#set ($myClassName = "${myExtendedBhvClassName}")
 
 using System;
 using System.Collections;
@@ -6,9 +6,9 @@ using System.Collections;
 namespace ${glPackageExtendedBhv} {
 
     /// <summary>
-    /// The behavior-interface of ${table.Name}. (partial class for customizing)
+    /// The behavior of ${table.Name}. (partial class for customizing)
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    partial interface $myClassName {
+    partial class $myClassName {
     }
 }

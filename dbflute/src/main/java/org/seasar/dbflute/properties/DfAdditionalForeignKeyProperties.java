@@ -96,7 +96,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         final String foreignCondition = componentMap.get("foreignCondition");
 
-        // TODO: Ç≥Ç†Ç«Ç§Ç∑ÇÈÅH
+        // TODO: Append ForeignCondition.
         return null;
     }
 

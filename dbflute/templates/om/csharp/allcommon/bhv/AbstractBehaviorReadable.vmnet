@@ -84,15 +84,32 @@ namespace ${glPackageBaseCommonBhv} {
         #endregion
 
         // =====================================================================================
-        //                                                                            Dao Getter
-        //                                                                            ==========
-        #region Dao Getter
+        //                                                                          Dao Accessor
+        //                                                                          ============
+        #region Dao Accessor
         /**
          * ${database.ImplementComment}
          * 
          * @return Dao-readable. (NotNull)
          */
         abstract public ${glDaoReadableInterfaceName} GetDaoReadable();
+        #endregion
+
+        // =====================================================================================
+        //                                                                          New Instance
+        //                                                                          ============
+        #region New Instance
+        /// <summary>
+        /// New entity.
+        /// </summary>
+        /// <returns>Entity. (NotNull)</returns>
+        abstract public ${glEntityInterfaceName} NewEntity();
+
+        /// <summary>
+        /// New condition-bean.
+        /// </summary>
+        /// <returns>Condition-bean. (NotNull)</returns>
+        abstract public ${glConditionBeanInterfaceName} NewConditionBean();
         #endregion
 
         // =====================================================================================
@@ -117,7 +134,7 @@ namespace ${glPackageBaseCommonBhv} {
         /**
          * ${database.ImplementComment}
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
          * @return Read count. (NotNull)
          */
         IList ${glBehaviorReadableInterfaceName}.DelegateReadAllList() {
@@ -128,35 +145,35 @@ namespace ${glPackageBaseCommonBhv} {
         /**
          * ${database.ImplementComment}
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
          * @return Read count. (NotNull)
          */
-        int ${glBehaviorReadableInterfaceName}.DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            return DoDelegateReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
+        int ${glBehaviorReadableInterfaceName}.DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
+            return DoDelegateReadCountIgnoreFetchScope(cb);
         }
-        abstract protected int DoDelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        abstract protected int DoDelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
 
         /**
          * ${database.ImplementComment}
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
          * @return Read entity. If the select result is zero, it returns null. (Nullable)
          */
-        ${glEntityInterfaceName} ${glBehaviorReadableInterfaceName}.DelegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            return DoDelegateReadEntity(${glAttachedCBArgsVariableName});
+        ${glEntityInterfaceName} ${glBehaviorReadableInterfaceName}.DelegateReadEntity(${glConditionBeanInterfaceName} cb) {
+            return DoDelegateReadEntity(cb);
         }
-        abstract protected ${glEntityInterfaceName} DoDelegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        abstract protected ${glEntityInterfaceName} DoDelegateReadEntity(${glConditionBeanInterfaceName} cb);
 
         /**
          * ${database.ImplementComment}
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
          * @return Read list. If the select result is zero, it returns empty list. (NotNull)
          */
-        IList ${glBehaviorReadableInterfaceName}.DelegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            return DoDelegateReadList(${glAttachedCBArgsVariableName});
+        IList ${glBehaviorReadableInterfaceName}.DelegateReadList(${glConditionBeanInterfaceName} cb) {
+            return DoDelegateReadList(cb);
         }
-        abstract protected IList DoDelegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+        abstract protected IList DoDelegateReadList(${glConditionBeanInterfaceName} cb);
         #endregion
 
         // =====================================================================================
@@ -166,44 +183,44 @@ namespace ${glPackageBaseCommonBhv} {
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
-        public ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            return new ResultBeanBuilder(this).BuildListResultBean(${glAttachedCBArgsVariableName}, this.SelfReadable.DelegateReadList(${glAttachedCBArgsVariableName}));
+        public ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.DelegateReadList(cb));
         }
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        public ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            return this.SelfReadable.ReadPage(${glAttachedCBArgsVariableName}, new SelectPageSimpleInvoker(this));
+        public ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.SelfReadable.ReadPage(cb, new SelectPageSimpleInvoker(this));
         }
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        public ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker) {
-            AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            return invoker.InvokeSelectPage(new SelectPageSimpleCallback(${glAttachedCBArgsVariableName}, this));
+        public ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker invoker) {
+            AssertConditionBeanNotNull(cb);
+            return invoker.InvokeSelectPage(new SelectPageSimpleCallback(cb, this));
         }
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Entity that is read from database. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            ${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
-            AssertRecordHasNotBeenDeleted(currentEntity, ${glAttachedCBArgsVariableName}.ToString());
+        public ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            ${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(cb);
+            AssertRecordHasNotBeenDeleted(currentEntity, cb.ToString());
             return currentEntity;
         }
 
@@ -254,26 +271,6 @@ namespace ${glPackageBaseCommonBhv} {
                 throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
             }
         }
-        #endregion
-
-        // =====================================================================================
-        //                                                                        Various Select
-        //                                                                        ==============
-        #region Various Select
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean.
-         * @param maxCount Max count.
-         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-         * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-         */
-        public ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
-            AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            int selectedCount = this.SelfReadable.DelegateReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
-            AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.ToString());
-            return new ResultBeanBuilder(this).BuildListResultBean(${glAttachedCBArgsVariableName}, this.SelfReadable.DelegateReadList(${glAttachedCBArgsVariableName}));
-        }
 
         /**
          * Assert that selected count has not exceeded max count.
@@ -291,81 +288,54 @@ namespace ${glPackageBaseCommonBhv} {
                 throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
             }
         }
+        #endregion
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <param name="fetchSize">Fetch-size.</param>
-        /// <returns>Read page as first page. (NotNull)</returns>
-        public ${glPagingResultBeanName} ReadPageAsFirst(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchSize) {
-            AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            ${glAttachedCBArgsVariableName}.FetchFirst(fetchSize);
-            return this.SelfReadable.ReadPage(${glAttachedCBArgsVariableName});
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <param name="fetchPageNumber">Fetch-page-number.</param>
-        /// <returns>Read page as PageNumber page. (NotNull)</returns>
-        public ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int fetchPageNumber) {
-            AssertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-            ${glAttachedCBArgsVariableName}.FetchPage(fetchPageNumber);
-            return this.SelfReadable.ReadPage(${glAttachedCBArgsVariableName});
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is read from database. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public ${glEntityInterfaceName} ReadByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-            AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
-            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString);
-            ${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
-            AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-            return currentEntity;
-        }
+        // =====================================================================================
+        //                                                                        Various Select
+        //                                                                        ==============
+        #region Various Select
     #if ($database.isMakeDeprecated())
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is read from database by select-for-read-only. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        [Obsolete("This class is deprecated. Please use ReadByPKMapStringWithDeletedCheck().")]
-        public ${glEntityInterfaceName} ReadForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-            AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
-            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString);
-            ${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
-            AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-            return currentEntity;
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean.
+         * @param maxCount Max count.
+         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+         * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+         */
+        [Obsolete("This method is deprecated.")]
+        public ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount) {
+            AssertConditionBeanNotNull(cb);
+            int selectedCount = this.SelfReadable.DelegateReadCountIgnoreFetchScope(cb);
+            AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.ToString());
+            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.DelegateReadList(cb));
         }
     #end
-    #if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is read from database by select-for-update. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public ${glEntityInterfaceName} ReadForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-            AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
-            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(primaryKeyMapString);
-            ${glAttachedCBArgsVariableName}.LockForUpdate();
-            ${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
-            AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-            return currentEntity;
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <param name="fetchSize">Fetch-size.</param>
+        /// <returns>Read page as first page. (NotNull)</returns>
+        public ${glPagingResultBeanName} ReadPageAsFirst(${glConditionBeanInterfaceName} cb, int fetchSize) {
+            AssertConditionBeanNotNull(cb);
+            cb.FetchFirst(fetchSize);
+            return this.SelfReadable.ReadPage(cb);
         }
-    #end
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <param name="fetchPageNumber">Fetch-page-number.</param>
+        /// <returns>Read page as PageNumber page. (NotNull)</returns>
+        public ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} cb, int fetchPageNumber) {
+            AssertConditionBeanNotNull(cb);
+            cb.FetchPage(fetchPageNumber);
+            return this.SelfReadable.ReadPage(cb);
+        }
 
         #endregion
 
@@ -408,10 +378,10 @@ namespace ${glPackageBaseCommonBhv} {
         /**
          * Assert that the condition-bean is not null.
          * 
-         * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+         * @param cb Condition-bean. (NotNull)
          */
-        protected void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-            AssertObjectNotNull("${glAttachedCBArgsVariableName}", ${glAttachedCBArgsVariableName});
+        protected void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
+            AssertObjectNotNull("cb", cb);
         }
 
         /**

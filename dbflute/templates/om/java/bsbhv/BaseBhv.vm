@@ -84,8 +84,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    //                                                                          Dao Accessor
+    //                                                                          ============
     /**
      * Get my dao.
      * 
@@ -129,12 +129,30 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                          New Instance
     //                                                                          ============
     /**
+     * New entity.
+     * 
+     * @return Entity. (NotNull)
+     */
+    public ${glEntityInterfaceName} newEntity() {
+        return newMyEntity();
+    }
+
+    /**
      * New condition-bean.
      * 
      * @return Condition-bean. (NotNull)
      */
     public ${glConditionBeanInterfaceName} newConditionBean() {
         return newMyConditionBean();
+    }
+
+    /**
+     * New my entity.
+     * 
+     * @return My entity. (NotNull)
+     */
+    public ${myExtendedObjectClassName} newMyEntity() {
+        return new ${myExtendedObjectClassName}();
     }
 
     /**
