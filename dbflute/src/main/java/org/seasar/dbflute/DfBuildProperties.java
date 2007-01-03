@@ -33,16 +33,17 @@ import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDaoDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
-import org.seasar.dbflute.properties.DfPropertiesHandler;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
+import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
@@ -357,112 +358,116 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                                      Properties - Common-Column
     //                                                      ==========================
-    public static final String KEY_commonColumnMap = "commonColumnMap";
-    protected Map<String, Object> _commonColumnMap;
-
-    public Map<String, Object> getCommonColumnMap() {
-        if (_commonColumnMap == null) {
-            _commonColumnMap = mapProp("torque." + KEY_commonColumnMap, DEFAULT_EMPTY_MAP);
-        }
-        return _commonColumnMap;
+    public DfCommonColumnProperties getCommonColumnProperties() {
+        return getHandler().getCommonColumnProperties(getProperties());
     }
-
-    protected List<String> _commonColumnNameList;
-
-    public List<String> getCommonColumnNameList() {
-        if (_commonColumnNameList == null) {
-            final Map<String, Object> commonColumnMap = getCommonColumnMap();
-            _commonColumnNameList = new ArrayList<String>(commonColumnMap.keySet());
-        }
-        return _commonColumnNameList;
-    }
-
-    // --------------------------------------
-    //                                 insert
-    //                                 ------
-    public static final String KEY_commonColumnSetupBeforeInsertInterceptorLogicMap = "commonColumnSetupBeforeInsertInterceptorLogicMap";
-    protected Map<String, Object> _commonColumnSetupBeforeInsertInterceptorLogicMap;
-
-    public Map<String, Object> getCommonColumnSetupBeforeInsertInterceptorLogicMap() {
-        if (_commonColumnSetupBeforeInsertInterceptorLogicMap == null) {
-            final String key = "torque." + KEY_commonColumnSetupBeforeInsertInterceptorLogicMap;
-            _commonColumnSetupBeforeInsertInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
-        }
-        return _commonColumnSetupBeforeInsertInterceptorLogicMap;
-    }
-
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
-        final Map map = getCommonColumnSetupBeforeInsertInterceptorLogicMap();
-        final String logic = (String) map.get(columnName);
-        if (logic != null && logic.trim().length() != 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(String columnName) {
-        final Map map = getCommonColumnSetupBeforeInsertInterceptorLogicMap();
-        return (String) map.get(columnName);
-    }
-
-    // --------------------------------------
-    //                                 update
-    //                                 ------
-    public static final String KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap = "commonColumnSetupBeforeUpdateInterceptorLogicMap";
-    protected Map<String, Object> _commonColumnSetupBeforeUpdateInterceptorLogicMap;
-
-    public Map<String, Object> getCommonColumnSetupBeforeUpdateInterceptorLogicMap() {
-        if (_commonColumnSetupBeforeUpdateInterceptorLogicMap == null) {
-            final String key = "torque." + KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap;
-            _commonColumnSetupBeforeUpdateInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
-        }
-        return _commonColumnSetupBeforeUpdateInterceptorLogicMap;
-    }
-
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(String columnName) {
-        final Map map = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
-        final String logic = (String) map.get(columnName);
-        if (logic != null && logic.trim().length() != 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
-        final Map map = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
-        return (String) map.get(columnName);
-    }
-
-    // --------------------------------------
-    //                                 delete
-    //                                 ------
-    public static final String KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap = "commonColumnSetupBeforeDeleteInterceptorLogicMap";
-    protected Map<String, Object> _commonColumnSetupBeforeDeleteInterceptorLogicMap;
-
-    public Map<String, Object> getCommonColumnSetupBeforeDeleteInterceptorLogicMap() {
-        if (_commonColumnSetupBeforeDeleteInterceptorLogicMap == null) {
-            final String key = "torque." + KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap;
-            _commonColumnSetupBeforeDeleteInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
-        }
-        return _commonColumnSetupBeforeDeleteInterceptorLogicMap;
-    }
-
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(String columnName) {
-        final Map map = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
-        final String logic = (String) map.get(columnName);
-        if (logic != null && logic.trim().length() != 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(String columnName) {
-        final Map map = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
-        return (String) map.get(columnName);
-    }
+//    
+//    public static final String KEY_commonColumnMap = "commonColumnMap";
+//    protected Map<String, Object> _commonColumnMap;
+//
+//    public Map<String, Object> getCommonColumnMap() {
+//        if (_commonColumnMap == null) {
+//            _commonColumnMap = mapProp("torque." + KEY_commonColumnMap, DEFAULT_EMPTY_MAP);
+//        }
+//        return _commonColumnMap;
+//    }
+//
+//    protected List<String> _commonColumnNameList;
+//
+//    public List<String> getCommonColumnNameList() {
+//        if (_commonColumnNameList == null) {
+//            final Map<String, Object> commonColumnMap = getCommonColumnMap();
+//            _commonColumnNameList = new ArrayList<String>(commonColumnMap.keySet());
+//        }
+//        return _commonColumnNameList;
+//    }
+//
+//    // --------------------------------------
+//    //                                 insert
+//    //                                 ------
+//    public static final String KEY_commonColumnSetupBeforeInsertInterceptorLogicMap = "commonColumnSetupBeforeInsertInterceptorLogicMap";
+//    protected Map<String, Object> _commonColumnSetupBeforeInsertInterceptorLogicMap;
+//
+//    public Map<String, Object> getCommonColumnSetupBeforeInsertInterceptorLogicMap() {
+//        if (_commonColumnSetupBeforeInsertInterceptorLogicMap == null) {
+//            final String key = "torque." + KEY_commonColumnSetupBeforeInsertInterceptorLogicMap;
+//            _commonColumnSetupBeforeInsertInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
+//        }
+//        return _commonColumnSetupBeforeInsertInterceptorLogicMap;
+//    }
+//
+//    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
+//        final Map map = getCommonColumnSetupBeforeInsertInterceptorLogicMap();
+//        final String logic = (String) map.get(columnName);
+//        if (logic != null && logic.trim().length() != 0) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
+//
+//    public String getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(String columnName) {
+//        final Map map = getCommonColumnSetupBeforeInsertInterceptorLogicMap();
+//        return (String) map.get(columnName);
+//    }
+//
+//    // --------------------------------------
+//    //                                 update
+//    //                                 ------
+//    public static final String KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap = "commonColumnSetupBeforeUpdateInterceptorLogicMap";
+//    protected Map<String, Object> _commonColumnSetupBeforeUpdateInterceptorLogicMap;
+//
+//    public Map<String, Object> getCommonColumnSetupBeforeUpdateInterceptorLogicMap() {
+//        if (_commonColumnSetupBeforeUpdateInterceptorLogicMap == null) {
+//            final String key = "torque." + KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap;
+//            _commonColumnSetupBeforeUpdateInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
+//        }
+//        return _commonColumnSetupBeforeUpdateInterceptorLogicMap;
+//    }
+//
+//    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(String columnName) {
+//        final Map map = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
+//        final String logic = (String) map.get(columnName);
+//        if (logic != null && logic.trim().length() != 0) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
+//
+//    public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
+//        final Map map = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
+//        return (String) map.get(columnName);
+//    }
+//
+//    // --------------------------------------
+//    //                                 delete
+//    //                                 ------
+//    public static final String KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap = "commonColumnSetupBeforeDeleteInterceptorLogicMap";
+//    protected Map<String, Object> _commonColumnSetupBeforeDeleteInterceptorLogicMap;
+//
+//    public Map<String, Object> getCommonColumnSetupBeforeDeleteInterceptorLogicMap() {
+//        if (_commonColumnSetupBeforeDeleteInterceptorLogicMap == null) {
+//            final String key = "torque." + KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap;
+//            _commonColumnSetupBeforeDeleteInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
+//        }
+//        return _commonColumnSetupBeforeDeleteInterceptorLogicMap;
+//    }
+//
+//    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(String columnName) {
+//        final Map map = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
+//        final String logic = (String) map.get(columnName);
+//        if (logic != null && logic.trim().length() != 0) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
+//
+//    public String getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(String columnName) {
+//        final Map map = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
+//        return (String) map.get(columnName);
+//    }
 
     // ===============================================================================
     //                                                     Properties - Logical-Delete

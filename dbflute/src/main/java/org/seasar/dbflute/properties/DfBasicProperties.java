@@ -192,14 +192,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return booleanProp("torque.isAvailableBehaviorGeneration", false);
     }
 
-    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
-        return booleanProp("torque.isAvailableCommonColumnSetupInterceptorToBehavior", false);
-    }
-
-    public boolean isAvailableCommonColumnSetupInterceptorToDao() {
-        return booleanProp("torque.isAvailableCommonColumnSetupInterceptorToDao", false);
-    }
-
     public boolean isAvailableGenerics() {
         return booleanProp("torque.isAvailableGenerics", true);
     }

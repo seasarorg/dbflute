@@ -1,6 +1,19 @@
-package org.seasar.dbflute.properties;
+package org.seasar.dbflute.properties.handler;
 
 import java.util.Properties;
+
+import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfCommonColumnProperties;
+import org.seasar.dbflute.properties.DfDaoDiconProperties;
+import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
+import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
+import org.seasar.dbflute.properties.DfOptimisticLockProperties;
+import org.seasar.dbflute.properties.DfOtherProperties;
+import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.DfSelectParamProperties;
+import org.seasar.dbflute.properties.DfSourceReductionProperties;
+import org.seasar.dbflute.properties.DfSql2EntityProperties;
 
 /**
  * Build properties for Torque.
@@ -25,6 +38,15 @@ public final class DfPropertiesHandler {
             _basicProperties = new DfBasicProperties(prop);
         }
         return _basicProperties;
+    }
+
+    protected DfCommonColumnProperties _commonColumnProperties;
+
+    public DfCommonColumnProperties getCommonColumnProperties(Properties prop) {
+        if (_commonColumnProperties == null) {
+            _commonColumnProperties = new DfCommonColumnProperties(prop);
+        }
+        return _commonColumnProperties;
     }
 
     protected DfDaoDiconProperties _daoDiconProperties;
@@ -80,7 +102,7 @@ public final class DfPropertiesHandler {
         }
         return _otherProperties;
     }
-    
+
     protected DfSourceReductionProperties _sourceReductionProperties;
 
     public DfSourceReductionProperties getSourceReductionProperties(Properties prop) {
@@ -89,7 +111,6 @@ public final class DfPropertiesHandler {
         }
         return _sourceReductionProperties;
     }
-    
 
     protected DfSql2EntityProperties _sql2EntityProperties;
 

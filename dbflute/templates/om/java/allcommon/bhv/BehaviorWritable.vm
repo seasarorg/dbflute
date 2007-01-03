@@ -126,7 +126,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
     /**
      * Create or modify after select.
      * 
-     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @return Updated count.
      */
     public int createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
@@ -144,7 +144,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
     /**
      * Create or modify after select-for-update.
      * 
-     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @return Updated count.
      */
     public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);

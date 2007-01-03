@@ -667,14 +667,6 @@ public class Database {
         return getBasicProperties().isAvailableBehaviorGeneration();
     }
 
-    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
-        return getBasicProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
-    }
-
-    public boolean isAvailableCommonColumnSetupInterceptorToDao() {
-        return getBasicProperties().isAvailableCommonColumnSetupInterceptorToDao();
-    }
-
     public boolean isAvailableGenerics() {
         return getBasicProperties().isAvailableGenerics();
     }
@@ -814,56 +806,74 @@ public class Database {
     //                                                      Properties - Common-Column
     //                                                      ==========================
     public Map<String, Object> getCommonColumnMap() {
-        return getProperties().getCommonColumnMap();
+        return getProperties().getCommonColumnProperties().getCommonColumnMap();
     }
 
     public List<String> getCommonColumnNameList() {
-        return getProperties().getCommonColumnNameList();
+        return getProperties().getCommonColumnProperties().getCommonColumnNameList();
+    }
+
+    public boolean hasCommonColumn() {
+        return !getProperties().getCommonColumnProperties().getCommonColumnNameList().isEmpty();
+    }
+
+    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
+        return getProperties().getCommonColumnProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
+    }
+
+    public boolean isAvailableCommonColumnSetupInterceptorToDao() {
+        return getProperties().getCommonColumnProperties().isAvailableCommonColumnSetupInterceptorToDao();
     }
 
     // --------------------------------------
     //                                 insert
     //                                 ------
     public Map<String, Object> getCommonColumnSetupBeforeInsertInterceptorLogicMap() {
-        return getProperties().getCommonColumnSetupBeforeInsertInterceptorLogicMap();
+        return getProperties().getCommonColumnProperties().getCommonColumnSetupBeforeInsertInterceptorLogicMap();
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
-        return getProperties().containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(columnName);
+        return getProperties().getCommonColumnProperties()
+                .containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(columnName);
     }
 
     public String getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(String columnName) {
-        return getProperties().getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(columnName);
+        return getProperties().getCommonColumnProperties()
+                .getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(columnName);
     }
 
     // --------------------------------------
     //                                 update
     //                                 ------
     public Map<String, Object> getCommonColumnSetupBeforeUpdateInterceptorLogicMap() {
-        return getProperties().getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
+        return getProperties().getCommonColumnProperties().getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(String columnName) {
-        return getProperties().containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(columnName);
+        return getProperties().getCommonColumnProperties()
+                .containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(columnName);
     }
 
     public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
-        return getProperties().getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(columnName);
+        return getProperties().getCommonColumnProperties()
+                .getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(columnName);
     }
 
     // --------------------------------------
     //                                 delete
     //                                 ------
     public Map<String, Object> getCommonColumnSetupBeforeDeleteInterceptorLogicMap() {
-        return getProperties().getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
+        return getProperties().getCommonColumnProperties().getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(String columnName) {
-        return getProperties().containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(columnName);
+        return getProperties().getCommonColumnProperties()
+                .containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(columnName);
     }
 
     public String getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(String columnName) {
-        return getProperties().getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(columnName);
+        return getProperties().getCommonColumnProperties()
+                .getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(columnName);
     }
 
     // ===============================================================================
