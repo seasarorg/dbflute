@@ -233,17 +233,19 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                  IncludedSelectColumn
     //                                                                  ====================
     /**
-     * Make included-select-column effective.
-     */
-    public void makeIncludedSelectColumnEffective() {
-        _isIncludedSelectColumnEffective = true;
-    }
-
-    /**
      * Ignore included-select-column.
      */
     public void ignoreIncludedSelectColumn() {
         _isIncludedSelectColumnEffective = false;
+    }
+
+    /**
+     * Make included-select-column effective.
+     */
+    public void makeIncludedSelectColumnEffective() {
+        if (!_includedSelectColumnMap.isEmpty()) {
+            _isIncludedSelectColumnEffective = true;
+        }
     }
 
     /**
@@ -436,7 +438,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} makeOrderByEffective() {
-        _isOrderByEffective = true;
+        if (!_orderByClause.isEmpty()) {
+            _isOrderByEffective = true;
+        }
         return this;
     }
 
@@ -704,7 +708,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} makeFetchScopeEffective() {
-        _isFetchScopeEffective = true;
         if (getFetchSize() > 0 && getFetchPageNumber() > 0) {
             fetchPage(getFetchPageNumber());
         }

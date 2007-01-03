@@ -21,11 +21,38 @@ namespace ${glPackageBaseCommonBhv} {
         ${glDaoWritableInterfaceName} GetDaoWritable();
 
         /**
+         * Create entity. (Call-Method)
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Inserted count.
+         */
+        int CallCreate(${glEntityInterfaceName} entity);
+
+        /**
+         * Modify entity. (Call-Method)
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Updated count.
+         */
+        int CallModify(${glEntityInterfaceName} entity);
+
+        /**
+         * Remove entity. (Call-Method)
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Deleted count.
+         */
+        int CallRemove(${glEntityInterfaceName} entity);
+
+#if ($database.isMakeDeprecated())
+
+        /**
          * Create entity. (Delegate-Method)
          * 
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Inserted count.
          */
+        [Obsolete("This method is deprecated. Please use CallCreate()")]
         int DelegateCreate(${glEntityInterfaceName} entity);
 
         /**
@@ -34,6 +61,7 @@ namespace ${glPackageBaseCommonBhv} {
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Updated count.
          */
+        [Obsolete("This method is deprecated. Please use CallModify()")]
         int DelegateModify(${glEntityInterfaceName} entity);
 
         /**
@@ -42,57 +70,27 @@ namespace ${glPackageBaseCommonBhv} {
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Deleted count.
          */
+        [Obsolete("This method is deprecated. Please use CallRemove()")]
         int DelegateRemove(${glEntityInterfaceName} entity);
-
-        /**
-         * Create several entity-list. (Delegate-Method)
-         * 
-         * @param entityList Entity-list that the type is entity-interface. (NotNull)
-         * @return Inserted count.
-         */
-/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int DelegateCreateList(System.Collections.IList entityList);
-
-        /**
-         * Modify several entity-list. (Delegate-Method)
-         * 
-         * @param entityList Entity-list that the type is entity-interface. (NotNull)
-         * @return Updated count.
-         */
-/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int DelegateModifyList(System.Collections.IList entityList);
-
-        /**
-         * Remove several entity-list. (Delegate-Method)
-         * 
-         * @param entityList Entity-list that the type is entity-interface. (NotNull)
-         * @return Deleted count.
-         */
-/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int DelegateRemoveList(System.Collections.IList entityList);
-
-        /**
-         * Modify after select-for-update.
-         * 
-         * @param entity Entity.
-         * @return Updated count.
-         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-         */
-// TODO: Commented out because GetDaoReadable().GetType() doesn't have the method.
-//        int ModifyAfterSelectForUpdate(${glEntityInterfaceName} entity);
+#end
 
         // =====================================================================================
-        //                                                                          Basic Update
-        //                                                                          ============
-        #region Basic Update
+        //                                                                   Basic Entity Update
+        //                                                                   ===================
+        #region Basic Entity Update
+        /// <summary>
+        /// Create.
+        /// </summary>
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Created count.</returns>
+        int Create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
-        /// Create or modify after select.
+        /// Modify.
         /// </summary>
-        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        int CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Modified count.</returns>
+        int Modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /**
         /// Modify after select.
@@ -102,14 +100,15 @@ namespace ${glPackageBaseCommonBhv} {
          * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
          */
         int ModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-#if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
-        /// Create or modify after select-for-update.
+        /// Create or modify after select.
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
         /// <returns>Updated count.</returns>
-        int CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        int CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+#if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
         /// Modify after select-for-update.
@@ -118,7 +117,21 @@ namespace ${glPackageBaseCommonBhv} {
         /// <returns>Updated count.</returns>
         /// <exception cref="MspadminBiz.Dao.Allcommon.exception.RecordHasAlreadyBeenDeletedException"></exception>
         int ModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+        /// <summary>
+        /// Create or modify after select-for-update.
+        /// </summary>
+        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        int CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 #end
+
+        /// <summary>
+        /// Remove.
+        /// </summary>
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Removed count.</returns>
+        int Remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
         /// Reflect(insert or update) from separated-file.

@@ -234,7 +234,10 @@ namespace ${glPackageBaseCommonS2Dao} {
          */
         protected bool IsSelectCountIgnoreFetchScopeMethod(Seasar.Framework.Aop.IMethodInvocation invocation) {
             String name = invocation.Method.Name;
-            if (name.StartsWith("ReadCountIgnoreFetchScope") || name.StartsWith("SelectCountIgnoreFetchScope")) {
+            if (name.StartsWith("ReadCount")
+                    || name.StartsWith("SelectCount")
+                    || name.StartsWith("SelectCountIgnoreFetchScope")
+                    || name.StartsWith("SelectCountIgnoreFetchScope")) {
                 return true;
             } else {
                 return false;

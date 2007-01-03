@@ -54,17 +54,18 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                       Delegate Method
         //                                                                       ===============
         #region Delegate-Method
+
         /**
          * ${database.ImplementComment}
          * 
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Inserted count.
          */
-        int ${glBehaviorWritableInterfaceName}.DelegateCreate(${glEntityInterfaceName} entity) {
+        int ${glBehaviorWritableInterfaceName}.CallCreate(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             FilterEntityOfInsert(entity);
             AssertEntityOfInsert(entity);
-            return DoDelegateCreate(entity);
+            return DoCallCreate(entity);
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace ${glPackageBaseCommonBhv} {
         protected virtual void AssertEntityOfInsert(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         }
 
-        abstract protected int DoDelegateCreate(${glEntityInterfaceName} entity);
+        abstract protected int DoCallCreate(${glEntityInterfaceName} entity);
 
         /**
          * ${database.ImplementComment}
@@ -89,11 +90,11 @@ namespace ${glPackageBaseCommonBhv} {
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Updated count.
          */
-        int ${glBehaviorWritableInterfaceName}.DelegateModify(${glEntityInterfaceName} entity) {
+        int ${glBehaviorWritableInterfaceName}.CallModify(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             FilterEntityOfUpdate(entity);
             AssertEntityOfUpdate(entity);
-            return DoDelegateModify(entity);
+            return DoCallModify(entity);
         }
 
         /// <summary>
@@ -110,7 +111,7 @@ namespace ${glPackageBaseCommonBhv} {
         protected virtual void AssertEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         }
 
-        abstract protected int DoDelegateModify(${glEntityInterfaceName} entity);
+        abstract protected int DoCallModify(${glEntityInterfaceName} entity);
 
         /**
          * ${database.ImplementComment}
@@ -118,11 +119,11 @@ namespace ${glPackageBaseCommonBhv} {
          * @param entity Entity that the type is entity-interface. (NotNull)
          * @return Deleted count.
          */
-        int ${glBehaviorWritableInterfaceName}.DelegateRemove(${glEntityInterfaceName} entity) {
+        int ${glBehaviorWritableInterfaceName}.CallRemove(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             FilterEntityOfDelete(entity);
             AssertEntityOfDelete(entity);
-            return DoDelegateRemove(entity);
+            return DoCallRemove(entity);
         }
 
         /// <summary>
@@ -139,36 +140,84 @@ namespace ${glPackageBaseCommonBhv} {
         protected virtual void AssertEntityOfDelete(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         }
 
+        abstract protected int DoCallRemove(${glEntityInterfaceName} entity);
+
+
+#if ($database.isMakeDeprecated())
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Inserted count.
+         */
+        [Obsolete("This method is deprecated. Please use CallCreate()")]
+        int ${glBehaviorWritableInterfaceName}.DelegateCreate(${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            FilterEntityOfInsert(entity);
+            AssertEntityOfInsert(entity);
+            return DoDelegateCreate(entity);
+        }
+
+        abstract protected int DoDelegateCreate(${glEntityInterfaceName} entity);
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Updated count.
+         */
+        [Obsolete("This method is deprecated. Please use CallModify()")]
+        int ${glBehaviorWritableInterfaceName}.DelegateModify(${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            FilterEntityOfUpdate(entity);
+            AssertEntityOfUpdate(entity);
+            return DoDelegateModify(entity);
+        }
+
+        abstract protected int DoDelegateModify(${glEntityInterfaceName} entity);
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param entity Entity that the type is entity-interface. (NotNull)
+         * @return Deleted count.
+         */
+        [Obsolete("This method is deprecated. Please use CallRemove()")]
+        int ${glBehaviorWritableInterfaceName}.DelegateRemove(${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            FilterEntityOfDelete(entity);
+            AssertEntityOfDelete(entity);
+            return DoDelegateRemove(entity);
+        }
+
         abstract protected int DoDelegateRemove(${glEntityInterfaceName} entity);
+#end
 
         #endregion
 
         // =====================================================================================
-        //                                                                          Basic Update
-        //                                                                          ============
-        #region Basic Update
+        //                                                                   Basic Entity Update
+        //                                                                   ===================
+        #region Basic Entity Update
         /// <summary>
-        /// ${database.ImplementComment}
+        /// Create.
         /// </summary>
-        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Created count.</returns>
+        public int Create(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
-            if (!entity.HasPrimaryKeyValue) {
-                return this.SelfWritable.DelegateCreate(entity);
-            }
-            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
-            try {
-                ${glConditionBeanInterfaceName} cb = NewConditionBean();
-                cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-                currentEntity = ReadEntityWithDeletedCheck(cb);
-            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-                return this.SelfWritable.DelegateCreate(entity);
-            }
-            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            MergeEntity(entity, currentEntity);
-            return this.SelfWritable.DelegateModify(currentEntity);
+            return this.SelfWritable.CallCreate(entity);
+        }
+
+        /// <summary>
+        /// Modify.
+        /// </summary>
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Modified count.</returns>
+        public int Modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            return this.SelfWritable.CallModify(entity);
         }
 
         /**
@@ -182,12 +231,11 @@ namespace ${glPackageBaseCommonBhv} {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
             ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
+            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = this.SelfReadable.ReadEntity(${glAttachedCBArgsVariableName});
             AssertRecordHasNotBeenDeleted(currentEntity, entity.ExtractPrimaryKeyMapString());
             MergeEntity(entity, currentEntity);
-            return this.SelfWritable.DelegateModify(currentEntity);
+            return this.SelfWritable.CallModify(currentEntity);
         }
-#if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
         /// ${database.ImplementComment}
@@ -195,24 +243,25 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        public int CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
-                return this.SelfWritable.DelegateCreate(entity);
+                return this.SelfWritable.CallCreate(entity);
             }
             ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
             try {
                 ${glConditionBeanInterfaceName} cb = NewConditionBean();
                 cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-                cb.LockForUpdate();
                 currentEntity = ReadEntityWithDeletedCheck(cb);
             } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-                return this.SelfWritable.DelegateCreate(entity);
+                return this.SelfWritable.CallCreate(entity);
             }
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             MergeEntity(entity, currentEntity);
-            return this.SelfWritable.DelegateModify(currentEntity);
+            return this.SelfWritable.CallModify(currentEntity);
         }
+
+#if ($database.isMakeBehaviorForUpdate())
 
         /**
          * ${database.ImplementComment}
@@ -226,10 +275,35 @@ namespace ${glPackageBaseCommonBhv} {
             ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
             ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
             ${glAttachedCBArgsVariableName}.LockForUpdate();
-            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(${glAttachedCBArgsVariableName});
+            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = this.SelfReadable.ReadEntity(${glAttachedCBArgsVariableName});
             AssertRecordHasNotBeenDeleted(currentEntity, entity.ExtractPrimaryKeyMapString());
             MergeEntity(entity, currentEntity);
-            return this.SelfWritable.DelegateModify(currentEntity);
+            return this.SelfWritable.CallModify(currentEntity);
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        public int CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            if (!entity.HasPrimaryKeyValue) {
+                return this.SelfWritable.CallCreate(entity);
+            }
+            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
+            try {
+                ${glConditionBeanInterfaceName} cb = NewConditionBean();
+                cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
+                cb.LockForUpdate();
+                currentEntity = ReadEntityWithDeletedCheck(cb);
+            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
+                return this.SelfWritable.CallCreate(entity);
+            }
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            MergeEntity(entity, currentEntity);
+            return this.SelfWritable.CallModify(currentEntity);
         }
 #end
 
@@ -241,6 +315,16 @@ namespace ${glPackageBaseCommonBhv} {
          * @param destinationEntity Destination entity.
          */
         abstract protected void MergeEntity(${glPackageBaseCommon}.${glEntityInterfaceName} sourceEntity, ${glPackageBaseCommon}.${glEntityInterfaceName} destinationEntity);
+
+        /// <summary>
+        /// Remove.
+        /// </summary>
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Removed count.</returns>
+        public int Remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            return this.SelfWritable.CallRemove(entity);
+        }
         #endregion
 
         // =====================================================================================

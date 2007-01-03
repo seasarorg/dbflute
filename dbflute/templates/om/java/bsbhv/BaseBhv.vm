@@ -207,17 +207,20 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertConditionBeanNotNull(cb);
         return getMyDao().selectCount(cb);
     }
+#if ($database.isMakeDeprecated())
 
     /**
      * Select count ignore fetch scope by condition-bean. (Delegate-Method)
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
+     * @deprecated This method is deprecated. Please use delegateSelectCount()!
      */
     public int delegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
         return getMyDao().selectCountIgnoreFetchScope(cb);
     }
+#end
 
     /**
      * Select entity by condition-bean. (Delegate-Method)
@@ -330,13 +333,114 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     // =====================================================================================
-    //                                                                          Basic Select
-    //                                                                          ============
+    //                                                                    Basic Select Count
+    //                                                                    ==================
     /**
-     * Select list.
+     * Select count by condition-bean.
+     * <pre>
+     * If the argument 'condition-bean' is effective about fetch-scope,
+     * this method invoke select count ignoring the fetch-scope.
+     * </pre>
+     * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
+     * @return Selected count.
+     */
+    public int selectCount(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return delegateSelectCount(cb);
+    }
+
+    // =====================================================================================
+    //                                                                   Basic Select Entity
+    //                                                                   ===================
+    /**
+     * Select entity by condition-bean.
      * 
      * @param cb Condition-bean. (NotNull)
-     * @return List-result-bean. (NotNull)
+     * @return Selected entity. (Nullalble)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = delegateSelectList(cb);
+        if (ls.isEmpty()) {
+            return null;
+        }
+        assertRecordHasBeenSelectedAsOne(ls, cb.toString());
+        return (${myExtendedObjectClassName})ls.get(0);
+    }
+
+    /**
+     * Select entity by condition-bean with deleted check.
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @return Selected entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = delegateSelectList(cb);
+        assertRecordHasNotBeenDeleted(ls, cb.toString());
+        assertRecordHasBeenSelectedAsOne(ls, cb.toString());
+        return (${myExtendedObjectClassName})ls.get(0);
+    }
+#if ($table.hasPrimaryKey())
+
+    /*
+     * Select entity with deleted check. {by primary-key}
+     * 
+     * @param primaryKey
+     * @return Selected entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        return selectEntityWithDeletedCheck(cb);
+    }
+#end
+#if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
+
+    /*
+     * Select entity for update with deleted check. {by primary-key}
+     * 
+     * @param primaryKey
+     * @return Selected entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheckForUpdate(${table.PrimaryKeyArgsString}) {
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.lockForUpdate();
+        return selectEntityWithDeletedCheck(cb);
+    }
+#end
+
+    // =====================================================================================
+    //                                                                     Basic Select List
+    //                                                                     =================
+    /**
+     * Select simple list.
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @return Selected list. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectSimpleList(${myConditionBeanClassName} cb) {
+        assertConditionBeanNotNull(cb);
+        return delegateSelectList(cb);
+    }
+
+    /**
+     * Select list as result-bean.
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @return Selected list-result-bean. (NotNull)
      */
     public ${glListResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectList(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
@@ -344,10 +448,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Select page.
+     * Select page as result-bean.
      * 
      * @param cb Condition-bean. (NotNull)
-     * @return Selected page as first page. (NotNull)
+     * @return Selected paging-result-bean. (NotNull)
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
@@ -359,58 +463,26 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param cb Condition-bean. (NotNull)
      * @param invoker Select-page-invoker (NotNull)
-     * @return Selected page as first page. (NotNull)
+     * @return Selected paging-result-bean. (NotNull)
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} cb, SelectPageInvoker${database.filterGenericsString(${myExtendedObjectClassName})} invoker) {
         assertConditionBeanNotNull(cb);
         final SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})}() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
             public int selectCountIgnoreFetchScope() {
-                return delegateSelectCountIgnoreFetchScope(cb);
+                return selectCount(cb);
             }
             public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectList() {
-                return delegateSelectList(cb);
+                return selectSimpleList(cb);
             }
         };
         return invoker.invokeSelectPage(pageCallback);
     }
 
-    /**
-     * Select entity by condition-bean with deleted check.
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Entity that is selected from database by select-for-update. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = delegateSelectEntity(cb);
-        assertRecordHasNotBeenDeleted(currentEntity, cb.toString());
-        return currentEntity;
-    }
-#if ($table.hasPrimaryKey())
 
-    public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-        return selectEntityWithDeletedCheck(cb);
-    }
-#end
-#if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
-
-    public ${myExtendedObjectClassName} selectForUpdateByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-        cb.lockForUpdate();
-        return selectEntityWithDeletedCheck(cb);
-    }
-#end
 #if ($database.isMakeDeprecated())
 
+    // This is deprecated!!!
     /**
      * Select list after checking count(ignore fetch scope).
      * 
@@ -430,6 +502,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.hasPrimaryKey())
   #if ($database.isMakeDeprecated())
 
+    // This is deprecated!!!
     /**
      * @deprecated Please use selectByPKValueWithDeletedCheck().
      */
@@ -441,6 +514,20 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return selectEntityWithDeletedCheck(cb);
     }
   #end
+#end
+#if ($table.isUseSequence())
+
+    // =====================================================================================
+    //                                                                              Sequence
+    //                                                                              ========
+    /**
+     * Select next value as sequence.
+     * 
+     * @return Next value. (NotNull)
+     */
+    public java.math.BigDecimal selectNextVal() {
+        return getMyDao().selectNextVal();
+    }
 #end
 #if (${table.hasOnlyOnePrimaryKey()})
 
@@ -566,8 +653,46 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.isWritable())
 
     // =====================================================================================
-    //                                                                          Basic Update
-    //                                                                          ============
+    //                                                                   Basic Entity Update
+    //                                                                   ===================
+    /**
+     * Insert.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Inserted count.
+     */
+    public int insert(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        return delegateInsert(entity);
+    }
+
+    /**
+     * Update.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Updated count.
+     */
+    public int update(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        return delegateUpdate(entity);
+    }
+
+    /**
+     * Update after select.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int updateAfterSelect(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
+        mergeEntity(entity, currentEntity);
+        return delegateUpdate(currentEntity);
+    }
+
     /**
      * Insert or update after select.
      * {update: modified only}
@@ -592,23 +717,24 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         mergeEntity(entity, currentEntity);
         return delegateUpdate(currentEntity);
     }
+  #if ($database.isMakeBehaviorForUpdate())
 
     /**
-     * Update after select.
+     * Update after select-for-update.
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int updateAfterSelect(${myExtendedObjectClassName} entity) {
+    public int updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.lockForUpdate();
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         return delegateUpdate(currentEntity);
     }
-  #if ($database.isMakeBehaviorForUpdate())
 
     /**
      * Insert or update after select-for-update.
@@ -635,23 +761,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         mergeEntity(entity, currentEntity);
         return delegateUpdate(entity);
     }
-
-    /**
-     * Update after select-for-update.
-     * 
-     * @param entity Entity. This must contain primary-key value at least. (NotNull)
-     * @return Updated count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public int updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-        cb.lockForUpdate();
-        final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
-        mergeEntity(entity, currentEntity);
-        return delegateUpdate(currentEntity);
-    }
   #end
 
     /**
@@ -674,6 +783,53 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         }
   #end
 
+    }
+
+    /**
+     * Delete.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Deleted count.
+     */
+    public int delete(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        return delegateDelete(entity);
+    }
+
+    // =====================================================================================
+    //                                                                    Basic Batch Update
+    //                                                                    ==================
+    /**
+     * Insert list.
+     * 
+     * @param entityList Entity-list. (NotNull & NotEmpty)
+     * @return Inserted count.
+     */
+    public int insertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+        assertListNotNullAndEmpty(entityList);
+        return delegateInsertList(entityList);
+    }
+
+    /**
+     * Update list.
+     * 
+     * @param entityList Entity-list. (NotNull & NotEmpty)
+     * @return Updated count.
+     */
+    public int updateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+        assertListNotNullAndEmpty(entityList);
+        return delegateUpdateList(entityList);
+    }
+
+    /**
+     * Delete list.
+     * 
+     * @param entityList Entity-list. (NotNull & NotEmpty)
+     * @return Deleted count.
+     */
+    public int deleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+        assertListNotNullAndEmpty(entityList);
+        return delegateDeleteList(entityList);
     }
 
     // =====================================================================================
@@ -705,140 +861,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      */
     protected void filterCopyInsertEntity(${myExtendedObjectClassName} entity) {
-    }
-  #end
-
-    // =====================================================================================
-    //                                                                        Various Update
-    //                                                                        ==============
-  #if ($table.hasLogicalDeleteColumn() && $database.isMakeBehaviorForUpdate())
-    #if ($table.hasPrimaryKey())
-
-    // 
-    // Logical-delete after select-for-update.
-    // 
-    // @param primaryKey Primary-keys. (NotNull)
-    // @return Updated count.
-    // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-    // @deprecated Not for public use in the future. 
-    // 
-    public int logicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        return logicalDeleteByPKMapStringAfterSelectForUpdate(entity.extractPrimaryKeyMapString());
-    }
-    #end
-
-    /**
-     * Logical-delete after select-for-update.
-     * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @return Updated count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated Not for public use in the future. 
-     */
-    public int logicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString) {
-        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myExtendedObjectClassName} currentEntity = selectForUpdateByPKMapStringWithDeletedCheck(primaryKeyMapString);
-        setupLogicalDeleteValue(currentEntity);
-        filterLogicalDeleteEntity(currentEntity);
-        return delegateUpdate(currentEntity);
-    }
-
-    /**
-     * Set up 'revival from logical-delete' value.
-     * 
-     * @param entity Entity having primary-key value. (NotNull)
-     * @deprecated Not for public use in the future. 
-     */
-    protected void setupLogicalDeleteValue(${myExtendedObjectClassName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-    #foreach ($logicalDeleteColumn in $table.LogicalDeleteColumnList)
-      #set ($logic = ${table.LogicalDeleteColumnValueMap.get(${logicalDeleteColumn.Name})})
-      #if ($database.isCommonColumnSetupInvokingLogic($logic))
-        #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
-
-            ${filteredLogic}
-      #else
-
-            entity.set${logicalDeleteColumn.JavaName}(${logic});
-      #end
-    #end
-
-    }
-
-    /**
-     * Filter 'logical-delete' entity.
-     * 
-     * @param entity Entity. (NotNull)
-     * @deprecated Not for public use in the future. 
-     */
-    protected void filterLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
-    }
-  #end
-  #if ($table.hasRevivalFromLogicalDeleteColumn() && $database.isMakeBehaviorForUpdate())
-    #if ($table.hasPrimaryKey())
-
-    // 
-    // Revival from logical-delete after select-for-update.
-    // 
-    // @param primaryKey Primary-keys. (NotNull)
-    // @return Updated count.
-    // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated Not for public use in the future. 
-    // 
-    public int revivalFromLogicalDeleteByPKValueAfterSelectForUpdate(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        return revivalFromLogicalDeleteByPKMapStringAfterSelectForUpdate(entity.extractPrimaryKeyMapString());
-    }
-    #end
-
-    /**
-     * Revival from logical-delete after select-for-update.
-     * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @return Updated count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated Not for public use in the future. 
-     */
-    public int revivalFromLogicalDeleteByPKMapStringAfterSelectForUpdate(String primaryKeyMapString) {
-        assertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-        final ${myExtendedObjectClassName} currentEntity = selectForUpdateByPKMapStringWithDeletedCheck(primaryKeyMapString);
-        setupRevivalFromLogicalDeleteValue(currentEntity);
-        filterRevivalFromLogicalDeleteEntity(currentEntity);
-        return delegateUpdate(currentEntity);
-    }
-
-    /**
-     * Set up 'revival from logical-delete' value.
-     * 
-     * @param entity Entity having primary-key value. (NotNull)
-     * @deprecated Not for public use in the future. 
-     */
-    protected void setupRevivalFromLogicalDeleteValue(${myExtendedObjectClassName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-    #foreach ($revivalFromLogicalDeleteColumn in $table.RevivalFromLogicalDeleteColumnList)
-      #set ($logic = ${table.RevivalFromLogicalDeleteColumnValueMap.get(${revivalFromLogicalDeleteColumn.Name})})
-      #if ($database.isCommonColumnSetupInvokingLogic($logic))
-        #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
-
-            ${filteredLogic}
-      #else
-
-            entity.set${revivalFromLogicalDeleteColumn.JavaName}(${logic});
-      #end
-    #end
-
-    }
-
-    /**
-     * Filter 'revival from logical-delete' entity.
-     * 
-     * @param entity Entity. (NotNull)
-     * @deprecated Not for public use in the future. 
-     */
-    protected void filterRevivalFromLogicalDeleteEntity(${myExtendedObjectClassName} entity) {
     }
   #end
 #end

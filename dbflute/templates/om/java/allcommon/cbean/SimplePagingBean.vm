@@ -169,6 +169,15 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
         return getSqlClause().getPageEndIndex();
     }
 
+    /**
+     * Is fetch scope effective?
+     * 
+     * @return Determiantion.
+     */
+    public boolean isFetchScopeEffective() {
+        return getSqlClause().isFetchScopeEffective();
+    }
+
     // =====================================================================================
     //                                                                        For SqlComment
     //                                                                        ==============

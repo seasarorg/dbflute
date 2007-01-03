@@ -137,10 +137,10 @@ namespace ${glPackageBaseCommonBhv} {
          * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
          * @return Read count. (NotNull)
          */
-        IList ${glBehaviorReadableInterfaceName}.DelegateReadAllList() {
-            return DoDelegateReadAllList();
+        int ${glBehaviorReadableInterfaceName}.CallGetCountAll() {
+            return DoCallGetCountAll();
         }
-        abstract protected IList DoDelegateReadAllList();
+        abstract protected int DoCallGetCountAll();
 
         /**
          * ${database.ImplementComment}
@@ -148,10 +148,35 @@ namespace ${glPackageBaseCommonBhv} {
          * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
          * @return Read count. (NotNull)
          */
-        int ${glBehaviorReadableInterfaceName}.DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
-            return DoDelegateReadCountIgnoreFetchScope(cb);
+        IList ${glBehaviorReadableInterfaceName}.CallGetListAll() {
+            return DoCallGetListAll();
         }
-        abstract protected int DoDelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
+        abstract protected IList DoCallGetListAll();
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        int ${glBehaviorReadableInterfaceName}.CallReadCount(${glConditionBeanInterfaceName} cb) {
+            return DoCallReadCount(cb);
+        }
+        abstract protected int DoCallReadCount(${glConditionBeanInterfaceName} cb);
+#if ($database.isMakeDeprecated())
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadCount()")]
+        int ${glBehaviorReadableInterfaceName}.CallReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
+            return DoCallReadCountIgnoreFetchScope(cb);
+        }
+        abstract protected int DoCallReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
+#end
 
         /**
          * ${database.ImplementComment}
@@ -159,6 +184,59 @@ namespace ${glPackageBaseCommonBhv} {
          * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
          * @return Read entity. If the select result is zero, it returns null. (Nullable)
          */
+        ${glEntityInterfaceName} ${glBehaviorReadableInterfaceName}.CallReadEntity(${glConditionBeanInterfaceName} cb) {
+            return DoCallReadEntity(cb);
+        }
+        abstract protected ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb);
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+         */
+        IList ${glBehaviorReadableInterfaceName}.CallReadList(${glConditionBeanInterfaceName} cb) {
+            return DoCallReadList(cb);
+        }
+        abstract protected IList DoCallReadList(${glConditionBeanInterfaceName} cb);
+
+
+
+#if ($database.isMakeDeprecated())
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadAllList()")]
+        IList ${glBehaviorReadableInterfaceName}.DelegateReadAllList() {
+            return DoDelegateReadAllList();
+        }
+        abstract protected IList DoDelegateReadAllList();
+#if ($database.isMakeDeprecated())
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please don't use!")]
+        int ${glBehaviorReadableInterfaceName}.DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
+            return DoDelegateReadCountIgnoreFetchScope(cb);
+        }
+        abstract protected int DoDelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
+#end
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read entity. If the select result is zero, it returns null. (Nullable)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadEntity()")]
         ${glEntityInterfaceName} ${glBehaviorReadableInterfaceName}.DelegateReadEntity(${glConditionBeanInterfaceName} cb) {
             return DoDelegateReadEntity(cb);
         }
@@ -170,11 +248,27 @@ namespace ${glPackageBaseCommonBhv} {
          * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
          * @return Read list. If the select result is zero, it returns empty list. (NotNull)
          */
+        [Obsolete("This method is deprecated. Please use CallReadList()")]
         IList ${glBehaviorReadableInterfaceName}.DelegateReadList(${glConditionBeanInterfaceName} cb) {
             return DoDelegateReadList(cb);
         }
         abstract protected IList DoDelegateReadList(${glConditionBeanInterfaceName} cb);
+
+#end
+
         #endregion
+
+	    // =====================================================================================
+	    //                                                                         Basic Get All
+	    //                                                                         =============
+	    /**
+	     * Get count all.
+	     * 
+	     * @return Count all.
+	     */
+	    public int GetCountAll() {
+	        return this.SelfReadable.CallGetCountAll();
+	    }
 
         // =====================================================================================
         //                                                                          Basic Select
@@ -184,10 +278,62 @@ namespace ${glPackageBaseCommonBhv} {
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read count.</returns>
+        public int ReadCount(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.SelfReadable.CallReadCount(cb);
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read entity. (Nullable)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        public ${glEntityInterfaceName} ReadEntity(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            System.Collections.IList ls = this.SelfReadable.CallReadList(cb);
+            if (ls.Count == 0) {
+                return null;
+            }
+            AssertRecordHasBeenSelectedAsOne(ls, cb.ToString());
+            return (${glEntityInterfaceName})ls[0];
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read entity. (NotNull)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        public ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            System.Collections.IList ls = this.SelfReadable.CallReadList(cb);
+            AssertRecordHasNotBeenDeleted(ls, cb.ToString());
+            AssertRecordHasBeenSelectedAsOne(ls, cb.ToString());
+            return (${glEntityInterfaceName})ls[0];
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read list. (NotNull)</returns>
+        public System.Collections.IList ReadSimpleList(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.SelfReadable.CallReadList(cb);
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
         public ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
-            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.DelegateReadList(cb));
+            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.CallReadList(cb));
         }
 
         /// <summary>
@@ -211,18 +357,6 @@ namespace ${glPackageBaseCommonBhv} {
             return invoker.InvokeSelectPage(new SelectPageSimpleCallback(cb, this));
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Entity that is read from database. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
-            AssertConditionBeanNotNull(cb);
-            ${glEntityInterfaceName} currentEntity = this.SelfReadable.DelegateReadEntity(cb);
-            AssertRecordHasNotBeenDeleted(currentEntity, cb.ToString());
-            return currentEntity;
-        }
 
         /**
          * Assert that record has not been deleted.
@@ -307,9 +441,9 @@ namespace ${glPackageBaseCommonBhv} {
         [Obsolete("This method is deprecated.")]
         public ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount) {
             AssertConditionBeanNotNull(cb);
-            int selectedCount = this.SelfReadable.DelegateReadCountIgnoreFetchScope(cb);
+            int selectedCount = this.SelfReadable.ReadCount(cb);
             AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.ToString());
-            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.DelegateReadList(cb));
+            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.callReadList(cb));
         }
     #end
 

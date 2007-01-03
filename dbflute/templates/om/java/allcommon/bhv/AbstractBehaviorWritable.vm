@@ -266,8 +266,46 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 #end
 
     // =====================================================================================
-    //                                                                    Dao Various Method
-    //                                                                    ==================
+    //                                                                   Basic Entity Update
+    //                                                                   ===================
+    /**
+     * Create.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Created count.
+     */
+    public int create(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        return callCreate(entity);
+    }
+
+    /**
+     * Modify.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Modified count.
+     */
+    public int modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        return callModify(entity);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Entity having primary-key value. (NotNull)
+     * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public int modifyAfterSelect(${glEntityInterfaceName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        final ${glConditionBeanInterfaceName} cb = newConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
+        mergeEntity(entity, currentEntity);
+        return callModify(currentEntity);
+    }
+
     /**
      * Create or modify after select.
      * {modify: modified only}
@@ -292,6 +330,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         mergeEntity(entity, currentEntity);
         return callModify(entity);
     }
+#if ($database.isMakeBehaviorForUpdate())
 
     /**
      * ${database.ImplementComment}
@@ -300,15 +339,15 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int modifyAfterSelect(${glEntityInterfaceName} entity) {
+    public int modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${glConditionBeanInterfaceName} cb = newConditionBean();
         cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.lockForUpdate();
         final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         return callModify(currentEntity);
     }
-#if ($database.isMakeBehaviorForUpdate())
 
     /**
      * Create or modify after select-for-update.
@@ -335,23 +374,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         mergeEntity(entity, currentEntity);
         return callModify(currentEntity);
     }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entity Entity having primary-key value. (NotNull)
-     * @return Updated count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public int modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${glConditionBeanInterfaceName} cb = newConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-        cb.lockForUpdate();
-        final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
-        mergeEntity(entity, currentEntity);
-        return callModify(currentEntity);
-    }
 #end
 
     /**
@@ -362,6 +384,57 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param destinationEntity Destination entity. (NotNull)
      */
     abstract protected void mergeEntity(${glEntityInterfaceName} sourceEntity, ${glEntityInterfaceName} destinationEntity);
+
+    /**
+     * Remove.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Removed count.
+     */
+    public int remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        return callRemove(entity);
+    }
+
+    // =====================================================================================
+    //                                                                    Basic Batch Update
+    //                                                                    ==================
+    /**
+     * Create list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Created count.
+     */
+    public int createList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callCreateList(entityList);
+    }
+
+    /**
+     * Modify list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Modified count.
+     */
+    public int modifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callModifyList(entityList);
+    }
+
+    /**
+     * Remove list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Removed count.
+     */
+    public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callRemoveList(entityList);
+    }
+
+    // =====================================================================================
+    //                                                                        Separated File
+    //                                                                        ==============
 
     /**
      * Reflect(insert or update) from separated-file.

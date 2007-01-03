@@ -79,6 +79,13 @@ namespace ${glPackageBaseCommonCBean} {
          */
         int PageEndIndex { get; }
 
+        /**
+         * Is fetch scope effective?
+         * 
+         * @return Determination.
+         */
+        bool IsFetchScopeEffective { get; }
+
         // =====================================================================================
         //                                                                                Clause
         //                                                                                ======

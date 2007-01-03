@@ -75,6 +75,13 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
      */
     public int getPageEndIndex();
 
+    /**
+     * Is fetch scope effective?
+     * 
+     * @return Determiantion.
+     */
+    public boolean isFetchScopeEffective();
+
     // =====================================================================================
     //                                                                        For SqlComment
     //                                                                        ==============

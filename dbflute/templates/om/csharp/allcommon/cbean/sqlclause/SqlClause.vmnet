@@ -261,6 +261,13 @@ namespace ${glPackageBaseCommonSqlClause} {
         ${glSqlClauseInterfaceName} MakeFetchScopeEffective();
 
         /**
+         * Is fetch scope effective?
+         * 
+         * @return Determination.
+         */
+        bool IsFetchScopeEffective { get; }
+
+        /**
          * Is fetch start index supported?
          * 
          * @return Determination.

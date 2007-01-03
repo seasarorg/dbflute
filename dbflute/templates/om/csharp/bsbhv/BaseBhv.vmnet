@@ -71,7 +71,13 @@ namespace ${glPackageExtendedBhv} {
         /// Select all list. (Delegate-Method)
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList DelegateSelectAllList();
+        int DelegateGetCountAll();
+
+        /// <summary>
+        /// Select all list. (Delegate-Method)
+        /// </summary> 
+        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        IList DelegateGetListAll();
 #if ($table.hasPrimaryKey())
 
         //
@@ -88,7 +94,17 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected count. (NotNull)</returns>
+        int DelegateSelectCount(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+#if ($database.isMakeDeprecated())
+
+        /// <summary>
+        /// Select count by condition-bean. (Delegate-Method)
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <returns>Selected count. (NotNull)</returns>
+        [Obsolete("This method is deprecated. Please use DelegateSelectCount()")]
         int DelegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+#end
 
         /// <summary>
         /// Select entity by condition-bean. (Delegate-Method)
@@ -112,7 +128,6 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>Next value. (NotNull)</returns>
         int DelegateSelectNextVal();
     #end
-
     #if ($table.isWritable())
 
         /// <summary>
@@ -144,26 +159,20 @@ namespace ${glPackageExtendedBhv} {
         //                                                                          ============
         #region Basic Select
         /// <summary>
-        /// Select list.
+        /// Select count by condition-bean.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>List-result-bean. (NotNull)</returns>
-        ${glListResultBeanName} SelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Selected count. (NotNull)</returns>
+        int SelectCount(${myConditionBeanClassName} cb);
 
         /// <summary>
-        /// Select page.
+        /// Select simple entity by condition-bean.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>Selected page. (NotNull)</returns>
-        ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
-
-        /// <summary>
-        /// Select page.
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <param name="invoker">Select-page-invoker. (NotNull)</param>
-        /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker);
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb);
 
         /// <summary>
         /// Select entity by condition-bean with deleted check.
@@ -172,6 +181,44 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+    #if ($table.hasPrimaryKey())
+
+        ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
+    #end
+    #if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
+
+        ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheckForUpdate(${table.PrimaryKeyArgsString});
+    #end
+
+        /// <summary>
+        /// Select simple list.
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <returns>Selected list. (NotNull)</returns>
+        System.Collections.IList SelectSimpleList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+
+        /// <summary>
+        /// Select list as result-bean.
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <returns>List-result-bean. (NotNull)</returns>
+        ${glListResultBeanName} SelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+
+        /// <summary>
+        /// Select page as result-bean.
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <returns>Selected page. (NotNull)</returns>
+        ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+
+        /// <summary>
+        /// Select page as result-bean.
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="invoker">Select-page-invoker. (NotNull)</param>
+        /// <returns>Read page. (NotNull)</returns>
+        ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker);
+
         #endregion
 
         // =====================================================================================
@@ -208,8 +255,6 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>Selected page as [fetchPageNumber] page. (NotNull)</returns>
         ${glPagingResultBeanName} SelectPageByPageNumber(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int fetchPageNumber);
     #if ($table.hasPrimaryKey())
-
-        ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
       #if ($database.isMakeDeprecated())
 
         [Obsolete("This method is deprecated. Please use SelectByPKMapStringWithDeletedCheck().")]
@@ -226,10 +271,6 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         [Obsolete("This class is deprecated. Please use SelectByPKMapStringWithDeletedCheck().")]
         ${myExtendedObjectClassName} SelectForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-    #end
-    #if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
-
-        ${myExtendedObjectClassName} SelectForUpdateByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
     #end
 
         #endregion
@@ -276,9 +317,16 @@ namespace ${glPackageExtendedBhv} {
     #if ($table.isWritable())
 
         // =====================================================================================
-        //                                                                          Basic Update
-        //                                                                          ============
-        #region Basic Update
+        //                                                                   Basic Entity Update
+        //                                                                   ===================
+        #region Basic Entity Update
+
+        /// <summary>
+        /// Insert.
+        /// </summary>
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Inserted count.</returns>
+        int Insert(${myExtendedObjectClassName} entity);
 
         /// <summary>
         /// Insert or update after select.
@@ -287,6 +335,13 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         int InsertOrUpdateAfterSelect(${myExtendedObjectClassName} entity);
+
+        /// <summary>
+        /// Update.
+        /// </summary>
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        int Update(${myExtendedObjectClassName} entity);
 
         /// <summary>
         /// Update after select.
@@ -313,6 +368,13 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         int UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity);
       #end
+
+        /// <summary>
+        /// Delete.
+        /// </summary>
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <returns>Deleted count.</returns>
+        int Delete(${myExtendedObjectClassName} entity);
 
         #endregion
 

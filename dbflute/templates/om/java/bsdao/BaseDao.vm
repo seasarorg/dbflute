@@ -79,9 +79,11 @@ public interface ${myClassName} extends ${InterfaceName} {
 
     /**
      * Select count by condition-bean.
-     * If the condition-bean is invoked fetchFirst() and fetchScope() and fetchPage(), throw exception.
-     * 
      * <pre>
+     * Ignore fetchFirst() and fetchScope() and fetchPage().
+     * But the fetch status of the condition-bean remains as it is.
+     * This select method generates SQL based on condition-bean.
+     * 
      * Example)
      *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
      *   ${glAttachedCBArgsVariableName}.query().setXxx_GreaterEqual(new BigDecimal(14));
@@ -95,9 +97,10 @@ public interface ${myClassName} extends ${InterfaceName} {
 
     /**
      * Select count by condition-bean.
+     * <pre>
      * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
      * This select method generates SQL based on condition-bean.
-     * <pre>
+     * 
      * Example)
      *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
      *   ${glAttachedCBArgsVariableName}.query().setXxx_GreaterEqual(new BigDecimal(14));
@@ -106,13 +109,15 @@ public interface ${myClassName} extends ${InterfaceName} {
      * 
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
+     * @deprecated Please use selectCount().
      */
     public int selectCountIgnoreFetchScope(${myAttachedCBArgsString});
 
     /**
      * Select entity '${myExtendedObjectClassName}' by condition-bean.
-     * This select method generates SQL based on condition-bean.
      * <pre>
+     * This select method generates SQL based on condition-bean.
+     * 
      * Example)
      *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
      *   ${glAttachedCBArgsVariableName}.query().setXxxCode_Equal("abc");// It is assumed that this is the primary key...
@@ -127,8 +132,9 @@ public interface ${myClassName} extends ${InterfaceName} {
 
     /**
      * Select list by condition-bean.
-     * This select method generates SQL based on condition-bean.
      * <pre>
+     * This select method generates SQL based on condition-bean.
+     * 
      * Example)
      *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
      *   ${glAttachedCBArgsVariableName}.setupSelect_Xxx(); // Including the foreign table in select clause

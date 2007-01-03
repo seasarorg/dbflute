@@ -205,6 +205,15 @@ namespace ${glPackageBaseCommonCBean} {
             get { return this.SqlClause.PageEndIndex; }
         }
 
+        /**
+         * Is fetch scope effective?
+         * 
+         * @return Determination.
+         */
+        public bool IsFetchScopeEffective {
+            get { return this.SqlClause.IsFetchScopeEffective; }
+        }
+
         // =====================================================================================
         //                                                                          Limit Select
         //                                                                          ============

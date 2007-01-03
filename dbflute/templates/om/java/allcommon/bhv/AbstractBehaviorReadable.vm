@@ -61,7 +61,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @return All count.
      */
-    public int callReadCountAll() {
+    public int callGetCountAll() {
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getCountAll", new Class[]{});
         final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
         return ((Integer)result).intValue();
@@ -72,7 +72,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @return All list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callReadListAll() {
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callGetListAll() {
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getListAll", new Class[]{});
         final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
         return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
@@ -81,56 +81,59 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      */
-    public int callReadCount(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+    public int callReadCount(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCount", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return ((Integer)result).intValue();
     }
+#if ($database.isMakeDeprecated())
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
+     * @deprecated This method is deprecated. Please don't use!
      */
-    public int callReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+    public int callReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCountIgnoreFetchScope", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return ((Integer)result).intValue();
     }
+#end
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read entity. If the select result is zero, it returns null. (Nullable)
      */
-    public ${glEntityInterfaceName} callReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+    public ${glEntityInterfaceName} callReadEntity(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectEntity", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return (${glEntityInterfaceName})result;
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callReadList(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectList", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
     }
 #if ($database.isMakeDeprecated())
@@ -139,7 +142,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * ${database.ImplementComment}
      * 
      * @return All count.
-     * @deprecated Please use callReadCountAll().
+     * @deprecated Please use callGetCountAll().
      */
     public int delegateReadCountAll() {
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getCountAll", new Class[]{});
@@ -162,60 +165,60 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      * @deprecated Please use callReadCount().
      */
-    public int delegateReadCount(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+    public int delegateReadCount(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCount", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return ((Integer)result).intValue();
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      * @deprecated Please use callReadCountIgnoreFetchScope().
      */
-    public int delegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+    public int delegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCountIgnoreFetchScope", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return ((Integer)result).intValue();
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read entity. If the select result is zero, it returns null. (Nullable)
      * @deprecated Please use callReadEntity().
      */
-    public ${glEntityInterfaceName} delegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+    public ${glEntityInterfaceName} delegateReadEntity(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectEntity", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return (${glEntityInterfaceName})result;
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      * @deprecated Please use callReadList().
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final Class[] types = new Class[]{${glAttachedCBArgsVariableName}.getClass()};
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadList(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectList", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{${glAttachedCBArgsVariableName}});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
     }
 #end
@@ -249,63 +252,122 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     // =====================================================================================
-    //                                                                          Basic Select
-    //                                                                          ============
+    //                                                                         Basic Get All
+    //                                                                         =============
+    /**
+     * Get count all.
+     * 
+     * @return Count all.
+     */
+    public int getCountAll() {
+        return callGetCountAll();
+    }
+
+    // =====================================================================================
+    //                                                                      Basic Read Count
+    //                                                                      ================
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean.
+     * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
+     * @return Read count. (NotNull)
+     */
+    public int readCount(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        return callReadCount(cb);
+    }
+
+    // =====================================================================================
+    //                                                                     Basic Read Entity
+    //                                                                     =================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @return Read entity. (Nullalble)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public ${glEntityInterfaceName} readEntity(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = callReadList(cb);
+        if (ls.isEmpty()) {
+            return null;
+        }
+        assertRecordHasBeenSelectedAsOne(ls, cb.toString());
+        return (${glEntityInterfaceName})ls.get(0);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @return Read entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = callReadList(cb);
+        assertRecordHasNotBeenDeleted(ls, cb.toString());
+        assertRecordHasBeenSelectedAsOne(ls, cb.toString());
+        return (${glEntityInterfaceName})ls.get(0);
+    }
+
+    // =====================================================================================
+    //                                                                       Basic Read List
+    //                                                                       ===============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @return Read list. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} readSimpleList(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        return callReadList(cb);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param cb Condition-bean.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, callReadList(${glAttachedCBArgsVariableName}));
+    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readList(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(cb, callReadList(cb));
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        return readPage(${glAttachedCBArgsVariableName}, new SelectPageSimpleInvoker${database.filterGenericsString(${glEntityInterfaceName})}(this));
+    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        return readPage(cb, new SelectPageSimpleInvoker${database.filterGenericsString(${glEntityInterfaceName})}(this));
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @param invoker Select-page-invoker (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
+    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} cb, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker) {
+        assertConditionBeanNotNull(cb);
         final SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})}() {
-            public ${glPagingBeanInterfaceName} getPagingBean() { return ${glAttachedCBArgsVariableName}; }
+            public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
             public int selectCountIgnoreFetchScope() {
-                return callReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
+                return readCount(cb);
             }
             public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} selectList() {
-                return callReadList(${glAttachedCBArgsVariableName});
+                return readSimpleList(cb);
             }
         };
         return invoker.invokeSelectPage(pageCallback);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Entity that is read from database. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     */
-    public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        ${glEntityInterfaceName} currentEntity = callReadEntity(${glAttachedCBArgsVariableName});
-        assertRecordHasNotBeenDeleted(currentEntity, ${glAttachedCBArgsVariableName}.toString());
-        return currentEntity;
     }
 
     /**
@@ -378,17 +440,17 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * ${database.ImplementComment}
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean.
+     * @param cb Condition-bean.
      * @param maxCount Max count.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
      * @deprecated Please don't use this.
      */
-    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount) {
-        assertConditionBeanNotNull(${glAttachedCBArgsVariableName});
-        final int selectedCount = callReadCountIgnoreFetchScope(${glAttachedCBArgsVariableName});
-        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, ${glAttachedCBArgsVariableName}.toString());
-        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(${glAttachedCBArgsVariableName}, callReadList(${glAttachedCBArgsVariableName}));
+    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount) {
+        assertConditionBeanNotNull(cb);
+        final int selectedCount = readCount(cb);
+        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.toString());
+        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(cb, callReadList(cb));
     }
 #end
 
@@ -428,10 +490,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * Assert that the condition-bean is not null.
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      */
-    protected void assertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
-        assertObjectNotNull("${glAttachedCBArgsVariableName}", ${glAttachedCBArgsVariableName});
+    protected void assertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
+        assertObjectNotNull("cb", cb);
     }
 
     /**

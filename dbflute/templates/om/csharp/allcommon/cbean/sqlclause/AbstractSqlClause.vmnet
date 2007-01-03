@@ -690,6 +690,17 @@ namespace ${glPackageBaseCommonSqlClause} {
         /**
          * ${database.ImplementComment}
          * 
+         * @return Determiantion.
+         */
+        public bool IsFetchScopeEffective {
+            get {
+                return _isFetchScopeEffective;
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
          * @return Determination.
          */
         public virtual bool IsFetchStartIndexSupported {

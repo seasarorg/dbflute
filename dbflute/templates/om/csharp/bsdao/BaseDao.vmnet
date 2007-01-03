@@ -78,6 +78,22 @@ namespace ${myExtendedDaoPackageName} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected count. (NotNull)</returns>
+        int SelectCount(${myAttachedCBArgsString});
+
+        /// <summary>
+        /// Select count by condition-bean.
+        /// Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
+        /// This select method generates SQL based on condition-bean.
+        /// <para>
+        /// Example)
+        ///   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
+        ///   ${glAttachedCBArgsVariableName}.query().setXxx_GreaterEqual(new BigDecimal(14));
+        ///   final int count = dao.${database.ConditionBeanSelectCountMethodName}(${glAttachedCBArgsVariableName});
+        /// </para>
+        /// </summary>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <returns>Selected count. (NotNull)</returns>
+        [Obsolete("This method is deprecated. Please use SelectCount()")]
         int SelectCountIgnoreFetchScope(${myAttachedCBArgsString});
 
         /// <summary>

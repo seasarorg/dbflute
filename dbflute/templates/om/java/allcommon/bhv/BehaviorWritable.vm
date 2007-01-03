@@ -123,13 +123,24 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
     public int delegateRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 #end
 
+    // =====================================================================================
+    //                                                                   Basic Entity Update
+    //                                                                   ===================
     /**
-     * Create or modify after select.
+     * Create.
      * 
-     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @return Updated count.
+     * @param entity Entity. (NotNull)
+     * @return Created count.
      */
-    public int createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public int create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Modify.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Modified count.
+     */
+    public int modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
      * Modify after select.
@@ -139,15 +150,15 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public int modifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-#if ($database.isMakeBehaviorForUpdate())
 
     /**
-     * Create or modify after select-for-update.
+     * Create or modify after select.
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @return Updated count.
      */
-    public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public int createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+#if ($database.isMakeBehaviorForUpdate())
 
     /**
      * Modify after select-for-update.
@@ -157,8 +168,54 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public int modifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Create or modify after select-for-update.
+     * 
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @return Updated count.
+     */
+    public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 #end
 
+    /**
+     * Remove.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Removed count.
+     */
+    public int remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    // =====================================================================================
+    //                                                                    Basic Batch Update
+    //                                                                    ==================
+    /**
+     * Create list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Created count.
+     */
+    public int createList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Modify list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Modified count.
+     */
+    public int modifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Remove list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Removed count.
+     */
+    public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    // =====================================================================================
+    //                                                                        Separated File
+    //                                                                        ==============
     /**
      * Reflect(insert or update) from separated-file.
      * 

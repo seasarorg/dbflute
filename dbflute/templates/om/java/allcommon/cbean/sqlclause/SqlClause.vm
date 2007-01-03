@@ -92,14 +92,14 @@ public interface ${myClassName} {
     //                                                                  IncludedSelectColumn
     //                                                                  ====================
     /**
-     * Make included-select-column effective.
-     */
-    public void makeIncludedSelectColumnEffective();
-
-    /**
      * Ignore included-select-column.
      */
     public void ignoreIncludedSelectColumn();
+
+    /**
+     * Make included-select-column effective.
+     */
+    public void makeIncludedSelectColumnEffective();
 
     /**
      * Register included-select-column.
