@@ -303,7 +303,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
         final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
-        return callModify(currentEntity);
+        return modify(currentEntity);
     }
 
     /**
@@ -316,7 +316,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     public int createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            return callCreate(entity);
+            return create(entity);
         }
         ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
         try {
@@ -324,11 +324,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
             currentEntity = readEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return callCreate(entity);
+            return create(entity);
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return callModify(entity);
+        return modify(entity);
     }
 #if ($database.isMakeBehaviorForUpdate())
 
@@ -346,7 +346,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         cb.lockForUpdate();
         final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
-        return callModify(currentEntity);
+        return modify(currentEntity);
     }
 
     /**
@@ -359,7 +359,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            return callCreate(entity);
+            return create(entity);
         }
         ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
         try {
@@ -368,11 +368,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             cb.lockForUpdate();
             currentEntity = readEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return callCreate(entity);
+            return create(entity);
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return callModify(currentEntity);
+        return modify(currentEntity);
     }
 #end
 

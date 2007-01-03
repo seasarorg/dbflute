@@ -379,7 +379,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = delegateSelectList(cb);
+        final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = selectList(cb);
         assertRecordHasNotBeenDeleted(ls, cb.toString());
         assertRecordHasBeenSelectedAsOne(ls, cb.toString());
         return (${myExtendedObjectClassName})ls.get(0);
@@ -426,17 +426,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                     Basic Select List
     //                                                                     =================
     /**
-     * Select simple list.
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected list. (NotNull)
-     */
-    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectSimpleList(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        return delegateSelectList(cb);
-    }
-
-    /**
      * Select list as result-bean.
      * 
      * @param cb Condition-bean. (NotNull)
@@ -472,8 +461,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             public int selectCountIgnoreFetchScope() {
                 return selectCount(cb);
             }
-            public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectList() {
-                return selectSimpleList(cb);
+            public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectListWithFetchScope() {
+                return selectList(cb);
             }
         };
         return invoker.invokeSelectPage(pageCallback);
@@ -494,7 +483,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${glListResultBeanName} selectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} cb, int maxCount) {
         assertConditionBeanNotNull(cb);
-        final int selectedCount = delegateSelectCountIgnoreFetchScope(cb);
+        final int selectedCount = selectCount(cb);
         assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.toString());
         return selectList(cb);
     }
@@ -560,7 +549,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
      *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
      *     cb.query().setXxx_Equal("xxx");
-     *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
+     *     final List<${myExtendedObjectClassName}> ls = bhv.selectList(cb);
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls);
      * 
      * </pre>
@@ -585,7 +574,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
      *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
      *     cb.query().setXxx_Equal("xxx");
-     *     final List<${myExtendedObjectClassName}> ls = bhv.delegateSelectList(cb);
+     *     final List<${myExtendedObjectClassName}> ls = bhv.selectList(cb);
      *     final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
      *         public void setup(${reffererCBClassName} cb) {
      *             cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
@@ -617,7 +606,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
         cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
         cbSetupper.setup(cb);
-        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.delegateSelectList(cb);
+        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.selectList(cb);
 
         final java.util.Map${database.filterGenericsString(${genericPKChildListMap})} pkReffererListMap;
         pkReffererListMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKChildListMap})}();
@@ -703,7 +692,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public int insertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            return delegateInsert(entity);
+            return insert(entity);
         }
         ${myExtendedObjectClassName} currentEntity = null;
         try {
@@ -711,11 +700,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
             currentEntity = selectEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return delegateInsert(entity);
+            return insert(entity);
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return delegateUpdate(currentEntity);
+        return update(currentEntity);
     }
   #if ($database.isMakeBehaviorForUpdate())
 
@@ -733,7 +722,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         cb.lockForUpdate();
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
-        return delegateUpdate(currentEntity);
+        return update(currentEntity);
     }
 
     /**
@@ -746,7 +735,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public int insertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            return delegateInsert(entity);
+            return insert(entity);
         }
         ${myExtendedObjectClassName} currentEntity = null;
         try {
@@ -755,11 +744,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             cb.lockForUpdate();
             currentEntity = selectEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return delegateInsert(entity);
+            return insert(entity);
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return delegateUpdate(entity);
+        return update(entity);
     }
   #end
 

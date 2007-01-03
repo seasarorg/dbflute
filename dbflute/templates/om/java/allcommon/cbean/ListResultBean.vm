@@ -8,10 +8,10 @@ import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 /**
  * The list-result-bean of ${myClassName}.
  * 
- * @param <T> The generic template for 'selectedList'.
+ * @param ${database.filterGenericsString('T')} The generic template for 'selectedList'.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName}${database.filterGenericsString('T')} implements java.io.Serializable {
+public class ${myClassName}${database.filterGenericsString('T')} implements java.util.List${database.filterGenericsString('T')}, java.io.Serializable {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -26,13 +26,10 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     protected int _allRecordCount;
 
     /** Selected list. */
-    protected java.util.List${database.filterGenericsString('T')} _selectedList;
+    protected java.util.List${database.filterGenericsString('T')} _selectedList = new java.util.ArrayList${database.filterGenericsString('T')}();
 
     /** Order-by clause. */
-    protected ${glOrderByClauseName} _orderByClause;
-
-    /** Has the setter of selected list invoked? */
-    protected boolean _isSetterInvokedSelectedList;
+    protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
 
     // =====================================================================================
     //                                                                           Constructor
@@ -85,7 +82,7 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     /**
      * Get the value of selectedList.
      * 
-     * @return Selected list.
+     * @return Selected list. (NotNull)
      */
     public java.util.List${database.filterGenericsString('T')} getSelectedList() {
         return _selectedList;
@@ -94,16 +91,16 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     /**
      * Set the value of selectedList.
      * 
-     * @param value Selected list.
+     * @param value Selected list. (NotNull)
      */
     public void setSelectedList(java.util.List${database.filterGenericsString('T')} value) {
-        _isSetterInvokedSelectedList = true; _selectedList = value;
+        _selectedList = value;
     }
 
     /**
      * Get the value of orderByClause.
      * 
-     * @return The value of orderByClause.
+     * @return The value of orderByClause. (NotNull)
      */
     public ${glOrderByClauseName} getOrderByClause() {
         return _orderByClause;
@@ -112,7 +109,7 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     /**
      * Set the value of orderByClause.
      * 
-     * @param value The value of orderByClause.
+     * @param value The value of orderByClause. (NotNull)
      */
     public void setOrderByClause(${glOrderByClauseName} value) {
         _orderByClause = value;
@@ -123,11 +120,14 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     //                                                                         =============
     /**
      * Has this result selected?
+     * <pre>
+     * If isSetterInvokedSelectedList is true, returns true.
+     * </pre>
      * 
      * @return Determination.
      */
     public boolean isSelectedResult() {
-        return _isSetterInvokedSelectedList;
+        return _tableDbName != null;
     }
 
     // =====================================================================================
@@ -148,4 +148,198 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
 
         return sb.toString();
     }
+#if ($database.isAvailableGenerics())
+
+    // =====================================================================================
+    //                                                                         List Elements
+    //                                                                         =============
+    public boolean add(T o) {
+        return _selectedList.add(o);
+    }
+
+    public boolean addAll(java.util.Collection${database.filterGenericsString('? extends T')} c) {
+        return _selectedList.addAll(c);
+    }
+
+    public void clear() {
+        _selectedList.clear();
+    }
+
+    public boolean contains(Object o) {
+        return _selectedList.contains(o);
+    }
+
+    public boolean containsAll(java.util.Collection<?> c) {
+        return _selectedList.containsAll(c);
+    }
+
+    public boolean isEmpty() {
+        return _selectedList.isEmpty();
+    }
+
+    public java.util.Iterator${database.filterGenericsString('T')} iterator() {
+        return _selectedList.iterator();
+    }
+
+    public boolean remove(Object o) {
+        return _selectedList.remove(o);
+    }
+
+    public boolean removeAll(java.util.Collection${database.filterGenericsString('?')} c) {
+        return _selectedList.removeAll(c);
+    }
+
+    public boolean retainAll(java.util.Collection${database.filterGenericsString('?')} c) {
+        return _selectedList.retainAll(c);
+    }
+
+    public int size() {
+        return _selectedList.size();
+    }
+
+    public Object[] toArray() {
+        return _selectedList.toArray();
+    }
+
+    public ${database.filterGenericsString('T')} T[] toArray(T[] a) {
+        return _selectedList.toArray(a);
+    }
+
+    public void add(int index, T element) {
+        _selectedList.add(index, element);
+    }
+
+    public boolean addAll(int index, java.util.Collection${database.filterGenericsString('? extends T')} c) {
+        return _selectedList.addAll(index, c);
+    }
+
+    public T get(int index) {
+        return _selectedList.get(index);
+    }
+
+    public int indexOf(Object o) {
+        return _selectedList.indexOf(o);
+    }
+
+    public int lastIndexOf(Object o) {
+        return _selectedList.lastIndexOf(o);
+    }
+
+    public java.util.ListIterator${database.filterGenericsString('T')} listIterator() {
+        return _selectedList.listIterator();
+    }
+
+    public java.util.ListIterator${database.filterGenericsString('T')} listIterator(int index) {
+        return _selectedList.listIterator(index);
+    }
+
+    public T remove(int index) {
+        return _selectedList.remove(index);
+    }
+
+    public T set(int index, T element) {
+        return _selectedList.set(index, element);
+    }
+
+    public java.util.List${database.filterGenericsString('T')} subList(int fromIndex, int toIndex) {
+        return _selectedList.subList(fromIndex, toIndex);
+    }
+#else
+
+    // =====================================================================================
+    //                                                                         List Elements
+    //                                                                         =============
+    public boolean add(Object arg0) {
+        return _selectedList.add(arg0);
+    }
+
+    public void add(int arg0, Object arg1) {
+        _selectedList.add(arg0, arg1);
+    }
+
+    public boolean addAll(java.util.Collection arg0) {
+        return _selectedList.addAll(arg0);
+    }
+
+    public boolean addAll(int arg0, java.util.Collection arg1) {
+        return _selectedList.addAll(arg0, arg1);
+    }
+
+    public void clear() {
+        _selectedList.clear();
+    }
+
+    public boolean contains(Object o) {
+        return _selectedList.contains(o);
+    }
+
+    public boolean containsAll(java.util.Collection arg0) {
+        return _selectedList.containsAll(arg0);
+    }
+
+    public Object get(int index) {
+        return _selectedList.get(index);
+    }
+
+    public int indexOf(Object o) {
+        return _selectedList.indexOf(o);
+    }
+
+    public boolean isEmpty() {
+        return _selectedList.isEmpty();
+    }
+
+    public java.util.Iterator iterator() {
+        return _selectedList.iterator();
+    }
+
+    public int lastIndexOf(Object o) {
+        return _selectedList.lastIndexOf(o);
+    }
+
+    public java.util.ListIterator listIterator() {
+        return _selectedList.listIterator();
+    }
+
+    public java.util.ListIterator listIterator(int index) {
+        return _selectedList.listIterator();
+    }
+
+    public boolean remove(Object o) {
+        return _selectedList.remove(o);
+    }
+
+    public Object remove(int index) {
+        return _selectedList.remove(index);
+    }
+
+    public boolean removeAll(java.util.Collection arg0) {
+        return _selectedList.removeAll(arg0);
+    }
+
+    public boolean retainAll(java.util.Collection arg0) {
+        return _selectedList.retainAll(arg0);
+    }
+
+    public Object set(int arg0, Object arg1) {
+        return _selectedList.set(arg0, arg1);
+    }
+
+    public int size() {
+        return _selectedList.size();
+    }
+
+    public java.util.List subList(int fromIndex, int toIndex) {
+        return _selectedList.subList(fromIndex, toIndex);
+    }
+
+    public Object[] toArray() {
+        return _selectedList.toArray();
+    }
+
+    public Object[] toArray(Object[] arg0) {
+        return _selectedList.toArray(arg0);
+    }
+#end
+
 }

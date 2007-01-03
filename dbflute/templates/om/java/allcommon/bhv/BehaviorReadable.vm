@@ -281,15 +281,6 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Read page. (NotNull)
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker);
-
-    /**
-     * Read simple list.
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Read list. (NotNull)
-     */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} readSimpleList(${glConditionBeanInterfaceName} cb);
-
 #if ($database.isMakeDeprecated())
 
     // =====================================================================================
@@ -314,7 +305,7 @@ public interface ${glBehaviorReadableInterfaceName} {
     public static interface SelectPageCallback${database.filterGenericsString('T')} {
         public ${glPagingBeanInterfaceName} getPagingBean();
         public int selectCountIgnoreFetchScope();
-        public java.util.List${database.filterGenericsString('T')} selectList();
+        public java.util.List${database.filterGenericsString('T')} selectListWithFetchScope();
     }
 
     /**
@@ -398,12 +389,12 @@ public interface ${glBehaviorReadableInterfaceName} {
                 throw new IllegalStateException(msg);
             }
             final int allRecordCount = callback.selectCountIgnoreFetchScope();
-            final java.util.List${database.filterGenericsString('T')} selectedList = callback.selectList();
+            final java.util.List${database.filterGenericsString('T')} selectedList = callback.selectListWithFetchScope();
             final ${glPagingResultBeanName}${database.filterGenericsString('T')} rb = new ResultBeanBuilder${database.filterGenericsString('T')}(_bhv).buildPagingResultBean(callback.getPagingBean(), allRecordCount, selectedList);
             if (isNecessaryToReadPageAgain(rb)) {
                 callback.getPagingBean().fetchPage(rb.getAllPageCount());
                 final int reAllRecordCount = callback.selectCountIgnoreFetchScope();
-                final java.util.List${database.filterGenericsString('T')} reSelectedList = callback.selectList();
+                final java.util.List${database.filterGenericsString('T')} reSelectedList = callback.selectListWithFetchScope();
                 return new ResultBeanBuilder${database.filterGenericsString('T')}(_bhv).buildPagingResultBean(callback.getPagingBean(), reAllRecordCount, reSelectedList);
             } else {
                 return rb;

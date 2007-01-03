@@ -289,7 +289,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glEntityInterfaceName} readEntity(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
-        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = callReadList(cb);
+        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = readList(cb);
         if (ls.isEmpty()) {
             return null;
         }
@@ -307,7 +307,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
-        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = callReadList(cb);
+        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = readList(cb);
         assertRecordHasNotBeenDeleted(ls, cb.toString());
         assertRecordHasBeenSelectedAsOne(ls, cb.toString());
         return (${glEntityInterfaceName})ls.get(0);
@@ -316,17 +316,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // =====================================================================================
     //                                                                       Basic Read List
     //                                                                       ===============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Read list. (NotNull)
-     */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} readSimpleList(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        return callReadList(cb);
-    }
-
     /**
      * ${database.ImplementComment}
      * 
@@ -363,8 +352,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             public int selectCountIgnoreFetchScope() {
                 return readCount(cb);
             }
-            public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} selectList() {
-                return readSimpleList(cb);
+            public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} selectListWithFetchScope() {
+                return readList(cb);
             }
         };
         return invoker.invokeSelectPage(pageCallback);
