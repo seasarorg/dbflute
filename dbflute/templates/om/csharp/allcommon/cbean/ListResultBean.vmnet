@@ -117,5 +117,107 @@ namespace ${glPackageBaseCommonCBean} {
 
             return sb.ToString();
         }
+
+        // =====================================================================================
+        //                                                                         List Elements
+        //                                                                         =============
+        public virtual int Add(Object value)
+        {
+            return _selectedList.Add(value);
+        }
+
+        public virtual bool Contains(Object value)
+        {
+            return _selectedList.Contains(value);
+        }
+
+        public virtual void Clear()
+        {
+            _selectedList.Clear();
+        }
+
+        public virtual int IndexOf(Object value)
+        {
+            return _selectedList.IndexOf(value);
+        }
+
+        public virtual void Insert(int index, Object value)
+        {
+            _selectedList.Insert(index, value);
+        }
+
+
+        public virtual void Remove(Object value)
+        {
+            _selectedList.Remove(value);
+        }
+
+
+        public virtual void RemoveAt(int index)
+        {
+            _selectedList.RemoveAt(index);
+        }
+
+
+        public virtual bool IsReadOnly
+        {
+            get
+            {
+                return _selectedList.IsReadOnly;
+            }
+        }
+        public virtual bool IsFixedSize
+        {
+            get
+            {
+                return _selectedList.IsFixedSize;
+            }
+        }
+
+        public virtual void CopyTo(System.Array array, int index)
+        {
+            _selectedList.CopyTo(array, index);
+        }
+
+        public virtual int Count
+        {
+            get
+            {
+                return _selectedList.Count;
+            }
+        }
+
+        public virtual Object SyncRoot
+        {
+            get
+            {
+                return _selectedList.SyncRoot;
+            }
+        }
+
+        public virtual bool IsSynchronized
+        {
+            get
+            {
+                return _selectedList.IsSynchronized;
+            }
+        }
+
+        public virtual System.Collections.IEnumerator GetEnumerator()
+        {
+            return _selectedList.GetEnumerator();
+        }
+
+        public virtual Object this[int index]
+        {
+            get
+            {
+                return _selectedList[index];
+            }
+            set
+            {
+                _selectedList[index] = value;
+            }
+        }
     }
 }

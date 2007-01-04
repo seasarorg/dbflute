@@ -325,56 +325,49 @@ namespace ${glPackageExtendedBhv} {
         /// Insert.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Inserted count.</returns>
-        int Insert(${myExtendedObjectClassName} entity);
-
-        /// <summary>
-        /// Insert or update after select.
-        /// </summary>
-        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        int InsertOrUpdateAfterSelect(${myExtendedObjectClassName} entity);
+        void Insert(${myExtendedObjectClassName} entity);
 
         /// <summary>
         /// Update.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        int Update(${myExtendedObjectClassName} entity);
+        void Update(${myExtendedObjectClassName} entity);
 
         /// <summary>
         /// Update after select.
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        int UpdateAfterSelect(${myExtendedObjectClassName} entity);
-      #if ($database.isMakeBehaviorForUpdate())
+        void UpdateAfterSelect(${myExtendedObjectClassName} entity);
 
         /// <summary>
-        /// Insert or update after select-for-update.
+        /// Insert or update after select.
         /// </summary>
         /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        int InsertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity);
+        void InsertOrUpdateAfterSelect(${myExtendedObjectClassName} entity);
+      #if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
         /// Update after select-for-update.
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        int UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity);
+        void UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity);
+
+        /// <summary>
+        /// Insert or update after select-for-update.
+        /// </summary>
+        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        void InsertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity);
       #end
 
         /// <summary>
         /// Delete.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Deleted count.</returns>
-        int Delete(${myExtendedObjectClassName} entity);
+        void Delete(${myExtendedObjectClassName} entity);
 
         #endregion
 

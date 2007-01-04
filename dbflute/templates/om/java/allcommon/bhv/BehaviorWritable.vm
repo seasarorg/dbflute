@@ -130,61 +130,54 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * Create.
      * 
      * @param entity Entity. (NotNull)
-     * @return Created count.
      */
-    public int create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
      * Modify.
      * 
      * @param entity Entity. (NotNull)
-     * @return Modified count.
      */
-    public int modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
      * Modify after select.
      * 
      * @param entity Entity.
-     * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int modifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void modifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
      * Create or modify after select.
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @return Updated count.
      */
-    public int createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 #if ($database.isMakeBehaviorForUpdate())
 
     /**
      * Modify after select-for-update.
      * 
      * @param entity Entity.
-     * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int modifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void modifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
      * Create or modify after select-for-update.
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @return Updated count.
      */
-    public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 #end
 
     /**
      * Remove.
      * 
      * @param entity Entity. (NotNull)
-     * @return Removed count.
      */
-    public int remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+    public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     // =====================================================================================
     //                                                                    Basic Batch Update

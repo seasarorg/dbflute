@@ -82,15 +82,13 @@ namespace ${glPackageBaseCommonBhv} {
         /// Create.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Created count.</returns>
-        int Create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        void Create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
         /// Modify.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Modified count.</returns>
-        int Modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        void Modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /**
         /// Modify after select.
@@ -99,39 +97,35 @@ namespace ${glPackageBaseCommonBhv} {
          * @return Updated count.
          * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
          */
-        int ModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        void ModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
         /// Create or modify after select.
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        int CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        void CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 #if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
         /// Modify after select-for-update.
         /// </summary>
         /// <param name="entity">Entity.</param>
-        /// <returns>Updated count.</returns>
         /// <exception cref="MspadminBiz.Dao.Allcommon.exception.RecordHasAlreadyBeenDeletedException"></exception>
-        int ModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        void ModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
         /// Create or modify after select-for-update.
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        int CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        void CreateOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 #end
 
         /// <summary>
         /// Remove.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Removed count.</returns>
-        int Remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        void Remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
         /// Reflect(insert or update) from separated-file.

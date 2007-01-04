@@ -272,38 +272,38 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Create.
      * 
      * @param entity Entity. (NotNull)
-     * @return Created count.
      */
-    public int create(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public void create(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
-        return callCreate(entity);
+        callCreate(entity);
     }
 
     /**
      * Modify.
      * 
      * @param entity Entity. (NotNull)
-     * @return Modified count.
      */
-    public int modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public void modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
-        return callModify(entity);
+        final int modifiedCount = callModify(entity);
+        if (modifiedCount != 1) {
+            throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, modifiedCount);
+        }
     }
 
     /**
      * ${database.ImplementComment}
      * 
      * @param entity Entity having primary-key value. (NotNull)
-     * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int modifyAfterSelect(${glEntityInterfaceName} entity) {
+    public void modifyAfterSelect(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${glConditionBeanInterfaceName} cb = newConditionBean();
         cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
         final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
-        return modify(currentEntity);
+        modify(currentEntity);
     }
 
     /**
@@ -311,12 +311,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * {modify: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @return Updated count.
      */
-    public int createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public void createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            return create(entity);
+            create(entity);
+            return;
         }
         ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
         try {
@@ -324,11 +324,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
             currentEntity = readEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return create(entity);
+            create(entity);
+            return;
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return modify(entity);
+        modify(entity);
     }
 #if ($database.isMakeBehaviorForUpdate())
 
@@ -336,17 +337,16 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * ${database.ImplementComment}
      * 
      * @param entity Entity having primary-key value. (NotNull)
-     * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
+    public void modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${glConditionBeanInterfaceName} cb = newConditionBean();
         cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
         cb.lockForUpdate();
         final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
-        return modify(currentEntity);
+        modify(currentEntity);
     }
 
     /**
@@ -354,12 +354,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * {modify: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @return Updated count.
      */
-    public int createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public void createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            return create(entity);
+            create(entity);
+            return;
         }
         ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
         try {
@@ -368,11 +368,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             cb.lockForUpdate();
             currentEntity = readEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return create(entity);
+            create(entity);
+            return;
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return modify(currentEntity);
+        modify(currentEntity);
     }
 #end
 
@@ -391,9 +392,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity. (NotNull)
      * @return Removed count.
      */
-    public int remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+    public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
-        return callRemove(entity);
+        callRemove(entity);
     }
 
     // =====================================================================================

@@ -750,92 +750,67 @@ namespace ${glPackageExtendedBhv} {
         /// Insert.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Inserted count.</returns>
-        public int Insert(${myExtendedObjectClassName} entity) {
+        public void Insert(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
-            return this.Self.DelegateInsert(entity);
-        }
-
-        /// <summary>
-        /// Insert or update after select.
-        /// </summary>
-        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int InsertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
-            AssertEntityNotNull(entity);
-            if (!entity.HasPrimaryKeyValue) {
-                return this.Self.DelegateInsert(entity);
-            }
-            ${myExtendedObjectClassName} currentEntity = null;
-            try {
-                ${myConditionBeanClassName} cb = NewMyConditionBean();
-                cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-                currentEntity = SelectEntityWithDeletedCheck(cb);
-            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-                return this.Self.DelegateInsert(entity);
-            }
-            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            MergeEntity(entity, currentEntity);
-            return this.Self.DelegateUpdate(currentEntity);
+            this.Self.DelegateInsert(entity);
         }
 
         /// <summary>
         /// Update.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        public int Update(${myExtendedObjectClassName} entity) {
+        public void Update(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
-            return this.Self.DelegateUpdate(entity);
+            int updatedCount = this.Self.DelegateUpdate(entity);
+            if (updatedCount != 1) {
+                throw new Seasar.Dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
+            }
         }
 
         /// <summary>
         /// Update after select.
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int UpdateAfterSelect(${myExtendedObjectClassName} entity) {
+        public void UpdateAfterSelect(${myExtendedObjectClassName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             ${myConditionBeanClassName} cb = NewMyConditionBean();
             cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
             ${myExtendedObjectClassName} currentEntity = SelectEntityWithDeletedCheck(cb);
             MergeEntity(entity, currentEntity);
-            return this.Self.DelegateUpdate(currentEntity);
+            this.Self.Update(currentEntity);
         }
-      #if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
-        /// Insert or update after select-for-update.
+        /// Insert or update after select.
         /// </summary>
         /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int InsertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
+        public void InsertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
-                return this.Self.DelegateInsert(entity);
+                this.Self.Insert(entity);
+                return;
             }
             ${myExtendedObjectClassName} currentEntity = null;
             try {
                 ${myConditionBeanClassName} cb = NewMyConditionBean();
                 cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-                cb.LockForUpdate();
                 currentEntity = SelectEntityWithDeletedCheck(cb);
             } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-                return this.Self.DelegateInsert(entity);
+                this.Self.Insert(entity);
+                return;
             }
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             MergeEntity(entity, currentEntity);
-            return this.Self.DelegateUpdate(currentEntity);
+            this.Self.Update(currentEntity);
         }
+      #if ($database.isMakeBehaviorForUpdate())
 
         /// <summary>
         /// Update after select-for-update.
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         public int UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -844,9 +819,36 @@ namespace ${glPackageExtendedBhv} {
             cb.LockForUpdate();
             ${myExtendedObjectClassName} currentEntity = SelectEntityWithDeletedCheck(cb);
             MergeEntity(entity, currentEntity);
-            return this.Self.DelegateUpdate(currentEntity);
+            this.Self.Update(currentEntity);
+        }
+
+        /// <summary>
+        /// Insert or update after select-for-update.
+        /// </summary>
+        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        public void InsertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            if (!entity.HasPrimaryKeyValue) {
+                this.Self.Insert(entity);
+                return;
+            }
+            ${myExtendedObjectClassName} currentEntity = null;
+            try {
+                ${myConditionBeanClassName} cb = NewMyConditionBean();
+                cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
+                cb.LockForUpdate();
+                currentEntity = SelectEntityWithDeletedCheck(cb);
+            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
+                this.Self.Insert(entity);
+                return;
+            }
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            MergeEntity(entity, currentEntity);
+            this.Self.Update(currentEntity);
         }
       #end
+
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
@@ -870,10 +872,9 @@ namespace ${glPackageExtendedBhv} {
         /// Delete.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <returns>Deleted count.</returns>
-        public int Delete(${myExtendedObjectClassName} entity) {
+        public void Delete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
-            return this.Self.DelegateDelete(entity);
+            this.Self.DelegateDelete(entity);
         }
         #endregion
 

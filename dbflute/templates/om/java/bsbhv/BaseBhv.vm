@@ -361,7 +361,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = delegateSelectList(cb);
+        final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = selectList(cb);
         if (ls.isEmpty()) {
             return null;
         }
@@ -650,9 +650,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      * @return Inserted count.
      */
-    public int insert(${myExtendedObjectClassName} entity) {
+    public void insert(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
-        return delegateInsert(entity);
+        delegateInsert(entity);
     }
 
     /**
@@ -661,9 +661,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      * @return Updated count.
      */
-    public int update(${myExtendedObjectClassName} entity) {
+    public void update(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
-        return delegateUpdate(entity);
+        final int updatedCount = delegateUpdate(entity);
+        if (updatedCount != 1) {
+            throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
+        }
     }
 
     /**
@@ -673,13 +676,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int updateAfterSelect(${myExtendedObjectClassName} entity) {
+    public void updateAfterSelect(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
-        return delegateUpdate(currentEntity);
+        update(currentEntity);
     }
 
     /**
@@ -689,10 +692,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @return Updated count.
      */
-    public int insertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
+    public void insertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            return insert(entity);
+            insert(entity);
+            return;
         }
         ${myExtendedObjectClassName} currentEntity = null;
         try {
@@ -700,11 +704,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
             currentEntity = selectEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return insert(entity);
+            insert(entity);
+            return;
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return update(currentEntity);
+        update(currentEntity);
     }
   #if ($database.isMakeBehaviorForUpdate())
 
@@ -715,14 +720,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    public int updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
+    public void updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
         cb.lockForUpdate();
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
-        return update(currentEntity);
+        update(currentEntity);
     }
 
     /**
@@ -732,10 +737,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @return Updated count.
      */
-    public int insertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
+    public void insertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            return insert(entity);
+            insert(entity);
+            return;
         }
         ${myExtendedObjectClassName} currentEntity = null;
         try {
@@ -744,11 +750,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             cb.lockForUpdate();
             currentEntity = selectEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            return insert(entity);
+            insert(entity);
+            return;
         }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
-        return update(entity);
+        update(entity);
     }
   #end
 

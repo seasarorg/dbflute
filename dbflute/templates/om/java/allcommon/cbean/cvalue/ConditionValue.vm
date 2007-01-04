@@ -531,6 +531,9 @@ public class ${myClassName} {
         if (value == null) {
             return value;
         }
+        if (value instanceof java.sql.Timestamp) {
+            return value;
+        }
         if (value instanceof java.util.Date || value instanceof java.util.Calendar) {
             return SqlDateConversionUtil.toDate(value);
         } else {
