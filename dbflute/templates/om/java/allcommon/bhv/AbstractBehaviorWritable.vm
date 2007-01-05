@@ -273,23 +273,22 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * 
      * @param entity Entity. (NotNull)
      */
-    public void create(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-        assertEntityNotNull(entity);
-        callCreate(entity);
+    public void create(${glEntityInterfaceName} entity) {
+        doCreate(entity);
     }
+
+    abstract protected void doCreate(${glEntityInterfaceName} entity);
 
     /**
      * Modify.
      * 
      * @param entity Entity. (NotNull)
      */
-    public void modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-        assertEntityNotNull(entity);
-        final int modifiedCount = callModify(entity);
-        if (modifiedCount != 1) {
-            throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, modifiedCount);
-        }
+    public void modify(${glEntityInterfaceName} entity) {
+        doModify(entity);
     }
+
+    abstract protected void doModify(${glEntityInterfaceName} entity);
 
     /**
      * ${database.ImplementComment}
@@ -298,13 +297,10 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public void modifyAfterSelect(${glEntityInterfaceName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${glConditionBeanInterfaceName} cb = newConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-        final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
-        mergeEntity(entity, currentEntity);
-        modify(currentEntity);
+        doModifyAfterSelect(entity);
     }
+
+    abstract protected void doModifyAfterSelect(${glEntityInterfaceName} entity);
 
     /**
      * Create or modify after select.
@@ -331,6 +327,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         mergeEntity(entity, currentEntity);
         modify(entity);
     }
+
+    abstract protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity);
 #if ($database.isMakeBehaviorForUpdate())
 
     /**
@@ -348,6 +346,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         mergeEntity(entity, currentEntity);
         modify(currentEntity);
     }
+
+    abstract protected void doModifyAfterSelectForUpdate(${glEntityInterfaceName} entity);
 
     /**
      * Create or modify after select-for-update.
@@ -375,6 +375,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         mergeEntity(entity, currentEntity);
         modify(currentEntity);
     }
+
+    abstract protected void doCreateOrModifyAfterSelectForUpdate(${glEntityInterfaceName} entity);
 #end
 
     /**
@@ -396,6 +398,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertEntityNotNull(entity);
         callRemove(entity);
     }
+
+    abstract protected void doRemove(${glEntityInterfaceName} entity);
 
     // =====================================================================================
     //                                                                    Basic Batch Update

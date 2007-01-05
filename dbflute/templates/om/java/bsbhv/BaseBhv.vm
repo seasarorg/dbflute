@@ -655,6 +655,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         delegateInsert(entity);
     }
 
+    protected void doCreate(${glEntityInterfaceName} entity) {
+        insert((${myExtendedObjectClassName})entity);
+    }
+
     /**
      * Update.
      * 
@@ -667,6 +671,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         if (updatedCount != 1) {
             throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
         }
+    }
+
+    protected void doModify(${glEntityInterfaceName} entity) {
+        update((${myExtendedObjectClassName})entity);
     }
 
     /**
@@ -683,6 +691,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         update(currentEntity);
+    }
+
+    protected void doModifyAfterSelect(${glEntityInterfaceName} entity) {
+        updateAfterSelect((${myExtendedObjectClassName})entity);
     }
 
     /**
@@ -711,6 +723,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         mergeEntity(entity, currentEntity);
         update(currentEntity);
     }
+
+    protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity) {
+        insertOrUpdateAfterSelect((${myExtendedObjectClassName})entity);
+    }
   #if ($database.isMakeBehaviorForUpdate())
 
     /**
@@ -728,6 +744,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         update(currentEntity);
+    }
+
+    protected void doModifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
+        updateAfterSelectForUpdate((${myExtendedObjectClassName})entity);
     }
 
     /**
@@ -756,6 +776,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         mergeEntity(entity, currentEntity);
         update(entity);
+    }
+
+    protected void doCreateOrModifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
+        insertOrUpdateAfterSelectForUpdate((${myExtendedObjectClassName})entity);
     }
   #end
 
@@ -790,6 +814,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public int delete(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
         return delegateDelete(entity);
+    }
+
+    protected void doRemove(${glEntityInterfaceName} entity) {
+        delete((${myExtendedObjectClassName})entity);
     }
 
     // =====================================================================================
