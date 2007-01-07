@@ -1,0 +1,128 @@
+package ${glPackageCIQ};
+
+#set ($myClassName = "${myConditionInlineQueryClassName}")
+#set ($myCQClassName = "")
+#if ($database.isJavaDirOnlyOne())
+  #set ($myCQClassName = "${myBaseConditionQueryClassName}")
+#else
+  #set ($myCQClassName = "${myConditionQueryClassName}")
+#end
+import ${glPackageBaseCQ}.*;
+import ${glPackageCQ}.*;
+
+import ${glPackageBaseCommonCBean}.*;
+import ${glPackageBaseCommonCKey}.*;
+import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+
+
+/**
+ * The condition-query of {table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
+
+    protected ${myCQClassName} _myCQ;
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor.
+     * 
+     * @param childQuery Child query as abstract class. (Nullable: If null, this is base instance.)
+     * @param sqlClause SQL clause instance. (NotNull)
+     * @param aliasName My alias name. (NotNull)
+     * @param nestLevel Nest level.
+     */
+    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
+        super(childQuery, sqlClause, aliasName, nestLevel);
+        _myCQ = myCQ;
+    }
+
+    // =====================================================================================
+    //                                                                                 Query
+    //                                                                                 =====
+    protected ${glConditionQueryInterfaceName} registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+        return registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
+    }
+
+  ## --------------------------------------------------------------------------------
+  ##                                                  Make getter and setter methods.
+  ##                                                  -------------------------------
+
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   MyTable = [$table.Name]
+    // * * * * * * * * */
+
+  #foreach ($col in $table.Columns)
+    #set ($tmpJavaName = "${col.JavaName}")
+    #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+
+    protected ${glConditionValueName} getCValue${tmpJavaName}() {
+        return _myCQ.get${tmpJavaName}();
+    }
+
+    #if (${col.isJavaNativeStringObject()})
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
+    }
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
+    }
+        #end
+      #end
+    #end
+    #if (${col.isJavaNativeNumberObject()})
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
+    }
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
+    }
+        #end
+      #end
+    #end
+    #if (${col.isJavaNativeDateObject()})
+    #end
+    #if (${col.isJavaNativeBooleanObject()})
+    #end
+    #if (${col.isJavaNativeBinaryObject()})
+    #end
+    #if (!${col.isNotNull()})
+    #end
+    #if (!${col.isJavaNativeBinaryObject()})
+    #end
+  #end
+
+}

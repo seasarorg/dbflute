@@ -174,6 +174,48 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // =====================================================================================
+    //                                                                         IncludeAsMine
+    //                                                                         =============
+    /**
+     * Register included-select-column.
+     * 
+     * @param aliasName Alias name. This should not contain comma. (NotNull)
+     * @param realColumnName Real column name. This should not contain comma. (NotNull)
+     * @return this. (NotNull)
+     */
+    protected ${glConditionQueryInterfaceName} registerIncludedSelectColumn(String aliasName, String realColumnName) {
+        assertAliasName(aliasName);
+        assertColumnName(realColumnName);
+        getSqlClause().registerIncludedSelectColumn(aliasName, realColumnName);
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                                 Query
+    //                                                                                 =====
+    protected ${glConditionQueryInterfaceName} registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
+            getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
+        }
+        return this;
+    }
+
+    protected ${glConditionQueryInterfaceName} registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
+            if (isBaseQuery(this)) {
+                getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
+            } else {
+                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue);
+            }
+        }
+        return this;
+    }
+
+    // =====================================================================================
     //                                                                              SubQuery
     //                                                                              ========
     protected ${glConditionQueryInterfaceName} registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
@@ -399,6 +441,39 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                 return buf.toString();
             }
         } while(true);
+    }
+
+    /**
+     * Filter removing empty-string.
+     * If the value is null or empty-string, returns null.
+     * 
+     * @param value Query-value-string. (Nullable)
+     * @return Filtered value. (Nullable)
+     */
+    protected String filterRemoveEmptyString(String value) {
+        return ((value != null && !"".equals(value)) ? value : null);
+    }
+
+    /**
+     * Filter removing empty-string from the list.
+     * If the list is null or empty-string, returns null.
+     * 
+     * @param ls List. (Nullable)
+     * @return Filtered list. (Nullable)
+     */
+    protected java.util.List${database.filterGenericsString('String')} filterRemoveEmptyStringFromList(java.util.List${database.filterGenericsString('String')} ls) {
+        if (ls == null) {
+            return null;
+        }
+        java.util.List${database.filterGenericsString('String')} newList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final String str = (String)ite.next();
+            if ("".equals(str)) {
+                continue;
+            }
+            newList.add(str);
+        }
+        return newList;
     }
 
     // ----------------------------------------------------------------

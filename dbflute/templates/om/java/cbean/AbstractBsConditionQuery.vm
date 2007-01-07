@@ -1,0 +1,592 @@
+
+package ${glPackageBaseCQ};
+
+#set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
+
+#if ($database.hasClassificationDefinitionMap())
+
+import ${glPackageBaseCommon}.${glClassificationDefinition};
+#end
+
+import ${glPackageBaseCommonCBean}.*;
+import ${glPackageBaseCommonCKey}.*;
+import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageCQ}.*;
+
+/**
+ * The condition-query of {table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /**
+     * Constructor.
+     * 
+     * @param childQuery Child query as abstract class. (Nullable: If null, this is base instance.)
+     * @param sqlClause SQL clause instance. (NotNull)
+     * @param aliasName My alias name. (NotNull)
+     * @param nestLevel Nest level.
+     */
+    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+        super(childQuery, sqlClause, aliasName, nestLevel);
+    }
+
+    // =====================================================================================
+    //                                                                            Table name
+    //                                                                            ==========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    final public String getTableDbName() {
+        return "${table.Name}";
+    }
+
+    // =====================================================================================
+    //                                                                                 Query
+    //                                                                                 =====
+  ## --------------------------------------------------------------------------------
+  ##                                                  Make getter and setter methods.
+  ##                                                  -------------------------------
+
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   MyTable = [$table.Name]
+    // * * * * * * * * */
+
+  #foreach ($col in $table.Columns)
+    #set ($tmpJavaName = "${col.JavaName}")
+    #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+    
+    /** Column db name of ${col.UncapitalisedJavaName}. */
+    protected static final String COL_${col.Name} = "${col.Name}";
+
+    /** Column java name of ${col.UncapitalisedJavaName}. */
+    protected static final String J_${col.JavaName} = "${col.JavaName}";
+
+    /** Column uncapitalised java name of ${col.UncapitalisedJavaName}. */
+    protected static final String UJ_${col.UncapitalisedJavaName} = "${col.UncapitalisedJavaName}";
+    #if (${col.isJavaNativeStringObject()})
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using equal. { = }
+     * If the value is null or empty-string, this condition is ignored.
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as equal.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_Equal($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, filterRemoveEmptyString(value));
+    }
+
+    /**
+     * Set the empty-string of ${col.UncapitalisedJavaName} as equal. { = }
+     * 
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_Equal_EmptyString() {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, "");
+    }
+      #if (${col.hasClassification()})
+        #foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+     * 
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+    }
+        #end
+      #end
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
+     * If the value is null or empty-string, this condition is ignored.
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as notEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_NotEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, filterRemoveEmptyString(value));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
+     * If the value is null or empty-string, this condition is ignored.
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterThan.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_GreaterThan($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, filterRemoveEmptyString(value));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
+     * If the value is null or empty-string, this condition is ignored.
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessThan.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_LessThan($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, filterRemoveEmptyString(value));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
+     * If the value is null or empty-string, this condition is ignored.
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, filterRemoveEmptyString(value));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
+     * If the value is null or empty-string, this condition is ignored.
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_LessEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, filterRemoveEmptyString(value));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using prefixSearch. { like 'xxx%' }
+     * If the value is null or empty-string, this condition is ignored.
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as prefixSearch.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using inScope. { in ('a', 'b') }
+     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * 
+     * @param valueList The value of ${col.UncapitalisedJavaName} as inScope.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_InScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using notInScope. { not in ('a', 'b') }
+     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * 
+     * @param valueList The value of ${col.UncapitalisedJavaName} as notInScope.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_NotInScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
+    }
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    /**
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+     * This method use from clause and where clause of the sub-query instance.
+     * this query keep the sub-query instance for query-value.
+     * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+     * 
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        assertObjectNotNull("subQuery", subQuery);
+        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        return this;
+    }
+
+    abstract public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery);
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    /**
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
+     * { exists (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+     * This method use from clause and where clause of the sub-query instance.
+     * this query keep the sub-query instance for query-value.
+     * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+     * 
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        assertObjectNotNull("subQuery", subQuery);
+        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        return this;
+    }
+
+    abstract public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery);
+        #end
+      #end
+    #end
+    #if (${col.isJavaNativeNumberObject()})
+    
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using equal. { = }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as equal.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_Equal($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using equal. { = }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as equal.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_Equal(long value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
+    }
+      #if (${col.hasClassification()})
+        #foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+     * 
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
+        final String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(code));
+    }
+        #end
+      #end
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as notEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_NotEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as notEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_NotEqual(long value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterThan.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_GreaterThan($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterThan.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_GreaterThan(long value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, new ${col.JavaNative}(String.valueOf(value)));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessThan.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_LessThan($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessThan.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_LessThan(long value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, new ${col.JavaNative}(String.valueOf(value)));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_GreaterEqual(long value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_LessEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_LessEqual(long value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using inScope. { in (a, b) }
+     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * 
+     * @param valueList The value of ${col.UncapitalisedJavaName} as inScope.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_InScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, valueList);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using notInScope. { not in (a, b) }
+     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * 
+     * @param valueList The value of ${col.UncapitalisedJavaName} as notInScope.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_NotInScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, valueList);
+    }
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    /**
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * { in (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+     * This method use from clause and where clause of the sub-query instance.
+     * this query keep the sub-query instance for query-value.
+     * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+     * 
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        assertObjectNotNull("subQuery", subQuery);
+        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        return this;
+    }
+
+    abstract public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery);
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    /**
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
+     * { exists (select xxx.${refferer.FirstLocalColumnName} from ${refferer.Table.Name} where ...) }
+     * This method use from clause and where clause of the sub-query instance.
+     * this query keep the sub-query instance for query-value.
+     * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+     * 
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+        assertObjectNotNull("subQuery", subQuery);
+        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        return this;
+    }
+
+    abstract public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery);
+        #end
+      #end
+    #end
+    #if (${col.isJavaNativeDateObject()})
+    
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using equal. { = }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as equal.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_Equal($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as notEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_NotEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterThan.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_GreaterThan($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessThan.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_LessThan($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_LessEqual($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+    }
+    #end
+    #if (${col.isJavaNativeBooleanObject()})
+    
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using equal. { = }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as equal.
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_Equal($col.JavaNative value) {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+    }
+    #end
+    #if (${col.isJavaNativeBinaryObject()})
+    #end
+    #if (!${col.isNotNull()})
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using isNull. { is null }
+     * 
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_IsNull() {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_IS_NULL, DUMMY_OBJECT);
+    }
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using isNotNull. { is not null }
+     * 
+     * @return this. (NotNull)
+     */
+    public ${myClassName} set${tmpJavaName}_IsNotNull() {
+        return register${tmpJavaName}(${glConditionKeyName}.CK_IS_NOT_NULL, DUMMY_OBJECT);
+    }
+    #end
+    
+    /**
+     * Register condition of ${col.UncapitalisedJavaName}.
+     * 
+     * @param key Condition key. (NotNull)
+     * @param value The value of ${col.UncapitalisedJavaName}. (Nullable)
+     * @return this. (NotNull)
+     */
+    protected ${myClassName} register${tmpJavaName}(${glConditionKeyName} key, Object value) {
+        return (${myClassName})registerQuery(key, value, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName});
+    }
+
+    /**
+     * Register inline condition of ${col.UncapitalisedJavaName}.
+     * 
+     * @param key Condition key. (NotNull)
+     * @param value The value of ${col.UncapitalisedJavaName}. (Nullable)
+     * @return this. (NotNull)
+     */
+    protected ${myClassName} registerInline${tmpJavaName}(${glConditionKeyName} key, Object value) {
+        return (${myClassName})registerInlineQuery(key, value, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName});
+    }
+
+    abstract protected ${glConditionValueName} getCValue${tmpJavaName}();
+  #end
+
+    // =====================================================================================
+    //                                                                 Basic-Override Method
+    //                                                                 =====================
+    /**
+     * This method overrides the method that is declared at super.
+     * 
+     * @return Clause string. (NotNull)
+     */
+    public String toString() {
+        return getSqlClause().getClause();
+    }
+}
