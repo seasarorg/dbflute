@@ -1157,6 +1157,14 @@ public class Database {
         return getProperties().getSourceReductionProperties().isMakeDeprecated();
     }
 
+    public boolean isMakeConditionQueryEqualEmptyString() {
+        return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
+    }
+    
+    public boolean isMakeConditionQueryNumericArgumentLong() {
+        return getProperties().getSourceReductionProperties().isMakeConditionQueryNumericArgumentLong();
+    }
+    
     public boolean isMakeBehaviorForUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorForUpdate();
     }

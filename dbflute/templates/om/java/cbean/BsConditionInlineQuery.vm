@@ -44,9 +44,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // =====================================================================================
     //                                                                                 Query
     //                                                                                 =====
-    protected ${glConditionQueryInterfaceName} registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
-        return registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
+        registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
     }
 
   ## --------------------------------------------------------------------------------

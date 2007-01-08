@@ -181,28 +181,25 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * 
      * @param aliasName Alias name. This should not contain comma. (NotNull)
      * @param realColumnName Real column name. This should not contain comma. (NotNull)
-     * @return this. (NotNull)
      */
-    protected ${glConditionQueryInterfaceName} registerIncludedSelectColumn(String aliasName, String realColumnName) {
+    protected void registerIncludedSelectColumn(String aliasName, String realColumnName) {
         assertAliasName(aliasName);
         assertColumnName(realColumnName);
         getSqlClause().registerIncludedSelectColumn(aliasName, realColumnName);
-        return this;
     }
 
     // =====================================================================================
     //                                                                                 Query
     //                                                                                 =====
-    protected ${glConditionQueryInterfaceName} registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
             getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
         }
-        return this;
     }
 
-    protected ${glConditionQueryInterfaceName} registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
@@ -212,21 +209,19 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                 getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue);
             }
         }
-        return this;
     }
 
     // =====================================================================================
     //                                                                              SubQuery
     //                                                                              ========
-    protected ${glConditionQueryInterfaceName} registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String reffererColumnName, String propertyName) {
         final String realColumnName = getRealColumnName(columnName);
         final String subQueryClause = getInScopeSubQuerySql(subQuery, reffererColumnName, propertyName);
         getSqlClause().registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
-        return this;
     }
 
-    protected ${glConditionQueryInterfaceName} registerInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String reffererColumnName, String propertyName) {
         final String subQueryClause = getInScopeSubQuerySql(subQuery, reffererColumnName, propertyName);
         final String finalClause = columnName + " in (" + subQueryClause + ")";
@@ -235,7 +230,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         } else {
             getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
         }
-        return this;
     }
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
@@ -248,27 +242,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return selectClause + " " + fromClause + " " + whereClause;
     }
 
-    protected ${glConditionQueryInterfaceName} registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String reffererColumnName, String propertyName) {
         final String realColumnName = getRealColumnName(columnName);
         final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, reffererColumnName, propertyName);
         getSqlClause().registerWhereClause("exists (" + subQueryClause + ")");
-        return this;
     }
 
 // *Unsupport ExistsSubQuery as inline because it's so dangerous.
-//    protected ${glConditionQueryInterfaceName} registerInlineExistsSubQuery(${glConditionQueryInterfaceName} subQuery
-//                                 , String columnName, String reffererColumnName, String propertyName) {
-//        final String realColumnName = getTableDbName() + "." + columnName;
-//        final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, reffererColumnName, propertyName);
-//        final String finalClause = "exists (" + subQueryClause + ")";
-//        if (isBaseQuery(this)) {
-//            getSqlClause().registerBaseTableInlineWhereClause(finalClause);
-//        } else {
-//            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
-//        }
-//        return this;
-//    }
 
     protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String realColumnName, String reffererColumnName, String propertyName) {

@@ -959,13 +959,11 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/cbean/BsConditionBean.${glTemplateFileExtension}", $path, "table", $table)
 
-        #if ($database.isTargetLanguageJava())
-          #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCQ})}${myAbstractBaseConditionQueryClassName}.${glClassFileExtension}" )
-          $generator.parse("om/${glTargetLanguage}/cbean/AbstractBsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCQ})}${myAbstractBaseConditionQueryClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/cbean/AbstractBsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
 
-          #set ( $path = "${strings.getPackageAsPath(${glPackageCIQ})}${myConditionInlineQueryClassName}.${glClassFileExtension}" )
-          $generator.parse("om/${glTargetLanguage}/cbean/BsConditionInlineQuery.${glTemplateFileExtension}", $path, "table", $table)
-        #end
+        #set ( $path = "${strings.getPackageAsPath(${glPackageCIQ})}${myConditionInlineQueryClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/cbean/BsConditionInlineQuery.${glTemplateFileExtension}", $path, "table", $table)
 
         #if ($database.isJavaDirOnlyOne())
           #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCQ})}${myBaseConditionQueryClassName}.${glClassFileExtension}" )

@@ -37,7 +37,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected readonly int _nestLevel;
 
         /** Child query. */
-        protected readonly ${myClassName} _childQuery;
+        protected readonly ${glConditionQueryInterfaceName} _childQuery;
 
         // =====================================================================================
         //                                                                           Constructor
@@ -50,7 +50,7 @@ namespace ${glPackageBaseCommonCBean} {
          * @param aliasName My alias name. (NotNull)
          * @param nestLevel Nest level.
          */
-        public ${myClassName}(${myClassName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+        public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
             _childQuery = childQuery;
             _sqlClause = sqlClause;
             _aliasName = aliasName;
@@ -149,17 +149,63 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         // =====================================================================================
+        //                                                                         IncludeAsMine
+        //                                                                         =============
+        /// <summary>
+        /// Register included-select-column.
+        /// </summary>
+        /// <param name="aliasName">Alias name. This should not contain comma. (NotNull)</param>
+        /// <param name="realColumnName">Real column name. This should not contain comma. (NotNull)</param>
+        protected void RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
+            AssertAliasName(aliasName);
+            AssertColumnName(realColumnName);
+            GetSqlClause().RegisterIncludedSelectColumn(aliasName, realColumnName);
+        }
+
+        // =====================================================================================
+        //                                                                                 Query
+        //                                                                                 =====
+        /// <summary>
+        /// Register condition of ${col.UncapitalisedJavaName}.
+        /// </summary>
+        /// <param name="key">Condition key. (NotNull)</param>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
+        protected virtual void RegisterQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+            if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
+                key.SetupConditionValue(cvalue, value, GetLocation(capPropName, key));// If C#, CapProp!
+                GetSqlClause().RegisterWhereClause(GetRealColumnName(colName), key, cvalue);
+            }
+        }
+
+        /// <summary>
+        /// Register inline condition of ${col.UncapitalisedJavaName}.
+        /// </summary>
+        /// <param name="key">Condition key. (NotNull)</param>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
+        protected virtual void RegisterInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+            if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
+                key.SetupConditionValue(cvalue, value, GetLocation(capPropName, key));// If C#, CapProp!
+                if (IsBaseQuery(this)) {
+                    GetSqlClause().RegisterBaseTableInlineWhereClause(colName, key, cvalue);
+                } else {
+                    GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), colName, key, cvalue);
+                }
+            }
+        }
+
+        // =====================================================================================
         //                                                                              SubQuery
         //                                                                              ========
-        protected ${glConditionQueryInterfaceName} RegisterInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+        protected void RegisterInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                      , String columnName, String reffererColumnName, String propertyName) {
             String realColumnName = GetRealColumnName(columnName);
             String subQueryClause = GetInScopeSubQuerySql(subQuery, reffererColumnName, propertyName);
             GetSqlClause().RegisterWhereClause(realColumnName + " in (" + subQueryClause + ")");
-            return this;
         }
 
-        protected ${glConditionQueryInterfaceName} RegisterInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+        protected void RegisterInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                      , String columnName, String reffererColumnName, String propertyName) {
             String subQueryClause = GetInScopeSubQuerySql(subQuery, reffererColumnName, propertyName);
             String finalClause = columnName + " in (" + subQueryClause + ")";
@@ -168,7 +214,6 @@ namespace ${glPackageBaseCommonCBean} {
             } else {
                 GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), finalClause);
             }
-            return this;
         }
 
         protected String GetInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
@@ -181,12 +226,11 @@ namespace ${glPackageBaseCommonCBean} {
             return selectClause + " " + fromClause + " " + whereClause;
         }
 
-        protected ${glConditionQueryInterfaceName} RegisterExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+        protected void RegisterExistsSubQuery(${glConditionQueryInterfaceName} subQuery
                                      , String columnName, String reffererColumnName, String propertyName) {
             String realColumnName = GetRealColumnName(columnName);
             String subQueryClause = GetExistsSubQuerySql(subQuery, realColumnName, reffererColumnName, propertyName);
             GetSqlClause().RegisterWhereClause("exists (" + subQueryClause + ")");
-            return this;
         }
 
         // *Unsupport ExistsSubQuery as inline because it's so dangerous.
@@ -330,6 +374,40 @@ namespace ${glPackageBaseCommonCBean} {
 
         protected String GetLocationBase(String columnPropertyName) {
             return GetLocationBase() + columnPropertyName;
+        }
+
+
+        // =====================================================================================
+        //                                                                                Helper
+        //                                                                                ======
+        /// <summary>
+        /// Filter removing empty-string.
+        /// If the value is null or empty-string, returns null.
+        /// </summary>
+        /// <param name="value">Query-value-string. (Nullable)</param>
+        /// <returns>Filtered value. (Nullable)</returns>
+        protected String FilterRemoveEmptyString(String value) {
+            return ((value != null && value.Length != 0) ? value : null);
+        }
+
+        /// <summary>
+        /// Filter removing empty-string from the list.
+        /// If the list is null or empty-string, returns null.
+        /// </summary>
+        /// <param name="ls">List. (Nullable)</param>
+        /// <returns>Filtered list. (Nullable)</returns>
+        protected IList FilterRemoveEmptyStringFromList(IList ls) {
+            if (ls == null) {
+                return null;
+            }
+            IList newList = new ArrayList();
+            foreach (Object obj in ls) {
+                if ((obj is String) && "".Equals((String)obj)) {
+                    continue;
+                }
+                newList.Add(obj);
+            }
+            return newList;
         }
 
         // ----------------------------------------------------------------

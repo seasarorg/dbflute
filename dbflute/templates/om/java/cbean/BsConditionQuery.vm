@@ -50,6 +50,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
 
+    // =====================================================================================
+    //                                                                                Inline
+    //                                                                                ======
+    /**
+     * Get inline query.
+     * 
+     * @return Inline query. (NotNull)
+     */
     public ${myConditionInlineQueryClassName} inline() {
         if (_inlineQuery == null) {
             _inlineQuery = new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
@@ -66,21 +74,18 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * Include select-column of ${col.UncapitalisedJavaName} as mine.
      * Alias name is java-name of this column.
      * Be careful to whether your table have the same column.
-     * 
-     * @return this. (NotNull)
      */
-    public ${myClassName} includeAsMine_${col.JavaName}() {
-        return (${myClassName})registerIncludedSelectColumn("${col.JavaName}", getRealColumnName("${col.Name}"));
+    public void includeAsMine_${col.JavaName}() {
+        registerIncludedSelectColumn("${col.JavaName}", getRealColumnName("${col.Name}"));
     }
 
     /**
      * Include select-column of ${col.UncapitalisedJavaName} as mine.
      * 
      * @param aliasName Alias name. {select columnName as aliasName from ...} This should not contain comma. (NotNull)
-     * @return this. (NotNull)
      */
-    public ${myClassName} includeAsMine_${col.JavaName}(String aliasName) {
-        return (${myClassName})registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}"));
+    public void includeAsMine_${col.JavaName}(String aliasName) {
+        registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}"));
     }
   #end
 
@@ -126,11 +131,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the value is null or empty-string, this condition is ignored.
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as equal.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, filterRemoveEmptyString(value));
+    public void set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, filterRemoveEmptyString(value));
     }
       #if (${col.hasClassification()})
         #foreach ($classificationMap in $col.ClassificationMapList)
@@ -138,11 +142,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     /**
      * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal as inline. { = }
      * 
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_Equal_${classificationMap.get('name')}_AsInline() {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}_AsInline() {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
     }
         #end
       #end
@@ -152,11 +155,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the value is null or empty-string, this condition is ignored.
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as notEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, filterRemoveEmptyString(value));
+    public void set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, filterRemoveEmptyString(value));
     }
 
     /**
@@ -164,11 +166,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the value is null or empty-string, this condition is ignored.
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as greaterThan.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, filterRemoveEmptyString(value));
+    public void set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, filterRemoveEmptyString(value));
     }
 
     /**
@@ -176,11 +177,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the value is null or empty-string, this condition is ignored.
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as lessThan.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, filterRemoveEmptyString(value));
+    public void set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, filterRemoveEmptyString(value));
     }
 
     /**
@@ -188,11 +188,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the value is null or empty-string, this condition is ignored.
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, filterRemoveEmptyString(value));
+    public void set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, filterRemoveEmptyString(value));
     }
 
     /**
@@ -200,11 +199,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the value is null or empty-string, this condition is ignored.
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, filterRemoveEmptyString(value));
+    public void set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, filterRemoveEmptyString(value));
     }
 
     /**
@@ -212,11 +210,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the value is null or empty-string, this condition is ignored.
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as prefixSearch.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_PrefixSearch_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
+    public void set${tmpJavaName}_PrefixSearch_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
     }
 
     /**
@@ -224,11 +221,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the element in the list is null or empty-string, the condition-element is ignored.
      * 
      * @param valueList The value of ${col.UncapitalisedJavaName} as inScope.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_InScope_AsInline(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
+    public void set${tmpJavaName}_InScope_AsInline(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
     }
 
     /**
@@ -236,11 +232,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * If the element in the list is null or empty-string, the condition-element is ignored.
      * 
      * @param valueList The value of ${col.UncapitalisedJavaName} as notInScope.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_NotInScope_AsInline(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
+    public void set${tmpJavaName}_NotInScope_AsInline(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
     }
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -288,14 +283,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
      * 
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline. (NotNull)
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${subQueryPropertyNameInitCap}_AsInline(${reffererCQClassName} subQuery) {
+    public void set${subQueryPropertyNameInitCap}_AsInline(${reffererCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
         registerInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}_AsInline");
-        return this;
     }
           #end
         #end
@@ -331,22 +324,20 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * Set the value of ${col.UncapitalisedJavaName} using equal as inline. { = }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as equal.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+    public void set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using equal as inline. { = }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as equal.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_Equal_AsInline(long value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
+    public void set${tmpJavaName}_Equal_AsInline(long value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
       #if (${col.hasClassification()})
         #foreach ($classificationMap in $col.ClassificationMapList)
@@ -354,12 +345,11 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     /**
      * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal as inline. { = }
      * 
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_Equal_${classificationMap.get('name')}_AsInline() {
+    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}_AsInline() {
         final String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(code));
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(code));
     }
         #end
       #end
@@ -368,110 +358,100 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * Set the value of ${col.UncapitalisedJavaName} using notEqual as inline. { != }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as notEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
+    public void set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notEqual as inline. { != }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as notEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_NotEqual_AsInline(long value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
+    public void set${tmpJavaName}_NotEqual_AsInline(long value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterThan as inline. { &gt; }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as greaterThan.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
+    public void set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterThan as inline. { &gt; }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as greaterThan.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_GreaterThan_AsInline(long value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, new ${col.JavaNative}(String.valueOf(value)));
+    public void set${tmpJavaName}_GreaterThan_AsInline(long value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, new ${col.JavaNative}(String.valueOf(value)));
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessThan as inline. { &lt; }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as lessThan.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
+    public void set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessThan as inline. { &lt; }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as lessThan.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_LessThan_AsInline(long value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, new ${col.JavaNative}(String.valueOf(value)));
+    public void set${tmpJavaName}_LessThan_AsInline(long value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, new ${col.JavaNative}(String.valueOf(value)));
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterEqual as inline. { &gt;= }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+    public void set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterEqual as inline. { &gt;= }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_GreaterEqual_AsInline(long value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
+    public void set${tmpJavaName}_GreaterEqual_AsInline(long value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessEqual as inline. { &lt;= }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+    public void set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessEqual as inline. { &lt;= }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_LessEqual_AsInline(long value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
+    public void set${tmpJavaName}_LessEqual_AsInline(long value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -518,14 +498,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
      * 
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline. (NotNull)
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${subQueryPropertyNameInitCap}_AsInline(${reffererCQClassName} subQuery) {
+    public void set${subQueryPropertyNameInitCap}_AsInline(${reffererCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
         registerInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}_AsInline");
-        return this;
     }
           #end
         #end
@@ -561,66 +539,60 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * Set the value of ${col.UncapitalisedJavaName} using equal as inline. { = }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as equal.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
+    public void set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notEqual as inline. { != }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as notEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
+    public void set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterThan as inline. { &gt; }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as greaterThan.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
+    public void set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessThan as inline. { &lt; }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as lessThan.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
+    public void set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterEqual as inline. { &gt;= }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+    public void set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessEqual as inline. { &lt;= }
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
-     * @return this. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${myAbstractBaseConditionQueryClassName} set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
-        return registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+    public void set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
+        registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
     }
       #end
     #end

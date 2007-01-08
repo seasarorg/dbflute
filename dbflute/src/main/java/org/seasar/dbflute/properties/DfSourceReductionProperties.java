@@ -26,6 +26,17 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     }
 
     // ===============================================================================
+    //                                                     Properties - ConditionQuery
+    //                                                     ===========================
+    public boolean isMakeConditionQueryEqualEmptyString() {
+        return booleanProp("torque.isMakeConditionQueryEqualEmptyString", true);
+    }
+    
+    public boolean isMakeConditionQueryNumericArgumentLong() {
+        return booleanProp("torque.isMakeConditionQueryNumericArgumentLong", true);
+    }
+    
+    // ===============================================================================
     //                                                           Properties - Behavior
     //                                                           =====================
     public boolean isMakeBehaviorForUpdate() {
