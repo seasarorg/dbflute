@@ -434,13 +434,10 @@ namespace ${glPackageBaseCommonSqlClause} {
             _isOrderByEffective = true;
             if (!_orderByClause.IsSameOrderByColumn(columnFullName)) {
                 ClearOrderBy();
-                if (isAsc) {
-                    RegisterOrderBy(columnFullName, registeredColumnFullName, true);
-                } else {
-                    RegisterOrderBy(columnFullName, registeredColumnFullName, false);
-                }
+                RegisterOrderBy(columnFullName, registeredColumnFullName, isAsc);
+            } else {
+                _orderByClause.ReverseAll();
             }
-            _orderByClause.ReverseAll();
         }
 
         /**

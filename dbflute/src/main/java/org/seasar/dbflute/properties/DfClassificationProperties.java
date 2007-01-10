@@ -234,6 +234,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     public static final String MARK_classificationDeploymentAllTable = "$$ALL$$";
     protected Map<String, Map<String, String>> _classificationDeploymentMap;
 
+    // TODO: 列名の大文字小文字を区別しないようにする。CaseInsensitiveMapかな？
+    
     public Map<String, Map<String, String>> getClassificationDeploymentMap() {
         if (_classificationDeploymentMap == null) {
             final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);

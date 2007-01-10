@@ -455,13 +455,10 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         _isOrderByEffective = true;
         if (!_orderByClause.isSameOrderByColumn(orderByProperty)) {
             clearOrderBy();
-            if (isAsc) {
-                registerOrderBy(orderByProperty, registeredOrderByProperty, isAsc);
-            } else {
-                registerOrderBy(orderByProperty, registeredOrderByProperty, isAsc);
-            }
+            registerOrderBy(orderByProperty, registeredOrderByProperty, isAsc);
+        } else {
+            _orderByClause.reverseAll();
         }
-        _orderByClause.reverseAll();
     }
 
     /**
