@@ -193,13 +193,6 @@ namespace ${glPackageBaseCommonBhv} {
         ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read list. (NotNull)</returns>
-        System.Collections.IList ReadSimpleList(${glConditionBeanInterfaceName} cb);
-
-        /// <summary>
         /// Read list.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
@@ -311,7 +304,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
         public virtual System.Collections.IList SelectList() {
             // This is default method of select-list.
-            return _bhv.ReadSimpleList((${glConditionBeanInterfaceName})this.PagingBean);
+            return _bhv.ReadList((${glConditionBeanInterfaceName})this.PagingBean);
         }
     }
 

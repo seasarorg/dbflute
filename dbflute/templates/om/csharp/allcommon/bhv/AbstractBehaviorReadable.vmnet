@@ -320,16 +320,6 @@ namespace ${glPackageBaseCommonBhv} {
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read list. (NotNull)</returns>
-        public System.Collections.IList ReadSimpleList(${glConditionBeanInterfaceName} cb) {
-            AssertConditionBeanNotNull(cb);
-            return this.SelfReadable.CallReadList(cb);
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
         public ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);

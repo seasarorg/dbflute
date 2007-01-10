@@ -532,16 +532,6 @@ namespace ${glPackageExtendedBhv} {
     #end
 
         /// <summary>
-        /// Select simple list.
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>Selected list. (NotNull)</returns>
-        public System.Collections.IList SelectSimpleList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-            AssertConditionBeanNotNull(cb);
-            return this.Self.DelegateSelectList(cb);
-        }
-
-        /// <summary>
         /// Select list.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>

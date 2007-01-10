@@ -166,7 +166,7 @@ namespace ${glPackageExtendedBhv} {
         int SelectCount(${myConditionBeanClassName} cb);
 
         /// <summary>
-        /// Select simple entity by condition-bean.
+        /// Select entity by condition-bean.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
@@ -189,13 +189,6 @@ namespace ${glPackageExtendedBhv} {
 
         ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheckForUpdate(${table.PrimaryKeyArgsString});
     #end
-
-        /// <summary>
-        /// Select simple list.
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>Selected list. (NotNull)</returns>
-        System.Collections.IList SelectSimpleList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
 
         /// <summary>
         /// Select list as result-bean.
