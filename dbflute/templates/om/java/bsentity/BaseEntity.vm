@@ -751,16 +751,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         final StringBuffer sb = new StringBuffer();
   #foreach ($columnName in ${database.CommonColumnNameList})
-    #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
-    #set ($col = $table.getColumn($columnName))
+    #set ($col = $table.getColumnByFlexibleName($columnName))
     #if ($col.isJavaNativeDateObject())
 
         sb.append(delimiter).append("${columnName}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? formatDate(_${uncapitalisedJavaName}) : ""));
+        sb.append((_${col.UncapitalisedJavaName} != null ? formatDate(_${col.UncapitalisedJavaName}) : ""));
     #else
 
         sb.append(delimiter).append("${columnName}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? _${uncapitalisedJavaName}.toString() : ""));
+        sb.append((_${col.UncapitalisedJavaName} != null ? _${col.UncapitalisedJavaName}.toString() : ""));
     #end
   #end
 

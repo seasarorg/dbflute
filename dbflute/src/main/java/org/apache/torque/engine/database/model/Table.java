@@ -68,6 +68,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
@@ -339,6 +340,7 @@ public class Table implements IDMethod {
         _columnList.add(col);
         _columnsByName.put(col.getName(), col);
         _columnsByJavaName.put(col.getJavaName(), col);
+
         col.setPosition(_columnList.size());
         _isNeedsTransactionInPostgres |= col.requiresTransactionInPostgres();
     }
@@ -383,7 +385,6 @@ public class Table implements IDMethod {
         }
         return names;
     }
-
 
     // ============================================================================
     //                                                                     Referrer
@@ -797,7 +798,7 @@ public class Table implements IDMethod {
     public boolean needsJavaNameConvert() {
         return _needsJavaNameConvert;
     }
-    
+
     /**
      * Get name to use in Java sources
      */
@@ -1077,6 +1078,11 @@ public class Table implements IDMethod {
      */
     public Column getColumnByJavaName(String javaName) {
         return (Column) _columnsByJavaName.get(javaName);
+    }
+
+    public Column getColumnByFlexibleName(String flexibleName) {
+        final DfFlexibleNameMap<String, Column> flexibleNameMap = new DfFlexibleNameMap<String, Column>(_columnsByName);
+        return flexibleNameMap.get(flexibleName);
     }
 
     /**
@@ -1863,8 +1869,9 @@ public class Table implements IDMethod {
         if (commonColumnNameList.isEmpty()) {
             return false;
         }
+        final DfFlexibleNameMap<String, Column> flexibleNameMap = new DfFlexibleNameMap<String, Column>(_columnsByName);
         for (String commonColumnName : commonColumnNameList) {
-            if (!containsColumn(commonColumnName)) {
+            if (!flexibleNameMap.containsKey(commonColumnName)) {
                 return false;
             }
         }
@@ -1872,13 +1879,13 @@ public class Table implements IDMethod {
     }
 
     public List<Column> getCommonColumnList() {
-        List<Column> ls = new ArrayList<Column>();
+        final List<Column> ls = new ArrayList<Column>();
         if (!hasAllCommonColumn()) {
             return ls;
         }
         final List<String> commonColumnNameList = getDatabase().getCommonColumnNameList();
-        for (String columnName : commonColumnNameList) {
-            ls.add(getColumn(columnName));
+        for (String commonColumnName : commonColumnNameList) {
+            ls.add(getColumnByFlexibleName(commonColumnName));
         }
         return ls;
     }

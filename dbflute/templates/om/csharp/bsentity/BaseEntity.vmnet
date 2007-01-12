@@ -821,11 +821,11 @@ namespace ${myExtendedEntityPackageName} {
             StringBuilder sb = new StringBuilder();
 
   #foreach ($columnName in ${database.CommonColumnNameList})
-    #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+    #set ($col = $table.getColumnByFlexibleName($columnName))
 
             sb.Append(delimiter);
             {
-                Object obj = _${uncapitalisedJavaName};
+                Object obj = _${col.UncapitalisedJavaName};
                 if (obj != null && (obj.GetType().IsPrimitive || obj is DateTime)) {
                     sb.Append("${columnName}").Append(equal).Append(obj);
                 } else {
