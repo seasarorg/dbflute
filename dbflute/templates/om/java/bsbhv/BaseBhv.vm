@@ -599,7 +599,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
             final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
             pkList.add(entity.get${table.getPrimaryKeyJavaNameAsOne()}());
-            pkMyEntityMap.put(entity.get${table.getPrimaryKeyJavaNameAsOne()}(), entity);
+            pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}()), entity);
         }
         final ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})getDaoSelector().getRBhv(${reffererBhvClassName}.class);
         final ${reffererCBClassName} cb = reffererBhv.newMyConditionBean();
@@ -612,19 +612,19 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         pkReffererListMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKChildListMap})}();
         for (final java.util.Iterator ite = reffererList.iterator(); ite.hasNext(); ) {
             final ${reffererEntityClassName} reffererEntity = (${reffererEntityClassName})ite.next();
-            if (!pkReffererListMap.containsKey(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}())) {
-                pkReffererListMap.put(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}(), new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
+            if (!pkReffererListMap.containsKey(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))) {
+                pkReffererListMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()), new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
             }
-            ((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}())).add(reffererEntity);
+            ((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))).add(reffererEntity);
 
             // for Reverse Reference.
-            final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap.get(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}());
+            final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()));
             reffererEntity.set${refferer.ForeignPropertyNameInitCap}(myEntity);
         }
 
         for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
             final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
-            entity.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(entity.get${table.getPrimaryKeyJavaNameAsOne()}()));
+            entity.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}())));
         }
     }
     #if ($database.isMakeDeprecated())

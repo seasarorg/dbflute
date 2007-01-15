@@ -25,10 +25,16 @@ namespace ${glPackageBaseCommonS2Dao} {
             IDataReaderFactory dataReaderFactory, IDatabaseMetaData dbMetaData)
             : base(daoType, dataSource, commandFactory, dataReaderFactory, dbMetaData) {}
 
-        protected override IBeanMetaData CreateBeanMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms)  {
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanType, false);
+        public override void Initialize()
+        {
+            daoInterface = GetDaoInterface(daoType);
+            annotationReader = AnnotationReaderFactory.CreateDaoAnnotationReader(daoType);
+            beanType = annotationReader.GetBeanType();
+            dbms = DbmsManager.GetDbms(dataSource);
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanType, annotationReaderFactory, false);
             bmdExt.Initialize(dbMetaData, dbms);
-            return bmdExt;
+            beanMetaData = bmdExt;
+            SetupSqlCommand();
         }
 
         // =====================================================================================
@@ -195,7 +201,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (beanClass4SelectMethodByManual.Equals(beanType)) {
                 return beanMetaData;
             }
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanClass4SelectMethodByManual, false);
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanClass4SelectMethodByManual, annotationReaderFactory, false);
             bmdExt.Initialize(databaseMetaData, dbInfo);
             return bmdExt;
         }
@@ -280,8 +286,11 @@ namespace ${glPackageBaseCommonS2Dao} {
     }
 
     public class BeanMetaDataExtension : BeanMetaDataImpl {
-        public BeanMetaDataExtension(Type beanType, bool relation)
-            : base(beanType, relation) {
+        public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
+            : base() {
+            this.BeanType = beanType;
+            this.relation = relation;
+            this.AnnotationReaderFactory = annotationReaderFactory;
         }
         protected int _nestNo;
         public int NestNo {
@@ -293,7 +302,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (this.NestNo > 0) {
                 isRelation = true;
             }
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(propertyInfo.PropertyType, isRelation);
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(propertyInfo.PropertyType, this.AnnotationReaderFactory, isRelation);
             bmdExt.NestNo = this.NestNo + 1;
             bmdExt.Initialize(dbMetaData, dbms);
             return bmdExt;

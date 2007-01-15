@@ -12,8 +12,10 @@
 
 
     <!-- S2Dao component. -->
+    <component class="Seasar.Dao.Impl.FieldAnnotationReaderFactory" />
     <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataFactoryImpl}"/>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
+
 
 
     <!-- Common column setup interceptor. -->

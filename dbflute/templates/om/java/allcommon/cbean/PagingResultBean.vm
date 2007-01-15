@@ -86,6 +86,24 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
     }
 
     /**
+     * Get the value of currentStartRecordNumber.
+     * 
+     * @return The value of currentStartRecordNumber.
+     */
+    public int getCurrentStartRecordNumber() {
+        return calculateCurrentStartRecordNumber(_currentPageNumber, _pageSize);
+    }
+
+    /**
+     * Get the value of currentEndRecordNumber.
+     * 
+     * @return The value of currentEndRecordNumber.
+     */
+    public int getCurrentEndRecordNumber() {
+        return calculateCurrentEndRecordNumber(_currentPageNumber, _pageSize);
+    }
+
+    /**
      * Get the value of pageGroupSize.
      * 
      * @return The value of pageGroupSize.
@@ -143,6 +161,14 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
             pageCountBase++;
         }
         return pageCountBase;
+    }
+
+    protected int calculateCurrentStartRecordNumber(int currentPageNumber, int pageSize) {
+        return ((currentPageNumber - 1) * pageSize) + 1;
+    }
+
+    protected int calculateCurrentEndRecordNumber(int currentPageNumber, int pageSize) {
+        return calculateCurrentStartRecordNumber(currentPageNumber, pageSize) + _selectedList.size() - 1;
     }
 
     /**

@@ -446,6 +446,19 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // =====================================================================================
     //                                                                         Helper Method
     //                                                                         =============
+    /**
+     * To lower case if the type is String.
+     * 
+     * @param obj Object. (Nullable)
+     * @return Lower object. (Nullable)
+     */
+    protected Object toLowerCaseIfString(Object obj) {
+        if (obj != null && obj instanceof String) {
+            return ((String)obj).toLowerCase();
+        }
+        return obj;
+    }
+
     // ----------------------------------------------------------------
     //                                                    Assert Object
     //                                                    -------------
