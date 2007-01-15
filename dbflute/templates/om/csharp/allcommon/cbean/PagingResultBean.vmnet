@@ -54,8 +54,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>
         /// The property of page size.
         /// </summary>
-        public int PageSize
-        {
+        public int PageSize {
             get { return _pageSize; }
             set { _pageSize = value; }
         }
@@ -63,8 +62,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>
         /// The property of current page number.
         /// </summary>
-        public int CurrentPageNumber
-        {
+        public int CurrentPageNumber {
             get { return _currentPageNumber; }
             set { _currentPageNumber = value; }
         }
@@ -72,16 +70,32 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>
         /// The property of all page count.
         /// </summary>
-        public int AllPageCount
-        {
+        public int AllPageCount {
             get { return CalculateAllPageCount(_allRecordCount, _pageSize); }
+        }
+
+        /**
+         * Get the value of currentStartRecordNumber.
+         * 
+         * @return The value of currentStartRecordNumber.
+         */
+        public int CurrentStartRecordNumber {
+            get { return CalculateCurrentStartRecordNumber(_currentPageNumber, _pageSize); }
+        }
+
+        /**
+         * Get the value of currentEndRecordNumber.
+         * 
+         * @return The value of currentEndRecordNumber.
+         */
+        public int CurrentEndRecordNumber {
+            get { return CalculateCurrentEndRecordNumber(_currentPageNumber, _pageSize); }
         }
 
         /// <summary>
         /// The property of page-group size.
         /// </summary>
-        public int PageGroupSize
-        {
+        public int PageGroupSize {
             get { return _pageGroupSize; }
             set { _pageGroupSize = value; }
         }
@@ -89,8 +103,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>
         /// The property of range-group size.
         /// </summary>
-        public int PageRangeSize
-        {
+        public int PageRangeSize {
             get { return _pageRangeSize; }
             set { _pageRangeSize = value; }
         }
@@ -112,7 +125,7 @@ namespace ${glPackageBaseCommonCBean} {
          * @param pageSize Fetch-size.
          * @returns All page count.
          */
-        public int CalculateAllPageCount(int allRecordCount, int pageSize) {
+        protected int CalculateAllPageCount(int allRecordCount, int pageSize) {
             if (allRecordCount == 0) {
                 return 1;
             }
@@ -121,6 +134,14 @@ namespace ${glPackageBaseCommonCBean} {
                 pageCountBase++;
             }
             return pageCountBase;
+        }
+
+        protected int CalculateCurrentStartRecordNumber(int currentPageNumber, int pageSize) {
+            return ((currentPageNumber - 1) * pageSize) + 1;
+        }
+
+        protected int CalculateCurrentEndRecordNumber(int currentPageNumber, int pageSize) {
+            return CalculateCurrentStartRecordNumber(currentPageNumber, pageSize) + _selectedList.Count - 1;
         }
 
         /// <summary>

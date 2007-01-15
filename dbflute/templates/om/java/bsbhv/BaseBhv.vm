@@ -552,6 +552,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     final List<${myExtendedObjectClassName}> ls = bhv.selectList(cb);
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls);
      * 
+     *  *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
      * @param ls Entity list of main table. (NotNull)
@@ -582,6 +583,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     };
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
      * 
+     *  *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
      * @param ls Entity list of main table. (NotNull)
