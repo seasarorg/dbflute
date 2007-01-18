@@ -864,13 +864,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #if ($table.isUseIdentity())
     #if ($table.hasPrimaryKey())
 
-    // 
-    // Copy-insert.
-    // 
-    // @param primaryKey Primary-keys. (NotNull)
-    // @return Inserted count.
-    // @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-    // 
+    /* (non-javadoc) 
+     * Copy-insert.
+     * 
+     * @param primaryKey Primary-keys. (NotNull)
+     * @return Inserted count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
     public int copyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
