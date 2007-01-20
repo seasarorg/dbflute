@@ -1,6 +1,7 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,16 @@ public final class DfDaoDiconProperties extends DfAbstractHelperProperties {
 
     public String getDaoDiconPackageName() {
         return stringProp("torque.daoDiconPackageName", "");
+    }
+
+    public List<String> getDaoDiconPackageNameList() {
+        final String diconSeparatedString = stringProp("torque.daoDiconPackageName", "");
+        final String[] array = diconSeparatedString.split(";");
+        final List<String> ls = new ArrayList<String>();
+        for (String string : array) {
+            ls.add(string.trim());
+        }
+        return ls;
     }
 
     public String getDaoDiconFileName() {

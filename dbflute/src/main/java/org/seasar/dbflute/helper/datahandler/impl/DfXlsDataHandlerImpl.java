@@ -2,8 +2,11 @@ package org.seasar.dbflute.helper.datahandler.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.sql.DataSource;
@@ -11,9 +14,14 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
+import org.seasar.dbflute.util.DfMapStringFileUtil;
+import org.seasar.extension.dataset.ColumnType;
+import org.seasar.extension.dataset.DataRow;
 import org.seasar.extension.dataset.DataSet;
+import org.seasar.extension.dataset.DataTable;
 import org.seasar.extension.dataset.impl.SqlWriter;
 import org.seasar.extension.dataset.impl.XlsReader;
+import org.seasar.extension.dataset.types.ColumnTypes;
 
 public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
@@ -38,8 +46,40 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             _log.info("= = = = = = =/");
             final XlsReader xlsReader = new XlsReader(file);
             final DataSet dataSet = xlsReader.read();
+
+            setupDefaultValue(dataDirectoryName, dataSet);
+
             final SqlWriter sqlWriter = new SqlWriter(dataSource);
             sqlWriter.write(dataSet);
+        }
+    }
+
+    protected void setupDefaultValue(String dataDirectoryName, final DataSet dataSet) {
+        final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectoryName);
+        for (int i = 0; i < dataSet.getTableSize(); i++) {
+            final DataTable table = dataSet.getTable(i);
+            final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
+            for (String defaultTargetColumnName : defaultValueMapKeySet) {
+                final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
+
+                if (!table.hasColumn(defaultTargetColumnName)) {
+                    final ColumnType columnType;
+                    final Object value;
+                    if (defaultValue.equalsIgnoreCase("sysdate")) {
+                        columnType = ColumnTypes.TIMESTAMP;
+                        value = new Timestamp(System.currentTimeMillis());
+                    } else {
+                        columnType = ColumnTypes.STRING;
+                        value = defaultValue;
+                    }
+                    table.addColumn(defaultTargetColumnName, columnType);
+
+                    for (int j = 0; j < table.getRowSize(); j++) {
+                        final DataRow row = table.getRow(j);
+                        row.setValue(defaultTargetColumnName, value);
+                    }
+                }
+            }
         }
     }
 
@@ -56,5 +96,10 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             xlsTreeSet.add(file);
         }
         return new ArrayList<File>(xlsTreeSet);
+    }
+
+    private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
+        final String path = dataDirectoryName + "/default-value.txt";
+        return DfMapStringFileUtil.getSimpleMap(path, "UTF-8");
     }
 }

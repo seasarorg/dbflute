@@ -37,7 +37,6 @@ targetdatabase = $targetDatabase
 
     ## [Dicon]
     #set ($glDaoDiconNamespace = "${database.DaoDiconNamespace}")
-    #set ($glDaoDiconPackageName = "${database.DaoDiconPackageName}")
     #set ($glDaoDiconFileName = "${database.DaoDiconFileName}")
     #set ($glJdbcDiconResourceName = "${database.JdbcDiconResourceName}")
 
@@ -501,13 +500,16 @@ targetdatabase = $targetDatabase
     ## Setup java directory for daoDicon.
     $database.setupJavaDir_for_daoDicon()
 
-    #set ($path = "${glDaoDiconPackageName}" )
-    $database.makeDirectory($path)
+    $database.debug("parseDaoDicon() {")
+    #foreach ($daoDiconPackageName in $database.daoDiconPackageNameList)
+      #set ($path = "${daoDiconPackageName}" )
+      $database.makeDirectory($path)
 
-    $database.debug("[container]")
-    $database.debug("    ...Parsing DaoDicon")
-    #set ($path = "${glDaoDiconPackageName}/${glDaoDiconFileName}" )
-    $generator.parse("om/${glTargetLanguage}/allcommon/DaoDicon.${glTemplateFileExtension}", $path, "", "")
+      #set ($path = "${daoDiconPackageName}/${glDaoDiconFileName}" )
+      $database.debug("    ${path}")
+      $generator.parse("om/${glTargetLanguage}/allcommon/DaoDicon.${glTemplateFileExtension}", $path, "", "")
+    #end
+    $database.debug("}")
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                             Parse lazy-load container

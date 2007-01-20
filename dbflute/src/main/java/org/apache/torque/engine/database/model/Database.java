@@ -700,6 +700,10 @@ public class Database {
     public String getDaoDiconPackageName() {
         return getProperties().getDaoDiconProperties().getDaoDiconPackageName();
     }
+    
+    public List<String> getDaoDiconPackageNameList() {
+        return getProperties().getDaoDiconProperties().getDaoDiconPackageNameList();
+    }
 
     public String getDaoDiconFileName() {
         return getProperties().getDaoDiconProperties().getDaoDiconFileName();

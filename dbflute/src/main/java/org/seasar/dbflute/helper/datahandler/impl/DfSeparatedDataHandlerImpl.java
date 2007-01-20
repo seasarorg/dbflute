@@ -33,6 +33,7 @@ import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
 import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
+import org.seasar.dbflute.util.DfMapStringFileUtil;
 import org.seasar.framework.util.CaseInsensitiveMap;
 
 public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
@@ -83,46 +84,9 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         return resultInfo;
     }
 
-    private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String elementName) {
-        final List<String> defaultSysdateList = new ArrayList<String>();
-        final File file = new File(info.getBasePath() + "/" + elementName + "/default-value.txt");
-        final StringBuilder sb = new StringBuilder();
-        if (file.exists()) {
-            java.io.FileInputStream fis = null;
-            java.io.InputStreamReader ir = null;
-            java.io.BufferedReader br = null;
-            try {
-                fis = new java.io.FileInputStream(file);
-                ir = new java.io.InputStreamReader(fis, elementName);
-                br = new java.io.BufferedReader(ir);
-
-                int count = -1;
-                while (true) {
-                    ++count;
-
-                    String lineString = br.readLine();
-                    if (lineString == null || lineString.trim().length() == 0) {
-                        break;
-                    }
-                    sb.append(lineString);
-                    defaultSysdateList.add(lineString);
-                }
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        final DfMapListStringImpl mapListString = new DfMapListStringImpl();
-        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        if (sb.toString().trim().length() != 0) {
-            final Map<String, Object> map = mapListString.generateMap(sb.toString());
-            final Set<String> keySet = map.keySet();
-            for (String key : keySet) {
-                resultMap.put(key, (String) map.get(key));
-            }
-        }
-        return resultMap;
+    private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
+        final String path = info.getBasePath() + "/" + encoding + "/default-value.txt";
+        return DfMapStringFileUtil.getSimpleMap(path, encoding);
     }
 
     protected FilenameFilter createFilenameFilter(final String typeName) {
