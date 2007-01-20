@@ -716,7 +716,11 @@ namespace ${glPackageExtendedBhv} {
             }
 
             foreach (${myExtendedObjectClassName} entity in ls) {
-                entity.${refferer.ReffererPropertyNameInitCap} = (System.Collections.IList)pkReffererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
+                if (pkReffererListMap.Contains(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
+                    entity.${refferer.ReffererPropertyNameInitCap} = (System.Collections.IList)pkReffererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
+                } else {
+                    entity.${refferer.ReffererPropertyNameInitCap} = new System.Collections.ArrayList();
+                }
             }
         }
 

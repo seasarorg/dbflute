@@ -626,7 +626,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
         for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
             final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
-            entity.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}())));
+            if (pkReffererListMap.containsKey(toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}()))) {
+                entity.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}())));
+            } else {
+                entity.set${refferer.ReffererPropertyNameInitCap}(new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
+            }
         }
     }
     #if ($database.isMakeDeprecated())
