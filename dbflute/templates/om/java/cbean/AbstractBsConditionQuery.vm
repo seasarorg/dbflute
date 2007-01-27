@@ -186,11 +186,33 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotInScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
     }
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+
+    /**
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * { in (select xxx.${col.foreignKey.firstForeignColumnName} from ${col.foreignKey.foreignTable.Name} where ...) }
+     * This method use from clause and where clause of the sub-query instance.
+     * this query keep the sub-query instance for query-value.
+     * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+     * 
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
+     */
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        assertObjectNotNull("subQuery", subQuery);
+        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerInScopeSubQuery(subQuery, COL_${col.Name}, "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyName}");
+    }
+
+    abstract public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+      #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.reffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.reffererPropertyNameInitCap}")
 
     /**
      * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
@@ -201,18 +223,18 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * 
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
         registerInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery);
+    abstract public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
@@ -225,13 +247,13 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * 
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
         registerExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery);
+    abstract public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
         #end
       #end
     #end
@@ -378,9 +400,31 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotInScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, valueList);
     }
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+
+    /**
+     * Set the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * { in (select xxx.${col.foreignKey.firstForeignColumnName} from ${col.foreignKey.foreignTable.Name} where ...) }
+     * This method use from clause and where clause of the sub-query instance.
+     * this query keep the sub-query instance for query-value.
+     * After you invoke this, If you set query in the argument[subQuery], the query is ignored.
+     * 
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
+     */
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        assertObjectNotNull("subQuery", subQuery);
+        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerInScopeSubQuery(subQuery, COL_${col.Name}, "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyName}");
+    }
+
+    abstract public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+      #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
@@ -393,18 +437,18 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * 
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
         registerInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery);
+    abstract public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
@@ -417,13 +461,13 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * 
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (NotNull)
      */
-    public void set${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
         registerExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery);
+    abstract public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
         #end
       #end
     #end

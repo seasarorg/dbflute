@@ -66,48 +66,66 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     #if (${col.isJavaNativeStringObject()})
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
+    }
+      #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
         #end
       #end
     #end
     #if (${col.isJavaNativeNumberObject()})
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
+    }
+      #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
         #end

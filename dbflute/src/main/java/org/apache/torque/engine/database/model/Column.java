@@ -267,7 +267,7 @@ public class Column {
         final Database db = getTable().getDatabase();
         return db.decapitalizePropertyName(db.convertJavaNameByJdbcNameAsTable(getName()));
     }
-    
+
     /**
      * Set name to use in Java sources
      */
@@ -449,6 +449,8 @@ public class Column {
     /**
      * get the foreign key object for this column
      * if it is a foreign key or part of a foreign key
+     * 
+     * @return Foreign key. (Nullable)
      */
     public ForeignKey getForeignKey() {
         return _parentTable.getForeignKey(this._name);
@@ -472,6 +474,22 @@ public class Column {
         return (fk == null ? "" : fk.getForeignTableName());
     }
 
+    // -------------------------------------------
+    //                      Single Key Foreign Key
+    //                      ----------------------
+    /**
+     * Adds the foreign key from another table that refers to this column.
+     * 
+     * @return Determination.
+     */
+    public boolean isSingleKeyForeignKey() {
+        final ForeignKey fk = getForeignKey();
+        return (fk == null ? false : fk.isSimpleKeyFK());
+    }
+
+    // -------------------------------------------
+    //                         Related Column Name
+    //                         -------------------
     /**
      * Utility method to get the related column of this local column if this
      * column is a foreign key or part of a foreign key.
@@ -485,6 +503,9 @@ public class Column {
         }
     }
 
+    // -------------------------------------------
+    //                                    Refferer
+    //                                    --------
     /**
      * Adds the foreign key from another table that refers to this column.
      */

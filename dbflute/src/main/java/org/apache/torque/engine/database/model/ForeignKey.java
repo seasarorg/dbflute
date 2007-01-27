@@ -459,6 +459,15 @@ public class ForeignKey {
     }
 
     /**
+     * Returns first local column name.
+     * 
+     * @return Fisrt local column name.
+     */
+    public String getFirstForeignColumnName() {
+        return getForeignColumns().get(0);
+    }
+    
+    /**
      * Get the value of foreign property name.
      * 
      * @return Generated string.

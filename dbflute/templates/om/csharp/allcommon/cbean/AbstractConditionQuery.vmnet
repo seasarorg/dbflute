@@ -199,15 +199,15 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                              SubQuery
         //                                                                              ========
         protected void RegisterInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
-                                     , String columnName, String reffererColumnName, String propertyName) {
+                                     , String columnName, String relatedColumnName, String propertyName) {
             String realColumnName = GetRealColumnName(columnName);
-            String subQueryClause = GetInScopeSubQuerySql(subQuery, reffererColumnName, propertyName);
+            String subQueryClause = GetInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
             GetSqlClause().RegisterWhereClause(realColumnName + " in (" + subQueryClause + ")");
         }
 
         protected void RegisterInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
-                                     , String columnName, String reffererColumnName, String propertyName) {
-            String subQueryClause = GetInScopeSubQuerySql(subQuery, reffererColumnName, propertyName);
+                                     , String columnName, String relatedColumnName, String propertyName) {
+            String subQueryClause = GetInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
             String finalClause = columnName + " in (" + subQueryClause + ")";
             if (IsBaseQuery(this)) {
                 GetSqlClause().RegisterBaseTableInlineWhereClause(finalClause);
@@ -217,8 +217,8 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         protected String GetInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
-                                     , String reffererColumnName, String propertyName) {
-            String selectClause = "select " + subQuery.GetAliasName() + "." + reffererColumnName;
+                                     , String relatedColumnName, String propertyName) {
+            String selectClause = "select " + subQuery.GetAliasName() + "." + relatedColumnName;
             String fromClause = subQuery.GetSqlClause().GetFromClause();
             String oldStr = ".ConditionQuery.";
             String newStr = "." + GetLocationBase(propertyName) + ".";
@@ -227,21 +227,21 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         protected void RegisterExistsSubQuery(${glConditionQueryInterfaceName} subQuery
-                                     , String columnName, String reffererColumnName, String propertyName) {
+                                     , String columnName, String relatedColumnName, String propertyName) {
             String realColumnName = GetRealColumnName(columnName);
-            String subQueryClause = GetExistsSubQuerySql(subQuery, realColumnName, reffererColumnName, propertyName);
+            String subQueryClause = GetExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
             GetSqlClause().RegisterWhereClause("exists (" + subQueryClause + ")");
         }
 
         // *Unsupport ExistsSubQuery as inline because it's so dangerous.
 
         protected String GetExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
-                                 , String realColumnName, String reffererColumnName, String propertyName) {
-            String selectClause = "select " + subQuery.GetAliasName() + "." + reffererColumnName;
+                                 , String realColumnName, String relatedColumnName, String propertyName) {
+            String selectClause = "select " + subQuery.GetAliasName() + "." + relatedColumnName;
             String fromClause = subQuery.GetSqlClause().GetFromClause();
             String oldStr = ".ConditionQuery.";
             String newStr = "." + GetLocationBase(propertyName) + ".";
-            String parentCondition = " and " + reffererColumnName + " = " + realColumnName;
+            String parentCondition = " and " + relatedColumnName + " = " + realColumnName;
             String whereClause = subQuery.GetSqlClause().GetWhereClause().Replace(oldStr, newStr);
             return selectClause + " " + fromClause + " " + whereClause;
         }

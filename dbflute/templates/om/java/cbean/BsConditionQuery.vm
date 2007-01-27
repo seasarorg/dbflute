@@ -238,32 +238,53 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         registerInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
     }
       #end
-      #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
-    protected ${reffererCQClassName} _${subQueryPropertyName};
+    protected ${relatedCQClassName} _${subQueryPropertyName};
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
-    public ${reffererCQClassName} get${subQueryPropertyNameInitCap}() {
+    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName};
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        _${subQueryPropertyName} = subQuery;
+    }
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    protected ${relatedCQClassName} _${subQueryPropertyName};
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName};
+    }
+
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _${subQueryPropertyName} = subQuery;
     }
 
           #if ($database.isMakeDeprecated())
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline. */
-    protected ${reffererCQClassName} _${subQueryPropertyName}_AsInline;
+    protected ${relatedCQClassName} _${subQueryPropertyName}_AsInline;
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline.
@@ -271,7 +292,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline. (Nullable)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${reffererCQClassName} get${subQueryPropertyNameInitCap}_AsInline() {
+    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}_AsInline() {
         return _${subQueryPropertyName}_AsInline;
     }
 
@@ -285,7 +306,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public void set${subQueryPropertyNameInitCap}_AsInline(${reffererCQClassName} subQuery) {
+    public void set${subQueryPropertyNameInitCap}_AsInline(${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
         registerInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}_AsInline");
@@ -295,23 +316,23 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
-    protected ${reffererCQClassName} _${subQueryPropertyName};
+    protected ${relatedCQClassName} _${subQueryPropertyName};
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
-    public ${reffererCQClassName} get${subQueryPropertyNameInitCap}() {
+    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName};
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _${subQueryPropertyName} = subQuery;
     }
         #end
@@ -454,31 +475,52 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         registerInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
       #end
-      #if (${col.hasSingleKeyReferrer()})
-        #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
-    protected ${reffererCQClassName} _${subQueryPropertyName};
+    protected ${relatedCQClassName} _${subQueryPropertyName};
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
-    public ${reffererCQClassName} get${subQueryPropertyNameInitCap}() {
+    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName};
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        _${subQueryPropertyName} = subQuery;
+    }
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    protected ${relatedCQClassName} _${subQueryPropertyName};
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName};
+    }
+
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _${subQueryPropertyName} = subQuery;
     }
           #if ($database.isMakeDeprecated())
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline. */
-    protected ${reffererCQClassName} _${subQueryPropertyName}_AsInline;
+    protected ${relatedCQClassName} _${subQueryPropertyName}_AsInline;
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline.
@@ -486,7 +528,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline. (Nullable)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public ${reffererCQClassName} get${subQueryPropertyNameInitCap}_AsInline() {
+    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}_AsInline() {
         return _${subQueryPropertyName}_AsInline;
     }
 
@@ -500,7 +542,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline. (NotNull)
      * @deprecated This method is deprecated. Please use query().inline().setXxx_Xxx()!
      */
-    public void set${subQueryPropertyNameInitCap}_AsInline(${reffererCQClassName} subQuery) {
+    public void set${subQueryPropertyNameInitCap}_AsInline(${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
         _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
         registerInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}_AsInline");
@@ -510,23 +552,23 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
-    protected ${reffererCQClassName} _${subQueryPropertyName};
+    protected ${relatedCQClassName} _${subQueryPropertyName};
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (Nullable)
      */
-    public ${reffererCQClassName} get${subQueryPropertyNameInitCap}() {
+    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
         return _${subQueryPropertyName};
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${reffererCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _${subQueryPropertyName} = subQuery;
     }
         #end
@@ -693,7 +735,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
   #end
 
   #foreach ($refferer in $table.Referrers)
-    #set ($reffererCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+    #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
     #if (${refferer.isOneToOne()})
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
@@ -704,9 +746,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     /**
      * Query for ${refferer.ReffererPropertyNameAsOne}.
      * 
-     * @return Instance of ${reffererCQClassName} as ${refferer.ReffererPropertyNameAsOne}. (NotNull)
+     * @return Instance of ${relatedCQClassName} as ${refferer.ReffererPropertyNameAsOne}. (NotNull)
      */
-    public ${reffererCQClassName} query${refferer.ReffererPropertyNameInitCapAsOne}() {
+    public ${relatedCQClassName} query${refferer.ReffererPropertyNameInitCapAsOne}() {
         return getConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}();
     }
 
@@ -732,14 +774,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     /** Condition-query for ${refferer.ReffererPropertyNameAsOne}. */
-    protected ${reffererCQClassName} _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
+    protected ${relatedCQClassName} _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
 
     /**
      * Get condition-query for ${refferer.ReffererPropertyNameAsOne}.
      * 
-     * @return Instance of ${reffererCQClassName} as ${refferer.ReffererPropertyNameAsOne}. (NotNull)
+     * @return Instance of ${relatedCQClassName} as ${refferer.ReffererPropertyNameAsOne}. (NotNull)
      */
-    public ${reffererCQClassName} getConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
+    public ${relatedCQClassName} getConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
         if (_conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} == null) {
             _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} = newQuery${refferer.ReffererPropertyNameInitCapAsOne}();
             setupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}();
@@ -752,8 +794,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * 
      * @return Query for ${refferer.ReffererPropertyNameAsOne}. (NotNull)
      */
-    protected ${reffererCQClassName} newQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
-        return new ${reffererCQClassName}(this, getSqlClause(), "${refferer.ReffererPropertyNameInitCapAsOne}", getNextNestLevel());
+    protected ${relatedCQClassName} newQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
+        return new ${relatedCQClassName}(this, getSqlClause(), "${refferer.ReffererPropertyNameInitCapAsOne}", getNextNestLevel());
     }
     #end
   #end
