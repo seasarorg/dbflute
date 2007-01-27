@@ -27,16 +27,9 @@
     <component name="commonColumnSetupBeforeUpdateInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeUpdateInterceptor}"/>
     <component name="commonColumnSetupBeforeDeleteInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeDeleteInterceptor}"/>
 
-
     <!-- Dao selector. -->
     <component name="daoSelector" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
-  #if (${database.isAvailableBehaviorGeneration()})
-
-    #foreach ($table in $database.Tables)
-      <property name="${table.UncapitalisedJavaName}Bhv">${table.UncapitalisedJavaName}Bhv</property>
-    #end
-  #end
-
+        <destroyMethod name="destroy"/>
     </component>
 
 

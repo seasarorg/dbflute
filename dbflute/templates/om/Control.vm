@@ -668,6 +668,7 @@ targetdatabase = $targetDatabase
         #set ($myDBMetaClassName = "${glProjectPrefix}${table.JavaName}Dbm")
         #set ($myDBMetaPackageName = "${glPackageBaseCustomizeDBMeta}")
 
+        #set ($isExistBehavior = false)
         #set ($isExistDao = true)
         #set ($isExistConditionBean = false)
 
@@ -852,7 +853,9 @@ targetdatabase = $targetDatabase
         ## Java name of the current table.
         ##
         #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
+        #set ($myBaseBhvPackageName = "${glPackageBaseBhv}")
         #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}Bhv")
+        #set ($myExtendedBhvPackageName = "${glPackageExtendedBhv}")
 
         #set ($myBaseDaoClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Dao")
         #set ($myBaseDaoPackageName = "${glPackageBaseDao}")
@@ -879,6 +882,10 @@ targetdatabase = $targetDatabase
 
         #set ($myAttachedCBArgsString = "${glPackageCB}.${myConditionBeanClassName} ${glAttachedCBArgsVariableName}")
 
+        #set ($isExistBehavior = false)
+        #if ($database.isAvailableBehaviorGeneration())
+          #set ($isExistBehavior = true)
+        #end
         #set ($isExistDao = true)
         #set ($isExistConditionBean = true)
 

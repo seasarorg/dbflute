@@ -330,6 +330,28 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return null;
     }
 #end
+#if ($isExistBehavior)
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type-name of behavior. (NotNull)
+     */ 
+    public String getBehaviorTypeName() {
+        return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}";
+    }
+#else
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The type-name of behavior. (Nullable: If the behavior does not exist)
+     */ 
+    public String getBehaviorTypeName() {
+        return null;
+    }
+#end
+
 
     // =====================================================================================
     //                                                                           Type Getter

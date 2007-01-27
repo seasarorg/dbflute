@@ -654,7 +654,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Insert.
      * 
      * @param entity Entity. (NotNull)
-     * @return Inserted count.
      */
     public void insert(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
@@ -669,7 +668,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Update.
      * 
      * @param entity Entity. (NotNull)
-     * @return Updated count.
      */
     public void update(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
@@ -687,7 +685,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Update after select.
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
-     * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public void updateAfterSelect(${myExtendedObjectClassName} entity) {
@@ -708,7 +705,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * {update: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @return Updated count.
      */
     public void insertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
@@ -739,7 +735,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Update after select-for-update.
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
-     * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
     public void updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
@@ -761,7 +756,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * {update: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @return Updated count.
      */
     public void insertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
@@ -815,15 +809,35 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Delete.
      * 
      * @param entity Entity. (NotNull)
-     * @return Deleted count.
      */
-    public int delete(${myExtendedObjectClassName} entity) {
+    public void delete(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
-        return delegateDelete(entity);
+        final int deletedCount = delegateDelete(entity);
+        if (deletedCount != 1) {
+            throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, deletedCount);
+        }
     }
 
     protected void doRemove(${glEntityInterfaceName} entity) {
         delete((${myExtendedObjectClassName})entity);
+    }
+
+    /**
+     * Delete after select.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public void deleteAfterSelect(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        final ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        selectEntityWithDeletedCheck(cb);
+        delete(entity);
+    }
+
+    protected void doRemoveAfterSelect(${glEntityInterfaceName} entity) {
+        deleteAfterSelect((${myExtendedObjectClassName})entity);
     }
 
     // =====================================================================================

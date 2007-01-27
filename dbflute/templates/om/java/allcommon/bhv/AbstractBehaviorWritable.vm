@@ -310,22 +310,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public void createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
-        if (!entity.hasPrimaryKeyValue()) {
-            create(entity);
-            return;
-        }
-        ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
-        try {
-            final ${glConditionBeanInterfaceName} cb = newConditionBean();
-            cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-            currentEntity = readEntityWithDeletedCheck(cb);
-        } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            create(entity);
-            return;
-        }
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        mergeEntity(entity, currentEntity);
-        modify(entity);
+        doCreateOrModifyAfterSelect(entity);
     }
 
     abstract protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity);
@@ -339,12 +324,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public void modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        final ${glConditionBeanInterfaceName} cb = newConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-        cb.lockForUpdate();
-        final ${glEntityInterfaceName} currentEntity = readEntityWithDeletedCheck(cb);
-        mergeEntity(entity, currentEntity);
-        modify(currentEntity);
+        doModifyAfterSelectForUpdate(entity);
     }
 
     abstract protected void doModifyAfterSelectForUpdate(${glEntityInterfaceName} entity);
@@ -357,23 +337,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public void createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
-        if (!entity.hasPrimaryKeyValue()) {
-            create(entity);
-            return;
-        }
-        ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
-        try {
-            final ${glConditionBeanInterfaceName} cb = newConditionBean();
-            cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-            cb.lockForUpdate();
-            currentEntity = readEntityWithDeletedCheck(cb);
-        } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-            create(entity);
-            return;
-        }
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        mergeEntity(entity, currentEntity);
-        modify(currentEntity);
+        doCreateOrModifyAfterSelectForUpdate(entity);
     }
 
     abstract protected void doCreateOrModifyAfterSelectForUpdate(${glEntityInterfaceName} entity);
@@ -400,6 +364,19 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     abstract protected void doRemove(${glEntityInterfaceName} entity);
+
+    /**
+     * Remove after select.
+     * 
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public void removeAfterSelect(${glEntityInterfaceName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        doRemoveAfterSelect(entity);
+    }
+
+    abstract protected void doRemoveAfterSelect(${glEntityInterfaceName} entity);
 
     // =====================================================================================
     //                                                                    Basic Batch Update

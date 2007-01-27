@@ -8,13 +8,24 @@ import ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
+import org.seasar.framework.container.S2Container;
 
 /**
  * The implementation of dao-selector.
- * 
+ * <pre>
+ * Long long ago this object have cache of dao and bhv.
+ * But the cache cause wrong performance when this is initialized.
+ * So now this object don't have cache.
+ * </pre>
  * @author ${database.ClassAuthor}
  */
 public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} {
+
+    protected S2Container _container;
+
+    public void setContainer(S2Container container) {
+        this._container = container;
+    }
 
     /**
      * Get dao-readable by dao type.
@@ -24,13 +35,7 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
      */
     public ${glDaoReadableInterfaceName} getRDao(Class daoType) {
         assertObjectNotNull("daoType", daoType);
-        setupDaoCacheMap();
-        final ${glDaoReadableInterfaceName} dao = (${glDaoReadableInterfaceName})_daoCacheMap.get(daoType);
-        if (dao == null) {
-            String msg = "The daoCacheMap does not have the dao-type: daoType=" + daoType + " daoCacheMap=" + _daoCacheMap;
-            throw new IllegalStateException(msg);
-        }
-        return dao;
+        return (${glDaoReadableInterfaceName})_container.getComponent(daoType);
     }
 
     /**
@@ -98,13 +103,7 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
      */
     public ${glBehaviorReadableInterfaceName} getRBhv(Class bhvType) {
         assertObjectNotNull("bhvType", bhvType);
-        setupBhvCacheMap();
-        final ${glBehaviorReadableInterfaceName} bhv = (${glBehaviorReadableInterfaceName})_bhvCacheMap.get(bhvType);
-        if (bhv == null) {
-            String msg = "The bhvCacheMap does not have the bhv-type: bhvType=" + bhvType + " bhvCacheMap=" + _bhvCacheMap;
-            throw new IllegalStateException(msg);
-        }
-        return bhv;
+        return (${glBehaviorReadableInterfaceName})_container.getComponent(bhvType);
     }
 
     /**
@@ -170,13 +169,18 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
      * @return Bhv-type. (NotNull)
      */
     protected Class getBhvType(${glDBMetaInterfaceName} dbmeta) {
-        assertObjectNotNull("dbmeta", dbmeta);
-        setupDaoBhvMap();
-        if (_daoBhvMap == null) {
-            String msg = "The daoBhvMap has not been initialized yet!";
+        final String bhvTypeName = dbmeta.getBehaviorTypeName();
+        if (bhvTypeName == null) {
+            String msg = "The dbmeta.getBehaviorTypeName() should not return null: dbmeta=" + dbmeta;
             throw new IllegalStateException(msg);
         }
-        return (Class)_daoBhvMap.get(getDaoType(dbmeta));
+        final Class bhvType;
+        try {
+            bhvType = Class.forName(bhvTypeName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("The class does not exist: " + bhvTypeName, e);
+        }
+        return bhvType;
     }
 #end
 
@@ -194,101 +198,13 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
         }
         return daoType;
     }
-#set ($mapGenericDefinition = "Class, ${glDaoReadableInterfaceName}")
 
-    protected java.util.Map${database.filterGenericsString(${mapGenericDefinition})} _daoCacheMap;
-    protected void setupDaoCacheMap() {
-        if (_daoCacheMap == null) {
-            _daoCacheMap = new java.util.HashMap${database.filterGenericsString(${mapGenericDefinition})}();
-#foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
-  #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
-  #if ($database.isDaoComponent($componentName))
-
-            _daoCacheMap.put(${className}.class, get${database.initCap($componentName)}());
-  #end
-#end
-#foreach ($table in $database.Tables)
-
-            _daoCacheMap.put(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao.class, get${table.JavaName}Dao());
-#end
-#foreach ($table in $database.CustomizeTableList)
-
-            _daoCacheMap.put(${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao.class, get${table.JavaName}Dao());
-#end
-
-        }
+    // =====================================================================================
+    //                                                                               Destroy
+    //                                                                               =======
+    public void destroy() {
+        _container = null;
     }
-#foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
-  #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
-  #if ($database.isDaoComponent($componentName))
-
-    protected ${className} _${componentName};
-    public void set${database.initCap($componentName)}(${className} dao) {
-        _${componentName} = dao;
-    }
-    public ${className} get${database.initCap($componentName)}() {
-        return _${componentName};
-    }
-  #end
-#end
-#foreach ($table in $database.Tables)
-
-    protected ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;
-    public void set${table.JavaName}Dao(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao dao) {
-        _${table.UncapitalisedJavaName}Dao = dao;
-    }
-    public ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao get${table.JavaName}Dao() {
-        return _${table.UncapitalisedJavaName}Dao;
-    }
-#end
-#foreach ($table in $database.CustomizeTableList)
-
-    protected ${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;
-    public void set${table.JavaName}Dao(${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao dao) {
-        _${table.UncapitalisedJavaName}Dao = dao;
-    }
-    public ${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao get${table.JavaName}Dao() {
-        return _${table.UncapitalisedJavaName}Dao;
-    }
-#end
-#if ($database.isAvailableBehaviorGeneration())
-  #set ($mapGenericDefinition = "Class, ${glBehaviorReadableInterfaceName}")
-
-    protected java.util.Map${database.filterGenericsString(${mapGenericDefinition})} _bhvCacheMap;
-    protected void setupBhvCacheMap() {
-        if (_bhvCacheMap == null) {
-            _bhvCacheMap = new java.util.HashMap${database.filterGenericsString(${mapGenericDefinition})}();
-  #foreach ($table in $database.Tables)
-
-            _bhvCacheMap.put(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv.class, get${table.JavaName}Bhv());
-  #end
-
-        }
-    }
-  #set ($mapGenericDefinition = "Class, Class")
-
-    protected java.util.Map${database.filterGenericsString(${mapGenericDefinition})} _daoBhvMap;
-    protected void setupDaoBhvMap() {
-        if (_daoBhvMap == null) {
-            _daoBhvMap = new java.util.HashMap${database.filterGenericsString(${mapGenericDefinition})}();
-  #foreach ($table in $database.Tables)
-
-            _daoBhvMap.put(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao.class, ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv.class);
-  #end
-
-        }
-    }
-  #foreach ($table in $database.Tables)
-
-    protected ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv _${table.UncapitalisedJavaName}Bhv;
-    public void set${table.JavaName}Bhv(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv bhv) {
-        _${table.UncapitalisedJavaName}Bhv = bhv;
-    }
-    public ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv get${table.JavaName}Bhv() {
-        return _${table.UncapitalisedJavaName}Bhv;
-    }
-  #end
-#end
 
     // ----------------------------------------------------------------
     //                                                    Assert Object
