@@ -16,8 +16,8 @@
 package org.seasar.dbflute.task;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,13 +65,16 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         initializeSchema();
 
         final DfRunnerInformation runInfo = createRunnerInformation();
-        fireSqlFile(runInfo);
+        replaceSchema(runInfo);
 
         writeDbFromSeparatedFile("tsv", "\t");
         writeDbFromSeparatedFile("csv", ",");
         writeDbFromXls();
     }
 
+    // --------------------------------------------
+    //                            initialize schema
+    //                            -----------------
     protected void initializeSchema() {
         if (DfBuildProperties.getInstance().getBasicProperties().isDatabaseMySQL()) {
             final DfSchemaInitializerMySQL initializer = createSchemaInitializerMySQL();
@@ -87,6 +90,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return initializer;
     }
 
+    // --------------------------------------------
+    //                                       runner
+    //                                       ------
     protected DfRunnerInformation createRunnerInformation() {
         final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
@@ -99,22 +105,76 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return runInfo;
     }
 
-    protected void fireSqlFile(DfRunnerInformation runInfo) {
+    protected void replaceSchema(DfRunnerInformation runInfo) {
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        fireMan.execute(getSqlFileRunner(runInfo), getSqlFileList());
+        fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
     }
 
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource());
     }
 
-    protected List<File> getSqlFileList() {
+    // --------------------------------------------
+    //                      replace schema sql file
+    //                      -----------------------
+    protected List<File> getReplaceSchemaSqlFileList() {
         final String sqlFile = getMyProperties().getReplaceSchemaSqlFile();
         final List<File> fileList = new ArrayList<File>();
-        fileList.add(new File(sqlFile));
+        final File replaceSchemaSqlFile = new File(sqlFile);
+        if (!replaceSchemaSqlFile.exists()) {
+            String msg = "Not found replace schema sql file: " + replaceSchemaSqlFile.getPath();
+            throw new IllegalStateException(msg);
+        }
+        fileList.add(replaceSchemaSqlFile);
+        fileList.addAll(getReplaceSchemaNextSqlFileList());
         return fileList;
     }
 
+    protected List<File> getReplaceSchemaNextSqlFileList() {
+        final String replaceSchemaSqlFileDirectoryName = getReplaceSchemaSqlFileDirectoryName();
+        final File baseDir = new File(replaceSchemaSqlFileDirectoryName);
+        final FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                if (name.startsWith(getReplaceSchemaSqlFileNameWithoutExt())) {
+                    if (name.endsWith("." + getReplaceSchemaSqlFileExt())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+        final ArrayList<File> resultList = new ArrayList<File>();
+        final String[] targetList = baseDir.list(filter);
+        for (String targetFileName : targetList) {
+            final String targetFilePath = replaceSchemaSqlFileDirectoryName + "/" + targetFileName;
+            resultList.add(new File(targetFilePath));
+        }
+        return resultList;
+    }
+
+    protected String getReplaceSchemaSqlFileDirectoryName() {
+        final String sqlFileName = getMyProperties().getReplaceSchemaSqlFile();
+        return sqlFileName.substring(0, sqlFileName.lastIndexOf("/"));
+    }
+
+    protected String getReplaceSchemaSqlFileNameWithoutExt() {
+        final String sqlFileName = getMyProperties().getReplaceSchemaSqlFile();
+        final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
+        return tmp.substring(0, tmp.lastIndexOf("."));
+    }
+
+    protected String getReplaceSchemaSqlFileExt() {
+        final String sqlFileName = getMyProperties().getReplaceSchemaSqlFile();
+        return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
+    }
+
+    protected DfReplaceSchemaProperties getMyProperties() {
+        return DfBuildProperties.getInstance().getInvokeReplaceSchemaProperties();
+    }
+
+    // --------------------------------------------
+    //                                 data writing
+    //                                 ------------
     protected void writeDbFromXls() {
         final DfXlsDataHandler xlsDataHandler = new DfXlsDataHandlerImpl();
         xlsDataHandler.writeSeveralData(getDataDirectoryPath("xls"), getDataSource());
@@ -151,15 +211,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected String getDataDirectoryPath(final String typeName) {
-        return getSqlFileDirectoryName() + "/testdata/" + typeName;
+        return getReplaceSchemaSqlFileDirectoryName() + "/testdata/" + typeName;
     }
 
-    protected String getSqlFileDirectoryName() {
-        final String sqlFileName = getMyProperties().getReplaceSchemaSqlFile();
-        return sqlFileName.substring(0, sqlFileName.lastIndexOf("/"));
-    }
-
-    protected DfReplaceSchemaProperties getMyProperties() {
-        return DfBuildProperties.getInstance().getInvokeReplaceSchemaProperties();
-    }
 }
