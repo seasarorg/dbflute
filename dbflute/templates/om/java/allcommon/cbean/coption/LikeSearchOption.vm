@@ -1,0 +1,109 @@
+package ${glPackageBaseCommonCOption};
+
+#set ($myClassName = "${glConditionOptionLikeSearchName}")
+
+/**
+ * The class of like-search-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} implements ${glConditionOptionInterfaceName} {
+
+    protected static final String LIKE_PREFIX = "prefix";
+    protected static final String LIKE_SUFFIX = "suffix";
+    protected static final String LIKE_CONTAIN = "contain";
+
+    protected String _like;
+    protected String _escape;
+
+    public String getRearOption() {
+        if (_escape == null || _escape.trim().length() == 0) {
+            return "";
+        }
+        return " escape '" + _escape + "'";
+    }
+
+    public ${myClassName} likePrefix() {
+        _like = LIKE_PREFIX;
+        return this;
+    }
+    public ${myClassName} likeSuffix() {
+        _like = LIKE_SUFFIX;
+        return this;
+    }
+    public ${myClassName} likeContain() {
+        _like = LIKE_CONTAIN;
+        return this;
+    }
+
+    public ${myClassName} escapeByPipeLine() {
+        _escape = "|";
+        return this;
+    }
+
+    public ${myClassName} escapeByAtMark() {
+        _escape = "@";
+        return this;
+    }
+
+    public ${myClassName} escapeBySlash() {
+        _escape = "/";
+        return this;
+    }
+
+    public ${myClassName} escapeByBackSlash() {
+        _escape = "\\";
+        return this;
+    }
+
+    public String generateRealValue(String value) {
+        if (value == null || value.trim().length() == 0) {
+            String msg = "The argument[value] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final String escapedString;
+        if (_escape == null || _escape.trim().length() == 0) {
+            escapedString = value;
+        } else {
+            escapedString = replace(replace(value, "%", _escape + "%"), "_", _escape + "_");
+        }
+        if (_like == null || _like.trim().length() == 0) {
+            return escapedString;
+        } else if (_like.equals(LIKE_PREFIX)) {
+            return escapedString + "${database.wildCard}";
+        } else if (_like.equals(LIKE_SUFFIX)) {
+            return "${database.wildCard}" + escapedString;
+        } else if (_like.equals(LIKE_CONTAIN)) {
+            return "${database.wildCard}" + escapedString + "${database.wildCard}";
+        } else {
+            String msg = "The like was wrong string: " + _like;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected final String replace(String text, String fromText,
+            String toText) {
+
+        if (text == null || fromText == null || toText == null) {
+            return null;
+        }
+        StringBuffer buf = new StringBuffer(100);
+        int pos = 0;
+        int pos2 = 0;
+        while (true) {
+            pos = text.indexOf(fromText, pos2);
+            if (pos == 0) {
+                buf.append(toText);
+                pos2 = fromText.length();
+            } else if (pos > 0) {
+                buf.append(text.substring(pos2, pos));
+                buf.append(toText);
+                pos2 = pos + fromText.length();
+            } else {
+                buf.append(text.substring(pos2));
+                break;
+            }
+        }
+        return buf.toString();
+    }
+}

@@ -4,6 +4,8 @@
 using ${glPackageCQ};
   #set ($myClassName = "${myBaseConditionQueryClassName}")
 #else
+
+using ${glPackageBaseCQ};
   #set ($myClassName = "${myConditionQueryClassName}")
 #end
 
@@ -263,7 +265,6 @@ namespace ${glPackageCQ} {
             AssertObjectNotNull("subQuery", subQuery);
             _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
             RegisterInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
-            return this;
         }
           #end
         #end
@@ -415,7 +416,6 @@ namespace ${glPackageCQ} {
             AssertObjectNotNull("subQuery", subQuery);
             _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
             RegisterInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
-            return this;
         }
           #end
         #end

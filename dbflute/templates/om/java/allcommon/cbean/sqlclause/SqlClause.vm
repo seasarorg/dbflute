@@ -5,6 +5,7 @@ package ${glPackageBaseCommonSqlClause};
 import java.util.Map;
 
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};
+import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
@@ -132,6 +133,16 @@ public interface ${myClassName} {
      * @param value Condition value. (NotNull)
      */
     public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value);
+
+    /**
+     * Register where clause.
+     * 
+     * @param columnFullName Column-full-name([table-name].[column-name]). (NotNull)
+     * @param key Condition key. (NotNull)
+     * @param value Condition value. (NotNull)
+     * @param option Condition option. (NotNull)
+     */
+    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
 
     /**
      * Register where clause.

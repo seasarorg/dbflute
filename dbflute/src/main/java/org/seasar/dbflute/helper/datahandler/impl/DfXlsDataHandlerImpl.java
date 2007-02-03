@@ -92,6 +92,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             }
         };
         final File[] listFiles = dir.listFiles(filter);
+        if (listFiles == null) {
+            return new ArrayList<File>();
+        }
         for (File file : listFiles) {
             xlsTreeSet.add(file);
         }

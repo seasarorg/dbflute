@@ -10,7 +10,7 @@
                 ; firebird   = map:{daoGenDbName = Firebird   ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}
                 ; oracle     = map:{daoGenDbName = Oracle     ; wildCard = % ; sequenceNextSql = select $$sequenceName$$.nextval from dual}
                 ; mysql      = map:{daoGenDbName = MySql      ; wildCard = % ; sequenceNextSql = Unsupported}
-                ; postgresql = map:{daoGenDbName = PostgreSql ; wildCard = % ; sequenceNextSql = sequenceNextSql=select nextval ('$$sequenceName$$')}
+                ; postgresql = map:{daoGenDbName = PostgreSql ; wildCard = % ; sequenceNextSql = select nextval ('$$sequenceName$$')}
                 ; mssql      = map:{daoGenDbName = SqlServer  ; wildCard = % ; sequenceNextSql = Unsupported}
                 ; db2        = map:{daoGenDbName = Db2        ; wildCard = % ; sequenceNextSql = values nextval for $$sequenceName$$}
                 ; interbase  = map:{daoGenDbName = Interbase  ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}
@@ -24,7 +24,7 @@
                 , "firebird"  : #{"daoGenDbName": "Firebird"  , "wildCard": "%", "sequenceNextSql": "select gen_id($$sequenceName$$, 1) from RDB$DATABASE"}
                 , "oracle"    : #{"daoGenDbName": "Oracle"    , "wildCard": "%", "sequenceNextSql": "select $$sequenceName$$.nextval from dual"}
                 , "mysql"     : #{"daoGenDbName": "MySql"     , "wildCard": "%", "sequenceNextSql": "Unsupported"}
-                , "postgresql": #{"daoGenDbName": "PostgreSql", "wildCard": "%", "sequenceNextSql": "sequenceNextSql=select nextval ('$$sequenceName$$')"}
+                , "postgresql": #{"daoGenDbName": "PostgreSql", "wildCard": "%", "sequenceNextSql": "select nextval ('$$sequenceName$$')"}
                 , "mssql"     : #{"daoGenDbName": "SqlServer" , "wildCard": "%", "sequenceNextSql": "Unsupported"}
                 , "db2"       : #{"daoGenDbName": "Db2"       , "wildCard": "%", "sequenceNextSql": "values nextval for $$sequenceName$$"}
                 , "interbase" : #{"daoGenDbName": "Interbase" , "wildCard": "%", "sequenceNextSql": "select gen_id($$sequenceName$$, 1) from RDB$DATABASE"}

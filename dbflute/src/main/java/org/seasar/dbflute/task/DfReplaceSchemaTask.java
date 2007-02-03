@@ -118,14 +118,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                      replace schema sql file
     //                      -----------------------
     protected List<File> getReplaceSchemaSqlFileList() {
-        final String sqlFile = getMyProperties().getReplaceSchemaSqlFile();
         final List<File> fileList = new ArrayList<File>();
-        final File replaceSchemaSqlFile = new File(sqlFile);
-        if (!replaceSchemaSqlFile.exists()) {
-            String msg = "Not found replace schema sql file: " + replaceSchemaSqlFile.getPath();
-            throw new IllegalStateException(msg);
-        }
-        fileList.add(replaceSchemaSqlFile);
         fileList.addAll(getReplaceSchemaNextSqlFileList());
         return fileList;
     }
@@ -144,7 +137,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             }
         };
         final ArrayList<File> resultList = new ArrayList<File>();
+
+        // TODO: ちゃんとソートすること。
+
         final String[] targetList = baseDir.list(filter);
+        if (targetList == null) {
+            return new ArrayList<File>();
+        }
         for (String targetFileName : targetList) {
             final String targetFilePath = replaceSchemaSqlFileDirectoryName + "/" + targetFileName;
             resultList.add(new File(targetFilePath));

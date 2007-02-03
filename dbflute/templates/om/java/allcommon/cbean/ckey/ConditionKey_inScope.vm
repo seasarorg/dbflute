@@ -2,6 +2,7 @@ package ${glPackageBaseCommonCKey};
 
 #set ($myClassName = "${glConditionKeyName}InScope")
 
+import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
@@ -63,6 +64,18 @@ public class ${myClassName} extends ${glConditionKeyName} {
     }
 
     /**
+     * This method implements super#doAddWhereClause().
+     * 
+     * @param conditionList Condition list. (NotNull)
+     * @param columnName Column name. (NotNull)
+     * @param value Condition value. (NotNull)
+     * @param option Condition option. (NotNull)
+     */
+    protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+        throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
+    }
+
+    /**
      * This method implements super#doSetupConditionValue().
      * 
      * @param conditionValue Condition value. (NotNull)
@@ -71,5 +84,17 @@ public class ${myClassName} extends ${glConditionKeyName} {
      */
     protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
         conditionValue.setInScope((java.util.List)value).setInScopeLocation(location);
+    }
+
+    /**
+     * This method implements super#doSetupConditionValue().
+     * 
+     * @param conditionValue Condition value. (NotNull)
+     * @param value Value. (NotNull)
+     * @param location Location. (NotNull)
+     * @param option Condition option. (NotNull)
+     */
+    protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }

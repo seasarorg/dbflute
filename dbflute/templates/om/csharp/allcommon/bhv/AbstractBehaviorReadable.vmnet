@@ -433,7 +433,7 @@ namespace ${glPackageBaseCommonBhv} {
             AssertConditionBeanNotNull(cb);
             int selectedCount = this.SelfReadable.ReadCount(cb);
             AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.ToString());
-            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.callReadList(cb));
+            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.CallReadList(cb));
         }
     #end
 

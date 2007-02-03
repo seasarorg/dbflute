@@ -203,6 +203,14 @@ namespace ${glPackageExtendedBhv} {
         IList ${myExtendedBhvInterfaceName}.DelegateGetListAll() {
             return this.Dao.GetListAll();
         }
+
+        /// <summary>
+        /// Select all list. (Delegate-Method)
+        /// </summary> 
+        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        IList ${myExtendedBhvInterfaceName}.DelegateSelectListAll() {// for saving compatible
+            return this.Dao.GetListAll();
+        }
 #if ($table.hasPrimaryKey())
 
         //
@@ -320,7 +328,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
         protected override IList DoDelegateReadAllList() {
-            return this.Self.DelegateSelectAllList();
+            return this.Self.DelegateGetListAll();
         }
 
         /// <summary>
@@ -806,7 +814,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public int UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
+        public void UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             ${myConditionBeanClassName} cb = NewMyConditionBean();
             cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());

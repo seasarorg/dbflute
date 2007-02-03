@@ -168,6 +168,17 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
 
     /**
+     * Set the value of ${col.UncapitalisedJavaName} using likeSearch. { like '%xxx%' }
+     * If the value is null or empty-string, this condition is ignored.
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as likeSearch.
+     * @param likeSearchOption Like search option. (NotNull)
+     */
+    public void set${tmpJavaName}_LikeSearch($col.JavaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
+        registerQuery(${glConditionKeyName}.CK_LIKE_SEARCH, value, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, likeSearchOption);
+    }
+
+    /**
      * Set the value of ${col.UncapitalisedJavaName} using inScope. { in ('a', 'b') }
      * If the element in the list is null or empty-string, the condition-element is ignored.
      * 

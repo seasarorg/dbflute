@@ -78,6 +78,12 @@ namespace ${glPackageExtendedBhv} {
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
         IList DelegateGetListAll();
+
+        /// <summary>
+        /// Select all list. (Delegate-Method)
+        /// </summary> 
+        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        IList DelegateSelectListAll();// for saving compatible
 #if ($table.hasPrimaryKey())
 
         //

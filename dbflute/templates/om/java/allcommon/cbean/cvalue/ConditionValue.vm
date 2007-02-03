@@ -4,6 +4,8 @@ package ${glPackageBaseCommonCValue};
 
 import java.util.List;
 
+import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
+
 /**
  * Condition value.
  * 
@@ -287,6 +289,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Prefix Search
+    //                                                                       =============
     /** Value of prefixSearch. */
     protected Object _prefixSearch;
 
@@ -333,6 +338,102 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                         Like Search
+    //                                                                         ===========
+    /** Value of likeSearch. */
+    protected java.util.List${database.filterGenericsString('LikeSearchValue')} _likeSearch;
+
+    /** Value of likeSearch for spare. */
+    protected java.util.List${database.filterGenericsString('LikeSearchValue')} _likeSearch4Spare;
+
+    /**
+     * Get the value of likeSearch.
+     * 
+     * @return The value of likeSearch. (Nullable)
+     */
+    public String getLikeSearch() {
+        if (_likeSearch == null) {
+            return null;
+        }
+        if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
+            for (int index=0; index < _likeSearch4Spare.size(); index++) {
+                _likeSearch.add(_likeSearch4Spare.get(index));
+            }
+        }
+        final LikeSearchValue likeSearchValue = (LikeSearchValue)_likeSearch.remove(0);
+        return (String)filterValue(likeSearchValue.generateRealValue());
+    }
+
+    /**
+     * Set the value of likeSearch.
+     * 
+     * @param value The value of likeSearch. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} setLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {
+        if (_likeSearch == null) {
+            _likeSearch = new java.util.ArrayList${database.filterGenericsString('LikeSearchValue')}();
+            _likeSearch4Spare= new java.util.ArrayList${database.filterGenericsString('LikeSearchValue')}();
+        }
+        if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
+            for (int index=0; index < _likeSearch4Spare.size(); index++) {
+                _likeSearch.add(_likeSearch4Spare.get(index));
+            }
+        }
+        final LikeSearchValue likeSearchValue = new LikeSearchValue(value, option);
+        _likeSearch.add(likeSearchValue);
+        _likeSearch4Spare.add(likeSearchValue);
+        return this;
+    }
+
+    /** Location of likeSearch. */
+    protected String _likeSearchLocation;
+
+    /**
+     * Get the location of likeSearch.
+     * 
+     * @return The location of likeSearch. (Nullable)
+     */
+    public String getLikeSearchLocation() {
+        return _likeSearchLocation;
+    }
+
+    /**
+     * Set the location of likeSearch.
+     * 
+     * @param location The location of likeSearch. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} setLikeSearchLocation(String location) {
+        _likeSearchLocation = location;
+        return this;
+    }
+
+    protected static class LikeSearchValue {
+        protected String _value;
+        protected ${glConditionOptionLikeSearchName} _option;
+        public LikeSearchValue(String value, ${glConditionOptionLikeSearchName} option) {
+            _value = value;
+            _option = option;
+        }
+        public String getValue() {
+            return _value;
+        }
+        public ${glConditionOptionLikeSearchName} getOption() {
+            return _option;
+        }
+        public String generateRealValue() {
+            if (_option == null) {
+                return _value;
+            }
+            return _option.generateRealValue(_value);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            In Scope
+    //                                                                            ========
     /** Value of inScope. */
     protected List _inScope;
 
@@ -379,6 +480,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                        Not In Scope
+    //                                                                        ============
     /** Value of notInScope. */
     protected List _notInScope;
 

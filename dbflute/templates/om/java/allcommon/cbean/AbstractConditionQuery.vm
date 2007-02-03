@@ -3,6 +3,7 @@ package ${glPackageBaseCommonCBean};
 #set ($myClassName = "${glConditionQueryAbstractName}")
 
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};
+import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
@@ -196,6 +197,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
             getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
+        }
+    }
+
+    protected void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
+            getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
         }
     }
 

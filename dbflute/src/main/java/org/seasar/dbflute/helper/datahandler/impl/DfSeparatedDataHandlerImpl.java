@@ -57,6 +57,9 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         resultInfo.setNotFoundColumnMap(notFoundColumnMap);
         final File baseDir = new File(info.getBasePath());
         final String[] dataDirectoryElements = baseDir.list();
+        if (dataDirectoryElements == null) {
+            return resultInfo;
+        }
         final FilenameFilter filter = createFilenameFilter(info.getTypeName());
 
         try {

@@ -1,0 +1,12 @@
+package ${glPackageBaseCommonCOption};
+
+#set ($myClassName = "${glConditionOptionInterfaceName}")
+
+/**
+ * The interface of condition-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${myClassName} {
+    public String getRearOption();
+}

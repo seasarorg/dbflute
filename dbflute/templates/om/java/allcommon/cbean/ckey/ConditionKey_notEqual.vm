@@ -2,9 +2,7 @@ package ${glPackageBaseCommonCKey};
 
 #set ($myClassName = "${glConditionKeyName}NotEqual")
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
@@ -13,9 +11,6 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glConditionKeyName} {
-
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${myClassName}.class);
 
     /**
      * Constructor.
@@ -37,11 +32,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
         if (value == null) {
             return false;
         }
-        Object valueObject = conditionValue.getNotEqual();
-        if (valueObject != null && valueObject.equals(value)) {
-            _log.warn("The value has already registered at " + callerName + ": " + valueObject + " = " + value);
-            return false;
-        }
         return true;
     }
 
@@ -60,6 +50,18 @@ public class ${myClassName} extends ${glConditionKeyName} {
     }
 
     /**
+     * This method implements super#doAddWhereClause().
+     * 
+     * @param conditionList Condition list. (NotNull)
+     * @param columnName Column name. (NotNull)
+     * @param value Condition value. (NotNull)
+     * @param option Condition option. (NotNull)
+     */
+    protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+        throw new UnsupportedOperationException("doAddWhereClause with condition-option is unsupported!!!");
+    }
+
+    /**
      * This method implements super#doSetupConditionValue().
      * 
      * @param conditionValue Condition value. (NotNull)
@@ -68,5 +70,17 @@ public class ${myClassName} extends ${glConditionKeyName} {
      */
     protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
         conditionValue.setNotEqual(value).setNotEqualLocation(location);
+    }
+
+    /**
+     * This method implements super#doSetupConditionValue().
+     * 
+     * @param conditionValue Condition value. (NotNull)
+     * @param value Value. (NotNull)
+     * @param location Location. (NotNull)
+     * @param option Condition option. (NotNull)
+     */
+    protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }

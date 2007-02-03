@@ -172,7 +172,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
     /**
      * Read the statements from the .sql file and execute them.
-     * Lines starting with '//', '--' or 'REM ' are ignored.
      *
      * @param reader
      * @return List.
@@ -190,10 +189,14 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 // SQL defines "--" as a comment to EOL
                 // and in Oracle it may contain a hint
                 // so we cannot just remove it, instead we must end it
-                if (line.indexOf("--") >= 0) {
+                if (line.trim().startsWith("--")) {// If this line is comment only, ...
                     sql = sql + line + "\n";
                 } else {
-                    sql = sql + " " + line;
+                    if (line.indexOf("--") >= 0) {// If this line contains both sql and comment, ...
+                        sql = sql + " " + line + "\n";
+                    } else {
+                        sql = sql + " " + line;
+                    }
                 }
 
                 if (sql.endsWith(_runInfo.getDelimiter())) {

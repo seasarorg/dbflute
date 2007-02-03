@@ -75,6 +75,8 @@ targetdatabase = $targetDatabase
     #set ($glConditionQueryAbstractName = "${glProjectPrefix}AbstractConditionQuery")
     #set ($glConditionKeyName = "${glProjectPrefix}ConditionKey")
     #set ($glConditionValueName = "${glProjectPrefix}ConditionValue")
+    #set ($glConditionOptionInterfaceName = "${glProjectPrefix}ConditionOption")
+    #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
     #set ($glSqlClauseName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseInterfaceName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseAbstractName = "${glProjectPrefix}AbstractSqlClause")
@@ -135,6 +137,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
     #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
     #set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.cbean.cvalue")
+    #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
     #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
     #set ($glPackageBaseCommonException = "${database.baseCommonPackage}.exception")
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
@@ -333,6 +336,10 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}PrefixSearch.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_prefixSearch.${glTemplateFileExtension}",$path ,"", "")
 
+    $database.debug("    ...Parsing ConditionKey_likeSearch")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}LikeSearch.${glClassFileExtension}" )
+    $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_likeSearch.${glTemplateFileExtension}",$path ,"", "")
+
     $database.debug("    ...Parsing ConditionKey_inScope")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}InScope.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_inScope.${glTemplateFileExtension}",$path ,"", "")
@@ -348,6 +355,25 @@ targetdatabase = $targetDatabase
     $database.debug("    ...Parsing ConditionKey_isNotNull")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}IsNotNull.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_isNotNull.${glTemplateFileExtension}",$path ,"", "")
+
+    #if ($database.isTargetLanguageJava())
+      ## -------------------------------------------------------
+      ##                                   Parse condition-value
+      ##                                   ---------------------
+      ## Setup java directory for allcommon.
+      $database.setupJavaDir_for_allcommon()
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
+      $database.makeDirectory($path)
+
+      $database.debug("    ...Parsing ConditionOption")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    ...Parsing LikeSearchOption")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
+    #end
 
     ## -------------------------------------------------------
     ##                                   Parse condition-value

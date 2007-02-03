@@ -132,7 +132,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return new DfSqlFileRunnerBase(runInfo, getDataSource()) {
             protected String filterSql(String sql) {
 
-                //                // TODO: ���\�b�h�̈��Ȃ�Ƃ��Ă���I�ł�^�����Ȃ��Ȃ��I
                 //                final SqlTokenizerImpl tokenizer = new SqlTokenizerImpl(sql);
                 //                while (true) {
                 //                    final int result = tokenizer.next();
