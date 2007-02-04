@@ -170,6 +170,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     /**
      * Set the value of ${col.UncapitalisedJavaName} using likeSearch. { like '%xxx%' }
      * If the value is null or empty-string, this condition is ignored.
+     * You can invoke this method several times and the conditions are set up.
      * 
      * @param value The value of ${col.UncapitalisedJavaName} as likeSearch.
      * @param likeSearchOption Like search option. (NotNull)

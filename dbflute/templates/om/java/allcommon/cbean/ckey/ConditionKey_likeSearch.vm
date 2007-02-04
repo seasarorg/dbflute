@@ -33,7 +33,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
         if (value == null) {
             return false;
         }
-
         return true;
     }
 

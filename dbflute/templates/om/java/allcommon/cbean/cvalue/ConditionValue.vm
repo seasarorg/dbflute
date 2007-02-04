@@ -13,6 +13,9 @@ import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
  */
 public class ${myClassName} {
 
+    // ===================================================================================
+    //                                                                               Equal
+    //                                                                               =====
     /** Value of equal. */
     protected Object _equalValue;
 
@@ -32,6 +35,36 @@ public class ${myClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} setEqual(Object value) {
+        _equalValue = value;
+        return this;
+    }
+
+    /**
+     * Does it has the value of equal?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasEqual() {
+        return _equalValue != null;
+    }
+
+    /**
+     * Does the value equal the value of equal?
+     * 
+     * @param value The value of equal. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalEqual(Object value) {
+        return hasEqual() ? _equalValue.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of equal.
+     * 
+     * @param value The value of equal. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideEqual(Object value) {
         _equalValue = value;
         return this;
     }
@@ -59,6 +92,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                           Not Equal
+    //                                                                           =========
     /** Value of notEqual. */
     protected Object _notEqualValue;
 
@@ -78,6 +114,36 @@ public class ${myClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} setNotEqual(Object value) {
+        _notEqualValue = value;
+        return this;
+    }
+
+    /**
+     * Does it has the value of notEqual?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasNotEqual() {
+        return _notEqualValue != null;
+    }
+
+    /**
+     * Does the value equal the value of notEqual?
+     * 
+     * @param value The value of notEqual. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalNotEqual(Object value) {
+        return hasNotEqual() ? _notEqualValue.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of notEqual.
+     * 
+     * @param value The value of notEqual. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideNotEqual(Object value) {
         _notEqualValue = value;
         return this;
     }
@@ -105,6 +171,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                        Greater Than
+    //                                                                        ============
     /** Value of greaterThan. */
     protected Object _greaterThanValue;
 
@@ -124,6 +193,36 @@ public class ${myClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} setGreaterThan(Object value) {
+        _greaterThanValue = value;
+        return this;
+    }
+
+    /**
+     * Does it has the value of greaterThan?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasGreaterThan() {
+        return _greaterThanValue != null;
+    }
+
+    /**
+     * Does the value equal the value of greaterThan?
+     * 
+     * @param value The value of greaterThan. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalGreaterThan(Object value) {
+        return hasGreaterThan() ? _greaterThanValue.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of greaterThan.
+     * 
+     * @param value The value of greaterThan. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideGreaterThan(Object value) {
         _greaterThanValue = value;
         return this;
     }
@@ -151,6 +250,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                           Less Than
+    //                                                                           =========
     /** Value of lessThan. */
     protected Object _lessThanValue;
 
@@ -170,6 +272,36 @@ public class ${myClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} setLessThan(Object value) {
+        _lessThanValue = value;
+        return this;
+    }
+
+    /**
+     * Does it has the value of lessThan?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasLessThan() {
+        return _lessThanValue != null;
+    }
+
+    /**
+     * Does the value equal the value of lessThan?
+     * 
+     * @param value The value of lessThan. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalLessThan(Object value) {
+        return hasLessThan() ? _lessThanValue.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of lessThan.
+     * 
+     * @param value The value of lessThan. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideLessThan(Object value) {
         _lessThanValue = value;
         return this;
     }
@@ -197,6 +329,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Greater Equal
+    //                                                                       =============
     /** Value of greaterEqual. */
     protected Object _greaterEqualValue;
 
@@ -216,6 +351,36 @@ public class ${myClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} setGreaterEqual(Object value) {
+        _greaterEqualValue = value;
+        return this;
+    }
+
+    /**
+     * Does it has the value of greaterEqual?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasGreaterEqual() {
+        return _greaterEqualValue != null;
+    }
+
+    /**
+     * Does the value equal the value of greaterEqual?
+     * 
+     * @param value The value of greaterEqual. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalGreaterEqual(Object value) {
+        return hasGreaterEqual() ? _greaterEqualValue.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of greaterEqual.
+     * 
+     * @param value The value of greaterEqual. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideGreaterEqual(Object value) {
         _greaterEqualValue = value;
         return this;
     }
@@ -243,6 +408,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                          Less Equal
+    //                                                                          ==========
     /** Value of lessEqual. */
     protected Object _lessEqualValue;
 
@@ -262,6 +430,36 @@ public class ${myClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} setLessEqual(Object value) {
+        _lessEqualValue = value;
+        return this;
+    }
+
+    /**
+     * Does it has the value of lessEqual?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasLessEqual() {
+        return _lessEqualValue != null;
+    }
+
+    /**
+     * Does the value equal the value of lessEqual?
+     * 
+     * @param value The value of lessEqual. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalLessEqual(Object value) {
+        return hasLessEqual() ? _lessEqualValue.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of lessEqual.
+     * 
+     * @param value The value of lessEqual. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideLessEqual(Object value) {
         _lessEqualValue = value;
         return this;
     }
@@ -311,6 +509,36 @@ public class ${myClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} setPrefixSearch(Object value) {
+        _prefixSearch = value;
+        return this;
+    }
+
+    /**
+     * Does it has the value of prefixSearch?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasPrefixSearch() {
+        return _prefixSearch != null;
+    }
+
+    /**
+     * Does the value equal the value of prefixSearch?
+     * 
+     * @param value The value of prefixSearch. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalPrefixSearch(Object value) {
+        return hasPrefixSearch() ? _prefixSearch.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of prefixSearch.
+     * 
+     * @param value The value of prefixSearch. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overridePrefixSearch(Object value) {
         _prefixSearch = value;
         return this;
     }
@@ -457,6 +685,36 @@ public class ${myClassName} {
         return this;
     }
 
+    /**
+     * Does it has the value of inScope?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasInScope() {
+        return _inScope != null;
+    }
+
+    /**
+     * Does the value equal the value of inScope?
+     * 
+     * @param value The value of inScope. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalInScope(List value) {
+        return hasInScope() ? _inScope.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of inScope.
+     * 
+     * @param value The value of inScope. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideInScope(List value) {
+        _inScope = value;
+        return this;
+    }
+
     /** Location of InScope. */
     protected String _inScopeLocation;
 
@@ -506,6 +764,36 @@ public class ${myClassName} {
         return this;
     }
 
+    /**
+     * Does it has the value of inNotScope?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasNotInScope() {
+        return _notInScope != null;
+    }
+
+    /**
+     * Does the value equal the value of inNotScope?
+     * 
+     * @param value The value of inNotScope. (Nullable)
+     * @return Determination. (NotNull)
+     */
+    public boolean equalNotInScope(List value) {
+        return hasNotInScope() ? _notInScope.equals(value) : value == null;
+    }
+
+    /**
+     * Override the value of inNotScope.
+     * 
+     * @param value The value of inNotScope. (Nullable)
+     * @return this. (NotNull)
+     */
+    public ${myClassName} overrideNotInScope(List value) {
+        _notInScope = value;
+        return this;
+    }
+
     /** Location of notInScope. */
     protected String _notInScopeLocation;
 
@@ -529,6 +817,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                             Is Null
+    //                                                                             =======
     /** Value of isNull. */
     protected Object _isNullValue;
 
@@ -550,6 +841,15 @@ public class ${myClassName} {
     public ${myClassName} setIsNull(Object value) {
         _isNullValue = value;
         return this;
+    }
+
+    /**
+     * Does it has the value of isNull?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasIsNull() {
+        return _isNullValue != null;
     }
 
     /** Location of isNull. */
@@ -575,6 +875,9 @@ public class ${myClassName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                         Is Not Null
+    //                                                                         ===========
     /** Value of isNotNull. */
     protected Object _isNotNullValue;
 
@@ -596,6 +899,15 @@ public class ${myClassName} {
     public ${myClassName} setIsNotNull(Object value) {
         _isNotNullValue = value;
         return this;
+    }
+
+    /**
+     * Does it has the value of isNotNull?
+     * 
+     * @return Determination. (NotNull)
+     */
+    public boolean hasIsNotNull() {
+        return _isNotNullValue != null;
     }
 
     /** Location of isNotNull. */
