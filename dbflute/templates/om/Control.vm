@@ -336,9 +336,11 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}PrefixSearch.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_prefixSearch.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_likeSearch")
-    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}LikeSearch.${glClassFileExtension}" )
-    $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_likeSearch.${glTemplateFileExtension}",$path ,"", "")
+    #if ($database.isTargetLanguageJava())
+      $database.debug("    ...Parsing ConditionKey_likeSearch")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}LikeSearch.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_likeSearch.${glTemplateFileExtension}",$path ,"", "")
+    #end
 
     $database.debug("    ...Parsing ConditionKey_inScope")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}InScope.${glClassFileExtension}" )
