@@ -105,6 +105,12 @@ targetdatabase = $targetDatabase
     #set ($glMapStringBuilderName = "${glProjectPrefix}MapStringBuilder")
     #set ($glMapStringBuilderImplName = "${glProjectPrefix}MapStringBuilderImpl")
 
+    #set ($glGeneralCharacterName = "${glProjectPrefix}GeneralCharacter")
+    #set ($glGeneralCharacterImplName = "${glProjectPrefix}GeneralCharacterImpl")
+
+    #set ($glJapaneseCharacterName = "${glProjectPrefix}JapaneseCharacter")
+    #set ($glJapaneseCharacterImplName = "${glProjectPrefix}JapaneseCharacterImpl")
+
     ## [Interceptor]
     #set ($glCommonColumnSetupAbstractInterceptor = "${glProjectPrefix}CommonColumnSetupAbstractInterceptor")
     #set ($glCommonColumnSetupBeforeInsertInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeInsertInterceptor")
@@ -141,6 +147,8 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
     #set ($glPackageBaseCommonException = "${database.baseCommonPackage}.exception")
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
+    #set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.helper.character")
+    #set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.helper.character.impl")
     #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
     #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
     #set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
@@ -504,6 +512,30 @@ targetdatabase = $targetDatabase
     $database.debug("    parseMapStringBuilderImpl();")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapStringBuilderImplName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/helper/MapStringBuilderImpl.${glTemplateFileExtension}",$path,"", "")
+
+    #if ($database.isTargetLanguageJava())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperCharacter}))
+      $database.makeDirectory($path)
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperCharacterImpl}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parseGeneralCharacter();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCharacter})}${glGeneralCharacterName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/character/GeneralCharacter.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseGeneralCharacterImpl();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCharacterImpl})}${glGeneralCharacterImplName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/character/impl/GeneralCharacterImpl.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseJapaneseCharacter();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCharacter})}${glJapaneseCharacterName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/character/JapaneseCharacter.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseJapaneseCharacterImpl();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCharacterImpl})}${glJapaneseCharacterImplName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/character/impl/JapaneseCharacterImpl.${glTemplateFileExtension}",$path,"", "")
+    #end
 
     $database.debug("}")
 

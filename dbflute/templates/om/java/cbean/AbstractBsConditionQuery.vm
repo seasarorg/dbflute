@@ -176,7 +176,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @param likeSearchOption Like search option. (NotNull)
      */
     public void set${tmpJavaName}_LikeSearch($col.JavaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-        registerQuery(${glConditionKeyName}.CK_LIKE_SEARCH, value, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, likeSearchOption);
+        registerLikeQuery(${glConditionKeyName}.CK_LIKE_SEARCH, value, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, likeSearchOption);
     }
 
     /**

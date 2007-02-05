@@ -2,6 +2,12 @@ package ${glPackageBaseCommonCOption};
 
 #set ($myClassName = "${glConditionOptionLikeSearchName}")
 
+import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacterName};
+import ${glPackageBaseCommonHelperCharacterImpl}.${glGeneralCharacterImplName};
+import ${glPackageBaseCommonHelperCharacter}.${glJapaneseCharacterName};
+import ${glPackageBaseCommonHelperCharacterImpl}.${glJapaneseCharacterImplName};
+
+
 /**
  * The class of like-search-option.
  * 
@@ -15,7 +21,24 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
 
     protected String _like;
     protected String _escape;
+    protected String _split;
+    protected String _splitContainedDelimiter;
 
+    protected boolean _toSingleByteSpace;
+    protected boolean _toSingleByteAlphabetNumber;
+    protected boolean _toSingleByteAlphabetNumberMark;
+
+    protected boolean _toUpperCase;
+    protected boolean _toLowerCase;
+
+    protected LikeSearchOptionJapanese _likeSearchOptionJapanese;
+
+    private ${glGeneralCharacterName} _generalCharacter;
+    private ${glJapaneseCharacterName} _japaneseCharacter;
+
+    // =====================================================================================
+    //                                                                           Rear Option
+    //                                                                           ===========
     public String getRearOption() {
         if (_escape == null || _escape.trim().length() == 0) {
             return "";
@@ -23,6 +46,9 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         return " escape '" + _escape + "'";
     }
 
+    // =====================================================================================
+    //                                                                                  Like
+    //                                                                                  ====
     public ${myClassName} likePrefix() {
         _like = LIKE_PREFIX;
         return this;
@@ -36,6 +62,9 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         return this;
     }
 
+    // =====================================================================================
+    //                                                                                Escape
+    //                                                                                ======
     public ${myClassName} escapeByPipeLine() {
         _escape = "|";
         return this;
@@ -56,29 +85,202 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         return this;
     }
 
-    public String generateRealValue(String value) {
+    // =====================================================================================
+    //                                                                                 Split
+    //                                                                                 =====
+    public boolean isSplit() {
+        return _split != null;
+    }
+
+    public ${myClassName} splitBySpace() {
+        _split = " ";
+        return this;
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte() {
+        _split = " ";
+        _splitContainedDelimiter = "\u3000";
+        return this;
+    }
+
+    public String[] generateSplitValueArray(String value) {
+        if (value == null || value.trim().length() == 0) {
+            String msg = "The argument[value] should not be null of empty: " + value;
+            throw new IllegalArgumentException(msg);
+        }
+        value = repalceContainedDelimiterToRealDelimiter(value);
+        return value.split(_split + "+");
+    }
+
+    protected String repalceContainedDelimiterToRealDelimiter(String value) {
+        if (value == null || value.trim().length() == 0) {
+            return value;
+        }
+        if (_splitContainedDelimiter == null) {
+            return value;
+        }
+        if (_split == null) {
+            return value;
+        }
+        return replace(value, _splitContainedDelimiter, _split);
+    }
+
+    // =====================================================================================
+    //                                                                        To Single Byte
+    //                                                                        ==============
+    public boolean isToSingleByteSpace() {
+        return _toSingleByteSpace;
+    }
+    public ${myClassName} toSingleByteSpace() {
+        _toSingleByteSpace = true;
+        return this;
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumber() {
+        _toSingleByteAlphabetNumber = true;
+        return this;
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumberMark() {
+        _toSingleByteAlphabetNumberMark = true;
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                        To Double Byte
+    //                                                                        ==============
+
+    // =====================================================================================
+    //                                                                   To Upper/Lower Case
+    //                                                                   ===================
+    public ${myClassName} toUpperCase() {
+        _toUpperCase = true;
+        _toLowerCase = false;
+        return this;
+    }
+
+    public ${myClassName} toLowerCase() {
+        _toUpperCase = false;
+        _toLowerCase = true;
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                                 Local
+    //                                                                                 =====
+    public LikeSearchOptionJapanese localJapanese() {
+        if (_likeSearchOptionJapanese == null) {
+            _likeSearchOptionJapanese = new LikeSearchOptionJapaneseImpl();
+        }
+        return _likeSearchOptionJapanese;
+    }
+
+    public static interface LikeSearchOptionJapanese {
+        public boolean isToDoubleByteKatakana();
+        public LikeSearchOptionJapanese toDoubleByteKatakana();
+        public boolean isRemoveLastLongVowel();
+        public LikeSearchOptionJapanese removeLastLongVowel();
+    }
+
+    public static class LikeSearchOptionJapaneseImpl implements LikeSearchOptionJapanese {
+        protected boolean _toDoubleByteKatakana;
+        protected boolean _removeLastLongVowel;
+
+        // =====================================================================================
+        //                                                                        To Double Byte
+        //                                                                        ==============
+        public boolean isToDoubleByteKatakana() {
+            return _toDoubleByteKatakana;
+        }
+        public LikeSearchOptionJapanese toDoubleByteKatakana() {
+            _toDoubleByteKatakana = true;
+            return this;
+        }
+
+        // =====================================================================================
+        //                                                                                Remove
+        //                                                                                ======
+        public boolean isRemoveLastLongVowel() {
+            return _removeLastLongVowel;
+        }
+        public LikeSearchOptionJapanese removeLastLongVowel() {
+            _removeLastLongVowel = true;
+            return this;
+        }
+    }
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public String generateRealValue(String value) {// TODO: @jflute - I want to refactor!!!
         if (value == null || value.trim().length() == 0) {
             String msg = "The argument[value] should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        final String escapedString;
-        if (_escape == null || _escape.trim().length() == 0) {
-            escapedString = value;
-        } else {
-            escapedString = replace(replace(value, "%", _escape + "%"), "_", _escape + "_");
+
+        // To Single Byte
+        if (_toSingleByteSpace) {
+            value = (value != null ? value.replaceAll("\u3000", " ") : value);
+        }
+
+        if (_toSingleByteAlphabetNumberMark) {
+            value = getGeneralCharacter().toSingleByteAlphabetNumberMark(value);
+        } else if (_toSingleByteAlphabetNumber) {
+            value = getGeneralCharacter().toSingleByteAlphabetNumber(value);
+        }
+
+        // To Double Byte
+        if (_likeSearchOptionJapanese != null && _likeSearchOptionJapanese.isToDoubleByteKatakana()) {
+            value = getJapaneseCharacter().toDoubleByteKatakana(value);
+        }
+
+        // To Upper/Lower Case
+        if (_toUpperCase) {
+            value = (value != null ? value.toUpperCase() : value);
+        }
+        if (_toLowerCase) {
+            value = (value != null ? value.toLowerCase() : value);
+        }
+
+        // Remove
+        if (_likeSearchOptionJapanese != null && _likeSearchOptionJapanese.isRemoveLastLongVowel()) {
+            if (value != null && value.endsWith("\u30fc")) {
+                value = value.substring(0, value.length() - "\u30fc".length());
+            }
+        }
+
+        if (_escape != null && _escape.trim().length() != 0) {
+            value = replace(replace(value, "%", _escape + "%"), "_", _escape + "_");
         }
         if (_like == null || _like.trim().length() == 0) {
-            return escapedString;
+            return value;
         } else if (_like.equals(LIKE_PREFIX)) {
-            return escapedString + "${database.wildCard}";
+            return value + "${database.wildCard}";
         } else if (_like.equals(LIKE_SUFFIX)) {
-            return "${database.wildCard}" + escapedString;
+            return "${database.wildCard}" + value;
         } else if (_like.equals(LIKE_CONTAIN)) {
-            return "${database.wildCard}" + escapedString + "${database.wildCard}";
+            return "${database.wildCard}" + value + "${database.wildCard}";
         } else {
             String msg = "The like was wrong string: " + _like;
             throw new IllegalStateException(msg);
         }
+    }
+
+    // =====================================================================================
+    //                                                                                Helper
+    //                                                                                ======
+    protected ${glGeneralCharacterName} getGeneralCharacter() {
+        if (_generalCharacter == null) {
+            _generalCharacter = new ${glGeneralCharacterImplName}();
+        }
+        return _generalCharacter;
+    }
+
+    protected ${glJapaneseCharacterName} getJapaneseCharacter() {
+        if (_japaneseCharacter == null) {
+            _japaneseCharacter = new ${glJapaneseCharacterImplName}();
+        }
+        return _japaneseCharacter;
     }
 
     protected final String replace(String text, String fromText,
