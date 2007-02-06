@@ -15,9 +15,6 @@
  */
 package org.seasar.dbflute;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -36,6 +33,7 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDaoDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
+import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
@@ -968,6 +966,10 @@ public final class DfBuildProperties {
         return getHandler().getSourceReductionProperties(getProperties());
     }
 
+    public DfIncludeQueryProperties getIncludeQueryProperties() {
+        return getHandler().getIncludeQueryProperties(getProperties());
+    }
+    
     // ===============================================================================
     //                                                              Properties - Other
     //                                                              ==================

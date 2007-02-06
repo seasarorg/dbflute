@@ -1,0 +1,178 @@
+package ${glPackageBaseCommonCOption};
+
+#set ($myClassName = "${glConditionOptionSimpleStringName}")
+
+import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsSplitName};
+import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsToUpperLowerCaseName};
+import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsToSingleByteName};
+import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
+
+/**
+ * The class of simple-string-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} implements ${glConditionOptionInterfaceName} {
+
+    protected ${glConditionOptionPartsSplitName} _splitOptionParts;
+    protected ${glConditionOptionPartsToUpperLowerCaseName} _toUpperLowerCaseOptionParts;
+    protected ${glConditionOptionPartsToSingleByteName} _toSingleByteCaseOptionParts;
+    protected ${glConditionOptionPartsAgentJapaneseName} _japaneseOptionPartsAgent;
+
+    // =====================================================================================
+    //                                                                           Rear Option
+    //                                                                           ===========
+    public String getRearOption() {
+        return "";
+    }
+
+    // =====================================================================================
+    //                                                                                 Split
+    //                                                                                 =====
+    public boolean isSplit() {
+        return getSplitOptionParts().isSplit();
+    }
+
+    public ${myClassName} splitBySpace() {
+        getSplitOptionParts().splitBySpace();
+        return this;
+    }
+
+    public ${myClassName} splitBySpace(int splitLimitCount) {
+        getSplitOptionParts().splitBySpace(splitLimitCount);
+        return this;
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte() {
+        getSplitOptionParts().splitBySpaceContainsDoubleByte();
+        return this;
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte(int splitLimitCount) {
+        getSplitOptionParts().splitBySpaceContainsDoubleByte(splitLimitCount);
+        return this;
+    }
+
+    public ${myClassName} splitByPipeLine() {
+        getSplitOptionParts().splitByPipeLine();
+        return this;
+    }
+
+    public ${myClassName} splitByPipeLine(int splitLimitCount) {
+        getSplitOptionParts().splitByPipeLine(splitLimitCount);
+        return this;
+    }
+
+    public String[] generateSplitValueArray(String value) {
+        return getSplitOptionParts().generateSplitValueArray(value);
+    }
+
+    protected ${glConditionOptionPartsSplitName} getSplitOptionParts() {
+        if (_splitOptionParts == null) {
+            _splitOptionParts = new ${glConditionOptionPartsSplitName}();
+        }
+        return _splitOptionParts;
+    }
+
+    // =====================================================================================
+    //                                                                   To Upper/Lower Case
+    //                                                                   ===================
+    public ${myClassName} toUpperCase() {
+        getToUpperLowerCaseOptionParts().toUpperCase();
+        return this;
+    }
+
+    public ${myClassName} toLowerCase() {
+        getToUpperLowerCaseOptionParts().toLowerCase();
+        return this;
+    }
+
+    protected ${glConditionOptionPartsToUpperLowerCaseName} getToUpperLowerCaseOptionParts() {
+        if (_toUpperLowerCaseOptionParts == null) {
+            _toUpperLowerCaseOptionParts = new ${glConditionOptionPartsToUpperLowerCaseName}();
+        }
+        return _toUpperLowerCaseOptionParts;
+    }
+
+    // =====================================================================================
+    //                                                                        To Single Byte
+    //                                                                        ==============
+    public ${myClassName} toSingleByteSpace() {
+        getToSingleByteOptionParts().toSingleByteSpace();
+        return this;
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumber() {
+        getToSingleByteOptionParts().toSingleByteAlphabetNumber();
+        return this;
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumberMark() {
+        getToSingleByteOptionParts().toSingleByteAlphabetNumberMark();
+        return this;
+    }
+
+    protected ${glConditionOptionPartsToSingleByteName} getToSingleByteOptionParts() {
+        if (_toSingleByteCaseOptionParts == null) {
+            _toSingleByteCaseOptionParts = new ${glConditionOptionPartsToSingleByteName}();
+        }
+        return _toSingleByteCaseOptionParts;
+    }
+
+    // =====================================================================================
+    //                                                                        To Double Byte
+    //                                                                        ==============
+
+    // =====================================================================================
+    //                                                                              Japanese
+    //                                                                              ========
+    public ${glConditionOptionPartsAgentJapaneseName} localJapanese() {
+        return getJapaneseOptionPartsAgent();
+    }
+
+    protected ${glConditionOptionPartsAgentJapaneseName} getJapaneseOptionPartsAgent() {
+        if (_japaneseOptionPartsAgent == null) {
+            _japaneseOptionPartsAgent = new ${glConditionOptionPartsAgentJapaneseName}();
+        }
+        return _japaneseOptionPartsAgent;
+    }
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public String generateRealValue(String value) {
+        value = getToUpperLowerCaseOptionParts().generateRealValue(value);
+        value = getToSingleByteOptionParts().generateRealValue(value);
+        value = getJapaneseOptionPartsAgent().generateRealValue(value);
+        return value;
+    }
+
+    // =====================================================================================
+    //                                                                                Helper
+    //                                                                                ======
+    protected final String replace(String text, String fromText,
+            String toText) {
+
+        if (text == null || fromText == null || toText == null) {
+            return null;
+        }
+        StringBuffer buf = new StringBuffer(100);
+        int pos = 0;
+        int pos2 = 0;
+        while (true) {
+            pos = text.indexOf(fromText, pos2);
+            if (pos == 0) {
+                buf.append(toText);
+                pos2 = fromText.length();
+            } else if (pos > 0) {
+                buf.append(text.substring(pos2, pos));
+                buf.append(toText);
+                pos2 = pos + fromText.length();
+            } else {
+                buf.append(text.substring(pos2));
+                break;
+            }
+        }
+        return buf.toString();
+    }
+}

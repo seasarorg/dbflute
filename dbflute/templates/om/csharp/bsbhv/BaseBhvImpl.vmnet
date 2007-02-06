@@ -537,7 +537,20 @@ namespace ${glPackageExtendedBhv} {
             cb.LockForUpdate();
             return this.Self.SelectEntityWithDeletedCheck(cb);
         }
+
+      #if ($database.isMakeDeprecated())
+
+		//	K.Kotani Added.
+        [Obsolete("This method is deprecated. Please use SelectByPKValueWithDeleteCheckForUpdate.")]
+        public ${myExtendedObjectClassName} SelectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
+            ${myConditionBeanClassName} cb = NewMyConditionBean();
+            cb.AcceptPrimaryKeyMapString(primaryKeyMapString);
+            cb.LockForUpdate();
+            return this.Self.SelectEntityWithDeletedCheck(cb);
+        }
+      #end
     #end
+
 
         /// <summary>
         /// Select list.
@@ -902,6 +915,24 @@ namespace ${glPackageExtendedBhv} {
             FilterCopyInsertEntity(currentEntity);
             return this.Self.DelegateInsert(currentEntity);
         }
+		  #if ($database.isMakeDeprecated())
+
+		//	K.Kotani added.
+        /// <summary>
+        /// Select for read only by primary-key map-string with deleted check.
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
+        /// <returns>Entity that is selected from database by select-for-read-only. (NotNull)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        [Obsolete("This class is deprecated. Please use CopyInsertByPKValueAfterSelect().")]
+        public int CopyInsertByPKMapStringAfterSelect(String primaryKeyMapString) {
+            ${myConditionBeanClassName} cb = NewMyConditionBean();
+            cb.AcceptPrimaryKeyMapString(primaryKeyMapString);
+            ${myExtendedObjectClassName} currentEntity = SelectEntityWithDeletedCheck(cb);
+            FilterCopyInsertEntity(currentEntity);
+            return this.Self.DelegateInsert(currentEntity);
+        }
+    	  #end
         #end
       #end
 

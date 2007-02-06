@@ -72,6 +72,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.DfDBFluteProvider;
 import org.seasar.dbflute.config.DfDatabaseConfig;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
@@ -298,6 +299,11 @@ public class Database {
      */
     public Table getTableByJavaName(String javaName) {
         return (Table) _tablesByJavaName.get(javaName);
+    }
+
+    public Table getColumnByFlexibleName(String flexibleName) {
+        final DfFlexibleNameMap<String, Table> flexibleNameMap = new DfFlexibleNameMap<String, Table>(_tablesByName);
+        return flexibleNameMap.get(flexibleName);
     }
 
     /**
@@ -586,6 +592,46 @@ public class Database {
         getProperties().initializeClassificationDeploymentMap(getCustomizeTableList());
     }
 
+    // ===============================================================================
+    //                                                                    IncludeQuery
+    //                                                                    ============
+    public void initializeIncludeQuery() {
+        _log.debug("/=============================");
+        _log.debug("...Initializing customize dao.");
+        final Map<String, Map<String, Map<String, List<String>>>> map = getProperties().getIncludeQueryProperties()
+                .getIncludeQueryMap();
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            _log.debug(key);
+            final Map<String, Map<String, List<String>>> queryElementMap = map.get(key);
+            final Set<String> queryElementKeySet = queryElementMap.keySet();
+            for (String queryElementKey : queryElementKeySet) {
+                _log.debug("    " + queryElementKey);
+                final Map<String, List<String>> tableElementMap = queryElementMap.get(queryElementKey);
+                final Set<String> tableElementKeySet = tableElementMap.keySet();
+                for (String tableName : tableElementKeySet) {
+                    _log.debug("        " + tableName);
+                    final Table targetTable = getColumnByFlexibleName(tableName);
+                    if (targetTable == null) {
+                        String msg = "The table[" + tableName + "] of includeQueryMap was not found: " + map;
+                        throw new IllegalStateException(msg);
+                    }
+                    final List<String> columnNameList = tableElementMap.get(tableName);
+                    for (String columnName : columnNameList) {
+                        _log.debug("            " + columnName);
+                        final Column targetColumn = targetTable.getColumnByFlexibleName(columnName);
+                        if (targetColumn == null) {
+                            String msg = "The column[" + targetColumn
+                                    + "] of includeQueryMap was not found in the table[" + tableName + "]";
+                            throw new IllegalStateException(msg);
+                        }
+                    }
+                }
+            }
+        }
+        _log.debug("========/");
+    }
+
     // **********************************************************************************************
     //                                                                                     Properties
     //                                                                                     **********
@@ -700,7 +746,7 @@ public class Database {
     public String getDaoDiconPackageName() {
         return getProperties().getDaoDiconProperties().getDaoDiconPackageName();
     }
-    
+
     public List<String> getDaoDiconPackageNameList() {
         return getProperties().getDaoDiconProperties().getDaoDiconPackageNameList();
     }
@@ -1164,11 +1210,11 @@ public class Database {
     public boolean isMakeConditionQueryEqualEmptyString() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
-    
+
     public boolean isMakeConditionQueryNumericArgumentLong() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryNumericArgumentLong();
     }
-    
+
     public boolean isMakeBehaviorForUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorForUpdate();
     }

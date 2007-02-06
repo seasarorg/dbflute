@@ -5,6 +5,7 @@ package ${glPackageBaseCommonCBean};
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
+import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
@@ -196,39 +197,58 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                  , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-            setupConditionValueAndRefisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
         }
     }
 
     protected void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                  , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-            setupConditionValueAndRefisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
     }
 
-    protected void registerLikeQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
+    protected void registerLikeSearchQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
                                      , String colName, String capPropName, String uncapPropName, ${glConditionOptionLikeSearchName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             if (value != null && option.isSplit()) {
                 final String[] strArray = option.generateSplitValueArray(value);
                 for (int i=0; i < strArray.length; i++) {
                     final String currentValue = strArray[i];
-                    setupConditionValueAndRefisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
+                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
                 }
             } else {
-                setupConditionValueAndRefisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
             }
         }
     }
 
-    protected void setupConditionValueAndRefisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected void registerInScopeQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
+                                     , String colName, String capPropName, String uncapPropName, ${glConditionOptionInScopeName} option) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            if (value != null && option.isSplit()) {
+                final String[] strArray = option.generateSplitValueArray(value);
+                final java.util.List${database.filterGenericsString('String')} realValueList = new java.util.ArrayList${database.filterGenericsString('String')}();
+                for (int i=0; i < strArray.length; i++) {
+                    final String currentValue = strArray[i];
+                    realValueList.add(currentValue);
+                }
+                setupConditionValueAndRegisterWhereClause(key, realValueList, cvalue, colName, capPropName, uncapPropName, option);
+            } else {
+                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+            }
+        }
+    }
+
+
+
+    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
-    protected void setupConditionValueAndRefisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);

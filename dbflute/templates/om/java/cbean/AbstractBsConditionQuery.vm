@@ -116,6 +116,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, filterRemoveEmptyString(value));
     }
+      #if (${col.isAvailableStringGreaterThan()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
@@ -126,6 +127,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_GreaterThan($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, filterRemoveEmptyString(value));
     }
+      #end
+      #if (${col.isAvailableStringLessThan()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
@@ -136,6 +139,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessThan($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, filterRemoveEmptyString(value));
     }
+      #end
+      #if (${col.isAvailableStringGreaterEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
@@ -146,6 +151,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, filterRemoveEmptyString(value));
     }
+      #end
+      #if (${col.isAvailableStringLessEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
@@ -156,6 +163,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, filterRemoveEmptyString(value));
     }
+      #end
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using prefixSearch. { like 'xxx%' }
@@ -175,9 +183,10 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @param value The value of ${col.UncapitalisedJavaName} as likeSearch.
      * @param likeSearchOption Like search option. (NotNull)
      */
-    public void set${tmpJavaName}_LikeSearch($col.JavaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-        registerLikeQuery(${glConditionKeyName}.CK_LIKE_SEARCH, value, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, likeSearchOption);
+    public void set${tmpJavaName}_LikeSearch($col.JavaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} option) {
+        registerLikeSearchQuery(${glConditionKeyName}.CK_LIKE_SEARCH, filterRemoveEmptyString(value), getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, option);
     }
+      #if (${col.isAvailableStringInScope()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using inScope. { in ('a', 'b') }
@@ -190,6 +199,18 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
 
     /**
+     * Set the value of ${col.UncapitalisedJavaName} using inScope. { in ('a', 'b') }
+     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * 
+     * @param valueList The value of ${col.UncapitalisedJavaName} as inScope.
+     */
+    public void set${tmpJavaName}_InScope(${col.JavaNative} value, ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName} option) {
+        registerInScopeQuery(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyString(value), getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, option);
+    }
+      #end
+      #if (${col.isAvailableStringNotInScope()})
+
+    /**
      * Set the value of ${col.UncapitalisedJavaName} using notInScope. { not in ('a', 'b') }
      * If the element in the list is null or empty-string, the condition-element is ignored.
      * 
@@ -198,6 +219,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotInScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(valueList));
     }
+      #end
       #if (${col.isSingleKeyForeignKey()})
         #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
@@ -291,6 +313,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
         #end
       #end
+      #if (${col.isAvailableNumberNotEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
@@ -300,6 +323,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
     }
+      #end
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
@@ -392,7 +416,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
     }
-
+      #if (${col.isAvailableNumberInScope()})
     /**
      * Set the value of ${col.UncapitalisedJavaName} using inScope. { in (a, b) }
      * If the element in the list is null or empty-string, the condition-element is ignored.
@@ -402,6 +426,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_InScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
         register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, valueList);
     }
+      #end
+      #if (${col.isAvailableNumberNotInScope()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notInScope. { not in (a, b) }
@@ -412,6 +438,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotInScope(java.util.List${database.filterGenericsString(${col.JavaNative})} valueList) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, valueList);
     }
+      #end
       #if (${col.isSingleKeyForeignKey()})
         #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")

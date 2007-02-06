@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
+import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
@@ -89,7 +90,15 @@ public class ${myClassName} extends ${glConditionKeyName} {
      * @param option Condition option. (NotNull)
      */
     protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
-        throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
+        if (option == null) {
+            String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (!(option instanceof ${glConditionOptionInScopeName})) {
+            String msg = "The argument[option] should be ${glConditionOptionInScopeName}: columnName=" + columnName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        conditionList.add(buildBindClause(columnName, value.getInScopeLocation(), "('a1', 'a2')"));
     }
 
     /**
@@ -112,6 +121,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
      * @param option Condition option. (NotNull)
      */
     protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
-        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
+        conditionValue.setInScope((java.util.List)value, (${glConditionOptionInScopeName})option).setInScopeLocation(location);
     }
 }

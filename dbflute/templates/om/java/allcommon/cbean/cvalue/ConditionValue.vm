@@ -5,6 +5,7 @@ package ${glPackageBaseCommonCValue};
 import java.util.List;
 
 import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
+import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
 
 /**
  * Condition value.
@@ -665,12 +666,17 @@ public class ${myClassName} {
     /** Value of inScope. */
     protected List _inScope;
 
+    protected ${glConditionOptionInScopeName} _inScopeOption;
+
     /**
      * Get the value of inScope.
      * 
      * @return The value of inScope. (Nullable)
      */
     public List getInScope() {
+        if (_inScopeOption != null) {
+            return filterValue(_inScopeOption.generateRealValueList(_inScope));
+        }
         return filterValue(_inScope);
     }
 
@@ -682,6 +688,12 @@ public class ${myClassName} {
      */
     public ${myClassName} setInScope(List value) {
         _inScope = value;
+        return this;
+    }
+
+    public ${myClassName} setInScope(List value, ${glConditionOptionInScopeName} option) {
+        _inScope = value;
+        _inScopeOption = option;
         return this;
     }
 

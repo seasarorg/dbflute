@@ -19,6 +19,7 @@ targetdatabase = $targetDatabase
     ${database.initializeCustomizeDao()}
     ${database.initializeAdditionalForeignKey()}
     ${database.initializeClassificationDeployment()}
+    ${database.initializeIncludeQuery()}
 
     ## ------------------------------------------------------------------
     ##                                                    Global-Paramter
@@ -76,7 +77,14 @@ targetdatabase = $targetDatabase
     #set ($glConditionKeyName = "${glProjectPrefix}ConditionKey")
     #set ($glConditionValueName = "${glProjectPrefix}ConditionValue")
     #set ($glConditionOptionInterfaceName = "${glProjectPrefix}ConditionOption")
+    #set ($glConditionOptionSimpleStringName = "${glProjectPrefix}SimpleStringOption")
     #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
+    #set ($glConditionOptionInScopeName = "${glProjectPrefix}InScopeOption")
+    #set ($glConditionOptionPartsSplitName = "${glProjectPrefix}SplitOptionParts")
+    #set ($glConditionOptionPartsToUpperLowerCaseName = "${glProjectPrefix}ToUpperLowerCaseOptionParts")
+    #set ($glConditionOptionPartsToSingleByteName = "${glProjectPrefix}ToSingleByteOptionParts")
+    #set ($glConditionOptionPartsAgentJapaneseName = "${glProjectPrefix}JapaneseOptionPartsAgent")
+
     #set ($glSqlClauseName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseInterfaceName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseAbstractName = "${glProjectPrefix}AbstractSqlClause")
@@ -144,6 +152,8 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
     #set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.cbean.cvalue")
     #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
+    #set ($glPackageBaseCommonCOptionParts = "${database.baseCommonPackage}.cbean.coption.parts")
+    #set ($glPackageBaseCommonCOptionPartsLocal = "${database.baseCommonPackage}.cbean.coption.parts.local")
     #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
     #set ($glPackageBaseCommonException = "${database.baseCommonPackage}.exception")
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
@@ -380,9 +390,39 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
 
+      $database.debug("    ...Parsing SimpleStringOption")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
+
       $database.debug("    ...Parsing LikeSearchOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    ...Parsing InScopeOption")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInScopeName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/InScopeOption.${glTemplateFileExtension}",$path ,"", "")
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOptionParts}))
+      $database.makeDirectory($path)
+
+      $database.debug("    ...Parsing SplitOptionParts")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glConditionOptionPartsSplitName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/parts/SplitOptionParts.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    ...Parsing ToUpperLowerCaseOptionParts")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glConditionOptionPartsToUpperLowerCaseName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/parts/ToUpperLowerCaseOptionParts.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    ...Parsing ToSingleByteOptionParts")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glConditionOptionPartsToSingleByteName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/parts/ToSingleByteOptionParts.${glTemplateFileExtension}",$path ,"", "")
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOptionPartsLocal}))
+      $database.makeDirectory($path)
+
+      $database.debug("    ...Parsing JapaneseOptionPartsAgent")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionPartsLocal})}${glConditionOptionPartsAgentJapaneseName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/parts/local/JapaneseOptionPartsAgent.${glTemplateFileExtension}",$path ,"", "")
     #end
 
     ## -------------------------------------------------------

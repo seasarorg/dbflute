@@ -1,0 +1,51 @@
+package ${glPackageBaseCommonCOptionParts};
+
+#set ($myClassName = "${glConditionOptionPartsToUpperLowerCaseName}")
+
+/**
+ * The class of condition-option-parts about toUpperCase/toLowerCase.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected boolean _toUpperCase;
+    protected boolean _toLowerCase;
+
+    // =====================================================================================
+    //                                                                                  Main
+    //                                                                                  ====
+    public ${myClassName} toUpperCase() {
+        _toUpperCase = true;
+        _toLowerCase = false;
+        return this;
+    }
+
+    public ${myClassName} toLowerCase() {
+        _toUpperCase = false;
+        _toLowerCase = true;
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public String generateRealValue(String value) {
+        if (value == null || value.trim().length() == 0) {
+            String msg = "The argument[value] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+
+        // To Upper/Lower Case
+        if (_toUpperCase) {
+            value = (value != null ? value.toUpperCase() : value);
+        }
+        if (_toLowerCase) {
+            value = (value != null ? value.toLowerCase() : value);
+        }
+        return value;
+    }
+}

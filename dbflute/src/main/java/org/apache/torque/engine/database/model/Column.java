@@ -64,6 +64,8 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.xml.sax.Attributes;
 
 /**
@@ -896,6 +898,55 @@ public class Column {
     //        return (s != null && s.equals("primitive"))
     //                || (s == null && !"object".equals(getTable().getDatabase().getDefaultJavaType()));
     //    }
+
+    // ===============================================================================
+    //                                                              Properties - Query
+    //                                                              ==================
+    // ---------------------------------------
+    //                                  String
+    //                                  ------
+    public boolean isAvailableStringGreaterThan() {
+        return getIncludeQueryProperties().isAvailableStringGreaterThan(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringLessThan() {
+        return getIncludeQueryProperties().isAvailableStringLessThan(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringGreaterEqual() {
+        return getIncludeQueryProperties().isAvailableStringGreaterEqual(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringLessEqual() {
+        return getIncludeQueryProperties().isAvailableStringLessEqual(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringInScope() {
+        return getIncludeQueryProperties().isAvailableStringInScope(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringNotInScope() {
+        return getIncludeQueryProperties().isAvailableStringNotInScope(getTableName(), getName());
+    }
+
+    // ---------------------------------------
+    //                                  Number
+    //                                  ------
+    public boolean isAvailableNumberNotEqual() {
+        return getIncludeQueryProperties().isAvailableNumberNotEqual(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberInScope() {
+        return getIncludeQueryProperties().isAvailableNumberInScope(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberNotInScope() {
+        return getIncludeQueryProperties().isAvailableNumberNotInScope(getTableName(), getName());
+    }
+
+    protected DfIncludeQueryProperties getIncludeQueryProperties() {
+        return DfBuildProperties.getInstance().getIncludeQueryProperties();
+    }
 
     // **********************************************************************************************
     //                                                                                     Properties

@@ -64,8 +64,8 @@ public class ${myClassName} extends ${glConditionKeyName} {
             String msg = "The argument[option] should be ${glConditionOptionLikeSearchName}: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
-        final ${glConditionOptionLikeSearchName} likeSearchOption = (${glConditionOptionLikeSearchName})option;
-        conditionList.add(buildBindClauseWithRearOption(columnName, value.getLikeSearchLocation(), likeSearchOption.getRearOption()));
+        final ${glConditionOptionLikeSearchName} myOption = (${glConditionOptionLikeSearchName})option;
+        conditionList.add(buildBindClauseWithRearOption(columnName, value.getLikeSearchLocation(), myOption.getRearOption()));
     }
 
     /**

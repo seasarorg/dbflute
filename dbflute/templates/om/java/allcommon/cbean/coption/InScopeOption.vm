@@ -1,0 +1,23 @@
+package ${glPackageBaseCommonCOption};
+
+#set ($myClassName = "${glConditionOptionInScopeName}")
+
+/**
+ * The class of in-scope-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public java.util.List generateRealValueList(java.util.List valueList) {
+        final java.util.List resultList = new java.util.ArrayList();
+        for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
+            final String value = (String)ite.next();
+            resultList.add(generateRealValue(value));
+        }
+        return resultList;
+    }
+}

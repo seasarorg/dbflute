@@ -7,6 +7,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDaoDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
+import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
@@ -110,6 +111,15 @@ public final class DfPropertiesHandler {
             _sourceReductionProperties = new DfSourceReductionProperties(prop);
         }
         return _sourceReductionProperties;
+    }
+
+    protected DfIncludeQueryProperties _includeQueryProperties;
+
+    public DfIncludeQueryProperties getIncludeQueryProperties(Properties prop) {
+        if (_includeQueryProperties == null) {
+            _includeQueryProperties = new DfIncludeQueryProperties(prop);
+        }
+        return _includeQueryProperties;
     }
 
     protected DfSql2EntityProperties _sql2EntityProperties;

@@ -1,0 +1,75 @@
+package ${glPackageBaseCommonCOptionParts};
+
+#set ($myClassName = "${glConditionOptionPartsToSingleByteName}")
+
+import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacterName};
+import ${glPackageBaseCommonHelperCharacterImpl}.${glGeneralCharacterImplName};
+
+/**
+ * The interface of condition-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected boolean _toSingleByteSpace;
+    protected boolean _toSingleByteAlphabetNumber;
+    protected boolean _toSingleByteAlphabetNumberMark;
+
+    private ${glGeneralCharacterName} _generalCharacter;
+
+    // =====================================================================================
+    //                                                                                  Main
+    //                                                                                  ====
+    public boolean isToSingleByteSpace() {
+        return _toSingleByteSpace;
+    }
+    public ${myClassName} toSingleByteSpace() {
+        _toSingleByteSpace = true;
+        return this;
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumber() {
+        _toSingleByteAlphabetNumber = true;
+        return this;
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumberMark() {
+        _toSingleByteAlphabetNumberMark = true;
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public String generateRealValue(String value) {
+        if (value == null || value.trim().length() == 0) {
+            String msg = "The argument[value] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+
+        // To Single Byte
+        if (_toSingleByteSpace) {
+            value = (value != null ? value.replaceAll("\u3000", " ") : value);
+        }
+        if (_toSingleByteAlphabetNumberMark) {
+            value = getGeneralCharacter().toSingleByteAlphabetNumberMark(value);
+        } else if (_toSingleByteAlphabetNumber) {
+            value = getGeneralCharacter().toSingleByteAlphabetNumber(value);
+        }
+        return value;
+    }
+
+    // =====================================================================================
+    //                                                                                Helper
+    //                                                                                ======
+    protected ${glGeneralCharacterName} getGeneralCharacter() {
+        if (_generalCharacter == null) {
+            _generalCharacter = new ${glGeneralCharacterImplName}();
+        }
+        return _generalCharacter;
+    }
+}
