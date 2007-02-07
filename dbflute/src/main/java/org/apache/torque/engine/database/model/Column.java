@@ -905,6 +905,10 @@ public class Column {
     // ---------------------------------------
     //                                  String
     //                                  ------
+    public boolean isAvailableStringNotEqual() {
+        return getIncludeQueryProperties().isAvailableStringNotEqual(getTableName(), getName());
+    }
+
     public boolean isAvailableStringGreaterThan() {
         return getIncludeQueryProperties().isAvailableStringGreaterThan(getTableName(), getName());
     }
@@ -919,6 +923,10 @@ public class Column {
 
     public boolean isAvailableStringLessEqual() {
         return getIncludeQueryProperties().isAvailableStringLessEqual(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringPrefixSearch() {
+        return getIncludeQueryProperties().isAvailableStringPrefixSearch(getTableName(), getName());
     }
 
     public boolean isAvailableStringInScope() {
@@ -936,12 +944,51 @@ public class Column {
         return getIncludeQueryProperties().isAvailableNumberNotEqual(getTableName(), getName());
     }
 
+    public boolean isAvailableNumberGreaterThan() {
+        return getIncludeQueryProperties().isAvailableNumberGreaterThan(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberLessThan() {
+        return getIncludeQueryProperties().isAvailableNumberLessThan(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberGreaterEqual() {
+        return getIncludeQueryProperties().isAvailableNumberGreaterEqual(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberLessEqual() {
+        return getIncludeQueryProperties().isAvailableNumberLessEqual(getTableName(), getName());
+    }
+
     public boolean isAvailableNumberInScope() {
         return getIncludeQueryProperties().isAvailableNumberInScope(getTableName(), getName());
     }
 
     public boolean isAvailableNumberNotInScope() {
         return getIncludeQueryProperties().isAvailableNumberNotInScope(getTableName(), getName());
+    }
+
+    // ---------------------------------------
+    //                                    Date
+    //                                    ----
+    public boolean isAvailableDateNotEqual() {
+        return getIncludeQueryProperties().isAvailableDateNotEqual(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateGreaterThan() {
+        return getIncludeQueryProperties().isAvailableDateGreaterThan(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateLessThan() {
+        return getIncludeQueryProperties().isAvailableDateLessThan(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateGreaterEqual() {
+        return getIncludeQueryProperties().isAvailableDateGreaterEqual(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateLessEqual() {
+        return getIncludeQueryProperties().isAvailableDateLessEqual(getTableName(), getName());
     }
 
     protected DfIncludeQueryProperties getIncludeQueryProperties() {

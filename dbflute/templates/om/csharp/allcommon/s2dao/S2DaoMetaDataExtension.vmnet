@@ -189,7 +189,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                     =================
         protected override void SetupSelectMethodByManual(MethodInfo mi, string sql) {
             IBeanMetaData myMetaData = BuildBeanMetaData(mi, dbMetaData, dbms);
-            SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler(mi, myMetaData));
+            SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler4SelectMethodByManual(mi, myMetaData));
             cmd.Sql = sql;
             cmd.ArgNames = MethodUtil.GetParameterNames(mi);
             cmd.ArgTypes = MethodUtil.GetParameterTypes(mi);
@@ -219,6 +219,30 @@ namespace ${glPackageBaseCommonS2Dao} {
             } else {
                 return retType;
             }
+        }
+
+        protected IDataReaderHandler CreateDataReaderHandler4SelectMethodByManual(MethodInfo mi, IBeanMetaData bmd)
+        {
+            Type retType = mi.ReturnType;
+
+            if (retType.IsArray) {
+                return CreateBeanArrayMetaDataDataReaderHandler(bmd);
+            } else if (!retType.IsGenericType && typeof(IList).IsAssignableFrom(retType)) {
+                return CreateBeanListMetaDataDataReaderHandler(bmd);
+            } else if (IsBeanTypeAssignable4SelectMethodByManual(retType, bmd)) {
+                return CreateBeanMetaDataDataReaderHandler(bmd);
+            } else if (Array.CreateInstance(beanType, 0).GetType().IsAssignableFrom(retType)) {
+                return CreateBeanArrayMetaDataDataReaderHandler(bmd);
+            } else if(retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>))
+                    || retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.List<>)))) {
+                return CreateBeanGenericListMetaDataDataReaderHandler(bmd);
+            } else {
+                return CreateObjectDataReaderHandler();
+            }
+        }
+
+        protected bool IsBeanTypeAssignable4SelectMethodByManual(Type type, IBeanMetaData bmd) {
+            return bmd.BeanType.IsAssignableFrom(type) || type.IsAssignableFrom(bmd.BeanType);
         }
 
         // =====================================================================================

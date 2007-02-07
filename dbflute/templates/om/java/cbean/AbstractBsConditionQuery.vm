@@ -106,6 +106,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
         #end
       #end
+      #if (${col.isAvailableStringNotEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
@@ -116,6 +117,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, filterRemoveEmptyString(value));
     }
+      #end
       #if (${col.isAvailableStringGreaterThan()})
 
     /**
@@ -164,6 +166,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, filterRemoveEmptyString(value));
     }
       #end
+      #if (${col.isAvailableStringPrefixSearch()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using prefixSearch. { like 'xxx%' }
@@ -174,6 +177,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
     }
+      #end
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using likeSearch. { like '%xxx%' }
@@ -324,6 +328,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
     }
       #end
+      #if (${col.isAvailableNumberGreaterThan()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
@@ -333,6 +338,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_GreaterThan($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
     }
+      #end
+      #if (${col.isAvailableNumberLessThan()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
@@ -342,6 +349,29 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessThan($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
     }
+      #end
+      #if (${col.isAvailableNumberGreaterEqual()})
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
+     */
+    public void set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
+        register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
+    }
+      #end
+      #if (${col.isAvailableNumberLessEqual()})
+
+    /**
+     * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
+     * 
+     * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
+     */
+    public void set${tmpJavaName}_LessEqual($col.JavaNative value) {
+        register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
+    }
+      #end
       #if ($database.isMakeConditionQueryNumericArgumentLong())
 
     /**
@@ -352,6 +382,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_Equal(long value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
+        #if (${col.isAvailableNumberNotEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
@@ -361,6 +392,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotEqual(long value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
+        #end
+        #if (${col.isAvailableNumberGreaterThan()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
@@ -370,6 +403,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_GreaterThan(long value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, new ${col.JavaNative}(String.valueOf(value)));
     }
+        #end
+        #if (${col.isAvailableNumberLessThan()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
@@ -379,6 +414,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessThan(long value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, new ${col.JavaNative}(String.valueOf(value)));
     }
+        #end
+        #if (${col.isAvailableNumberGreaterEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
@@ -388,6 +425,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_GreaterEqual(long value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
+        #end
+        #if (${col.isAvailableNumberLessEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
@@ -397,25 +436,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessEqual(long value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, new ${col.JavaNative}(String.valueOf(value)));
     }
+        #end
       #end
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
-     * 
-     * @param value The value of ${col.UncapitalisedJavaName} as greaterEqual.
-     */
-    public void set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
-    }
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
-     * 
-     * @param value The value of ${col.UncapitalisedJavaName} as lessEqual.
-     */
-    public void set${tmpJavaName}_LessEqual($col.JavaNative value) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
-    }
       #if (${col.isAvailableNumberInScope()})
     /**
      * Set the value of ${col.UncapitalisedJavaName} using inScope. { in (a, b) }
@@ -520,6 +542,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_Equal($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
     }
+      #if (${col.isAvailableDateNotEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
@@ -529,6 +552,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
     }
+      #end
+      #if (${col.isAvailableDateGreaterThan()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
@@ -538,6 +563,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_GreaterThan($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
     }
+      #end
+      #if (${col.isAvailableDateLessThan()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
@@ -547,6 +574,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessThan($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
     }
+      #end
+      #if (${col.isAvailableDateGreaterEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
@@ -556,6 +585,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
     }
+      #end
+      #if (${col.isAvailableDateLessEqual()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
@@ -565,6 +596,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessEqual($col.JavaNative value) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
     }
+      #end
     #end
     #if (${col.isJavaNativeBooleanObject()})
     

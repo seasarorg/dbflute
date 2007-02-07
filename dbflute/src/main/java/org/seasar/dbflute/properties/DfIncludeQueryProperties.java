@@ -54,9 +54,16 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return _includeQueryMap;
     }
 
+    // ===============================================================================
+    //                                                                       Available
+    //                                                                       =========
     // ---------------------------------------
     //                                  String
     //                                  ------
+    public boolean isAvailableStringNotEqual(String tableName, String columnName) {
+        return isAvailable("String", "NotEqual", tableName, columnName);
+    }
+    
     public boolean isAvailableStringGreaterThan(String tableName, String columnName) {
         return isAvailable("String", "GreaterThan", tableName, columnName);
     }
@@ -73,6 +80,10 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable("String", "LessEqual", tableName, columnName);
     }
 
+    public boolean isAvailableStringPrefixSearch(String tableName, String columnName) {
+        return isAvailable("String", "PrefixSearch", tableName, columnName);
+    }
+    
     public boolean isAvailableStringInScope(String tableName, String columnName) {
         return isAvailable("String", "InScope", tableName, columnName);
     }
@@ -88,6 +99,22 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable("Number", "NotEqual", tableName, columnName);
     }
 
+    public boolean isAvailableNumberGreaterThan(String tableName, String columnName) {
+        return isAvailable("Number", "GreaterThan", tableName, columnName);
+    }
+
+    public boolean isAvailableNumberGreaterEqual(String tableName, String columnName) {
+        return isAvailable("Number", "GreaterEqual", tableName, columnName);
+    }
+
+    public boolean isAvailableNumberLessThan(String tableName, String columnName) {
+        return isAvailable("Number", "LessThan", tableName, columnName);
+    }
+
+    public boolean isAvailableNumberLessEqual(String tableName, String columnName) {
+        return isAvailable("Number", "LessEqual", tableName, columnName);
+    }
+    
     public boolean isAvailableNumberInScope(String tableName, String columnName) {
         return isAvailable("Number", "InScope", tableName, columnName);
     }
@@ -96,6 +123,29 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable("Number", "NotInScope", tableName, columnName);
     }
 
+    // ---------------------------------------
+    //                                    Date
+    //                                    ----
+    public boolean isAvailableDateNotEqual(String tableName, String columnName) {
+        return isAvailable("Date", "NotEqual", tableName, columnName);
+    }
+
+    public boolean isAvailableDateGreaterThan(String tableName, String columnName) {
+        return isAvailable("Date", "GreaterThan", tableName, columnName);
+    }
+
+    public boolean isAvailableDateGreaterEqual(String tableName, String columnName) {
+        return isAvailable("Date", "GreaterEqual", tableName, columnName);
+    }
+
+    public boolean isAvailableDateLessThan(String tableName, String columnName) {
+        return isAvailable("Date", "LessThan", tableName, columnName);
+    }
+
+    public boolean isAvailableDateLessEqual(String tableName, String columnName) {
+        return isAvailable("Date", "LessEqual", tableName, columnName);
+    }
+    
     protected boolean isAvailable(String javaTypeName, String queryTypeName, String tableName, String columnName) {
         if (containsQueryType(javaTypeName, queryTypeName)) {
             return containsTableColumn(javaTypeName, queryTypeName, tableName, columnName);
