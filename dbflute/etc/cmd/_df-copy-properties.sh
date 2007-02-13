@@ -1,0 +1,5 @@
+#!/bin/sh
+
+NATIVE_PROPERTIES_PATH=$1
+
+cp $NATIVE_PROPERTIES_PATH $DBFLUTE_HOME/build.properties

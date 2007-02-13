@@ -3,8 +3,14 @@ package org.seasar.dbflute.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.framework.util.StringUtil;
+
 public abstract class DfStringUtil {
 
+    public static String replace(String text, String fromText, String toText) {
+        return StringUtil.replace(text, fromText, toText);
+    }
+    
     public static String getStringBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
         final String ret;
         {

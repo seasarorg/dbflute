@@ -7,14 +7,6 @@ import java.util.Map;
 
 /**
  * MapList-String.
- * <p>
- * <pre>
- * # MapListString�C���^�[�t�F�[�X�̃V���v�����B
- * #
- * # �}�b�vor���X�g�̍쐬�̓X�e�[�g���X�ł͂Ȃ����߁A����X���b�h���쐬��s����
- * # �ʃX���b�h���쐬��s�����ꍇ�A���̃X���b�h�͎s���̃X���b�h���I������܂�
- * # �҂�����B
- * </pre>
  * 
  * @author jflute
  */

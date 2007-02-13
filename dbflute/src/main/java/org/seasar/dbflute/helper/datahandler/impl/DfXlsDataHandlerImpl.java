@@ -103,6 +103,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/default-value.txt";
-        return DfMapStringFileUtil.getSimpleMap(path, "UTF-8");
+        return DfMapStringFileUtil.getSimpleMapAsStringValue(path, "UTF-8");
     }
 }

@@ -95,6 +95,7 @@ namespace ${glPackageBaseCQ} {
         }
         #end
       #end
+      #if (${col.isAvailableStringNotEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
@@ -104,6 +105,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringGreaterThan()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
@@ -113,6 +116,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringLessThan()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
@@ -122,6 +127,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringGreaterEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
@@ -131,6 +138,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringLessEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
@@ -140,6 +149,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringPrefixSearch()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using prefixSearch. { like 'xxx%' }
@@ -149,6 +160,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringInScope()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using inScope. { in ('a', 'b') }
@@ -158,6 +171,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_InScope(System.Collections.IList valueList) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, FilterRemoveEmptyStringFromList(valueList));
         }
+      #end
+      #if (${col.isAvailableStringNotInScope()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using notInScope. { not in ('a', 'b') }
@@ -167,6 +182,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotInScope(System.Collections.IList valueList) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, FilterRemoveEmptyStringFromList(valueList));
         }
+      #end
       #if (${col.isSingleKeyForeignKey()})
         #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
@@ -256,6 +272,7 @@ namespace ${glPackageBaseCQ} {
         }
         #end
       #end
+      #if (${col.isAvailableNumberNotEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
@@ -264,6 +281,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableNumberGreaterThan()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
@@ -272,6 +291,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
         }
+      #end
+      #if (${col.isAvailableNumberLessThan()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
@@ -280,6 +301,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
         }
+      #end
+      #if (${col.isAvailableNumberGreaterEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
@@ -288,6 +311,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableNumberLessEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
@@ -296,6 +321,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableNumberInScope()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using inScope. { in ('a', 'b') }
@@ -305,6 +332,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_InScope(System.Collections.IList valueList) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, FilterRemoveEmptyStringFromList(valueList));
         }
+      #end
+      #if (${col.isAvailableNumberNotInScope()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using notInScope. { not in ('a', 'b') }
@@ -314,6 +343,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotInScope(System.Collections.IList valueList) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, FilterRemoveEmptyStringFromList(valueList));
         }
+      #end
       #if (${col.isSingleKeyForeignKey()})
         #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
@@ -391,6 +421,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
         }
+      #if (${col.isAvailableDateNotEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
@@ -399,6 +430,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableDateGreaterThan()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
@@ -407,6 +440,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
         }
+      #end
+      #if (${col.isAvailableDateLessThan()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
@@ -415,6 +450,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
         }
+      #end
+      #if (${col.isAvailableDateGreaterEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
@@ -423,6 +460,8 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableDateLessEqual()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
@@ -431,6 +470,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
             Register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
         }
+      #end
     #end
     #if (${col.isJavaNativeBooleanObject()})
     

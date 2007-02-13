@@ -48,9 +48,6 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             resultMap.put(key, elementMap);
         }
         _includeQueryMap = resultMap;
-
-        // TODO: テーブル名や列名のチェックをしたい！
-
         return _includeQueryMap;
     }
 
@@ -144,6 +141,115 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
     public boolean isAvailableDateLessEqual(String tableName, String columnName) {
         return isAvailable("Date", "LessEqual", tableName, columnName);
+    }
+    
+    // ---------------------------------------
+    //                                  String Old AsInline
+    //                                  ------
+    public boolean isAvailableStringEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "EqualOldAsInline", tableName, columnName);
+    }
+    
+    public boolean isAvailableStringNotEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "NotEqualOldAsInline", tableName, columnName);
+    }
+    
+    public boolean isAvailableStringGreaterThanOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "GreaterThanOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableStringGreaterEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "GreaterEqualOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableStringLessThanOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "LessThanOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableStringLessEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "LessEqualOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableStringPrefixSearchOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "PrefixSearchOldAsInline", tableName, columnName);
+    }
+    
+    public boolean isAvailableStringInScopeOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "InScopeOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableStringNotInScopeOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "NotInScopeOldAsInline", tableName, columnName);
+    }
+    
+    public boolean isAvailableStringInScopeSubQueryOldAsInline(String tableName, String columnName) {
+        return isAvailable("String", "InScopeSubQueryOldAsInline", tableName, columnName);
+    }
+
+    // ---------------------------------------
+    //                                  Number Old AsInline
+    //                                  ------
+    public boolean isAvailableNumberEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "EqualOldAsInline", tableName, columnName);
+    }
+    
+    public boolean isAvailableNumberNotEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "NotEqualOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableNumberGreaterThanOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "GreaterThanOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableNumberGreaterEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "GreaterEqualOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableNumberLessThanOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "LessThanOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableNumberLessEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "LessEqualOldAsInline", tableName, columnName);
+    }
+    
+    public boolean isAvailableNumberInScopeOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "InScopeOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableNumberNotInScopeOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "NotInScopeOldAsInline", tableName, columnName);
+    }
+    
+    public boolean isAvailableNumberInScopeSubQueryOldAsInline(String tableName, String columnName) {
+        return isAvailable("Number", "InScopeSubQueryOldAsInline", tableName, columnName);
+    }
+
+    // ---------------------------------------
+    //                                    Date Old AsInline
+    //                                    ----
+    public boolean isAvailableDateEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("Date", "EqualOldAsInline", tableName, columnName);
+    }
+    
+    public boolean isAvailableDateNotEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("Date", "NotEqualOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableDateGreaterThanOldAsInline(String tableName, String columnName) {
+        return isAvailable("Date", "GreaterThanOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableDateGreaterEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("Date", "GreaterEqualOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableDateLessThanOldAsInline(String tableName, String columnName) {
+        return isAvailable("Date", "LessThanOldAsInline", tableName, columnName);
+    }
+
+    public boolean isAvailableDateLessEqualOldAsInline(String tableName, String columnName) {
+        return isAvailable("Date", "LessEqualOldAsInline", tableName, columnName);
     }
     
     protected boolean isAvailable(String javaTypeName, String queryTypeName, String tableName, String columnName) {

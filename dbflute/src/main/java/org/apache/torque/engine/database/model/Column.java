@@ -995,6 +995,115 @@ public class Column {
         return DfBuildProperties.getInstance().getIncludeQueryProperties();
     }
 
+    // ---------------------------------------
+    //                     String Old AsInline
+    //                                  ------
+    public boolean isAvailableStringEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringEqualOldAsInline(getTableName(), getName());
+    }
+    
+    public boolean isAvailableStringNotEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringNotEqualOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringGreaterThanOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringGreaterThanOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringLessThanOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringLessThanOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringGreaterEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringGreaterEqualOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringLessEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringLessEqualOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringPrefixSearchOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringPrefixSearchOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringInScopeOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringInScopeOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableStringNotInScopeOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringNotInScopeOldAsInline(getTableName(), getName());
+    }
+    
+    public boolean isAvailableStringInScopeSubQueryOldAsInline() {
+        return getIncludeQueryProperties().isAvailableStringInScopeSubQueryOldAsInline(getTableName(), getName());
+    }
+
+    // ---------------------------------------
+    //                                  Number
+    //                                  ------
+    public boolean isAvailableNumberEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberEqualOldAsInline(getTableName(), getName());
+    }
+    
+    public boolean isAvailableNumberNotEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberNotEqualOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberGreaterThanOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberGreaterThanOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberLessThanOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberLessThanOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberGreaterEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberGreaterEqualOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberLessEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberLessEqualOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberInScopeOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberInScopeOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableNumberNotInScopeOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberNotInScopeOldAsInline(getTableName(), getName());
+    }
+    
+    public boolean isAvailableNumberInScopeSubQueryOldAsInline() {
+        return getIncludeQueryProperties().isAvailableNumberInScopeSubQueryOldAsInline(getTableName(), getName());
+    }
+
+    // ---------------------------------------
+    //                                    Date
+    //                                    ----
+    public boolean isAvailableDateEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableDateEqualOldAsInline(getTableName(), getName());
+    }
+    
+    public boolean isAvailableDateNotEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableDateNotEqualOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateGreaterThanOldAsInline() {
+        return getIncludeQueryProperties().isAvailableDateGreaterThanOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateLessThanOldAsInline() {
+        return getIncludeQueryProperties().isAvailableDateLessThanOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateGreaterEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableDateGreaterEqualOldAsInline(getTableName(), getName());
+    }
+
+    public boolean isAvailableDateLessEqualOldAsInline() {
+        return getIncludeQueryProperties().isAvailableDateLessEqualOldAsInline(getTableName(), getName());
+    }
+
     // **********************************************************************************************
     //                                                                                     Properties
     //                                                                                     **********

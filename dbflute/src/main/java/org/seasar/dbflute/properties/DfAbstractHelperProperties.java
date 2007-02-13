@@ -9,9 +9,10 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfConfigProvider;
-import org.seasar.dbflute.config.DfAdditionalForeignKeyConfig;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
+import org.seasar.dbflute.util.DfMapStringFileUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
@@ -192,7 +193,11 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected Map<String, Object> mapProp(String key) {
         try {
-            return DfPropertyUtil.mapProp(_buildProperties, key, ";");
+            final Map<String, Object> outsidePropMap = getOutsidePropMap(key);
+            if (!outsidePropMap.isEmpty()) {
+                return outsidePropMap;
+            }
+            return DfPropertyUtil.mapProp(_buildProperties, key, ";");// TODO: DelimiterはDefaultでOK
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -208,7 +213,11 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected Map<String, Object> mapProp(String key, Map<String, Object> defaultValue) {
         try {
-            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, ";");
+            final Map<String, Object> outsidePropMap = getOutsidePropMap(key);
+            if (!outsidePropMap.isEmpty()) {
+                return outsidePropMap;
+            }
+            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, ";");// TODO: DelimiterはDefaultでOK
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -222,10 +231,15 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
+    protected Map<String, Object> getOutsidePropMap(String key) {
+        final String filteredKey = DfStringUtil.replace(key, "torque.", "");
+        return DfMapStringFileUtil.getSimpleMap("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
+    }
+
     protected DfPropertiesHandler getPropertiesHandler() {
         return DfPropertiesHandler.getInstance();
     }
-    
+
     protected DfBasicProperties getBasicProperties() {
         return DfPropertiesHandler.getInstance().getBasicProperties(getProperties());
     }

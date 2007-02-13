@@ -3,21 +3,18 @@ package org.seasar.dbflute.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 
 /**
- * @author mkubo
+ * @author jflute
  */
 public class DfMapStringFileUtil {
 
-    public static Map<String, String> getSimpleMap(String path, String encoding) {
-        final List<String> defaultSysdateList = new ArrayList<String>();
+    public static Map<String, Object> getSimpleMap(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
         if (file.exists()) {
@@ -33,12 +30,17 @@ public class DfMapStringFileUtil {
                 while (true) {
                     ++count;
 
-                    String lineString = br.readLine();
-                    if (lineString == null || lineString.trim().length() == 0) {
+                    final String lineString = br.readLine();
+                    if (lineString == null) {
                         break;
                     }
+                    if (lineString.trim().length() == 0) {
+                        continue;
+                    }
+                    if (lineString.trim().startsWith("#")) {// If the line is comment...
+                        continue;
+                    }
                     sb.append(lineString);
-                    defaultSysdateList.add(lineString);
                 }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -46,14 +48,19 @@ public class DfMapStringFileUtil {
                 throw new RuntimeException(e);
             }
         }
+        if (sb.toString().trim().length() == 0) {
+            return new LinkedHashMap<String, Object>();
+        }
         final DfMapListStringImpl mapListString = new DfMapListStringImpl();
+        return mapListString.generateMap(sb.toString());
+    }
+
+    public static Map<String, String> getSimpleMapAsStringValue(String path, String encoding) {
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        if (sb.toString().trim().length() != 0) {
-            final Map<String, Object> map = mapListString.generateMap(sb.toString());
-            final Set<String> keySet = map.keySet();
-            for (String key : keySet) {
-                resultMap.put(key, (String) map.get(key));
-            }
+        final Map<String, Object> map = getSimpleMap(path, encoding);
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            resultMap.put(key, (String) map.get(key));
         }
         return resultMap;
     }

@@ -12,28 +12,11 @@ import java.util.Set;
 import org.seasar.dbflute.helper.mapstring.DfMapListString;
 import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 
-/**
- * Property Utility.
- * <p>
- * <pre>
- * # プロパティオブジェクトから値を取得する際のNullチェックや型変換などの煩わしさを
- * # 代理する単純なプロパティユーティリティ。
- * </pre>
- * 
- * @author mkubo
- */
 public class DfPropertyUtil {
 
     //========================================================================================
     //																				PropGetter
     //																				==========
-    /**
-     * プロパティを｛String型｝で取得する。
-     * 
-     * @param prop プロパティオブジェクト (NotNull)
-     * @param key キー値 (NotNull)
-     * @return プロパティ｛String型｝ (NotNull) (Trim)
-     */
     public static String stringProp(Properties prop, String key) {
         if (prop == null) {
             String msg = "Argument[prop] must not be null: " + getLogStrKey(key);
@@ -54,13 +37,6 @@ public class DfPropertyUtil {
         }
     }
 
-    /**
-     * プロパティを｛boolean型｝で取得する。
-     * 
-     * @param prop プロパティオブジェクト (NotNull)
-     * @param key キー値 (NotNull)
-     * @return プロパティ｛boolean型｝
-     */
     public static boolean booleanProp(Properties prop, String key) {
         String value = stringProp(prop, key);
         if ("true".equalsIgnoreCase(value)) {
@@ -73,13 +49,6 @@ public class DfPropertyUtil {
         }
     }
 
-    /**
-     * プロパティを｛int型｝で取得する。
-     * 
-     * @param prop プロパティオブジェクト (NotNull)
-     * @param key キー値 (NotNull)
-     * @return プロパティ｛int型｝
-     */
     public static int intProp(Properties prop, String key) {
         String value = stringProp(prop, key);
         try {
@@ -90,13 +59,6 @@ public class DfPropertyUtil {
         }
     }
 
-    /**
-     * プロパティを｛BigDecimal型｝で取得する。
-     * 
-     * @param prop プロパティオブジェクト (NotNull)
-     * @param key キー値 (NotNull)
-     * @return プロパティ｛int型｝
-     */
     public static BigDecimal bigDecimalProp(Properties prop, String key) {
         String value = stringProp(prop, key);
         try {
@@ -140,22 +102,6 @@ public class DfPropertyUtil {
     //========================================================================================
     //																				TagStrUtil
     //																				==========
-    /**
-     * タグをコンバートします．
-     * <p>
-     * 
-     * <pre>
-     *	例．
-     *	    targetStr="Select[aa]And[bb]Fdefs"
-     *	    key="aa" value="FZ"
-     *	    key="bb" value="SUI-"
-     *	    result="SelectFZAndSUI-Fdefs"
-     *	<br>
-     *	@param		targetStr		対象文字列
-     *	@param		convertMap		コンバートマップ
-     *	@return	対象文字列
-     *	<p>
-     */
     public static String convertTag(String targetStr, Map convertMap) {
         Set keySet = convertMap.keySet();
         Collection valCol = convertMap.values();
@@ -170,22 +116,10 @@ public class DfPropertyUtil {
         return convertAll(targetStr, wk);
     }
 
-    /**
-     * タグをリムーブします． <br>
-     * @param targetStr
-     * @return 対象文字列
-     *         <p>
-     */
     public static String removeTag(String targetStr) {
         return removeAll(targetStr, "[", "]");
     }
 
-    /**
-     * タグが含まれているか否か判定します． <br>
-     * @param targetStr
-     * @return タグが含まれているか否か
-     *         <p>
-     */
     public static boolean containsTag(String targetStr) {
         int start = targetStr.indexOf("[");
         int end = targetStr.indexOf("]");
@@ -199,13 +133,6 @@ public class DfPropertyUtil {
     //========================================================================================
     //																				StringUtil
     //																				==========
-    /**
-     * targetStrに含まれている全てのoldStrをnewStrにコンバートします． <br>
-     * @param targetStr
-     * @param oldStr
-     * @param newStr
-     * @return コンバートされた文字列
-     */
     public static String convertAll(String targetStr, String oldStr, String newStr) {
         if (targetStr == null) {
             throw new IllegalArgumentException("'targetStr' is null");
@@ -235,13 +162,6 @@ public class DfPropertyUtil {
         return result;
     }
 
-    /**
-     * targetStrに含まれている全てのkeyをvalueにコンバートします． <br>
-     * @param targetStr
-     * @param convertMap
-     * @return コンバートされた文字列
-     *         <p>
-     */
     public static String convertAll(String targetStr, Map convertMap) {
         if (targetStr == null) {
             throw new IllegalArgumentException("'targetStr' is null");
@@ -267,12 +187,6 @@ public class DfPropertyUtil {
         return targetStr;
     }
 
-    /**
-     * targetStrに含まれている全てのremoveStrをリムーブします． <br>
-     * @param targetStr
-     * @param removeStr
-     * @return リムーブされた文字列
-     */
     public static String removeAll(String targetStr, String removeStr) {
         if (targetStr == null) {
             throw new IllegalArgumentException("'targetStr' is null");
@@ -283,12 +197,6 @@ public class DfPropertyUtil {
         return removeAll(targetStr, new String[] { removeStr });
     }
 
-    /**
-     * targetStrに含まれている全てのremoveStrsをリムーブします． <br>
-     * @param targetStr
-     * @param removeStrs
-     * @return リムーブされた文字列
-     */
     public static String removeAll(String targetStr, String[] removeStrs) {
         if (targetStr == null) {
             throw new IllegalArgumentException("'targetStr' is null");
@@ -306,13 +214,6 @@ public class DfPropertyUtil {
         return targetStr;
     }
 
-    /**
-     * targetStrに含まれている全てのstartとendに囲まれた文字列をリムーブします． <br>
-     * @param targetStr
-     * @param start
-     * @param end
-     * @return リムーブされた文字列
-     */
     public static String removeAll(String targetStr, String start, String end) {
         if (targetStr == null) {
             throw new IllegalArgumentException("'targetStr' is null");
@@ -340,15 +241,6 @@ public class DfPropertyUtil {
         return sb.toString();
     }
 
-    /**
-     * 文字列に指定のデリミタが存在する数を取得します．
-     * <p>
-     * 存在しない場合は、String#indexOf()と同じ値を戻します． <br>
-     * @param str 文字列
-     * @param delim デリミタ
-     * @return 数
-     *         <p>
-     */
     public static int countDelim(String str, String delim) {
         int result = 0;
         for (int i = 0;;) {

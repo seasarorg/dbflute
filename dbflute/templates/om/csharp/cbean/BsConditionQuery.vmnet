@@ -128,6 +128,7 @@ namespace ${glPackageCQ} {
 
     #if (${col.isJavaNativeStringObject()})
       #if ($database.isMakeDeprecated())
+        #if (${col.isAvailableStringEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using equal as inline. { = }
@@ -137,8 +138,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, FilterRemoveEmptyString(value));
         }
-      #if (${col.hasClassification()})
-        #foreach ($classificationMap in $col.ClassificationMapList)
+          #if (${col.hasClassification()})
+            #foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
         /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal as inline. { = }
@@ -146,8 +147,10 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}_AsInline() {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
         }
+            #end
+          #end
         #end
-      #end
+      #if (${col.isAvailableStringNotEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using notEqual as inline. { != }
@@ -157,6 +160,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringGreaterThanOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterThan as inline. { &gt; }
@@ -166,6 +171,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringLessThanOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessThan as inline. { &lt; }
@@ -175,6 +182,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringGreaterEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterEqual as inline. { &gt;= }
@@ -184,6 +193,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringLessEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessEqual as inline. { &lt;= }
@@ -193,6 +204,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, FilterRemoveEmptyString(value));
         }
+      #end
+      #if (${col.isAvailableStringPrefixSearchOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using prefixSearch as inline. { like 'xxx%' }
@@ -202,6 +215,7 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_PrefixSearch_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, FilterRemoveEmptyString(value));
         }
+      #end
       #end
       #if (${col.isSingleKeyForeignKey()})
         #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
@@ -242,6 +256,7 @@ namespace ${glPackageCQ} {
             _${subQueryPropertyName} = subQuery;
         }
           #if ($database.isMakeDeprecated())
+            #if (${col.isAvailableStringInScopeSubQueryOldAsInline()})
 
         /// <summary>The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline.</summary>
         protected ${relatedCQClassName} _${subQueryPropertyName}_AsInline;
@@ -266,6 +281,7 @@ namespace ${glPackageCQ} {
             _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
             RegisterInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
         }
+            #end
           #end
         #end
       #end
@@ -293,6 +309,7 @@ namespace ${glPackageCQ} {
     #end
     #if (${col.isJavaNativeNumberObject()})
       #if ($database.isMakeDeprecated())
+        #if (${col.isAvailableNumberEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using equal as inline. { = }
@@ -301,8 +318,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
         }
-      #if (${col.hasClassification()})
-        #foreach ($classificationMap in $col.ClassificationMapList)
+          #if (${col.hasClassification()})
+            #foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
         /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal as inline. { = }
@@ -311,8 +328,10 @@ namespace ${glPackageCQ} {
             String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${col.JavaNative}.Parse(code));
         }
+            #end
+          #end
         #end
-      #end
+      #if (${col.isAvailableNumberNotEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using notEqual as inline. { != }
@@ -321,6 +340,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableNumberGreaterThanOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterThan as inline. { &gt; }
@@ -329,6 +350,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
         }
+      #end
+      #if (${col.isAvailableNumberLessThanOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessThan as inline. { &lt; }
@@ -337,6 +360,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
         }
+      #end
+      #if (${col.isAvailableNumberGreaterEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterEqual as inline. { &gt;= }
@@ -345,6 +370,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableNumberLessEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessEqual as inline. { &lt;= }
@@ -353,6 +380,7 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
         }
+      #end
       #end
       #if (${col.isSingleKeyForeignKey()})
         #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
@@ -393,6 +421,7 @@ namespace ${glPackageCQ} {
             _${subQueryPropertyName} = subQuery;
         }
           #if ($database.isMakeDeprecated())
+            #if (${col.isAvailableNumberInScopeSubQueryOldAsInline()})
 
         /// <summary>The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery as inline.</summary>
         protected ${relatedCQClassName} _${subQueryPropertyName}_AsInline;
@@ -417,6 +446,7 @@ namespace ${glPackageCQ} {
             _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
             RegisterInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
         }
+            #end
           #end
         #end
       #end
@@ -444,6 +474,7 @@ namespace ${glPackageCQ} {
     #end
     #if (${col.isJavaNativeDateObject()})
       #if ($database.isMakeDeprecated())
+        #if (${col.isAvailableDateEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using equal as inline. { = }
@@ -452,6 +483,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_Equal_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, value);
         }
+        #end
+      #if (${col.isAvailableDateNotEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using notEqual as inline. { != }
@@ -460,6 +493,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_NotEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableDateGreaterThanOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterThan as inline. { &gt; }
@@ -468,6 +503,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_GreaterThan_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, value);
         }
+      #end
+      #if (${col.isAvailableDateLessThanOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessThan as inline. { &lt; }
@@ -476,6 +513,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_LessThan_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, value);
         }
+      #end
+      #if (${col.isAvailableDateGreaterEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using greaterEqual as inline. { &gt;= }
@@ -484,6 +523,8 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_GreaterEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, value);
         }
+      #end
+      #if (${col.isAvailableDateLessEqualOldAsInline()})
 
         /// <summary>
         /// Set the value of ${col.UncapitalisedJavaName} using lessEqual as inline. { &lt;= }
@@ -492,6 +533,7 @@ namespace ${glPackageCQ} {
         public void Set${tmpJavaName}_LessEqual_AsInline($col.JavaNative value) {
             RegisterInline${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, value);
         }
+      #end
       #end
     #end
     #if (${col.isJavaNativeBooleanObject()})

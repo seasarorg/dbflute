@@ -89,7 +89,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
     private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final String path = info.getBasePath() + "/" + encoding + "/default-value.txt";
-        return DfMapStringFileUtil.getSimpleMap(path, encoding);
+        return DfMapStringFileUtil.getSimpleMapAsStringValue(path, encoding);
     }
 
     protected FilenameFilter createFilenameFilter(final String typeName) {
