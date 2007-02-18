@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
-import org.seasar.dbflute.properties.DfDaoDiconProperties;
+import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
@@ -50,13 +50,13 @@ public final class DfPropertiesHandler {
         return _commonColumnProperties;
     }
 
-    protected DfDaoDiconProperties _daoDiconProperties;
+    protected DfDBFluteDiconProperties _dbfluteDiconProperties;
 
-    public DfDaoDiconProperties getDaoDiconProperties(Properties prop) {
-        if (_daoDiconProperties == null) {
-            _daoDiconProperties = new DfDaoDiconProperties(prop);
+    public DfDBFluteDiconProperties getDBFluteDiconProperties(Properties prop) {
+        if (_dbfluteDiconProperties == null) {
+            _dbfluteDiconProperties = new DfDBFluteDiconProperties(prop);
         }
-        return _daoDiconProperties;
+        return _dbfluteDiconProperties;
     }
 
     protected DfGeneratedClassPackageProperties _generatedClassPackageProperties;

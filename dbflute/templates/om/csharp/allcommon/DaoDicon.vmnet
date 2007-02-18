@@ -3,9 +3,13 @@
 "http://www.seasar.org/dtd/components21.dtd">
 
 <components namespace="${glDaoDiconNamespace}">
-    <include path="${glJdbcDiconResourceName}"/>
+#foreach ($includePath in $database.DBFluteDiconBeforeJ2eeIncludePathList)
 
-#foreach ($includePath in $database.DaoDiconOtherIncludePathList)
+    <include path="${includePath}"/>
+#end
+
+    <include path="${glJdbcDiconResourceName}"/>
+#foreach ($includePath in $database.DBFluteDiconOtherIncludePathList)
 
     <include path="${includePath}"/>
 #end

@@ -740,51 +740,63 @@ public class Database {
     //                                                           Properties - DaoDicon
     //                                                           =====================
     public String getDaoDiconNamespace() {
-        return getProperties().getDaoDiconProperties().getDaoDiconNamespace();
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconNamespace();
     }
 
     public String getDaoDiconPackageName() {
-        return getProperties().getDaoDiconProperties().getDaoDiconPackageName();
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageName();
     }
 
     public List<String> getDaoDiconPackageNameList() {
-        return getProperties().getDaoDiconProperties().getDaoDiconPackageNameList();
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageNameList();
     }
 
     public String getDaoDiconFileName() {
-        return getProperties().getDaoDiconProperties().getDaoDiconFileName();
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconFileName();
     }
 
     public String getJdbcDiconResourceName() {
-        return getProperties().getDaoDiconProperties().getJdbcDiconResourceName();
+        return getProperties().getDBFluteDiconProperties().getJdbcDiconResourceName();
     }
 
     public String getRequiredTxComponentName() {
-        return getProperties().getDaoDiconProperties().getRequiredTxComponentName();
+        return getProperties().getDBFluteDiconProperties().getRequiredTxComponentName();
     }
 
     public String getRequiresNewTxComponentName() {
-        return getProperties().getDaoDiconProperties().getRequiresNewTxComponentName();
+        return getProperties().getDBFluteDiconProperties().getRequiresNewTxComponentName();
     }
 
+    public List<String> getDBFluteDiconBeforeJ2eeIncludePathList() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconBeforeJ2eeIncludePathList();
+    }
+    
+    public List<String> getDaoDiconBeforeJ2eeIncludePathList() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconBeforeJ2eeIncludePathList();
+    }
+    
+    public List<String> getDBFluteDiconOtherIncludePathList() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconOtherIncludePathList();
+    }
+    
     public List<String> getDaoDiconOtherIncludePathList() {
-        return getProperties().getDaoDiconProperties().getDaoDiconOtherIncludePathList();
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconOtherIncludePathList();
     }
 
     public Map<String, Map<String, String>> getOriginalDaoComponentMap() {
-        return getProperties().getDaoDiconProperties().getOriginalDaoComponentMap();
+        return getProperties().getDBFluteDiconProperties().getOriginalDBFluteComponentMap();
     }
 
     public List<String> getOriginalDaoComponentComponentNameList() {
-        return getProperties().getDaoDiconProperties().getOriginalDaoComponentComponentNameList();
+        return getProperties().getDBFluteDiconProperties().getOriginalDBFluteComponentComponentNameList();
     }
 
     public String getOriginalDaoComponentClassName(String componentName) {
-        return getProperties().getDaoDiconProperties().getOriginalDaoComponentClassName(componentName);
+        return getProperties().getDBFluteDiconProperties().getOriginalDBFluteComponentClassName(componentName);
     }
 
     public boolean isDaoComponent(String componentName) {
-        return getProperties().getDaoDiconProperties().isDaoComponent(componentName);
+        return getProperties().getDBFluteDiconProperties().isDBFluteComponent(componentName);
     }
 
     // ===============================================================================
@@ -1236,6 +1248,10 @@ public class Database {
 
     public boolean isVersionAfter1040() {
         return getProperties().getOtherProperties().isVersionAfter1040();
+    }
+    
+    public boolean isAvailableDaoMethodLazyInitializing() {
+        return getProperties().getOtherProperties().isAvailableDaoMethodLazyInitializing();
     }
 
     // ===============================================================================

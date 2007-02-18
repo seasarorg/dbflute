@@ -1,7 +1,7 @@
 package org.seasar.dbflute.helper.language.properties;
 
 public class DfDaoDiconDefaultJava implements DfDaoDiconDefault {
-    public String getJdbcDiconResourceName() {
+    public String getJ2eeDiconResourceName() {
         return "j2ee.dicon";
     }
 

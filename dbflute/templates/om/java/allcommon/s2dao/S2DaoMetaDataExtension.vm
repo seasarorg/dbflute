@@ -25,7 +25,6 @@ import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.ResultSetHandlerFactory;
-import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.RelationRowCreatorImpl;
@@ -52,6 +51,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     public ${glDaoMetaDataExtension}() {
     }
 
+    // =====================================================================================
+    //                                                                         Bean Enhancer
+    //                                                                         =============
+
     protected BeanEnhancer beanEnhancer;
 
     public BeanEnhancer getBeanEnhancer() {
@@ -69,6 +72,37 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected ResultSetHandlerFactory createResultSetHandlerFactory(final BeanMetaData beanMetaData) {
         return new ResultSetHandlerFactoryExtension(beanMetaData);
     }
+#if ($database.isAvailableDaoMethodLazyInitializing())
+
+    // =====================================================================================
+    //                                                             SqlCommand Setup Override
+    //                                                             =========================
+    protected void setupSqlCommand() {
+        // Do nothing for lazy initializing!
+    }
+
+    public org.seasar.dao.SqlCommand getSqlCommand(String methodName) throws org.seasar.framework.beans.MethodNotFoundRuntimeException {
+        {
+            final org.seasar.dao.SqlCommand cmd = (org.seasar.dao.SqlCommand) sqlCommands.get(methodName);
+            if (cmd != null) {
+                return cmd;
+            }
+        }
+
+        final Method[] methods = daoBeanDesc.getMethods(methodName);
+        if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
+            setupMethod(methods[0]);
+        }
+
+        {
+            final org.seasar.dao.SqlCommand cmd = (org.seasar.dao.SqlCommand) sqlCommands.get(methodName);
+            if (cmd != null) {
+                return cmd;
+            }
+            throw new org.seasar.framework.beans.MethodNotFoundRuntimeException(daoClass, methodName, null);
+        }
+    }
+#end
 
     // =====================================================================================
     //                                                                ConditionBean Override
@@ -242,7 +276,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected Class getOriginalBeanClass(Method method) {
         final Class retType = method.getReturnType();
         if (java.util.List.class.isAssignableFrom(retType)) {
-            final Class elementType = MethodUtil.getElementTypeOfListFromReturnMethod(method);
+            final Class elementType = InternalMethodUtil.getElementTypeOfListFromReturnMethod(method);
             if (elementType != null) {
                 return elementType;
             } else {
@@ -257,7 +291,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
     }
     
-    protected static class MethodUtil {
+    protected static class InternalMethodUtil {
         public static Class getElementTypeOfListFromReturnMethod(Method method) {
             return ReflectionUtil.getElementTypeOfListFromReturnType(method);
         }
@@ -677,7 +711,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected Class getBeanClass4SelectMethodByManual(Method method) {
         final Class retType = method.getReturnType();
         if (java.util.List.class.isAssignableFrom(retType)) {
-            final Class elementType = MethodUtil.getElementTypeOfListFromReturnMethod(method);
+            final Class elementType = InternalMethodUtil.getElementTypeOfListFromReturnMethod(method);
             if (elementType != null) {
                 return elementType;
             } else {
@@ -692,7 +726,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
     }
     
-    protected static class MethodUtil {
+    protected static class InternalMethodUtil {
         public static Class getElementTypeOfListFromReturnMethod(Method method) {
             return ReflectionUtil.getElementTypeOfListFromReturnType(method);
         }

@@ -31,7 +31,7 @@ import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
-import org.seasar.dbflute.properties.DfDaoDiconProperties;
+import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
@@ -307,8 +307,8 @@ public final class DfBuildProperties {
     // ===============================================================================
     //                                                           Properties - DaoDicon
     //                                                           =====================
-    public DfDaoDiconProperties getDaoDiconProperties() {
-        return getHandler().getDaoDiconProperties(getProperties());
+    public DfDBFluteDiconProperties getDBFluteDiconProperties() {
+        return getHandler().getDBFluteDiconProperties(getProperties());
     }
 
     // ===============================================================================

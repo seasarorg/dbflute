@@ -24,7 +24,7 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
     public boolean isStopGenerateExtendedBhv() {
         return booleanProp("torque.isStopGenerateExtendedBhv", false);
     }
-    
+
     public boolean isStopGenerateExtendedDao() {
         return booleanProp("torque.isStopGenerateExtendedDao", false);
     }
@@ -35,5 +35,9 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
 
     public boolean isVersionAfter1040() {
         return booleanProp("torque.isVersionAfter1040", true);
+    }
+
+    public boolean isAvailableDaoMethodLazyInitializing() {
+        return booleanProp("torque.isAvailableDaoMethodLazyInitializing", false);
     }
 }
