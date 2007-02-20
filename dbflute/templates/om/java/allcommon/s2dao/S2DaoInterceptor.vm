@@ -48,19 +48,22 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         if (!org.seasar.framework.util.MethodUtil.isAbstract(method)) {
             return invocation.proceed();
         }
-
         traceMethod(invocation);
+        final long before = System.currentTimeMillis();
 
         final org.seasar.dao.SqlCommand cmd;
         {
+            final long beforeCmd = System.currentTimeMillis();
             final Class targetClass = getTargetClass(invocation);
             final org.seasar.dao.DaoMetaData dmd = daoMetaDataFactory_.getDaoMetaData(targetClass);
             cmd = dmd.getSqlCommand(method.getName());
+            final long afterCmd = System.currentTimeMillis();
+            traceSqlCommand(invocation, cmd, beforeCmd, afterCmd);
         }
 
         final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = preprocessConditionBean(invocation, cmd);
         Object ret = null;
-        final long before = System.currentTimeMillis();
+
         try {
             ret = cmd.execute(invocation.getArguments());
         } catch (Exception e) {
@@ -105,6 +108,12 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             _log.debug("/=====================================================" + sb.toString() + "==");
             _log.debug("                                                      " + invokeName + "()");
             _log.debug("                                                      " + sb.toString() + "=/");
+        }
+    }
+
+    protected void traceSqlCommand(MethodInvocation invocation, org.seasar.dao.SqlCommand cmd, long beforeCmd, long afterCmd) {
+        if (_log.isDebugEnabled()) {
+            _log.debug("SqlCommand Initialization Cost: [" + getPerformanceView(afterCmd - beforeCmd) + "]");
         }
     }
 

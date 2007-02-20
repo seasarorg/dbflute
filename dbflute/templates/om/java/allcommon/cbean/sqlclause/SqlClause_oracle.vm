@@ -44,16 +44,16 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
         if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
             return;
         }
-        _fetchScopeSelectHint = " * from (select";
+        _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (select";
         _fetchScopeSqlSuffix = "";
         if (isFetchStartIndexSupported()) {
-            _fetchScopeSqlSuffix = ") where rownum > " + getPageStartIndex();
+            _fetchScopeSqlSuffix = ") base ) where rn > " + getPageStartIndex();
         }
         if (isFetchSizeSupported()) {
             if (isFetchStartIndexSupported()) {
-                _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rownum <= " + getPageEndIndex();
+                _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + getPageEndIndex();
             } else {
-                _fetchScopeSqlSuffix = ") where rownum <= " + getFetchSize();
+                _fetchScopeSqlSuffix = ") base ) where rn <= " + getPageEndIndex();
             }
         }
     }

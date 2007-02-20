@@ -25,6 +25,7 @@
 	<zip zipfile="${dbflute.zip.dirfile}">
 		<zipfileset prefix="etc/cmd" dir="etc/cmd">
 			<include name="*.cmd"/>
+			<include name="*.sh"/>
 		</zipfileset>
 		<zipfileset prefix="etc/client_directory-template" dir="etc/client_directory-template"/>
 		<zipfileset prefix="lib/forExecute" dir="dist">

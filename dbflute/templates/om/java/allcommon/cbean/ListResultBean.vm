@@ -55,10 +55,10 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     /**
      * Set the value of tableDbName.
      * 
-     * @param value The value of tableDbName.
+     * @param tableDbName The value of tableDbName.
      */
-    public void setTableDbName(String value) {
-        _tableDbName = value;
+    public void setTableDbName(String tableDbName) {
+        _tableDbName = tableDbName;
     }
 
     /**
@@ -73,10 +73,10 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     /**
      * Set the value of allRecordCount.
      * 
-     * @param value The value of allRecordCount.
+     * @param allRecordCount The value of allRecordCount.
      */
-    public void setAllRecordCount(int value) {
-        _allRecordCount = value;
+    public void setAllRecordCount(int allRecordCount) {
+        _allRecordCount = allRecordCount;
     }
 
     /**
@@ -91,10 +91,10 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     /**
      * Set the value of selectedList.
      * 
-     * @param value Selected list. (NotNull)
+     * @param selectedList Selected list. (NotNull)
      */
-    public void setSelectedList(java.util.List${database.filterGenericsString('T')} value) {
-        _selectedList = value;
+    public void setSelectedList(java.util.List${database.filterGenericsString('T')} selectedList) {
+        _selectedList = selectedList;
     }
 
     /**
@@ -109,10 +109,10 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     /**
      * Set the value of orderByClause.
      * 
-     * @param value The value of orderByClause. (NotNull)
+     * @param orderByClause The value of orderByClause. (NotNull)
      */
-    public void setOrderByClause(${glOrderByClauseName} value) {
-        _orderByClause = value;
+    public void setOrderByClause(${glOrderByClauseName} orderByClause) {
+        _orderByClause = orderByClause;
     }
 
     // =====================================================================================
