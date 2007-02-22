@@ -200,7 +200,12 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 }
 
                 if (sql.endsWith(_runInfo.getDelimiter())) {
-                    sql = sql.substring(0, sql.length() - _runInfo.getDelimiter().length()).trim();
+                    if (sql.endsWith("\\" + _runInfo.getDelimiter())) {// for escaping delimiter.
+                        sql = sql.substring(0, sql.length() - ("\\" + _runInfo.getDelimiter()).length()).trim();
+                        sql = sql + _runInfo.getDelimiter();
+                    } else {
+                        sql = sql.substring(0, sql.length() - _runInfo.getDelimiter().length()).trim();
+                    }
                     if ("".equals(sql)) {
                         continue;
                     }
@@ -212,6 +217,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         _runInfo.setDelimiter(delimiterChanger.getNewDelimiter(sql, _runInfo.getDelimiter()));
                         sql = "";
                     }
+                } else if (sql.endsWith("\\")) {// for escaping new line.
+                    sql = sql.substring(0, sql.length() - "\\".length()).trim();
+                    sql = sql + "\n";
                 }
             }
             if (sql.trim().length() != 0) {
@@ -264,6 +272,29 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
     public static class DelimiterChanger_firebird implements DelimiterChanger {
         public static final String CHANGE_COMMAND = "set term ";
+        public static final int CHANGE_COMMAND_LENGTH = CHANGE_COMMAND.length();
+
+        public boolean isDelimiterChanger(String sql) {
+            sql = sql.trim();
+            if (sql.length() > CHANGE_COMMAND_LENGTH) {
+                if (sql.substring(0, CHANGE_COMMAND_LENGTH).equalsIgnoreCase(CHANGE_COMMAND)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public String getNewDelimiter(String sql, String preDelimiter) {
+            String tmp = sql.substring(CHANGE_COMMAND.length());
+            if (tmp.indexOf(" ") >= 0) {
+                tmp = tmp.substring(0, tmp.indexOf(" "));
+            }
+            return tmp;
+        }
+    }
+
+    public static class DelimiterChanger_mysql implements DelimiterChanger {
+        public static final String CHANGE_COMMAND = "delimiter ";
         public static final int CHANGE_COMMAND_LENGTH = CHANGE_COMMAND.length();
 
         public boolean isDelimiterChanger(String sql) {
