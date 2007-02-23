@@ -1,0 +1,10 @@
+
+using System;
+
+namespace ${glPackageBaseCommonAnnotation} {
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class ${glOutsideSqlAnnotation} : Attribute {
+        public ${glOutsideSqlAnnotation}() {
+        }
+    }
+}

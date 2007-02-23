@@ -16,6 +16,7 @@ using Seasar.Framework.Beans;
 using Seasar.Framework.Util;
 
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonAnnotation};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -35,6 +36,19 @@ namespace ${glPackageBaseCommonS2Dao} {
             bmdExt.Initialize(dbMetaData, dbms);
             beanMetaData = bmdExt;
             SetupSqlCommand();
+        }
+
+        // =====================================================================================
+        //                                                            Outside Sql Check Override
+        //                                                            ==========================
+        protected override void SetupMethodByAuto(MethodInfo mi) {
+            ${glOutsideSqlAnnotation} outsideSql = Attribute.GetCustomAttribute(mi, typeof(${glOutsideSqlAnnotation})) as ${glOutsideSqlAnnotation};
+            if (outsideSql != null) {
+                String msg = "This method '" + mi.Name + "()' should use Outside Sql but the file was not found!";
+                msg = msg + " Expected sql file name is '" + mi.DeclaringType.Name + "_" + mi.Name + ".sql'";
+                throw new SystemException(msg);
+            }
+            base.SetupMethodByAuto(mi);
         }
 
         // =====================================================================================

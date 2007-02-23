@@ -134,6 +134,7 @@ targetdatabase = $targetDatabase
     #set ($glDaoStatementFactory = "${glProjectPrefix}S2DaoStatementFactory")
     #set ($glFetchNarrowingResultSetFactory = "${glProjectPrefix}FetchNarrowingResultSetFactory")
     #set ($glFetchNarrowingResultSetWrapper = "${glProjectPrefix}FetchNarrowingResultSetWrapper")
+    #set ($glOutsideSqlAnnotation = "OutsideSql")
 
     ## [LazyLoadContainer]
     #set ($glLazyLoadContainerClassName = "${glProjectPrefix}LazyLoadContainer")
@@ -146,6 +147,7 @@ targetdatabase = $targetDatabase
 
     ## [Package]
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
+    #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
     #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
     #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
@@ -186,6 +188,25 @@ targetdatabase = $targetDatabase
     ## [Other]
     #set ($glParentVariablePrefix = "_parent")
     #set ($glChildrenVariablePrefix = "_children")
+
+    ## -----------------------------------------------------------------------------------------------------
+    ##                                                                                      Parse annotation
+    ##                                                                                      ----------------
+    #if (($database.isTargetLanguageJava() && $database.isAvailableGenerics()) || $database.isTargetLanguageCSharp())
+      ## Setup java directory for allcommon.
+      $database.setupJavaDir_for_allcommon()
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonAnnotation}))
+      $database.makeDirectory($path)
+
+      $database.debug("public void parseAnnotation) {")
+      $database.debug("    parseOutsideSql();")
+
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonAnnotation})}${glOutsideSqlAnnotation}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/annotation/OutsideSql.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("}")
+    #end
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                   Parse behavior-interface & abstract
@@ -729,7 +750,6 @@ targetdatabase = $targetDatabase
 
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetWrapper}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/s2dao/FetchNarrowingResultSetWrapper.${glTemplateFileExtension}",$path,"", "")
-
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                    Parse cutomize dao

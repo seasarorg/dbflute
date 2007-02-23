@@ -37,6 +37,10 @@ import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+#if ($database.isAvailableGenerics())
+
+import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
+#end
 
 /**
  * DaoMetaDataImpl for DaoGen.
@@ -54,7 +58,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // =====================================================================================
     //                                                                         Bean Enhancer
     //                                                                         =============
-
     protected BeanEnhancer beanEnhancer;
 
     public BeanEnhancer getBeanEnhancer() {
@@ -64,11 +67,25 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
         this.beanEnhancer = beanEnhancer;
     }
+#if ($database.isAvailableGenerics())
+
+    // =====================================================================================
+    //                                                            Outside Sql Check Override
+    //                                                            ==========================
+    protected void setupMethodByAuto(Method method) {
+        final ${glOutsideSqlAnnotation} outsideSql = method.getAnnotation(${glOutsideSqlAnnotation}.class);
+        if (outsideSql != null) {
+            String msg = "This method '" + method.getName() + "()' should use Outside Sql but the file was not found!";
+            msg = msg + " Expected sql file name is '" + method.getDeclaringClass().getSimpleName() + "_" + method.getName() + ".sql'";
+            throw new IllegalStateException(msg);
+        }
+        super.setupMethodByAuto(method);
+    }
+#end
 
     // =====================================================================================
     //                                                      ResultSetHandlerFactory Override
     //                                                      ================================
-
     protected ResultSetHandlerFactory createResultSetHandlerFactory(final BeanMetaData beanMetaData) {
         return new ResultSetHandlerFactoryExtension(beanMetaData);
     }
