@@ -3,9 +3,12 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties {
 
-    //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
+    private static final Log _log = LogFactory.getLog(DfReplaceSchemaProperties.class);
 
     /**
      * Constructor.
@@ -25,6 +28,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_replaceSchemaDefinitionMap == null) {
             final Map<String, Object> defaultMap = mapProp("torque." + KEY_oldKey, DEFAULT_EMPTY_MAP);
             _replaceSchemaDefinitionMap = mapProp("torque." + KEY_replaceSchemaDefinitionMap, defaultMap);
+            _log.info("...Initializing " + KEY_replaceSchemaDefinitionMap + ": " + _replaceSchemaDefinitionMap);
         }
         return _replaceSchemaDefinitionMap;
     }
@@ -35,6 +39,45 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             return sqlFile;
         } else {
             return "./playsql/replace-schema.sql";
+        }
+    }
+
+    public boolean isEnvironmentTypeTest() {
+        return getEnvironmentType().equalsIgnoreCase("test");
+    }
+
+    public boolean isEnvironmentTypeUT() {
+        return getEnvironmentType().equalsIgnoreCase("ut");
+    }
+
+    public boolean isEnvironmentTypeIT() {
+        return getEnvironmentType().equalsIgnoreCase("it");
+    }
+
+    public boolean isEnvironmentTypePT() {
+        return getEnvironmentType().equalsIgnoreCase("pt");
+    }
+
+    public boolean isEnvironmentTypeReal() {
+        return getEnvironmentType().equalsIgnoreCase("real");
+    }
+
+    public String getEnvironmentType() {
+        final String propString = (String) getReplaceSchemaDefinitionMap().get("environmentType");
+        if (propString == null) {
+            return "ut";
+        }
+        if (propString.trim().equalsIgnoreCase("ut")) {
+            return "ut";
+        } else if (propString.trim().equalsIgnoreCase("it")) {
+            return "it";
+        } else if (propString.trim().equalsIgnoreCase("pt")) {
+            return "pt";
+        } else if (propString.trim().equalsIgnoreCase("real")) {
+            return "real";
+        } else {
+            String msg = "The environmentType[" + propString + "] is unsupported. Options are {test/it/pt/real}";
+            throw new IllegalStateException(msg);
         }
     }
 

@@ -48,6 +48,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseMySQL() {
         return getDatabaseName().equalsIgnoreCase("mysql");
     }
+    
+    public boolean isDatabaseOracle() {
+        return getDatabaseName().equalsIgnoreCase("oracle");
+    }
 
     // ===============================================================================
     //                                                            Properties - JavaDir

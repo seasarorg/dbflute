@@ -357,8 +357,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #set ($parentCBClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionBeanInitialName}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ForeignTable    = [${foreignKeys.ForeignTable.Name}]
-    //   ForeignProperty = [${foreignKeys.ForeignPropertyName}]
+    //   ForeignTable    = [${foreignKeys.foreignTable.name}]
+    //   ForeignProperty = [${foreignKeys.foreignPropertyName}]
     // * * * * * * * * */
 
     /** RELNO of foreign table for s2dao. */
@@ -387,6 +387,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public void set${foreignKeys.foreignPropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} v) {
         ${foreignVariableName} = v;
     }
+
+    /**
+     * Has relation of ${foreignKeys.foreignPropertyName}.
+     * 
+     * @return Determination.
+     */
+    public boolean hasRelation${foreignKeys.foreignPropertyNameInitCap}() {
+        return ${foreignVariableName} != null && ${foreignVariableName}.hasPrimaryKeyValue();
+    }
+
   #set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
 
@@ -452,7 +462,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @return The entity of refferer table. (Nullable)
      */
-    public ${reffererEntityLongClassName} get${refferer.ReffererPropertyNameInitCapAsOne}() {
+    public ${reffererEntityLongClassName} get${refferer.reffererPropertyNameInitCapAsOne}() {
         final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}();
         if (ls == null || ls.isEmpty()) {
             return null;
@@ -470,7 +480,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @param entity The entity of refferer table. (Nullable)
      */
-    public void set${refferer.ReffererPropertyNameInitCapAsOne}(${reffererEntityLongClassName} entity) {
+    public void set${refferer.reffererPropertyNameInitCapAsOne}(${reffererEntityLongClassName} entity) {
         if (entity == null) {
             ${reffererVariableName} = null;
             return;
@@ -478,6 +488,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = new java.util.ArrayList${database.filterGenericsString(${reffererEntityLongClassName})}();
         ls.add(entity);
         ${reffererVariableName} = ls;
+    }
+
+    /**
+     * Has relation of ${refferer.reffererPropertyNameAsOne}.
+     * 
+     * @return Determination.
+     */
+    public boolean hasRelation${refferer.reffererPropertyNameInitCapAsOne}() {
+        return get${refferer.reffererPropertyNameInitCapAsOne}() != null && get${refferer.reffererPropertyNameInitCapAsOne}().hasPrimaryKeyValue();
     }
   #end
 #end

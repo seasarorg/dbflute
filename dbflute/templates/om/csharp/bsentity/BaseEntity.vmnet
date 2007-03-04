@@ -385,14 +385,14 @@ namespace ${myExtendedEntityPackageName} {
         #region Foreign Table
 #set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.ForeignKeys)
-  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
+  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
   #set ($foreignDaoClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}Dao")
   #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
   #set ($parentCBClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionBeanInitialName}")
 
         // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   ForeignTable    = [${foreignKeys.ForeignTable.Name}]
-        //   ForeignProperty = [${foreignKeys.ForeignPropertyName}]
+        //   ForeignTable    = [${foreignKeys.foreignTable.name}]
+        //   ForeignProperty = [${foreignKeys.foreignPropertyName}]
         // * * * * * * * * */
 
         /// <summary>The entity of foreign table.</summary>
@@ -406,6 +406,11 @@ namespace ${myExtendedEntityPackageName} {
             get { return ${foreignVariableName}; }
             set { ${foreignVariableName} = value; }
         }
+
+        public bool HasRelation${foreignKeys.foreignPropertyNameInitCap} {
+            get { return ${foreignVariableName} != null && ${foreignVariableName}.HasPrimaryKeyValue; }
+        }
+
   #set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
 
@@ -458,10 +463,10 @@ namespace ${myExtendedEntityPackageName} {
         /// <summary>
         /// Property of ${refferer.ReffererPropertyName} as one of refferer table.
         /// </summary>
-        [Seasar.Dao.Attrs.Relno(${foreignKeysIndex}), Seasar.Dao.Attrs.Relkeys("$refferer.RelationKeysCommaStringForOneToOneRefferer")]
-        public ${reffererEntityLongClassName} ${refferer.ReffererPropertyNameInitCapAsOne} {
+        [Seasar.Dao.Attrs.Relno(${foreignKeysIndex}), Seasar.Dao.Attrs.Relkeys("$refferer.relationKeysCommaStringForOneToOneRefferer")]
+        public ${reffererEntityLongClassName} ${refferer.reffererPropertyNameInitCapAsOne} {
             get {
-                System.Collections.IList ls = this.${refferer.ReffererPropertyNameInitCap};
+                System.Collections.IList ls = this.${refferer.reffererPropertyNameInitCap};
                 if (ls == null || ls.Count == 0) {
                     return null;
                 }
@@ -481,6 +486,10 @@ namespace ${myExtendedEntityPackageName} {
                 ls.Add(value);
                 ${reffererVariableName} = ls;
             }
+        }
+
+        public bool HasRelation${refferer.reffererPropertyNameInitCapAsOne} {
+            get { return ${refferer.reffererPropertyNameInitCapAsOne} != null && ${refferer.reffererPropertyNameInitCapAsOne}.HasPrimaryKeyValue; }
         }
     #set ($foreignKeysIndex = $foreignKeysIndex + 1)
   #end
@@ -854,7 +863,7 @@ namespace ${myExtendedEntityPackageName} {
             get {
   #foreach ($col in $table.PrimaryKey)
 
-                if (_${col.UncapitalisedJavaName} == null) {
+                if (_${col.UncapitalisedJavaName} == null || IsNullableTypeNull(_${col.UncapitalisedJavaName})) {
                     return false;
                 }
   #end
@@ -980,6 +989,19 @@ namespace ${myExtendedEntityPackageName} {
             return sb.ToString();
         }
 
+        #endregion
+
+        // =====================================================================================
+        //                                                                                Helper
+        //                                                                                ======
+        #region Helper
+        protected bool IsNullableTypeNull(Object obj) {
+            if (obj != null && obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         #endregion
     }
 }

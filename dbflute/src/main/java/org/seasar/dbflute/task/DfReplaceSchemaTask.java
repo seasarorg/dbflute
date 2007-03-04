@@ -32,10 +32,13 @@ import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
 import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.datahandler.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerMySQL;
+import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerOracle;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
@@ -62,30 +65,52 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
      */
     @Override
     protected void doExecute() {
+        _log.info("* * * * * * * * * * *");
+        _log.info("environmentType: " + getEnvironmentType());
+        _log.info("* * * * * * * * * * *");
+
         initializeSchema();
 
         final DfRunnerInformation runInfo = createRunnerInformation();
         replaceSchema(runInfo);
 
-        writeDbFromSeparatedFile("tsv", "\t");
-        writeDbFromSeparatedFile("csv", ",");
-        writeDbFromXls();
+        writeDbFromSeparatedFileAsCommonData("tsv", "\t");
+        writeDbFromSeparatedFileAsCommonData("csv", ",");
+        writeDbFromXlsAsCommonData();
+
+        writeDbFromSeparatedFileAsAdditionalData("tsv", "\t");
+        writeDbFromSeparatedFileAsAdditionalData("csv", ",");
+        writeDbFromXlsAsAdditionalData();
     }
 
     // --------------------------------------------
     //                            initialize schema
     //                            -----------------
     protected void initializeSchema() {
-        if (DfBuildProperties.getInstance().getBasicProperties().isDatabaseMySQL()) {
-            final DfSchemaInitializerMySQL initializer = createSchemaInitializerMySQL();
+        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
+        final DfSchemaInitializer initializer;
+        if (basicProperties.isDatabaseMySQL()) {
+            initializer = createSchemaInitializerMySQL();
+        } else if (basicProperties.isDatabaseOracle()) {
+            initializer = createSchemaInitializerOracle();
+        } else {
+            initializer = null;
+        }
+        if (initializer != null) {
             initializer.initializeSchema();
         }
 
         // TODO: Make initializeSchema for Other DB.
     }
 
-    protected DfSchemaInitializerMySQL createSchemaInitializerMySQL() {
+    protected DfSchemaInitializer createSchemaInitializerMySQL() {
         final DfSchemaInitializerMySQL initializer = new DfSchemaInitializerMySQL();
+        initializer.setDataSource(getDataSource());
+        return initializer;
+    }
+
+    protected DfSchemaInitializer createSchemaInitializerOracle() {
+        final DfSchemaInitializerOracle initializer = new DfSchemaInitializerOracle();
         initializer.setDataSource(getDataSource());
         return initializer;
     }
@@ -167,23 +192,46 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
     }
 
+    protected String getEnvironmentType() {
+        return getMyProperties().getEnvironmentType();
+    }
+
     protected DfReplaceSchemaProperties getMyProperties() {
         return DfBuildProperties.getInstance().getInvokeReplaceSchemaProperties();
     }
 
     // --------------------------------------------
-    //                                 data writing
-    //                                 ------------
-    protected void writeDbFromXls() {
-        final DfXlsDataHandler xlsDataHandler = new DfXlsDataHandlerImpl();
-        xlsDataHandler.writeSeveralData(getDataDirectoryPath("xls"), getDataSource());
+    //                                     xls data
+    //                                     --------
+    protected void writeDbFromXlsAsCommonData() {
+        writeDbFromXls(getCommonDataDirectoryPath("xls"));
     }
 
-    protected void writeDbFromSeparatedFile(String typeName, String delimter) {
+    protected void writeDbFromXlsAsAdditionalData() {
+        writeDbFromXls(getAdditionalDataDirectoryPath(getEnvironmentType(), "xls"));
+    }
+
+    protected void writeDbFromXls(String directoryPath) {
+        final DfXlsDataHandler xlsDataHandler = new DfXlsDataHandlerImpl();
+        xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
+    }
+
+    // --------------------------------------------
+    //                                     tsv data
+    //                                     --------
+    protected void writeDbFromSeparatedFileAsCommonData(String typeName, String delimter) {
+        writeDbFromSeparatedFile(typeName, delimter, getCommonDataDirectoryPath("tsv"));
+    }
+
+    protected void writeDbFromSeparatedFileAsAdditionalData(String typeName, String delimter) {
+        writeDbFromSeparatedFile(typeName, delimter, getAdditionalDataDirectoryPath(getEnvironmentType(), typeName));
+    }
+
+    protected void writeDbFromSeparatedFile(String typeName, String delimter, String directoryPath) {
         final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
         handler.setDataSource(getDataSource());
         final DfSeparatedDataSeveralHandlingInfo handlingInfo = new DfSeparatedDataSeveralHandlingInfo();
-        handlingInfo.setBasePath(getDataDirectoryPath("tsv"));
+        handlingInfo.setBasePath(directoryPath);
         handlingInfo.setTypeName(typeName);
         handlingInfo.setDelimter(delimter);
         handlingInfo.setErrorContinue(true);
@@ -209,8 +257,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         }
     }
 
-    protected String getDataDirectoryPath(final String typeName) {
-        return getReplaceSchemaSqlFileDirectoryName() + "/testdata/" + typeName;
+    protected String getCommonDataDirectoryPath(final String typeName) {
+        return getReplaceSchemaSqlFileDirectoryName() + "/data/common/" + typeName;
     }
 
+    protected String getAdditionalDataDirectoryPath(final String envType, final String typeName) {
+        return getReplaceSchemaSqlFileDirectoryName() + "/data/" + envType + "/" + typeName;
+    }
 }
