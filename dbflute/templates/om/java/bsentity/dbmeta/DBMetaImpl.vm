@@ -551,7 +551,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
             throw new RuntimeException(e.getCause());
         }
     }
-
 #foreach ($foreignKeys in $table.ForeignKeys)
 
     /**
@@ -563,7 +562,25 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm.getInstance();
     }
 #end
+#foreach ($refferer in $table.Referrers)
+  #set ($reffererTable = $refferer.Table)
+  #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
+  #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
+  #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
+  #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+  #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
+  #if (${refferer.isOneToOne()})
 
+    /**
+     * Get foreign dbmeta of ${refferer.reffererPropertyNameInitCapAsOne}.
+     * 
+     * @return Foreign DBMeta. (NotNull)
+     */
+    public ${glProjectPrefix}${refferer.Table.JavaName}Dbm getForeignDBMeta_${refferer.reffererPropertyNameInitCapAsOne}() {
+        return ${glProjectPrefix}${refferer.Table.JavaName}Dbm.getInstance();
+    }
+  #end
+#end
 
     // =====================================================================================
     //                                                                         Determination

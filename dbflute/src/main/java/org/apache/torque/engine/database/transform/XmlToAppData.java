@@ -64,8 +64,6 @@ import java.util.Vector;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -89,9 +87,10 @@ import org.xml.sax.helpers.DefaultHandler;
  * @version $Id$
  */
 public class XmlToAppData extends DefaultHandler {
-    /** Logging class from commons.logging */
-    private static Log log = LogFactory.getLog(XmlToAppData.class);
 
+    // Comment out!
+    /** Logging class from commons.logging */
+    //    private static Log log = LogFactory.getLog(XmlToAppData.class);
     private AppData app;
     private Database currDB;
     private Table currTable;
@@ -168,7 +167,8 @@ public class XmlToAppData extends DefaultHandler {
             }
             BufferedReader br = new BufferedReader(fr);
             try {
-                log.info("Parsing file: '" + (new File(xmlFile)).getName() + "'");
+                // Comment out!
+                //                log.info("Parsing file: '" + (new File(xmlFile)).getName() + "'");
                 InputSource is = new InputSource(br);
                 parser.parse(is, this);
             } finally {
@@ -278,9 +278,10 @@ public class XmlToAppData extends DefaultHandler {
      *         qualified names are not available.
      */
     public void endElement(String uri, String localName, String rawName) {
-        if (log.isDebugEnabled()) {
-            log.debug("endElement(" + uri + ", " + localName + ", " + rawName + ") called");
-        }
+        // Comment out!
+        //        if (log.isDebugEnabled()) {
+        //            log.debug("endElement(" + uri + ", " + localName + ", " + rawName + ") called");
+        //        }
     }
 
     /**

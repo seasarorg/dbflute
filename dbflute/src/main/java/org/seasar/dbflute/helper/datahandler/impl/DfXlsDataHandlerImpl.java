@@ -14,6 +14,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
+import org.seasar.dbflute.helper.excel.DfXlsReader;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.util.DfMapStringFileUtil;
 import org.seasar.extension.dataset.ColumnType;
 import org.seasar.extension.dataset.DataRow;
@@ -32,7 +34,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final List<File> xlsList = getXlsList(dataDirectoryName);
         final List<DataSet> ls = new ArrayList<DataSet>();
         for (File file : xlsList) {
-            final XlsReader xlsReader = new XlsReader(file);
+            final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
             ls.add(xlsReader.read());
         }
         return ls;
@@ -44,7 +46,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
             _log.info("writeData(" + file + ")");
             _log.info("= = = = = = =/");
-            final XlsReader xlsReader = new XlsReader(file);
+            final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
             final DataSet dataSet = xlsReader.read();
 
             setupDefaultValue(dataDirectoryName, dataSet);
@@ -52,6 +54,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             final SqlWriter sqlWriter = new SqlWriter(dataSource);
             sqlWriter.write(dataSet);
         }
+    }
+
+    protected DfXlsReader createXlsReader(String dataDirectoryName, File file) {
+        final DfXlsReader xlsReader = new DfXlsReader(file, getTableNameMap(dataDirectoryName));
+        return xlsReader;
     }
 
     protected void setupDefaultValue(String dataDirectoryName, final DataSet dataSet) {
@@ -104,5 +111,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/default-value.txt";
         return DfMapStringFileUtil.getSimpleMapAsStringValue(path, "UTF-8");
+    }
+
+    private DfFlexibleNameMap<String, String> getTableNameMap(String dataDirectoryName) {
+        final String path = dataDirectoryName + "/table-name.txt";
+        final Map<String, String> targetMap = DfMapStringFileUtil.getSimpleMapAsStringValue(path, "UTF-8");
+        return new DfFlexibleNameMap<String, String>(targetMap);
     }
 }

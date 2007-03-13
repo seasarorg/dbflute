@@ -30,5 +30,6 @@
 	<classpathentry kind="lib" path="lib/forCompile/ognl-2.6.7.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/s2-extension-2.4.4.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/s2-framework-2.4.4.jar"/>
+	<classpathentry kind="lib" path="lib/forCompile/poi-2.5.1-final-20040804.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

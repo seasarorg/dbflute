@@ -301,7 +301,7 @@ public class Database {
         return (Table) _tablesByJavaName.get(javaName);
     }
 
-    public Table getColumnByFlexibleName(String flexibleName) {
+    public Table getTableByFlexibleName(String flexibleName) {
         final DfFlexibleNameMap<String, Table> flexibleNameMap = new DfFlexibleNameMap<String, Table>(_tablesByName);
         return flexibleNameMap.get(flexibleName);
     }
@@ -395,7 +395,7 @@ public class Database {
             ForeignKey[] fks = currTable.getForeignKeys();
             for (int j = 0; j < fks.length; j++) {
                 ForeignKey currFK = fks[j];
-                Table foreignTable = getTable(currFK.getForeignTableName());
+                Table foreignTable = getTableByFlexibleName(currFK.getForeignTableName());
                 if (foreignTable == null) {
                     throw new EngineException("Attempt to set foreign" + " key to nonexistent table, "
                             + currFK.getForeignTableName());
@@ -611,7 +611,7 @@ public class Database {
                 final Set<String> tableElementKeySet = tableElementMap.keySet();
                 for (String tableName : tableElementKeySet) {
                     _log.debug("        " + tableName);
-                    final Table targetTable = getColumnByFlexibleName(tableName);
+                    final Table targetTable = getTableByFlexibleName(tableName);
                     if (targetTable == null) {
                         String msg = "The table[" + tableName + "] of includeQueryMap was not found: " + map;
                         throw new IllegalStateException(msg);

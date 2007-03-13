@@ -305,7 +305,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Inserted count.
      */
     public int delegateInsertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         return getMyDao().insertList(entityList);
     }
 
@@ -316,7 +316,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Updated count.
      */
     public int delegateUpdateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         return getMyDao().updateList(entityList);
     }
 
@@ -327,7 +327,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Deleted count.
      */
     public int delegateDeleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         return getMyDao().deleteList(entityList);
     }
 #end
@@ -850,7 +850,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Inserted count.
      */
     public int insertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         return delegateInsertList(entityList);
     }
 
@@ -861,7 +861,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Updated count.
      */
     public int updateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         return delegateUpdateList(entityList);
     }
 
@@ -872,7 +872,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Deleted count.
      */
     public int deleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
-        assertListNotNullAndEmpty(entityList);
+        assertListNotNullAndNotEmpty(entityList);
         return delegateDeleteList(entityList);
     }
 

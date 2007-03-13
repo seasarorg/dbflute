@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataWriter;
 import org.seasar.dbflute.helper.datahandler.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.datahandler.impl.internal.DfInternalSqlBuildingResult;
+import org.seasar.dbflute.util.DfTokenUtil;
 import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
 
 public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
@@ -271,7 +272,11 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
 
     protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
         final List<String> valueList = new ArrayList<String>();
-        final String[] values = lineString.split(delimiter);
+
+        // Don't use split!
+        //        final String[] values = lineString.split(delimiter);
+        final String[] values = DfTokenUtil.tokenToArgs(lineString, delimiter);
+
         for (String value : values) {
             valueList.add(value);
         }

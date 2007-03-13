@@ -251,9 +251,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determanation.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
-        if (_${col.UncapitalisedJavaName} == null) {
-            return false;
-        }
+        if (_${col.UncapitalisedJavaName} == null) { return false; }
         String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
         return code.equalsIgnoreCase(_${col.UncapitalisedJavaName}.toString());
     }
@@ -266,10 +264,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determanation.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}IfNullException() {
-        if (_${col.UncapitalisedJavaName} == null) {
-            String msg = "If the value of ${col.UncapitalisedJavaName} is null, this method throws exception!";
-            throw new IllegalStateException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
-        }
+        throwExceptionIfTheValueIsNull("${col.UncapitalisedJavaName}", _${col.UncapitalisedJavaName});
         return is${col.JavaName}${classificationMap.get('name')}();
     }
       #else
@@ -282,9 +277,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determanation.
      */
     public boolean is${col.JavaName}_${classificationMap.get('name')}() {
-        if (_${col.UncapitalisedJavaName} == null) {
-            return false;
-        }
+        if (_${col.UncapitalisedJavaName} == null) { return false; }
         String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
         return code.equalsIgnoreCase(_${col.UncapitalisedJavaName}.toString());
     }
@@ -297,16 +290,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determanation.
      */
     public boolean is${col.JavaName}_${classificationMap.get('name')}_IfNullException() {
-        if (_${col.UncapitalisedJavaName} == null) {
-            String msg = "If the value of ${col.UncapitalisedJavaName} is null, this method throws exception!";
-            throw new IllegalStateException(msg + " ${col.UncapitalisedJavaName}=" + _${col.UncapitalisedJavaName});
-        }
+        throwExceptionIfTheValueIsNull("${col.UncapitalisedJavaName}", _${col.UncapitalisedJavaName});
         return is${col.JavaName}_${classificationMap.get('name')}();
     }
       #end
     #end
   #end
 #end
+
+    private void throwExceptionIfTheValueIsNull(String propertyName, Object value) {
+        if (value == null) {
+            String msg = "If the value of " + propertyName + " is null, this method throws exception!";
+            throw new IllegalStateException(msg + " " + propertyName + "=" + value);
+        }
+    }
 
     // =====================================================================================
     //                                                                 Classification Getter
@@ -651,11 +648,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         MapStringUtil.acceptColumnValueMapString(columnValueMapString, this);
     }
 
-    protected void checkTypeString(Object value, String propertyName, String typeName) {
+    private void checkTypeString(Object value, String propertyName, String typeName) {
         MapStringUtil.checkTypeString(value, propertyName, typeName);
     }
 
-    protected long parseDateString(Object value, String propertyName, String typeName) {
+    private long parseDateString(Object value, String propertyName, String typeName) {
         return MapStringUtil.parseDateString(value, propertyName, typeName);
     }
 

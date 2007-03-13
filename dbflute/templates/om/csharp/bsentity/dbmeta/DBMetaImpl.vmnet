@@ -454,7 +454,6 @@ namespace ${myDBMetaPackageName} {
             }
             return (${glDBMetaInterfaceName})method.Invoke(this, null);
         }
-
 #foreach ($foreignKeys in $table.ForeignKeys)
 
         /// <summary>
@@ -464,6 +463,24 @@ namespace ${myDBMetaPackageName} {
         public ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm GetForeignDBMeta_${foreignKeys.foreignPropertyNameInitCap}() {
             return ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm.GetInstance();
         }
+#end
+#foreach ($refferer in $table.Referrers)
+  #set ($reffererTable = $refferer.Table)
+  #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
+  #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
+  #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
+  #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+  #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
+  #if (${refferer.isOneToOne()})
+
+        /// <summary>
+        /// Get foreign dbmeta of ${foreignKeys.reffererPropertyNameInitCapAsOne}.
+        /// </summary>
+        /// <returns>Foreign DBMeta. (NotNull)</returns>
+        public ${glProjectPrefix}${refferer.Table.JavaName}Dbm GetForeignDBMeta_${refferer.reffererPropertyNameInitCapAsOne}() {
+            return ${glProjectPrefix}${refferer.Table.JavaName}Dbm.GetInstance();
+        }
+  #end
 #end
 
         // =====================================================================================
