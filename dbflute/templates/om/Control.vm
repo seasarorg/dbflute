@@ -476,9 +476,48 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/AbstractSqlClause.${glTemplateFileExtension}",$path ,"" ,"")
 
-    $database.debug("    ...Parsing SqlClause_${database.DatabaseType}")
-    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}${database.DaoGenDbName}.${glClassFileExtension}" )
-    $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_${database.DatabaseType}.${glTemplateFileExtension}",$path ,"" ,"")
+    #if ($database.isTargetLanguageJava())
+      $database.debug("    ...Parsing SqlClause_derby")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Derby.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_derby.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("    ...Parsing SqlClause_oracle")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Oracle.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_oracle.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("    ...Parsing SqlClause_firebird")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Firebird.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_firebird.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("    ...Parsing SqlClause_mysql")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}MySql.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_mysql.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("    ...Parsing SqlClause_postgresql")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}PostgreSql.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_postgresql.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("    ...Parsing SqlClause_mssql")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}SqlServer.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_mssql.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("    ...Parsing SqlClause_db2")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Db2.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_db2.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("    ...Parsing SqlClause_interbase")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Interbase.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_interbase.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.debug("    ...Parsing SqlClause_default")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Default.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_default.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
+    #if ($database.isTargetLanguageCSharp())
+      $database.debug("    ...Parsing SqlClause_${database.DatabaseType}")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}${database.DaoGenDbName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_${database.DatabaseType}.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
 
     $database.debug("    ...Parsing OrderByClause")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glOrderByClauseName}.${glClassFileExtension}" )

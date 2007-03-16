@@ -1654,6 +1654,16 @@ public class Table implements IDMethod {
         return DfBuildProperties.getInstance();
     }
 
+    public boolean hasClassification() {
+        final Column[] columns = getColumns();
+        for (Column column : columns) {
+            if (getDatabase().hasClassification(getName(), column.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===============================================================================
     //                                                                 SequenceNextSql
     //                                                                 ===============

@@ -268,6 +268,7 @@ namespace ${myExtendedEntityPackageName} {
             String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
             return code.ToLower().Equals(_${col.UncapitalisedJavaName}.ToString().ToLower());
         }
+        #if ($database.isMakeDeprecated())
 
         /// <summary>
         /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
@@ -275,6 +276,7 @@ namespace ${myExtendedEntityPackageName} {
         /// If the value is null, this method throws exception!
         /// </summary>
         /// <returns>Determanation.</returns>
+        [Obsolete("This method is deprecated. Sorry!")]
         public bool Is${col.JavaName}${classificationMap.get('name')}IfNullException() {
             if (_${col.UncapitalisedJavaName} == null) {
                 String msg = "If the value of ${col.UncapitalisedJavaName} is null, this method throws exception!";
@@ -287,6 +289,7 @@ namespace ${myExtendedEntityPackageName} {
             }
             return Is${col.JavaName}${classificationMap.get('name')}();
         }
+        #end
       #else
 
         /// <summary>
@@ -306,6 +309,7 @@ namespace ${myExtendedEntityPackageName} {
             String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
             return code.ToLower().Equals(_${col.UncapitalisedJavaName}.ToString().ToLower());
         }
+        #if ($database.isMakeDeprecated())
 
         /// <summary>
         /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
@@ -313,6 +317,7 @@ namespace ${myExtendedEntityPackageName} {
         /// If the value is null, this method throws exception!
         /// </summary>
         /// <returns>Determanation.</returns>
+        [Obsolete("This method is deprecated. Sorry!")]
         public bool Is${col.JavaName}_${classificationMap.get('name')}_IfNullException() {
             if (_${col.UncapitalisedJavaName} == null) {
                 String msg = "If the value of ${col.UncapitalisedJavaName} is null, this method throws exception!";
@@ -325,6 +330,7 @@ namespace ${myExtendedEntityPackageName} {
             }
             return Is${col.JavaName}_${classificationMap.get('name')}();
         }
+        #end
       #end
     #end
   #end

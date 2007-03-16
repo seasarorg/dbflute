@@ -929,6 +929,10 @@ public class Column {
         return getIncludeQueryProperties().isAvailableStringPrefixSearch(getTableName(), getName());
     }
 
+    public boolean isAvailableStringLikeSearch() {
+        return getIncludeQueryProperties().isAvailableStringLikeSearch(getTableName(), getName());
+    }
+    
     public boolean isAvailableStringInScope() {
         return getIncludeQueryProperties().isAvailableStringInScope(getTableName(), getName());
     }

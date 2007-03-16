@@ -1,5 +1,7 @@
 package ${glPackageBaseCommonS2Dao};
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import javax.sql.DataSource;
 #if ($database.isVersionAfter1040())
 
@@ -18,6 +20,13 @@ import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.StatementFactory;
 #end
+
+import org.seasar.dao.Dbms;
+import org.seasar.dao.dbms.DbmsManager;
+import org.seasar.extension.jdbc.util.ConnectionUtil;
+import org.seasar.extension.jdbc.util.DataSourceUtil;
+
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 
 /**
  * DaoMetaDataFactoryImpl for DBFlute.
@@ -39,7 +48,55 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             ResultSetFactory resultSetFactory,
             AnnotationReaderFactory readerFactory) {
         super(dataSource, statementFactory, resultSetFactory, readerFactory);
+
+        initializeDatabaseProductNameOfContext(dataSource);
     }
+
+    protected void initializeDatabaseProductNameOfContext(DataSource dataSource) {
+        if (getDatabaseProductNameFromContext() != null) {
+            return;
+        }
+        final Connection con = DataSourceUtil.getConnection(dataSource);
+        String suffix = null;
+        try {
+            final DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
+            final Dbms dbms = DbmsManager.getDbms(dbMetaData);
+            suffix = dbms.getSuffix();
+        } finally {
+            ConnectionUtil.close(con);
+        }
+        if (suffix == null) {
+            setDatabaseProductNameToContext("${database.DaoGenDbName}");
+            return;
+        }
+        suffix = suffix.startsWith("_") ? suffix.substring("_".length()) : suffix;
+        if (suffix.equalsIgnoreCase("derby")) {
+            setDatabaseProductNameToContext("Derby");
+        } else if (suffix.equalsIgnoreCase("oracle")) {
+            setDatabaseProductNameToContext("Oracle");
+        } else if (suffix.equalsIgnoreCase("firebird")) {
+            setDatabaseProductNameToContext("Firebird");
+        } else if (suffix.equalsIgnoreCase("mysql")) {
+            setDatabaseProductNameToContext("MySql");
+        } else if (suffix.equalsIgnoreCase("postgre")) {
+            setDatabaseProductNameToContext("PostgreSql");
+        } else if (suffix.equalsIgnoreCase("mssql")) {
+            setDatabaseProductNameToContext("SqlServer");
+        } else if (suffix.equalsIgnoreCase("db2")) {
+            setDatabaseProductNameToContext("Db2");
+        } else {
+            setDatabaseProductNameToContext("${database.DaoGenDbName}");
+        }
+    }
+
+    protected String getDatabaseProductNameFromContext() {
+        return ${glConditionBeanContextName}.getDatabaseProductName();
+    }
+
+    protected void setDatabaseProductNameToContext(String name) {
+        ${glConditionBeanContextName}.setDatabaseProductName(name);
+    }
+
 #if ($database.isVersionAfter1040())
 
     protected BeanEnhancer beanEnhancer;

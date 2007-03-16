@@ -255,6 +255,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
         return code.equalsIgnoreCase(_${col.UncapitalisedJavaName}.toString());
     }
+        #if ($database.isMakeDeprecated())
 
     /**
      * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
@@ -262,11 +263,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * If the value is null, this method throws exception!
      * 
      * @return Determanation.
+     * @deprecated This method is deprecated. Sorry!
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}IfNullException() {
         throwExceptionIfTheValueIsNull("${col.UncapitalisedJavaName}", _${col.UncapitalisedJavaName});
         return is${col.JavaName}${classificationMap.get('name')}();
     }
+        #end
       #else
 
     /**
@@ -281,6 +284,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
         return code.equalsIgnoreCase(_${col.UncapitalisedJavaName}.toString());
     }
+        #if ($database.isMakeDeprecated())
 
     /**
      * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
@@ -288,15 +292,19 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * If the value is null, this method throws exception!
      * 
      * @return Determanation.
+     * @deprecated This method is deprecated. Sorry!
      */
     public boolean is${col.JavaName}_${classificationMap.get('name')}_IfNullException() {
         throwExceptionIfTheValueIsNull("${col.UncapitalisedJavaName}", _${col.UncapitalisedJavaName});
         return is${col.JavaName}_${classificationMap.get('name')}();
     }
+        #end
       #end
     #end
   #end
 #end
+#if (${table.hasClassification()})
+  #if ($database.isMakeDeprecated())
 
     private void throwExceptionIfTheValueIsNull(String propertyName, Object value) {
         if (value == null) {
@@ -304,6 +312,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
             throw new IllegalStateException(msg + " " + propertyName + "=" + value);
         }
     }
+  #end
+#end
 
     // =====================================================================================
     //                                                                 Classification Getter
@@ -679,25 +689,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public String extractPrimaryKeyMapString(String startBrace, String endBrace, String delimiter, String equal) {
 #if ($table.hasPrimaryKey())
-
         final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         final StringBuffer sb = new StringBuffer();
   #foreach ($col in $table.PrimaryKey)
-    #if ($col.isJavaNativeDateObject())
 
-        sb.append(delimiter).append("${col.Name}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? formatDate(_${col.UncapitalisedJavaName}) : ""));
-    #else
-
-        sb.append(delimiter).append("${col.Name}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? _${col.UncapitalisedJavaName}.toString() : ""));
-    #end
+        appendColumnValueString(sb, delimiter, equal, "${col.Name}", _${col.UncapitalisedJavaName});
   #end
 
         sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
         return sb.toString();
 #else
-
         return extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
 #end
 
@@ -725,20 +726,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         final StringBuffer sb = new StringBuffer();
 #foreach ($col in $table.Columns)
-    #if ($col.isJavaNativeDateObject())
-
-        sb.append(delimiter).append("${col.Name}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? formatDate(_${col.UncapitalisedJavaName}) : ""));
-    #else
-
-        sb.append(delimiter).append("${col.Name}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? _${col.UncapitalisedJavaName}.toString() : ""));
-    #end
+        appendColumnValueString(sb, delimiter, equal, "${col.Name}", _${col.UncapitalisedJavaName});
 #end
 
         sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
         return sb.toString();
     }
+
+    private void appendColumnValueString(StringBuffer sb, String delimiter, String equal, String colName, Object value) {
+        sb.append(delimiter).append(colName).append(equal);
+        if (value instanceof java.util.Date) {
+            sb.append((value != null ? formatDate((java.util.Date)value) : ""));
+        } else {
+            sb.append((value != null ? value.toString() : ""));
+        }
+    }
+
 #if (${table.hasAllCommonColumn()})
 
     /**

@@ -10,22 +10,6 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName}${database.DaoGenDbName
 public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implements ${glPagingBeanInterfaceName} {
 
     // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
-    /** SQL clause instance. */
-    protected final ${glSqlClauseName} _sqlClause;
-
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
-    /**
-     * Constructor.
-     */
-    public ${glSimplePagingBeanName}() {
-        _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}("Dummy");
-    }
-
-    // =====================================================================================
     //                                                                             SqlClause
     //                                                                             =========
     /**

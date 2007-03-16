@@ -51,6 +51,29 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return _includeQueryMap;
     }
 
+    protected Map<String, Map<String, Map<String, List<String>>>> _excludeQueryMap;
+
+    public Map<String, Map<String, Map<String, List<String>>>> getExcludeQueryMap() {
+        if (_excludeQueryMap != null) {
+            return _excludeQueryMap;
+        }
+        final LinkedHashMap<String, Map<String, Map<String, List<String>>>> resultMap = new LinkedHashMap<String, Map<String, Map<String, List<String>>>>();
+        final Map<String, Object> targetMap = mapProp("torque.excludeQueryMap", DEFAULT_EMPTY_MAP);
+        final Set<String> targetKeySet = targetMap.keySet();
+        for (String key : targetKeySet) {
+            final Object value = targetMap.get(key);
+            if (!(value instanceof Map)) {
+                String msg = "The key[" + key + "] should have map value. But the value is " + value + ": targetMap="
+                        + targetMap;
+                throw new IllegalStateException(msg);
+            }
+            final Map<String, Map<String, List<String>>> elementMap = (Map<String, Map<String, List<String>>>) value;
+            resultMap.put(key, elementMap);
+        }
+        _excludeQueryMap = resultMap;
+        return _excludeQueryMap;
+    }
+
     // ===============================================================================
     //                                                                       Available
     //                                                                       =========
@@ -60,7 +83,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableStringNotEqual(String tableName, String columnName) {
         return isAvailable("String", "NotEqual", tableName, columnName);
     }
-    
+
     public boolean isAvailableStringGreaterThan(String tableName, String columnName) {
         return isAvailable("String", "GreaterThan", tableName, columnName);
     }
@@ -81,6 +104,10 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable("String", "PrefixSearch", tableName, columnName);
     }
     
+    public boolean isAvailableStringLikeSearch(String tableName, String columnName) {
+        return isAvailable("String", "LikeSearch", tableName, columnName);
+    }
+
     public boolean isAvailableStringInScope(String tableName, String columnName) {
         return isAvailable("String", "InScope", tableName, columnName);
     }
@@ -111,7 +138,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableNumberLessEqual(String tableName, String columnName) {
         return isAvailable("Number", "LessEqual", tableName, columnName);
     }
-    
+
     public boolean isAvailableNumberInScope(String tableName, String columnName) {
         return isAvailable("Number", "InScope", tableName, columnName);
     }
@@ -142,18 +169,18 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableDateLessEqual(String tableName, String columnName) {
         return isAvailable("Date", "LessEqual", tableName, columnName);
     }
-    
+
     // ---------------------------------------
     //                                  String Old AsInline
     //                                  ------
     public boolean isAvailableStringEqualOldAsInline(String tableName, String columnName) {
         return isAvailable("String", "EqualOldAsInline", tableName, columnName);
     }
-    
+
     public boolean isAvailableStringNotEqualOldAsInline(String tableName, String columnName) {
         return isAvailable("String", "NotEqualOldAsInline", tableName, columnName);
     }
-    
+
     public boolean isAvailableStringGreaterThanOldAsInline(String tableName, String columnName) {
         return isAvailable("String", "GreaterThanOldAsInline", tableName, columnName);
     }
@@ -173,7 +200,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableStringPrefixSearchOldAsInline(String tableName, String columnName) {
         return isAvailable("String", "PrefixSearchOldAsInline", tableName, columnName);
     }
-    
+
     public boolean isAvailableStringInScopeOldAsInline(String tableName, String columnName) {
         return isAvailable("String", "InScopeOldAsInline", tableName, columnName);
     }
@@ -181,7 +208,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableStringNotInScopeOldAsInline(String tableName, String columnName) {
         return isAvailable("String", "NotInScopeOldAsInline", tableName, columnName);
     }
-    
+
     public boolean isAvailableStringInScopeSubQueryOldAsInline(String tableName, String columnName) {
         return isAvailable("String", "InScopeSubQueryOldAsInline", tableName, columnName);
     }
@@ -192,7 +219,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableNumberEqualOldAsInline(String tableName, String columnName) {
         return isAvailable("Number", "EqualOldAsInline", tableName, columnName);
     }
-    
+
     public boolean isAvailableNumberNotEqualOldAsInline(String tableName, String columnName) {
         return isAvailable("Number", "NotEqualOldAsInline", tableName, columnName);
     }
@@ -212,7 +239,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableNumberLessEqualOldAsInline(String tableName, String columnName) {
         return isAvailable("Number", "LessEqualOldAsInline", tableName, columnName);
     }
-    
+
     public boolean isAvailableNumberInScopeOldAsInline(String tableName, String columnName) {
         return isAvailable("Number", "InScopeOldAsInline", tableName, columnName);
     }
@@ -220,7 +247,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableNumberNotInScopeOldAsInline(String tableName, String columnName) {
         return isAvailable("Number", "NotInScopeOldAsInline", tableName, columnName);
     }
-    
+
     public boolean isAvailableNumberInScopeSubQueryOldAsInline(String tableName, String columnName) {
         return isAvailable("Number", "InScopeSubQueryOldAsInline", tableName, columnName);
     }
@@ -231,7 +258,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableDateEqualOldAsInline(String tableName, String columnName) {
         return isAvailable("Date", "EqualOldAsInline", tableName, columnName);
     }
-    
+
     public boolean isAvailableDateNotEqualOldAsInline(String tableName, String columnName) {
         return isAvailable("Date", "NotEqualOldAsInline", tableName, columnName);
     }
@@ -251,15 +278,18 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableDateLessEqualOldAsInline(String tableName, String columnName) {
         return isAvailable("Date", "LessEqualOldAsInline", tableName, columnName);
     }
-    
+
     protected boolean isAvailable(String javaTypeName, String queryTypeName, String tableName, String columnName) {
-        if (containsQueryType(javaTypeName, queryTypeName)) {
-            return containsTableColumn(javaTypeName, queryTypeName, tableName, columnName);
+        if (containsQueryTypeIncludeQueryMap(javaTypeName, queryTypeName)) {
+            return containsTableColumnIncludeQueryMap(javaTypeName, queryTypeName, tableName, columnName);
+        }
+        if (containsQueryTypeExcludeQueryMap(javaTypeName, queryTypeName)) {
+            return !containsTableColumnExcludeQueryMap(javaTypeName, queryTypeName, tableName, columnName);
         }
         return true;
     }
 
-    protected boolean containsQueryType(String javaTypeName, String queryTypeName) {
+    protected boolean containsQueryTypeIncludeQueryMap(String javaTypeName, String queryTypeName) {
         final Map<String, Map<String, List<String>>> map = getIncludeQueryMap().get(javaTypeName);
         if (map != null && map.get(queryTypeName) != null) {
             return true;
@@ -267,32 +297,73 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return false;
     }
 
-    protected boolean containsTableColumn(String javaTypeName, String queryTypeName, String tableName, String columnName) {
-        if (getIncludeQueryMap().get(javaTypeName) == null) {
-            String msg = "The javaTypeName[" + javaTypeName + "] should have the value of includeQueryMap: "
-                    + getIncludeQueryMap();
-            throw new IllegalStateException(msg);
+    protected boolean containsQueryTypeExcludeQueryMap(String javaTypeName, String queryTypeName) {
+        final Map<String, Map<String, List<String>>> map = getExcludeQueryMap().get(javaTypeName);
+        if (map != null && map.get(queryTypeName) != null) {
+            return true;
         }
-        if (getIncludeQueryMap().get(javaTypeName).get(queryTypeName) == null) {
-            String msg = "The queryTypeName[" + queryTypeName + "] should have the value of includeQueryMap: "
-                    + getIncludeQueryMap();
-            throw new IllegalStateException(msg);
-        }
-        final Map<String, List<String>> map = getIncludeQueryMap().get(javaTypeName).get(queryTypeName);
-        final DfFlexibleNameMap<String, List<String>> tableNameMap = new DfFlexibleNameMap<String, List<String>>(map);
-        if (!tableNameMap.containsKey(tableName)) {
-            return false;
-        }
-        final List<String> columnNameList = tableNameMap.get(tableName);
-        final Map<String, Object> columnTmpMap = new HashMap<String, Object>();
-        for (String protoColumnName : columnNameList) {
-            columnTmpMap.put(protoColumnName, new Object());
+        return false;
+    }
+
+    protected boolean containsTableColumnIncludeQueryMap(String javaTypeName, String queryTypeName, String tableName,
+            String columnName) {
+
+        final InternalTableColumnJudgement judgement = new InternalTableColumnJudgement();
+        judgement.setQueryMap(getIncludeQueryMap());
+        return judgement.containsTableColumn(javaTypeName, queryTypeName, tableName, columnName);
+    }
+
+    protected boolean containsTableColumnExcludeQueryMap(String javaTypeName, String queryTypeName, String tableName,
+            String columnName) {
+
+        final InternalTableColumnJudgement judgement = new InternalTableColumnJudgement();
+        judgement.setQueryMap(getExcludeQueryMap());
+        return judgement.containsTableColumn(javaTypeName, queryTypeName, tableName, columnName);
+    }
+
+    protected static class InternalTableColumnJudgement {
+        protected Map<String, Map<String, Map<String, List<String>>>> _queryMap;
+
+        protected boolean containsTableColumn(String javaTypeName, String queryTypeName, String tableName,
+                String columnName) {
+            if (_queryMap.get(javaTypeName) == null) {
+                String msg = "The javaTypeName[" + javaTypeName + "] should have the value of excludeQueryMap: "
+                        + _queryMap;
+                throw new IllegalStateException(msg);
+            }
+            if (_queryMap.get(javaTypeName).get(queryTypeName) == null) {
+                String msg = "The queryTypeName[" + queryTypeName + "] should have the value of excludeQueryMap: "
+                        + _queryMap;
+                throw new IllegalStateException(msg);
+            }
+            final Map<String, List<String>> map = _queryMap.get(javaTypeName).get(queryTypeName);
+            final DfFlexibleNameMap<String, List<String>> tableNameMap = new DfFlexibleNameMap<String, List<String>>(
+                    map);
+            if (!tableNameMap.containsKey(tableName) && !tableNameMap.containsKey("$$ALL$$")) {
+                return false;
+            }
+            List<String> columnNameList = tableNameMap.get(tableName);
+            if (columnNameList == null) {
+                columnNameList = tableNameMap.get("$$ALL$$");
+            }
+            final Map<String, Object> columnTmpMap = new HashMap<String, Object>();
+            for (String protoColumnName : columnNameList) {
+                columnTmpMap.put(protoColumnName, new Object());
+            }
+
+            final DfFlexibleNameMap<String, Object> columnNameMap = new DfFlexibleNameMap<String, Object>(columnTmpMap);
+            if (!columnNameMap.containsKey(columnName)) {
+                return false;
+            }
+            return true;
         }
 
-        final DfFlexibleNameMap<String, Object> columnNameMap = new DfFlexibleNameMap<String, Object>(columnTmpMap);
-        if (!columnNameMap.containsKey(columnName)) {
-            return false;
+        public Map<String, Map<String, Map<String, List<String>>>> getQueryMap() {
+            return _queryMap;
         }
-        return true;
+
+        public void setQueryMap(Map<String, Map<String, Map<String, List<String>>>> queryMap) {
+            this._queryMap = queryMap;
+        }
     }
 }

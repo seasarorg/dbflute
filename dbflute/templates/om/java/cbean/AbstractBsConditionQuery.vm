@@ -178,6 +178,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
     }
       #end
+      #if (${col.isAvailableStringLikeSearch()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using likeSearch. { like '%xxx%' }
@@ -190,6 +191,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LikeSearch($col.JavaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} option) {
         registerLikeSearchQuery(${glConditionKeyName}.CK_LIKE_SEARCH, filterRemoveEmptyString(value), getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, option);
     }
+      #end
       #if (${col.isAvailableStringInScope()})
 
     /**
@@ -439,6 +441,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         #end
       #end
       #if (${col.isAvailableNumberInScope()})
+
     /**
      * Set the value of ${col.UncapitalisedJavaName} using inScope. { in (a, b) }
      * If the element in the list is null or empty-string, the condition-element is ignored.

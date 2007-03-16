@@ -1,6 +1,6 @@
 package ${glPackageBaseCommonSqlClause};
 
-#set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
+#set ($myClassName = "${glSqlClauseInterfaceName}SqlServer")
 
 /**
  * SqlClause for MSSQL.

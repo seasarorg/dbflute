@@ -8,7 +8,10 @@ package ${glPackageBaseCommonCBean};
 public class ${glConditionBeanContextName} {
 
     /** The thread-local for this. */
-    private static ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})} _threadLocal = new ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})}();
+    private static final ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})} _threadLocal = new ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})}();
+
+    /** The database product name. */
+    private static String _databaseProductName;
 
     /**
      * Get fetch-narrowing-bean on thread.
@@ -74,5 +77,27 @@ public class ${glConditionBeanContextName} {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Get database product name.
+     * 
+     * @return Database product name.
+     */
+    public static String getDatabaseProductName() {
+        return _databaseProductName;
+    }
+
+    /**
+     * Set database product name.
+     * 
+     * @param name Database product name. (NotNull)
+     */
+    public static void setDatabaseProductName(String name) {
+        if (_databaseProductName != null) {
+            String msg = "Already set up: current=" + _databaseProductName + " your=" + name;
+            throw new IllegalStateException(msg);
+        }
+        _databaseProductName = name;
     }
 }
