@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DfBuildProperties;
 
 /**
  * This class generates an XML schema of an existing database from JDBC metadata..
  * <p>
- * @author mkubo
- * @version $Revision$ $Date$
+ * @author jflute
  */
 public class DfTableNameHandler extends DfAbstractMetaDataHandler {
 
@@ -62,6 +62,13 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
                     _log.debug("$ isTableExcept(" + tableName + ") == true");
                     continue;
                 }
+                if (DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle()) {
+                    if (tableName.startsWith("BIN$")) {
+                        _log.debug("$ isTableExcept(" + tableName + ") == true {Forced because the database is Oracle!}");
+                        continue;
+                    }
+                }
+
                 tables.add(tableName);
             }
         } finally {

@@ -9,7 +9,6 @@ import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName}${database.DaoGenDbName};
 
 /**
  * The condition-bean as abstract.
@@ -24,22 +23,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     /** SQL clause instance. */
     protected final ${glSqlClauseName} _sqlClause;
     {
-        final String databaseProductName = ${glConditionBeanContextName}.getDatabaseProductName();
-        if (databaseProductName == null) {
-            _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(getTableDbName());
-        } else {
-            final String className = "${glPackageBaseCommonSqlClause}.${glSqlClauseName}" + databaseProductName;
-            try {
-                final Class clazz = Class.forName(className);
-                final Class[] argTypes = new Class[]{String.class};
-                final java.lang.reflect.Constructor constructor = clazz.getConstructor(argTypes);
-                final Object[] args = new Object[]{getTableDbName()};
-                _sqlClause = (${glSqlClauseName})constructor.newInstance(args);
-            } catch (Exception e) {
-                String msg = "Instantiation of the className[" + className + "] was failure!";
-                throw new IllegalStateException(msg, e);
-            }
-        }
+        _sqlClause = ${glConditionBeanContextName}.createSqlClause(getTableDbName());
     }
 
     // =====================================================================================

@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
-    public static final Log _log = LogFactory.getLog(DfColumnHandler.class);
+    private static final Log _log = LogFactory.getLog(DfColumnHandler.class);
 
     /**
      * Retrieves all the column names and types for a given table from
@@ -63,6 +63,9 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 col.add(defValue);
                 columns.add(col);
             }
+        } catch (SQLException e) {
+            _log.warn("SQLException occured: schemaName=" + schemaName + " tableName=" + tableName);
+            throw e;
         } finally {
             if (columnResultSet != null) {
                 columnResultSet.close();

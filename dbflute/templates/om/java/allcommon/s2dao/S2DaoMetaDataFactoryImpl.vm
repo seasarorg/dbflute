@@ -70,23 +70,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             return;
         }
         suffix = suffix.startsWith("_") ? suffix.substring("_".length()) : suffix;
-        if (suffix.equalsIgnoreCase("derby")) {
-            setDatabaseProductNameToContext("Derby");
-        } else if (suffix.equalsIgnoreCase("oracle")) {
-            setDatabaseProductNameToContext("Oracle");
-        } else if (suffix.equalsIgnoreCase("firebird")) {
-            setDatabaseProductNameToContext("Firebird");
-        } else if (suffix.equalsIgnoreCase("mysql")) {
-            setDatabaseProductNameToContext("MySql");
-        } else if (suffix.equalsIgnoreCase("postgre")) {
-            setDatabaseProductNameToContext("PostgreSql");
-        } else if (suffix.equalsIgnoreCase("mssql")) {
-            setDatabaseProductNameToContext("SqlServer");
-        } else if (suffix.equalsIgnoreCase("db2")) {
-            setDatabaseProductNameToContext("Db2");
-        } else {
-            setDatabaseProductNameToContext("${database.DaoGenDbName}");
-        }
+        setDatabaseProductNameToContext(suffix);
     }
 
     protected String getDatabaseProductNameFromContext() {

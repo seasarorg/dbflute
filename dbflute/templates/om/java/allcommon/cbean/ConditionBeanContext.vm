@@ -1,5 +1,7 @@
 package ${glPackageBaseCommonCBean};
 
+import ${glPackageBaseCommonSqlClause}.*;
+
 /**
  * Condition-Bean context. (referring to s2pager)
  * 
@@ -99,5 +101,31 @@ public class ${glConditionBeanContextName} {
             throw new IllegalStateException(msg);
         }
         _databaseProductName = name;
+    }
+
+    public static ${glSqlClauseName} createSqlClause(String tableDbName) {
+        final String databaseProductName = getDatabaseProductName();
+        if (databaseProductName == null) {
+            return new ${glSqlClauseName}${database.DaoGenDbName}(tableDbName);
+        } else {
+            final String name = databaseProductName.toLowerCase();
+            if (name.startsWith("derby")) {
+                return new ${glSqlClauseName}Derby(tableDbName);
+            } else if (name.startsWith("oracle")) {
+                return new ${glSqlClauseName}Oracle(tableDbName);
+            } else if (name.startsWith("firebird")) {
+                return new ${glSqlClauseName}Firebird(tableDbName);
+            } else if (name.startsWith("mysql")) {
+                return new ${glSqlClauseName}MySql(tableDbName);
+            } else if (name.startsWith("postgre")) {
+                return new ${glSqlClauseName}PostgreSql(tableDbName);
+            } else if (name.startsWith("mssql")) {
+                return new ${glSqlClauseName}SqlServer(tableDbName);
+            } else if (name.startsWith("db2")) {
+                return new ${glSqlClauseName}Db2(tableDbName);
+            } else {
+                return new ${glSqlClauseName}${database.DaoGenDbName}(tableDbName);
+            }
+        }
     }
 }
