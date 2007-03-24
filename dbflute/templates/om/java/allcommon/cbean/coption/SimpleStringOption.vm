@@ -29,42 +29,34 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     // =====================================================================================
     //                                                                                 Split
     //                                                                                 =====
-    public boolean isSplit() {
-        return getSplitOptionParts().isSplit();
-    }
-
-    public ${myClassName} splitBySpace() {
+    protected ${myClassName} doSplitBySpace() {
         getSplitOptionParts().splitBySpace();
         return this;
     }
 
-    public ${myClassName} splitBySpace(int splitLimitCount) {
+    protected ${myClassName} doSplitBySpace(int splitLimitCount) {
         getSplitOptionParts().splitBySpace(splitLimitCount);
         return this;
     }
 
-    public ${myClassName} splitBySpaceContainsDoubleByte() {
+    protected ${myClassName} doSplitBySpaceContainsDoubleByte() {
         getSplitOptionParts().splitBySpaceContainsDoubleByte();
         return this;
     }
 
-    public ${myClassName} splitBySpaceContainsDoubleByte(int splitLimitCount) {
+    protected ${myClassName} doSplitBySpaceContainsDoubleByte(int splitLimitCount) {
         getSplitOptionParts().splitBySpaceContainsDoubleByte(splitLimitCount);
         return this;
     }
 
-    public ${myClassName} splitByPipeLine() {
+    protected ${myClassName} doSplitByPipeLine() {
         getSplitOptionParts().splitByPipeLine();
         return this;
     }
 
-    public ${myClassName} splitByPipeLine(int splitLimitCount) {
+    protected ${myClassName} doSplitByPipeLine(int splitLimitCount) {
         getSplitOptionParts().splitByPipeLine(splitLimitCount);
         return this;
-    }
-
-    public String[] generateSplitValueArray(String value) {
-        return getSplitOptionParts().generateSplitValueArray(value);
     }
 
     protected ${glConditionOptionPartsSplitName} getSplitOptionParts() {
@@ -74,15 +66,23 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         return _splitOptionParts;
     }
 
+    public boolean isSplit() {
+        return getSplitOptionParts().isSplit();
+    }
+
+    public String[] generateSplitValueArray(String value) {
+        return getSplitOptionParts().generateSplitValueArray(value);
+    }
+
     // =====================================================================================
     //                                                                   To Upper/Lower Case
     //                                                                   ===================
-    public ${myClassName} toUpperCase() {
+    protected ${myClassName} doToUpperCase() {
         getToUpperLowerCaseOptionParts().toUpperCase();
         return this;
     }
 
-    public ${myClassName} toLowerCase() {
+    protected ${myClassName} doToLowerCase() {
         getToUpperLowerCaseOptionParts().toLowerCase();
         return this;
     }
@@ -97,17 +97,17 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     // =====================================================================================
     //                                                                        To Single Byte
     //                                                                        ==============
-    public ${myClassName} toSingleByteSpace() {
+    protected ${myClassName} doToSingleByteSpace() {
         getToSingleByteOptionParts().toSingleByteSpace();
         return this;
     }
 
-    public ${myClassName} toSingleByteAlphabetNumber() {
+    protected ${myClassName} doToSingleByteAlphabetNumber() {
         getToSingleByteOptionParts().toSingleByteAlphabetNumber();
         return this;
     }
 
-    public ${myClassName} toSingleByteAlphabetNumberMark() {
+    protected ${myClassName} doToSingleByteAlphabetNumberMark() {
         getToSingleByteOptionParts().toSingleByteAlphabetNumberMark();
         return this;
     }
@@ -126,7 +126,7 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     // =====================================================================================
     //                                                                              Japanese
     //                                                                              ========
-    public ${glConditionOptionPartsAgentJapaneseName} localJapanese() {
+    protected ${glConditionOptionPartsAgentJapaneseName} doLocalJapanese() {
         return getJapaneseOptionPartsAgent();
     }
 
@@ -174,5 +174,20 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
             }
         }
         return buf.toString();
+    }
+
+    // =====================================================================================
+    //                                                                              DeepCopy
+    //                                                                              ========
+    public Object createDeepCopy() {
+        final ${myClassName} deepCopy = newDeepCopyInstance();
+        deepCopy._splitOptionParts = _splitOptionParts != null ? (${glConditionOptionPartsSplitName})_splitOptionParts.createDeepCopy() : null;
+        deepCopy._toUpperLowerCaseOptionParts = _toUpperLowerCaseOptionParts != null ? (${glConditionOptionPartsToUpperLowerCaseName})_toUpperLowerCaseOptionParts.createDeepCopy() : null;
+        deepCopy._toSingleByteCaseOptionParts = _toSingleByteCaseOptionParts != null ? (${glConditionOptionPartsToSingleByteName})_toSingleByteCaseOptionParts.createDeepCopy() : null;
+        deepCopy._japaneseOptionPartsAgent = _japaneseOptionPartsAgent != null ? (${glConditionOptionPartsAgentJapaneseName})_japaneseOptionPartsAgent.createDeepCopy() : null;
+        return deepCopy;
+    }
+    protected ${myClassName} newDeepCopyInstance() {
+        return new ${myClassName}();
     }
 }

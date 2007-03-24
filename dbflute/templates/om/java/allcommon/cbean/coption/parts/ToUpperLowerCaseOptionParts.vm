@@ -18,16 +18,14 @@ public class ${myClassName} {
     // =====================================================================================
     //                                                                                  Main
     //                                                                                  ====
-    public ${myClassName} toUpperCase() {
+    public void toUpperCase() {
         _toUpperCase = true;
         _toLowerCase = false;
-        return this;
     }
 
-    public ${myClassName} toLowerCase() {
+    public void toLowerCase() {
         _toUpperCase = false;
         _toLowerCase = true;
-        return this;
     }
 
     // =====================================================================================
@@ -47,5 +45,15 @@ public class ${myClassName} {
             value = (value != null ? value.toLowerCase() : value);
         }
         return value;
+    }
+
+    // =====================================================================================
+    //                                                                              DeepCopy
+    //                                                                              ========
+    public Object createDeepCopy() {
+        final ${myClassName} deepCopy = new ${myClassName}();
+        deepCopy._toUpperCase = _toUpperCase;
+        deepCopy._toLowerCase = _toLowerCase;
+        return deepCopy;
     }
 }

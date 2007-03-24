@@ -27,19 +27,16 @@ public class ${myClassName} {
     public boolean isToSingleByteSpace() {
         return _toSingleByteSpace;
     }
-    public ${myClassName} toSingleByteSpace() {
+    public void toSingleByteSpace() {
         _toSingleByteSpace = true;
-        return this;
     }
 
-    public ${myClassName} toSingleByteAlphabetNumber() {
+    public void toSingleByteAlphabetNumber() {
         _toSingleByteAlphabetNumber = true;
-        return this;
     }
 
-    public ${myClassName} toSingleByteAlphabetNumberMark() {
+    public void toSingleByteAlphabetNumberMark() {
         _toSingleByteAlphabetNumberMark = true;
-        return this;
     }
 
     // =====================================================================================
@@ -71,5 +68,16 @@ public class ${myClassName} {
             _generalCharacter = new ${glGeneralCharacterImplName}();
         }
         return _generalCharacter;
+    }
+
+    // =====================================================================================
+    //                                                                              DeepCopy
+    //                                                                              ========
+    public Object createDeepCopy() {
+        final ${myClassName} deepCopy = new ${myClassName}();
+        deepCopy._toSingleByteSpace = _toSingleByteSpace;
+        deepCopy._toSingleByteAlphabetNumber = _toSingleByteAlphabetNumber;
+        deepCopy._toSingleByteAlphabetNumberMark = _toSingleByteAlphabetNumberMark;
+        return deepCopy;
     }
 }

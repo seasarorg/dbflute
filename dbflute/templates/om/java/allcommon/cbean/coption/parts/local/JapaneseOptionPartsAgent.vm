@@ -25,17 +25,16 @@ public class ${myClassName} {
     public boolean isToDoubleByteKatakana() {
         return _toDoubleByteKatakana;
     }
-    public ${glConditionOptionPartsAgentJapaneseName} toDoubleByteKatakana() {
+
+    public void toDoubleByteKatakana() {
         _toDoubleByteKatakana = true;
-        return this;
     }
 
     public boolean isRemoveLastLongVowel() {
         return _removeLastLongVowel;
     }
-    public ${glConditionOptionPartsAgentJapaneseName} removeLastLongVowel() {
+    public void removeLastLongVowel() {
         _removeLastLongVowel = true;
-        return this;
     }
 
     // =====================================================================================
@@ -71,4 +70,13 @@ public class ${myClassName} {
         return _japaneseCharacter;
     }
 
+    // =====================================================================================
+    //                                                                              DeepCopy
+    //                                                                              ========
+    public Object createDeepCopy() {
+        final ${myClassName} deepCopy = new ${myClassName}();
+        deepCopy._toDoubleByteKatakana = _toDoubleByteKatakana;
+        deepCopy._removeLastLongVowel = _removeLastLongVowel;
+        return deepCopy;
+    }
 }

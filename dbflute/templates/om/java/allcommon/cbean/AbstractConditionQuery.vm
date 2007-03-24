@@ -207,6 +207,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
     }
+#set ($likeAsOrCallbackFullClassName = "${glConditionOptionLikeSearchName}.LikeAsOrCallback")
 
     protected void registerLikeSearchQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
                                      , String colName, String capPropName, String uncapPropName, ${glConditionOptionLikeSearchName} option) {
@@ -216,6 +217,22 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                 for (int i=0; i < strArray.length; i++) {
                     final String currentValue = strArray[i];
                     setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
+
+                    // Callback for LikeAsOr!
+                    final java.util.List${database.filterGenericsString(${likeAsOrCallbackFullClassName})} callbackList = option.getLikeAsOrCallbackList();
+                    if (!callbackList.isEmpty()) {
+                        getSqlClause().makeAdditionalConditionAsOrEffective();
+                        for (java.util.Iterator ite = callbackList.iterator(); ite.hasNext(); ) {
+                            final ${likeAsOrCallbackFullClassName} likeAsOrCallback = (${likeAsOrCallbackFullClassName})ite.next();
+                            final String additionalTargetPropertyName = likeAsOrCallback.getAdditionalTargetPropertyName();
+                            final String filteredValue = likeAsOrCallback.filterValue(currentValue);
+                            final ${glConditionOptionLikeSearchName} optionDeepCopy = (${glConditionOptionLikeSearchName})option.createDeepCopy();
+                            optionDeepCopy.clearLikeAsOrCallback();
+                            final ${glConditionOptionLikeSearchName} filteredOption = likeAsOrCallback.filterOption(optionDeepCopy);
+                            invokeSetterLikeSearch(additionalTargetPropertyName, filteredValue, filteredOption);
+                        }
+                        getSqlClause().ignoreAdditionalConditionAsOr();
+                    }
                 }
             } else {
                 setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
@@ -240,8 +257,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-
-
     protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
@@ -254,6 +269,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
 
+    // =====================================================================================
+    //                                                                         Query(Inline)
+    //                                                                         =============
     protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                        , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
@@ -266,6 +284,18 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
+    protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                       , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
+            if (isBaseQuery(this)) {
+                getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
+            } else {
+                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option);
+            }
+        }
+    }
+
     // =====================================================================================
     //                                                                              SubQuery
     //                                                                              ========
@@ -273,18 +303,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                  , String columnName, String relatedColumnName, String propertyName) {
         final String realColumnName = getRealColumnName(columnName);
         final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        getSqlClause().registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
-    }
-
-    protected void registerInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
-                                 , String columnName, String relatedColumnName, String propertyName) {
-        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        final String finalClause = columnName + " in (" + subQueryClause + ")";
-        if (isBaseQuery(this)) {
-            getSqlClause().registerBaseTableInlineWhereClause(finalClause);
-        } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
-        }
+        registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
     }
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
@@ -301,7 +320,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                  , String columnName, String relatedColumnName, String propertyName) {
         final String realColumnName = getRealColumnName(columnName);
         final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
-        getSqlClause().registerWhereClause("exists (" + subQueryClause + ")");
+        registerWhereClause("exists (" + subQueryClause + ")");
     }
 
 // *Unsupport ExistsSubQuery as inline because it's so dangerous.
@@ -316,6 +335,38 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause() + parentCondition, oldStr, newStr);
         return selectClause + " " + fromClause + " " + whereClause;
     }
+
+    protected void registerWhereClause(String whereClause) {
+        getSqlClause().registerWhereClause(whereClause);
+    }
+
+    protected void registerInlineWhereClause(String whereClause) {
+        if (isBaseQuery(this)) {
+            getSqlClause().registerBaseTableInlineWhereClause(whereClause);
+        } else {
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause);
+        }
+    }
+#if ($database.isMakeDeprecated())
+
+    /**
+     * @param subQuery Sub query. (NotNull)
+     * @param columName Column name. (NotNull)
+     * @param relatedColumnName Related column name. (NotNull)
+     * @param propertyName Property name. (NotNull)
+     * @deprecated This method is deprecated.
+     */
+    protected void registerInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String relatedColumnName, String propertyName) {
+        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
+        final String finalClause = columnName + " in (" + subQueryClause + ")";
+        if (isBaseQuery(this)) {
+            getSqlClause().registerBaseTableInlineWhereClause(finalClause);
+        } else {
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
+        }
+    }
+#end
 
     // =====================================================================================
     //                                                                                Invoke
@@ -383,6 +434,30 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         try {
             method.invoke(this, new Object[]{value});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    protected void invokeSetterLikeSearch(String columnMultiName, Object value, ${glConditionOptionLikeSearchName} option) {
+        if (value == null) {
+            return;
+        }
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
+        final String columnCapPropName = dbmeta.getCapPropNameByMultiName(columnMultiName);
+        String methodName = "set" + columnCapPropName + "_" + "likeSearch".substring(0, 1).toUpperCase() + "likeSearch".substring(1);
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{value.getClass(), ${glConditionOptionLikeSearchName}.class});
+        } catch (NoSuchMethodException e) {
+            String msg = "The columnMultiName is not existing in this table: columnMultiName=" + columnMultiName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            method.invoke(this, new Object[]{value, option});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {

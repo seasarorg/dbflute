@@ -22,7 +22,6 @@ import org.seasar.extension.dataset.DataRow;
 import org.seasar.extension.dataset.DataSet;
 import org.seasar.extension.dataset.DataTable;
 import org.seasar.extension.dataset.impl.SqlWriter;
-import org.seasar.extension.dataset.impl.XlsReader;
 import org.seasar.extension.dataset.types.ColumnTypes;
 
 public class DfXlsDataHandlerImpl implements DfXlsDataHandler {

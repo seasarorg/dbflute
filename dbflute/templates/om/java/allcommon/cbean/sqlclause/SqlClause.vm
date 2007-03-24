@@ -155,9 +155,17 @@ public interface ${myClassName} {
     //                                                                           InlineWhere
     //                                                                           ===========
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
     public void registerBaseTableInlineWhereClause(String value);
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
     public void registerOuterJoinInlineWhereClause(String aliasName, String value);
+
+    // =====================================================================================
+    //                                                               AdditionalConditionAsOr
+    //                                                               =======================
+    public void makeAdditionalConditionAsOrEffective();
+    public void ignoreAdditionalConditionAsOr();
 
     // =====================================================================================
     //                                                                               OrderBy

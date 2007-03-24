@@ -23,39 +23,33 @@ public class ${myClassName} {
         return _split != null;
     }
 
-    public ${myClassName} splitBySpace() {
+    public void splitBySpace() {
         _split = " ";
-        return this;
     }
 
-    public ${myClassName} splitBySpace(int splitLimitCount) {
+    public void splitBySpace(int splitLimitCount) {
         _split = " ";
         _splitLimitCount = splitLimitCount;
-        return this;
     }
 
-    public ${myClassName} splitBySpaceContainsDoubleByte() {
+    public void splitBySpaceContainsDoubleByte() {
         _split = " ";
         _splitContainedDelimiter = "\u3000";
-        return this;
     }
 
-    public ${myClassName} splitBySpaceContainsDoubleByte(int splitLimitCount) {
+    public void splitBySpaceContainsDoubleByte(int splitLimitCount) {
         _split = " ";
         _splitContainedDelimiter = "\u3000";
         _splitLimitCount = splitLimitCount;
-        return this;
     }
 
-    public ${myClassName} splitByPipeLine() {
+    public void splitByPipeLine() {
         _split = "|";
-        return this;
     }
 
-    public ${myClassName} splitByPipeLine(int splitLimitCount) {
+    public void splitByPipeLine(int splitLimitCount) {
         _split = "|";
         _splitLimitCount = splitLimitCount;
-        return this;
     }
 
     // =====================================================================================
@@ -146,5 +140,16 @@ public class ${myClassName} {
             }
         }
         return buf.toString();
+    }
+
+    // =====================================================================================
+    //                                                                              DeepCopy
+    //                                                                              ========
+    public Object createDeepCopy() {
+        final ${myClassName} deepCopy = new ${myClassName}();
+        deepCopy._split = _split;
+        deepCopy._splitContainedDelimiter = _splitContainedDelimiter;
+        deepCopy._splitLimitCount = _splitLimitCount;
+        return deepCopy;
     }
 }

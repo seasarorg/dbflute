@@ -52,6 +52,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /** Is fetch-narrowing effective? Default value is false. */
     protected boolean _isFetchScopeEffective = false;
 
+    /** Is additional condition as or effective?*/
+    protected boolean _isAdditionalConditionAsOrEffective = false;
+
     // =====================================================================================
     //                                                                           Constructor
     //                                                                           ===========
@@ -349,6 +352,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         key.addWhereClause(_whereList, columnFullName, value);
+        arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
     /**
@@ -361,7 +365,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      */
     public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
+        assertObjectNotNull("option of " + columnFullName, option);
         key.addWhereClause(_whereList, columnFullName, value, option);
+        arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
     /**
@@ -372,15 +378,23 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     public void registerWhereClause(String clause) {
         assertStringNotNullAndNotTrimmedEmpty("clause", clause);
         _whereList.add(clause);
+        arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
     // =====================================================================================
     //                                                                           InlineWhere
     //                                                                           ===========
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
-        registerWhereClause(columnName, key, value);
-        final String inlineWhereClause = (String)_whereList.remove(_whereList.size()-1);
-        _baseTableInlineWhereList.add(inlineWhereClause);
+        assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+        key.addWhereClause(_baseTableInlineWhereList, columnName, value);
+        arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
+    }
+
+    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+        assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+        assertObjectNotNull("option of " + columnName, option);
+        key.addWhereClause(_baseTableInlineWhereList, columnName, value, option);
+        arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
     }
 
     public void registerBaseTableInlineWhereClause(String value) {
@@ -389,16 +403,25 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
         assertNotYetOuterJoin(aliasName);
+        assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-        registerWhereClause(columnName, key, value);
-        final String inlineWhereClause = (String)_whereList.remove(_whereList.size()-1);
-        joinInfo.addInlineWhereClause(inlineWhereClause);
+        key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value);
+        arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+    }
+
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+        assertNotYetOuterJoin(aliasName);
+        assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+        final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
+        key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value, option);
+        arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String value) {
         assertNotYetOuterJoin(aliasName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
         joinInfo.addInlineWhereClause(value);
+        arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
     }
 
     /**
@@ -410,6 +433,29 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         if (!_outerJoinMap.containsKey(aliasName)) {
             String msg = "The alias name have not registered in outer join yet: " + aliasName;
             throw new IllegalStateException(msg);
+        }
+    }
+
+    // =====================================================================================
+    //                                                               AdditionalConditionAsOr
+    //                                                               =======================
+    public void makeAdditionalConditionAsOrEffective() {
+        _isAdditionalConditionAsOrEffective = true;
+    }
+
+    public void ignoreAdditionalConditionAsOr() {
+        _isAdditionalConditionAsOrEffective = false;
+    }
+
+    protected void arrangeWhereListAdditionalConditionAsOr(java.util.List${database.filterGenericsString('String')} whereList) {
+        if (_isAdditionalConditionAsOrEffective) {
+            if (whereList.size() < 2) {
+                String msg = "The whereList should have two more elements when the isAdditionalConditionAsOrEffective is true: " + toString();
+                throw new IllegalStateException(msg);
+            }
+            final String lastWhereClause = (String)whereList.remove(whereList.size() - 1);
+            final String preWhereClause = (String)whereList.remove(whereList.size() - 1);
+            whereList.add("(" + preWhereClause + " or " + lastWhereClause + ")");
         }
     }
 
