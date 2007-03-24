@@ -205,7 +205,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return deepCopy;
     }
 
-    protected ${myClassName} newDeepCopyInstance() {
+    protected ${glConditionOptionSimpleStringName} newDeepCopyInstance() {
         return new ${myClassName}();
     }
 }
