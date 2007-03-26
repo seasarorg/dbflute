@@ -183,6 +183,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         try {
             String sql = "";
             String line = "";
+            boolean inGroup = false;
             while ((line = in.readLine()) != null) {
                 line = line.trim();
 
@@ -190,6 +191,15 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 // and in Oracle it may contain a hint
                 // so we cannot just remove it, instead we must end it
                 if (line.trim().startsWith("--")) {// If this line is comment only, ...
+                    if (line.trim().contains("#df:begin#")) {
+                        inGroup = true;
+                        continue;
+                    } else if (line.trim().contains("#df:end#")) {
+                        inGroup = false;
+                        sqlList.add(sql);
+                        sql = "";
+                        continue;
+                    }
                     sql = sql + line + "\n";
                 } else {
                     if (line.indexOf("--") >= 0) {// If this line contains both sql and comment, ...
@@ -199,17 +209,15 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     }
                 }
 
+                if (inGroup) {
+                    sql = sql + "\n";
+                    continue;
+                }
                 if (sql.endsWith(_runInfo.getDelimiter())) {
-                    if (sql.endsWith("\\" + _runInfo.getDelimiter())) {// for escaping delimiter.
-                        sql = sql.substring(0, sql.length() - ("\\" + _runInfo.getDelimiter()).length()).trim();
-                        sql = sql + _runInfo.getDelimiter();
-                    } else {
-                        sql = sql.substring(0, sql.length() - _runInfo.getDelimiter().length()).trim();
-                    }
+                    sql = sql.substring(0, sql.length() - _runInfo.getDelimiter().length()).trim();
                     if ("".equals(sql)) {
                         continue;
                     }
-
                     if (!delimiterChanger.isDelimiterChanger(sql)) {
                         sqlList.add(sql);
                         sql = "";
@@ -217,9 +225,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         _runInfo.setDelimiter(delimiterChanger.getNewDelimiter(sql, _runInfo.getDelimiter()));
                         sql = "";
                     }
-                } else if (sql.endsWith("\\")) {// for escaping new line.
-                    sql = sql.substring(0, sql.length() - "\\".length()).trim();
-                    sql = sql + "\n";
                 }
             }
             if (sql.trim().length() != 0) {

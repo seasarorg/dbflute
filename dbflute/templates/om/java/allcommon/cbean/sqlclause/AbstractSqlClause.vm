@@ -455,7 +455,12 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             }
             final String lastWhereClause = (String)whereList.remove(whereList.size() - 1);
             final String preWhereClause = (String)whereList.remove(whereList.size() - 1);
-            whereList.add("(" + preWhereClause + " or " + lastWhereClause + ")");
+            if (preWhereClause.startsWith("(") && preWhereClause.endsWith(")")) {
+                final String plainClause = preWhereClause.substring("(".length(), preWhereClause.length() - ")".length());
+                whereList.add("(" + plainClause + " or " + lastWhereClause + ")");
+            } else {
+                whereList.add("(" + preWhereClause + " or " + lastWhereClause + ")");
+            }
         }
     }
 

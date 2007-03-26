@@ -126,7 +126,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         }
         String lineString = null;
         String preContinueString = "";
-        List<String> valueList = new ArrayList<String>();
+        final List<String> valueList = new ArrayList<String>();
         List<String> appendDefaultColumnNameList = null;
         List<String> columnNameList = null;
 

@@ -3,7 +3,6 @@ package ${glPackageBaseCommonCOption};
 #set ($myClassName = "${glConditionOptionLikeSearchName}")
 
 import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
 /**
  * The class of like-search-option.
