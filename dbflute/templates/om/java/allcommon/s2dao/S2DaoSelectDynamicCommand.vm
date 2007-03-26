@@ -1,24 +1,45 @@
 package ${glPackageBaseCommonS2Dao};
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
 #if ($database.isSelectQueryTimeoutValid())
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 #end
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
+import javax.sql.DataSource;
+
 import org.seasar.dao.CommandContext;
+import org.seasar.dao.EndCommentNotFoundRuntimeException;
+import org.seasar.dao.IfConditionNotFoundRuntimeException;
+import org.seasar.dao.Node;
+import org.seasar.dao.SqlParser;
+import org.seasar.dao.SqlTokenizer;
 import org.seasar.dao.impl.SelectDynamicCommand;
+import org.seasar.dao.node.BeginNode;
+import org.seasar.dao.node.BindVariableNode;
+import org.seasar.dao.node.ContainerNode;
+import org.seasar.dao.node.ElseNode;
+import org.seasar.dao.node.EmbeddedValueNode;
+import org.seasar.dao.node.IfNode;
+import org.seasar.dao.node.ParenBindVariableNode;
+import org.seasar.dao.node.PrefixSqlNode;
+import org.seasar.dao.node.SqlNode;
+import org.seasar.dao.parser.SqlTokenizerImpl;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.impl.BasicSelectHandler;
+import org.seasar.framework.beans.BeanDesc;
+import org.seasar.framework.beans.PropertyDesc;
+import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
 
 /**
  * My-SelectDynamicCommand.
@@ -33,6 +54,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
 #end
 
+    /** Root node. */
+    private Node rootNode;// Override!
+
     /** Result-set handler. */
     private ResultSetHandler resultSetHandler;
 
@@ -44,6 +68,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 
     /** Cache of select clause PK-only command. */
     protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
+
 
     /**
      * Constructor.
@@ -61,6 +86,17 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 
         this.resultSetHandler = resultSetHandler;
         this.resultSetFactory = resultSetFactory;
+    }
+
+    public void setSql(String sql) {// Override!
+        super.setSql(sql);
+        this.rootNode = new InternalSqlParserImpl(sql).parse();
+    }
+
+    protected CommandContext apply(Object[] args) {// Override!
+        CommandContext ctx = createCommandContext(args);
+        rootNode.accept(ctx);
+        return ctx;
     }
 
     /**
@@ -129,12 +165,11 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         final List${database.filterGenericsString('Object')} bindVariableList = new ArrayList${database.filterGenericsString('Object')}();
         final List${database.filterGenericsString('Class')} bindVariableTypeList = new ArrayList${database.filterGenericsString('Class')}();
 
-        final StringBuffer sb = new StringBuffer();
-        sb.append(setupRealSelectClause(args, bindVariableList, bindVariableTypeList));
-        sb.append(" ");
-        sb.append(setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList));
+        final String selectClause = setupRealSelectClause(args, bindVariableList, bindVariableTypeList);
+        final String fromWhereClause = setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList);
+        final String finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
 
-        BasicSelectHandler selectHandler = createBasicSelectHandler(sb.toString());
+        final BasicSelectHandler selectHandler = createBasicSelectHandler(finalClause);
         selectHandler.setFetchSize(-1);
 
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
@@ -166,6 +201,10 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             final ${glSelectDynamicCommand} fromWhereCommand = createMySelectDynamicCommand();
             fromWhereCommand.setArgNames(getArgNames());
             fromWhereCommand.setArgTypes(getArgTypes());
+
+            // for Union
+            cb.getSqlClause().setSelectClauseColumnAliasMap(${glConditionBeanContextName}.getSelectClauseColumnAliasMap(cb.getClass()));
+
             fromWhereCommand.setSql(cb.getSqlClause().getClause());
             CommandContext ctx = fromWhereCommand.doApply(args);
             realFromWhereClause = ctx.getSql();
@@ -236,6 +275,283 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         if (_selectClauseCommand == null) {
             String msg = "Select clause command should not be null.";
             throw new IllegalStateException(msg);
+        }
+    }
+
+    protected static class InternalSqlParserImpl implements SqlParser {
+
+        private SqlTokenizer tokenizer;
+
+        private Stack nodeStack = new Stack();
+
+        public InternalSqlParserImpl(String sql) {
+            sql = sql.trim();
+            if (sql.endsWith(";")) {
+                sql = sql.substring(0, sql.length() - 1);
+            }
+            tokenizer = new SqlTokenizerImpl(sql);
+        }
+
+        public Node parse() {
+            push(new ContainerNode());
+            while (SqlTokenizer.EOF != tokenizer.next()) {
+                parseToken();
+            }
+            return pop();
+        }
+
+        protected void parseToken() {
+            switch (tokenizer.getTokenType()) {
+            case SqlTokenizer.SQL:
+                parseSql();
+                break;
+            case SqlTokenizer.COMMENT:
+                parseComment();
+                break;
+            case SqlTokenizer.ELSE:
+                parseElse();
+                break;
+            case SqlTokenizer.BIND_VARIABLE:
+                parseBindVariable();
+                break;
+            }
+        }
+
+        protected void parseSql() {
+            String sql = tokenizer.getToken();
+            if (isElseMode()) {
+                sql = StringUtil.replace(sql, "--", "");
+            }
+            Node node = peek();
+            if ((node instanceof IfNode || node instanceof ElseNode) && node.getChildSize() == 0) {
+
+                SqlTokenizer st = new SqlTokenizerImpl(sql);
+                st.skipWhitespace();
+                String token = st.skipToken();
+                st.skipWhitespace();
+                if (sql.startsWith(",")) {
+                    if (sql.startsWith(", ")) {
+                        node.addChild(new PrefixSqlNode(", ", sql.substring(2)));
+                    } else {
+                        node.addChild(new PrefixSqlNode(",", sql.substring(1)));
+                    }
+                } else if ("AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token)) {
+                    node.addChild(new PrefixSqlNode(st.getBefore(), st.getAfter()));
+                } else {
+                    node.addChild(new SqlNode(sql));
+                }
+            } else {
+                node.addChild(new SqlNode(sql));
+            }
+        }
+
+        protected void parseComment() {
+            String comment = tokenizer.getToken();
+            if (isTargetComment(comment)) {
+                if (isIfComment(comment)) {
+                    parseIf();
+                } else if (isBeginComment(comment)) {
+                    parseBegin();
+                } else if (isEndComment(comment)) {
+                    return;
+                } else {
+                    parseCommentBindVariable();
+                }
+            } else if (comment != null && 0 < comment.length()) {
+                String before = tokenizer.getBefore();
+                peek().addChild(new SqlNode(before.substring(before.lastIndexOf("/*"))));
+            }
+        }
+
+        protected void parseIf() {
+            String condition = tokenizer.getToken().substring(2).trim();
+            if (StringUtil.isEmpty(condition)) {
+                throw new IfConditionNotFoundRuntimeException();
+            }
+            IfNode ifNode = new IfNode(condition);
+            peek().addChild(ifNode);
+            push(ifNode);
+            parseEnd();
+        }
+
+        protected void parseBegin() {
+            BeginNode beginNode = new BeginNode();
+            peek().addChild(beginNode);
+            push(beginNode);
+            parseEnd();
+        }
+
+        protected void parseEnd() {
+            while (SqlTokenizer.EOF != tokenizer.next()) {
+                if (tokenizer.getTokenType() == SqlTokenizer.COMMENT && isEndComment(tokenizer.getToken())) {
+
+                    pop();
+                    return;
+                }
+                parseToken();
+            }
+            throw new EndCommentNotFoundRuntimeException();
+        }
+
+        protected void parseElse() {
+            Node parent = peek();
+            if (!(parent instanceof IfNode)) {
+                return;
+            }
+            IfNode ifNode = (IfNode) pop();
+            ElseNode elseNode = new ElseNode();
+            ifNode.setElseNode(elseNode);
+            push(elseNode);
+            tokenizer.skipWhitespace();
+        }
+
+        protected void parseCommentBindVariable() {
+            String expr = tokenizer.getToken();
+            String s = tokenizer.skipToken();
+            if (s.startsWith("(") && s.endsWith(")")) {
+                peek().addChild(new ParenBindVariableNode(expr));
+            } else if (expr.startsWith("$")) {
+                peek().addChild(new EmbeddedValueNode(expr.substring(1)));
+            } else {
+                peek().addChild(new InternalBindVariableNode(expr));
+            }
+        }
+
+        protected void parseBindVariable() {
+            String expr = tokenizer.getToken();
+            peek().addChild(new InternalBindVariableNode(expr));
+        }
+
+        protected Node pop() {
+            return (Node) nodeStack.pop();
+        }
+
+        protected Node peek() {
+            return (Node) nodeStack.peek();
+        }
+
+        protected void push(Node node) {
+            nodeStack.push(node);
+        }
+
+        protected boolean isElseMode() {
+            for (int i = 0; i < nodeStack.size(); ++i) {
+                if (nodeStack.get(i) instanceof ElseNode) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static boolean isTargetComment(String comment) {
+            return comment != null && comment.length() > 0 && Character.isJavaIdentifierStart(comment.charAt(0));
+        }
+
+        private static boolean isIfComment(String comment) {
+            return comment.startsWith("IF");
+        }
+
+        private static boolean isBeginComment(String content) {
+            return content != null && "BEGIN".equals(content);
+        }
+
+        private static boolean isEndComment(String content) {
+            return content != null && "END".equals(content);
+        }
+    }
+
+    protected static class InternalBindVariableNode extends BindVariableNode {
+        private String expression;
+
+        private String[] names;
+
+        public InternalBindVariableNode(String expression) {
+            super(expression);
+            
+            this.expression = expression;
+            names = StringUtil.split(expression, ".");
+            // baseName_ = array[0];
+            // if (array.length > 1) {
+            // propertyName_ = array[1];
+            // }
+        }
+
+        public String getExpression() {
+            return expression;
+        }
+
+        public void accept(CommandContext ctx) {
+            Object value = ctx.getArg(names[0]);
+            Class clazz = ctx.getArgType(names[0]);
+            for (int pos = 1; pos < names.length; pos++) {
+                if (value == null) {
+                    break;
+                }
+                if (java.util.Map.class.isInstance(value)) {
+                    final java.util.Map map = (java.util.Map) value;
+                    value = map.get(names[pos]);
+                    if (value == null) {
+                        break;
+                    }
+                    clazz = value.getClass();
+                } else {
+                    BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
+                    PropertyDesc pd = beanDesc.getPropertyDesc(names[pos]);
+                    value = pd.getValue(value);
+                    clazz = pd.getPropertyType();
+                }
+            }
+            ctx.addSql("?", value, clazz);
+        }
+    }
+
+    protected static class InternalStringUtil {
+
+        public static final String[] EMPTY_STRINGS = new String[0];
+
+        private InternalStringUtil() {
+        }
+
+        public static final boolean isEmpty(String text) {
+            return text == null || text.length() == 0;
+        }
+
+        public static final String replace(String text, String fromText,
+                String toText) {
+
+            if (text == null || fromText == null || toText == null) {
+                return null;
+            }
+            StringBuffer buf = new StringBuffer(100);
+            int pos = 0;
+            int pos2 = 0;
+            while (true) {
+                pos = text.indexOf(fromText, pos2);
+                if (pos == 0) {
+                    buf.append(toText);
+                    pos2 = fromText.length();
+                } else if (pos > 0) {
+                    buf.append(text.substring(pos2, pos));
+                    buf.append(toText);
+                    pos2 = pos + fromText.length();
+                } else {
+                    buf.append(text.substring(pos2));
+                    break;
+                }
+            }
+            return buf.toString();
+        }
+
+        public static String[] split(String str, String delim) {
+            if (str == null) {
+                return EMPTY_STRINGS;
+            }
+            java.util.List<String> list = new java.util.ArrayList<String>();
+            java.util.StringTokenizer st = new java.util.StringTokenizer(str, delim);
+            while (st.hasMoreElements()) {
+                list.add(st.nextToken());
+            }
+            return (String[]) list.toArray(new String[list.size()]);
         }
     }
 }

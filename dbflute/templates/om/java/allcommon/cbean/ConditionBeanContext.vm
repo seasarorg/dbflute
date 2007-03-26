@@ -9,11 +9,11 @@ import ${glPackageBaseCommonSqlClause}.*;
  */
 public class ${glConditionBeanContextName} {
 
+    // =====================================================================================
+    //                                                                          Thread Local
+    //                                                                          ============
     /** The thread-local for this. */
     private static final ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})} _threadLocal = new ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})}();
-
-    /** The database product name. */
-    private static String _databaseProductName;
 
     /**
      * Get fetch-narrowing-bean on thread.
@@ -53,6 +53,9 @@ public class ${glConditionBeanContextName} {
         _threadLocal.set(null);
     }
 
+    // =====================================================================================
+    //                                                                        Type Judgement
+    //                                                                        ==============
     /**
      * Is the argument condition-bean?
      * 
@@ -81,6 +84,12 @@ public class ${glConditionBeanContextName} {
         }
     }
 
+    // =====================================================================================
+    //                                                                          Product Name
+    //                                                                          ============
+    /** The database product name. */
+    private static String _databaseProductName;
+
     /**
      * Get database product name.
      * 
@@ -102,30 +111,58 @@ public class ${glConditionBeanContextName} {
         }
         _databaseProductName = name;
     }
+#set ($columnAliasGeneric = "Class, java.util.Map<String, String>")
+
+    // =====================================================================================
+    //                                                                          Column Alias
+    //                                                                          ============
+    public static final java.util.Map${database.filterGenericsString('Class, java.util.Map<String, String>')} _selectClauseColumnAliasContainerMap = new java.util.HashMap${database.filterGenericsString('Class, java.util.Map<String, String>')}();
+
+    public static void addColumnAliasInfo(Class conditionBeanClass, String columnFullName, String columnAliasName) {
+        if (_selectClauseColumnAliasContainerMap.containsKey(conditionBeanClass)) {
+            final java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap = (java.util.Map${database.filterGenericsString('String, String')})_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
+            selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
+        } else {
+            final java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap = new java.util.HashMap${database.filterGenericsString('String, String')}();
+            _selectClauseColumnAliasContainerMap.put(conditionBeanClass, selectClauseColumnAliasMap);
+            selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
+        }
+    }
+
+    public static java.util.Map${database.filterGenericsString('String, String')} getSelectClauseColumnAliasMap(Class conditionBeanClass) {
+        return (java.util.Map${database.filterGenericsString('String, String')})_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
+    }
+
+    // =====================================================================================
+    //                                                                               Creator
+    //                                                                               =======
+    public static ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb) {
+        final String tableDbName = cb.getTableDbName();
+        return createSqlClause(tableDbName);
+    }
 
     public static ${glSqlClauseName} createSqlClause(String tableDbName) {
         final String databaseProductName = getDatabaseProductName();
         if (databaseProductName == null) {
             return new ${glSqlClauseName}${database.DaoGenDbName}(tableDbName);
+        }
+        final String name = databaseProductName.toLowerCase();
+        if (name.startsWith("derby")) {
+            return new ${glSqlClauseName}Derby(tableDbName);
+        } else if (name.startsWith("oracle")) {
+            return new ${glSqlClauseName}Oracle(tableDbName);
+        } else if (name.startsWith("firebird")) {
+            return new ${glSqlClauseName}Firebird(tableDbName);
+        } else if (name.startsWith("mysql")) {
+            return new ${glSqlClauseName}MySql(tableDbName);
+        } else if (name.startsWith("postgre")) {
+            return new ${glSqlClauseName}PostgreSql(tableDbName);
+        } else if (name.startsWith("mssql")) {
+            return new ${glSqlClauseName}SqlServer(tableDbName);
+        } else if (name.startsWith("db2")) {
+            return new ${glSqlClauseName}Db2(tableDbName);
         } else {
-            final String name = databaseProductName.toLowerCase();
-            if (name.startsWith("derby")) {
-                return new ${glSqlClauseName}Derby(tableDbName);
-            } else if (name.startsWith("oracle")) {
-                return new ${glSqlClauseName}Oracle(tableDbName);
-            } else if (name.startsWith("firebird")) {
-                return new ${glSqlClauseName}Firebird(tableDbName);
-            } else if (name.startsWith("mysql")) {
-                return new ${glSqlClauseName}MySql(tableDbName);
-            } else if (name.startsWith("postgre")) {
-                return new ${glSqlClauseName}PostgreSql(tableDbName);
-            } else if (name.startsWith("mssql")) {
-                return new ${glSqlClauseName}SqlServer(tableDbName);
-            } else if (name.startsWith("db2")) {
-                return new ${glSqlClauseName}Db2(tableDbName);
-            } else {
-                return new ${glSqlClauseName}${database.DaoGenDbName}(tableDbName);
-            }
+            return new ${glSqlClauseName}${database.DaoGenDbName}(tableDbName);
         }
     }
 }

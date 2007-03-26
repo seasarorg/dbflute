@@ -217,6 +217,56 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     public ${glConditionQueryInterfaceName} getConditionQueryAsInterface() {
         return getConditionQuery();
     }
+#set ($unionQueryGenericsString = "String, ${myConditionQueryClassName}")
+
+    // =====================================================================================
+    //                                                                           Union Query
+    //                                                                           ===========
+    protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
+
+    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionQueryMap() {
+        return _unionQueryMap;
+    }
+
+    /**
+     * Union.
+     * <pre>
+     * Add union query to condition bean.
+     * </pre>
+     * @param unionQuery Union query. (NotNull)
+     */
+    public void union(${myConditionQueryClassName} unionQuery) {
+        if (unionQuery == null) {
+            String msg = "The argument[unionQuery] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final String key = "unionQuery" + _unionQueryMap.size();
+        _unionQueryMap.put(key, unionQuery);
+        query().registerUnionQuery(unionQuery, false, "unionQueryMap." + key);
+    }
+
+    protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionAllQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
+
+    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionAllQueryMap() {
+        return _unionAllQueryMap;
+    }
+
+    /**
+     * Union all.
+     * <pre>
+     * Add union all query to condition bean.
+     * </pre>
+     * @param unionAllQuery Union all query. (NotNull)
+     */
+    public void unionAll(${myConditionQueryClassName} unionAllQuery) {
+        if (unionAllQuery == null) {
+            String msg = "The argument[unionAllQuery] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final String key = "unionAllQuery" + _unionAllQueryMap.size();
+        _unionAllQueryMap.put(key, unionAllQuery);
+        query().registerUnionQuery(unionAllQuery, false, "unionAllQueryMap." + key);
+    }
 
     // =====================================================================================
     //                                                                          Setup Select

@@ -34,6 +34,12 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /** Order-by clause. */
     protected final ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
 
+    /** Order-by clause. */
+    protected java.util.Map${database.filterGenericsString('String, String')} _selectClauseColumnAliasMap;
+
+    /** Union clause list. */
+    protected java.util.List${database.filterGenericsString('UnionQueryInfo')} _unionQueryInfoList = new java.util.ArrayList${database.filterGenericsString('UnionQueryInfo')}();
+
     /** Is incoluded-select-column effective? Default value is false. */
     protected boolean _isIncludedSelectColumnEffective = false;
 
@@ -72,6 +78,13 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     // =====================================================================================
+    //                                                                         Select Clause
+    //                                                                         =============
+    public void setSelectClauseColumnAliasMap(java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap) {
+        _selectClauseColumnAliasMap = selectClauseColumnAliasMap;
+    }
+
+    // =====================================================================================
     //                                                                                Clause
     //                                                                                ======
     /**
@@ -80,6 +93,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      * @return Clause string. (NotNull)
      */
     public String getClause() {
+        final StringBuffer sb = new StringBuffer(128);
+        sb.append(INCLUDE_SELECT_CLAUSE_MARK).append(" ").append(getClauseIncludedFromWhere());
+        sb.append(getClauseOrderBySqlSuffix());
+        return sb.toString();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Clause string. (NotNull)
+     */
+    public String getClauseIncludedFromWhere() {
         final StringBuffer sb = new StringBuffer(128);
         if (_isIncludedSelectColumnEffective && !_includedSelectColumnMap.isEmpty()) {
             sb.append(" ").append(getIncludedSelectColumnClause());
@@ -90,7 +115,22 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         sb.append(getFromHint());
         sb.append(" ");
         sb.append(getWhereClause());
+        for (final java.util.Iterator ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
+            final UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
+            final String unionQueryClause = unionQueryInfo.getUnionQueryClause();
+            final boolean unionAll = unionQueryInfo.isUnionAll();
+            sb.append(unionAll ? " union all " : " union ").append(INCLUDE_SELECT_CLAUSE_MARK).append(unionQueryClause);
+        }
+        return sb.toString();
+    }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Clause string. (NotNull)
+     */
+    public String getClauseOrderBySqlSuffix() {
+        final StringBuffer sb = new StringBuffer(128);
         if (_isOrderByEffective && !_orderByClause.isEmpty()) {
             sb.append(" ");
             sb.append(getOrderByClause());
@@ -100,6 +140,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return sb.toString();
     }
 
+    // =====================================================================================
+    //                                                                          Clause Parts
+    //                                                                          ============
     /**
      * ${database.ImplementComment}
      * 
@@ -221,7 +264,15 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     public String getOrderByClause() {
-        return _orderByClause.getOrderByClause();
+        if (!_unionQueryInfoList.isEmpty()) {
+            if (_selectClauseColumnAliasMap == null || _selectClauseColumnAliasMap.isEmpty()) {
+                String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists: " + toString();
+                throw new IllegalStateException(msg);
+            }
+            return _orderByClause.getOrderByClause(_selectClauseColumnAliasMap);
+        } else {
+            return _orderByClause.getOrderByClause();
+        }
     }
 
     /**
@@ -601,6 +652,34 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             msg = msg + " isAsc=" + isAsc;
             msg = msg + " sqlClause=" + this.toString();
             throw new RuntimeException(msg, e);
+        }
+    }
+
+    // =====================================================================================
+    //                                                                                Clause
+    //                                                                                ======
+    public void registerUnionQuery(String unionQueryClause, boolean unionAll) {
+        assertStringNotNullAndNotTrimmedEmpty("unionQueryClause", unionQueryClause);
+        final UnionQueryInfo unionQueryInfo = new UnionQueryInfo();
+        unionQueryInfo.setUnionQueryClause(unionQueryClause);
+        unionQueryInfo.setUnionAll(unionAll);
+        _unionQueryInfoList.add(unionQueryInfo);
+    }
+
+    protected static class UnionQueryInfo {
+        protected String _unionQueryClause;
+        protected boolean _unionAll;
+        public String getUnionQueryClause() {
+            return _unionQueryClause;
+        }
+        public void setUnionQueryClause(String unionQueryClause) {
+            _unionQueryClause = unionQueryClause;
+        }
+        public boolean isUnionAll() {
+            return _unionAll;
+        }
+        public void setUnionAll(boolean unionAll) {
+            _unionAll = unionAll;
         }
     }
 

@@ -23,7 +23,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     /** SQL clause instance. */
     protected final ${glSqlClauseName} _sqlClause;
     {
-        _sqlClause = ${glConditionBeanContextName}.createSqlClause(getTableDbName());
+        _sqlClause = ${glConditionBeanContextName}.createSqlClause(this);
     }
 
     // =====================================================================================

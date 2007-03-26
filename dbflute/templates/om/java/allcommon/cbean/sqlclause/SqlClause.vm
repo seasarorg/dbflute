@@ -15,6 +15,13 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
  */
 public interface ${myClassName} {
 
+    public static final String INCLUDE_SELECT_CLAUSE_MARK = "/* df:includeSelectClause */";
+
+    // =====================================================================================
+    //                                                                         Select Clause
+    //                                                                         =============
+    public void setSelectClauseColumnAliasMap(java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap);
+
     // =====================================================================================
     //                                                                                Clause
     //                                                                                ======
@@ -22,7 +29,7 @@ public interface ${myClassName} {
      * Get clause string.
      * <p>
      * <pre>
-     * EX.
+     * ex)
      * # from [base-table] left outer join [fk-table] [fk-alias] on [join-condition]
      * # where [base-table].[column] = [value] and [fk-alias].[column] is null
      * # order by [base-table].[column] asc, [fk-alias].[column] desc
@@ -33,6 +40,23 @@ public interface ${myClassName} {
      */
     public String getClause();
 
+    /**
+     * Get clause string of Included and From and Where.
+     * 
+     * @return Clause string. (NotNull)
+     */
+    public String getClauseIncludedFromWhere();
+
+    /**
+     * Get clause string of OrderBy and SqlSuffix.
+     * 
+     * @return Clause string. (NotNull)
+     */
+    public String getClauseOrderBySqlSuffix();
+
+    // =====================================================================================
+    //                                                                          Clause Parts
+    //                                                                          ============
     /**
      * Get select-hint. This is an internal method.
      * 
@@ -196,6 +220,11 @@ public interface ${myClassName} {
     public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
 
     public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
+
+    // =====================================================================================
+    //                                                                                Clause
+    //                                                                                ======
+    public void registerUnionQuery(String unionClause, boolean unionAll);
 
     // =====================================================================================
     //                                                                               Advance

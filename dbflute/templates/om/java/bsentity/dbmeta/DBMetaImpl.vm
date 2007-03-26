@@ -296,7 +296,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @return The type-name of condition-bean. (NotNull)
      */ 
     public String getConditionBeanTypeName() {
-        return "${myConditionBeanClassName}.${myConditionBeanClassName}";
+        return "${glPackageBaseCB}.${myConditionBeanClassName}";
     }
 #else
 

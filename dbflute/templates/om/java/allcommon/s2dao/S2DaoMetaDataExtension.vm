@@ -133,7 +133,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
         // /----------------------------------------------------- [MyExtension]
         argNames = new String[] { "dto" };
-        final String sqlNormal = getSelectClause(getBeanMetaData());
+        final String sqlNormal = getSelectClause(getBeanMetaData(), clazz);
         final String sqlPKOnly = getSelectClausePKOnly(getBeanMetaData());
         final ${glSelectDynamicCommand} dynamicCommand = newMySelectDynamicCommand(handler);
         String sql = sqlNormal;
@@ -156,7 +156,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      * @param beanMetaData BeanMetaData. (NotNull)
      * @return Select clause. (NotNull)
      */
-    protected String getSelectClause(BeanMetaData beanMetaData) {
+    protected String getSelectClause(BeanMetaData beanMetaData, Class conditionBeanClass) {
         final StringBuffer sb = new StringBuffer(100);
         sb.append("select/*$dto.selectHint*/ ");
 
@@ -167,18 +167,19 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 if (sbMySelectList.length() != 0) {
                     sbMySelectList.append(", ");
                 }
-                sbMySelectList.append(beanMetaData.getTableName());
-                sbMySelectList.append(".");
-                sbMySelectList.append(pt.getColumnName());
+                final String columnFullName = beanMetaData.getTableName() + "." + pt.getColumnName();
+                sbMySelectList.append(columnFullName);
+
+                ${glConditionBeanContextName}.addColumnAliasInfo(conditionBeanClass, columnFullName, pt.getColumnName());
             }
         }
         sb.append(sbMySelectList);
 
-        setupRelationSelectClause(sb, beanMetaData, "", "", 1);
+        setupRelationSelectClause(sb, beanMetaData, "", "", 1, conditionBeanClass);
         return sb.toString();
     }
 
-    protected void setupRelationSelectClause(StringBuffer sb, BeanMetaData baseBmd, String judgeProp, String preNoSuffix, int cqNestNo) {
+    protected void setupRelationSelectClause(StringBuffer sb, BeanMetaData baseBmd, String judgeProp, String preNoSuffix, int cqNestNo, Class conditionBeanClass) {
         for (int i = 0; i < baseBmd.getRelationPropertyTypeSize(); ++i) {
             final StringBuffer sbYourSelectList = new StringBuffer(100);
             final RelationPropertyType rpt = baseBmd.getRelationPropertyType(i);
@@ -198,17 +199,19 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 final String tableAliasName = StringUtil.capitalize(rpt.getPropertyName()) + (cqNestNo > 1 ? "_n" + cqNestNo : "");
                 if (pt.isPersistent()) {
                     final String columnName = pt.getColumnName();
+                    final String columnFullName = tableAliasName + "." + columnName;
+                    final String columnAliasName = pt.getColumnName() + preNoSuffix + "_" + rpt.getRelationNo();
                     sbYourSelectList.append(", ");
-                    sbYourSelectList.append(tableAliasName).append(".").append(columnName);
-                    sbYourSelectList.append(" AS ");
-                    sbYourSelectList.append(pt.getColumnName()).append(preNoSuffix).append("_").append(rpt.getRelationNo());
+                    sbYourSelectList.append(columnFullName).append(" AS ").append(columnAliasName);
+
+                    ${glConditionBeanContextName}.addColumnAliasInfo(conditionBeanClass, columnFullName, columnAliasName);
                 }
             }
             if (relationBmd.getRelationPropertyTypeSize() > 0) {
                 final String nssString = "nss" + initCapPropertyName + ".";
                 final String nextPreNoSuffix = preNoSuffix + "_" + rpt.getRelationNo();
                 final int nextCQNestNo = cqNestNo + 1;
-                setupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo);
+                setupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo, conditionBeanClass);
             }
             sb.append(ifComment).append(sbYourSelectList).append(endComment);
         }
@@ -597,18 +600,19 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 if (sbMySelectList.length() != 0) {
                     sbMySelectList.append(", ");
                 }
-                sbMySelectList.append(beanMetaData.getTableName());
-                sbMySelectList.append(".");
-                sbMySelectList.append(pt.getColumnName());
+                final String columnFullName = beanMetaData.getTableName() + "." + pt.getColumnName();
+                sbMySelectList.append(columnFullName);
+
+                ${glConditionBeanContextName}.addColumnAliasInfo(conditionBeanClass, columnFullName, pt.getColumnName());
             }
         }
         sb.append(sbMySelectList);
 
-        setupRelationSelectClause(sb, beanMetaData, "", "", 1);
+        setupRelationSelectClause(sb, beanMetaData, "", "", 1, conditionBeanClass);
         return sb.toString();
     }
 
-    protected void setupRelationSelectClause(StringBuffer sb, BeanMetaData baseBmd, String judgeProp, String preNoSuffix, int cqNestNo) {
+    protected void setupRelationSelectClause(StringBuffer sb, BeanMetaData baseBmd, String judgeProp, String preNoSuffix, int cqNestNo, Class conditionBeanClass) {
         for (int i = 0; i < baseBmd.getRelationPropertyTypeSize(); ++i) {
             final StringBuffer sbYourSelectList = new StringBuffer(100);
             final RelationPropertyType rpt = baseBmd.getRelationPropertyType(i);
@@ -628,17 +632,19 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 final String tableAliasName = StringUtil.capitalize(rpt.getPropertyName()) + (cqNestNo > 1 ? "_n" + cqNestNo : "");
                 if (pt.isPersistent()) {
                     final String columnName = pt.getColumnName();
+                    final String columnFullName = tableAliasName + "." + columnName;
+                    final String columnAliasName = pt.getColumnName() + preNoSuffix + "_" + rpt.getRelationNo();
                     sbYourSelectList.append(", ");
-                    sbYourSelectList.append(tableAliasName).append(".").append(columnName);
-                    sbYourSelectList.append(" AS ");
-                    sbYourSelectList.append(pt.getColumnName()).append(preNoSuffix).append("_").append(rpt.getRelationNo());
+                    sbYourSelectList.append(columnFullName).append(" AS ").append(columnAliasName);
+
+                    ${glConditionBeanContextName}.addColumnAliasInfo(conditionBeanClass, columnFullName, columnAliasName);
                 }
             }
             if (relationBmd.getRelationPropertyTypeSize() > 0) {
                 final String nssString = "nss" + initCapPropertyName + ".";
                 final String nextPreNoSuffix = preNoSuffix + "_" + rpt.getRelationNo();
                 final int nextCQNestNo = cqNestNo + 1;
-                setupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo);
+                setupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo, conditionBeanClass);
             }
             sb.append(ifComment).append(sbYourSelectList).append(endComment);
         }

@@ -63,6 +63,20 @@ public class ${myClassName} implements java.io.Serializable {
         return sb.toString();
     }
 
+    public String getOrderByClause(java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap) {
+        if (_orderByList.isEmpty()) {
+            return "";
+        }
+        final StringBuffer sb = new StringBuffer();
+        final String delimiter = ", ";
+        for (final java.util.Iterator ite = _orderByList.iterator(); ite.hasNext(); ) {
+            final ${glOrderByElementName} element = (${glOrderByElementName})ite.next();
+            sb.append(delimiter).append(element.getElementClause(selectClauseColumnAliasMap));
+        }
+        sb.delete(0, delimiter.length()).insert(0, "order by ");
+        return sb.toString();
+    }
+
     public boolean isSameOrderByColumn(String orderByProperty) {
         final java.util.List${database.filterGenericsString('String')} orderByList = new java.util.ArrayList${database.filterGenericsString('String')}();
         {

@@ -369,6 +369,23 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 #end
 
     // =====================================================================================
+    //                                                                            UnionQuery
+    //                                                                            ==========
+    public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, String unionQueryPropertyName) {
+        final String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
+        getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
+    }
+
+    protected String getUnionQuerySql(${glConditionQueryInterfaceName} unionQuery, String unionQueryPropertyName) {
+        final String selectClause = unionQuery.getSqlClause().getIncludedSelectColumnClause();
+        final String queryClause = unionQuery.getSqlClause().getFromClause() + " " + unionQuery.getSqlClause().getWhereClause();
+        final String oldStr = ".conditionQuery.";
+        final String newStr = "." + unionQueryPropertyName + ".";
+        final String replacedClause = replaceString(queryClause, oldStr, newStr);
+        return selectClause + " " + replacedClause;
+    }
+
+    // =====================================================================================
     //                                                                                Invoke
     //                                                                                ======
     public ${glConditionValueName} invokeGetter(String columnMultiName) {
