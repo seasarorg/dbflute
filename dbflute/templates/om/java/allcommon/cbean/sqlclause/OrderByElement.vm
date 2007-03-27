@@ -144,7 +144,7 @@ public class ${myClassName} implements java.io.Serializable {
             throw new IllegalStateException(msg);
         }
         final StringBuffer sb = new StringBuffer();
-        final String columnAlias = selectClauseColumnAliasMap.get(getColumnFullName());
+        final String columnAlias = (String)selectClauseColumnAliasMap.get(getColumnFullName());
         if (columnAlias == null || columnAlias.trim().length() == 0) {
             String msg = "The selectClauseColumnAliasMap should have the value of the key: " + getColumnFullName();
             throw new IllegalStateException(msg + " But the map is " + selectClauseColumnAliasMap);

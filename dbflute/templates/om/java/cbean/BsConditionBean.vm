@@ -224,7 +224,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                           ===========
     protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
 
-    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionQueryMap() {
+    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionQueryMap() {// for Internal
         return _unionQueryMap;
     }
 
@@ -236,18 +236,12 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * @param unionQuery Union query. (NotNull)
      */
     public void union(${myConditionQueryClassName} unionQuery) {
-        if (unionQuery == null) {
-            String msg = "The argument[unionQuery] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        final String key = "unionQuery" + _unionQueryMap.size();
-        _unionQueryMap.put(key, unionQuery);
-        query().registerUnionQuery(unionQuery, false, "unionQueryMap." + key);
+        setupUnion(unionQuery, false, _unionQueryMap);
     }
 
     protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionAllQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
 
-    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionAllQueryMap() {
+    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionAllQueryMap() {// for Internal
         return _unionAllQueryMap;
     }
 
@@ -259,13 +253,36 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * @param unionAllQuery Union all query. (NotNull)
      */
     public void unionAll(${myConditionQueryClassName} unionAllQuery) {
-        if (unionAllQuery == null) {
-            String msg = "The argument[unionAllQuery] should not be null.";
+        setupUnion(unionAllQuery, true, _unionAllQueryMap);
+    }
+
+    protected void setupUnion(${myConditionQueryClassName} unionQuery, boolean unionAll, java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} unionQueryMap) {
+        if (unionQuery == null) {
+            String msg = "The argument[unionQuery] should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        final String key = "unionAllQuery" + _unionAllQueryMap.size();
-        _unionAllQueryMap.put(key, unionAllQuery);
-        query().registerUnionQuery(unionAllQuery, false, "unionAllQueryMap." + key);
+        reflectRelationOnUnionQuery(unionQuery);
+        final String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
+        unionQueryMap.put(key, unionQuery);
+        query().registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
+    }
+
+    protected void reflectRelationOnUnionQuery(${myConditionQueryClassName} unionQuery) {
+  #foreach ($foreignKeys in $table.ForeignKeys)
+
+        if (query().hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
+            unionQuery.query${foreignKeys.foreignPropertyNameInitCap}();
+        }
+  #end
+  #foreach ($refferer in $table.Referrers)
+    #if (${refferer.isOneToOne()})
+
+        if (query().hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
+            unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}();
+        }
+    #end
+  #end
+
     }
 
     // =====================================================================================

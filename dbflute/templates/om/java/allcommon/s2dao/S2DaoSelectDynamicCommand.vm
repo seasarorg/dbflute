@@ -546,7 +546,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             if (str == null) {
                 return EMPTY_STRINGS;
             }
-            java.util.List<String> list = new java.util.ArrayList<String>();
+            java.util.List${database.filterGenericsString('String')} list = new java.util.ArrayList${database.filterGenericsString('String')}();
             java.util.StringTokenizer st = new java.util.StringTokenizer(str, delim);
             while (st.hasMoreElements()) {
                 list.add(st.nextToken());
