@@ -381,7 +381,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         if (ls.isEmpty()) {
             return null;
         }
-        assertRecordHasBeenSelectedAsOne(ls, cb.toString());
+        assertRecordHasBeenSelectedAsOne(ls, cb);
         return (${myExtendedObjectClassName})ls.get(0);
     }
 
@@ -396,8 +396,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
         final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = selectList(cb);
-        assertRecordHasNotBeenDeleted(ls, cb.toString());
-        assertRecordHasBeenSelectedAsOne(ls, cb.toString());
+        assertRecordHasNotBeenDeleted(ls, cb);
+        assertRecordHasBeenSelectedAsOne(ls, cb);
         return (${myExtendedObjectClassName})ls.get(0);
     }
 #if ($table.hasPrimaryKey())
@@ -500,7 +500,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${glListResultBeanName} selectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} cb, int maxCount) {
         assertConditionBeanNotNull(cb);
         final int selectedCount = selectCount(cb);
-        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.toString());
+        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb);
         return selectList(cb);
     }
 #end

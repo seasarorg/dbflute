@@ -498,7 +498,7 @@ namespace ${glPackageExtendedBhv} {
             if (ls.Count == 0) {
                 return null;
             }
-            AssertRecordHasBeenSelectedAsOne(ls, cb.ToString());
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
 
@@ -512,8 +512,8 @@ namespace ${glPackageExtendedBhv} {
         public ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             System.Collections.IList ls = this.Self.DelegateSelectList(cb);
-            AssertRecordHasNotBeenDeleted(ls, cb.ToString());
-            AssertRecordHasBeenSelectedAsOne(ls, cb.ToString());
+            AssertRecordHasNotBeenDeleted(ls, cb);
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
 
@@ -603,7 +603,7 @@ namespace ${glPackageExtendedBhv} {
         public ${glListResultBeanName} SelectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} cb, int maxCount) {
             AssertConditionBeanNotNull(cb);
             int selectedCount = this.Self.DelegateSelectCountIgnoreFetchScope(cb);
-            AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.ToString());
+            AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb);
             return new ResultBeanBuilder(this).BuildListResultBean(cb, this.Self.DelegateSelectList(cb));
         }
     #end

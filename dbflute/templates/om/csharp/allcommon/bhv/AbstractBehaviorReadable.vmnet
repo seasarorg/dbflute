@@ -297,7 +297,7 @@ namespace ${glPackageBaseCommonBhv} {
             if (ls.Count == 0) {
                 return null;
             }
-            AssertRecordHasBeenSelectedAsOne(ls, cb.ToString());
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
             return (${glEntityInterfaceName})ls[0];
         }
 
@@ -311,8 +311,8 @@ namespace ${glPackageBaseCommonBhv} {
         public ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
             System.Collections.IList ls = this.SelfReadable.CallReadList(cb);
-            AssertRecordHasNotBeenDeleted(ls, cb.ToString());
-            AssertRecordHasBeenSelectedAsOne(ls, cb.ToString());
+            AssertRecordHasNotBeenDeleted(ls, cb);
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
             return (${glEntityInterfaceName})ls[0];
         }
 
@@ -401,14 +401,14 @@ namespace ${glPackageBaseCommonBhv} {
          * 
          * @param selectedCount Selected count.
          * @param maxCount Max count.
-         * @param clauseString Clause string for exception message.
+         * @param clauseObject Clause object for exception message.
          * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
          */
-        protected void AssertSelectedCountHasNotExceededMaxCount(int selectedCount, int maxCount, String clauseString) {
+        protected void AssertSelectedCountHasNotExceededMaxCount(int selectedCount, int maxCount, Object clauseObject) {
             AssertObjectNotNull("selectedCount", selectedCount);
             AssertObjectNotNull("maxCount", maxCount);
             if (selectedCount > maxCount) {
-                String msg = "Selected count[" + selectedCount + "] has exceeded max count[" + maxCount + "]: clauseString=" + clauseString;
+                String msg = "Selected count[" + selectedCount + "] has exceeded max count[" + maxCount + "]: clauseObject=" + clauseObject;
                 throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
             }
         }
@@ -432,7 +432,7 @@ namespace ${glPackageBaseCommonBhv} {
         public ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount) {
             AssertConditionBeanNotNull(cb);
             int selectedCount = this.SelfReadable.ReadCount(cb);
-            AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb.ToString());
+            AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb);
             return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.CallReadList(cb));
         }
     #end
