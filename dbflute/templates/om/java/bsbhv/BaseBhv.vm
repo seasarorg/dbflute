@@ -284,6 +284,22 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityOfUpdate(entity);
         return getMyDao().updateModifiedOnly(entity);
     }
+  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+
+    /**
+     * Update one entity. (Delegate-Method)
+     * {non strict & modified only}
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Updated count.
+     */
+    public int delegateUpdateNonstrict(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        filterEntityOfUpdate(entity);
+        assertEntityOfUpdate(entity);
+        return getMyDao().updateNonstrictModifiedOnly(entity);
+    }
+  #end
 
     /**
      * Delete one entity. (Delegate-Method)
@@ -666,7 +682,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Update.
-     * 
+     * <pre>
+     * If it updates count zero, throws exception.
+     * If concurrency control of this table is valid, this update have it.
+     * </pre>
      * @param entity Entity. (NotNull)
      */
     public void update(${myExtendedObjectClassName} entity) {
@@ -680,6 +699,24 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doModify(${glEntityInterfaceName} entity) {
         update((${myExtendedObjectClassName})entity);
     }
+  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+
+    /**
+     * Update non stritct.
+     * <pre>
+     * This update ignores concurrency control.
+     * This method is faster than updateAfterSelect().
+     * </pre>
+     * @param entity Entity. (NotNull)
+     */
+    public void updateNonstrict(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        final int updatedCount = delegateUpdateNonstrict(entity);
+        if (updatedCount != 1) {
+            throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
+        }
+    }
+  #end
 
     /**
      * Update after select.
@@ -699,12 +736,39 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doModifyAfterSelect(${glEntityInterfaceName} entity) {
         updateAfterSelect((${myExtendedObjectClassName})entity);
     }
+  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+
+    /**
+     * Insert or update non strict.
+     * {update: modified only}
+     * <pre>
+     * This method is faster than insertOrUpdateAfterSelect().
+     * </pre>
+     * @param entity Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     */
+    public void insertOrUpdateNonStrict(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            insert(entity);
+        } else {
+            try {
+                updateNonstrict(entity);
+            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
+                if (e.getRows() == 0) {
+                    insert(entity);
+                } else {
+                    throw e;
+                }
+            }
+        }
+    }
+  #end
 
     /**
      * Insert or update after select.
      * {update: modified only}
      * 
-     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @param entity Entity. This should contain primary-key value at least(Except use identity). (NotNull)
      */
     public void insertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);

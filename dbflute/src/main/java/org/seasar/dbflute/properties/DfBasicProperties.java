@@ -226,6 +226,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return stringProp("torque.database.url");
     }
 
+    public String getDatabaseSchema() {
+        return stringProp("torque.database.schema");
+    }
+    
     public String getDatabaseUser() {
         return stringProp("torque.database.user");
     }

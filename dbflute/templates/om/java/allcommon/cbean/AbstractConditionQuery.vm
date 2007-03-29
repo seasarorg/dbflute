@@ -309,11 +309,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
         final String selectClause = "select " + subQuery.getAliasName() + "." + relatedColumnName;
-        final String fromClause = subQuery.getSqlClause().getFromClause();
-        final String oldStr = ".conditionQuery.";
-        final String newStr = "." + getLocationBase(propertyName) + ".";
-        final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause(), oldStr, newStr);
-        return selectClause + " " + fromClause + " " + whereClause;
+        String clause = subQuery.getSqlClause().getClauseWithoutIncludedOrderBySqlSuffix();
+        clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+        return replaceString(clause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
     }
 
     protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
@@ -323,17 +321,17 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         registerWhereClause("exists (" + subQueryClause + ")");
     }
 
-// *Unsupport ExistsSubQuery as inline because it's so dangerous.
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // *Unsupport ExistsSubQuery as inline because it's so dangerous.
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
         final String selectClause = "select " + subQuery.getAliasName() + "." + relatedColumnName;
-        final String fromClause = subQuery.getSqlClause().getFromClause();
-        final String oldStr = ".conditionQuery.";
-        final String newStr = "." + getLocationBase(propertyName) + ".";
+        String clause = subQuery.getSqlClause().getClauseWithoutIncludedOrderBySqlSuffix();
+        clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
         final String parentCondition = " and " + relatedColumnName + " = " + realColumnName;
-        final String whereClause = replaceString(subQuery.getSqlClause().getWhereClause() + parentCondition, oldStr, newStr);
-        return selectClause + " " + fromClause + " " + whereClause;
+        return replaceString(clause + parentCondition, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
     }
 
     protected void registerWhereClause(String whereClause) {
@@ -380,8 +378,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String selectClause = unionQuery.getSqlClause().getIncludedSelectColumnClause();
         final String queryClause = unionQuery.getSqlClause().getFromClause() + " " + unionQuery.getSqlClause().getWhereClause();
         final String oldStr = ".conditionQuery.";
-        final String newStr = "." + unionQueryPropertyName + ".";
-        final String replacedClause = replaceString(queryClause, oldStr, newStr);
+        final String newStr = ".conditionQuery." + unionQueryPropertyName + ".";
+        final String replacedClause = replaceString(queryClause, oldStr, newStr);// Very Important!
         return selectClause + " " + replacedClause;
     }
 

@@ -27,6 +27,7 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
         Connection connection = null;
         Statement statement = null;
         ResultSet rs = null;
+        String currentGeneratedSql = null;
         try {
             connection = _dataSource.getConnection();
             statement = connection.createStatement();
@@ -39,10 +40,12 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
             }
             for (String generatedSql : generatedSqlList) {
                 _log.debug(generatedSql);
+                currentGeneratedSql = generatedSql;
                 statement.execute(generatedSql);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("DfGeneratedSqlExecutorImpl.execute() threw the exception: " + sql, e);
+            throw new RuntimeException("DfGeneratedSqlExecutorImpl.execute() threw the exception: baseSql=" + sql
+                    + " generatedSql=" + currentGeneratedSql, e);
         } finally {
             try {
                 if (rs != null) {

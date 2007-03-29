@@ -665,6 +665,73 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
     #end
   #end
+  #set ($unionQueryGenericsString = "String, ${myConditionQueryClassName}")
+
+    // =====================================================================================
+    //                                                                           Union Query
+    //                                                                           ===========
+    protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
+
+    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionQueryMap() {// for Internal
+        return _unionQueryMap;
+    }
+
+    /**
+     * Set union query.
+     * <pre>
+     * Add union query to condition bean.
+     * </pre>
+     * @param unionQuery Union query. (NotNull)
+     */
+    public void setUnionQuery(${myConditionQueryClassName} unionQuery) {
+        setupUnion(unionQuery, false, _unionQueryMap);
+    }
+
+    protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionAllQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
+
+    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionAllQueryMap() {// for Internal
+        return _unionAllQueryMap;
+    }
+
+    /**
+     * Set union all query.
+     * <pre>
+     * Add union all query to condition bean.
+     * </pre>
+     * @param unionAllQuery Union all query. (NotNull)
+     */
+    public void setUnionAllQuery(${myConditionQueryClassName} unionAllQuery) {
+        setupUnion(unionAllQuery, true, _unionAllQueryMap);
+    }
+
+    protected void setupUnion(${myConditionQueryClassName} unionQuery, boolean unionAll, java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} unionQueryMap) {
+        if (unionQuery == null) {
+            String msg = "The argument[unionQuery] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        reflectRelationOnUnionQuery(unionQuery);
+        final String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
+        unionQueryMap.put(key, unionQuery);
+        registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
+    }
+
+    protected void reflectRelationOnUnionQuery(${myConditionQueryClassName} unionQuery) {
+  #foreach ($foreignKeys in $table.ForeignKeys)
+
+        if (hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
+            unionQuery.query${foreignKeys.foreignPropertyNameInitCap}();
+        }
+  #end
+  #foreach ($refferer in $table.Referrers)
+    #if (${refferer.isOneToOne()})
+
+        if (hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
+            unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}();
+        }
+    #end
+  #end
+
+    }
 
     // =====================================================================================
     //                                                               Query-SetupOuter-Method

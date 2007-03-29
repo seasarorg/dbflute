@@ -797,6 +797,26 @@ namespace ${glPackageExtendedBhv} {
         }
 
         /// <summary>
+        /// Insert or update.
+        /// </summary>
+        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+// TODO: @jflute - In development
+//        public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
+//            AssertEntityNotNull(entity);
+//            if (!entity.HasPrimaryKeyValue) {
+//                this.Self.Insert(entity);
+//                return;
+//            }
+//            try {
+//                this.Self.Update(entity);
+//            } catch (Exception) {
+//                this.Self.Insert(entity);
+//                return;
+//            }
+//        }
+
+        /// <summary>
         /// Insert or update after select.
         /// </summary>
         /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>

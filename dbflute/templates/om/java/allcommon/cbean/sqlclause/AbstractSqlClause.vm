@@ -94,18 +94,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      */
     public String getClause() {
         final StringBuffer sb = new StringBuffer(128);
-        sb.append(INCLUDE_SELECT_CLAUSE_MARK).append(" ").append(getClauseIncludedFromWhere());
-        sb.append(getClauseOrderBySqlSuffix());
-        return sb.toString();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Clause string. (NotNull)
-     */
-    public String getClauseIncludedFromWhere() {
-        final StringBuffer sb = new StringBuffer(128);
+        sb.append(INCLUDE_SELECT_CLAUSE_MARK);
+        sb.append(" ");
         if (_isIncludedSelectColumnEffective && !_includedSelectColumnMap.isEmpty()) {
             sb.append(" ").append(getIncludedSelectColumnClause());
         }
@@ -115,12 +105,13 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         sb.append(getFromHint());
         sb.append(" ");
         sb.append(getWhereClause());
-        for (final java.util.Iterator ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
-            final UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
-            final String unionQueryClause = unionQueryInfo.getUnionQueryClause();
-            final boolean unionAll = unionQueryInfo.isUnionAll();
-            sb.append(unionAll ? " union all " : " union ").append(INCLUDE_SELECT_CLAUSE_MARK).append(unionQueryClause);
+        sb.append(getUnionClause());
+        if (_isOrderByEffective && !_orderByClause.isEmpty()) {
+            sb.append(" ");
+            sb.append(getOrderByClause());
         }
+        sb.append(" ");
+        sb.append(getSqlSuffix());
         return sb.toString();
     }
 
@@ -129,14 +120,27 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      * 
      * @return Clause string. (NotNull)
      */
-    public String getClauseOrderBySqlSuffix() {
+    public String getClauseWithoutIncludedOrderBySqlSuffix() {
         final StringBuffer sb = new StringBuffer(128);
-        if (_isOrderByEffective && !_orderByClause.isEmpty()) {
-            sb.append(" ");
-            sb.append(getOrderByClause());
-        }
+        sb.append(INCLUDE_SELECT_CLAUSE_MARK);
         sb.append(" ");
-        sb.append(getSqlSuffix());
+        sb.append(getFromClause());
+        sb.append(" ");
+        sb.append(getFromHint());
+        sb.append(" ");
+        sb.append(getWhereClause());
+        sb.append(getUnionClause());
+        return sb.toString();
+    }
+
+    protected String getUnionClause() {
+        final StringBuffer sb = new StringBuffer();
+        for (final java.util.Iterator ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
+            final UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
+            final String unionQueryClause = unionQueryInfo.getUnionQueryClause();
+            final boolean unionAll = unionQueryInfo.isUnionAll();
+            sb.append(unionAll ? " union all " : " union ").append(INCLUDE_SELECT_CLAUSE_MARK).append(unionQueryClause);
+        }
         return sb.toString();
     }
 

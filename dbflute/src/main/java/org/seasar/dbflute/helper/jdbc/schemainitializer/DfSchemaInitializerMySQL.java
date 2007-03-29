@@ -2,6 +2,7 @@ package org.seasar.dbflute.helper.jdbc.schemainitializer;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.generatedsql.DfGeneratedSqlExecutor;
 import org.seasar.dbflute.helper.jdbc.generatedsql.DfGeneratedSqlExecutorImpl;
 
@@ -41,7 +42,13 @@ public class DfSchemaInitializerMySQL implements DfSchemaInitializer {
         sb.append(lineSeparator);
         sb.append("  from information_schema.table_constraints");
         sb.append(lineSeparator);
-        sb.append(" where constraint_type='foreign key';");
+        final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
+        if (schema != null) {
+            sb.append(" where table_schema = '" + schema + "' and constraint_type='foreign key';");
+        } else {
+            // TODO: Should it use user value?
+            sb.append(" where constraint_type='foreign key';");
+        }
         sb.append(lineSeparator);
         return sb.toString();
     }
@@ -53,7 +60,13 @@ public class DfSchemaInitializerMySQL implements DfSchemaInitializer {
         sb.append(lineSeparator);
         sb.append("  from information_schema.tables");
         sb.append(lineSeparator);
-        sb.append(" where table_type = 'BASE TABLE';");
+        final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
+        if (schema != null) {
+            sb.append(" where table_schema = '" + schema + "' and table_type = 'BASE TABLE';");
+        } else {
+            // TODO: Should it use user value?
+            sb.append(" where table_type = 'BASE TABLE';");
+        }
         sb.append(lineSeparator);
         return sb.toString();
     }

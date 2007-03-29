@@ -41,18 +41,11 @@ public interface ${myClassName} {
     public String getClause();
 
     /**
-     * Get clause string of Included and From and Where.
+     * Get clause string without included and orderby and sqlsuffix.
      * 
      * @return Clause string. (NotNull)
      */
-    public String getClauseIncludedFromWhere();
-
-    /**
-     * Get clause string of OrderBy and SqlSuffix.
-     * 
-     * @return Clause string. (NotNull)
-     */
-    public String getClauseOrderBySqlSuffix();
+    public String getClauseWithoutIncludedOrderBySqlSuffix();
 
     // =====================================================================================
     //                                                                          Clause Parts

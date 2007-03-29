@@ -31,7 +31,12 @@ import org.seasar.dao.ResultSetHandlerFactory;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.RelationRowCreatorImpl;
+import org.seasar.dao.impl.AbstractSqlCommand;
 import org.seasar.dao.impl.SelectDynamicCommand;
+import org.seasar.dao.impl.UpdateAutoDynamicCommand;
+import org.seasar.dao.impl.UpdateAutoStaticCommand;
+import org.seasar.dao.impl.UpdateBatchAutoStaticCommand;
+import org.seasar.dao.impl.UpdateModifiedOnlyCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
@@ -76,8 +81,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #if ($database.isAvailableGenerics())
 
     // =====================================================================================
-    //                                                            Outside Sql Check Override
-    //                                                            ==========================
+    //                                                             OutsideSql Check Override
+    //                                                             =========================
     protected void setupMethodByAuto(Method method) {
         final ${glOutsideSqlAnnotation} outsideSql = method.getAnnotation(${glOutsideSqlAnnotation}.class);
         if (outsideSql != null) {
@@ -262,8 +267,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     // =====================================================================================
-    //                                                                      Command Override
-    //                                                                      ================
+    //                                                         SelectDynamicCommand Override
+    //                                                         =============================
     protected SelectDynamicCommand createSelectDynamicCommand(ResultSetHandler rsh) {// for all except condition-bean
         return new SelectDynamicCommand(dataSource, statementFactory, rsh, resultSetFactory);
     }
@@ -318,6 +323,75 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             selectHandler.setFetchSize(-1);
             return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
         }
+    }
+
+    // =====================================================================================
+    //                                                                 UpdateByAuto Override
+    //                                                                 =====================
+    protected void setupUpdateMethodByAuto(Method method) {
+        checkAutoUpdateMethod(method);
+        String[] propertyNames = getPersistentPropertyNames(method);
+        AbstractSqlCommand cmd;
+        if (isUpdateSignatureForBean(method)) {
+            if (isUnlessNull(method.getName())) {
+                cmd = createUpdateAutoDynamicCommand(method, propertyNames);
+            } else if (isModifiedOnly(method.getName())) {
+                cmd = createUpdateModifiedOnlyCommand(method, propertyNames);
+            } else {
+                cmd = new UpdateAutoStaticCommand(dataSource, statementFactory, createNonConcurrencyBeanMetaData(method), propertyNames);// Extension Point!
+            }
+        } else {
+            cmd = new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createNonConcurrencyBeanMetaData(method), propertyNames);// Extension Point!
+        }
+        sqlCommands.put(method.getName(), cmd);
+    }
+
+    protected AbstractSqlCommand createUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
+        AbstractSqlCommand cmd;
+        UpdateAutoDynamicCommand uac = new UpdateAutoDynamicCommand(dataSource, statementFactory);
+        uac.setBeanMetaData(createNonConcurrencyBeanMetaData(method));// Extension Point!
+        uac.setPropertyNames(propertyNames);
+        uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+        cmd = uac;
+        return cmd;
+    }
+
+    protected AbstractSqlCommand createUpdateModifiedOnlyCommand(final Method method, final String[] propertyNames) {
+        UpdateModifiedOnlyCommand uac = new UpdateModifiedOnlyCommand(dataSource, statementFactory);
+        uac.setBeanMetaData(createNonConcurrencyBeanMetaData(method));// Extension Point!
+        uac.setPropertyNames(propertyNames);
+        uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+        return uac;
+    }
+
+    protected BeanMetaData createNonConcurrencyBeanMetaData(Method method) {
+        if (method.getName().contains("Nonstrict")) {
+            return createNonConcurrencyBmdFactory().createBeanMetaData(getBeanClass());
+        } else {
+            return getBeanMetaData();
+        }
+    }
+
+    protected BeanMetaDataFactory createNonConcurrencyBmdFactory() {
+        final ${glBeanMetaDataFactoryImpl} nonConcurrencyBmdFactory = new ${glBeanMetaDataFactoryImpl}() {
+            protected BeanMetaDataImpl createBeanMetaDataImpl() {
+                return new BeanMetaDataImpl() {
+                    public boolean hasVersionNoPropertyType() {
+                        return false;
+                    }
+
+                    public boolean hasTimestampPropertyType() {
+                        return false;
+                    }
+                };
+            }
+        };
+        nonConcurrencyBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
+        nonConcurrencyBmdFactory.setValueTypeFactory(this.valueTypeFactory);
+        nonConcurrencyBmdFactory.setDataSource(this.dataSource);
+        nonConcurrencyBmdFactory.setDaoNamingConvention(this.daoNamingConvention);
+        nonConcurrencyBmdFactory.setBeanEnhancer(this.beanEnhancer);
+        return nonConcurrencyBmdFactory;
     }
 
     // =====================================================================================
