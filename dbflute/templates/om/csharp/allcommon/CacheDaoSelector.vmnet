@@ -18,6 +18,12 @@ namespace ${glPackageBaseCommon} {
      */
     public class ${glCacheDaoSelectorName} : ${glDaoSelectorInterfaceName} {
 
+        protected Seasar.Framework.Container.IS2Container _container;
+        public Seasar.Framework.Container.IS2Container Container {
+            get { return _container; }
+            set { _container = value; }
+        }
+
         /**
          * Get dao-readable by dao type.
          * 
@@ -26,13 +32,7 @@ namespace ${glPackageBaseCommon} {
          */
         public ${glDaoReadableInterfaceName} GetRDao(Type daoType) {
             AssertObjectNotNull("daoType", daoType);
-            SetupDaoCacheMap();
-            ${glDaoReadableInterfaceName} dao = (${glDaoReadableInterfaceName})_daoCacheMap[daoType];
-            if (dao == null) {
-                String msg = "The daoCacheMap does not have the dao-type: daoType=" + daoType + " daoCacheMap=" + _daoCacheMap;
-                throw new SystemException(msg);
-            }
-            return dao;
+            return GetRDaoObject(daoType);
         }
 
         /**
@@ -90,7 +90,23 @@ namespace ${glPackageBaseCommon} {
             AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
             return (${glDaoWritableInterfaceName})GetRDao(tableMultiName);
         }
-    #if ($database.isAvailableBehaviorGeneration())
+
+        protected System.Collections.Generic.IDictionary<Type, ${glDaoReadableInterfaceName}> _daoCacheMap;
+        protected ${glDaoReadableInterfaceName} GetRDaoObject(Type daoType) {
+            ${glDaoReadableInterfaceName} result = null;
+            if (_daoCacheMap == null) {
+                _daoCacheMap = new System.Collections.Generic.Dictionary<Type, ${glDaoReadableInterfaceName}>();
+            }
+            if (_daoCacheMap.ContainsKey(daoType)) {
+                result = _daoCacheMap[daoType];
+            }
+            if (result == null) {
+                result = (${glDaoReadableInterfaceName})_container.GetComponent(daoType);
+                _daoCacheMap.Add(daoType, result);
+            }
+            return result;
+        }
+#if ($database.isAvailableBehaviorGeneration())
 
         /**
          * Get bhv-readable by bhv type.
@@ -100,13 +116,7 @@ namespace ${glPackageBaseCommon} {
          */
         public ${glBehaviorReadableInterfaceName} GetRBhv(Type bhvType) {
             AssertObjectNotNull("bhvType", bhvType);
-            SetupBhvCacheMap();
-            ${glBehaviorReadableInterfaceName} bhv = (${glBehaviorReadableInterfaceName})_bhvCacheMap[bhvType];
-            if (bhv == null) {
-                String msg = "The bhvCacheMap does not have the bhv-type: bhvType=" + bhvType + " bhvCacheMap=" + _bhvCacheMap;
-                throw new SystemException(msg);
-            }
-            return bhv;
+            return GetRBhvObject(bhvType);
         }
 
         /**
@@ -175,91 +185,35 @@ namespace ${glPackageBaseCommon} {
             SetupDaoBhvMap();
             return (Type)_daoBhvMap[dbmeta.GetDaoType()];
         }
-    #end
-
-        protected System.Collections.Generic.IDictionary<Type, ${glDaoReadableInterfaceName}> _daoCacheMap;
-        protected void SetupDaoCacheMap() {
-            if (_daoCacheMap == null) {
-                _daoCacheMap = new System.Collections.Generic.Dictionary<Type, ${glDaoReadableInterfaceName}>();
-    #foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
-      #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
-      #if ($database.isDaoComponent($componentName))
-
-                _daoCacheMap.Add(typeof(${className}), this.${database.initCap($componentName)});
-      #end
-    #end
-    #foreach ($table in $database.Tables)
-
-                _daoCacheMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), this.${table.JavaName}Dao);
-    #end
-    #foreach ($table in $database.CustomizeTableList)
-
-                _daoCacheMap.Add(typeof(${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao), this.${table.JavaName}Dao);
-    #end
-
-            }
-        }
-    #foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
-      #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
-      #if ($database.isDaoComponent($componentName))
-
-        protected ${className} _${componentName};
-        public ${className} ${database.initCap($componentName)} {
-            get { return _${componentName}; }
-            set { _${componentName} = value; }
-        }
-      #end
-    #end
-    #foreach ($table in $database.Tables)
-
-        protected ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;
-        public ${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao ${table.JavaName}Dao {
-            get { return _${table.UncapitalisedJavaName}Dao; }
-            set { _${table.UncapitalisedJavaName}Dao = value; }
-        }
-    #end
-    #foreach ($table in $database.CustomizeTableList)
-
-        protected ${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao _${table.UncapitalisedJavaName}Dao;
-        public ${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao ${table.JavaName}Dao {
-            get { return _${table.UncapitalisedJavaName}Dao; }
-            set { _${table.UncapitalisedJavaName}Dao = value; }
-        }
-    #end
-    #if ($database.isAvailableBehaviorGeneration())
 
         protected System.Collections.Generic.IDictionary<Type, ${glBehaviorReadableInterfaceName}> _bhvCacheMap;
-        protected void SetupBhvCacheMap() {
+        protected ${glBehaviorReadableInterfaceName} GetRBhvObject(Type bhvType) {
+            ${glBehaviorReadableInterfaceName} result = null;
             if (_bhvCacheMap == null) {
                 _bhvCacheMap = new System.Collections.Generic.Dictionary<Type, ${glBehaviorReadableInterfaceName}>();
-      #foreach ($table in $database.Tables)
-
-                _bhvCacheMap.Add(typeof(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv), this.${table.JavaName}Bhv);
-      #end
-
             }
+            if (_bhvCacheMap.ContainsKey(bhvType)) {
+                result = _bhvCacheMap[bhvType];
+            }
+            if (result == null) {
+                result = (${glBehaviorReadableInterfaceName})_container.GetComponent(bhvType);
+                _bhvCacheMap.Add(bhvType, result);
+            }
+            return result;
         }
 
         protected System.Collections.Generic.IDictionary<Type, Type> _daoBhvMap;
         protected void SetupDaoBhvMap() {
             if (_daoBhvMap == null) {
                 _daoBhvMap = new System.Collections.Generic.Dictionary<Type, Type>();
-      #foreach ($table in $database.Tables)
+  #foreach ($table in $database.Tables)
 
                 _daoBhvMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), typeof(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv));
-      #end
+  #end
 
             }
         }
-      #foreach ($table in $database.Tables)
-
-        protected ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv _${table.UncapitalisedJavaName}Bhv;
-        public ${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv ${table.JavaName}Bhv {
-            get { return _${table.UncapitalisedJavaName}Bhv; }
-            set { _${table.UncapitalisedJavaName}Bhv = value; }
-        }
-      #end
-    #end
+#end
 
         // ----------------------------------------------------------------
         //                                                    Assert Object
@@ -293,7 +247,7 @@ namespace ${glPackageBaseCommon} {
          */
         protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
             AssertObjectNotNull("variableName", variableName);
-            AssertObjectNotNull("value", value);
+            AssertObjectNotNull(variableName, value);
             if (value.Trim().Length ==0) {
                 String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
                 throw new SystemException(msg);
