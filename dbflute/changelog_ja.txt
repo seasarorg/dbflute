@@ -1,0 +1,8 @@
+DBFlute 変更履歴
+
+0.4.4
+-------------------------------------------------------------------------------
+[DBFLUTE-72] {Java}: ConditionBeanにて同Table間限定のUnionをサポートする。
+[DBFLUTE-71] {Java/C#}: Volocityが吐き出す「report.${torque.project}.sql2entity.generation」を阻止する。
+[DBFLUTE-70] {Java/C#}: 外だしSQLに対してQueryTimeout設定が無効になっているのを修正すること。
+-------------------------------------------------------------------------------
