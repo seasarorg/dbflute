@@ -35,6 +35,9 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
  */
 public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
     /**
      * Constructor.
      * 
@@ -52,6 +55,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         initializeDatabaseProductNameOfContext(dataSource);
     }
 
+    // --------------------------------------
+    //                  Database Product Name
+    //                  ---------------------
     protected void initializeDatabaseProductNameOfContext(DataSource dataSource) {
         if (getDatabaseProductNameFromContext() != null) {
             return;
@@ -83,6 +89,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
 #if ($database.isVersionAfter1040())
 
+    // =====================================================================================
+    //                                                        DataMetaData Creation Override
+    //                                                        ==============================
     protected BeanEnhancer beanEnhancer;
 
     public BeanEnhancer getBeanEnhancer() {
@@ -93,13 +102,16 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         this.beanEnhancer = beanEnhancer;
     }
 
-    protected DaoMetaDataImpl createDaoMetaDataImpl() {
+    protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
         ${glDaoMetaDataExtension} dmdExtension = new ${glDaoMetaDataExtension}();
         dmdExtension.setBeanEnhancer(this.beanEnhancer);
         return dmdExtension;
     }
 #else
 
+    // =====================================================================================
+    //                                                                           DaoMetaData
+    //                                                                           ===========
     /**
      * Create data meta data.
      * 

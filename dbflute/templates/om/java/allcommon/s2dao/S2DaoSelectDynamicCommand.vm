@@ -42,8 +42,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
 
 /**
- * My-SelectDynamicCommand.
- * Overrides original class 'SelectDynamicCommand'.
+ * SelectDynamicCommand for DBFlute.
  * 
  * @author ${database.ClassAuthor}
  */
@@ -54,6 +53,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
 #end
 
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
     /** Root node. */
     private Node rootNode;// Override!
 
@@ -69,7 +71,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     /** Cache of select clause PK-only command. */
     protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
 
-
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
     /**
      * Constructor.
      * 
@@ -88,6 +92,12 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         this.resultSetFactory = resultSetFactory;
     }
 
+    // =====================================================================================
+    //                                                                                  Main
+    //                                                                                  ====
+    // --------------------------------------
+    //                Very Important Override
+    //                -----------------------
     public void setSql(String sql) {// Override!
         super.setSql(sql);
         this.rootNode = new InternalSqlParserImpl(sql).parse();
@@ -99,6 +109,29 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return ctx;
     }
 
+    public void setArgNames(String[] argNames) {
+        if (_selectClauseCommand != null) {
+            _selectClauseCommand.setArgNames(argNames);
+        }
+        if (_selectClausePKOnlyCommand != null) {
+            _selectClausePKOnlyCommand.setArgNames(argNames);
+        }
+        super.setArgNames(argNames);
+    }
+
+    public void setArgTypes(Class[] argTypes) {
+        if (_selectClauseCommand != null) {
+            _selectClauseCommand.setArgTypes(argTypes);
+        }
+        if (_selectClausePKOnlyCommand != null) {
+            _selectClausePKOnlyCommand.setArgTypes(argTypes);
+        }
+        super.setArgTypes(argTypes);
+    }
+
+    // --------------------------------------
+    //                             For Public
+    //                             ----------
     /**
      * Do apply. {for delegating to apply()}
      * 
@@ -109,6 +142,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return apply(args);
     }
 
+    // --------------------------------------
+    //                          Select Clause
+    //                          -------------
     /**
      * Set select clause.
      * 
@@ -133,30 +169,16 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return this;
     }
 
+    // --------------------------------------
+    //          SelectDynamicCommand Creation
+    //          -----------------------------
     protected ${glSelectDynamicCommand} createMySelectDynamicCommand() {
         return new ${glSelectDynamicCommand}(getDataSource(), getStatementFactory(), resultSetHandler, resultSetFactory);
     }
 
-    public void setArgNames(String[] argNames) {
-        if (_selectClauseCommand != null) {
-            _selectClauseCommand.setArgNames(argNames);
-        }
-        if (_selectClausePKOnlyCommand != null) {
-            _selectClausePKOnlyCommand.setArgNames(argNames);
-        }
-        super.setArgNames(argNames);
-    }
-
-    public void setArgTypes(Class[] argTypes) {
-        if (_selectClauseCommand != null) {
-            _selectClauseCommand.setArgTypes(argTypes);
-        }
-        if (_selectClausePKOnlyCommand != null) {
-            _selectClausePKOnlyCommand.setArgTypes(argTypes);
-        }
-        super.setArgTypes(argTypes);
-    }
-
+    // --------------------------------------
+    //                                Execute
+    //                                -------
     public Object execute(Object[] args) {
         if (!${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
             return super.execute(args);
@@ -175,6 +197,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
 
+    // --------------------------------------
+    //                           Setup Clause
+    //                           ------------
     protected String setupRealSelectClause(Object[] args, List${database.filterGenericsString('Object')} bindVariableList, List${database.filterGenericsString('Class')} bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         if (cb.isSelectCountIgnoreFetchScope()) {
@@ -278,6 +303,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
     }
 
+    // =====================================================================================
+    //                                                                          Static Class
+    //                                                                          ============
     protected static class InternalSqlParserImpl implements SqlParser {
 
         private SqlTokenizer tokenizer;
@@ -413,13 +441,13 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             } else if (expr.startsWith("$")) {
                 peek().addChild(new EmbeddedValueNode(expr.substring(1)));
             } else {
-                peek().addChild(new InternalBindVariableNode(expr));
+                peek().addChild(new InternalBindVariableNode(expr));// Extension!
             }
         }
 
         protected void parseBindVariable() {
             String expr = tokenizer.getToken();
-            peek().addChild(new InternalBindVariableNode(expr));
+            peek().addChild(new InternalBindVariableNode(expr));// Extension!
         }
 
         protected Node pop() {
@@ -487,7 +515,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                 if (value == null) {
                     break;
                 }
-                if (java.util.Map.class.isInstance(value)) {
+                if (java.util.Map.class.isInstance(value)) {// Extension!
                     final java.util.Map map = (java.util.Map) value;
                     value = map.get(names[pos]);
                     if (value == null) {

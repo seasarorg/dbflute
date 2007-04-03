@@ -54,12 +54,15 @@ import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
 #end
 
 /**
- * DaoMetaDataImpl for DaoGen.
+ * DaoMetaDataImpl for DBFlute.
  * 
  * @author ${database.ClassAuthor}
  */
 public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
     /**
      * Constructor.
      */
