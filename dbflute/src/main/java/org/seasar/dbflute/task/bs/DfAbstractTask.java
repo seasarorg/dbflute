@@ -50,53 +50,18 @@ public abstract class DfAbstractTask extends Task {
     /** User name. */
     protected String _userId = null;
 
+    /** Schema name. */
+    protected String _schema = null;
+
     /** Password */
     protected String _password = null;
 
     protected DfDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
 
-    // =========================================================================================
-    //                                                                                  Accessor
-    //                                                                                  ========
-    /**
-     * Set the JDBC driver to be used.
-     *
-     * @param driver driver class name
-     */
-    public void setDriver(String driver) {
-        this._driver = driver;
-    }
-
-    /**
-     * Set the DB connection url.
-     *
-     * @param url connection url
-     */
-    public void setUrl(String url) {
-        this._url = url;
-    }
-
-    /**
-     * Set the user name for the DB connection.
-     *
-     * @param userId database user
-     */
-    public void setUserId(String userId) {
-        this._userId = userId;
-    }
-
-    /**
-     * Set the password for the DB connection.
-     *
-     * @param password database password
-     */
-    public void setPassword(String password) {
-        this._password = password;
-    }
-
     @Override
     final public void execute() {
         try {
+            initializeDatabaseInfo();
             if (isUseDataSource()) {
                 setupDataSource();
             }
@@ -108,6 +73,14 @@ public abstract class DfAbstractTask extends Task {
             _log.error("execute() threw the exception!", e);
             throw e;
         }
+    }
+
+    protected void initializeDatabaseInfo() {
+        _driver = DfBuildProperties.getInstance().getBasicProperties().getDatabaseDriver();
+        _url = DfBuildProperties.getInstance().getBasicProperties().getDatabaseUri();
+        _userId = DfBuildProperties.getInstance().getBasicProperties().getDatabaseUser();
+        _schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
+        _password = DfBuildProperties.getInstance().getBasicProperties().getDatabasePassword();
     }
 
     abstract protected void doExecute();

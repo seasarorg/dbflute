@@ -247,21 +247,8 @@
     <echo message="| Replace-Schema !                              |"/>
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
-    	
-    <echo message=" "/>
-    <echo message="+-------------------------------------------------------------------------------+"/>
-    <echo message="driver   = ${torque.database.driver}"/>
-    <echo message="url      = ${torque.database.url}"/>
-    <echo message="userId   = ${torque.database.user}"/>
-    <echo message="password = ${torque.database.password}"/>
-    <echo message="+-----------------+"/>
-  	
-    <torque-replace-schema
-      contextProperties="${torque.contextProperties}"
-      driver="${torque.database.driver}"
-      url="${torque.database.url}"
-      userId="${torque.database.user}"
-      password="${torque.database.password}">
+
+    <torque-replace-schema contextProperties="${torque.contextProperties}">
     </torque-replace-schema>
   </target>
 
@@ -273,20 +260,7 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
   	
-    <echo message=" "/>
-    <echo message="+-------------------------------------------------------------------------------+"/>
-    <echo message="driver   = ${torque.database.driver}"/>
-    <echo message="url      = ${torque.database.url}"/>
-    <echo message="userId   = ${torque.database.user}"/>
-    <echo message="password = ${torque.database.password}"/>
-    <echo message="+-----------------+"/>
-	
-    <torque-outside-sql-test
-      contextProperties="${torque.contextProperties}"
-      driver="${torque.database.driver}"
-      url="${torque.database.url}"
-      userId="${torque.database.user}"
-      password="${torque.database.password}">
+    <torque-outside-sql-test contextProperties="${torque.contextProperties}">
     </torque-outside-sql-test>
   </target>
 
@@ -297,21 +271,8 @@
     <echo message="| Invoke sql-directory !                        |"/>
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
-  	
-    <echo message=" "/>
-    <echo message="+-------------------------------------------------------------------------------+"/>
-    <echo message="driver   = ${torque.database.driver}"/>
-    <echo message="url      = ${torque.database.url}"/>
-    <echo message="userId   = ${torque.database.user}"/>
-    <echo message="password = ${torque.database.password}"/>
-    <echo message="+-----------------+"/>
 	
-    <torque-invoke-sql-directory
-      contextProperties="${torque.contextProperties}"
-      driver="${torque.database.driver}"
-      url="${torque.database.url}"
-      userId="${torque.database.user}"
-      password="${torque.database.password}">
+    <torque-invoke-sql-directory contextProperties="${torque.contextProperties}">
     </torque-invoke-sql-directory>
   </target>
 
@@ -323,14 +284,6 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
 
-    <echo message=" "/>
-    <echo message="+-------------------------------------------------------------------------------+"/>
-    <echo message="driver   = ${torque.database.driver}"/>
-    <echo message="url      = ${torque.database.url}"/>
-    <echo message="userId   = ${torque.database.user}"/>
-    <echo message="password = ${torque.database.password}"/>
-    <echo message="+-----------------+"/>
-
     <torque-sql2entity
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.sql2entity}"
@@ -338,10 +291,7 @@
       outputFile="report.${torque.project}.sql2entity.generation"
       targetDatabase="${torque.database}"
       templatePath="${torque.templatePath}"
-      driver="${torque.database.driver}"
-      url="${torque.database.url}"
-      userId="${torque.database.user}"
-      password="${torque.database.password}">
+    >
     </torque-sql2entity>
   </target>
 
@@ -363,71 +313,16 @@
     <echo message=" "/>
     <echo message="+-------------------------------------------------------------------------------+"/>
     <echo message="contextProperties = ${torque.contextProperties}"/>
-    <echo message="dbDriver          = ${torque.database.driver}"/>
-    <echo message="dbPassword        = ${torque.database.password}"/>
-    <echo message="dbSchema          = ${torque.database.schema}"/>
-    <echo message="dbUrl             = ${torque.database.url}"/>
-    <echo message="dbUser            = ${torque.database.user}"/>
     <echo message="outputFile        = ${torque.schema.dir}/project-schema-${torque.project}.xml"/>
     <echo message="sameJavaName      = ${torque.sameJavaName}"/>
     <echo message="+-----------------+"/>
 
     <torque-jdbc-transform
       contextProperties="${torque.contextProperties}"
-      dbDriver="${torque.database.driver}"
-      dbPassword="${torque.database.password}"
-      dbSchema="${torque.database.schema}"
-      dbUrl="${torque.database.url}"
-      dbUser="${torque.database.user}"
       outputFile="${torque.schema.dir}/project-schema-${torque.project}.xml"
       sameJavaName="${torque.sameJavaName}"
-    />
-  </target>
-
-  <!-- **************************************************************************************************** -->
-  <!--                                                                                             DataDump -->
-  <!--                                                                                             ******** -->
-  <!-- ================================================================ -->
-  <!-- Dump data from database into xml file                            -->
-  <!-- ================================================================ -->
-
-  <target
-    name="datadump"
-    description="==> dump data from database into xml file">
-
-    <echo message="+-----------------------------------------------+"/>
-    <echo message="|                                               |"/>
-    <echo message="| Dumping the data from database into XML       |"/>
-    <echo message="|                                               |"/>
-    <echo message="+-----------------------------------------------+"/>
-    <echo message=" "/>
-    <echo message="+-------------------------------------------------------------------------------+"/>
-    <echo message="contextProperties = ${torque.contextProperties}"/>
-    <echo message="controlTemplate   = ${torque.template.dataDump}"/>
-    <echo message="databaseDriver    = ${torque.database.driver}"/>
-    <echo message="databaseName      = ${torque.database.name}"/>
-    <echo message="databaseUrl       = ${torque.database.url}"/>
-    <echo message="databaseUser      = ${torque.database.user}"/>
-    <echo message="databasePassword  = ${torque.database.password}"/>
-    <echo message="outputDirectory   = ${torque.output.dir}"/>
-    <echo message="outputFile        = report.${torque.project}.datadump.generation"/>
-    <echo message="useClasspath      = ${torque.useClasspath}"/>
-    <echo message="+-----------------+"/>
-
-    <torque-data-dump
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.dataDump}"
-      databaseDriver="${torque.database.driver}"
-      databaseName="${torque.database.name}"
-      databaseUrl="${torque.database.url}"
-      databaseUser="${torque.database.user}"
-      databasePassword="${torque.database.password}"
-      outputDirectory="${torque.output.dir}"
-      outputFile="report.${torque.project}.datadump.generation"
-      templatePath="${torque.templatePath}"
-      useClasspath="${torque.useClasspath}"
-      xmlFile="${torque.schema.dir}/project-schema-${torque.project}.xml"
-    />
+    >
+    </torque-jdbc-transform>
   </target>
 
   <!-- **************************************************************************************************** -->

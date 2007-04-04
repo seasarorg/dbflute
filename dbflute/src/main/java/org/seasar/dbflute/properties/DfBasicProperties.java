@@ -3,6 +3,7 @@ package org.seasar.dbflute.properties;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -48,7 +49,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseMySQL() {
         return getDatabaseName().equalsIgnoreCase("mysql");
     }
-    
+
     public boolean isDatabaseOracle() {
         return getDatabaseName().equalsIgnoreCase("oracle");
     }
@@ -218,24 +219,75 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===============================================================================
     //                                                      Properties - Database Info
     //                                                      ==========================
+    protected Map<String, Object> _databaseInfoMap;
+
     public String getDatabaseDriver() {
+        initializeDatabaseInfoMap();
+        final String key = "driver";
+        final String databaseInfoElement = getDatabaseInfoElement(key);
+        if (databaseInfoElement != null) {
+            return databaseInfoElement;
+        }
         return stringProp("torque.database.driver");
     }
 
     public String getDatabaseUri() {
+        initializeDatabaseInfoMap();
+        final String key = "url";
+        final String databaseInfoElement = getDatabaseInfoElement(key);
+        if (databaseInfoElement != null) {
+            return databaseInfoElement;
+        }
         return stringProp("torque.database.url");
     }
 
     public String getDatabaseSchema() {
+        initializeDatabaseInfoMap();
+        final String key = "schema";
+        final String databaseInfoElement = getDatabaseInfoElement(key);
+        if (databaseInfoElement != null) {
+            return databaseInfoElement;
+        }
         return stringProp("torque.database.schema");
     }
-    
+
     public String getDatabaseUser() {
+        initializeDatabaseInfoMap();
+        final String key = "user";
+        final String databaseInfoElement = getDatabaseInfoElement(key);
+        if (databaseInfoElement != null) {
+            return databaseInfoElement;
+        }
         return stringProp("torque.database.user");
     }
 
     public String getDatabasePassword() {
+        initializeDatabaseInfoMap();
+        final String key = "password";
+        final String databaseInfoElement = getDatabaseInfoElement(key);
+        if (databaseInfoElement != null) {
+            return databaseInfoElement;
+        }
         return stringProp("torque.database.password");
+    }
+
+    private void initializeDatabaseInfoMap() {
+        if (_databaseInfoMap == null) {
+            Map<String, Object> databaseInfoMap = getOutsidePropMap("databaseInfo");
+            if (databaseInfoMap.isEmpty()) {
+                databaseInfoMap = getOutsidePropMap("databaseInfoMap");
+            }
+            if (!databaseInfoMap.isEmpty()) {
+                _databaseInfoMap = databaseInfoMap;
+            }
+        }
+    }
+
+    protected String getDatabaseInfoElement(final String key) {
+        if (_databaseInfoMap != null) {
+            return (String) _databaseInfoMap.get(key);
+        }
+        return null;
     }
 
     public Connection getConnection() {

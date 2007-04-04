@@ -119,21 +119,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /** Name of XML database schema produced. */
     protected String _xmlSchema;
 
-    /** JDBC URL. */
-    protected String _dbUrl;
-
-    /** JDBC driver. */
-    protected String _dbDriver;
-
-    /** JDBC user name. */
-    protected String _dbUser;
-
-    /** JDBC password. */
-    protected String _dbPassword;
-
-    /** DB schema to use. */
-    protected String _dbSchema;
-
     /** Is same java name? */
     protected boolean _isSameJavaName;
     
@@ -161,30 +146,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ==============================================================================
     //                                                                       Accessor
     //                                                                       ========
-    public String getDbSchema() {
-        return _dbSchema;
-    }
-
-    public void setDbSchema(String dbSchema) {
-        this._dbSchema = dbSchema;
-    }
-
-    public void setDbUrl(String v) {
-        _dbUrl = v;
-    }
-
-    public void setDbDriver(String v) {
-        _dbDriver = v;
-    }
-
-    public void setDbUser(String v) {
-        _dbUser = v;
-    }
-
-    public void setDbPassword(String v) {
-        _dbPassword = v;
-    }
-
     public void setOutputFile(String v) {
         _xmlSchema = v;
     }
@@ -204,10 +165,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void doExecute() {
         _log.info("------------------------------------------------------- [Torque - JDBCToXMLSchema] Start!");
         _log.info("Your DB settings are:");
-        _log.info("  driver : " + _dbDriver);
-        _log.info("  URL    : " + _dbUrl);
-        _log.info("  user   : " + _dbUser);
-        _log.info("  schema : " + _dbSchema);
+        _log.info("  driver : " + _driver);
+        _log.info("  URL    : " + _url);
+        _log.info("  user   : " + _userId);
+        _log.info("  schema : " + _schema);
 
         final DocumentTypeImpl docType = new DocumentTypeImpl(null, "database", null, DTDResolver.WEB_SITE_DTD);
         _doc = new DocumentImpl(docType);
@@ -246,10 +207,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected void generateXML() throws Exception {
         _log.info("...Instantiate DB-driver");
-        Class.forName(_dbDriver);
+        Class.forName(_driver);
 
         _log.info("...Getting DB-connection");
-        final Connection conn = DriverManager.getConnection(_dbUrl, _dbUser, _dbPassword);
+        final Connection conn = DriverManager.getConnection(_url, _userId, _password);
 
         _log.info("...Getting DB-meta-data");
         final DatabaseMetaData dbMetaData = conn.getMetaData();
@@ -270,7 +231,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ *************************************/");
 
         _databaseNode = _doc.createElement("database");
-        _databaseNode.setAttribute("name", _dbSchema);
+        _databaseNode.setAttribute("name", _schema);
 
         // Build a database-wide column -> table map.
         setupColumnTableMap(dbMetaData, tableList);
@@ -432,7 +393,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        return _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, _dbSchema, tableName);
+        return _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, _schema, tableName);
     }
 
     /**
@@ -445,7 +406,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta, String tableName)
             throws SQLException {
-        return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, _dbSchema, tableName);
+        return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, _schema, tableName);
     }
 
     /**
@@ -472,7 +433,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     protected Collection getForeignKeys(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        return _foreignKeyHandler.getForeignKeys(dbMeta, _dbSchema, tableName);
+        return _foreignKeyHandler.getForeignKeys(dbMeta, _schema, tableName);
     }
     
     /**
@@ -484,7 +445,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        return _tableNameHandler.getTableNames(dbMeta, _dbSchema);
+        return _tableNameHandler.getTableNames(dbMeta, _schema);
     }
 
     /**
@@ -503,6 +464,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List getColumns(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        return _columnHandler.getColumns(dbMeta, _dbSchema, tableName);
+        return _columnHandler.getColumns(dbMeta, _schema, tableName);
     }
 }
