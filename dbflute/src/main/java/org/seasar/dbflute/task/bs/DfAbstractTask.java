@@ -60,6 +60,7 @@ public abstract class DfAbstractTask extends Task {
 
     @Override
     final public void execute() {
+        long before = System.currentTimeMillis();
         try {
             initializeDatabaseInfo();
             if (isUseDataSource()) {
@@ -72,6 +73,11 @@ public abstract class DfAbstractTask extends Task {
         } catch (RuntimeException e) {
             _log.error("execute() threw the exception!", e);
             throw e;
+        } finally {
+            long after = System.currentTimeMillis();
+            _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+            _log.info("[Task End: " + getPerformanceView(after - before) + "]");
+            _log.info("_/_/_/_/_/");
         }
     }
 
@@ -84,6 +90,44 @@ public abstract class DfAbstractTask extends Task {
     }
 
     abstract protected void doExecute();
+
+    /**
+     * Get performance view.
+     * 
+     * @param mil The value of millisecound.
+     * @return Performance view. (ex. 1m23s456ms) (NotNull)
+     */
+    protected String getPerformanceView(long mil) {
+        if (mil < 0) {
+            return String.valueOf(mil);
+        }
+
+        long sec = mil / 1000;
+        long min = sec / 60;
+        sec = sec % 60;
+        mil = mil % 1000;
+
+        StringBuffer sb = new StringBuffer();
+        if (min >= 10) { // Minute
+            sb.append(min).append("m");
+        } else if (min < 10 && min >= 0) {
+            sb.append("0").append(min).append("m");
+        }
+        if (sec >= 10) { // Second
+            sb.append(sec).append("s");
+        } else if (sec < 10 && sec >= 0) {
+            sb.append("0").append(sec).append("s");
+        }
+        if (mil >= 100) { // Millisecond
+            sb.append(mil).append("ms");
+        } else if (mil < 100 && mil >= 10) {
+            sb.append("0").append(mil).append("ms");
+        } else if (mil < 10 && mil >= 0) {
+            sb.append("00").append(mil).append("ms");
+        }
+
+        return sb.toString();
+    }
 
     abstract protected boolean isUseDataSource();
 

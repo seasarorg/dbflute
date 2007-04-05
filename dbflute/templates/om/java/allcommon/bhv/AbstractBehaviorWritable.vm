@@ -283,6 +283,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Modify.
      * 
      * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
     public void modify(${glEntityInterfaceName} entity) {
         doModify(entity);
@@ -356,7 +358,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Remove.
      * 
      * @param entity Entity. (NotNull)
-     * @return Removed count.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
     public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);

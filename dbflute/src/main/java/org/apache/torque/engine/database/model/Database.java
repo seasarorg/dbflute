@@ -770,15 +770,15 @@ public class Database {
     public List<String> getDBFluteDiconBeforeJ2eeIncludePathList() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconBeforeJ2eeIncludePathList();
     }
-    
+
     public List<String> getDaoDiconBeforeJ2eeIncludePathList() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconBeforeJ2eeIncludePathList();
     }
-    
+
     public List<String> getDBFluteDiconOtherIncludePathList() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconOtherIncludePathList();
     }
-    
+
     public List<String> getDaoDiconOtherIncludePathList() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconOtherIncludePathList();
     }
@@ -1249,7 +1249,7 @@ public class Database {
     public boolean isVersionAfter1040() {
         return getProperties().getOtherProperties().isVersionAfter1040();
     }
-    
+
     public boolean isAvailableDaoMethodLazyInitializing() {
         return getProperties().getOtherProperties().isAvailableDaoMethodLazyInitializing();
     }
@@ -1313,6 +1313,20 @@ public class Database {
 
     public String getSql2EntityExtendedParameterBeanPackage() {
         return getProperties().getSql2EntityProperties().getExtendedParameterBeanPackage();
+    }
+
+    public String filterProjectSuffixForComponentName(String targetName) {
+        if (getBasicProperties().isAppendProjectSuffixToComponentName()) {
+            final String prefix = getBasicProperties().getProjectPrefix();
+            if (prefix == null || prefix.trim().length() == 0) {
+                return targetName;
+            } else {
+                final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
+                return filteredPrefix + targetName.substring(0, 1).toUpperCase() + targetName.substring(1);
+            }
+        } else {
+            return targetName;
+        }
     }
 
     // **********************************************************************************************

@@ -215,6 +215,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getProjectPrefix() {
         return stringProp("torque.projectPrefix", "");
     }
+    
+    public boolean isAppendProjectSuffixToComponentName() {
+        return booleanProp("torque.isAppendProjectSuffixToComponentName", true);
+    }
 
     // ===============================================================================
     //                                                      Properties - Database Info

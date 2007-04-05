@@ -687,12 +687,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * If concurrency control of this table is valid, this update have it.
      * </pre>
      * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
     public void update(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
         final int updatedCount = delegateUpdate(entity);
-        if (updatedCount != 1) {
-            throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
+        if (updatedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(entity.toString());
+        } else if (updatedCount > 1) {
+            String msg = "updatedCount=" + updatedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
         }
     }
 
@@ -708,12 +713,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method is faster than updateAfterSelect().
      * </pre>
      * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
     public void updateNonstrict(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
         final int updatedCount = delegateUpdateNonstrict(entity);
-        if (updatedCount != 1) {
-            throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
+        if (updatedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(entity.toString());
+        } else if (updatedCount > 1) {
+            String msg = "updatedCount=" + updatedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
         }
     }
   #end
@@ -745,6 +755,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method is faster than insertOrUpdateAfterSelect().
      * </pre>
      * @param entity Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
     public void insertOrUpdateNonStrict(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
@@ -753,12 +764,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         } else {
             try {
                 updateNonstrict(entity);
-            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
-                if (e.getRows() == 0) {
-                    insert(entity);
-                } else {
-                    throw e;
-                }
+            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+                insert(entity);
             }
         }
     }
@@ -873,12 +880,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Delete.
      * 
      * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
     public void delete(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
         final int deletedCount = delegateDelete(entity);
-        if (deletedCount != 1) {
-            throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(entity, deletedCount);
+        if (deletedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(entity.toString());
+        } else if (deletedCount > 1) {
+            String msg = "deletedCount=" + deletedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
         }
     }
 
