@@ -187,4 +187,12 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
     public boolean isDBFluteComponent(String componentName) {
         return _isDaoMap.containsKey(componentName);
     }
+
+    public boolean isAvailableBehaviorRequiresNewTx() {
+        return booleanProp("torque.isAvailableBehaviorRequiresNewTx", true);
+    }
+
+    public boolean isAvailableBehaviorRequiredTx() {
+        return booleanProp("torque.isAvailableBehaviorRequiredTx", true);
+    }
 }

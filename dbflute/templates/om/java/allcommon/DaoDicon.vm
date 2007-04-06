@@ -81,8 +81,12 @@
     #if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
 
     <component name="${database.filterProjectSuffixForComponentName($table.UncapitalisedJavaName)}Bhv" class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv">
+#if (${database.isAvailableBehaviorRequiresNewTx()})
         <aspect pointcut="${database.RequiresNewTransactionToBehaviorPointcut}">${database.RequiresNewTxComponentName}</aspect>
+#end
+#if (${database.isAvailableBehaviorRequiredTx()})
         <aspect pointcut="${database.RequiredTransactionToBehaviorPointcut}">${database.RequiredTxComponentName}</aspect>
+#end
         <aspect pointcut="${database.ColumnSetupBeforeInsertInterceptorToBehaviorPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeInsertInterceptor</aspect>
         <aspect pointcut="${database.ColumnSetupBeforeUpdateInterceptorToBehaviorPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor</aspect>
         <aspect pointcut="${database.ColumnSetupBeforeDeleteInterceptorToBehaviorPointcut}">${glDaoDiconNamespace}.commonColumnSetupBeforeDeleteInterceptor</aspect>
@@ -96,8 +100,12 @@
     #else
 
     <component name="${database.filterProjectSuffixForComponentName($table.UncapitalisedJavaName)}Bhv" class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv">
+#if (${database.isAvailableBehaviorRequiresNewTx()})
         <aspect pointcut="${database.RequiresNewTransactionToBehaviorPointcut}">${database.RequiresNewTxComponentName}</aspect>
+#end
+#if (${database.isAvailableBehaviorRequiredTx()})
         <aspect pointcut="${database.RequiredTransactionToBehaviorPointcut}">${database.RequiredTxComponentName}</aspect>
+#end
     #foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
       #set ($pointcut = ${database.getOriginalBehaviorAspectPointcut($componentName)})
 

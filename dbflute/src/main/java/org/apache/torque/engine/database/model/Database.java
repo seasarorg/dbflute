@@ -799,6 +799,14 @@ public class Database {
         return getProperties().getDBFluteDiconProperties().isDBFluteComponent(componentName);
     }
 
+    public boolean isAvailableBehaviorRequiresNewTx() {
+        return getProperties().getDBFluteDiconProperties().isAvailableBehaviorRequiresNewTx();
+    }
+
+    public boolean isAvailableBehaviorRequiredTx() {
+        return getProperties().getDBFluteDiconProperties().isAvailableBehaviorRequiredTx();
+    }
+    
     // ===============================================================================
     //                                            Properties - Generated Class Package
     //                                            ====================================
