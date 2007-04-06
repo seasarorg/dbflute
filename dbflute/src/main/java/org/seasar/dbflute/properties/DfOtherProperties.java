@@ -37,6 +37,10 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
         return booleanProp("torque.isVersionAfter1040", true);
     }
 
+    public boolean isAvailableOtherConnectionDaoInitialization() {
+        return booleanProp("torque.isAvailableOtherConnectionDaoInitialization", false);
+    }
+    
     public boolean isAvailableDaoMethodLazyInitializing() {
         return booleanProp("torque.isAvailableDaoMethodLazyInitializing", false);
     }

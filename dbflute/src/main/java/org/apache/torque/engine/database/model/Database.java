@@ -1258,6 +1258,10 @@ public class Database {
         return getProperties().getOtherProperties().isVersionAfter1040();
     }
 
+    public boolean isAvailableOtherConnectionDaoInitialization() {
+        return getProperties().getOtherProperties().isAvailableOtherConnectionDaoInitialization();
+    }
+    
     public boolean isAvailableDaoMethodLazyInitializing() {
         return getProperties().getOtherProperties().isAvailableDaoMethodLazyInitializing();
     }

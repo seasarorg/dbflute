@@ -17,6 +17,15 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
+#if ($database.isAvailableOtherConnectionDaoInitialization())
+
+import javax.transaction.InvalidTransactionException;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
+import org.seasar.framework.exception.EmptyRuntimeException;
+#end
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,6 +69,9 @@ import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
  */
 public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
+    /** Log-instance. */
+    private static final Log _log = LogFactory.getLog(${glDaoMetaDataExtension}.class);
+
     // =====================================================================================
     //                                                                           Constructor
     //                                                                           ===========
@@ -68,6 +80,61 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      */
     public ${glDaoMetaDataExtension}() {
     }
+
+#if ($database.isAvailableOtherConnectionDaoInitialization())
+
+    // =====================================================================================
+    //                                          Other Connection Dao Initialization Override
+    //                                          ============================================
+    protected TransactionManager transactionManager;
+
+    public void setTransactionManager(TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
+    public boolean hasTransaction() throws SystemException {
+        return transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;
+    }
+
+    public Transaction suspend() throws SystemException {
+        if (transactionManager == null) {
+            throw new EmptyRuntimeException("transactionManager");
+        }
+        return transactionManager.suspend();
+    }
+
+    public void resume(final Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
+        if (transactionManager == null) {
+            throw new EmptyRuntimeException("transactionManager");
+        }
+        transactionManager.resume(transaction);
+    }
+
+    public void initialize() {// Override!
+        Transaction tx = null;
+        try {
+            if (!hasTransaction()) {
+                super.initialize();
+            }
+            _log.debug("...Suspending the transaction!");
+            tx = suspend();
+            super.initialize();
+        } catch (Exception e) {
+            String msg = "The initialize() that is overrided threw the exception: tx=" + tx;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (tx != null) {
+                try {
+                    _log.debug("...Resuming the transaction: tx=" + tx);
+                    resume(tx);
+                } catch (Exception ignored) {
+                    _log.warn("resume(tx) threw the exception: tx=" + tx, ignored);
+                }
+            }
+        }
+    }
+
+#end
 
     // =====================================================================================
     //                                                                         Bean Enhancer

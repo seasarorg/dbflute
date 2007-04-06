@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import javax.sql.DataSource;
 #if ($database.isVersionAfter1040())
+  #if ($database.isAvailableOtherConnectionDaoInitialization())
+
+import javax.transaction.TransactionManager;
+  #end
 
 import org.seasar.dao.AnnotationReaderFactory;
 import org.seasar.dao.BeanEnhancer;
@@ -34,6 +38,13 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
  * @author ${database.ClassAuthor}
  */
 public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
+#if ($database.isVersionAfter1040() && $database.isAvailableOtherConnectionDaoInitialization())
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    private TransactionManager transactionManager;
+#end
 
     // =====================================================================================
     //                                                                           Constructor
@@ -101,12 +112,33 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
         this.beanEnhancer = beanEnhancer;
     }
+  #if ($database.isAvailableOtherConnectionDaoInitialization())
+
+    protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
+        ${glDaoMetaDataExtension} dmdExtension = new ${glDaoMetaDataExtension}();
+        dmdExtension.setBeanEnhancer(this.beanEnhancer);
+        dmdExtension.setTransactionManager(this.transactionManager);
+        return dmdExtension;
+    }
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public TransactionManager getTransactionManager() {
+        return transactionManager;
+    }
+
+    public void setTransactionManager(TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+  #else
 
     protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
         ${glDaoMetaDataExtension} dmdExtension = new ${glDaoMetaDataExtension}();
         dmdExtension.setBeanEnhancer(this.beanEnhancer);
         return dmdExtension;
     }
+  #end
 #else
 
     // =====================================================================================
@@ -145,5 +177,4 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         return daoMetaData;
     }
 #end
-
 }
