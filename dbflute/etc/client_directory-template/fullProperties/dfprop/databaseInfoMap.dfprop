@@ -1,0 +1,7 @@
+map:{
+	; driver		= org.apache.derby.jdbc.EmbeddedDriver
+	; url			= jdbc:derby:/pj/ws/dbflute_ldb/src/test/resources/data-derby
+	; schema		= LDB
+	; user			= ldb
+	; password		= ldb
+}
