@@ -2,7 +2,10 @@ DBFlute 変更履歴
 
 0.4.4
 -------------------------------------------------------------------------------
-[DBFLUTE-72] {Java}: ConditionBeanにて同Table間限定のUnionをサポートする。
-[DBFLUTE-71] {Java/C#}: Volocityが吐き出す「report.${torque.project}.sql2entity.generation」を阻止する。
-[DBFLUTE-70] {Java/C#}: 外だしSQLに対してQueryTimeout設定が無効になっているのを修正すること。
+　[DBFLUTE-76] {Java/C#}: BehaviorのTransactionを設定でOn/Offできるようにする。
+　[DBFLUTE-75] {Java}: Daoの初期化時のConnectionをTransactionとは別のConnectioｎを使う。｛Sybase対応｝
+　[DBFLUTE-74] {Java}: 複数DB対応時にBehaviorのComponent名にprojectSuffixが付いていないためにInjectionができない。
+　[DBFLUTE-72] {Java}: ConditionBeanにて同Table間限定のUnionをサポートする。
+　[DBFLUTE-71] {Java/C#}: Volocityが吐き出す「report.${torque.project}.sql2entity.generation」を阻止する。
+　[DBFLUTE-70] {Java/C#}: 外だしSQLに対してQueryTimeout設定が無効になっているのを修正すること。
 -------------------------------------------------------------------------------
