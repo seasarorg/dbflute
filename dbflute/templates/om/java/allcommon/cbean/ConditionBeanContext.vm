@@ -68,6 +68,10 @@ public class ${glConditionBeanContextName} {
             _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
         }
         {
+            final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
+            _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
+        {
             final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
             _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
         }
