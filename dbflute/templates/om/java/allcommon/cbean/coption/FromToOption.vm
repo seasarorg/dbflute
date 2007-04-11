@@ -1,0 +1,85 @@
+package ${glPackageBaseCommonCOption};
+
+#set ($myClassName = "${glConditionOptionFromToName}")
+
+/**
+ * The class of from-to-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} implements ${glConditionOptionInterfaceName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected boolean _dateOnlyCompare;
+
+    // =====================================================================================
+    //                                                              Interface Implementation
+    //                                                              ========================
+    public String getRearOption() {
+        String msg = "Thie option does not use getRearOption()!";
+        throw new UnsupportedOperationException(msg);
+    }
+
+    // =====================================================================================
+    //                                                                                  Main
+    //                                                                                  ====
+    public void setupDateOnlyCompare() {
+        _dateOnlyCompare = true;
+    }
+
+    // =====================================================================================
+    //                                                                         Internal Main
+    //                                                                         =============
+    public java.util.Date filterFromDate(java.util.Date fromDate) {
+        if (_dateOnlyCompare) {
+            final java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTimeInMillis(fromDate.getTime());
+            clearCalendarHourMinuteSecondMilli(cal);
+            fromDate.setTime(cal.getTimeInMillis());
+            return fromDate;
+        }
+        return fromDate;
+    }
+
+    public java.util.Date filterToDate(java.util.Date toDate) {
+        if (_dateOnlyCompare) {
+            final java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTimeInMillis(toDate.getTime());
+            clearCalendarHourMinuteSecondMilli(cal);
+            addCalendarNextDay(cal);// Key Point!
+            toDate.setTime(cal.getTimeInMillis());
+            return toDate;
+        }
+        return toDate;
+    }
+
+    public ${glPackageBaseCommonCKey}.${glConditionKeyName} getFromDateConditionKey() {
+        if (_dateOnlyCompare) {
+            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;
+        }
+        return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
+    }
+
+    public ${glPackageBaseCommonCKey}.${glConditionKeyName} getToDateConditionKey() {
+        if (_dateOnlyCompare) {
+            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_THAN;
+        }
+        return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_EQUAL;// Default!
+    }
+
+    // =====================================================================================
+    //                                                                       Calendar Helper
+    //                                                                       ===============
+    protected void addCalendarNextDay(java.util.Calendar cal) {
+        cal.add(java.util.Calendar.DAY_OF_MONTH, 1);
+    }
+
+    protected void clearCalendarHourMinuteSecondMilli(java.util.Calendar cal) {
+        cal.clear(java.util.Calendar.MILLISECOND);
+        cal.clear(java.util.Calendar.SECOND);
+        cal.clear(java.util.Calendar.MINUTE);
+        cal.set(java.util.Calendar.HOUR_OF_DAY, cal.getActualMinimum(java.util.Calendar.HOUR_OF_DAY));
+    }
+}

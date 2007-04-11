@@ -169,6 +169,10 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableDateLessEqual(String tableName, String columnName) {
         return isAvailable("Date", "LessEqual", tableName, columnName);
     }
+    
+    public boolean isAvailableDateFromTo(String tableName, String columnName) {
+        return isAvailable("Date", "FromTo", tableName, columnName);
+    }
 
     // ---------------------------------------
     //                                  String Old AsInline

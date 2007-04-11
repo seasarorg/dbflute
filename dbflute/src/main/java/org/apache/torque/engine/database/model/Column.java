@@ -932,7 +932,7 @@ public class Column {
     public boolean isAvailableStringLikeSearch() {
         return getIncludeQueryProperties().isAvailableStringLikeSearch(getTableName(), getName());
     }
-    
+
     public boolean isAvailableStringInScope() {
         return getIncludeQueryProperties().isAvailableStringInScope(getTableName(), getName());
     }
@@ -995,6 +995,10 @@ public class Column {
         return getIncludeQueryProperties().isAvailableDateLessEqual(getTableName(), getName());
     }
 
+    public boolean isAvailableDateFromTo() {
+        return getIncludeQueryProperties().isAvailableDateFromTo(getTableName(), getName());
+    }
+
     protected DfIncludeQueryProperties getIncludeQueryProperties() {
         return DfBuildProperties.getInstance().getIncludeQueryProperties();
     }
@@ -1005,7 +1009,7 @@ public class Column {
     public boolean isAvailableStringEqualOldAsInline() {
         return getIncludeQueryProperties().isAvailableStringEqualOldAsInline(getTableName(), getName());
     }
-    
+
     public boolean isAvailableStringNotEqualOldAsInline() {
         return getIncludeQueryProperties().isAvailableStringNotEqualOldAsInline(getTableName(), getName());
     }
@@ -1037,7 +1041,7 @@ public class Column {
     public boolean isAvailableStringNotInScopeOldAsInline() {
         return getIncludeQueryProperties().isAvailableStringNotInScopeOldAsInline(getTableName(), getName());
     }
-    
+
     public boolean isAvailableStringInScopeSubQueryOldAsInline() {
         return getIncludeQueryProperties().isAvailableStringInScopeSubQueryOldAsInline(getTableName(), getName());
     }
@@ -1048,7 +1052,7 @@ public class Column {
     public boolean isAvailableNumberEqualOldAsInline() {
         return getIncludeQueryProperties().isAvailableNumberEqualOldAsInline(getTableName(), getName());
     }
-    
+
     public boolean isAvailableNumberNotEqualOldAsInline() {
         return getIncludeQueryProperties().isAvailableNumberNotEqualOldAsInline(getTableName(), getName());
     }
@@ -1076,7 +1080,7 @@ public class Column {
     public boolean isAvailableNumberNotInScopeOldAsInline() {
         return getIncludeQueryProperties().isAvailableNumberNotInScopeOldAsInline(getTableName(), getName());
     }
-    
+
     public boolean isAvailableNumberInScopeSubQueryOldAsInline() {
         return getIncludeQueryProperties().isAvailableNumberInScopeSubQueryOldAsInline(getTableName(), getName());
     }
@@ -1087,7 +1091,7 @@ public class Column {
     public boolean isAvailableDateEqualOldAsInline() {
         return getIncludeQueryProperties().isAvailableDateEqualOldAsInline(getTableName(), getName());
     }
-    
+
     public boolean isAvailableDateNotEqualOldAsInline() {
         return getIncludeQueryProperties().isAvailableDateNotEqualOldAsInline(getTableName(), getName());
     }

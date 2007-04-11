@@ -4,6 +4,7 @@ package ${glPackageBaseCommonCBean};
 
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
+import ${glPackageBaseCommonCOption}.${glConditionOptionFromToName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
@@ -205,6 +206,24 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                                  , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+        }
+    }
+
+    protected void registerFromToQuery(java.util.Date fromDate, java.util.Date toDate, ${glConditionValueName} cvalue
+                                 , String colName, String capPropName, String uncapPropName, ${glConditionOptionFromToName} option) {
+        {
+            final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
+            final ${glConditionKeyName} fromKey = option.getFromDateConditionKey();
+            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName, capPropName, uncapPropName);
+            }
+        }
+        {
+            final java.util.Date filteredToDate = option.filterToDate(toDate);
+            final ${glConditionKeyName} toKey = option.getToDateConditionKey();
+            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName, capPropName, uncapPropName);
+            }
         }
     }
 #set ($likeAsOrCallbackFullClassName = "${glConditionOptionLikeSearchName}.LikeAsOrCallback")
