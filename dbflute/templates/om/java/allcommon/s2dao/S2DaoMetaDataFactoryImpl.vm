@@ -63,6 +63,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             AnnotationReaderFactory readerFactory) {
         super(dataSource, statementFactory, resultSetFactory, readerFactory);
 
+        // Stop the LinkageError!
+        ${glConditionBeanContextName}.initialize();
+
         initializeDatabaseProductNameOfContext(dataSource);
     }
 

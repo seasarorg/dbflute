@@ -59,17 +59,22 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.xml.sax.Attributes;
+
+import sun.security.action.GetBooleanAction;
 
 /**
  * A class for information about foreign keys of a table.
  * <p>
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class ForeignKey {
 
@@ -84,7 +89,7 @@ public class ForeignKey {
     private List<String> _localColumns = new ArrayList<String>(3);
 
     private List<String> _foreignColumns = new ArrayList<String>(3);
-    
+
     private String _foreignPropertyNamePrefix;
 
     /**
@@ -118,7 +123,7 @@ public class ForeignKey {
     public void setForeignPropertyNamePrefix(String propertyNamePrefix) {
         _foreignPropertyNamePrefix = propertyNamePrefix;
     }
-    
+
     /**
      * TODO: To write Detail Comment.
      * 
@@ -466,7 +471,7 @@ public class ForeignKey {
     public String getFirstForeignColumnName() {
         return getForeignColumns().get(0);
     }
-    
+
     /**
      * Get the value of foreign property name.
      * 
@@ -495,16 +500,28 @@ public class ForeignKey {
         try {
             final List localColumnList = getLocalColumnObjectList();
 
+            final List<String> columnNameList = new ArrayList<String>();
             String result = "";
             for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
                 final Column col = (Column) ite.next();
 
                 if (col.isMultipleFK()) {
+                    columnNameList.add(col.getName());
                     result = result + col.getJavaName();
                 }
             }
             if (result.trim().length() != 0) {
-                result = "By" + result;
+                final String aliasName = getMultipleFKPropertyColumnAliasName(getTable().getName(), columnNameList);
+                if (aliasName != null && aliasName.trim().length() != 0) {
+                    final String firstUpper = aliasName.substring(0, 1).toUpperCase();
+                    if (aliasName.trim().length() == 1) {
+                        result = "By" + firstUpper;
+                    } else {
+                        result = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+                    }
+                } else {
+                    result = "By" + result;
+                }
             }
             if (getForeignTable().getName().equals(getTable().getName())) {
                 result = result + "Self";
@@ -526,6 +543,12 @@ public class ForeignKey {
             _log.warn(msg, e);
             throw e;
         }
+    }
+
+    protected String getMultipleFKPropertyColumnAliasName(String tableName, List<String> columnNameList) {
+        final DfOtherProperties prop = DfBuildProperties.getInstance().getOtherProperties();
+        final String columnAliasName = prop.getMultipleFKPropertyColumnAliasName(getTable().getName(), columnNameList);
+        return columnAliasName;
     }
 
     /**
@@ -555,16 +578,28 @@ public class ForeignKey {
     public String getReffererPropertyName(boolean isJavaBeansRule) {
         final List localColumnList = getLocalColumnObjectList();
 
+        final List<String> columnNameList = new ArrayList<String>();
         String result = "";
         for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
             final Column col = (Column) ite.next();
 
             if (col.isMultipleFK()) {
+                columnNameList.add(col.getName());
                 result = result + col.getJavaName();
             }
         }
         if (result.trim().length() != 0) {
-            result = "By" + result;
+            final String aliasName = getMultipleFKPropertyColumnAliasName(getForeignTable().getName(), columnNameList);
+            if (aliasName != null && aliasName.trim().length() != 0) {
+                final String firstUpper = aliasName.substring(0, 1).toUpperCase();
+                if (aliasName.trim().length() == 1) {
+                    result = "By" + firstUpper;
+                } else {
+                    result = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+                }
+            } else {
+                result = "By" + result;
+            }
         }
         if (getTable().getName().equals(getForeignTable().getName())) {
             result = result + "Self";
@@ -808,6 +843,5 @@ public class ForeignKey {
         result.append("    </foreign-key>\n");
         return result.toString();
     }
-
 
 }

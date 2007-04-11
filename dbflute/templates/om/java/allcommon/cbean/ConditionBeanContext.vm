@@ -1,6 +1,8 @@
 package ${glPackageBaseCommonCBean};
 
 import ${glPackageBaseCommonSqlClause}.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Condition-Bean context. (referring to s2pager)
@@ -8,6 +10,9 @@ import ${glPackageBaseCommonSqlClause}.*;
  * @author ${database.ClassAuthor}
  */
 public class ${glConditionBeanContextName} {
+
+    /** Log-instance. */
+    private static final Log _log = LogFactory.getLog(${glConditionBeanContextName}.class);
 
     // =====================================================================================
     //                                                                          Thread Local
@@ -51,6 +56,25 @@ public class ${glConditionBeanContextName} {
      */
     public static void clearConditionBeanOnThread() {
         _threadLocal.set(null);
+    }
+
+    // =====================================================================================
+    //                                                       Initialize against LinkageError
+    //                                                       ===============================
+    public static void initialize() {
+        // Stop the LinkageError!
+        {
+            final Class clazz = ${glPackageBaseCommonCBean}.${glSimplePagingBeanName}.class;
+            _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
+        {
+            final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
+            _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
+        {
+            final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
+            _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
     }
 
     // =====================================================================================

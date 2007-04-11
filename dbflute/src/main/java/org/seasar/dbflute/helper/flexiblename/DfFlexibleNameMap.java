@@ -42,4 +42,8 @@ public class DfFlexibleNameMap<T, E> {
     protected String removeUnderscore(String target) {
         return StringUtil.replace(target, "_", "");
     }
+    
+    public String toString() {
+        return caseInsensitiveMap.toString();
+    }
 }
