@@ -68,12 +68,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("* * * * * * * * * * *");
         _log.info("environmentType: " + getEnvironmentType());
         _log.info("* * * * * * * * * * *");
-
+        _log.info("isReplaceSchemaAutoCommit    = " + getMyProperties().isReplaceSchemaAutoCommit());
+        _log.info("isReplaceSchemaRollbackOnly  = " + getMyProperties().isReplaceSchemaRollbackOnly());
+        _log.info("isReplaceSchemaErrorContinue = " + getMyProperties().isReplaceSchemaErrorContinue());
+        
         initializeSchema();
-
         final DfRunnerInformation runInfo = createRunnerInformation();
         replaceSchema(runInfo);
-
         writeDbFromSeparatedFileAsCommonData("tsv", "\t");
         writeDbFromSeparatedFileAsCommonData("csv", ",");
         writeDbFromXlsAsCommonData();
