@@ -47,8 +47,8 @@ public class DfRunnerInformation {
         return _encoding;
     }
 
-    public void setEncoding(String _encoding) {
-        this._encoding = _encoding;
+    public void setEncoding(String encoding) {
+        this._encoding = encoding;
     }
 
     public boolean isEncodingNull() {

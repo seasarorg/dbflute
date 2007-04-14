@@ -3,6 +3,9 @@ package ${glPackageBaseCommonS2Dao};
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import javax.sql.DataSource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 #if ($database.isVersionAfter1040())
   #if ($database.isAvailableOtherConnectionDaoInitialization())
 
@@ -38,6 +41,9 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
  * @author ${database.ClassAuthor}
  */
 public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
+
+    /** Log-instance. */
+    private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
 #if ($database.isVersionAfter1040() && $database.isAvailableOtherConnectionDaoInitialization())
 
     // =====================================================================================
@@ -76,17 +82,22 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         if (getDatabaseProductNameFromContext() != null) {
             return;
         }
-        final Connection con = DataSourceUtil.getConnection(dataSource);
         String suffix = null;
         try {
-            final DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
-            final Dbms dbms = DbmsManager.getDbms(dbMetaData);
-            suffix = dbms.getSuffix();
-        } finally {
-            ConnectionUtil.close(con);
-        }
-        if (suffix == null) {
-            setDatabaseProductNameToContext("${database.DaoGenDbName}");
+            final Connection con = DataSourceUtil.getConnection(dataSource);
+            try {
+                final DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
+                final Dbms dbms = DbmsManager.getDbms(dbMetaData);
+                suffix = dbms.getSuffix();
+            } finally {
+                ConnectionUtil.close(con);
+            }
+            if (suffix == null) {
+                setDatabaseProductNameToContext("${database.DaoGenDbName}");
+                return;
+            }
+        } catch (RuntimeException e) {
+            _log.info("initializeDatabaseProductNameOfContext threw the exception: " + e.getClass(), e);
             return;
         }
         suffix = suffix.startsWith("_") ? suffix.substring("_".length()) : suffix;

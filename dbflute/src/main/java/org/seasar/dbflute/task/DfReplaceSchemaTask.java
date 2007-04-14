@@ -125,6 +125,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
+        runInfo.setEncoding("UTF-8");// TODO: @jflute - from Property
         runInfo.setAutoCommit(getMyProperties().isReplaceSchemaAutoCommit());
         runInfo.setErrorContinue(getMyProperties().isReplaceSchemaErrorContinue());
         runInfo.setRollbackOnly(getMyProperties().isReplaceSchemaRollbackOnly());
