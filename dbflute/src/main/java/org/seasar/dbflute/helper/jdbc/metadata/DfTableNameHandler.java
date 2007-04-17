@@ -34,15 +34,41 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
 
     public static final Log _log = LogFactory.getLog(DfTableNameHandler.class);
 
+    public static class DfTableMetaInfo {
+        protected String _tableName;
+        
+        protected String _tableType;
+
+        public boolean isTableTypeView() {
+            return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
+        }
+        
+        public String getTableName() {
+            return _tableName;
+        }
+
+        public void setTableName(String tableName) {
+            this._tableName = tableName;
+        }
+
+        public String getTableType() {
+            return _tableType;
+        }
+
+        public void setTableType(String tableType) {
+            this._tableType = tableType;
+        }
+    }
+    
     /**
      * Get all the table names in the current database that are not
      * system tables.
      * 
      * @param dbMeta JDBC database metadata.
-     * @return The list of all the tables in a database.
+     * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
-    public List getTableNames(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
+    public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
         // /---------------------------------------------------- [My Extension]
         // Get DatabaseTypes from ContextProperties.
         // These are the entity types we want from the database
@@ -50,13 +76,13 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
         logDatabaseTypes(types);
         // -------------------/
 
-        final List<String> tables = new ArrayList<String>();
+        final List<DfTableMetaInfo> tables = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
             resultSet = dbMeta.getTables(null, schemaName, "%", types);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString(3);
-                // final String databaseType = resultSet.getString(4);
+                 final String tableType = resultSet.getString(4);
 
                 if (isTableExcept(tableName)) {
                     _log.debug("$ isTableExcept(" + tableName + ") == true");
@@ -69,7 +95,10 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
                     }
                 }
 
-                tables.add(tableName);
+                final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
+                tableMetaInfo.setTableName(tableName);
+                tableMetaInfo.setTableType(tableType);
+                tables.add(tableMetaInfo);
             }
         } finally {
             if (resultSet != null) {

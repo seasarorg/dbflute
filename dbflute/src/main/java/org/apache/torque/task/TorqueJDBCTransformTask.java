@@ -83,6 +83,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
 
@@ -222,7 +223,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ ");
         _log.info("$ /------------------------------------ ...Getting table list");
 
-        final List tableList = getTableNames(dbMetaData);
+        final List<DfTableMetaInfo> tableList = getTableNames(dbMetaData);
 
         _log.info("$ ");
         _log.info("$ TableCount: " + tableList.size());
@@ -237,7 +238,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         setupColumnTableMap(dbMetaData, tableList);
 
         for (int i = 0; i < tableList.size(); i++) {
-            final String currentTable = (String) tableList.get(i);
+            final DfTableMetaInfo tableMataInfo = tableList.get(i);
+            final String currentTable = (String) tableMataInfo.getTableName();
 
             _log.info("...Processing table: " + currentTable);
 
@@ -335,7 +337,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
 
             // Unique keys for this table.
-            final Map<String, Map<Integer, String>> uniqueMap = getUniqueColumnNameList(dbMetaData, currentTable);
+            final Map<String, Map<Integer, String>> uniqueMap = getUniqueColumnNameList(dbMetaData, tableMataInfo);
             final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
             for (final String uniqueIndexName : uniqueKeySet) {
                 final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
@@ -368,11 +370,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @param tableList A list of table-name.
      * @throws SQLException
      */
-    protected void setupColumnTableMap(DatabaseMetaData dbMetaData, List tableList) throws SQLException {
+    protected void setupColumnTableMap(DatabaseMetaData dbMetaData, List<DfTableMetaInfo> tableList) throws SQLException {
         // Build a database-wide column -> table map.
         _columnTableMap = new Hashtable<String, String>();
         for (int i = 0; i < tableList.size(); i++) {
-            final String curTable = (String) tableList.get(i);
+            final DfTableMetaInfo tableMetaInfo = tableList.get(i);
+            final String curTable = tableMetaInfo.getTableName();
             final List columns = getColumns(dbMetaData, curTable);
 
             for (int j = 0; j < columns.size(); j++) {
@@ -400,13 +403,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * Get unique column name list.
      * 
      * @param dbMeta
-     * @param tableName
+     * @param tableMetaInfo
      * @return Unique column name list.
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta, String tableName)
+    protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
-        return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, _schema, tableName);
+        return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, _schema, tableMetaInfo);
     }
 
     /**
@@ -444,7 +447,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @return The list of all the tables in a database.
      * @throws SQLException
      */
-    public List getTableNames(DatabaseMetaData dbMeta) throws SQLException {
+    public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
         return _tableNameHandler.getTableNames(dbMeta, _schema);
     }
 

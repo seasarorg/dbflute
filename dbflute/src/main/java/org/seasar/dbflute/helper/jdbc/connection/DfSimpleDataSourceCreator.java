@@ -235,7 +235,6 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         }
 
         public void close() throws SQLException {
-            _realConnection.setAutoCommit(true);
             // _realConnection.close();
         }
 

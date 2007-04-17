@@ -19,11 +19,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -32,9 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
-import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 import org.seasar.dbflute.util.DfMapStringFileUtil;
-import org.seasar.framework.util.CaseInsensitiveMap;
 
 public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
@@ -66,8 +65,19 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
             for (String elementName : dataDirectoryElements) {
                 final File encodingNameDirectory = new File(info.getBasePath() + "/" + elementName);
                 final String[] fileNameList = encodingNameDirectory.list(filter);
-                final Map<String, String> defaultValueMap = getDefaultValueMap(info, elementName);
+
+                final Comparator<String> fileNameAscComparator = new Comparator<String>() {
+                    public int compare(String o1, String o2) {
+                        return o1.compareTo(o2);
+                    }
+                };
+                final SortedSet<String> sortedFileNameSet = new TreeSet<String>(fileNameAscComparator);
                 for (String fileName : fileNameList) {
+                    sortedFileNameSet.add(fileName);
+                }
+
+                final Map<String, String> defaultValueMap = getDefaultValueMap(info, elementName);
+                for (String fileName : sortedFileNameSet) {
                     final String fileNamePath = info.getBasePath() + "/" + elementName + "/" + fileName;
                     final DfSeparatedDataWriterImpl writerImpl = new DfSeparatedDataWriterImpl();
                     writerImpl.setDataSource(_dataSource);

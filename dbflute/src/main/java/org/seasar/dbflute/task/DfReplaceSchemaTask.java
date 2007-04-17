@@ -17,10 +17,13 @@ package org.seasar.dbflute.task;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,7 +74,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("isReplaceSchemaAutoCommit    = " + getMyProperties().isReplaceSchemaAutoCommit());
         _log.info("isReplaceSchemaRollbackOnly  = " + getMyProperties().isReplaceSchemaRollbackOnly());
         _log.info("isReplaceSchemaErrorContinue = " + getMyProperties().isReplaceSchemaErrorContinue());
-        
+
+        arrangeConnection();
+
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
         replaceSchema(runInfo);
@@ -82,6 +87,17 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromSeparatedFileAsAdditionalData("tsv", "\t");
         writeDbFromSeparatedFileAsAdditionalData("csv", ",");
         writeDbFromXlsAsAdditionalData();
+    }
+
+    protected void arrangeConnection() {
+        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
+        if (basicProperties.isDatabaseSybase()) {
+            try {
+                getDataSource().getConnection().setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // --------------------------------------------
@@ -163,9 +179,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
                 return false;
             }
         };
-        final ArrayList<File> resultList = new ArrayList<File>();
-
-        // TODO: ちゃんとソートすること。
+        // Order by FileName Asc
+        final Comparator<File> fileNameAscComparator = new Comparator<File>() {
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        };
+        final TreeSet<File> treeSet = new TreeSet<File>(fileNameAscComparator);
 
         final String[] targetList = baseDir.list(filter);
         if (targetList == null) {
@@ -173,9 +193,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         }
         for (String targetFileName : targetList) {
             final String targetFilePath = replaceSchemaSqlFileDirectoryName + "/" + targetFileName;
-            resultList.add(new File(targetFilePath));
+            treeSet.add(new File(targetFilePath));
         }
-        return resultList;
+        return new ArrayList<File>(treeSet);
     }
 
     protected String getReplaceSchemaSqlFileDirectoryName() {

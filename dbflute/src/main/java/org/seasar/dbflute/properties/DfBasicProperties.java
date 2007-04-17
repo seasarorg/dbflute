@@ -53,6 +53,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseOracle() {
         return getDatabaseName().equalsIgnoreCase("oracle");
     }
+    
+    public boolean isDatabaseSybase() {
+        return getDatabaseName().equalsIgnoreCase("sybase");
+    }
 
     // ===============================================================================
     //                                                            Properties - JavaDir

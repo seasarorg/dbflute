@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 
 /**
  * This class generates an XML schema of an existing database from JDBC metadata..
@@ -70,31 +71,35 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         return resultSet.getString(4);
     }
 
-    // {WEB‚©‚ç”²ˆ}
+    // {WEBã‹ã‚‰æŠœç²‹}
     // 
-    //ƒe[ƒuƒ‹‚ÌƒCƒ“ƒfƒbƒNƒX‚Æ“Œvî•ñ‚Ì‹Lq‚ğæ“¾‚µ‚Ü‚·B NON_UNIQUEATYPEAINDEX_NAMEAORDINAL_POSITION ‚Ì‡‚É•À‚×‚Ü‚·B
-    //ƒCƒ“ƒfƒbƒNƒX—ñ‚Ì‹Lq‚É‚ÍˆÈ‰º‚ÌƒJƒ‰ƒ€‚ª‚ ‚è‚Ü‚·B
+    //ãƒ†ãƒ¼ãƒ–ãƒ«ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¨çµ±è¨ˆæƒ…å ±ã®è¨˜è¿°ã‚’å–å¾—ã—ã¾ã™ã€‚ NON_UNIQUEã€TYPEã€INDEX_NAMEã€ORDINAL_POSITION ã®é †ã«ä¸¦ã¹ã¾ã™ã€‚
+    //ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹åˆ—ã®è¨˜è¿°ã«ã¯ä»¥ä¸‹ã®ã‚«ãƒ©ãƒ ãŒã‚ã‚Šã¾ã™ã€‚
     //
-    //   1. TABLE_CAT String => ƒe[ƒuƒ‹ ƒJƒ^ƒƒO (null ‚Ìê‡‚à‚ ‚è‚Ü‚·)B
-    //   2. TABLE_SCHEM String => ƒe[ƒuƒ‹ ƒXƒL[ƒ} (null ‚Ìê‡‚à‚ ‚è‚Ü‚·)B
-    //   3. TABLE_NAME String => ƒe[ƒuƒ‹–¼B
-    //   4. NON_UNIQUE boolean => ˆêˆÓ‚Å‚È‚¢ƒCƒ“ƒfƒbƒNƒX‚ğ‹–‰Â‚·‚é‚©‚Ç‚¤‚©BTYPE ‚ª tableIndexStatistic ‚Ìê‡‚Í falseB
-    //   5. INDEX_QUALIFIER String => ƒCƒ“ƒfƒbƒNƒX ƒJƒ^ƒƒO (null ‚Ìê‡‚à‚ ‚è‚Ü‚·)BTYPE ‚ª tableIndexStatistic ‚Ìê‡‚Í nullB
-    //   6. INDEX_NAME String => ƒCƒ“ƒfƒbƒNƒX–¼BTYPE ‚ª tableIndexStatistic ‚Ìê‡‚Í nullB
-    //   7. TYPE short => ƒCƒ“ƒfƒbƒNƒX ƒ^ƒCƒvB
-    //          * tableIndexStatistic - ƒe[ƒuƒ‹‚ÌƒCƒ“ƒfƒbƒNƒX‹Lq‚Æ‹¤‚É•Ô‚³‚ê‚éƒe[ƒuƒ‹‚Ì“Œvî•ñ‚ğ¯•ÊB
-    //          * tableIndexClustered - ƒNƒ‰ƒXƒ^‰»‚³‚ê‚½ƒCƒ“ƒfƒbƒNƒXB
-    //          * tableIndexHashed - ƒnƒbƒVƒ…‰»‚³‚ê‚½ƒCƒ“ƒfƒbƒNƒXB
-    //          * tableIndexOther - ‚Ù‚©‚ÌŒ`®‚ÌƒCƒ“ƒfƒbƒNƒXB 
-    //   8. ORDINAL_POSITION short => ƒCƒ“ƒfƒbƒNƒX“à‚Ì—ñ‚Ì˜A”ÔBTYPE ‚ª tableIndexStatistic ‚Ìê‡‚Í 0B
-    //   9. COLUMN_NAME String => —ñ–¼BTYPE ‚ª tableIndexStatistic ‚Ìê‡‚Í nullB
-    //  10. ASC_OR_DESC String => —ñ‚Ìƒ\[ƒg‡B"A" => ¸‡B"D" => ~‡Bƒ\[ƒg‡‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢ê‡‚Í nullBTYPE ‚ª tableIndexStatistic ‚Ìê‡‚Í nullB
-    //  11. CARDINALITY int => TYPE ‚ª tableIndexStatistic ‚Ìê‡‚ÍAƒe[ƒuƒ‹“à‚Ìs”B‚»‚Ì‚Ù‚©‚Ìê‡‚ÍAƒCƒ“ƒfƒbƒNƒX“à‚ÌˆêˆÓ‚Ì’l‚Ì”B
-    //  12. PAGES int => TYPE ‚ª tableIndexStatistic ‚Ìê‡‚ÍAƒe[ƒuƒ‹‚Ìƒy[ƒW”B‚»‚Ì‚Ù‚©‚Ìê‡‚ÍAŒ»İ‚ÌƒCƒ“ƒfƒbƒNƒX‚Ìƒy[ƒW”B
-    //  13. FILTER_CONDITION String => ƒtƒBƒ‹ƒ^‚ª‚ ‚éê‡‚ÍA‚»‚ÌƒtƒBƒ‹ƒ^‚Ìó‘Ô (null ‚Ìê‡‚à‚ ‚è‚Ü‚·)B 
+    //   1. TABLE_CAT String => ãƒ†ãƒ¼ãƒ–ãƒ« ã‚«ã‚¿ãƒ­ã‚° (null ã®å ´åˆã‚‚ã‚ã‚Šã¾ã™)ã€‚
+    //   2. TABLE_SCHEM String => ãƒ†ãƒ¼ãƒ–ãƒ« ã‚¹ã‚­ãƒ¼ãƒ (null ã®å ´åˆã‚‚ã‚ã‚Šã¾ã™)ã€‚
+    //   3. TABLE_NAME String => ãƒ†ãƒ¼ãƒ–ãƒ«åã€‚
+    //   4. NON_UNIQUE boolean => ä¸€æ„ã§ãªã„ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’è¨±å¯ã™ã‚‹ã‹ã©ã†ã‹ã€‚TYPE ãŒ tableIndexStatistic ã®å ´åˆã¯ falseã€‚
+    //   5. INDEX_QUALIFIER String => ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ ã‚«ã‚¿ãƒ­ã‚° (null ã®å ´åˆã‚‚ã‚ã‚Šã¾ã™)ã€‚TYPE ãŒ tableIndexStatistic ã®å ´åˆã¯ nullã€‚
+    //   6. INDEX_NAME String => ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹åã€‚TYPE ãŒ tableIndexStatistic ã®å ´åˆã¯ nullã€‚
+    //   7. TYPE short => ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ ã‚¿ã‚¤ãƒ—ã€‚
+    //          * tableIndexStatistic - ãƒ†ãƒ¼ãƒ–ãƒ«ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹è¨˜è¿°ã¨å…±ã«è¿”ã•ã‚Œã‚‹ãƒ†ãƒ¼ãƒ–ãƒ«ã®çµ±è¨ˆæƒ…å ±ã‚’è­˜åˆ¥ã€‚
+    //          * tableIndexClustered - ã‚¯ãƒ©ã‚¹ã‚¿åŒ–ã•ã‚ŒãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
+    //          * tableIndexHashed - ãƒãƒƒã‚·ãƒ¥åŒ–ã•ã‚ŒãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
+    //          * tableIndexOther - ã»ã‹ã®å½¢å¼ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚ 
+    //   8. ORDINAL_POSITION short => ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å†…ã®åˆ—ã®é€£ç•ªã€‚TYPE ãŒ tableIndexStatistic ã®å ´åˆã¯ 0ã€‚
+    //   9. COLUMN_NAME String => åˆ—åã€‚TYPE ãŒ tableIndexStatistic ã®å ´åˆã¯ nullã€‚
+    //  10. ASC_OR_DESC String => åˆ—ã®ã‚½ãƒ¼ãƒˆé †ã€‚"A" => æ˜‡é †ã€‚"D" => é™é †ã€‚ã‚½ãƒ¼ãƒˆé †ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„å ´åˆã¯ nullã€‚TYPE ãŒ tableIndexStatistic ã®å ´åˆã¯ nullã€‚
+    //  11. CARDINALITY int => TYPE ãŒ tableIndexStatistic ã®å ´åˆã¯ã€ãƒ†ãƒ¼ãƒ–ãƒ«å†…ã®è¡Œæ•°ã€‚ãã®ã»ã‹ã®å ´åˆã¯ã€ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹å†…ã®ä¸€æ„ã®å€¤ã®æ•°ã€‚
+    //  12. PAGES int => TYPE ãŒ tableIndexStatistic ã®å ´åˆã¯ã€ãƒ†ãƒ¼ãƒ–ãƒ«ã®ãƒšãƒ¼ã‚¸æ•°ã€‚ãã®ã»ã‹ã®å ´åˆã¯ã€ç¾åœ¨ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®ãƒšãƒ¼ã‚¸æ•°ã€‚
+    //  13. FILTER_CONDITION String => ãƒ•ã‚£ãƒ«ã‚¿ãŒã‚ã‚‹å ´åˆã¯ã€ãã®ãƒ•ã‚£ãƒ«ã‚¿ã®çŠ¶æ…‹ (null ã®å ´åˆã‚‚ã‚ã‚Šã¾ã™)ã€‚ 
     //
     public Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta, String schemaName,
-            String tableName) throws SQLException {
+            DfTableMetaInfo tableMetaInfo) throws SQLException {
+        if (tableMetaInfo.isTableTypeView()) {
+            return new LinkedHashMap<String, Map<Integer, String>>();
+        }
+        final String tableName = tableMetaInfo.getTableName();
         final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMeta, schemaName, tableName);
         final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
 

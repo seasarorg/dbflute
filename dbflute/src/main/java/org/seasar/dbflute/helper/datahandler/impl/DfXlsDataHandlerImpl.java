@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.sql.DataSource;
@@ -51,53 +53,53 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             setupDefaultValue(dataDirectoryName, dataSet);
 
             // TODO: performance turning
-//            final SqlWriter sqlWriter = new SqlWriter(dataSource) {
-//                public void write(DataSet dataSet) {
-//                    final TableWriter writer = new SqlTableWriter(getDataSource()) {
-//                        public void write(DataTable table) {
-//                            final List<String> columnNameList = new ArrayList<String>();
-//                            for (int j = 0; j < table.getColumnSize(); j++) {
-//                                columnNameList.add(table.getColumnName(j));
-//                            }
-//                            final StringBuilder sb = new StringBuilder();
-//                            sb.append("insert into ").append(table.getTableName());
-//                            sb.append("(");
-//                            for (String columnName : columnNameList) {
-//                                sb.append(columnName).append(", ");
-//                            }
-//                            sb.delete(0, sb.length() - ", ".length());
-//                            sb.append(") values(");
-//                            for (String columnName : columnNameList) {
-//                                sb.append("?, ");
-//                            }
-//                            sb.delete(0, sb.length() - ", ".length());
-//                            sb.append(")");
-//
-//                            try {
-//                                final Connection conn = dataSource.getConnection();
-//                                final PreparedStatement ps = conn.prepareStatement(sb.toString());
-//
-//                                for (int i = 0; i < table.getRowSize(); i++) {
-//                                    final DataRow row = table.getRow(i);
-//                                    int columnCount = 1;
-//                                    for (String columnName : columnNameList) {
-//                                        final Object value = row.getValue(columnName);
-//                                        ps.setObject(columnCount, value);
-//                                        columnCount++;
-//                                    }
-//                                    _log.info(sb.toString() + " ps=" + ps);
-//                                    ps.executeUpdate();
-//                                }
-//                            } catch (SQLException e) {
-//                                throw new IllegalStateException("sql=" + sb.toString(), e);
-//                            }
-//                        }
-//                    };
-//                    for (int i = 0; i < dataSet.getTableSize(); i++) {
-//                        writer.write(dataSet.getTable(i));
-//                    }
-//                }
-//            };
+            //            final SqlWriter sqlWriter = new SqlWriter(dataSource) {
+            //                public void write(DataSet dataSet) {
+            //                    final TableWriter writer = new SqlTableWriter(getDataSource()) {
+            //                        public void write(DataTable table) {
+            //                            final List<String> columnNameList = new ArrayList<String>();
+            //                            for (int j = 0; j < table.getColumnSize(); j++) {
+            //                                columnNameList.add(table.getColumnName(j));
+            //                            }
+            //                            final StringBuilder sb = new StringBuilder();
+            //                            sb.append("insert into ").append(table.getTableName());
+            //                            sb.append("(");
+            //                            for (String columnName : columnNameList) {
+            //                                sb.append(columnName).append(", ");
+            //                            }
+            //                            sb.delete(0, sb.length() - ", ".length());
+            //                            sb.append(") values(");
+            //                            for (String columnName : columnNameList) {
+            //                                sb.append("?, ");
+            //                            }
+            //                            sb.delete(0, sb.length() - ", ".length());
+            //                            sb.append(")");
+            //
+            //                            try {
+            //                                final Connection conn = dataSource.getConnection();
+            //                                final PreparedStatement ps = conn.prepareStatement(sb.toString());
+            //
+            //                                for (int i = 0; i < table.getRowSize(); i++) {
+            //                                    final DataRow row = table.getRow(i);
+            //                                    int columnCount = 1;
+            //                                    for (String columnName : columnNameList) {
+            //                                        final Object value = row.getValue(columnName);
+            //                                        ps.setObject(columnCount, value);
+            //                                        columnCount++;
+            //                                    }
+            //                                    _log.info(sb.toString() + " ps=" + ps);
+            //                                    ps.executeUpdate();
+            //                                }
+            //                            } catch (SQLException e) {
+            //                                throw new IllegalStateException("sql=" + sb.toString(), e);
+            //                            }
+            //                        }
+            //                    };
+            //                    for (int i = 0; i < dataSet.getTableSize(); i++) {
+            //                        writer.write(dataSet.getTable(i));
+            //                    }
+            //                }
+            //            };
             final SqlWriter sqlWriter = new SqlWriter(dataSource);
             sqlWriter.write(dataSet);
         }
@@ -138,7 +140,13 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     public List<File> getXlsList(String dataDirectoryName) {
-        TreeSet<File> xlsTreeSet = new TreeSet<File>();
+        final Comparator<File> fileNameAscComparator = new Comparator<File>() {
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        };
+        final SortedSet<File> sortedFileSet = new TreeSet<File>(fileNameAscComparator);
+
         final File dir = new File(dataDirectoryName);
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -150,9 +158,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             return new ArrayList<File>();
         }
         for (File file : listFiles) {
-            xlsTreeSet.add(file);
+            sortedFileSet.add(file);
         }
-        return new ArrayList<File>(xlsTreeSet);
+        return new ArrayList<File>(sortedFileSet);
     }
 
     private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
