@@ -12,7 +12,11 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected boolean _dateOnlyCompare;
+    protected boolean _fromDateGreaterThan;
+
+    protected boolean _toDateLessThan;
+
+    protected boolean _compareAsDate;
 
     // =====================================================================================
     //                                                              Interface Implementation
@@ -25,15 +29,30 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     // =====================================================================================
     //                                                                                  Main
     //                                                                                  ====
-    public void setupDateOnlyCompare() {
-        _dateOnlyCompare = true;
+    public ${myClassName} greaterThan() {
+        _fromDateGreaterThan = true; return this;
+    }
+
+    public ${myClassName} lessThan() {
+        _toDateLessThan = true; return this;
+    }
+
+    /**
+     * Compare as date.
+     * <pre>
+     * This method ignore greaterThan() and lessThan().
+     * </pre>
+     * @return this. (NotNull)
+     */
+    public ${myClassName} compareAsDate() {
+        _compareAsDate = true; return this;
     }
 
     // =====================================================================================
     //                                                                         Internal Main
     //                                                                         =============
     public java.util.Date filterFromDate(java.util.Date fromDate) {
-        if (_dateOnlyCompare) {
+        if (_compareAsDate) {
             final java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTimeInMillis(fromDate.getTime());
             clearCalendarHourMinuteSecondMilli(cal);
@@ -44,7 +63,7 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     }
 
     public java.util.Date filterToDate(java.util.Date toDate) {
-        if (_dateOnlyCompare) {
+        if (_compareAsDate) {
             final java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTimeInMillis(toDate.getTime());
             clearCalendarHourMinuteSecondMilli(cal);
@@ -56,17 +75,25 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     }
 
     public ${glPackageBaseCommonCKey}.${glConditionKeyName} getFromDateConditionKey() {
-        if (_dateOnlyCompare) {
+        if (_compareAsDate) {
             return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;
         }
-        return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
+        if (_fromDateGreaterThan) {
+            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_THAN;// Default!
+        } else {
+            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_GREATER_EQUAL;// Default!
+        }
     }
 
     public ${glPackageBaseCommonCKey}.${glConditionKeyName} getToDateConditionKey() {
-        if (_dateOnlyCompare) {
+        if (_compareAsDate) {
             return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_THAN;
         }
-        return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_EQUAL;// Default!
+        if (_toDateLessThan) {
+            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_THAN;// Default!
+        } else {
+            return ${glPackageBaseCommonCKey}.${glConditionKeyName}.CK_LESS_EQUAL;// Default!
+        }
     }
 
     // =====================================================================================
