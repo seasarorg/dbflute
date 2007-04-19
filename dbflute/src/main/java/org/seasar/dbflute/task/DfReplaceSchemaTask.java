@@ -17,7 +17,6 @@ package org.seasar.dbflute.task;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -75,8 +74,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("isReplaceSchemaRollbackOnly  = " + getMyProperties().isReplaceSchemaRollbackOnly());
         _log.info("isReplaceSchemaErrorContinue = " + getMyProperties().isReplaceSchemaErrorContinue());
 
-        arrangeConnection();
-
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
         replaceSchema(runInfo);
@@ -87,17 +84,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromSeparatedFileAsAdditionalData("tsv", "\t");
         writeDbFromSeparatedFileAsAdditionalData("csv", ",");
         writeDbFromXlsAsAdditionalData();
-    }
-
-    protected void arrangeConnection() {
-        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        if (basicProperties.isDatabaseSybase()) {
-            try {
-                getDataSource().getConnection().setAutoCommit(true);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     // --------------------------------------------

@@ -84,7 +84,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     public boolean isReplaceSchemaAutoCommit() {
         final String propString = (String) getReplaceSchemaDefinitionMap().get("isAutoCommit");
         if (propString == null) {
-            return false;
+            return true;
         }
         if (propString != null && propString.equalsIgnoreCase("true")) {
             return true;
