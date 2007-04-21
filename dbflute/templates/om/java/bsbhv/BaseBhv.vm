@@ -764,6 +764,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         } else {
             try {
                 updateNonstrict(entity);
+            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
+                insert(entity);
             } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
                 insert(entity);
             }
