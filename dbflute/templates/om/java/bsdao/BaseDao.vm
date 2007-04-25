@@ -228,6 +228,6 @@ public interface ${myClassName} extends ${InterfaceName} {
      * 
      * @return Next value. (NotNull)
      */
-    public java.math.BigDecimal selectNextVal();
+    public ${database.sequenceReturnType} selectNextVal();
 #end
 }

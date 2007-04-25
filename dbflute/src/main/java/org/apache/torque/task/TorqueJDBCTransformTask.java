@@ -83,6 +83,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
@@ -110,7 +111,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected boolean isUseDataSource() {
         return false;
     }
-    
+
     // ==============================================================================
     //                                                                      Attribute
     //                                                                      =========
@@ -122,7 +123,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     /** Is same java name? */
     protected boolean _isSameJavaName;
-    
+
     // ------------------------------------
     //                        Document Info
     //                        -------------
@@ -251,50 +252,29 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
             final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMetaData, currentTable);
 
-            final List columns = getColumns(dbMetaData, currentTable);
+            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, currentTable);
             for (int j = 0; j < columns.size(); j++) {
-                final List col = (List) columns.get(j);
-                final String name = (String) col.get(IDX_COLUMN_NAME);
-                final Integer type = ((Integer) col.get(IDX_COLUMN_TYPE));
-                final int size = ((Integer) col.get(IDX_COLUMN_SIZE)).intValue();
-
-                // Memo from DatabaseMetaData.java
-                //
-                // Indicates column might not allow NULL values.  Huh?
-                // Might? Boy, that's a definitive answer.
-                /* int columnNoNulls = 0; */
-                // 
-                // Indicates column definitely allows NULL values.
-                /* int columnNullable = 1; */
-                //
-                // Indicates NULLABILITY of column is unknown.
-                /* int columnNullableUnknown = 2; */
-
-                final Integer nullType = (Integer) col.get(IDX_COLUMN_NULL_TYPE);
-                String defaultValue = (String) col.get(IDX_COLUMN_DEFAULT_VALUE);
+                final DfColumnMetaInfo columnMetaInfo = columns.get(j);
+                final String columnName = columnMetaInfo.getColumnName();
 
                 final Element columnElement = _doc.createElement("column");
-                columnElement.setAttribute("name", name);
+                columnElement.setAttribute("name", columnName);
                 if (isSameJavaName()) {
-                    columnElement.setAttribute("javaName", name);
-                }
-                columnElement.setAttribute("type", TypeMap.getTorqueType(type));
-
-                if (size > 0
-                        && (type.intValue() == Types.CHAR || type.intValue() == Types.VARCHAR
-                                || type.intValue() == Types.LONGVARCHAR || type.intValue() == Types.DECIMAL || type
-                                .intValue() == Types.NUMERIC)) {
-                    columnElement.setAttribute("size", String.valueOf(size));
+                    columnElement.setAttribute("javaName", columnName);
                 }
 
-                if (nullType.intValue() == 0) {
+                setupColumnType(columnMetaInfo, columnElement);
+                setupColumnSize(columnMetaInfo, columnElement);
+
+                if (columnMetaInfo.isRequired()) {
                     columnElement.setAttribute("required", "true");
                 }
 
-                if (primaryColumnNameList.contains(name)) {
+                if (primaryColumnNameList.contains(columnName)) {
                     columnElement.setAttribute("primaryKey", "true");
                 }
 
+                String defaultValue = columnMetaInfo.getDefaultValue();
                 if (defaultValue != null) {
                     // trim out parens & quotes out of def value.
                     // makes sense for MSSQL. not sure about others.
@@ -309,8 +289,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                     columnElement.setAttribute("default", defaultValue);
                 }
 
-                if (primaryColumnNameList.contains(name)) {
-                    if (isAutoIncrementColumn(dbMetaData, currentTable, name, conn)) {
+                if (primaryColumnNameList.contains(columnName)) {
+                    if (isAutoIncrementColumn(dbMetaData, currentTable, columnName, conn)) {
                         columnElement.setAttribute("autoIncrement", "true");
                     }
                 }
@@ -363,6 +343,44 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _doc.appendChild(_databaseNode);
     }
 
+    protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final int sqlTypeCode = columnMetaInfo.getSqlTypeCode();
+        if (Types.OTHER != sqlTypeCode) {
+            final String torqueType = TypeMap.getTorqueType(sqlTypeCode);
+            columnElement.setAttribute("type", torqueType);
+            return;
+        }
+
+        // If other
+        final String sqlTypeName = columnMetaInfo.getSqlTypeName();
+        if (sqlTypeName == null) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
+            columnElement.setAttribute("type", torqueType);
+        } else if (sqlTypeName.toLowerCase().contains("char")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
+            columnElement.setAttribute("type", torqueType);
+        } else if (sqlTypeName.toLowerCase().contains("date")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.DATE);
+            columnElement.setAttribute("type", torqueType);
+        } else if (sqlTypeName.toLowerCase().contains("timestamp")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.TIMESTAMP);
+            columnElement.setAttribute("type", torqueType);
+        } else {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
+            columnElement.setAttribute("type", torqueType);
+        }
+    }
+
+    protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final int sqlTypeCode = columnMetaInfo.getSqlTypeCode();
+        final int columnSize = columnMetaInfo.getColumnSize();
+        if (columnSize > 0
+                && (sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
+                        || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC)) {
+            columnElement.setAttribute("size", String.valueOf(columnSize));
+        }
+    }
+
     /**
      * Set up column-table map. 
      * <p>
@@ -370,19 +388,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @param tableList A list of table-name.
      * @throws SQLException
      */
-    protected void setupColumnTableMap(DatabaseMetaData dbMetaData, List<DfTableMetaInfo> tableList) throws SQLException {
+    protected void setupColumnTableMap(DatabaseMetaData dbMetaData, List<DfTableMetaInfo> tableList)
+            throws SQLException {
         // Build a database-wide column -> table map.
         _columnTableMap = new Hashtable<String, String>();
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMetaInfo = tableList.get(i);
             final String curTable = tableMetaInfo.getTableName();
-            final List columns = getColumns(dbMetaData, curTable);
+            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, curTable);
 
             for (int j = 0; j < columns.size(); j++) {
-                final List col = (List) columns.get(j);
-                final String name = (String) col.get(IDX_COLUMN_NAME);
-
-                _columnTableMap.put(name, curTable);
+                final DfColumnMetaInfo columnMetaInfo = columns.get(j);
+                _columnTableMap.put(columnMetaInfo.getColumnName(), curTable);
             }
         }
     }
@@ -407,8 +424,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @return Unique column name list.
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
-            throws SQLException {
+    protected Map<String, Map<Integer, String>> getUniqueColumnNameList(DatabaseMetaData dbMeta,
+            DfTableMetaInfo tableMetaInfo) throws SQLException {
         return _uniqueKeyHandler.getUniqueColumnNameList(dbMeta, _schema, tableMetaInfo);
     }
 
@@ -438,7 +455,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected Collection getForeignKeys(DatabaseMetaData dbMeta, String tableName) throws SQLException {
         return _foreignKeyHandler.getForeignKeys(dbMeta, _schema, tableName);
     }
-    
+
     /**
      * Get all the table names in the current database that are not
      * system tables.
@@ -456,17 +473,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * JDBC metadata.  It returns a List of Lists.  Each element
      * of the returned List is a List with:
      *
-     * element 0 => a String object for the column name.
-     * element 1 => an Integer object for the column type.
-     * element 2 => size of the column.
-     * element 3 => null type.
-     * 
      * @param dbMeta JDBC metadata.
      * @param tableName Table from which to retrieve column information.
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException
      */
-    public List getColumns(DatabaseMetaData dbMeta, String tableName) throws SQLException {
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String tableName) throws SQLException {
         return _columnHandler.getColumns(dbMeta, _schema, tableName);
     }
 }

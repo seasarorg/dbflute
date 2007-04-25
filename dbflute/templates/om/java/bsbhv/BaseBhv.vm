@@ -251,7 +251,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @return Next value. (NotNull)
      */
-    public java.math.BigDecimal delegateSelectNextVal() {
+    public ${database.sequenceReturnType} delegateSelectNextVal() {
         return getMyDao().selectNextVal();
     }
 #end
@@ -530,8 +530,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @return Next value. (NotNull)
      */
-    public java.math.BigDecimal selectNextVal() {
-        return getMyDao().selectNextVal();
+    public ${database.sequenceReturnType} selectNextVal() {
+        return delegateSelectNextVal();
     }
 #end
 #if (${table.hasOnlyOnePrimaryKey()})

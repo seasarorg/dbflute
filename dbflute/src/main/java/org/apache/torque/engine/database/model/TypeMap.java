@@ -363,6 +363,10 @@ public class TypeMap {
         if (!isInitialized) {
             initialize();
         }
+        if (java.sql.Types.OTHER == jdbcType) {
+            String msg = "The jdbcType is unsupported: jdbcType=java.sql.Types.OTHER(" + jdbcType + ")";
+            throw new UnsupportedOperationException(msg);
+        }
         if (!_jdbcIntToTorqueTypeMap.containsKey(jdbcType)) {
             String msg = "_jdbcIntToTorqueTypeMap doesn't contain the type as key: ";
             msg = msg + "key=" + jdbcType + " map=" + _jdbcIntToTorqueTypeMap;

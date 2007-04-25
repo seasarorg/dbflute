@@ -1673,7 +1673,7 @@ public class Table implements IDMethod {
      * @return Determination.
      */
     public boolean isUseSequence() {
-        final String sequenceName = (String) getDatabase().getSequenceDefinitionMap().get(getName());
+        final String sequenceName = getDatabase().getSequenceDefinitionMapSequence(getName());
         if (sequenceName == null) {
             return false;
         } else {
@@ -1690,7 +1690,7 @@ public class Table implements IDMethod {
         if (!isUseSequence()) {
             return "";
         }
-        return (String) getDatabase().getSequenceDefinitionMap().get(getName());
+        return getDatabase().getSequenceDefinitionMapSequence(getName());
     }
 
     /**
@@ -1726,7 +1726,7 @@ public class Table implements IDMethod {
             }
         }
 
-        return getDatabase().getIdentityDefinitionMap().containsKey(getName());
+        return getDatabase().getIdentityDefinitionMapColumnName(getName()) != null;
     }
 
     /**
@@ -1747,7 +1747,7 @@ public class Table implements IDMethod {
             }
         }
 
-        final String columnName = (String) getDatabase().getIdentityDefinitionMap().get(getName());
+        final String columnName = (String) getDatabase().getIdentityDefinitionMapColumnName(getName());
         final Column col = getColumn(columnName);
         if (col == null) {
             String msg = "The columnName does not exist in the table: ";

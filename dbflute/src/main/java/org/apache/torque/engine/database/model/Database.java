@@ -75,6 +75,7 @@ import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -806,7 +807,7 @@ public class Database {
     public boolean isAvailableBehaviorRequiredTx() {
         return getProperties().getDBFluteDiconProperties().isAvailableBehaviorRequiredTx();
     }
-    
+
     // ===============================================================================
     //                                            Properties - Generated Class Package
     //                                            ====================================
@@ -849,12 +850,16 @@ public class Database {
     // ===============================================================================
     //                                              Properties - Sequence and Identity
     //                                              ==================================
-    public Map<String, Object> getSequenceDefinitionMap() {
-        return getProperties().getSequenceDefinitionMap();
+    public String getSequenceDefinitionMapSequence(String flexibleTableName) {
+        return getProperties().getSequenceIdentityProperties().getSequenceDefinitionMapSequence(flexibleTableName);
     }
 
-    public Map<String, Object> getIdentityDefinitionMap() {
-        return getProperties().getIdentityDefinitionMap();
+    public String getSequenceReturnType() {
+        return getProperties().getSequenceIdentityProperties().getSequenceReturnType();
+    }
+    
+    public String getIdentityDefinitionMapColumnName(String flexibleTableName) {
+        return getProperties().getSequenceIdentityProperties().getIdentityDefinitionMapColumnName(flexibleTableName);
     }
 
     // ===============================================================================
@@ -1261,7 +1266,7 @@ public class Database {
     public boolean isAvailableOtherConnectionDaoInitialization() {
         return getProperties().getOtherProperties().isAvailableOtherConnectionDaoInitialization();
     }
-    
+
     public boolean isAvailableDaoMethodLazyInitializing() {
         return getProperties().getOtherProperties().isAvailableDaoMethodLazyInitializing();
     }

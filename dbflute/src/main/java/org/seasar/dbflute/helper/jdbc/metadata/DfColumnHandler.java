@@ -33,35 +33,33 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      * JDBC metadata.  It returns a List of Lists.  Each element
      * of the returned List is a List with:
      *
-     * element 0 => a String object for the column name.
-     * element 1 => an Integer object for the column type.
-     * element 2 => size of the column.
-     * element 3 => null type.
-     * 
      * @param dbMeta JDBC metadata.
      * @param tableName Table from which to retrieve column information.
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException
      */
-    public List getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName) throws SQLException {
-        final List<List<Object>> columns = new ArrayList<List<Object>>();
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName)
+            throws SQLException {
+        final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
         try {
             columnResultSet = dbMeta.getColumns(null, schemaName, tableName, null);
             while (columnResultSet.next()) {
-                final String name = columnResultSet.getString(4);
-                final Integer sqlType = new Integer(columnResultSet.getString(5));
-                final Integer size = new Integer(columnResultSet.getInt(7));
+                final String columnName = columnResultSet.getString(4);
+                final Integer sqlTypeCode = new Integer(columnResultSet.getString(5));
+                final String sqlTypeName = columnResultSet.getString(6);
+                final Integer columnSize = new Integer(columnResultSet.getInt(7));
                 final Integer nullType = new Integer(columnResultSet.getInt(11));
-                final String defValue = columnResultSet.getString(13);
+                final String defaultValue = columnResultSet.getString(13);
 
-                final List<Object> col = new ArrayList<Object>(5);
-                col.add(name);
-                col.add(sqlType);
-                col.add(size);
-                col.add(nullType);
-                col.add(defValue);
-                columns.add(col);
+                final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
+                columnMetaInfo.setColumnName(columnName);
+                columnMetaInfo.setSqlTypeCode(sqlTypeCode);
+                columnMetaInfo.setSqlTypeName(sqlTypeName);
+                columnMetaInfo.setColumnSize(columnSize);
+                columnMetaInfo.setRequired(nullType == 0);
+                columnMetaInfo.setDefaultValue(defaultValue);
+                columns.add(columnMetaInfo);
             }
         } catch (SQLException e) {
             _log.warn("SQLException occured: schemaName=" + schemaName + " tableName=" + tableName);
@@ -72,6 +70,63 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             }
         }
         return columns;
+    }
+
+    public static class DfColumnMetaInfo {
+        protected String columnName;
+        protected int sqlTypeCode;
+        protected String sqlTypeName;
+        protected int columnSize;
+        protected boolean required;
+        protected String defaultValue;
+
+        public String getColumnName() {
+            return columnName;
+        }
+
+        public void setColumnName(String columnName) {
+            this.columnName = columnName;
+        }
+
+        public int getColumnSize() {
+            return columnSize;
+        }
+
+        public void setColumnSize(int columnSize) {
+            this.columnSize = columnSize;
+        }
+
+        public String getDefaultValue() {
+            return defaultValue;
+        }
+
+        public void setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+        }
+
+        public boolean isRequired() {
+            return required;
+        }
+
+        public void setRequired(boolean required) {
+            this.required = required;
+        }
+
+        public int getSqlTypeCode() {
+            return sqlTypeCode;
+        }
+
+        public void setSqlTypeCode(int sqlTypeCode) {
+            this.sqlTypeCode = sqlTypeCode;
+        }
+
+        public String getSqlTypeName() {
+            return sqlTypeName;
+        }
+
+        public void setSqlTypeName(String sqlTypeName) {
+            this.sqlTypeName = sqlTypeName;
+        }
     }
 
 }

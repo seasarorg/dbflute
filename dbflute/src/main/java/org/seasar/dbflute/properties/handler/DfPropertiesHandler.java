@@ -13,6 +13,7 @@ import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
+import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
 
@@ -84,6 +85,15 @@ public final class DfPropertiesHandler {
             _selectParamProperties = new DfSelectParamProperties(prop);
         }
         return _selectParamProperties;
+    }
+
+    protected DfSequenceIdentityProperties _sequenceIdentityProperties;
+
+    public DfSequenceIdentityProperties getSequenceIdentityProperties(Properties prop) {
+        if (_sequenceIdentityProperties == null) {
+            _sequenceIdentityProperties = new DfSequenceIdentityProperties(prop);
+        }
+        return _sequenceIdentityProperties;
     }
 
     protected DfAdditionalForeignKeyProperties _additionalForeignKeyProperties;
