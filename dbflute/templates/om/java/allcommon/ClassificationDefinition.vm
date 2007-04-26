@@ -83,7 +83,7 @@ public class ${myClassName} {
         return new java.util.ArrayList${database.filterGenericsString('java.util.Map<String, String>')}(VALUE_LABEL_NAME_LIST_${classificationName});
     }
 #end
-#foreach ($classificationName in $database.ClassificationNameListValidNameOnly)
+#foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
   #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
 
     /** The classification code-name map of ${classificationName}. */
