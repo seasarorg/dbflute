@@ -52,24 +52,32 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     //                                                                         Internal Main
     //                                                                         =============
     public java.util.Date filterFromDate(java.util.Date fromDate) {
+        if (fromDate == null) {
+            return null;
+        }
         if (_compareAsDate) {
             final java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTimeInMillis(fromDate.getTime());
             clearCalendarHourMinuteSecondMilli(cal);
-            fromDate.setTime(cal.getTimeInMillis());
-            return fromDate;
+            final java.util.Date cloneDate = (java.util.Date) fromDate.clone();
+            cloneDate.setTime(cal.getTimeInMillis());
+            return cloneDate;
         }
         return fromDate;
     }
 
     public java.util.Date filterToDate(java.util.Date toDate) {
+        if (toDate == null) {
+            return null;
+        }
         if (_compareAsDate) {
             final java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTimeInMillis(toDate.getTime());
             clearCalendarHourMinuteSecondMilli(cal);
             addCalendarNextDay(cal);// Key Point!
-            toDate.setTime(cal.getTimeInMillis());
-            return toDate;
+            final java.util.Date cloneDate = (java.util.Date) toDate.clone();
+            cloneDate.setTime(cal.getTimeInMillis());
+            return cloneDate;
         }
         return toDate;
     }
