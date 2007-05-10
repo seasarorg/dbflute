@@ -239,7 +239,12 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected void writeDbFromXls(String directoryPath) {
         final DfXlsDataHandler xlsDataHandler = new DfXlsDataHandlerImpl();
-        xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
+        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
+        if (basicProperties.isDatabaseSqlServer() || basicProperties.isDatabaseSybase()) {
+            xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
+        } else {
+            xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
+        }
     }
 
     // --------------------------------------------

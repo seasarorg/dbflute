@@ -90,9 +90,13 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                                     }
                                 }
 
+                                final String orderBy = (String) elementMap.get("orderBy");
                                 final StringBuffer sb = new StringBuffer();
                                 sb.append("select ").append(code).append(", ").append(name).append(", ").append(alias);
                                 sb.append(" from ").append(table);
+                                if (orderBy != null && orderBy.trim().length() != 0) {
+                                    sb.append(" ").append(orderBy);
+                                }
 
                                 Connection conn = null;
                                 Statement stmt = null;

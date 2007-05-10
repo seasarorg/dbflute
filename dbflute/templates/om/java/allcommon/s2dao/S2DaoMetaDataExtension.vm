@@ -69,9 +69,6 @@ import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
  */
 public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${glDaoMetaDataExtension}.class);
-
     // =====================================================================================
     //                                                                           Constructor
     //                                                                           ===========
@@ -92,48 +89,78 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         this.transactionManager = transactionManager;
     }
 
-    public boolean hasTransaction() throws SystemException {
-        return transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;
-    }
-
-    public Transaction suspend() throws SystemException {
-        if (transactionManager == null) {
-            throw new EmptyRuntimeException("transactionManager");
-        }
-        return transactionManager.suspend();
-    }
-
-    public void resume(final Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
-        if (transactionManager == null) {
-            throw new EmptyRuntimeException("transactionManager");
-        }
-        transactionManager.resume(transaction);
-    }
-
     public void initialize() {// Override!
-        Transaction tx = null;
-        try {
-            if (!hasTransaction()) {
-                super.initialize();
+        final TransactionSuspendEventInvoker transactionSuspendEventHandler = new TransactionSuspendEventInvoker();
+        transactionSuspendEventHandler.setTransactionManager(transactionManager);
+        final TransactionSuspendEventCallback callback = new TransactionSuspendEventCallback() {
+            public Object callback() {
+                executeSuperInitialize();
+                return null;
             }
-            _log.debug("...Suspending the transaction!");
-            tx = suspend();
-            super.initialize();
-        } catch (Exception e) {
-            String msg = "The initialize() that is overrided threw the exception: tx=" + tx;
-            throw new IllegalStateException(msg, e);
-        } finally {
-            if (tx != null) {
-                try {
-                    _log.debug("...Resuming the transaction: tx=" + tx);
-                    resume(tx);
-                } catch (Exception ignored) {
-                    _log.warn("resume(tx) threw the exception: tx=" + tx, ignored);
+        };
+        transactionSuspendEventHandler.callbackAfterSuspendAndResumeLater(callback);
+    }
+    
+    protected void executeSuperInitialize() {
+        super.initialize();
+    }
+
+    protected static interface TransactionSuspendEventCallback {
+        public Object callback();
+    }
+
+    protected static class TransactionSuspendEventInvoker {
+
+        private static final Log _log = LogFactory.getLog(TransactionSuspendEventInvoker.class);
+        
+        protected TransactionManager transactionManager;
+
+        public void setTransactionManager(TransactionManager transactionManager) {
+            this.transactionManager = transactionManager;
+        }
+
+        public boolean hasTransaction() throws SystemException {
+            return transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;
+        }
+
+        public Transaction suspend() throws SystemException {
+            if (transactionManager == null) {
+                throw new EmptyRuntimeException("transactionManager");
+            }
+            return transactionManager.suspend();
+        }
+
+        public void resume(final Transaction transaction) throws InvalidTransactionException, IllegalStateException, SystemException {
+            if (transactionManager == null) {
+                throw new EmptyRuntimeException("transactionManager");
+            }
+            transactionManager.resume(transaction);
+        }
+
+        public Object callbackAfterSuspendAndResumeLater(TransactionSuspendEventCallback callback) {
+            Transaction tx = null;
+            try {
+                if (!hasTransaction()) {
+                    return callback.callback();
+                }
+                _log.debug("...Suspending the transaction!");
+                tx = suspend();
+                return callback.callback();
+            } catch (Exception e) {
+                String msg = "The initialize() that is overrided threw the exception: tx=" + tx;
+                throw new IllegalStateException(msg, e);
+            } finally {
+                if (tx != null) {
+                    try {
+                        _log.debug("...Resuming the transaction: tx=" + tx);
+                        resume(tx);
+                    } catch (Exception ignored) {
+                        _log.warn("resume(tx) threw the exception: tx=" + tx, ignored);
+                    }
                 }
             }
         }
     }
-
 #end
 
     // =====================================================================================
@@ -344,8 +371,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     public static class SelectDynamicCommandExtension extends SelectDynamicCommand {
+#if ($database.isSelectQueryTimeoutValid())
+
         /** Log-instance. */
         private static final Log _log = LogFactory.getLog(SelectDynamicCommandExtension.class);
+#end
 
         private ResultSetHandler resultSetHandler;
         private ResultSetFactory resultSetFactory;
@@ -434,6 +464,24 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return uac;
     }
 
+#if ($database.isAvailableOtherConnectionDaoInitialization())
+
+    protected BeanMetaData createNonConcurrencyBeanMetaData(Method method) {
+        if (method.getName().contains("Nonstrict")) {
+            final TransactionSuspendEventInvoker transactionSuspendEventHandler = new TransactionSuspendEventInvoker();
+            transactionSuspendEventHandler.setTransactionManager(transactionManager);
+            final TransactionSuspendEventCallback callback = new TransactionSuspendEventCallback() {
+                public Object callback() {
+                    return createNonConcurrencyBmdFactory().createBeanMetaData(getBeanClass());
+                }
+            };
+            return (BeanMetaData)transactionSuspendEventHandler.callbackAfterSuspendAndResumeLater(callback);
+        } else {
+            return getBeanMetaData();
+        }
+    }
+#else
+
     protected BeanMetaData createNonConcurrencyBeanMetaData(Method method) {
         if (method.getName().contains("Nonstrict")) {
             return createNonConcurrencyBmdFactory().createBeanMetaData(getBeanClass());
@@ -441,6 +489,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return getBeanMetaData();
         }
     }
+#end
 
     protected BeanMetaDataFactory createNonConcurrencyBmdFactory() {
         final ${glBeanMetaDataFactoryImpl} nonConcurrencyBmdFactory = new ${glBeanMetaDataFactoryImpl}() {

@@ -28,6 +28,7 @@ import org.seasar.extension.dataset.DataColumn;
 import org.seasar.extension.dataset.DataRow;
 import org.seasar.extension.dataset.DataSet;
 import org.seasar.extension.dataset.DataTable;
+import org.seasar.extension.dataset.impl.SqlServerSqlWriter;
 import org.seasar.extension.dataset.states.CreatedState;
 import org.seasar.extension.dataset.states.SqlContext;
 import org.seasar.extension.dataset.types.ColumnTypes;
@@ -106,6 +107,24 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             // Commentted out for Performance Tuning.
             //            final SqlWriter sqlWriter = new SqlWriter(dataSource);
             //            sqlWriter.write(dataSet);
+        }
+    }
+
+    public void writeSeveralDataForSqlServer(String dataDirectoryName, final DataSource dataSource) {
+        final List<File> xlsList = getXlsList(dataDirectoryName);
+
+        for (File file : xlsList) {
+            _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
+            _log.info("writeData(" + file + ")");
+            _log.info("= = = = = = =/");
+            final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
+            final DataSet dataSet = xlsReader.read();
+
+            filterValidColumn(dataSet, dataSource);
+            setupDefaultValue(dataDirectoryName, dataSet, dataSource);
+
+            final SqlServerSqlWriter sqlServerSqlWriter = new SqlServerSqlWriter(dataSource);
+            sqlServerSqlWriter.write(dataSet);
         }
     }
 

@@ -26,6 +26,8 @@ public interface DfXlsDataHandler {
     public List<DataSet> readSeveralData(String dataDirectoryName);
 
     public void writeSeveralData(String dataDirectoryName, DataSource dataSource);
+    
+    public void writeSeveralDataForSqlServer(String dataDirectoryName, DataSource dataSource);
 
     public List<File> getXlsList(String dataDirectoryName);
 }
