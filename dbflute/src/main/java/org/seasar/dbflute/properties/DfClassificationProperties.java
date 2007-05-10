@@ -95,7 +95,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                                 sb.append("select ").append(code).append(", ").append(name).append(", ").append(alias);
                                 sb.append(" from ").append(table);
                                 if (orderBy != null && orderBy.trim().length() != 0) {
-                                    sb.append(" ").append(orderBy);
+                                    sb.append(" order by ").append(orderBy);
                                 }
 
                                 Connection conn = null;
