@@ -37,6 +37,9 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
         return booleanProp("torque.isStopGenerateExtendedEntity", false);
     }
 
+    // ===============================================================================
+    //                                                                   S2Dao Version
+    //                                                                   =============
     public boolean isVersionAfter1043() {
         if (!hasS2DaoVersion()) {
             return false;
@@ -66,6 +69,9 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
         return s2daoVersion.compareToIgnoreCase(filteredTargetVersion) >= 0;
     }
 
+    // ===============================================================================
+    //                                                                  S2Dao Override
+    //                                                                  ==============
     public boolean isAvailableOtherConnectionDaoInitialization() {
         return booleanProp("torque.isAvailableOtherConnectionDaoInitialization", false);
     }
@@ -73,7 +79,17 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
     public boolean isAvailableDaoMethodLazyInitializing() {
         return booleanProp("torque.isAvailableDaoMethodLazyInitializing", false);
     }
+    
+    // ===============================================================================
+    //                                                         Non PrimaryKey Writable
+    //                                                         =======================
+    public boolean isAvailableNonPrimaryKeyWritable() {
+        return booleanProp("torque.isAvailableNonPrimaryKeyWritable", false);
+    }
 
+    // ===============================================================================
+    //                                                             MultipleFK Property
+    //                                                             ===================
     public static final String KEY_multipleFKPropertyMap = "multipleFKPropertyMap";
     protected Map<String, Map<String, Map<String, String>>> _multipleFKPropertyMap;
 

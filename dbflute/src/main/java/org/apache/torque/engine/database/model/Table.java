@@ -966,7 +966,74 @@ public class Table implements IDMethod {
     public void setPackage(String v) {
         this._pkg = v;
     }
+    
+    /**
+     * Returns a Collection of parameters relevant for the chosen
+     * id generation method.
+     */
+    public List getIdMethodParameters() {
+        return _idMethodParameters;
+    }
+    
+    // ============================================================================
+    //                                                                     Sequence
+    //                                                                     ========
+    /**
+     * A name to use for creating a sequence if one is not specified.
+     *
+     * @return name of the sequence
+     */
+    public String getSequenceName() {
+        String result = null;
+        if (getIdMethod().equals(NATIVE)) {
+            List idMethodParams = getIdMethodParameters();
+            if (idMethodParams == null) {
+                result = getName() + "_SEQ";
+            } else {
+                result = ((IdMethodParameter) idMethodParams.get(0)).getValue();
+            }
+        }
+        return result;
+    }
+    
+    // ============================================================================
+    //                                                                        Index
+    //                                                                        =====
+    /**
+     * Returns an Array containing all the indices in the table
+     *
+     * @return An array containing all the indices
+     */
+    public Index[] getIndices() {
+        int size = _indices.size();
+        Index[] tbls = new Index[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (Index) _indices.get(i);
+        }
+        return tbls;
+    }
+    
+    /**
+     * Returns an Array containing all the UKs in the table
+     *
+     * @return An array containing all the UKs
+     */
+    public Unique[] getUnices() {
+        int size = _unices.size();
+        Unique[] tbls = new Unique[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (Unique) _unices.get(i);
+        }
+        return tbls;
+    }
+    
+    public List<Unique> getUniqueList() {
+        return _unices;
+    }
 
+    // ============================================================================
+    //                                                                       Column
+    //                                                                       ======
     /**
      * Returns an Array containing all the columns in the table
      */
@@ -994,6 +1061,26 @@ public class Table implements IDMethod {
         sb.delete(0, ", ".length());
         return sb.toString();
     }
+    
+    /**
+     * Get insert clause values with sql comment. {insertClauseValuesWithSqlComment}
+     * <pre>
+     * For availableNonPrimaryKeyWritable.
+     * </pre>
+     * @return Insert clause values with sql comment.
+     */
+    public String getInsertClauseValuesWithSqlComment() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<Column> ls = _columnList;
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final Column col = (Column) ls.get(i);
+            sb.append(", /*dto.").append(col.getUncapitalisedJavaName()).append("*/null ");
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
 
     /**
      * Utility method to get the number of columns in this table
@@ -1002,63 +1089,6 @@ public class Table implements IDMethod {
         return _columnList.size();
     }
 
-    /**
-     * Returns a Collection of parameters relevant for the chosen
-     * id generation method.
-     */
-    public List getIdMethodParameters() {
-        return _idMethodParameters;
-    }
-
-    /**
-     * A name to use for creating a sequence if one is not specified.
-     *
-     * @return name of the sequence
-     */
-    public String getSequenceName() {
-        String result = null;
-        if (getIdMethod().equals(NATIVE)) {
-            List idMethodParams = getIdMethodParameters();
-            if (idMethodParams == null) {
-                result = getName() + "_SEQ";
-            } else {
-                result = ((IdMethodParameter) idMethodParams.get(0)).getValue();
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns an Array containing all the indices in the table
-     *
-     * @return An array containing all the indices
-     */
-    public Index[] getIndices() {
-        int size = _indices.size();
-        Index[] tbls = new Index[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Index) _indices.get(i);
-        }
-        return tbls;
-    }
-
-    /**
-     * Returns an Array containing all the UKs in the table
-     *
-     * @return An array containing all the UKs
-     */
-    public Unique[] getUnices() {
-        int size = _unices.size();
-        Unique[] tbls = new Unique[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Unique) _unices.get(i);
-        }
-        return tbls;
-    }
-
-    public List<Unique> getUniqueList() {
-        return _unices;
-    }
 
     /**
      * Returns a specified column.
@@ -1493,7 +1523,7 @@ public class Table implements IDMethod {
     public boolean isWritable() {
         return hasPrimaryKey();
     }
-
+    
     /**
      * Get annotation table name. (for S2Dao)
      * 
@@ -1976,5 +2006,12 @@ public class Table implements IDMethod {
             revivalFromLogicalDeleteColumnList.add(column);
         }
         return revivalFromLogicalDeleteColumnList;
+    }
+
+    // ===============================================================================
+    //                                                         Non PrimaryKey Writable
+    //                                                         =======================
+    public boolean isAvailableNonPrimaryKeyWritable() {
+        return getProperties().getOtherProperties().isAvailableNonPrimaryKeyWritable();
     }
 }

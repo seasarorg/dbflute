@@ -346,6 +346,20 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertListNotNullAndNotEmpty(entityList);
         return getMyDao().deleteList(entityList);
     }
+#else
+  #if ($table.isAvailableNonPrimaryKeyWritable())
+
+    /**
+     * Insert one entity. (Delegate-Method)
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Inserted count.
+     */
+    public int delegateInsert(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        return getMyDao().insert(entity);
+    }
+  #end
 #end
 
     // =====================================================================================
@@ -983,6 +997,22 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      */
     protected void filterCopyInsertEntity(${myExtendedObjectClassName} entity) {
+    }
+  #end
+#else
+  #if ($table.isAvailableNonPrimaryKeyWritable())
+
+    // =====================================================================================
+    //                                                                   Basic Entity Update
+    //                                                                   ===================
+    /**
+     * Insert.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    public void insert(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        delegateInsert(entity);
     }
   #end
 #end
