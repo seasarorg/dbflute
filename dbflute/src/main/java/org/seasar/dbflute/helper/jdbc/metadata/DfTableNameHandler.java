@@ -32,17 +32,17 @@ import org.seasar.dbflute.DfBuildProperties;
  */
 public class DfTableNameHandler extends DfAbstractMetaDataHandler {
 
-    public static final Log _log = LogFactory.getLog(DfTableNameHandler.class);
+    private static final Log _log = LogFactory.getLog(DfTableNameHandler.class);
 
     public static class DfTableMetaInfo {
         protected String _tableName;
-        
+
         protected String _tableType;
 
         public boolean isTableTypeView() {
             return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
         }
-        
+
         public String getTableName() {
             return _tableName;
         }
@@ -59,7 +59,7 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
             this._tableType = tableType;
         }
     }
-    
+
     /**
      * Get all the table names in the current database that are not
      * system tables.
@@ -82,7 +82,7 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
             resultSet = dbMeta.getTables(null, schemaName, "%", types);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString(3);
-                 final String tableType = resultSet.getString(4);
+                final String tableType = resultSet.getString(4);
 
                 if (isTableExcept(tableName)) {
                     _log.debug("$ isTableExcept(" + tableName + ") == true");
@@ -90,7 +90,8 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
                 }
                 if (DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle()) {
                     if (tableName.startsWith("BIN$")) {
-                        _log.debug("$ isTableExcept(" + tableName + ") == true {Forced because the database is Oracle!}");
+                        _log.debug("$ isTableExcept(" + tableName
+                                + ") == true {Forced because the database is Oracle!}");
                         continue;
                     }
                 }

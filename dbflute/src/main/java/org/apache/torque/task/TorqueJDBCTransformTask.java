@@ -61,9 +61,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +82,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
@@ -96,7 +95,7 @@ import org.w3c.dom.Element;
  */
 public class TorqueJDBCTransformTask extends DfAbstractTask {
 
-    public static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
+    private static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
 
     public static final int IDX_COLUMN_NAME = 0;
 
@@ -299,22 +298,40 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
 
             // Foreign keys for this table.
-            final Collection foreignKeys = getForeignKeys(dbMetaData, currentTable);
-            for (final Iterator ite = foreignKeys.iterator(); ite.hasNext();) {
-                final Object[] forKey = (Object[]) ite.next();
-                final String foreignKeyTable = (String) forKey[0];
-                final List refs = (List) forKey[1];
+            final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = getForeignKeys(dbMetaData, currentTable);
+            final Set<String> foreignKeyMetaInfoKeySet = foreignKeyMetaInfoMap.keySet();
+            for (String foreignKeyName : foreignKeyMetaInfoKeySet) {
+                final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
                 final Element foreignKeyElement = _doc.createElement("foreign-key");
-                foreignKeyElement.setAttribute("foreignTable", foreignKeyTable);
-                for (int m = 0; m < refs.size(); m++) {
+                foreignKeyElement.setAttribute("foreignTable", foreignKeyMetaInfo.getForeignTableName());
+                final Map<String, String> columnNameMap = foreignKeyMetaInfo.getColumnNameMap();
+                final Set<String> columnNameKeySet = columnNameMap.keySet();
+                for (String localColumnName : columnNameKeySet) {
+                    final String foreignColumnName = columnNameMap.get(localColumnName);
                     final Element referenceElement = _doc.createElement("reference");
-                    final String[] refData = (String[]) refs.get(m);
-                    referenceElement.setAttribute("local", refData[0]);
-                    referenceElement.setAttribute("foreign", refData[1]);
+                    referenceElement.setAttribute("local", localColumnName);
+                    referenceElement.setAttribute("foreign", foreignColumnName);
                     foreignKeyElement.appendChild(referenceElement);
                 }
                 tableElement.appendChild(foreignKeyElement);
             }
+
+            //            final Collection foreignKeys = getForeignKeys(dbMetaData, currentTable);
+            //            for (final Iterator ite = foreignKeys.iterator(); ite.hasNext();) {
+            //                final Object[] forKey = (Object[]) ite.next();
+            //                final String foreignKeyTable = (String) forKey[0];
+            //                final List refs = (List) forKey[1];
+            //                final Element foreignKeyElement = _doc.createElement("foreign-key");
+            //                foreignKeyElement.setAttribute("foreignTable", foreignKeyTable);
+            //                for (int m = 0; m < refs.size(); m++) {
+            //                    final Element referenceElement = _doc.createElement("reference");
+            //                    final String[] refData = (String[]) refs.get(m);
+            //                    referenceElement.setAttribute("local", refData[0]);
+            //                    referenceElement.setAttribute("foreign", refData[1]);
+            //                    foreignKeyElement.appendChild(referenceElement);
+            //                }
+            //                tableElement.appendChild(foreignKeyElement);
+            //            }
 
             // Unique keys for this table.
             final Map<String, Map<Integer, String>> uniqueMap = getUniqueColumnNameList(dbMetaData, tableMataInfo);
@@ -452,8 +469,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    protected Collection getForeignKeys(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        return _foreignKeyHandler.getForeignKeys(dbMeta, _schema, tableName);
+    protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, String tableName)
+            throws SQLException {
+        return _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta, _schema, tableName);
     }
 
     /**

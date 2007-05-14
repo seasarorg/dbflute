@@ -80,7 +80,13 @@ public class ${myClassName} {
         VALUE_LABEL_NAME_LIST_${classificationName} = java.util.Collections.unmodifiableList(list);
     }
     public static java.util.List${database.filterGenericsString('java.util.Map<String, String>')} createValueLabelNameList${classificationName}() {
-        return new java.util.ArrayList${database.filterGenericsString('java.util.Map<String, String>')}(VALUE_LABEL_NAME_LIST_${classificationName});
+        final java.util.List${database.filterGenericsString('java.util.Map<String, String>')} newList = new java.util.ArrayList${database.filterGenericsString('java.util.Map<String, String>')}();
+        for (final java.util.Iterator ite = VALUE_LABEL_NAME_LIST_${classificationName}.iterator(); ite.hasNext(); ) {
+            final java.util.Map${database.filterGenericsString('String, String')} map = (java.util.Map${database.filterGenericsString('String, String')})ite.next();
+            final java.util.Map${database.filterGenericsString('String, String')} newMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}(map);
+            newList.add(newMap);
+        }
+        return newList;
     }
 #end
 #foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
@@ -103,7 +109,13 @@ public class ${myClassName} {
         VALUE_LABEL_ALIAS_LIST_${classificationName} = java.util.Collections.unmodifiableList(list);
     }
     public static java.util.List${database.filterGenericsString('java.util.Map<String, String>')} createValueLabelAliasList${classificationName}() {
-        return new java.util.ArrayList${database.filterGenericsString('java.util.Map<String, String>')}(VALUE_LABEL_ALIAS_LIST_${classificationName});
+        final java.util.List${database.filterGenericsString('java.util.Map<String, String>')} newList = new java.util.ArrayList${database.filterGenericsString('java.util.Map<String, String>')}();
+        for (final java.util.Iterator ite = VALUE_LABEL_ALIAS_LIST_${classificationName}.iterator(); ite.hasNext(); ) {
+            final java.util.Map${database.filterGenericsString('String, String')} map = (java.util.Map${database.filterGenericsString('String, String')})ite.next();
+            final java.util.Map${database.filterGenericsString('String, String')} newMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}(map);
+            newList.add(newMap);
+        }
+        return newList;
     }
 #end
 

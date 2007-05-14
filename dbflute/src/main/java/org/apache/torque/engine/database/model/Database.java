@@ -1259,6 +1259,10 @@ public class Database {
         return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
     }
 
+    public boolean isVersionAfter1043() {
+        return getProperties().getOtherProperties().isVersionAfter1043();
+    }
+    
     public boolean isVersionAfter1040() {
         return getProperties().getOtherProperties().isVersionAfter1040();
     }
