@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
+import org.seasar.dbflute.helper.datahandler.impl.internal.DfSybaseSqlWriter;
 import org.seasar.dbflute.helper.excel.DfXlsReader;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.util.DfMapStringFileUtil;
@@ -125,6 +126,24 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
             final SqlServerSqlWriter sqlServerSqlWriter = new SqlServerSqlWriter(dataSource);
             sqlServerSqlWriter.write(dataSet);
+        }
+    }
+
+    public void writeSeveralDataForSybase(String dataDirectoryName, final DataSource dataSource) {
+        final List<File> xlsList = getXlsList(dataDirectoryName);
+
+        for (File file : xlsList) {
+            _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
+            _log.info("writeData(" + file + ")");
+            _log.info("= = = = = = =/");
+            final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
+            final DataSet dataSet = xlsReader.read();
+
+            filterValidColumn(dataSet, dataSource);
+            setupDefaultValue(dataDirectoryName, dataSet, dataSource);
+
+            final DfSybaseSqlWriter sybaseSqlWriter = new DfSybaseSqlWriter(dataSource);
+            sybaseSqlWriter.write(dataSet);
         }
     }
 

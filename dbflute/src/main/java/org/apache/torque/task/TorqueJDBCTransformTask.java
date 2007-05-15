@@ -289,7 +289,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 }
 
                 if (primaryColumnNameList.contains(columnName)) {
-                    if (isAutoIncrementColumn(dbMetaData, currentTable, columnName, conn)) {
+                    if (isAutoIncrementColumn(conn, currentTable, columnName)) {
                         columnElement.setAttribute("autoIncrement", "true");
                     }
                 }
@@ -449,16 +449,15 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /**
      * Get auto-increment column name.
      * 
-     * @param dbMeta JDBC metadata.
      * @param tableName Table from which to retrieve PK information.
      * @param primaryKeyColumnName Primary-key column-name.
      * @param conn Connection.
      * @return Auto-increment column name. (Nullable)
      * @throws SQLException
      */
-    protected boolean isAutoIncrementColumn(DatabaseMetaData dbMeta, String tableName, String primaryKeyColumnName,
-            Connection conn) throws SQLException {
-        return _autoIncrementHandler.isAutoIncrementColumn(dbMeta, tableName, primaryKeyColumnName, conn);
+    protected boolean isAutoIncrementColumn(Connection conn, String tableName, String primaryKeyColumnName)
+            throws SQLException {
+        return _autoIncrementHandler.isAutoIncrementColumn(conn, tableName, primaryKeyColumnName);
     }
 
     /**

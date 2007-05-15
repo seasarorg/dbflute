@@ -35,6 +35,7 @@ import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.datahandler.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
+import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerJdbc;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerMySQL;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerOracle;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerSqlServer;
@@ -103,13 +104,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         } else if (basicProperties.isDatabaseSybase()) {
             initializer = createSchemaInitializerSybase();
         } else {
-            initializer = null;
+            initializer = createSchemaInitializerJdbc();
         }
         if (initializer != null) {
             initializer.initializeSchema();
         }
-
-        // TODO: Make initializeSchema for Other DB.
     }
 
     protected DfSchemaInitializer createSchemaInitializerMySQL() {
@@ -132,6 +131,12 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected DfSchemaInitializer createSchemaInitializerSybase() {
         final DfSchemaInitializerSybase initializer = new DfSchemaInitializerSybase();
+        initializer.setDataSource(getDataSource());
+        return initializer;
+    }
+
+    protected DfSchemaInitializer createSchemaInitializerJdbc() {
+        final DfSchemaInitializerJdbc initializer = new DfSchemaInitializerJdbc();
         initializer.setDataSource(getDataSource());
         return initializer;
     }
@@ -240,8 +245,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected void writeDbFromXls(String directoryPath) {
         final DfXlsDataHandler xlsDataHandler = new DfXlsDataHandlerImpl();
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        if (basicProperties.isDatabaseSqlServer() || basicProperties.isDatabaseSybase()) {
+        if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
+        } else if (basicProperties.isDatabaseSybase()) {
+            xlsDataHandler.writeSeveralDataForSybase(directoryPath, getDataSource());
         } else {
             xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
         }

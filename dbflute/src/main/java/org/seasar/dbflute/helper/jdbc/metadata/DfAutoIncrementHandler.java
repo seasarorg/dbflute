@@ -16,7 +16,6 @@
 package org.seasar.dbflute.helper.jdbc.metadata;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -28,25 +27,23 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This class generates an XML schema of an existing database from JDBC metadata..
  * <p>
- * @author mkubo
- * @version $Revision$ $Date$
+ * @author jflute
  */
 public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
 
     public static final Log _log = LogFactory.getLog(DfAutoIncrementHandler.class);
 
     /**
-     * Get auto-increment column name.
+     * Is auto-increment column?
      * <p>
-     * @param dbMeta JDBC metadata.
+     * @param conn Connection.
      * @param tableName Table from which to retrieve PK information.
      * @param primaryKeyColumnName Primary-key column-name.
-     * @param conn Connection.
      * @return Auto-increment column name. (Nullable)
      * @throws SQLException
      */
-    public boolean isAutoIncrementColumn(DatabaseMetaData dbMeta, String tableName, String primaryKeyColumnName,
-            Connection conn) throws SQLException {
+    public boolean isAutoIncrementColumn(Connection conn, String tableName, String primaryKeyColumnName)
+            throws SQLException {
         Statement stmt = null;
         ResultSet rs = null;
         try {
@@ -71,5 +68,37 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
         String msg = "The primaryKeyColumnName is not found in the table: ";
         msg = msg + tableName + " - " + primaryKeyColumnName;
         throw new RuntimeException(msg);
+    }
+
+    /**
+     * Has auto-increment at the table?
+     * <p>
+     * @param conn Connection.
+     * @param tableName Table from which to retrieve PK information.
+     * @return Determination. (Nullable)
+     * @throws SQLException
+     */
+    public boolean hasAutoIncrement(Connection conn, String tableName) throws SQLException {
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT * FROM " + tableName);
+            final ResultSetMetaData md = rs.getMetaData();
+
+            for (int i = 1; i <= md.getColumnCount(); i++) {
+                if (md.isAutoIncrement(i)) {
+                    return true;
+                }
+            }
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
+        }
+        return false;
     }
 }
