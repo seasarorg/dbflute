@@ -79,7 +79,7 @@ public class Index {
     /** table */
     private Table _parentTable;
 
-    /** Unique column map. */
+    /** Unique column map. {ordinalPosition : columnName} */
     private final Map<Integer, String> _uniqueColumnMap = new LinkedHashMap<Integer, String>();
 
     /** columns */

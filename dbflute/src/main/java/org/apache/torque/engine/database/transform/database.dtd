@@ -79,7 +79,6 @@ Java class or method name.
   name CDATA #REQUIRED
   javaName CDATA #IMPLIED
   primaryKey (true|false) "false"
-  uniqueKey (true|false) "false"
   required (true|false) "false"
   type
     (

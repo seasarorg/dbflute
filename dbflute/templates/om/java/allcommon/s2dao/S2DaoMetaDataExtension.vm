@@ -115,7 +115,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     protected static class TransactionSuspendEventInvoker {
 
-        private static final Log _log = LogFactory.getLog(TransactionSuspendEventInvoker.class);
+        private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(TransactionSuspendEventInvoker.class);
         
         protected TransactionManager transactionManager;
 
@@ -388,7 +388,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #if ($database.isSelectQueryTimeoutValid())
 
         /** Log-instance. */
-        private static final Log _log = LogFactory.getLog(SelectDynamicCommandExtension.class);
+        private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(SelectDynamicCommandExtension.class);
 #end
 
         private ResultSetHandler resultSetHandler;

@@ -31,6 +31,33 @@ import ${glPackageCB}.*;
 /**
  * The behavior of ${table.Name}.
  * 
+ * <pre>
+ * [primary-key]
+ *     ${table.PrimaryKeyNameCommaString}
+ * 
+ * [column-property]
+ *     ${table.ColumnNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.ForeignPropertyNameCommaString}
+ * 
+ * [refferer-property]
+ *     ${table.ReferrerPropertyNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.DefinedSequenceName}
+ * 
+ * [identity]
+ *     ${table.IdentityPropertyName}
+ * 
+ * [update-date]
+ *     ${table.UpdateDateJavaName}
+ * 
+ * [version-no]
+ *     ${table.VersionNoJavaName}
+ * 
+ * </pre>
+ * 
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExtendClassName} {

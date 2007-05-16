@@ -60,6 +60,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -101,8 +102,6 @@ public class Column {
     private int _position;
 
     private boolean _isPrimaryKey = false;
-
-    private boolean _isUnique = false;
 
     private boolean _isAutoIncrement = false;
 
@@ -181,11 +180,6 @@ public class Column {
         {
             final String primaryKey = attrib.getValue("primaryKey");
             _isPrimaryKey = ("true".equals(primaryKey));
-        }
-        {
-            //Unique Key
-            final String uniqueKey = attrib.getValue("uniqueKey");
-            _isUnique = ("true".equals(uniqueKey));
         }
 
         // HELP: Should primary key, index, and/or idMethod="native"
@@ -372,20 +366,52 @@ public class Column {
         return _isEnumeratedClasses;
     }
 
-    /**
-     * Return the isNotNull property of the column
-     */
-    public boolean isNotNull() {
-        return _isNotNull;
+    // =====================================================================================
+    //                                                                     Column Definition
+    //                                                                     =================
+    public String getColumnDefinitionLineDisp() {
+        final StringBuilder sb = new StringBuilder();
+        if (isPrimaryKey()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("PK");
+        }
+        if (isAutoIncrement()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("INC");
+        }
+        if (isUnique()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("UQ");
+        }
+        plugDelimiterIfNeeds(sb);
+        sb.append(getTorqueType());
+        if (getSize() != null) {
+            sb.append("(" + getSize() + ")");
+        }
+        if (isNotNull()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("NotNull");
+        }
+        if (getDefaultValue() != null) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("Default=[").append(getDefaultValue() + "]");
+        }
+        if (isForeignKey()) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("FK to " + getForeignTableName());
+        }
+        return sb.toString();
     }
 
-    /**
-     * Set the isNotNull property of the column
-     */
-    public void setNotNull(boolean status) {
-        _isNotNull = status;
+    private void plugDelimiterIfNeeds(StringBuilder sb) {
+        if (sb.length() != 0) {
+            sb.append(" : ");
+        }
     }
 
+    // -------------------------------------------
+    //                                 Primary Key
+    //                                 -----------
     /**
      * Set if the column is a primary key or not
      */
@@ -400,18 +426,51 @@ public class Column {
         return _isPrimaryKey;
     }
 
+    // -------------------------------------------
+    //                               AutoIncrement
+    //                               -------------
+    /**
+     * Return auto increment/sequence string for the target database. We need to
+     * pass in the props for the target database!
+     */
+    public boolean isAutoIncrement() {
+        return _isAutoIncrement;
+    }
+
+    /**
+     * Set the auto increment value.
+     * Use isAutoIncrement() to find out if it is set or not.
+     */
+    public void setAutoIncrement(boolean value) {
+        _isAutoIncrement = value;
+    }
+
+    // -------------------------------------------
+    //                                  Unique Key
+    //                                  ----------
     /**
      * Set true if the column is UNIQUE
      */
     public void setUnique(boolean u) {
-        _isUnique = u;
+        throw new UnsupportedOperationException();
     }
 
     /**
      * Get the UNIQUE property
      */
     public boolean isUnique() {
-        return _isUnique;
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        for (Unique unique : uniqueList) {
+            final Map<Integer, String> uniqueColumnMap = unique.getUniqueColumnMap();
+            final Set<Integer> ordinalPositionSet = uniqueColumnMap.keySet();
+            for (Integer ordinalPosition : ordinalPositionSet) {
+                final String columnName = uniqueColumnMap.get(ordinalPosition);
+                if (getName().equals(columnName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -421,6 +480,51 @@ public class Column {
         return _needsTransactionInPostgres;
     }
 
+    // -------------------------------------------
+    //                                     NotNull
+    //                                     -------
+    /**
+     * Return the isNotNull property of the column
+     */
+    public boolean isNotNull() {
+        return _isNotNull;
+    }
+
+    /**
+     * Set the isNotNull property of the column
+     */
+    public void setNotNull(boolean status) {
+        _isNotNull = status;
+    }
+
+    // -------------------------------------------
+    //                                        Size
+    //                                        ----
+    /**
+     * Returns the size of the column
+     */
+    public String getSize() {
+        return _size;
+    }
+
+    /**
+     * Set the size of the column
+     */
+    public void setSize(String newSize) {
+        _size = newSize;
+    }
+
+    /**
+     * Return the size in brackets for use in an sql
+     * schema if the type is String.  Otherwise return an empty string
+     */
+    public String printSize() {
+        return (_size == null ? "" : '(' + _size + ')');
+    }
+
+    // -------------------------------------------
+    //                                 Foreign Key
+    //                                 -----------
     /**
      * Utility method to determine if this column is a foreign key.
      */
@@ -476,9 +580,6 @@ public class Column {
         return (fk == null ? "" : fk.getForeignTableName());
     }
 
-    // -------------------------------------------
-    //                      Single Key Foreign Key
-    //                      ----------------------
     /**
      * Adds the foreign key from another table that refers to this column.
      * 
@@ -489,9 +590,6 @@ public class Column {
         return (fk == null ? false : fk.isSimpleKeyFK());
     }
 
-    // -------------------------------------------
-    //                         Related Column Name
-    //                         -------------------
     /**
      * Utility method to get the related column of this local column if this
      * column is a foreign key or part of a foreign key.
@@ -628,6 +726,39 @@ public class Column {
                         .equals("CHAR"));
     }
 
+    /**
+     * Return a string that will give this column a default value.
+     * <p>
+     * TODO: Properly SQL-escape text values.
+     */
+    public String getDefaultSetting() {
+        StringBuffer dflt = new StringBuffer(0);
+        if (_defaultValue != null) {
+            dflt.append("default ");
+            if (TypeMap.isTextType(_torqueType)) {
+                // TODO: Properly SQL-escape the text.
+                dflt.append('\'').append(_defaultValue).append('\'');
+            } else {
+                dflt.append(_defaultValue);
+            }
+        }
+        return dflt.toString();
+    }
+
+    /**
+     * Set a string that will give this column a default value.
+     */
+    public void setDefaultValue(String def) {
+        _defaultValue = def;
+    }
+
+    /**
+     * Get a string that will give this column a default value.
+     */
+    public String getDefaultValue() {
+        return _defaultValue;
+    }
+
     // =========================================================================================
     //                                                                            Checked Getter
     //                                                                            ==============
@@ -687,77 +818,6 @@ public class Column {
         result.append(" />\n");
 
         return result.toString();
-    }
-
-    /**
-     * Returns the size of the column
-     */
-    public String getSize() {
-        return _size;
-    }
-
-    /**
-     * Set the size of the column
-     */
-    public void setSize(String newSize) {
-        _size = newSize;
-    }
-
-    /**
-     * Return the size in brackets for use in an sql
-     * schema if the type is String.  Otherwise return an empty string
-     */
-    public String printSize() {
-        return (_size == null ? "" : '(' + _size + ')');
-    }
-
-    /**
-     * Return a string that will give this column a default value.
-     * <p>
-     * TODO: Properly SQL-escape text values.
-     */
-    public String getDefaultSetting() {
-        StringBuffer dflt = new StringBuffer(0);
-        if (_defaultValue != null) {
-            dflt.append("default ");
-            if (TypeMap.isTextType(_torqueType)) {
-                // TODO: Properly SQL-escape the text.
-                dflt.append('\'').append(_defaultValue).append('\'');
-            } else {
-                dflt.append(_defaultValue);
-            }
-        }
-        return dflt.toString();
-    }
-
-    /**
-     * Set a string that will give this column a default value.
-     */
-    public void setDefaultValue(String def) {
-        _defaultValue = def;
-    }
-
-    /**
-     * Get a string that will give this column a default value.
-     */
-    public String getDefaultValue() {
-        return _defaultValue;
-    }
-
-    /**
-     * Return auto increment/sequence string for the target database. We need to
-     * pass in the props for the target database!
-     */
-    public boolean isAutoIncrement() {
-        return _isAutoIncrement;
-    }
-
-    /**
-     * Set the auto increment value.
-     * Use isAutoIncrement() to find out if it is set or not.
-     */
-    public void setAutoIncrement(boolean value) {
-        _isAutoIncrement = value;
     }
 
     /**

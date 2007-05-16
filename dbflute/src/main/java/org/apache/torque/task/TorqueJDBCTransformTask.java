@@ -316,23 +316,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 tableElement.appendChild(foreignKeyElement);
             }
 
-            //            final Collection foreignKeys = getForeignKeys(dbMetaData, currentTable);
-            //            for (final Iterator ite = foreignKeys.iterator(); ite.hasNext();) {
-            //                final Object[] forKey = (Object[]) ite.next();
-            //                final String foreignKeyTable = (String) forKey[0];
-            //                final List refs = (List) forKey[1];
-            //                final Element foreignKeyElement = _doc.createElement("foreign-key");
-            //                foreignKeyElement.setAttribute("foreignTable", foreignKeyTable);
-            //                for (int m = 0; m < refs.size(); m++) {
-            //                    final Element referenceElement = _doc.createElement("reference");
-            //                    final String[] refData = (String[]) refs.get(m);
-            //                    referenceElement.setAttribute("local", refData[0]);
-            //                    referenceElement.setAttribute("foreign", refData[1]);
-            //                    foreignKeyElement.appendChild(referenceElement);
-            //                }
-            //                tableElement.appendChild(foreignKeyElement);
-            //            }
-
             // Unique keys for this table.
             final Map<String, Map<Integer, String>> uniqueMap = getUniqueColumnNameList(dbMetaData, tableMataInfo);
             final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();

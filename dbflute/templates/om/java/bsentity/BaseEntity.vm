@@ -83,14 +83,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($col in $table.Columns)
   #if ($database.isMakeDeprecated())
 
-    /** The value of ${col.UncapitalisedJavaName}. */
+    /** The value of ${col.UncapitalisedJavaName}. ColumnDefinition -- ${col.columnDefinitionLineDisp}*/
     protected ${col.JavaNative} _${col.UncapitalisedJavaName};
 
     /** Has the setter of ${col.UncapitalisedJavaName} been invoked? */
     protected boolean _isSetterInvoked${col.JavaName};
   #else
 
-    /** The value of ${col.UncapitalisedJavaName}. */
+    /** The value of ${col.UncapitalisedJavaName}. ColumnDefinition -- {${col.columnDefinitionLineDisp}*/
     protected ${col.JavaNative} _${col.UncapitalisedJavaName};
   #end
 #end
@@ -151,7 +151,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                              ========
 #foreach ($col in $table.Columns)
 
-    /** Column-Annotation for S2Dao */
+    /** Column-Annotation for S2Dao. ColumnDefinition -- ${col.columnDefinitionLineDisp}*/
     public static final String ${col.JavaBeansRulePropertyName}_COLUMN = "${col.Name}";
 
     /**
