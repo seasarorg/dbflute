@@ -46,16 +46,16 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             columnResultSet = dbMeta.getColumns(null, schemaName, tableName, null);
             while (columnResultSet.next()) {
                 final String columnName = columnResultSet.getString(4);
-                final Integer sqlTypeCode = new Integer(columnResultSet.getString(5));
-                final String sqlTypeName = columnResultSet.getString(6);
+                final Integer jdbcTypeCode = new Integer(columnResultSet.getString(5));
+                final String dbTypeName = columnResultSet.getString(6);
                 final Integer columnSize = new Integer(columnResultSet.getInt(7));
                 final Integer nullType = new Integer(columnResultSet.getInt(11));
                 final String defaultValue = columnResultSet.getString(13);
 
                 final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
                 columnMetaInfo.setColumnName(columnName);
-                columnMetaInfo.setSqlTypeCode(sqlTypeCode);
-                columnMetaInfo.setSqlTypeName(sqlTypeName);
+                columnMetaInfo.setJdbcTypeCode(jdbcTypeCode);
+                columnMetaInfo.setDbTypeName(dbTypeName);
                 columnMetaInfo.setColumnSize(columnSize);
                 columnMetaInfo.setRequired(nullType == 0);
                 columnMetaInfo.setDefaultValue(defaultValue);
@@ -74,8 +74,8 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
     public static class DfColumnMetaInfo {
         protected String columnName;
-        protected int sqlTypeCode;
-        protected String sqlTypeName;
+        protected int jdbcTypeCode;
+        protected String dbTypeName;
         protected int columnSize;
         protected boolean required;
         protected String defaultValue;
@@ -112,20 +112,20 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             this.required = required;
         }
 
-        public int getSqlTypeCode() {
-            return sqlTypeCode;
+        public int getJdbcTypeCode() {
+            return jdbcTypeCode;
         }
 
-        public void setSqlTypeCode(int sqlTypeCode) {
-            this.sqlTypeCode = sqlTypeCode;
+        public void setJdbcTypeCode(int sqlTypeCode) {
+            this.jdbcTypeCode = sqlTypeCode;
         }
 
-        public String getSqlTypeName() {
-            return sqlTypeName;
+        public String getDbTypeName() {
+            return dbTypeName;
         }
 
-        public void setSqlTypeName(String sqlTypeName) {
-            this.sqlTypeName = sqlTypeName;
+        public void setDbTypeName(String sqlTypeName) {
+            this.dbTypeName = sqlTypeName;
         }
     }
 

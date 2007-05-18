@@ -8,14 +8,14 @@ $!table.Description
     <th class="normalFont" bgcolor="#CCCCCC">INC</th>
     <th class="normalFont" bgcolor="#CCCCCC">UQ</th>
     <th class="normalFont" bgcolor="#CCCCCC">Name</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Type of dbflute</th>
+    <th class="normalFont" bgcolor="#CCCCCC">Type</th>
     <th class="normalFont" bgcolor="#CCCCCC">Size</th>
     <th class="normalFont" bgcolor="#CCCCCC">NotNull</th>
     <th class="normalFont" bgcolor="#CCCCCC">Default</th>
     <th class="normalFont" bgcolor="#CCCCCC">ForeignTable</th>
     <th class="normalFont" bgcolor="#CCCCCC">ReffererTable</th>
     <th class="normalFont" bgcolor="#CCCCCC">CapPropName</th>
-    <th class="normalFont" bgcolor="#CCCCCC">Type of ${table.Database.TargetLanguage}</th>
+    <th class="normalFont" bgcolor="#CCCCCC">${table.database.targetLanguageInitCap}Type</th>
     <th class="normalFont" bgcolor="#CCCCCC">Classification</th>
   </tr>
 #foreach ($col in $table.Columns)
@@ -24,7 +24,7 @@ $!table.Description
     <td class="normalFont"><center> #if ($col.isAutoIncrement()==true)o#else &nbsp;#end </center></td>
     <td class="normalFont"><center> #if ($col.isUnique()==true)o#else &nbsp;#end </center></td>
     <td class="normalFont" id="$table.Name$col.Name">$col.Name</td>
-    <td class="normalFont">$col.TorqueType</td>
+    <td class="normalFont">$col.dbType</td>
     <td class="normalFont">#if ($col.printSize() && $col.printSize().length() > 0) $col.printSize() #else &nbsp;#end</td>
     <td class="normalFont"><center> #if ($col.isNotNull()==true)o#else &nbsp;#end </center></td>
     <td class="normalFont">#if ($col.DefaultValue) $col.DefaultValue#else &nbsp;#end</td>

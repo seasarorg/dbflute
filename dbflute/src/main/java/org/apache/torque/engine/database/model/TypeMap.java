@@ -316,7 +316,7 @@ public class TypeMap {
      * @param jdbcType the JDBC type
      * @return name of the native java type
      */
-    public static String getJavaNative(String jdbcType) {
+    public static String getJavaType(String jdbcType) {
         // Make sure the we are initialized.
         if (!isInitialized) {
             initialize();

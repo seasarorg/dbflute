@@ -670,12 +670,15 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
         public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues,
                 String preRelationNoSuffix) throws SQLException {
-            final Object row = setupRelationKeyValue(rpt, columnNames, relKeyValues);
-            return setupRelationAllValue(row, rs, rpt, columnNames, relKeyValues, preRelationNoSuffix);
+            // It must doesn't need to invoke this!
+            // final Object row = setupRelationKeyValue(rpt, columnNames, relKeyValues);
+
+            return setupRelationAllValue(rs, rpt, columnNames, relKeyValues, preRelationNoSuffix);
         }
 
-        protected Object setupRelationAllValue(Object row, ResultSet rs, RelationPropertyType rpt, Set columnNames,
+        protected Object setupRelationAllValue(ResultSet rs, RelationPropertyType rpt, Set columnNames,
                 Map relKeyValues, String preRelationNoSuffix) throws SQLException {
+            Object row = null;
             final String relationNoSuffix = preRelationNoSuffix + "_" + rpt.getRelationNo();
             final BeanMetaData bmd = rpt.getBeanMetaData();
             int existColumn = 0;
@@ -685,19 +688,41 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 if (!columnNames.contains(columnName)) {
                     continue;
                 }
+
+                // Return null if the primary key of foreign table is invalid(The foreign key is deadlink).
+                if (pt.isPrimaryKey()) {
+                    if (!isValidValue(rs, pt, columnName, relKeyValues)) {
+                        return null;
+                    }
+                }
+
                 existColumn++;
                 if (row == null) {
                     row = createRelationRow(rpt);
                 }
                 registerRelationValue(row, rs, rpt, pt, columnName, relKeyValues);
             }
+
+            // Return null if setupSelect_Xxx() or withXxx() has not been invoked.
             if (existColumn == 0) {
                 return null;
             }
+
             if (rpt.getBeanMetaData().getRelationPropertyTypeSize() != 0) {
                 createParentRelationRow(rs, rpt.getBeanMetaData(), columnNames, relationNoSuffix, row);
             }
             return row;
+        }
+
+        protected boolean isValidValue(ResultSet rs, PropertyType pt, String columnName, Map relKeyValues) throws SQLException {
+            Object value = null;
+            if (relKeyValues != null && relKeyValues.containsKey(columnName)) {
+                value = relKeyValues.get(columnName);
+            } else {
+                final org.seasar.extension.jdbc.ValueType valueType = pt.getValueType();
+                value = valueType.getValue(rs, columnName);
+            }
+            return value != null;
         }
 
         protected void createParentRelationRow(ResultSet rs, BeanMetaData parentBmd, Set columnNames,

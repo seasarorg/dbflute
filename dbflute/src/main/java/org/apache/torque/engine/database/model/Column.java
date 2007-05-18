@@ -78,28 +78,17 @@ public class Column {
     /** Logging class from commons.logging */
     private static Log _log = LogFactory.getLog(Column.class);
 
+    // ==============================================================================
+    //                                                                      Attribute
+    //                                                                      =========
+    private Table _parentTable;
+    
+    // ------------------------------------
+    //                    Column Definition
+    //                    -----------------
     private String _name;
 
     private String _description;
-
-    private String _javaName = null;
-
-    private String _javaNamingMethod;
-
-    private boolean _isNotNull = false;
-
-    private String _size;
-
-    /** type as defined in schema.xml */
-    private String _torqueType;
-
-    private String _javaType;
-
-    private Object _columnType;
-
-    private Table _parentTable;
-
-    private int _position;
 
     private boolean _isPrimaryKey = false;
 
@@ -107,7 +96,40 @@ public class Column {
 
     private String _defaultValue;
 
+    // ........................
+    //                     Type
+    //                     ^^^^
+    private String _torqueType;
+
+    private String _dbType;
+
+    private String _javaType;
+
+    private Object _columnType;
+
+    private String _size;
+
+    // ........................
+    //               Constraint
+    //               ^^^^^^^^^^
+    private boolean _isNotNull = false;
+
+    // ........................
+    //                    Other
+    //                    ^^^^^
+    private String _javaName = null;
+
+    private String _javaNamingMethod;
+
+    // ------------------------------------
+    //                             Relation
+    //                             --------
     private List<ForeignKey> _referrers;
+
+    // ------------------------------------
+    //                                Other
+    //                                -----
+    private int _position;
 
     // only one type is supported currently, which assumes the
     // column either contains the classnames or a key to
@@ -126,6 +148,9 @@ public class Column {
     //    /** class name to do input validation on this column */
     //    private String _inputValidator = null;
 
+    // ==============================================================================
+    //                                                                    Constructor
+    //                                                                    ===========
     /**
      * Creates a new instance with a <code>null</code> name.
      */
@@ -142,6 +167,9 @@ public class Column {
         this._name = name;
     }
 
+    // ==============================================================================
+    //                                                                        Loading
+    //                                                                        =======
     public static String makeList(List columns) {
         Object obj = columns.get(0);
         boolean isColumnList = (obj instanceof Column);
@@ -197,6 +225,7 @@ public class Column {
         _size = attrib.getValue("size");
 
         setTorqueType(attrib.getValue("type"));
+        setDbType(attrib.getValue("dbType"));
 
         _inheritanceType = attrib.getValue("inheritance");
         _isInheritance = (_inheritanceType != null && !_inheritanceType.equals("false"));
@@ -209,6 +238,9 @@ public class Column {
         return (_parentTable.getName() + '.' + _name);
     }
 
+    // ==============================================================================
+    //                                                                       Accessor
+    //                                                                       ========
     public String getName() {
         return _name;
     }
@@ -384,7 +416,7 @@ public class Column {
             sb.append("UQ");
         }
         plugDelimiterIfNeeds(sb);
-        sb.append(getTorqueType());
+        sb.append(getDbType());
         if (getSize() != null) {
             sb.append("(" + getSize() + ")");
         }
@@ -691,9 +723,6 @@ public class Column {
         return sb.toString();
     }
 
-    /**
-     * Returns the colunm type
-     */
     public void setTorqueType(String torqueType) {
         this._torqueType = torqueType;
         if (torqueType.equals("VARBINARY") || torqueType.equals("BLOB")) {
@@ -701,11 +730,16 @@ public class Column {
         }
     }
 
-    /**
-     * Returns the column type as given in the schema as an object
-     */
     public Object getTorqueType() {
         return _torqueType;
+    }
+
+    public void setDbType(String dbType) {
+        this._dbType = dbType;
+    }
+
+    public Object getDbType() {
+        return _dbType;
     }
 
     /**
@@ -863,7 +897,7 @@ public class Column {
      * @return string representation of the primitive java type
      */
     public String getJavaPrimitive() {
-        return TypeMap.getJavaNative(_torqueType);
+        return TypeMap.getJavaType(_torqueType);
     }
 
     /**
@@ -875,7 +909,7 @@ public class Column {
      * @return java datatype used by torque
      */
     public String getJavaNative() {
-        return TypeMap.getJavaNative(_torqueType);
+        return TypeMap.getJavaType(_torqueType);
     }
 
     // ===================================================================================

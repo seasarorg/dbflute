@@ -64,17 +64,9 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-/**
- * A resolver to get the database.dtd file for the XML parser from the jar.
- *
- * @author <a href="mailto:mpoeschl@marmot.at">Martin Poeschl</a>
- * @author <a href="mailto:kschrader@karmalab.org">Kurt Schrader</a>
- * @author <a href="mailto:quintonm@bellsouth.net">Quinton McCombs</a>
- * @version $Id$
- */
 public class DTDResolver implements EntityResolver {
     /** Where the DTD is located on the web. */
-    public static final String WEB_SITE_DTD = "http://db.apache.org/torque/dtd/database_3_1.dtd";
+    public static final String WEB_SITE_DTD = "http://dbflute.sandbox.seasar.org/dtd/database.dtd";
 
     /** InputSource for <code>database.dtd</code>. */
     private InputSource databaseDTD = null;

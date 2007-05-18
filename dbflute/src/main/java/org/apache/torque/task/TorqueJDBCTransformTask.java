@@ -263,6 +263,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 }
 
                 setupColumnType(columnMetaInfo, columnElement);
+                setupColumnDbType(columnMetaInfo, columnElement);
+                setupColumnJavaType(columnMetaInfo, columnElement);
                 setupColumnSize(columnMetaInfo, columnElement);
 
                 if (columnMetaInfo.isRequired()) {
@@ -304,6 +306,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
                 final Element foreignKeyElement = _doc.createElement("foreign-key");
                 foreignKeyElement.setAttribute("foreignTable", foreignKeyMetaInfo.getForeignTableName());
+                foreignKeyElement.setAttribute("name", foreignKeyMetaInfo.getForeignKeyName());
                 final Map<String, String> columnNameMap = foreignKeyMetaInfo.getColumnNameMap();
                 final Set<String> columnNameKeySet = columnNameMap.keySet();
                 for (String localColumnName : columnNameKeySet) {
@@ -344,35 +347,47 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final int sqlTypeCode = columnMetaInfo.getSqlTypeCode();
+        columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo, columnElement));
+    }
+
+    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
         if (Types.OTHER != sqlTypeCode) {
             final String torqueType = TypeMap.getTorqueType(sqlTypeCode);
-            columnElement.setAttribute("type", torqueType);
-            return;
+            return torqueType;
         }
 
         // If other
-        final String sqlTypeName = columnMetaInfo.getSqlTypeName();
-        if (sqlTypeName == null) {
+        final String dbTypeName = columnMetaInfo.getDbTypeName();
+        if (dbTypeName == null) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            columnElement.setAttribute("type", torqueType);
-        } else if (sqlTypeName.toLowerCase().contains("char")) {
+            return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("char")) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            columnElement.setAttribute("type", torqueType);
-        } else if (sqlTypeName.toLowerCase().contains("date")) {
+            return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("date")) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.DATE);
-            columnElement.setAttribute("type", torqueType);
-        } else if (sqlTypeName.toLowerCase().contains("timestamp")) {
+            return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("timestamp")) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.TIMESTAMP);
-            columnElement.setAttribute("type", torqueType);
+            return torqueType;
         } else {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            columnElement.setAttribute("type", torqueType);
+            return torqueType;
         }
     }
 
+    protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        final String javaType = TypeMap.getJavaType(getColumnTorqueType(columnMetaInfo, columnElement));
+        columnElement.setAttribute("javaType", javaType);
+    }
+
+    protected void setupColumnDbType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
+        columnElement.setAttribute("dbType", columnMetaInfo.getDbTypeName());
+    }
+
     protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final int sqlTypeCode = columnMetaInfo.getSqlTypeCode();
+        final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
         final int columnSize = columnMetaInfo.getColumnSize();
         if (columnSize > 0
                 && (sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR

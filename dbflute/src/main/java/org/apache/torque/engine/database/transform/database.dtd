@@ -89,6 +89,7 @@ Java class or method name.
         | BLOB | CLOB    | REF         | BOOLEANINT | BOOLEANCHAR
         | DOUBLE
     ) "VARCHAR"
+  dbType CDATA #IMPLIED
   javaType (object|primitive) #IMPLIED
   size CDATA #IMPLIED
   default CDATA #IMPLIED
@@ -139,4 +140,5 @@ Java class or method name.
 <!ELEMENT unique-column EMPTY>
 <!ATTLIST unique-column
   name CDATA #REQUIRED
+  position CDATA #REQUIRED
 >

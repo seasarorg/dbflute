@@ -658,6 +658,11 @@ public class Database {
     public String getTargetLanguage() {
         return getBasicProperties().getTargetLanguage();
     }
+    
+    public String getTargetLanguageInitCap() {
+        final String targetLanguage = getBasicProperties().getTargetLanguage();
+        return targetLanguage.substring(0, 1).toUpperCase() + targetLanguage.substring(1);
+    }
 
     public boolean isTargetLanguageJava() {
         return getBasicProperties().isTargetLanguageJava();
@@ -1537,7 +1542,7 @@ public class Database {
     //                                                                         =======
     public String convertJavaNativeByJdbcType(String jdbcType) {
         try {
-            return TypeMap.getJavaNative(jdbcType);
+            return TypeMap.getJavaType(jdbcType);
         } catch (RuntimeException e) {
             _log.warn("TypeMap.getJavaNative(jdbcType) threw the exception: jdbcType=" + jdbcType, e);
             throw e;
