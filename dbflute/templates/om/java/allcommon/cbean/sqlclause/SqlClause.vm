@@ -107,6 +107,14 @@ public interface ${myClassName} {
     public String getSqlSuffix();
 
     // =====================================================================================
+    //                                                                            Copy Parts
+    //                                                                            ==========
+    /**
+     * Copy included-select-column.
+     */
+    public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause);
+
+    // =====================================================================================
     //                                                                  IncludedSelectColumn
     //                                                                  ====================
     /**

@@ -78,7 +78,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     // =====================================================================================
-    //                                                                         Select Clause
+    //                                                                         Select-Clause
     //                                                                         =============
     public void setSelectClauseColumnAliasMap(java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap) {
         _selectClauseColumnAliasMap = selectClauseColumnAliasMap;
@@ -286,6 +286,21 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      */
     public String getSqlSuffix() {
         return createSqlSuffix();
+    }
+
+    // =====================================================================================
+    //                                                                            Copy Parts
+    //                                                                            ==========
+    /**
+     * Copy included-select-column.
+     */
+    public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause) {
+        final java.util.Set keySet = _includedSelectColumnMap.keySet();
+        for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
+            final String aliasName = (String)ite.next();
+            final String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
+            sqlClause.registerIncludedSelectColumn(aliasName, realColumnName);
+        }
     }
 
     // =====================================================================================

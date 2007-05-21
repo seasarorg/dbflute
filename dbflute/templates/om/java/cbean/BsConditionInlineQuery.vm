@@ -41,6 +41,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         _myCQ = myCQ;
     }
 
+    protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} unionQueryAsSuper) {
+        throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + unionQueryAsSuper);
+    }
+
     // =====================================================================================
     //                                                                                 Query
     //                                                                                 =====

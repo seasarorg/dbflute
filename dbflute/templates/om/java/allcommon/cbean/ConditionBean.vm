@@ -31,7 +31,7 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
 
     // =====================================================================================
-    //                                                                            Table name
+    //                                                                            Table Name
     //                                                                            ==========
     /**
      * Get table db-name.
@@ -41,8 +41,8 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     public String getTableDbName();
 
     // =====================================================================================
-    //                                                                             SqlClause
-    //                                                                             =========
+    //                                                                            Sql-Clause
+    //                                                                            ==========
     /**
      * Get sql-clause instance.
      * 
@@ -51,8 +51,8 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     public ${glSqlClauseName} getSqlClause();
 
     // =====================================================================================
-    //                                                                            PrimaryKey
-    //                                                                            ==========
+    //                                                                           Primary-Key
+    //                                                                           ===========
     /**
      * Accept primary-key map-string.
      * 
@@ -68,8 +68,8 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     public void acceptPrimaryKeyMapString(String primaryKeyMapString);
 
     // =====================================================================================
-    //                                                                               OrderBy
-    //                                                                               =======
+    //                                                                              Order-By
+    //                                                                              ========
     /**
      * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
      * 
@@ -95,7 +95,12 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     public ${glConditionQueryInterfaceName} getConditionQueryAsInterface();
 
     // =====================================================================================
-    //                                                                          Limit Select
+    //                                                                           Union-Query
+    //                                                                           ===========
+    public boolean hasUnionQueryOrUnionAllQuery();
+
+    // =====================================================================================
+    //                                                                          Limit-Select
     //                                                                          ============
     /**
      * Limit select PK only.

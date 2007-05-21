@@ -42,7 +42,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // * * * * * * * * */
 
     // =====================================================================================
-    //                                                                            Table name
+    //                                                                            Table-Name
     //                                                                            ==========
     /**
      * ${database.ImplementComment}
@@ -219,7 +219,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     // =====================================================================================
-    //                                                                           Union Query
+    //                                                                           Union-Query
     //                                                                           ===========
     /**
      * Union.
@@ -229,7 +229,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * @param unionQuery Union query. (NotNull)
      */
     public void union(${myConditionQueryClassName} unionQuery) {
-        query().setUnionQuery(unionQuery);
+        query().xsetUnionQuery(unionQuery);
     }
 
     /**
@@ -240,11 +240,15 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * @param unionAllQuery Union all query. (NotNull)
      */
     public void unionAll(${myConditionQueryClassName} unionAllQuery) {
-        query().setUnionAllQuery(unionAllQuery);
+        query().xsetUnionAllQuery(unionAllQuery);
+    }
+
+    public boolean hasUnionQueryOrUnionAllQuery() {
+        return query().hasUnionQueryOrUnionAllQuery();
     }
 
     // =====================================================================================
-    //                                                                          Setup Select
+    //                                                                          Setup-Select
     //                                                                          ============
   #foreach ($foreignKeys in $table.ForeignKeys)
     #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")

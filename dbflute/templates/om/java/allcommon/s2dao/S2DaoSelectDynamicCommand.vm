@@ -143,7 +143,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     }
 
     // --------------------------------------
-    //                          Select Clause
+    //                          Select-Clause
     //                          -------------
     /**
      * Set select clause.
@@ -187,9 +187,28 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         final List${database.filterGenericsString('Object')} bindVariableList = new ArrayList${database.filterGenericsString('Object')}();
         final List${database.filterGenericsString('Class')} bindVariableTypeList = new ArrayList${database.filterGenericsString('Class')}();
 
-        final String selectClause = setupRealSelectClause(args, bindVariableList, bindVariableTypeList);
-        final String fromWhereClause = setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList);
-        final String finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
+        final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+        final String finalClause;
+        if (cb.hasUnionQueryOrUnionAllQuery()) {
+            final String selectClause = setupRealSelectClause(args, bindVariableList, bindVariableTypeList);
+            final String fromWhereClause = setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList);
+            if (cb.isSelectCountIgnoreFetchScope()) {
+                // If the query uses union and it selects count, the way of select-count is as follows.
+                // (Then it needs included-select-column)
+                finalClause = "select count(*) from (" + InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause) + ") base";
+            } else {
+                finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
+            }
+        } else {
+            final String selectClause;
+            if (cb.isSelectCountIgnoreFetchScope()) {
+                selectClause = "select count(*)";
+            } else {
+                selectClause = setupRealSelectClause(args, bindVariableList, bindVariableTypeList);
+            }
+            final String fromWhereClause = setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList);
+            finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
+        }
 
         final BasicSelectHandler selectHandler = createBasicSelectHandler(finalClause);
         selectHandler.setFetchSize(-1);
@@ -202,9 +221,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     //                           ------------
     protected String setupRealSelectClause(Object[] args, List${database.filterGenericsString('Object')} bindVariableList, List${database.filterGenericsString('Class')} bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        if (cb.isSelectCountIgnoreFetchScope()) {
-            return "select count(*)";
-        }
         final String realSelectClause;
         {
             final CommandContext ctx;

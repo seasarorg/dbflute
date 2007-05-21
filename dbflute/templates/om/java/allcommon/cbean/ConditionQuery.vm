@@ -10,6 +10,9 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
  */
 public interface ${glConditionQueryInterfaceName} {
 
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
     /**
      * Get table db-name.
      * 
@@ -91,7 +94,7 @@ public interface ${glConditionQueryInterfaceName} {
     public void invokeAddOrderByDesc(String columnMultiName);
 
     // =====================================================================================
-    //                                                                         Foregin Query
+    //                                                                         Foregin-Query
     //                                                                         =============
     /// <summary>
     /// Get foreign condition-query.

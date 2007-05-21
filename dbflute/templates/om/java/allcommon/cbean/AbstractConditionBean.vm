@@ -27,8 +27,8 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // =====================================================================================
-    //                                                                             SqlClause
-    //                                                                             =========
+    //                                                                            Sql-Clause
+    //                                                                            ==========
     /**
      * ${database.ImplementComment}
      * 
@@ -37,6 +37,16 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     public ${glSqlClauseName} getSqlClause() {
         return _sqlClause;
     }
+
+    // =====================================================================================
+    //                                                                       Condition-Query
+    //                                                                       ===============
+    /**
+     * Get condition query as interface.
+     * 
+     * @return Instance of query as interface. (NotNull)
+     */
+    abstract public ${glConditionQueryInterfaceName} getConditionQueryAsInterface();
 
     // =====================================================================================
     //                                                                    Accept Primary-Key
@@ -98,8 +108,8 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // =====================================================================================
-    //                                                                        FetchNarrowing
-    //                                                                        ==============
+    //                                                                       Fetch-Narrowing
+    //                                                                       ===============
     /**
      * ${database.ImplementComment}
      * 
@@ -237,8 +247,8 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // =====================================================================================
-    //                                                                               OrderBy
-    //                                                                               =======
+    //                                                                              Order-By
+    //                                                                              ========
     /**
      * ${database.ImplementComment}
      * 
@@ -387,7 +397,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // =====================================================================================
-    //                                                                          Limit Select
+    //                                                                          Limit-Select
     //                                                                          ============
     /** Is limit-select PK only? */
     protected boolean _isLimitSelectPKOnly;
@@ -493,7 +503,12 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     public ${glConditionBeanInterfaceName} setupSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = true;
-        getSqlClause().ignoreIncludedSelectColumn();
+
+        // If the query uses union query, it needs included-select-column.
+        if (!hasUnionQueryOrUnionAllQuery()) {
+            getSqlClause().ignoreIncludedSelectColumn();
+        }
+
         getSqlClause().ignoreOrderBy();
         getSqlClause().ignoreFetchScope();
         return this;
@@ -507,7 +522,12 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     public ${glConditionBeanInterfaceName} afterCareSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = false;
-        getSqlClause().makeIncludedSelectColumnEffective();
+
+        // If the query uses union query, it needs included-select-column.
+        if (!hasUnionQueryOrUnionAllQuery()) {
+            getSqlClause().makeIncludedSelectColumnEffective();
+        }
+
         getSqlClause().makeOrderByEffective();
         getSqlClause().makeFetchScopeEffective();
         return this;
