@@ -90,7 +90,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     protected boolean _isSetterInvoked${col.JavaName};
   #else
 
-    /** The value of ${col.UncapitalisedJavaName}. ColumnDefinition -- {${col.columnDefinitionLineDisp}*/
+    /** The value of ${col.UncapitalisedJavaName}. ColumnDefinition -- ${col.columnDefinitionLineDisp}*/
     protected ${col.JavaNative} _${col.UncapitalisedJavaName};
   #end
 #end
