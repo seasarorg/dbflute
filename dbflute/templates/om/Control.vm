@@ -47,6 +47,10 @@ targetdatabase = $targetDatabase
     #set ($glBehaviorReadableInterfaceName = "${glProjectPrefix}BehaviorReadable")
     #set ($glBehaviorWritableInterfaceName = "${glProjectPrefix}BehaviorWritable")
 
+    #set ($glTokenFileReflectionOptionName = "${glProjectPrefix}TokenFileReflectionOption")
+    #set ($glTokenFileReflectionResultName = "${glProjectPrefix}TokenFileReflectionResult")
+    #set ($glTokenFileReflectionFailureName = "${glProjectPrefix}TokenFileReflectionFailure")
+
     ## [Common-Dao]
     #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
     #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
@@ -120,6 +124,17 @@ targetdatabase = $targetDatabase
     #set ($glJapaneseCharacterName = "${glProjectPrefix}JapaneseCharacter")
     #set ($glJapaneseCharacterImplName = "${glProjectPrefix}JapaneseCharacterImpl")
 
+    #set ($glLineTokenName = "${glProjectPrefix}LineToken")
+    #set ($glLineTokenizingOptionName = "${glProjectPrefix}LineTokenizingOption")
+    #set ($glLineTokenImplName = "${glProjectPrefix}LineTokenImpl")
+
+    #set ($glFileTokenName = "${glProjectPrefix}FileToken")
+    #set ($glFileTokenizingOptionName = "${glProjectPrefix}FileTokenizingOption")
+    #set ($glFileTokenizingRowResourceName = "${glProjectPrefix}FileTokenizingRowResource")
+    #set ($glFileTokenizingCallbackName = "${glProjectPrefix}FileTokenizingCallback")
+    #set ($glFileTokenizingHeaderInfoName = "${glProjectPrefix}FileTokenizingHeaderInfo")
+    #set ($glFileTokenImplName = "${glProjectPrefix}FileTokenImpl")
+
     ## [Interceptor]
     #set ($glCommonColumnSetupAbstractInterceptor = "${glProjectPrefix}CommonColumnSetupAbstractInterceptor")
     #set ($glCommonColumnSetupBeforeInsertInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeInsertInterceptor")
@@ -150,6 +165,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
     #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
+    #set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.bhv.batch")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
     #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
     #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
@@ -162,6 +178,11 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
     #set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.helper.character")
     #set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.helper.character.impl")
+    #set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.helper.token")
+    #set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.helper.token.line")
+    #set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.helper.token.line.impl")
+    #set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.helper.token.file")
+    #set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.helper.token.file.impl")
     #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
     #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
     #set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
@@ -231,6 +252,23 @@ targetdatabase = $targetDatabase
     $database.debug("    ...Parsing AbstractBehaviorWritable")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhv})}${glBehaviorWritableAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/bhv/AbstractBehaviorWritable.${glTemplateFileExtension}",$path ,"", "")
+
+    #if ($database.isTargetLanguageJava())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhvBatch}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parseTokenFileReflectionOption()")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileReflectionOptionName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/bhv/batch/TokenFileReflectionOption.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parseTokenFileReflectionResult()")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileReflectionResultName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/bhv/batch/TokenFileReflectionResult.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parseTokenFileReflectionFailure()")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileReflectionFailureName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/bhv/batch/TokenFileReflectionFailure.${glTemplateFileExtension}",$path ,"", "")
+    #end
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                   Parse dao-interface
@@ -640,6 +678,57 @@ targetdatabase = $targetDatabase
       $database.debug("    parseJapaneseCharacterImpl();")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCharacterImpl})}${glJapaneseCharacterImplName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/helper/character/impl/JapaneseCharacterImpl.${glTemplateFileExtension}",$path,"", "")
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperToken}))
+      $database.makeDirectory($path)
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperTokenLine}))
+      $database.makeDirectory($path)
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperTokenLineImpl}))
+      $database.makeDirectory($path)
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperTokenFile}))
+      $database.makeDirectory($path)
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperTokenFileImpl}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parseLineToken();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenLine})}${glLineTokenName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/line/LineToken.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseLineTokenizingOption();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenLine})}${glLineTokenizingOptionName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/line/LineTokenizingOption.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseLineTokenImpl();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenLineImpl})}${glLineTokenImplName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/line/impl/LineTokenImpl.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseFileToken();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/file/FileToken.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseFileTokenizingOption();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenizingOptionName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/file/FileTokenizingOption.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseFileTokenizingResource();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenizingRowResourceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/file/FileTokenizingRowResource.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseFileTokenizingCallback();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenizingCallbackName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/file/FileTokenizingCallback.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseFileTokenizingHeaderInfo();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenizingHeaderInfoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/file/FileTokenizingHeaderInfo.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parseFileTokenImpl();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperTokenFileImpl})}${glFileTokenImplName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/helper/token/file/impl/FileTokenImpl.${glTemplateFileExtension}",$path,"", "")
     #end
 
     $database.debug("}")

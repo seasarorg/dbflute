@@ -2,6 +2,8 @@ package ${glPackageBaseCommonBhv};
 
 import ${glPackageBaseCommon}.${glDaoWritableInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionOptionName};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionResultName};
 
 /**
  * The interface of behavior-writable.
@@ -207,8 +209,19 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
     public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
     // =====================================================================================
-    //                                                                        Separated File
-    //                                                                        ==============
+    //                                                                            Token File
+    //                                                                            ==========
+    /**
+     * Reflect(insert or update) token-file to this table.
+     * 
+     * @param filename Name of the file. (NotNull and NotEmpty)
+     * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
+     * @return Token-file-reflection-result. (NotNull)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public ${glTokenFileReflectionResultName} reflectTokenFile(final String filename, final ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
+
     /**
      * Reflect(insert or update) from separated-file.
      * 
@@ -220,6 +233,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @return The list of InsertOrUpdateExceptionResult. (NotNull)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
+     * @deprecated Please use reflectTokenFile()
      */
     public java.util.List${database.filterGenericsString('OneEntityExceptionResult')} reflectFromSeparatedFile(
             String filename, String encoding,
@@ -228,6 +242,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
 
     /**
      * Exception result for one entity. 
+     * @deprecated Please use BatchTransactionFailureResult
      */
     public static class OneEntityExceptionResult {
         protected String _primaryKeyMapString;

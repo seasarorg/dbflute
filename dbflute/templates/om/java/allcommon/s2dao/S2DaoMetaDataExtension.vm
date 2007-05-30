@@ -41,6 +41,7 @@ import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.ResultSetHandlerFactory;
+import org.seasar.dao.SqlCommand;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.RelationRowCreatorImpl;
@@ -50,6 +51,8 @@ import org.seasar.dao.impl.UpdateAutoDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoStaticCommand;
 import org.seasar.dao.impl.UpdateBatchAutoStaticCommand;
 import org.seasar.dao.impl.UpdateModifiedOnlyCommand;
+import org.seasar.dao.impl.DeleteAutoStaticCommand;
+import org.seasar.dao.impl.DeleteBatchAutoStaticCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
@@ -525,6 +528,21 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         nonConcurrencyBmdFactory.setDaoNamingConvention(this.daoNamingConvention);
         nonConcurrencyBmdFactory.setBeanEnhancer(this.beanEnhancer);
         return nonConcurrencyBmdFactory;
+    }
+
+    // =====================================================================================
+    //                                                                 DeleteByAuto Override
+    //                                                                 =====================
+    protected void setupDeleteMethodByAuto(Method method) {
+        checkAutoUpdateMethod(method);
+        String[] propertyNames = getPersistentPropertyNames(method);
+        SqlCommand cmd = null;
+        if (isUpdateSignatureForBean(method)) {
+            cmd = new DeleteAutoStaticCommand(dataSource, statementFactory, createNonConcurrencyBeanMetaData(method), propertyNames);
+        } else {
+            cmd = new DeleteBatchAutoStaticCommand(dataSource, statementFactory, createNonConcurrencyBeanMetaData(method), propertyNames);
+        }
+        sqlCommands.put(method.getName(), cmd);
     }
 
     // =====================================================================================

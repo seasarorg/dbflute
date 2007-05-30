@@ -496,12 +496,12 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     //                   for Internal
     //                   ------------
     /**
-     * Set up various things for select-count-ignore-fetch-scope.
+     * Set up various things for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!
      * 
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} setupSelectCountIgnoreFetchScope() {
+    public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = true;
 
         // If the query uses union query, it needs included-select-column.
@@ -515,12 +515,12 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     /**
-     * Do after-care for select-count-ignore-fetch-scope.
+     * Do after-care for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!
      * 
      * @return this. (NotNull)
      */
-    public ${glConditionBeanInterfaceName} afterCareSelectCountIgnoreFetchScope() {
+    public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = false;
 
         // If the query uses union query, it needs included-select-column.

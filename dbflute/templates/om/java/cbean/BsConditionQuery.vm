@@ -669,19 +669,20 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // =====================================================================================
     //                                                                           Union-Query
     //                                                                           ===========
-    protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} unionQueryAsSuper) {
+    protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+        final ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
         final ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;
   #foreach ($foreignKeys in $table.ForeignKeys)
 
-        if (hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
-            unionQuery.query${foreignKeys.foreignPropertyNameInitCap}();
+        if (baseQuery.hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
+            unionQuery.query${foreignKeys.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(baseQuery.query${foreignKeys.foreignPropertyNameInitCap}(), unionQuery.query${foreignKeys.foreignPropertyNameInitCap}());
         }
   #end
   #foreach ($refferer in $table.Referrers)
     #if (${refferer.isOneToOne()})
 
-        if (hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
-            unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}();
+        if (baseQuery.hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
+            unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.query${refferer.reffererPropertyNameInitCapAsOne}(), unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}());
         }
     #end
   #end

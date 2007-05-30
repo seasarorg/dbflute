@@ -1,0 +1,9 @@
+package ${glPackageBaseCommonHelperTokenLine};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glLineTokenName} {
+
+    public java.util.List${database.filterGenericsString('String')} tokenize(String lineString, ${glLineTokenizingOptionName} lineTokenizingOption);
+}

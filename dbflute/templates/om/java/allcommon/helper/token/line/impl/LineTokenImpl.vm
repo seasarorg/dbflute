@@ -1,0 +1,35 @@
+package ${glPackageBaseCommonHelperTokenLineImpl};
+
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glLineTokenImplName} implements ${glLineTokenName} {
+
+    public java.util.List${database.filterGenericsString('String')} tokenize(String lineString, ${glLineTokenizingOptionName} lineTokenizingOption) {
+        final String delimiter = lineTokenizingOption.getDelimiter();
+        final java.util.List${database.filterGenericsString('String')} list = new java.util.ArrayList${database.filterGenericsString('String')}();
+        int i = 0;
+        int j = lineString.indexOf(delimiter);
+        for (int h = 0; j >= 0; h++) {
+            final String pureValue = lineString.substring(i, j);
+            if (lineTokenizingOption.isTrimDoubleQuotation()) {
+                final String before = pureValue;
+                if (before.length() > 1 && before.startsWith("\"") && before.endsWith("\"")) {
+                    final String after = before.substring(1, before.length() - 1);
+                    list.add(after);
+                } else {
+                    list.add(before);
+                }
+            } else {
+                list.add(pureValue);
+            }
+            i = j + 1;
+            j = lineString.indexOf(delimiter, i);
+        }
+        list.add(lineString.substring(i));
+        return list;
+    }
+}

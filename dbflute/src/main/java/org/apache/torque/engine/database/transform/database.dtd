@@ -90,7 +90,7 @@ Java class or method name.
         | DOUBLE
     ) "VARCHAR"
   dbType CDATA #IMPLIED
-  javaType (object|primitive) #IMPLIED
+  javaType CDATA #IMPLIED
   size CDATA #IMPLIED
   default CDATA #IMPLIED
   autoIncrement (true|false) "false"

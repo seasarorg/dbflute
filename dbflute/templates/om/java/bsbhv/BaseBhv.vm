@@ -340,6 +340,22 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityOfDelete(entity);
         return getMyDao().delete(entity);
     }
+  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+
+    /**
+     * Delete one entity. (Delegate-Method)
+     * {non strict}
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Deleted count.
+     */
+    public int delegateDeleteNonstrict(${myExtendedObjectClassName} entity) {
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        filterEntityOfDelete(entity);
+        assertEntityOfDelete(entity);
+        return getMyDao().deleteNonstrict(entity);
+    }
+  #end
 
     /**
      * Insert several entities. (Delegate-Method)
@@ -812,7 +828,40 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             }
         }
     }
+  #else
+
+    /**
+     * Insert or update.
+     * {update: modified only}
+     * 
+     * @param entity Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     */
+    public void insertOrUpdate(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            insert(entity);
+        } else {
+            try {
+                update(entity);
+            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
+                insert(entity);
+            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+                insert(entity);
+            }
+        }
+    }
   #end
+
+    protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity) {
+  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+
+        insertOrUpdateNonStrict((${myExtendedObjectClassName})entity);
+  #else
+
+        insertOrUpdate((${myExtendedObjectClassName})entity);
+  #end
+
+    }
 
     /**
      * Insert or update after select.
@@ -958,6 +1007,29 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doRemoveAfterSelect(${glEntityInterfaceName} entity) {
         deleteAfterSelect((${myExtendedObjectClassName})entity);
     }
+  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+
+    /**
+     * Delete non stritct.
+     * <pre>
+     * This delete ignores concurrency control.
+     * This method is faster than deleteAfterSelect().
+     * </pre>
+     * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public void deleteNonstrict(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);
+        final int deletedCount = delegateDeleteNonstrict(entity);
+        if (deletedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(entity.toString());
+        } else if (deletedCount > 1) {
+            String msg = "deletedCount=" + deletedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+        }
+    }
+  #end
 
     // =====================================================================================
     //                                                                    Basic Batch Update

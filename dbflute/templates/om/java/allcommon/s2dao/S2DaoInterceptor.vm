@@ -219,7 +219,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
 
         if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
-            ${glAttachedCBArgsVariableName}.setupSelectCountIgnoreFetchScope();
+            ${glAttachedCBArgsVariableName}.xsetupSelectCountIgnoreFetchScope();
         } else {
             ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(cb);
         }
@@ -238,7 +238,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         clearThreadLocal();
 
         if (${glAttachedCBArgsVariableName} != null && isSelectCountIgnoreFetchScopeMethod(invocation)) {
-            ${glAttachedCBArgsVariableName}.afterCareSelectCountIgnoreFetchScope();
+            ${glAttachedCBArgsVariableName}.xafterCareSelectCountIgnoreFetchScope();
         }
     }
 

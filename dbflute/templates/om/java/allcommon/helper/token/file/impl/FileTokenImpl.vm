@@ -1,0 +1,286 @@
+package ${glPackageBaseCommonHelperTokenFileImpl};
+
+import java.util.List;
+import java.util.ArrayList;
+
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingCallbackName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOptionName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingRowResourceName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingHeaderInfoName};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
+import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImplName};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glFileTokenImplName} implements ${glFileTokenName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    /** Line-token for help. */
+    protected final ${glLineTokenName} _lineToken = new ${glLineTokenImplName}();
+
+    // =====================================================================================
+    //                                                                                  Main
+    //                                                                                  ====
+    public void tokenize(String filename, ${glFileTokenizingCallbackName} fileTokenizingCallback, ${glFileTokenizingOptionName} fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
+        java.io.FileInputStream fis = null;
+        java.io.InputStreamReader ir = null;
+        java.io.BufferedReader br = null;
+
+        final String delimiter = fileTokenizingOption.getDelimiter();
+        final String encoding = fileTokenizingOption.getEncoding();
+        String lineString = null;
+        String preContinueString = "";
+        final List${database.filterGenericsString('String')} valueList = new ArrayList${database.filterGenericsString('String')}();
+
+        try {
+            fis = new java.io.FileInputStream(filename);
+            ir = new java.io.InputStreamReader(fis, encoding);
+            br = new java.io.BufferedReader(ir);
+
+            ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = null;
+            int count = -1;
+            int rowNumber = 1;
+            int lineNumber = 0;
+            while (true) {
+                ++count;
+                if ("".equals(preContinueString)) {
+                    lineNumber = count + 1;
+                }
+
+                lineString = br.readLine();
+                if (lineString == null) {
+                    break;
+                }
+                if (count == 0) {
+                    if (fileTokenizingOption.isBeginFirstLine()) {
+                        fileTokenizingHeaderInfo = new ${glFileTokenizingHeaderInfoName}();// As empty
+                    } else {
+                        fileTokenizingHeaderInfo = analyzeHeaderInfo(delimiter, lineString);
+                        continue;
+                    }
+                }
+                final String rowString;
+                if (preContinueString.equals("")) {
+                    rowString = lineString;
+                } else {
+                    final String lineSeparator = System.getProperty("line.separator");
+                    rowString = preContinueString + lineSeparator + lineString;
+                }
+                final ValueLineInfo valueLineInfo = arrangeValueList(rowString, delimiter);
+                final List${database.filterGenericsString('String')} ls = valueLineInfo.getValueList();
+                if (valueLineInfo.isContinueNextLine()) {
+                    preContinueString = (String)ls.remove(ls.size() - 1);
+                    valueList.addAll(ls);
+                    continue;
+                }
+                valueList.addAll(ls);
+                try {
+                    final ${glFileTokenizingRowResourceName} fileTokenizingRowResource = new ${glFileTokenizingRowResourceName}();
+                    fileTokenizingRowResource.setFirstLineInfo(fileTokenizingHeaderInfo);
+                    fileTokenizingRowResource.setValueList(valueList);
+                    fileTokenizingRowResource.setRowString(rowString);
+                    fileTokenizingRowResource.setRowNumber(rowNumber);
+                    fileTokenizingRowResource.setLineNumber(lineNumber);
+                    fileTokenizingCallback.handleRowResource(fileTokenizingRowResource);
+                } finally {
+                    ++rowNumber;
+                    valueList.clear();
+                    preContinueString = "";
+                }
+            }
+        } catch (java.io.FileNotFoundException e) {
+            throw e;
+        } catch (java.io.IOException e) {
+            throw e;
+        } finally {
+            try {
+                if (fis != null) {
+                    fis.close();
+                }
+                if (ir != null) {
+                    ir.close();
+                }
+                if (br != null) {
+                    br.close();
+                }
+            } catch (java.io.IOException ignored) {
+            }
+        }
+    }
+
+
+    protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
+        final List${database.filterGenericsString('String')} valueList = new ArrayList${database.filterGenericsString('String')}();
+
+        // Don't use split!
+        //        final String[] values = lineString.split(delimiter);
+        final ${glLineTokenizingOptionName} tokenizingOption = new ${glLineTokenizingOptionName}();
+        tokenizingOption.setDelimiter(delimiter);
+        final List${database.filterGenericsString('String')} list = _lineToken.tokenize(lineString, tokenizingOption);
+        final String[] values = (String[])list.toArray(new String[list.size()]);
+        for (int i=0; i < values.length; i++) {
+            valueList.add(values[i]);
+        }
+        return arrangeValueList(valueList, delimiter);
+    }
+
+    protected ValueLineInfo arrangeValueList(List${database.filterGenericsString('String')} valueList, String delimiter) {
+        final ValueLineInfo valueLineInfo = new ValueLineInfo();
+        final ArrayList${database.filterGenericsString('String')} resultList = new ArrayList${database.filterGenericsString('String')}();
+        String preString = "";
+        for (int i = 0; i < valueList.size(); i++) {
+            final String value = (String)valueList.get(i);
+            if (value == null) {
+                continue;
+            }
+            if (i == valueList.size() - 1) {// The last loop
+                if (preString.equals("")) {
+                    if (isFrontQOnly(value)) {
+                        valueLineInfo.setContinueNextLine(true);
+                        resultList.add(value);
+                        break;
+                    } else if (isRearQOnly(value)) {
+                        resultList.add(value);
+                        break;
+                    } else if (isNotBothQ(value)) {
+                        resultList.add(value);
+                        break;
+                    } else {
+                        resultList.add(removeDoubleQuotation(value));
+                        break;
+                    }
+                } else {
+                    if (isFrontQOnly(value)) {
+                        valueLineInfo.setContinueNextLine(true);
+                        resultList.add(connectPreString(preString, delimiter, value));
+                        break;
+                    } else if (isRearQOnly(value)) {
+                        resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
+                        break;
+                    } else if (isNotBothQ(value)) {
+                        valueLineInfo.setContinueNextLine(true);
+                        resultList.add(connectPreString(preString, delimiter, value));
+                        break;
+                    } else {
+                        resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
+                        break;
+                    }
+                }
+            }
+
+            if (preString.equals("")) {
+                if (isFrontQOnly(value)) {
+                    preString = value;
+                    continue;
+                } else if (isRearQOnly(value)) {
+                    preString = value;
+                    continue;
+                } else if (isNotBothQ(value)) {
+                    resultList.add(value);
+                } else {
+                    resultList.add(removeDoubleQuotation(value));
+                }
+            } else {
+                if (isFrontQOnly(value)) {
+                    preString = connectPreString(preString, delimiter, value);
+                    continue;
+                } else if (isRearQOnly(value)) {
+                    resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
+                } else if (isNotBothQ(value)) {
+                    preString = connectPreString(preString, delimiter, value);
+                    continue;
+                } else {
+                    resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
+                }
+            }
+            preString = "";
+        }
+        valueLineInfo.setValueList(resultList);
+        return valueLineInfo;
+    }
+
+    protected String connectPreString(String preString, String delimiter, String value) {
+        if (preString.equals("")) {
+            return value;
+        } else {
+            return preString + delimiter + value;
+        }
+    }
+
+    protected boolean isNotBothQ(final String value) {
+        return !value.startsWith("\"") && !value.endsWith("\"");
+    }
+
+    protected boolean isRearQOnly(final String value) {
+        return !value.startsWith("\"") && value.endsWith("\"");
+    }
+
+    protected boolean isFrontQOnly(final String value) {
+        return value.startsWith("\"") && !value.endsWith("\"");
+    }
+
+    protected String removeDoubleQuotation(String value) {
+        if (!value.startsWith("\"") && !value.endsWith("\"")) {
+            return value;
+        }
+        if (value.startsWith("\"")) {
+            value = value.substring(1);
+        }
+        if (value.endsWith("\"")) {
+            value = value.substring(0, value.length() - 1);
+        }
+        return value;
+    }
+
+    protected String removeRightDoubleQuotation(String value) {
+        if (value.endsWith("\"")) {
+            value = value.substring(0, value.length() - 1);
+        }
+        return value;
+    }
+
+    protected ${glFileTokenizingHeaderInfoName} analyzeHeaderInfo(String delimiter, final String lineString) {
+        final java.util.List${database.filterGenericsString('String')} columnNameList = new ArrayList${database.filterGenericsString('String')}();
+        final String[] values = lineString.split(delimiter);
+        int count = 0;
+        for (int i=0; i < values.length; i++) {
+            final String value = values[i];
+            if (value != null && value.startsWith("\"") && value.endsWith("\"")) {
+                columnNameList.add(value.substring(1, value.length() - 1));
+            } else {
+                columnNameList.add(value != null ? value : "");
+            }
+            count++;
+        }
+        final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = new ${glFileTokenizingHeaderInfoName}();
+        fileTokenizingHeaderInfo.setColumnNameList(columnNameList);
+        return fileTokenizingHeaderInfo;
+    }
+
+    public static class ValueLineInfo {
+        protected List${database.filterGenericsString('String')} valueList;
+
+        protected boolean continueNextLine;
+
+        public List${database.filterGenericsString('String')} getValueList() {
+            return valueList;
+        }
+
+        public void setValueList(List${database.filterGenericsString('String')} valueList) {
+            this.valueList = valueList;
+        }
+
+        public boolean isContinueNextLine() {
+            return continueNextLine;
+        }
+
+        public void setContinueNextLine(boolean continueNextLine) {
+            this.continueNextLine = continueNextLine;
+        }
+    }
+}

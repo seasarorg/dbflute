@@ -192,6 +192,16 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @return Deleted count.
      */
     public int delete(${myExtendedObjectClassName} entity);
+  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+
+    /**
+     * Delete one entity. (non strict)
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Deleted count.
+     */
+    public int deleteNonstrict(${myExtendedObjectClassName} entity);
+  #end
 
     /**
      * Insert several entities.

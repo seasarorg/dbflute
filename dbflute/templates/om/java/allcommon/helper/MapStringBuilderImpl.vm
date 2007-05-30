@@ -1,5 +1,9 @@
 package ${glPackageBaseCommonHelper};
 
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
+import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImplName};
+
 /**
  * The implementation of map-string-builder.
  *
@@ -7,7 +11,7 @@ package ${glPackageBaseCommonHelper};
  */
 public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} {
 
-    protected String[] _columnNames;
+    protected java.util.List${database.filterGenericsString('String')} _columnNameList;
 
     protected String _msMapMark;
 
@@ -19,8 +23,14 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
 
     protected String _msEqual;
 
-    public void setColumnNames(String[] value) {
-        _columnNames = value;
+    protected boolean _trimDoubleQuotation;
+
+    public void setColumnNames(String[] columnNames) {
+        _columnNameList = java.util.Arrays.asList(columnNames);
+    }
+
+    public void setColumnNameList(java.util.List${database.filterGenericsString('String')} columnNameList) {
+        _columnNameList = columnNameList;
     }
 
     public void setMsMapMark(String value) {
@@ -43,6 +53,10 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         _msEqual = value;
     }
 
+    public void trimDoubleQuotation() {
+        _trimDoubleQuotation = true;
+    }
+
     public String buildByDelimiter(String values, String delimiter) {
         if (values == null) {
             String msg = "The argument[values] should not be null.";
@@ -54,13 +68,13 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         }
         assertStringComponent();
 
-        String[] valueArray = tokenToArgs(values, delimiter);
-        assertValueArray(_columnNames, valueArray);
+        final java.util.List${database.filterGenericsString('String')} valueList = tokenize(values, delimiter);
+        assertColumnValueList(_columnNameList, valueList);
 
         final StringBuffer sb = new StringBuffer();
         sb.append(_msMapMark).append(_msStartBrace);
-        for (int i = 0; i < _columnNames.length; i++ ) {
-            sb.append(_columnNames[i]).append(_msEqual).append(valueArray[i]).append(_msDelimiter);
+        for (int i = 0; i < _columnNameList.size(); i++ ) {
+            sb.append(_columnNameList.get(i)).append(_msEqual).append(valueList.get(i)).append(_msDelimiter);
         }
 
         sb.delete(sb.length() - _msDelimiter.length(), sb.length());
@@ -68,13 +82,42 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         return sb.toString(); 
     }
 
+    public String buildFromList(java.util.List${database.filterGenericsString('String')} valueList) {
+        if (valueList == null) {
+            String msg = "The argument[valueList] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        assertStringComponent();
+        assertColumnValueList(_columnNameList, valueList);
+
+        final StringBuffer sb = new StringBuffer();
+        sb.append(_msMapMark).append(_msStartBrace);
+        for (int i = 0; i < _columnNameList.size(); i++ ) {
+            sb.append(_columnNameList.get(i)).append(_msEqual).append(valueList.get(i)).append(_msDelimiter);
+        }
+
+        sb.delete(sb.length() - _msDelimiter.length(), sb.length());
+        sb.append(_msEndBrace);
+        return sb.toString(); 
+    }
+
+    protected java.util.List${database.filterGenericsString('String')} tokenize(String value, String delimiter) {
+        final ${glLineTokenName} lineToken = new ${glLineTokenImplName}();
+        final ${glLineTokenizingOptionName} lineTokenizingOption = new ${glLineTokenizingOptionName}();
+        lineTokenizingOption.setDelimiter(delimiter);
+        if (_trimDoubleQuotation) {
+            lineTokenizingOption.trimDoubleQuotation();
+        }
+        return lineToken.tokenize(value, lineTokenizingOption);
+    }
+
     protected void assertStringComponent() {
-        if (_columnNames == null) {
-            String msg = "The columnNames should not be null.";
+        if (_columnNameList == null) {
+            String msg = "The columnNameList should not be null.";
             throw new IllegalStateException(msg);
         }
-        if (_columnNames.length == 0) {
-            String msg = "The columnNames should not be empty-array.";
+        if (_columnNameList.isEmpty()) {
+            String msg = "The columnNameList should not be empty.";
             throw new IllegalStateException(msg);
         }
         if (_msMapMark == null) {
@@ -99,12 +142,12 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
         }
     }
 
-    protected void assertValueArray(String[] expected, String[] actual) {
-        if (expected.length != actual.length) {
-            String msg = "StringArray's length is difference. (" + expected.length + ", " + actual.length + ")";
-            msg = msg + " expectedNames=" + java.util.Arrays.asList(expected);
-            msg = msg + " actualValues=" + java.util.Arrays.asList(actual);
-            throw new DifferentDelimiterCountException(msg, expected, actual);
+    protected void assertColumnValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
+        if (columnNameList.size() != valueList.size()) {
+            String msg = "The length of columnNameList and valueList are difference. (" + columnNameList.size() + ", " + valueList.size() + ")";
+            msg = msg + " columnNameList=" + columnNameList;
+            msg = msg + " valueList=" + valueList;
+            throw new DifferentDelimiterCountException(msg, columnNameList, valueList);
         }
     }
 
@@ -130,23 +173,5 @@ public class ${glMapStringBuilderImplName} implements ${glMapStringBuilderName} 
             }
         }
         return buf.toString();
-    }
-
-    protected static String[] tokenToArgs(String value, String delimiter) {
-        java.util.List list = tokenToList(value, delimiter);
-        return (String[])list.toArray(new String[list.size()]);
-    }
-
-    protected static java.util.List tokenToList(String value, String delimiter) {
-        java.util.List list = new java.util.ArrayList();
-        int i = 0;
-        int j = value.indexOf(delimiter);
-        for (int h = 0; j >= 0; h++) {
-            list.add(value.substring(i, j));
-            i = j + 1;
-            j = value.indexOf(delimiter, i);
-        }
-        list.add(value.substring(i));
-        return list;
     }
 }

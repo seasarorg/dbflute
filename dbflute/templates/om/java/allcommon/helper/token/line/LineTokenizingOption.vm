@@ -1,0 +1,38 @@
+package ${glPackageBaseCommonHelperTokenLine};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glLineTokenizingOptionName} {
+
+    protected String _delimiter;
+
+    protected boolean _trimDoubleQuotation;
+
+    public ${glLineTokenizingOptionName} tokenizeByComma() {
+        _delimiter = ",";
+        return this;
+    }
+
+    public ${glLineTokenizingOptionName} tokenizeByTab() {
+        _delimiter = "\t";
+        return this;
+    }
+
+    public String getDelimiter() {
+        return _delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        _delimiter = delimiter;
+    }
+
+    public ${glLineTokenizingOptionName} trimDoubleQuotation() {
+        _trimDoubleQuotation = true;
+        return this;
+    }
+
+    public boolean isTrimDoubleQuotation() {
+        return _trimDoubleQuotation;
+    }
+}

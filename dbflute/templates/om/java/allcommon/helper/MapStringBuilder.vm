@@ -7,7 +7,12 @@ package ${glPackageBaseCommonHelper};
  */
 public interface ${glMapStringBuilderName} {
 
-    public void setColumnNames(String[] value);
+    // =====================================================================================
+    //                                                                                Setter
+    //                                                                                ======
+    public void setColumnNames(String[] columnNames);
+
+    public void setColumnNameList(java.util.List${database.filterGenericsString('String')} columnNameList);
 
     public void setMsMapMark(String value);
 
@@ -19,21 +24,29 @@ public interface ${glMapStringBuilderName} {
 
     public void setMsEqual(String value);
 
+    // =====================================================================================
+    //                                                                                  Main
+    //                                                                                  ====
     public String buildByDelimiter(String values, String delimiter);
 
+    public String buildFromList(java.util.List${database.filterGenericsString('String')} valueList);
+
+    // =====================================================================================
+    //                                                                             Exception
+    //                                                                             =========
     public static class DifferentDelimiterCountException extends RuntimeException {
-        protected String[] _columnNames;
-        protected String[] _values;
-        public DifferentDelimiterCountException(String msg, String[] columnNames, String[] values) {
+        protected java.util.List${database.filterGenericsString('String')} _columnNameList;
+        protected java.util.List${database.filterGenericsString('String')} _valueList;
+        public DifferentDelimiterCountException(String msg, java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
             super(msg);
-            _columnNames = columnNames;
-            _values = values;
+            _columnNameList = columnNameList;
+            _valueList = valueList;
         }
-        public String[] getColumnNames() {
-            return _columnNames;
+        public java.util.List${database.filterGenericsString('String')} getColumnNameList() {
+            return _columnNameList;
         }
-        public String[] getValues() {
-            return _values;
+        public java.util.List${database.filterGenericsString('String')} getValueList() {
+            return _valueList;
         }
     }
 }

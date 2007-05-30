@@ -219,14 +219,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String msg = "The argument[unionQuery] should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        reflectRelationOnUnionQuery(unionQuery);// Reflect Relation!
+        reflectRelationOnUnionQuery(this, unionQuery);// Reflect Relation!
         getSqlClause().copyIncludedSelectColumn(unionQuery.getSqlClause());// Reflect IncludedSelectColumn!
         final String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.put(key, unionQuery);
         registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
     }
 
-    abstract protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} unionQueryAsSuper);
+    abstract protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper);
 
     public boolean hasUnionQueryOrUnionAllQuery() {
         return !_unionQueryMap.isEmpty() || !_unionAllQueryMap.isEmpty();

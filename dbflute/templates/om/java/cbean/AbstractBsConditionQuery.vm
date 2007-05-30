@@ -186,10 +186,10 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * You can invoke this method several times and the conditions are set up.
      * 
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as likeSearch.
-     * @param option Like search option. (NotNull)
+     * @param likeSearchOption Like search option. (NotNull)
      */
-    public void set${tmpJavaName}_LikeSearch($col.JavaNative ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} option) {
-        registerLikeSearchQuery(${glConditionKeyName}.CK_LIKE_SEARCH, filterRemoveEmptyString(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, option);
+    public void set${tmpJavaName}_LikeSearch($col.JavaNative ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
+        registerLikeSearchQuery(${glConditionKeyName}.CK_LIKE_SEARCH, filterRemoveEmptyString(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, likeSearchOption);
     }
       #end
       #if (${col.isAvailableStringInScope()})
@@ -606,10 +606,10 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * Set the value of ${col.UncapitalisedJavaName} using from-to. { $fromDate <= COLUMN_NAME <= $toDate }
      * 
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as from-to.
-     * @param option From-To option. (NotNull)
+     * @param fromToOption From-To option. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo($col.JavaNative fromDate, $col.JavaNative toDate, ${glPackageBaseCommonCOption}.${glConditionOptionFromToName} option) {
-        registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, option);
+    public void set${tmpJavaName}_FromTo($col.JavaNative fromDate, $col.JavaNative toDate, ${glPackageBaseCommonCOption}.${glConditionOptionFromToName} fromToOption) {
+        registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, fromToOption);
     }
       #end
     #end
