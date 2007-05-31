@@ -3,6 +3,8 @@ package ${glPackageBaseCommonDBMeta};
 #set ($myClassName = "${glDBMetaInterfaceName}")
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonHelper}.${glMapListStringName};
+import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 
 /**
  * The interface of dbmeta.
@@ -10,6 +12,27 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
  * @author ${database.ClassAuthor}
  */
 public interface ${myClassName} {
+
+    // =====================================================================================
+    //                                                                            Definition
+    //                                                                            ==========
+    /** Map-string map-mark. */
+    public static final String MAP_STRING_MAP_MARK = "map:";
+
+    /** Map-string list-mark. */
+    public static final String MAP_STRING_LIST_MARK = "list:";
+
+    /** Map-string start-brace. */
+    public static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
+
+    /** Map-string end-brace. */
+    public static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
+
+    /** Map-string delimiter. */
+    public static final String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
+
+    /** Map-string equal. */
+    public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
 
     // =====================================================================================
     //                                                                            Table Name
@@ -34,6 +57,22 @@ public interface ${myClassName} {
      * @return Table uncap-prop-name. (NotNull)
      */
     public String getTableUncapPropName();
+
+    // =====================================================================================
+    //                                                                           Column Name
+    //                                                                           ===========
+    public java.util.List${database.filterGenericsString('String')} getColumnDbNameList();
+
+    public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList();
+
+    public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList();
+
+    /**
+     * Get column-db-name comma-string.
+     * 
+     * @return Column-db-name comma-string. (NotNull)
+     */
+    public String getColumnDbNameCommaString();
 
     // =====================================================================================
     //                                                                         Name Handling
@@ -288,4 +327,143 @@ public interface ${myClassName} {
      * @return Determination.
      */
     public boolean hasCommonColumn();
+
+    // =====================================================================================
+    //                                                                       Entity Handling
+    //                                                                       ===============
+    public java.util.List${database.filterGenericsString('String')} extractColumnStringValueList(${glEntityInterfaceName} entity);
+
+    // =====================================================================================
+    //                                                                            Util Class
+    //                                                                            ==========
+    /**
+     * This class is for Internal. Don't use this!
+     */
+    public static class MapStringUtil {
+        public static void acceptPrimaryKeyMapString(String primaryKeyMapString, ${glEntityInterfaceName} entity) {
+            if (primaryKeyMapString == null) {
+                String msg = "The argument[primaryKeyMapString] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+            final String suffix = MAP_STRING_END_BRACE;
+            if (!primaryKeyMapString.trim().startsWith(prefix)) {
+                primaryKeyMapString = prefix + primaryKeyMapString;
+            }
+            if (!primaryKeyMapString.trim().endsWith(suffix)) {
+                primaryKeyMapString = primaryKeyMapString + suffix;
+            }
+            ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+            mapListString.setMapMark(MAP_STRING_MAP_MARK);
+            mapListString.setListMark(MAP_STRING_LIST_MARK);
+            mapListString.setStartBrace(MAP_STRING_START_BRACE);
+            mapListString.setEndBrace(MAP_STRING_END_BRACE);
+            mapListString.setEqual(MAP_STRING_EQUAL);
+            mapListString.setDelimiter(MAP_STRING_DELIMITER);
+            entity.acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
+        }
+
+        public static void acceptColumnValueMapString(String columnValueMapString, ${glEntityInterfaceName} entity) {
+            if (columnValueMapString == null) {
+                String msg = "The argument[columnValueMapString] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+            final String suffix = MAP_STRING_END_BRACE;
+            if (!columnValueMapString.trim().startsWith(prefix)) {
+                columnValueMapString = prefix + columnValueMapString;
+            }
+            if (!columnValueMapString.trim().endsWith(suffix)) {
+                columnValueMapString = columnValueMapString + suffix;
+            }
+            ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+            mapListString.setMapMark(MAP_STRING_MAP_MARK);
+            mapListString.setListMark(MAP_STRING_LIST_MARK);
+            mapListString.setStartBrace(MAP_STRING_START_BRACE);
+            mapListString.setEndBrace(MAP_STRING_END_BRACE);
+            mapListString.setEqual(MAP_STRING_EQUAL);
+            mapListString.setDelimiter(MAP_STRING_DELIMITER);
+            entity.acceptColumnValueMap(mapListString.generateMap(columnValueMapString));
+        }
+
+        public static String extractPrimaryKeyMapString(${glEntityInterfaceName} entity) {
+            final String startBrace = MAP_STRING_START_BRACE;
+            final String endBrace = MAP_STRING_END_BRACE;
+            final String delimiter = MAP_STRING_DELIMITER;
+            final String equal = MAP_STRING_EQUAL;
+            return entity.extractPrimaryKeyMapString(startBrace, endBrace, delimiter, equal);
+        }
+
+        public static String extractColumnValueMapString(${glEntityInterfaceName} entity) {
+            final String startBrace = MAP_STRING_START_BRACE;
+            final String endBrace = MAP_STRING_END_BRACE;
+            final String delimiter = MAP_STRING_DELIMITER;
+            final String equal = MAP_STRING_EQUAL;
+            return entity.extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
+        }
+
+        public static void checkTypeString(Object value, String propertyName, String typeName) {
+            if (value == null) {
+                throw new IllegalArgumentException("The value should not be null: " + propertyName);
+            }
+            if (!(value instanceof String)) {
+                String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
+                msg = msg + "valueType=" + value.getClass() + " value=" + value;
+                throw new IllegalArgumentException(msg);
+            }
+        }
+
+        public static long parseDateString(Object value, String propertyName, String typeName) {
+            checkTypeString(value, propertyName, typeName);
+            try {
+                return getDateFormat().parse((String)value).getTime();
+            } catch (java.text.ParseException e) {
+                String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
+                throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+            } catch (RuntimeException e) {
+                String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
+                throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+            }
+        }
+
+        public static String formatDate(java.util.Date value) {
+            return getDateFormat().format(value);
+        }
+
+        public static java.text.DateFormat getDateFormat() {
+            return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        }
+    }
+
+    /**
+     * This class is for Internal. Don't use this!
+     */
+    public static class MapAssertUtil {
+        public static void assertPrimaryKeyMapNotNullAndNotEmpty(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
+            if (primaryKeyMap == null) {
+                String msg = "The argument[primaryKeyMap] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            if (primaryKeyMap.isEmpty()) {
+                String msg = "The argument[primaryKeyMap] should not be empty.";
+                throw new IllegalArgumentException(msg);
+            }
+        }
+        public static void assertColumnExistingInPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap, String columnName) {
+            if (!primaryKeyMap.containsKey(columnName)) {
+                String msg = "The primaryKeyMap must have the value of " + columnName;
+                throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+            }
+        }
+        public static void assertColumnValueMapNotNullAndNotEmpty(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
+            if (columnValueMap == null) {
+                String msg = "The argument[columnValueMap] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            if (columnValueMap.isEmpty()) {
+                String msg = "The argument[columnValueMap] should not be empty.";
+                throw new IllegalArgumentException(msg);
+            }
+        }
+    }
 }

@@ -1,9 +1,31 @@
 package ${glPackageBaseCommonHelperTokenFile};
 
 /**
+ * File-Token.
+ * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glFileTokenName} {
 
+    /**
+     * Tokenize token-file data of a specified file.
+     * 
+     * @param filename Input target file name. (NotNull)
+     * @param fileTokenizingCallback File-tokenizing callback. (NotNull)
+     * @param fileTokenizingOption File-tokenizing option. (NotNull and Required{encoding and delimiter})
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
     public void tokenize(String filename, ${glFileTokenizingCallbackName} fileTokenizingCallback, ${glFileTokenizingOptionName} fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException;
+
+    /**
+     * Make token-file from specified row resources.
+     * 
+     * @param filename Output target file name. (NotNull)
+     * @param fileMakingCallback File-making callback. (NotNull)
+     * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public void make(String filename, ${glFileMakingCallbackName} fileMakingCallback, ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
 }

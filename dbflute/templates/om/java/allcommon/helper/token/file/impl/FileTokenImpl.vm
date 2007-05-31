@@ -4,12 +4,20 @@ import java.util.List;
 import java.util.ArrayList;
 
 import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenName};
+
 import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingCallbackName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOptionName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingRowResourceName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingHeaderInfoName};
+
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingCallbackName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingRowResourceName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
+
 import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
 import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
+import ${glPackageBaseCommonHelperTokenLine}.${glLineMakingOptionName};
 import ${glPackageBaseCommonHelperTokenLineImpl}.${glLineTokenImplName};
 
 /**
@@ -26,13 +34,28 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
     // =====================================================================================
     //                                                                                  Main
     //                                                                                  ====
+    /**
+     * Tokenize token-file data of a specified file.
+     * 
+     * @param filename File name. (NotNull)
+     * @param fileTokenizingCallback File-tokenizing callback. (NotNull)
+     * @param fileTokenizingOption File-tokenizing option. (NotNull and Required{encoding and delimiter})
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
     public void tokenize(String filename, ${glFileTokenizingCallbackName} fileTokenizingCallback, ${glFileTokenizingOptionName} fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
+        assertStringNotNullAndNotTrimmedEmpty("filename", filename);
+        assertObjectNotNull("fileTokenizingCallback", fileTokenizingCallback);
+        assertObjectNotNull("fileTokenizingOption", fileTokenizingOption);
+        final String delimiter = fileTokenizingOption.getDelimiter();
+        final String encoding = fileTokenizingOption.getEncoding();
+        assertStringNotNullAndNotTrimmedEmpty("encoding", filename);
+        assertStringNotNullAndNotTrimmedEmpty("delimiter", filename);
+
         java.io.FileInputStream fis = null;
         java.io.InputStreamReader ir = null;
         java.io.BufferedReader br = null;
 
-        final String delimiter = fileTokenizingOption.getDelimiter();
-        final String encoding = fileTokenizingOption.getEncoding();
         String lineString = null;
         String preContinueString = "";
         final List${database.filterGenericsString('String')} valueList = new ArrayList${database.filterGenericsString('String')}();
@@ -249,11 +272,15 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
         final String[] values = lineString.split(delimiter);
         int count = 0;
         for (int i=0; i < values.length; i++) {
-            final String value = values[i];
-            if (value != null && value.startsWith("\"") && value.endsWith("\"")) {
+            String value = values[i];
+            if (value == null) {
+                columnNameList.add("");
+            }
+            value = value.trim();// Trimming is Header Only!
+            if (value.startsWith("\"") && value.endsWith("\"")) {
                 columnNameList.add(value.substring(1, value.length() - 1));
             } else {
-                columnNameList.add(value != null ? value : "");
+                columnNameList.add(value);
             }
             count++;
         }
@@ -263,11 +290,11 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
     }
 
     public static class ValueLineInfo {
-        protected List${database.filterGenericsString('String')} valueList;
+        protected java.util.List${database.filterGenericsString('String')} valueList;
 
         protected boolean continueNextLine;
 
-        public List${database.filterGenericsString('String')} getValueList() {
+        public java.util.List${database.filterGenericsString('String')} getValueList() {
             return valueList;
         }
 
@@ -281,6 +308,117 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
 
         public void setContinueNextLine(boolean continueNextLine) {
             this.continueNextLine = continueNextLine;
+        }
+    }
+
+    /**
+     * Make token-file from specified row resources.
+     * 
+     * @param filename File name. (NotNull)
+     * @param fileMakingCallback File-making callback. (NotNull)
+     * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public void make(String filename, ${glFileMakingCallbackName} fileMakingCallback, ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+        assertStringNotNullAndNotTrimmedEmpty("filename", filename);
+        assertObjectNotNull("fileMakingOption", fileMakingOption);
+        final String encoding = fileMakingOption.getEncoding();
+        final String delimiter = fileMakingOption.getDelimiter();
+        assertStringNotNullAndNotTrimmedEmpty("encoding", filename);
+        assertStringNotNullAndNotTrimmedEmpty("delimiter", filename);
+        final String lineSeparator;
+        if (fileMakingOption.getLineSeparator() != null && !fileMakingOption.getLineSeparator().equals("")) {
+            lineSeparator = fileMakingOption.getLineSeparator();
+        } else {
+            lineSeparator = System.getProperty("line.separator");// Default!
+        }
+
+        java.io.BufferedOutputStream bos = null;
+        java.io.Writer writer = null;
+        try {
+            bos = new java.io.BufferedOutputStream(new java.io.FileOutputStream(filename));
+            writer = new java.io.OutputStreamWriter(bos, encoding);
+
+            // Make header.
+            final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = fileMakingOption.getFileMakingHeaderInfo();
+            if (fileMakingHeaderInfo != null) {
+                final List${database.filterGenericsString('String')} columnNameList = fileMakingHeaderInfo.getColumnNameList();
+                if (columnNameList != null && !columnNameList.isEmpty()) {
+                    final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
+                    lineMakingOption.setDelimiter(delimiter);
+                    lineMakingOption.trimSpace();// Trimming is Header Only!
+                    final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
+                    writer.write(columnHeaderString);
+                }
+            }
+
+            // Make row.
+            ${glFileMakingRowResourceName} rowResource = null;
+            while (true) {
+                rowResource = fileMakingCallback.getRowResource();
+                if (rowResource == null) {
+                    break;// The End!
+                }
+                final java.util.List${database.filterGenericsString('String')} valueList = rowResource.getValueList();
+                final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
+                lineMakingOption.setDelimiter(delimiter);
+                lineMakingOption.quoteByDoubleQuotation();
+                final String lineString = _lineToken.make(valueList, lineMakingOption);
+                writer.write(lineString + lineSeparator);
+            }
+            writer.flush();
+        } catch (java.io.FileNotFoundException e) {
+            throw e;
+        } catch (java.io.IOException e) {
+            throw e;
+        } finally {
+            if (bos != null) {
+                bos.close();
+            }
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
+
+
+    // ----------------------------------------------------------------
+    //                                                    Assert Object
+    //                                                    -------------
+    /**
+     * Assert that the object is not null.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    //                                                    Assert String
+    //                                                    -------------
+    /**
+     * Assert that the entity is not null and not trimmed empty.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     */
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull(variableName, value);
+        if (value.trim().length() ==0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
         }
     }
 }

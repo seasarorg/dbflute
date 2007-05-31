@@ -1,0 +1,17 @@
+package ${glPackageBaseCommonHelperTokenFile};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glFileMakingCallbackName} {
+
+    /**
+     * Get file-making header information.
+     * <pre>
+     * You should return your row resource for file-making.
+     * It continues invoking until this method returns null.
+     * </pre>
+     * @return File-making header information. (Nullable)
+     */
+    public ${glFileMakingRowResourceName} getRowResource();
+}

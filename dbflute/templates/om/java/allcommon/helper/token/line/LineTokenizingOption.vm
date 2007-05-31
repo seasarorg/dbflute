@@ -9,12 +9,12 @@ public class ${glLineTokenizingOptionName} {
 
     protected boolean _trimDoubleQuotation;
 
-    public ${glLineTokenizingOptionName} tokenizeByComma() {
+    public ${glLineTokenizingOptionName} delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
-    public ${glLineTokenizingOptionName} tokenizeByTab() {
+    public ${glLineTokenizingOptionName} delimitateByTab() {
         _delimiter = "\t";
         return this;
     }

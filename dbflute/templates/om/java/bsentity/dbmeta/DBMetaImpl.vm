@@ -221,6 +221,30 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     // =====================================================================================
+    //                                                                           Column Name
+    //                                                                           ===========
+    public java.util.List${database.filterGenericsString('String')} getColumnDbNameList() {
+        return new java.util.ArrayList${database.filterGenericsString('String')}(_dbNameCapPropNameMap.keySet());
+    }
+
+    public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList() {
+        return new java.util.ArrayList${database.filterGenericsString('String')}(_capPropNameDbNameMap.keySet());
+    }
+
+    public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList() {
+        return new java.util.ArrayList${database.filterGenericsString('String')}(_uncapPropNameDbNameMap.keySet());
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Column-db-name comma-string. (NotNull)
+     */
+    public String getColumnDbNameCommaString() {
+        return "${table.ColumnNameCommaString}";
+    }
+
+    // =====================================================================================
     //                                                                    DB-Name-Map Getter
     //                                                                    ==================
     /**
@@ -601,5 +625,32 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */
     public boolean hasCommonColumn() {
         return ${table.hasAllCommonColumn()};
+    }
+
+    // =====================================================================================
+    //                                                                       Entity Handling
+    //                                                                       ===============
+    public java.util.List${database.filterGenericsString('String')} extractColumnStringValueList(${glEntityInterfaceName} entity) {
+        return extractMyColumnStringValueList((${myExtendedObjectClassName})entity);
+    }
+
+    public java.util.List${database.filterGenericsString('String')} extractMyColumnStringValueList(${myExtendedObjectClassName} entity) {
+        final java.util.List${database.filterGenericsString('String')} valueList = new java.util.ArrayList${database.filterGenericsString('String')}();
+#foreach ($col in $table.columns)
+        valueList.add(getColumnStringValue(entity.get${col.JavaName}()));
+#end
+        return valueList;
+    }
+
+    private String getColumnStringValue(Object value) {
+        if (value instanceof java.util.Date) {
+            return (value != null ? formatDate((java.util.Date)value) : "");
+        } else {
+            return (value != null ? value.toString() : "");
+        }
+    }
+
+    private String formatDate(java.util.Date value) {
+        return MapStringUtil.formatDate(value);
     }
 }

@@ -9,6 +9,13 @@ import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
+
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
+import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImplName};
 
 /**
  * The abstract class of behavior-readable.
@@ -442,6 +449,43 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(cb, callReadList(cb));
     }
 #end
+
+
+    // =====================================================================================
+    //                                                                            Token File
+    //                                                                            ==========
+    /**
+     * Output token-file from this table records.
+     * 
+     * @param filename Name of the file. (NotNull and NotEmpty)
+     * @param tokenFileOutputOption token-file-output-option. (NotNull and Required{delimiter and encoding})
+     * @return Token-file-output-result. (NotNull)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public ${glTokenFileOutputResultName} outputTokenFile(String filename, ${glConditionBeanInterfaceName} cb, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
+        assertStringNotNullAndNotTrimmedEmpty("filename", filename);
+        assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
+
+        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = readList(cb);
+        java.util.List${database.filterGenericsString('java.util.List<String>')} rowList = new java.util.ArrayList${database.filterGenericsString('java.util.List<String>')}();
+        for (java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+            final java.util.List${database.filterGenericsString('String')} valueList = getDBMeta().extractColumnStringValueList(entity);
+            rowList.add(valueList);
+        }
+        final ${glFileMakingSimpleFacadeImplName} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImplName}();
+        final ${glFileMakingOptionName} fileMakingOption = new ${glFileMakingOptionName}();
+        final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
+        fileMakingHeaderInfo.setColumnNameList(getDBMeta().getColumnDbNameList());
+        fileMakingOption.setFileMakingHeaderInfo(fileMakingHeaderInfo);
+        fileMakingOption.setEncoding(tokenFileOutputOption.getEncoding());
+        fileMakingOption.setDelimiter(tokenFileOutputOption.getDelimiter());
+        fileMakingSimpleFacade.makeFromRowList(filename, rowList, fileMakingOption);
+        final ${glTokenFileOutputResultName} tokeFileOutputResult = new ${glTokenFileOutputResultName}();
+        tokeFileOutputResult.setSelectedList(ls);
+        return tokeFileOutputResult;
+    }
 
     // =====================================================================================
     //                                                                         Helper Method

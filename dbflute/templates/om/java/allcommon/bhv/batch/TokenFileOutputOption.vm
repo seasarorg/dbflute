@@ -1,0 +1,74 @@
+package ${glPackageBaseCommonBhvBatch};
+
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glTokenFileOutputOptionName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected ${glFileMakingOptionName} _fileMakingOption = new ${glFileMakingOptionName}();
+
+    // =====================================================================================
+    //                                                                           Easy-to-Use
+    //                                                                           ===========
+    public ${glTokenFileOutputOptionName} delimitateByComma() {
+        _fileMakingOption.delimitateByComma();
+        return this;
+    }
+
+    public ${glTokenFileOutputOptionName} delimitateByTab() {
+        _fileMakingOption.delimitateByTab();
+        return this;
+    }
+
+    public ${glTokenFileOutputOptionName} encodeAsUTF8() {
+        _fileMakingOption.encodeAsUTF8();
+        return this;
+    }
+
+    public ${glTokenFileOutputOptionName} encodeAsWindows31J() {
+        _fileMakingOption.encodeAsWindows31J();
+        return this;
+    }
+
+    public ${glTokenFileOutputOptionName} separateCrLf() {
+        _fileMakingOption.separateCrLf();
+        return this;
+    }
+
+    public ${glTokenFileOutputOptionName} separateLf() {
+        _fileMakingOption.separateLf();
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public String getEncoding() {
+        return _fileMakingOption.getEncoding();
+    }
+
+    public void setEncoding(String encoding) {
+        _fileMakingOption.setDelimiter(encoding);
+    }
+
+    public String getDelimiter() {
+        return _fileMakingOption.getDelimiter();
+    }
+
+    public void setDelimiter(String delimiter) {
+        _fileMakingOption.setDelimiter(delimiter);
+    }
+
+    public String getLineSeparator() {
+        return _fileMakingOption.getLineSeparator();
+    }
+
+    public void setLineSeparator(String lineSeparator) {
+        _fileMakingOption.setLineSeparator(lineSeparator);
+    }
+}
