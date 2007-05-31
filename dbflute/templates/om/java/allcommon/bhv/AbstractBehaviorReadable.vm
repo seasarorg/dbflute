@@ -457,13 +457,15 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * Output token-file from this table records.
      * 
+     * @param cb Condition-bean. (NotNull)
      * @param filename Name of the file. (NotNull and NotEmpty)
      * @param tokenFileOutputOption token-file-output-option. (NotNull and Required{delimiter and encoding})
      * @return Token-file-output-result. (NotNull)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public ${glTokenFileOutputResultName} outputTokenFile(String filename, ${glConditionBeanInterfaceName} cb, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBeanInterfaceName} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
+        assertConditionBeanNotNull(cb);
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
         assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
 
@@ -474,7 +476,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             final java.util.List${database.filterGenericsString('String')} valueList = getDBMeta().extractColumnStringValueList(entity);
             rowList.add(valueList);
         }
-        final ${glFileMakingSimpleFacadeImplName} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImplName}();
+        final ${glFileMakingSimpleFacadeName} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImplName}();
         final ${glFileMakingOptionName} fileMakingOption = new ${glFileMakingOptionName}();
         final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
         fileMakingHeaderInfo.setColumnNameList(getDBMeta().getColumnDbNameList());

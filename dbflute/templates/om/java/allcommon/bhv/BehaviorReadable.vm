@@ -300,20 +300,20 @@ public interface ${glBehaviorReadableInterfaceName} {
     public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
 #end
 
-
     // =====================================================================================
     //                                                                            Token File
     //                                                                            ==========
     /**
      * Output token-file from this table records.
      * 
+     * @param cb Condition-bean. (NotNull)
      * @param filename Name of the file. (NotNull and NotEmpty)
      * @param tokenFileOutputOption token-file-output-option. (NotNull and Required{delimiter and encoding})
      * @return Token-file-output-result. (NotNull)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public ${glTokenFileOutputResultName} outputTokenFile(String filename, ${glConditionBeanInterfaceName} cb, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBeanInterfaceName} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException;
 
     /**
      * The interface of select-page callback.
