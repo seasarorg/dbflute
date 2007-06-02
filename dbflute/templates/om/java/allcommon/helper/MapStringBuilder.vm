@@ -32,16 +32,31 @@ public interface ${glMapStringBuilderName} {
     public String buildFromList(java.util.List${database.filterGenericsString('String')} valueList);
 
     // =====================================================================================
-    //                                                                             Exception
-    //                                                                             =========
+    //                                                                Exception Static Class
+    //                                                                ======================
     public static class DifferentDelimiterCountException extends RuntimeException {
+
+        /** Serial version UID. (Default) */
+        private static final long serialVersionUID = 1L;
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
         protected java.util.List${database.filterGenericsString('String')} _columnNameList;
         protected java.util.List${database.filterGenericsString('String')} _valueList;
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
         public DifferentDelimiterCountException(String msg, java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
             super(msg);
             _columnNameList = columnNameList;
             _valueList = valueList;
         }
+
+        // =====================================================================================
+        //                                                                              Accessor
+        //                                                                              ========
         public java.util.List${database.filterGenericsString('String')} getColumnNameList() {
             return _columnNameList;
         }

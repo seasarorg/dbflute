@@ -320,8 +320,11 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     }
 
     // =====================================================================================
-    //                                                                          Static Class
-    //                                                                          ============
+    //                                                                 Internal Static Class
+    //                                                                 =====================
+    // --------------------------------------
+    //                              SqlParser
+    //                              ---------
     protected static class InternalSqlParserImpl implements SqlParser {
 
         private SqlTokenizer tokenizer;
@@ -504,6 +507,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
     }
 
+    // --------------------------------------
+    //                       BindVariableNode
+    //                       ----------------
     protected static class InternalBindVariableNode extends BindVariableNode {
         private String expression;
 
@@ -549,6 +555,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
     }
 
+    // --------------------------------------
+    //                             StringUtil
+    //                             ----------
     protected static class InternalStringUtil {
 
         public static final String[] EMPTY_STRINGS = new String[0];

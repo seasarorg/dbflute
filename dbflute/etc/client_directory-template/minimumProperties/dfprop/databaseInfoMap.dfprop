@@ -1,0 +1,18 @@
+# /---------------------------------------------------------------------------
+# [Database Information]
+#   databaseInfoMap: 
+#     driver   -- The class name of JDBC-Driver.
+#     url      -- The url for connecting database.
+#     schema   -- The schema name.
+#     user     -- The database user name.
+#     password -- The database password.
+#
+# @FirstProperty
+map:{
+	; driver		= org.apache.derby.jdbc.EmbeddedDriver
+	; url			= jdbc:derby:/pj/ws/dbflute-example/backup/data-derby
+	; schema		= LDB
+	; user			= ldb
+	; password		= ldb
+}
+# ----------------/

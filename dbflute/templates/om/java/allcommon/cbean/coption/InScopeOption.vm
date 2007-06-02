@@ -79,7 +79,7 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
     //                                                                            Real Value
     //                                                                            ==========
     public java.util.List generateRealValueList(java.util.List valueList) {
-        final java.util.List resultList = new java.util.ArrayList();
+        final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
         for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
             final String value = (String)ite.next();
             resultList.add(generateRealValue(value));

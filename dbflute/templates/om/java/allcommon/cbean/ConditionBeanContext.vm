@@ -21,7 +21,7 @@ public class ${glConditionBeanContextName} {
     private static final ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})} _threadLocal = new ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})}();
 
     /**
-     * Get fetch-narrowing-bean on thread.
+     * Get condition-bean on thread.
      * 
      * @return Condition-bean context. (Nullable)
      */

@@ -1,12 +1,12 @@
 package ${glPackageBaseCommonCBean};
 
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseName}${database.DaoGenDbName};
 
-/// <summary>
-/// The condition-bean as interface.
-/// Author: ${database.ClassAuthor}
-/// </summary>
+/**
+ * The simple paging-bean.
+ * 
+ * @author ${database.ClassAuthor}
+ */
 public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implements ${glPagingBeanInterfaceName} {
 
     // =====================================================================================
@@ -72,37 +72,43 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
     // =====================================================================================
     //                                                                                Paging
     //                                                                                ======
-    /// <summary>
-    /// Fetch first.
-    /// If you invoke this, your SQL returns [fetch-size] records from first.
-    /// </summary>
-    /// <param name="fetchSize">Fetch-size. (NotMinus & NotZero)</param>
-    /// <returns>this. (NotNull)</returns>
+    /**
+     * Fetch first.
+     * <pre>
+     * If you invoke this, your SQL returns [fetch-size] records from first.
+     * </pre>
+     * @param fetchSize Fetch-size. (NotMinus & NotZero)
+     * @return this. (NotNull)
+     */
     public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize) {
         getSqlClause().fetchFirst(fetchSize);
         return this;
     }
 
-    /// <summary>
-    /// Fetch scope.
-    /// If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
-    /// </summary>
-    /// <param name="fetchStartIndex">Fetch-start-index. 0 origin. (NotMinus)</param>
-    /// <param name="fetchSize">Fetch-size. (NotMinus & NotZero)</param>
-    /// <returns>this. (NotNull)</returns>
+    /**
+     * Fetch scope.
+     * <pre>
+     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
+     * </pre>
+     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
+     * @param fetchSize Fetch-size. (NotMinus & NotZero)</param>
+     * @return this. (NotNull)
+     */
     public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize) {
         getSqlClause().fetchScope(fetchStartIndex, fetchSize);
         return this;
     }
 
-    /// <summary>
-    /// Fetch page.
-    /// When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
-    /// But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
-    /// If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
-    /// </summary>
-    /// <param name="fetchPageNumber">Fetch-page-number. 1 origin. (NotMinus & NotZero)</param>
-    /// <returns>this. (NotNull)</returns>
+    /**
+     * Fetch page.
+     * <pre>
+     * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
+     *  But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
+     *  If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
+     * </pre>
+     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero)
+     * @return this. (NotNull)
+     */
     public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber) {
         getSqlClause().fetchPage(fetchPageNumber);
         return this;

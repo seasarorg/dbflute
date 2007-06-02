@@ -22,24 +22,24 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     //                                                         Properties - Deprecated
     //                                                         =======================
     public boolean isMakeDeprecated() {
-        return booleanProp("torque.isMakeDeprecated", true);
+        return booleanProp("torque.isMakeDeprecated", false);
     }
 
     // ===============================================================================
     //                                                     Properties - ConditionQuery
     //                                                     ===========================
     public boolean isMakeConditionQueryEqualEmptyString() {
-        return booleanProp("torque.isMakeConditionQueryEqualEmptyString", true);
+        return booleanProp("torque.isMakeConditionQueryEqualEmptyString", false);
     }
 
     public boolean isMakeConditionQueryNumericArgumentLong() {
-        return booleanProp("torque.isMakeConditionQueryNumericArgumentLong", true);
+        return booleanProp("torque.isMakeConditionQueryNumericArgumentLong", false);
     }
 
     // ===============================================================================
     //                                                           Properties - Behavior
     //                                                           =====================
     public boolean isMakeBehaviorForUpdate() {
-        return booleanProp("torque.isMakeBehaviorForUpdate", true);
+        return booleanProp("torque.isMakeBehaviorForUpdate", false);
     }
 }

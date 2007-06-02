@@ -3,7 +3,7 @@ package ${glPackageBaseCQ};
 
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
 
-#if ($database.hasClassificationDefinitionMap())
+#if ($table.hasClassification())
 
 import ${glPackageBaseCommon}.${glClassificationDefinition};
 #end

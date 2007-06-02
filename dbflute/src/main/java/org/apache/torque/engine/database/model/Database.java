@@ -659,7 +659,7 @@ public class Database {
     public String getTargetLanguage() {
         return getBasicProperties().getTargetLanguage();
     }
-    
+
     public String getTargetLanguageInitCap() {
         final String targetLanguage = getBasicProperties().getTargetLanguage();
         return targetLanguage.substring(0, 1).toUpperCase() + targetLanguage.substring(1);
@@ -712,10 +712,6 @@ public class Database {
     // ===============================================================================
     //                                                          Properties - Available
     //                                                          ======================
-    public boolean isAvailableEntityLazyLoad() {
-        return getBasicProperties().isAvailableEntityLazyLoad();
-    }
-
     public boolean isAvailableBehaviorGeneration() {
         return getBasicProperties().isAvailableBehaviorGeneration();
     }
@@ -724,8 +720,16 @@ public class Database {
         return getBasicProperties().isAvailableGenerics();
     }
 
-    public String filterGenericsString(String genericsString) {
+    public String filterGenericsString(String genericsString) {// It is very important!
         return getBasicProperties().filterGenericsString(genericsString);
+    }
+
+    public String filterGenericsDowncast(String genericsDowncast) {// It is very important!
+        return getBasicProperties().filterGenericsDowncast(genericsDowncast);
+    }
+
+    public String filterGenericsGeneralOutput(String genericsGeneralOutput) {// It is very important!
+        return getBasicProperties().filterGenericsGeneralOutput(genericsGeneralOutput);
     }
 
     // ===============================================================================
@@ -863,7 +867,7 @@ public class Database {
     public String getSequenceReturnType() {
         return getProperties().getSequenceIdentityProperties().getSequenceReturnType();
     }
-    
+
     public String getIdentityDefinitionMapColumnName(String flexibleTableName) {
         return getProperties().getSequenceIdentityProperties().getIdentityDefinitionMapColumnName(flexibleTableName);
     }
@@ -963,7 +967,7 @@ public class Database {
     public DfClassificationProperties getClassificationProperties() {
         return getProperties().getClassificationProperties();
     }
-    
+
     // --------------------------------------
     //                             Definition
     //                             ----------
@@ -988,7 +992,8 @@ public class Database {
     }
 
     public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getClassificationProperties().getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
+        return getClassificationProperties()
+                .getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
     public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
@@ -1003,7 +1008,8 @@ public class Database {
     }
 
     public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getClassificationProperties().getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
+        return getClassificationProperties()
+                .getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
     public boolean hasClassification(String tableName, String columnName) {
@@ -1044,7 +1050,7 @@ public class Database {
     public DfSelectParamProperties getSelectParamProperties() {
         return getProperties().getSelectParamProperties();
     }
-    
+
     public String getSelectQueryTimeout() {
         return getSelectParamProperties().getSelectQueryTimeout();
     }
@@ -1254,7 +1260,7 @@ public class Database {
     public boolean isVersionAfter1043() {
         return getProperties().getOtherProperties().isVersionAfter1043();
     }
-    
+
     public boolean isVersionAfter1040() {
         return getProperties().getOtherProperties().isVersionAfter1040();
     }

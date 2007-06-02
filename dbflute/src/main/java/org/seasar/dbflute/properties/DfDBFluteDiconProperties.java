@@ -47,7 +47,7 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
         if (prop != null) {
             diconSeparatedString = prop;
         } else {
-            diconSeparatedString = stringProp("torque.daoDiconPackageName", "");
+            diconSeparatedString = stringProp("torque.daoDiconPackageName", "../resources");
         }
         final String[] array = diconSeparatedString.split(";");
         final List<String> ls = new ArrayList<String>();

@@ -53,11 +53,11 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseOracle() {
         return getDatabaseName().equalsIgnoreCase("oracle");
     }
-    
+
     public boolean isDatabaseSqlServer() {
         return getDatabaseName().equalsIgnoreCase("mssql");
     }
-    
+
     public boolean isDatabaseSybase() {
         return getDatabaseName().equalsIgnoreCase("sybase");
     }
@@ -66,7 +66,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                            Properties - JavaDir
     //                                                            ====================
     public String getJavaDir() {
-        return stringProp("torque.java.dir", "");
+        return stringProp("torque.java.dir", "../src/main/java");
     }
 
     public String getJavaLocation_for_gen() {
@@ -197,12 +197,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===============================================================================
     //                                                          Properties - Available
     //                                                          ======================
-    public boolean isAvailableEntityLazyLoad() {
-        return booleanProp("torque.isAvailableEntityLazyLoad", false);
-    }
-
     public boolean isAvailableBehaviorGeneration() {
-        return booleanProp("torque.isAvailableBehaviorGeneration", false);
+        return booleanProp("torque.isAvailableBehaviorGeneration", true);
     }
 
     public boolean isAvailableGenerics() {
@@ -217,13 +213,29 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
+    public String filterGenericsDowncast(String genericsDowncast) {
+        if (isAvailableGenerics()) {
+            return "";
+        } else {
+            return "(" + genericsDowncast + ")";
+        }
+    }
+
+    public String filterGenericsGeneralOutput(String genericsGeneralOutput) {
+        if (isAvailableGenerics()) {
+            return "";
+        } else {
+            return genericsGeneralOutput;
+        }
+    }
+
     // ===============================================================================
     //                                                             Properties - Prefix
     //                                                             ===================
     public String getProjectPrefix() {
         return stringProp("torque.projectPrefix", "");
     }
-    
+
     public boolean isAppendProjectSuffixToComponentName() {
         return booleanProp("torque.isAppendProjectSuffixToComponentName", true);
     }
