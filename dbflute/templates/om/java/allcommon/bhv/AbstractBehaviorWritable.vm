@@ -439,12 +439,13 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public ${glTokenFileReflectionResultName} reflectTokenFile(final String filename, final ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public ${glTokenFileReflectionResultName} reflectTokenFile(String filename, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
         assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
 
         final String encoding = tokenFileReflectionOption.getEncoding();
         final String delimiter = tokenFileReflectionOption.getDelimiter();
+        final boolean interruptIfError = tokenFileReflectionOption.isInterruptIfError();
         assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
         assertObjectNotNull("delimiter", delimiter);
 
@@ -454,10 +455,10 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         result.setTokenFileReflectionFailureList(failureList);
 
         final ${glFileTokenizingCallbackName} fileTokenizingCallback = new ${glFileTokenizingCallbackName}() {
-            public void handleRowResource(${glFileTokenizingRowResourceName} fileTokenizingResource) {
-                final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = fileTokenizingResource.getFileTokenizingHeaderInfo();
+            public void handleRowResource(${glFileTokenizingRowResourceName} fileTokenizingRowResource) {
+                final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = fileTokenizingRowResource.getFileTokenizingHeaderInfo();
                 final java.util.List${database.filterGenericsString('String')} columnNameList = fileTokenizingHeaderInfo.getColumnNameList();
-                final java.util.List${database.filterGenericsString('String')} valueList = fileTokenizingResource.getValueList();
+                final java.util.List${database.filterGenericsString('String')} valueList = fileTokenizingRowResource.getValueList();
 
                 // Set up columnNameList of result object.
                 if (result.getColumnNameList() == null) {
@@ -475,15 +476,15 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                     // Increment successCount of result object.
                     result.incrementSuccessCount();
                 } catch (RuntimeException e) {
-                    if (tokenFileReflectionOption.isInterruptIfError()) {
+                    if (interruptIfError) {
                         throw e;
                     }
                     final ${glTokenFileReflectionFailureName} failure = new ${glTokenFileReflectionFailureName}();
                     failure.setColumnNameList(columnNameList);
                     failure.setValueList(valueList);
-                    failure.setRowString(fileTokenizingResource.getRowString());
-                    failure.setRowNumber(fileTokenizingResource.getRowNumber());
-                    failure.setLineNumber(fileTokenizingResource.getLineNumber());
+                    failure.setRowString(fileTokenizingRowResource.getRowString());
+                    failure.setRowNumber(fileTokenizingRowResource.getRowNumber());
+                    failure.setLineNumber(fileTokenizingRowResource.getLineNumber());
                     if (entity != null) {
                         failure.setEntity(entity);
                     }

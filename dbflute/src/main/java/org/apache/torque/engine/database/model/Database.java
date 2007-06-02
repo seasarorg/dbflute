@@ -70,12 +70,13 @@ import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.DfDBFluteProvider;
+import org.seasar.dbflute.DfComponentProvider;
 import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -589,8 +590,8 @@ public class Database {
     }
 
     public void initializeClassificationDeployment() {
-        getProperties().initializeClassificationDeploymentMap(getTableList());
-        getProperties().initializeClassificationDeploymentMap(getCustomizeTableList());
+        getClassificationProperties().initializeClassificationDeploymentMap(getTableList());
+        getClassificationProperties().initializeClassificationDeploymentMap(getCustomizeTableList());
     }
 
     // ===============================================================================
@@ -957,90 +958,72 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                     Properties - Logical-Delete
-    //                                                     ===========================
-    public Map<String, Object> getLogicalDeleteColumnValueMap() {
-        return getProperties().getLogicalDeleteColumnValueMap();
-    }
-
-    public List<String> getLogicalDeleteColumnNameList() {
-        return getProperties().getLogicalDeleteColumnNameList();
-    }
-
-    // ===============================================================================
-    //                                        Properties - Revival from Logical-Delete
-    //                                        ========================================
-    public Map<String, Object> getRevivalFromLogicalDeleteColumnValueMap() {
-        return getProperties().getRevivalFromLogicalDeleteColumnValueMap();
-    }
-
-    public List<String> getRevivalFromLogicalDeleteColumnNameList() {
-        return getProperties().getRevivalFromLogicalDeleteColumnNameList();
-    }
-
-    // ===============================================================================
     //                                                     Properties - Classification
     //                                                     ===========================
+    public DfClassificationProperties getClassificationProperties() {
+        return getProperties().getClassificationProperties();
+    }
+    
     // --------------------------------------
     //                             Definition
     //                             ----------
     public boolean hasClassificationDefinitionMap() {
-        return getProperties().hasClassificationDefinitionMap();
+        return getClassificationProperties().hasClassificationDefinitionMap();
     }
 
     public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
-        return getProperties().getClassificationDefinitionMap();
+        return getClassificationProperties().getClassificationDefinitionMap();
     }
 
     public List<String> getClassificationNameList() {
-        return getProperties().getClassificationNameList();
+        return getClassificationProperties().getClassificationNameList();
     }
 
     public List<String> getClassificationNameListValidNameOnly() {
-        return getProperties().getClassificationNameListValidNameOnly();
+        return getClassificationProperties().getClassificationNameListValidNameOnly();
     }
 
     public List<String> getClassificationNameListValidAliasOnly() {
-        return getProperties().getClassificationNameListValidAliasOnly();
+        return getClassificationProperties().getClassificationNameListValidAliasOnly();
     }
 
     public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getProperties().getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
+        return getClassificationProperties().getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
     public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
-        return getProperties().getClassificationMapList(classificationName);
+        return getClassificationProperties().getClassificationMapList(classificationName);
     }
 
     // --------------------------------------
     //                             Deployment
     //                             ----------
     public Map<String, Map<String, String>> getClassificationDeploymentMap() {
-        return getProperties().getClassificationDeploymentMap();
+        return getClassificationProperties().getClassificationDeploymentMap();
     }
 
     public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getProperties().getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
+        return getClassificationProperties().getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
     public boolean hasClassification(String tableName, String columnName) {
-        return getProperties().hasClassification(tableName, columnName);
+        return getClassificationProperties().hasClassification(tableName, columnName);
     }
 
     public String getClassificationName(String tableName, String columnName) {
-        return getProperties().getClassificationName(tableName, columnName);
+        return getClassificationProperties().getClassificationName(tableName, columnName);
     }
 
     public boolean hasClassificationName(String tableName, String columnName) {
-        return getProperties().hasClassificationName(tableName, columnName);
+        return getClassificationProperties().hasClassificationName(tableName, columnName);
     }
 
     public boolean hasClassificationAlias(String tableName, String columnName) {
-        return getProperties().hasClassificationAlias(tableName, columnName);
+        return getClassificationProperties().hasClassificationAlias(tableName, columnName);
     }
 
     public Map<String, String> getAllColumnClassificationMap() {
-        return getProperties().getAllColumnClassificationMap();
+        return getClassificationProperties().getAllColumnClassificationMap();
     }
 
     public boolean isAllClassificationColumn(String columnName) {
@@ -1048,34 +1031,38 @@ public class Database {
             String msg = "The argument[columnName] should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        return getProperties().isAllClassificationColumn(columnName);
+        return getClassificationProperties().isAllClassificationColumn(columnName);
     }
 
     public String getAllClassificationName(String columnName) {
-        return getProperties().getAllClassificationName(columnName);
+        return getClassificationProperties().getAllClassificationName(columnName);
     }
 
     // ===============================================================================
     //                                                       Properties - Select Param
     //                                                       =========================
+    public DfSelectParamProperties getSelectParamProperties() {
+        return getProperties().getSelectParamProperties();
+    }
+    
     public String getSelectQueryTimeout() {
-        return getProperties().getSelectQueryTimeout();
+        return getSelectParamProperties().getSelectQueryTimeout();
     }
 
     public boolean isSelectQueryTimeoutValid() {
-        return getProperties().isSelectQueryTimeoutValid();
+        return getSelectParamProperties().isSelectQueryTimeoutValid();
     }
 
     public String getStatementResultSetType() {
-        return getProperties().getStatementResultSetType();
+        return getSelectParamProperties().getStatementResultSetType();
     }
 
     public String getStatementResultSetConcurrency() {
-        return getProperties().getStatementResultSetConcurrency();
+        return getSelectParamProperties().getStatementResultSetConcurrency();
     }
 
     public boolean isStatementResultSetTypeValid() {
-        return getProperties().isStatementResultSetTypeValid();
+        return getSelectParamProperties().isStatementResultSetTypeValid();
     }
 
     // ===============================================================================
@@ -1364,7 +1351,7 @@ public class Database {
     protected Map<String, Map<String, String>> _databaseDefinitionMap;
 
     public Map<String, Map<String, String>> getDatabaseDefinitionMap() {
-        final DfDatabaseConfig config = (DfDatabaseConfig) DfDBFluteProvider.getComponent(DfDatabaseConfig.class);
+        final DfDatabaseConfig config = (DfDatabaseConfig) DfComponentProvider.getComponent(DfDatabaseConfig.class);
         return config.analyzeDatabaseBaseInfo();
     }
 

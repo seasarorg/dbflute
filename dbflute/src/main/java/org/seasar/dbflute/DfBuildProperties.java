@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2007 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -45,28 +44,38 @@ import org.seasar.dbflute.properties.DfSql2EntityProperties;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
-import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 
 /**
- * Build properties for Torque.
- * 
- * @author mkubo
- * @since
+ * Build properties.
+ * <pre>
+ * Singletonでbuild.propertiesの情報を保持する。
+ * ProcessのInitialize時にsetProperties()でPropertiesを設定されることが前提である。
+ * </pre>
+ * @author jflute
  */
 public final class DfBuildProperties {
 
-    /** Log-instance */
+    /** Log-instance. */
     private static final Log _log = LogFactory.getLog(DfBuildProperties.class);
 
     /** Singleton-instance. */
     private static final DfBuildProperties _instance = new DfBuildProperties();
 
-    /** TorqueContextProperties */
+    /** The delimiter of map-list-string. */
+    private static final String MAP_LIST_STRING_DELIMITER = ";";
+
+    //========================================================================================
+    //                                                                               Attribute
+    //                                                                               =========
+    /** Build properties. */
     private Properties _buildProperties;
 
+    //========================================================================================
+    //                                                                             Constructor
+    //                                                                             ===========
     /**
-     * Constructor.
+     * Constructor. (Private for Singleton)
      */
     private DfBuildProperties() {
     }
@@ -74,54 +83,48 @@ public final class DfBuildProperties {
     /**
      * Get singleton-instance.
      * 
-     * @return Singleton-Instance. (NotNull)
+     * @return Singleton-instance. (NotNull)
      */
     public synchronized static DfBuildProperties getInstance() {
         return _instance;
     }
 
+    //========================================================================================
+    //                                                                                Accessor
+    //                                                                                ========
     /**
-     * Set context-properties.
-     * 
-     * @param value Context-properties.
+     * Set build-properties.
+     * <pre>
+     * This method should be invoked at first initialization.
+     * Don't invoke with build-properties null.
+     * </pre>
+     * @param buildProperties Build-properties. (NotNull)
      */
-    final public void setProperties(Properties value) {
-        _buildProperties = value;
+    final public void setProperties(Properties buildProperties) {
+        _buildProperties = buildProperties;
     }
 
     /**
-     * Get context-properties.
+     * Get Build-properties.
      * 
-     * @return Context-properties.
+     * @return Build-properties. (NotNull)
      */
     final public Properties getProperties() {
         return _buildProperties;
     }
 
-    // **********************************************************************************************
-    //                                                                                       Delegate
-    //                                                                                       ********
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    // TODO: @jflute - DfAbstractHelperPropertiesに移行中。移行完了後は削除
+    //========================================================================================
+    //                                                                        Property Utility
+    //                                                                        ================
     /**
      * Get property as string. {Delegate method}
      * 
-     * @param key Property-key.
-     * @return Property as string.
-     */
-    final public String stringProp(String key) {
-        try {
-            return DfPropertyUtil.stringProp(_buildProperties, key);
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Get property as string. {Delegate method}
-     * 
-     * @param key Property-key.
-     * @param defaultValue Default value.
-     * @return Property as string.
+     * @param key Property-key. (NotNull)
+     * @param defaultValue Default value. (Nullable)
+     * @return Property as string. (Nullable: If the default-value is null)
+     * @deprecated
      */
     final public String stringProp(String key, String defaultValue) {
         try {
@@ -137,24 +140,10 @@ public final class DfBuildProperties {
     /**
      * Get property as boolean. {Delegate method}
      * 
-     * @param key Property-key.
-     * @return Property as boolean.
-     */
-    final public boolean booleanProp(String key) {
-        try {
-            return DfPropertyUtil.booleanProp(_buildProperties, key);
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#booleanProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Get property as boolean. {Delegate method}
-     * 
-     * @param key Property-key.
+     * @param key Property-key. (NotNull)
      * @param defaultValue Default value.
      * @return Property as boolean.
+     * @deprecated
      */
     final public boolean booleanProp(String key, boolean defaultValue) {
         try {
@@ -170,65 +159,16 @@ public final class DfBuildProperties {
     }
 
     /**
-     * Get property as integer. {Delegate method}
-     * 
-     * @param key Property-key.
-     * @return Property as integer.
-     */
-    final public int intProp(String key) {
-        try {
-            return DfPropertyUtil.intProp(_buildProperties, key);
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Get property as integer. {Delegate method}
-     * 
-     * @param key Property-key.
-     * @param defaultValue Default value.
-     * @return Property as integer.
-     */
-    final public int intProp(String key, int defaultValue) {
-        try {
-            return DfPropertyUtil.intProp(_buildProperties, key);
-        } catch (PropertyNotFoundException e) {
-            return defaultValue;
-        } catch (PropertyIntegerFormatException e) {
-            return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
      * Get property as list. {Delegate method}
      * 
-     * @param key Property-key.
-     * @return Property as list.
-     */
-    final public List<Object> listProp(String key) {
-        try {
-            return DfPropertyUtil.listProp(_buildProperties, key, ";");
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Get property as list. {Delegate method}
-     * 
-     * @param key Property-key.
-     * @param defaultValue Default value.
-     * @return Property as list.
+     * @param key Property-key. (NotNull)
+     * @param defaultValue Default value. (Nullable)
+     * @return Property as list. (Nullable: If the default-value is null)
+     * @deprecated
      */
     final public List<Object> listProp(String key, List<Object> defaultValue) {
         try {
-            final List<Object> result = DfPropertyUtil.listProp(_buildProperties, key, ";");
+            final List<Object> result = DfPropertyUtil.listProp(_buildProperties, key, MAP_LIST_STRING_DELIMITER);
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -245,28 +185,14 @@ public final class DfBuildProperties {
     /**
      * Get property as map. {Delegate method}
      * 
-     * @param key Property-key.
-     * @return Property as map.
-     */
-    final public Map<String, Object> mapProp(String key) {
-        try {
-            return DfPropertyUtil.mapProp(_buildProperties, key, ";");
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Get property as map. {Delegate method}
-     * 
-     * @param key Property-key.
-     * @param defaultValue Default value.
-     * @return Property as map.
+     * @param key Property-key. (NotNull)
+     * @param defaultValue Default value. (Nullable)
+     * @return Property as map. (Nullable: If the default-value is null)
+     * @deprecated
      */
     final public Map<String, Object> mapProp(String key, Map<String, Object> defaultValue) {
         try {
-            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, ";");
+            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, MAP_LIST_STRING_DELIMITER);
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -280,227 +206,168 @@ public final class DfBuildProperties {
         }
     }
 
-    // **********************************************************************************************
-    //                                                                                        Default
-    //                                                                                        *******
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★s
+
+    //========================================================================================
+    //                                                                      Default Definition
+    //                                                                      ==================
     public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
     public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
     public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
     public static final String DEFAULT_EMPTY_LIST_STRING = "list:{}";
 
-    // **********************************************************************************************
-    //                                                                                        Handler
-    //                                                                                        *******
+    //========================================================================================
+    //                                                                                 Handler
+    //                                                                                 =======
     public DfPropertiesHandler getHandler() {
         return DfPropertiesHandler.getInstance();
     }
 
-    // **********************************************************************************************
-    //                                                                                       Property
-    //                                                                                       ********
-    // ===============================================================================
-    //                                                              Properties - Basic
-    //                                                              ==================
+    //========================================================================================
+    //                                                                         Property Object
+    //                                                                         ===============
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     public DfBasicProperties getBasicProperties() {
         return getHandler().getBasicProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                                           Properties - DaoDicon
-    //                                                           =====================
+    // -----------------------------------------------------
+    //                                              DaoDicon
+    //                                              --------
     public DfDBFluteDiconProperties getDBFluteDiconProperties() {
         return getHandler().getDBFluteDiconProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                            Properties - Generated Class Package
-    //                                            ====================================
+    // -----------------------------------------------------
+    //                               Generated Class Package
+    //                               -----------------------
     public DfGeneratedClassPackageProperties getGeneratedClassPackageProperties() {
         return getHandler().getGeneratedClassPackageProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                              Properties - Sequence and Identity
-    //                                              ==================================
+    // -----------------------------------------------------
+    //                                 Sequence and Identity
+    //                                 ---------------------
     public DfSequenceIdentityProperties getSequenceIdentityProperties() {
         return getHandler().getSequenceIdentityProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                                    Properties - Optimistic Lock
-    //                                                    ============================
+    // -----------------------------------------------------
+    //                                       Optimistic Lock
+    //                                       ---------------
     public DfOptimisticLockProperties getOptimisticLockProperties() {
         return getHandler().getOptimisticLockProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                                      Properties - Common-Column
-    //                                                      ==========================
+    // -----------------------------------------------------
+    //                                         Common Column
+    //                                         -------------
     public DfCommonColumnProperties getCommonColumnProperties() {
         return getHandler().getCommonColumnProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                                     Properties - Logical-Delete
-    //                                                     ===========================
-    public static final String KEY_logicalDeleteColumnValueMap = "logicalDeleteColumnValueMap";
-    protected Map<String, Object> _logicalDeleteColumnValueMap;
-
-    public Map<String, Object> getLogicalDeleteColumnValueMap() {
-        if (_logicalDeleteColumnValueMap == null) {
-            final String key = "torque." + KEY_logicalDeleteColumnValueMap;
-            _logicalDeleteColumnValueMap = mapProp(key, DEFAULT_EMPTY_MAP);
-        }
-        return _logicalDeleteColumnValueMap;
-    }
-
-    protected List<String> _logicalDeleteColumnNameList;
-
-    public List<String> getLogicalDeleteColumnNameList() {
-        if (_logicalDeleteColumnNameList == null) {
-            _logicalDeleteColumnNameList = new ArrayList<String>(getLogicalDeleteColumnValueMap().keySet());
-        }
-        return _logicalDeleteColumnNameList;
-    }
-
-    // ===============================================================================
-    //                                        Properties - Revival from Logical-Delete
-    //                                        ========================================
-    public static final String KEY_revivalFromLogicalDeleteColumnValueMap = "revivalFromLogicalDeleteColumnValueMap";
-    protected Map<String, Object> _revivalFromLogicalDeleteColumnValueMap;
-
-    public Map<String, Object> getRevivalFromLogicalDeleteColumnValueMap() {
-        if (_revivalFromLogicalDeleteColumnValueMap == null) {
-            final String key = "torque." + KEY_revivalFromLogicalDeleteColumnValueMap;
-            _revivalFromLogicalDeleteColumnValueMap = mapProp(key, DEFAULT_EMPTY_MAP);
-        }
-        return _revivalFromLogicalDeleteColumnValueMap;
-    }
-
-    protected List<String> _revivalFromLogicalDeleteColumnNameList;
-
-    public List<String> getRevivalFromLogicalDeleteColumnNameList() {
-        if (_revivalFromLogicalDeleteColumnNameList == null) {
-            _revivalFromLogicalDeleteColumnNameList = new ArrayList<String>(getLogicalDeleteColumnValueMap().keySet());
-        }
-        return _revivalFromLogicalDeleteColumnNameList;
-    }
-
-    // ===============================================================================
-    //                                                     Properties - Classification
-    //                                                     ===========================
-    // --------------------------------------
-    //                             Definition
-    //                             ----------
+    // -----------------------------------------------------
+    //                                        Classification
+    //                                        --------------
     protected DfClassificationProperties _classificationProperties;
 
-    protected DfClassificationProperties getClassificationProperties() {
+    public DfClassificationProperties getClassificationProperties() {
         if (_classificationProperties == null) {
             _classificationProperties = new DfClassificationProperties(_buildProperties);
         }
         return _classificationProperties;
     }
 
-    public boolean hasClassificationDefinitionMap() {
-        return getClassificationProperties().hasClassificationDefinitionMap();
-    }
-
-    public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
-        return getClassificationProperties().getClassificationDefinitionMap();
-    }
-
-    public List<String> getClassificationNameList() {
-        return getClassificationProperties().getClassificationNameList();
-    }
-
-    public List<String> getClassificationNameListValidNameOnly() {
-        return getClassificationProperties().getClassificationNameListValidNameOnly();
-    }
-
-    public List<String> getClassificationNameListValidAliasOnly() {
-        return getClassificationProperties().getClassificationNameListValidAliasOnly();
-    }
-
-    public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getClassificationProperties()
-                .getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
-    }
-
-    public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
-        return getClassificationProperties().getClassificationMapList(classificationName);
-    }
-
-    // --------------------------------------
-    //                             Deployment
-    //                             ----------
-    public Map<String, Map<String, String>> getClassificationDeploymentMap() {
-        return getClassificationProperties().getClassificationDeploymentMap();
-    }
-
-    public void initializeClassificationDeploymentMap(List<Table> tableList) {
-        getClassificationProperties().initializeClassificationDeploymentMap(tableList);
-    }
-
-    public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getClassificationProperties()
-                .getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
-    }
-
-    public boolean hasClassification(String tableName, String columnName) {
-        return getClassificationProperties().hasClassification(tableName, columnName);
-    }
-
-    public String getClassificationName(String tableName, String columnName) {
-        return getClassificationProperties().getClassificationName(tableName, columnName);
-    }
-
-    public boolean hasClassificationName(String tableName, String columnName) {
-        return getClassificationProperties().hasClassificationName(tableName, columnName);
-    }
-
-    public boolean hasClassificationAlias(String tableName, String columnName) {
-        return getClassificationProperties().hasClassificationAlias(tableName, columnName);
-    }
-
-    public Map<String, String> getAllColumnClassificationMap() {
-        return getClassificationProperties().getAllColumnClassificationMap();
-    }
-
-    public boolean isAllClassificationColumn(String columnName) {
-        return getClassificationProperties().isAllClassificationColumn(columnName);
-    }
-
-    public String getAllClassificationName(String columnName) {
-        return getClassificationProperties().getAllClassificationName(columnName);
-    }
-
-    // ===============================================================================
-    //                                                       Properties - Select Param
-    //                                                       =========================
-    protected DfSelectParamProperties getSelectParamProperties() {
+    // -----------------------------------------------------
+    //                                          Select Param
+    //                                          ------------
+    public DfSelectParamProperties getSelectParamProperties() {
         return getHandler().getSelectParamProperties(getProperties());
     }
 
-    public String getSelectQueryTimeout() {
-        return getSelectParamProperties().getSelectQueryTimeout();
+    // -----------------------------------------------------
+    //                                Additional Foreign-Key
+    //                                ----------------------
+    public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
+        return getHandler().getAdditionalForeignKeyProperties(getProperties());
     }
 
-    public boolean isSelectQueryTimeoutValid() {
-        return getSelectParamProperties().isSelectQueryTimeoutValid();
+    // -----------------------------------------------------
+    //                              Original Behavior Aspect
+    //                              ------------------------
+    public static final String KEY_originalBehaviorAspectMap = "originalBehaviorAspectMap";
+    protected Map<String, Map<String, String>> _originalBehaviorAspectMap;
+
+    public Map<String, Map<String, String>> getOriginalBehaviorAspectMap() {
+        if (_originalBehaviorAspectMap == null) {
+            _originalBehaviorAspectMap = new LinkedHashMap<String, Map<String, String>>();
+
+            final Map<String, Object> generatedMap = mapProp("torque." + KEY_originalBehaviorAspectMap,
+                    DEFAULT_EMPTY_MAP);
+            final Set<String> keySet = generatedMap.keySet();
+            for (String key : keySet) {
+                final Map<String, String> aspectDefinition = (Map<String, String>) generatedMap.get(key);
+                _originalBehaviorAspectMap.put(key, aspectDefinition);
+            }
+        }
+        return _originalBehaviorAspectMap;
     }
 
-    public String getStatementResultSetType() {
-        return getSelectParamProperties().getStatementResultSetType();
+    public List<String> getOriginalBehaviorAspectComponentNameList() {
+        return new ArrayList<String>(getOriginalBehaviorAspectMap().keySet());
     }
 
-    public String getStatementResultSetConcurrency() {
-        return getSelectParamProperties().getStatementResultSetConcurrency();
+    public String getOriginalBehaviorAspectClassName(String componentName) {
+        final Map<String, String> aspectDefinition = getOriginalBehaviorAspectMap().get(componentName);
+        return aspectDefinition.get("className");
     }
 
-    public boolean isStatementResultSetTypeValid() {
-        return getSelectParamProperties().isStatementResultSetTypeValid();
+    public String getOriginalBehaviorAspectPointcut(String componentName) {
+        final Map<String, String> aspectDefinition = getOriginalBehaviorAspectMap().get(componentName);
+        return aspectDefinition.get("pointcut");
     }
 
+    // -----------------------------------------------------
+    //                                        Extract Accept
+    //                                        --------------
+    public String getExtractAcceptStartBrace() {
+        return stringProp("torque.extractAcceptStartBrace", "@{");
+    }
+
+    public String getExtractAcceptEndBrace() {
+        return stringProp("torque.extractAcceptEndBrace", "@}");
+    }
+
+    public String getExtractAcceptDelimiter() {
+        return stringProp("torque.extractAcceptDelimiter", "@;");
+    }
+
+    public String getExtractAcceptEqual() {
+        return stringProp("torque.extractAcceptEqual", "@=");
+    }
+
+    // -----------------------------------------------------
+    //                                      Source Reduction
+    //                                      ----------------
+    public DfSourceReductionProperties getSourceReductionProperties() {
+        return getHandler().getSourceReductionProperties(getProperties());
+    }
+
+    public DfIncludeQueryProperties getIncludeQueryProperties() {
+        return getHandler().getIncludeQueryProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                                 Other
+    //                                                 -----
+    public DfOtherProperties getOtherProperties() {
+        return getHandler().getOtherProperties(getProperties());
+    }
+
+    // TODO: @jflute - 削除予定。今後DBFluteではサポートしない。
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
     // ===============================================================================
     //                                                       Properties - CustomizeDao
     //                                                       =========================
@@ -622,13 +489,10 @@ public final class DfBuildProperties {
         return !getCustomizeDaoDifinitionMap().isEmpty();
     }
 
-    // ===============================================================================
-    //                                               Properties - AdditionalForeignKey
-    //                                               =================================
-    public DfAdditionalForeignKeyProperties getAdditionalForeignKeyProperties() {
-        return getHandler().getAdditionalForeignKeyProperties(getProperties());
-    }
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
+    // TODO: @jflute - 削除予定。今後DBFluteではサポートしない。
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
     // ===============================================================================
     //                                                   Properties - SqlParameterBean
     //                                                   =============================
@@ -698,6 +562,10 @@ public final class DfBuildProperties {
         return str != null;
     }
 
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+    // TODO: @jflute - 削除予定。今後DBFluteではサポートしない。
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
     // ===============================================================================
     //                                                       Properties - ArguemntBean
     //                                                       =========================
@@ -777,82 +645,11 @@ public final class DfBuildProperties {
         return (List<String>) getArgumentBeanRelatedSqlParameterMap().get(argumentBeanName);
     }
 
-    // ===============================================================================
-    //                                             Properties - OriginalBehaviorAspect
-    //                                             ===================================
-    public static final String KEY_originalBehaviorAspectMap = "originalBehaviorAspectMap";
-    protected Map<String, Map<String, String>> _originalBehaviorAspectMap;
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
-    public Map<String, Map<String, String>> getOriginalBehaviorAspectMap() {
-        if (_originalBehaviorAspectMap == null) {
-            _originalBehaviorAspectMap = new LinkedHashMap<String, Map<String, String>>();
-
-            final Map<String, Object> generatedMap = mapProp("torque." + KEY_originalBehaviorAspectMap,
-                    DEFAULT_EMPTY_MAP);
-            final Set<String> keySet = generatedMap.keySet();
-            for (String key : keySet) {
-                final Map<String, String> aspectDefinition = (Map<String, String>) generatedMap.get(key);
-                _originalBehaviorAspectMap.put(key, aspectDefinition);
-            }
-        }
-        return _originalBehaviorAspectMap;
-    }
-
-    public List<String> getOriginalBehaviorAspectComponentNameList() {
-        return new ArrayList<String>(getOriginalBehaviorAspectMap().keySet());
-    }
-
-    public String getOriginalBehaviorAspectClassName(String componentName) {
-        final Map<String, String> aspectDefinition = getOriginalBehaviorAspectMap().get(componentName);
-        return aspectDefinition.get("className");
-    }
-
-    public String getOriginalBehaviorAspectPointcut(String componentName) {
-        final Map<String, String> aspectDefinition = getOriginalBehaviorAspectMap().get(componentName);
-        return aspectDefinition.get("pointcut");
-    }
-
-    // ===============================================================================
-    //                                                      Properties - ExtractAccept
-    //                                                      ==========================
-
-    public String getExtractAcceptStartBrace() {
-        return stringProp("torque.extractAcceptStartBrace", "@{");
-    }
-
-    public String getExtractAcceptEndBrace() {
-        return stringProp("torque.extractAcceptEndBrace", "@}");
-    }
-
-    public String getExtractAcceptDelimiter() {
-        return stringProp("torque.extractAcceptDelimiter", "@;");
-    }
-
-    public String getExtractAcceptEqual() {
-        return stringProp("torque.extractAcceptEqual", "@=");
-    }
-
-    // ===============================================================================
-    //                                                   Properties - Source Reduction
-    //                                                   =============================
-    public DfSourceReductionProperties getSourceReductionProperties() {
-        return getHandler().getSourceReductionProperties(getProperties());
-    }
-
-    public DfIncludeQueryProperties getIncludeQueryProperties() {
-        return getHandler().getIncludeQueryProperties(getProperties());
-    }
-
-    // ===============================================================================
-    //                                                              Properties - Other
-    //                                                              ==================
-    public DfOtherProperties getOtherProperties() {
-        return getHandler().getOtherProperties(getProperties());
-    }
-
-    // ===============================================================================
-    //                                                        Properties - TableExcept
-    //                                                        ========================
+    // -----------------------------------------------------
+    //                                          Table Except
+    //                                          ------------
     protected List<String> _tableExceptList;
 
     public List<String> getTableExceptList() {
@@ -896,9 +693,9 @@ public final class DfBuildProperties {
         }
     }
 
-    // ===============================================================================
-    //                                        Properties - jdbcToJavaNative (Internal)
-    //                                        ========================================
+    // -----------------------------------------------------
+    //                           jdbcToJavaNative (Internal)
+    //                           ---------------------------
     public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
         final String property = stringProp("torque.jdbcToJavaNativeMap", DEFAULT_EMPTY_MAP_STRING);
         return removeNewLine(property);
@@ -1062,46 +859,38 @@ public final class DfBuildProperties {
         }
     }
 
-    // ===============================================================================
-    //                      Properties - ToLowerInGeneratorUnderscoreMethod (Internal)
-    //                      ==========================================================
+    // -----------------------------------------------------
+    //         ToLowerInGeneratorUnderscoreMethod (Internal)
+    //         ---------------------------------------------
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
         return booleanProp("torque.isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
 
-    // ===============================================================================
-    //                                   Properties - invokeReplaceSchemaDefinitionMap
-    //                                   =============================================
+    // -----------------------------------------------------
+    //                      invokeReplaceSchemaDefinitionMap
+    //                      --------------------------------
     public DfReplaceSchemaProperties getInvokeReplaceSchemaProperties() {
         return getHandler().getReplaceSchemaProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                    Properties - invokeSqlDirectoryDefinitionMap
-    //                                    ============================================
+    // -----------------------------------------------------
+    //                       invokeSqlDirectoryDefinitionMap
+    //                       -------------------------------
     public DfInvokeSqlDirectoryProperties getInvokeSqlDirectoryProperties() {
         return getHandler().getInvokeSqlDirectoryProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                            Properties - sql2EntityDefinitionMap
-    //                                            ====================================
+    // -----------------------------------------------------
+    //                               sql2EntityDefinitionMap
+    //                               -----------------------
     public DfSql2EntityProperties getSql2EntityProperties() {
         return getHandler().getSql2EntityProperties(getProperties());
     }
 
-    // **********************************************************************************************
-    //                                                                                         Helper
-    //                                                                                         ******
-
     // ===============================================================================
-    //                                                                          String
+    //                                                                          Helper
     //                                                                          ======
-    public String filterDoubleQuotation(String str) {
-        return DfPropertyUtil.convertAll(str, "\"", "'");
-    }
-
-    public String removeNewLine(String str) {
+    private String removeNewLine(String str) {
         return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
     }
 }

@@ -74,9 +74,7 @@ import org.seasar.dbflute.util.DfPropertyUtil;
 import org.xml.sax.Attributes;
 
 /**
- * Data about a table used in an application.
- *
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class Table implements IDMethod {
     /** Logging class from commons.logging */
@@ -966,7 +964,7 @@ public class Table implements IDMethod {
     public void setPackage(String v) {
         this._pkg = v;
     }
-    
+
     /**
      * Returns a Collection of parameters relevant for the chosen
      * id generation method.
@@ -974,7 +972,7 @@ public class Table implements IDMethod {
     public List getIdMethodParameters() {
         return _idMethodParameters;
     }
-    
+
     // ============================================================================
     //                                                                     Sequence
     //                                                                     ========
@@ -995,7 +993,7 @@ public class Table implements IDMethod {
         }
         return result;
     }
-    
+
     // ============================================================================
     //                                                                        Index
     //                                                                        =====
@@ -1012,7 +1010,7 @@ public class Table implements IDMethod {
         }
         return tbls;
     }
-    
+
     /**
      * Returns an Array containing all the UKs in the table
      *
@@ -1026,7 +1024,7 @@ public class Table implements IDMethod {
         }
         return tbls;
     }
-    
+
     public List<Unique> getUniqueList() {
         return _unices;
     }
@@ -1061,7 +1059,7 @@ public class Table implements IDMethod {
         sb.delete(0, ", ".length());
         return sb.toString();
     }
-    
+
     /**
      * Get insert clause values with sql comment. {insertClauseValuesWithSqlComment}
      * <pre>
@@ -1088,7 +1086,6 @@ public class Table implements IDMethod {
     public int getNumColumns() {
         return _columnList.size();
     }
-
 
     /**
      * Returns a specified column.
@@ -1523,7 +1520,7 @@ public class Table implements IDMethod {
     public boolean isWritable() {
         return hasPrimaryKey();
     }
-    
+
     /**
      * Get annotation table name. (for S2Dao)
      * 
@@ -1928,84 +1925,6 @@ public class Table implements IDMethod {
             ls.add(getColumnByFlexibleName(commonColumnName));
         }
         return ls;
-    }
-
-    // ===============================================================================
-    //                                                                  Logical-Delete
-    //                                                                  ==============
-    /**
-     * Is this table defined logical-delete columns?
-     * 
-     * @return Determination.
-     */
-    public boolean hasLogicalDeleteColumn() {
-        final List<String> logicalDeleteColumnNameList = getLogicalDeleteColumnNameList();
-        if (logicalDeleteColumnNameList.isEmpty()) {
-            return false;
-        }
-        for (String logicalDeleteColumnName : logicalDeleteColumnNameList) {
-            if (!containsColumn(logicalDeleteColumnName)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public Map<String, Object> getLogicalDeleteColumnValueMap() {
-        return getDatabase().getLogicalDeleteColumnValueMap();
-    }
-
-    public List<String> getLogicalDeleteColumnNameList() {
-        return getDatabase().getLogicalDeleteColumnNameList();
-    }
-
-    public List<Column> getLogicalDeleteColumnList() {
-        final List<String> columnNameList = getLogicalDeleteColumnNameList();
-        final List<Column> logicalDeleteColumnList = new ArrayList<Column>();
-        for (String logicalDeleteColumnName : columnNameList) {
-            final Column column = getColumn(logicalDeleteColumnName);
-            logicalDeleteColumnList.add(column);
-        }
-        return logicalDeleteColumnList;
-    }
-
-    // ===============================================================================
-    //                                                     Revival from Logical-Delete
-    //                                                     ===========================
-    /**
-     * Is this table defined revival from logical-delete columns?
-     * 
-     * @return Determination.
-     */
-    public boolean hasRevivalFromLogicalDeleteColumn() {
-        final List<String> revivalFromLogicalDeleteColumnNameList = getRevivalFromLogicalDeleteColumnNameList();
-        if (revivalFromLogicalDeleteColumnNameList.isEmpty()) {
-            return false;
-        }
-        for (String revivalFromLogicalDeleteColumnName : revivalFromLogicalDeleteColumnNameList) {
-            if (!containsColumn(revivalFromLogicalDeleteColumnName)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public Map<String, Object> getRevivalFromLogicalDeleteColumnValueMap() {
-        return getDatabase().getRevivalFromLogicalDeleteColumnValueMap();
-    }
-
-    public List<String> getRevivalFromLogicalDeleteColumnNameList() {
-        return getDatabase().getRevivalFromLogicalDeleteColumnNameList();
-    }
-
-    public List<Column> getRevivalFromLogicalDeleteColumnList() {
-        final List<String> columnNameList = getRevivalFromLogicalDeleteColumnNameList();
-        final List<Column> revivalFromLogicalDeleteColumnList = new ArrayList<Column>();
-        for (String revivalFromLogicalDeleteColumnName : columnNameList) {
-            final Column column = getColumn(revivalFromLogicalDeleteColumnName);
-            revivalFromLogicalDeleteColumnList.add(column);
-        }
-        return revivalFromLogicalDeleteColumnList;
     }
 
     // ===============================================================================

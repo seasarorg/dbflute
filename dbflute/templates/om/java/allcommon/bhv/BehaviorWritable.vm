@@ -220,7 +220,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public ${glTokenFileReflectionResultName} reflectTokenFile(final String filename, final ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public ${glTokenFileReflectionResultName} reflectTokenFile(String filename, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
 
     /**
      * Reflect(insert or update) from separated-file.
