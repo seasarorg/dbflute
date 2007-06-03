@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2007 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,58 +15,63 @@
  */
 package org.seasar.dbflute.helper.jdbc.metadata;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.torque.task.TorqueJDBCTransformTask;
 import org.seasar.dbflute.DfBuildProperties;
 
 /**
- * This class generates an XML schema of an existing database from JDBC metadata..
- * <p>
- * @author mkubo
- * @version $Revision$ $Date$
+ * @author jflute
  */
 public class DfAbstractMetaDataHandler {
 
-    public static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
-
+    //========================================================================================
+    //                                                                               Attribute
+    //                                                                               =========
     /** List for except table. */
-    protected List _tableExceptList;
+    protected List<String> _tableExceptList;
 
     /** List for target table. */
-    protected List _tableTargetList;
+    protected List<String> _tableTargetList;
 
+    //========================================================================================
+    //                                                                                Property
+    //                                                                                ========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
-    public List getTableTargetList() {
+    protected List<String> getTableExceptList() {
+        if (_tableExceptList == null) {
+            final List<String> tableExceptList = getProperties().getBasicProperties().getTableExceptList();
+            _tableExceptList = tableExceptList;
+        }
+        return _tableExceptList;
+    }
+
+    protected List<String> getTableTargetList() {
         if (_tableTargetList == null) {
-            _tableTargetList = getProperties().listProp("torque.table.target.list", new ArrayList<Object>());
+            final List<String> tableTargetList = getProperties().getBasicProperties().getTableTargetList();
+            _tableTargetList = tableTargetList;
         }
         return _tableTargetList;
     }
 
-    public List<String> getTableExceptList() {
-        return getProperties().getTableExceptList();
-    }
-
+    //========================================================================================
+    //                                                                           Determination
+    //                                                                           =======-=====
     /**
-     * Is table out of sight?
+     * Is the table out of sight?
      * 
-     * @param tableName Table-name.
+     * @param tableName Table-name. (NotNull)
      * @return Determination.
      */
-    public boolean isTableExcept(final String tableName) {
+    protected boolean isTableExcept(final String tableName) {
         if (tableName == null) {
             throw new NullPointerException("Argument[tableName] is required.");
         }
 
-        final List targetList = getTableTargetList();
+        final List<String> targetList = getTableTargetList();
         if (targetList == null) {
             throw new IllegalStateException("getTableTargetList() must not return null: + " + tableName);
         }
@@ -74,44 +79,51 @@ public class DfAbstractMetaDataHandler {
         if (!targetList.isEmpty()) {
             for (final Iterator ite = targetList.iterator(); ite.hasNext();) {
                 final String targetTableHint = (String) ite.next();
-                if (isHitTableHint(tableName, targetTableHint)) {
+                if (isHintMatchTheName(tableName, targetTableHint)) {
                     return false;
                 }
             }
             return true;
         }
 
-        final List exceptList = getTableExceptList();
+        final List<String> exceptList = getTableExceptList();
         if (exceptList == null) {
             throw new IllegalStateException("getTableExceptList() must not return null: + " + tableName);
         }
 
         for (final Iterator ite = exceptList.iterator(); ite.hasNext();) {
             final String tableHint = (String) ite.next();
-            if (isHitTableHint(tableName, tableHint)) {
+            if (isHintMatchTheName(tableName, tableHint)) {
                 return true;
             }
         }
         return false;
     }
 
-    protected boolean isHitTableHint(String tableName, String tableHint) {
+    /**
+     * Does the hint match the name?
+     * 
+     * @param name Target name. (NotNull)
+     * @param hint Hint-string that contains prefix-mark or suffix-mark. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isHintMatchTheName(String name, String hint) {
         // TODO: I want to refactor this judgement logic for hint someday.
         final String prefixMark = "prefix:";
         final String suffixMark = "suffix:";
 
-        if (tableHint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
-            final String pureTableHint = tableHint.substring(prefixMark.length(), tableHint.length());
-            if (tableName.toLowerCase().startsWith(pureTableHint.toLowerCase())) {
+        if (hint.toLowerCase().startsWith(prefixMark.toLowerCase())) {
+            final String pureTableHint = hint.substring(prefixMark.length(), hint.length());
+            if (name.toLowerCase().startsWith(pureTableHint.toLowerCase())) {
                 return true;
             }
-        } else if (tableHint.toLowerCase().startsWith(suffixMark.toLowerCase())) {
-            final String pureTableHint = tableHint.substring(suffixMark.length(), tableHint.length());
-            if (tableName.toLowerCase().endsWith(pureTableHint.toLowerCase())) {
+        } else if (hint.toLowerCase().startsWith(suffixMark.toLowerCase())) {
+            final String pureTableHint = hint.substring(suffixMark.length(), hint.length());
+            if (name.toLowerCase().endsWith(pureTableHint.toLowerCase())) {
                 return true;
             }
         } else {
-            if (tableName.equalsIgnoreCase(tableHint)) {
+            if (name.equalsIgnoreCase(hint)) {
                 return true;
             }
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2007 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ import org.apache.tools.ant.Project;
 import org.seasar.dbflute.DfBuildProperties;
 
 /**
- * Torque task utility.
+ * Ant task utility.
  * 
- * @author mkubo
+ * @author jflute
  */
 public final class DfAntTaskUtil {
 
@@ -82,8 +82,11 @@ public final class DfAntTaskUtil {
                     prop.setProperty(key, value);
                 }
             }
+
+            // Initialize build-properties!
             DfBuildProperties.getInstance().setProperties(prop);
 
+            // Show properties!
             _log.debug("[Properties]: size=" + prop.size());
             for (final Iterator ite = prop.keySet().iterator(); ite.hasNext();) {
                 final String key = (String) ite.next();

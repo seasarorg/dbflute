@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2007 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,12 +88,9 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
                     _log.debug("$ isTableExcept(" + tableName + ") == true");
                     continue;
                 }
-                if (DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle()) {
-                    if (tableName.startsWith("BIN$")) {
-                        _log.debug("$ isTableExcept(" + tableName
-                                + ") == true {Forced because the database is Oracle!}");
-                        continue;
-                    }
+                if (isOracle() && tableName.startsWith("BIN$")) {
+                    _log.debug("$ isTableExcept(" + tableName + ") == true {Forced because the database is Oracle!}");
+                    continue;
                 }
 
                 final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
@@ -112,18 +109,11 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
     /**
      * Get database-type-string-array.
      * 
-     * @return Database-type-string-array.
+     * @return Database-type-string-array. (NotNull)
      */
     protected String[] getDatabaseTypeStringArray() {
-        final List<Object> defaultList = new ArrayList<Object>();
-        defaultList.add("TABLE");
-        defaultList.add("VIEW");
-        final List ls = getProperties().listProp("torque.database.type.list", defaultList);
-        final String[] result = new String[ls.size()];
-        for (int i = 0; i < ls.size(); i++) {
-            result[i] = (String) ls.get(i);
-        }
-        return result;
+        final List<String> databaseTypeList = getProperties().getBasicProperties().getDatabaseTypeList();
+        return databaseTypeList.toArray(new String[databaseTypeList.size()]);
     }
 
     /**
@@ -141,6 +131,15 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
             }
         }
         _log.info("$ DatabaseTypes are '" + typeString + "'");
+    }
+
+    /**
+     * Is the database Oracle?
+     * 
+     * @return Determination.
+     */
+    protected boolean isOracle() {
+        return DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle();
     }
 
 }
