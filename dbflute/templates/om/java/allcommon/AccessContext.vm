@@ -1,0 +1,152 @@
+package ${glPackageBaseCommon};
+
+/**
+ * Access-Context.
+ * <pre>
+ * This access-context on the thread should be initialized at the beginning of access.
+ * The access is various. Web-Access, Batch-Access, JUnit-Access and so on...
+ * </pre>
+ * @author ${database.ClassAuthor}
+ */
+public class ${glAccessContextName} {
+
+    // =====================================================================================
+    //                                                                          Thread Local
+    //                                                                          ============
+    /** The thread-local for this. */
+    private static final ThreadLocal${database.filterGenericsString(${glAccessContextName})} threadLocal = new ThreadLocal${database.filterGenericsString(${glAccessContextName})}();
+
+    /**
+     * Get access-context on thread.
+     * 
+     * @return Access-context. (Nullable)
+     */
+    public static ${glAccessContextName} getAccessContextOnThread() {
+        return (${glAccessContextName}) threadLocal.get();
+    }
+
+    /**
+     * Set access-context on thread.
+     * 
+     * @param accessContext Access-context. (NotNull)
+     */
+    public static void setAccessContextOnThread(${glAccessContextName} accessContext) {
+        if (accessContext == null) {
+            String msg = "The argument[accessContext] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        threadLocal.set(accessContext);
+    }
+
+    /**
+     * Is existing access-context on thread?
+     * 
+     * @return Determination.
+     */
+    public static boolean isExistAccessContextOnThread() {
+        return (threadLocal.get() != null);
+    }
+
+    /**
+     * Clear access-context on thread.
+     */
+    public static void clearAccessContextOnThread() {
+        threadLocal.set(null);
+    }
+
+    // =====================================================================================
+    //                                                                    Access Information
+    //                                                                    ==================
+    /**
+     * Get access user on thread.
+     * <pre>
+     * If it can't get access user from access-context, 
+     * returns 'Anonymous' as default value!
+     * </pre>
+     * @return Access user. (NotNull)
+     */
+    public static String getAccessUserOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final String accessUser = userContextOnThread.getAccessUser();
+            if (accessUser != null) {
+                return accessUser;
+            }
+        }
+        return "Anonymous";// as Default
+    }
+
+    /**
+     * Get access module on thread.
+     * <pre>
+     * If it can't get access module from access-context, 
+     * returns 'Anonymous' as default value!
+     * </pre>
+     * @return Access module. (NotNull)
+     */
+    public static String getAccessModuleOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final String accessModule = userContextOnThread.getAccessModule();
+            if (accessModule != null) {
+                return accessModule;
+            }
+        }
+        return "Anonymous";// as Default
+    }
+
+    /**
+     * Get access timestamp on thread.
+     * <pre>
+     * If it can't get access timestamp from access-context, 
+     * returns application current time as default value!
+     * </pre>
+     * @return Access timestamp. (NotNull)
+     */
+    public static java.sql.Timestamp getAccessTimestampOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final java.sql.Timestamp accessTimestamp = userContextOnThread.getAccessTimestamp();
+            if (accessTimestamp != null) {
+                return accessTimestamp;
+            }
+        }
+        return new java.sql.Timestamp(System.currentTimeMillis());// as Default
+    }
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected String accessUser;
+
+    protected String accessModule;
+
+    protected java.sql.Timestamp accessTimestamp;
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public String getAccessUser() {
+        return accessUser;
+    }
+
+    public void setAccessUser(String accessUser) {
+        this.accessUser = accessUser;
+    }
+
+    public String getAccessModule() {
+        return accessModule;
+    }
+
+    public void setAccessModule(String accessModule) {
+        this.accessModule = accessModule;
+    }
+
+    public java.sql.Timestamp getAccessTimestamp() {
+        return accessTimestamp;
+    }
+
+    public void setAccessTimestamp(java.sql.Timestamp accessTimestamp) {
+        this.accessTimestamp = accessTimestamp;
+    }
+}

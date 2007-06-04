@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2007 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInf
 /**
  * This class generates an XML schema of an existing database from JDBC metadata..
  * <p>
- * @author mkubo
- * @version $Revision$ $Date$
+ * @author jflute
  */
 public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
 

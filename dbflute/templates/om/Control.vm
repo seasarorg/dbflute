@@ -53,6 +53,8 @@ targetdatabase = $targetDatabase
     #set ($glTokenFileOutputOptionName = "${glProjectPrefix}TokenFileOutputOption")
     #set ($glTokenFileOutputResultName = "${glProjectPrefix}TokenFileOutputResult")
 
+    ## [AccessContext]
+    #set ($glAccessContextName = "${glProjectPrefix}AccessContext")
 
     ## [Common-Dao]
     #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
@@ -288,6 +290,18 @@ targetdatabase = $targetDatabase
       $database.debug("    parseTokenFileOutputResult()")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileOutputResultName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/bhv/batch/TokenFileOutputResult.${glTemplateFileExtension}",$path ,"", "")
+    #end
+
+    ## -----------------------------------------------------------------------------------------------------
+    ##                                                                                  Parse access-context
+    ##                                                                                  --------------------
+    ## Setup java directory for allcommon.
+    $database.setupJavaDir_for_allcommon()
+
+    #if ($database.isTargetLanguageJava())
+      $database.debug("    parseAccessContext()")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glAccessContextName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/AccessContext.${glTemplateFileExtension}",$path ,"", "")
     #end
 
     ## -----------------------------------------------------------------------------------------------------
