@@ -42,7 +42,7 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
     //                                                                   =============
     public boolean isVersionAfter1043() {
         if (!hasS2DaoVersion()) {
-            return false;
+            return true;
         }
         return isS2DaoVersionGreaterEqual("1.0.43");
     }
