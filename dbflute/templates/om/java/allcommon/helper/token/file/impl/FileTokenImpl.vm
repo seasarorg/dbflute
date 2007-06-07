@@ -311,6 +311,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
         }
         final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = new ${glFileTokenizingHeaderInfoName}();
         fileTokenizingHeaderInfo.setColumnNameList(columnNameList);
+        fileTokenizingHeaderInfo.setColumnNameRowString(lineString);
         return fileTokenizingHeaderInfo;
     }
 

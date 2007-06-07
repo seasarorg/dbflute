@@ -237,6 +237,10 @@ public class ForeignKey {
     public boolean isSimpleKeyFK() {
         return _localColumns.size() == 1;
     }
+    
+    public boolean isSelfReference() {
+        return _baseTable.getName().equals(_foreignTableName);
+    }
 
     // ==========================================================================================
     //                                                            Get Columns & ColumnList Method

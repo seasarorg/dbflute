@@ -241,9 +241,17 @@ namespace ${glPackageBaseCommonCBean} {
             String fromClause = subQuery.GetSqlClause().GetFromClause();
             String oldStr = ".ConditionQuery.";
             String newStr = "." + GetLocationBase(propertyName) + ".";
-            String parentCondition = " and " + relatedColumnName + " = " + realColumnName;
             String whereClause = subQuery.GetSqlClause().GetWhereClause().Replace(oldStr, newStr);
-            return selectClause + " " + fromClause + " " + whereClause;
+
+            // String parentCondition = " and " + relatedColumnName + " = " + realColumnName;
+            String parentCondition = "";
+            if (whereClause.Contains("where")) {
+                parentCondition = " and " + relatedColumnName + " = " + realColumnName;
+            } else {
+                parentCondition = " where " + relatedColumnName + " = " + realColumnName;
+            }
+
+            return selectClause + " " + fromClause + " " + whereClause + parentCondition;
         }
 
         // =====================================================================================

@@ -203,10 +203,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             }
 
             if (!${glConditionBeanContextName}.isTheTypeConditionBean(arg0.getClass())) {// The argument is not condition-bean...
-                if (!${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(arg0.getClass())) {// And it is not fetch-narrowing-bean...
-                    return null;
+                if (${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(arg0.getClass()) && !isSelectCountIgnoreFetchScopeMethod(invocation)) {
+                    // Fetch-narrowing-bean and Not select count!
+                    ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})arg0);
                 }
-                ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})arg0);
                 return null;
             }
 

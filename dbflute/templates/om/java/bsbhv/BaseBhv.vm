@@ -614,9 +614,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Load refferer of ${refferer.ReffererPropertyName}.
-     * 
-     * Default refferer order-by is 'primary-key asc'.
      * <pre>
+     *   Default refferer order-by is 'primary-key asc'.
+     * 
      *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
      * 
      *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
@@ -625,7 +625,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     final List<${myExtendedObjectClassName}> ls = bhv.selectList(cb);
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls);
      * 
-     *  *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
      * @param ls Entity list of main table. (NotNull)
@@ -641,7 +641,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Load refferer of ${refferer.ReffererPropertyName}.
-     * 
      * <pre>
      *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
      * 
@@ -656,7 +655,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     };
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
      * 
-     *  *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
      * @param ls Entity list of main table. (NotNull)
@@ -716,6 +715,58 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public static interface ReffererCondition${refferer.ReffererPropertyNameInitCap} extends ${reffererBhvClassName}.CBSetupper {
     }
     #end
+  #end
+#end
+
+    // =====================================================================================
+    //                                                                      Pull Out Foreign
+    //                                                                      ================
+#foreach ($foreignKeys in $table.ForeignKeys)
+  #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
+
+    /**
+     * Pull out the list of foreign table '${foreignEntityClassName}'.
+     * 
+     * @param ls The list of base table. (NotNull)
+     * @return The list of foreign table. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString(${foreignEntityClassName})} pullout${foreignKeys.foreignPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls) {
+        assertObjectNotNull("ls", ls);
+        final java.util.Set${database.filterGenericsString(${foreignEntityClassName})} foreignSet = new java.util.LinkedHashSet${database.filterGenericsString(${foreignEntityClassName})}();
+        for (java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            final ${foreignEntityClassName} foreignEntity = entity.get${foreignKeys.foreignPropertyNameInitCap}();
+            if (foreignEntity == null || foreignSet.contains(foreignEntity)) {
+                continue;
+            }
+            foreignSet.add(foreignEntity);
+        }
+        return new java.util.ArrayList${database.filterGenericsString(${foreignEntityClassName})}(foreignSet);
+    }
+#end
+#foreach ($refferer in $table.Referrers)
+  #set ($reffererTable = $refferer.Table)
+  #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
+  #if (${refferer.isOneToOne()})
+
+    /**
+     * Pull out the list of refferer-as-one table '${foreignEntityClassName}'.
+     * 
+     * @param ls The list of base table. (NotNull)
+     * @return The list of refferer-as-one table. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString(${reffererEntityClassName})} pullout${refferer.reffererPropertyNameInitCapAsOne}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls) {
+        final java.util.Set${database.filterGenericsString(${reffererEntityClassName})} reffererAsOneSet = new java.util.LinkedHashSet${database.filterGenericsString(${reffererEntityClassName})}();
+        for (java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            final ${reffererEntityClassName} reffererEntity = entity.get${refferer.reffererPropertyNameInitCapAsOne}();
+            if (reffererEntity == null || reffererAsOneSet.contains(reffererEntity)) {
+                continue;
+            }
+            reffererAsOneSet.add(reffererEntity);
+        }
+        return new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}(reffererAsOneSet);
+    }
   #end
 #end
 #if ($table.isWritable())

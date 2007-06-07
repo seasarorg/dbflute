@@ -101,13 +101,16 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
+        throw new UnsupportedOperationException("ExistsSubQuery at inline() is unsupported! Sorry!");
+        // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
+          #end
         #end
       #end
     #end
@@ -134,13 +137,16 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
+        throw new UnsupportedOperationException("ExistsSubQuery at inline() is unsupported! Sorry!");
+        // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
+          #end
         #end
       #end
     #end

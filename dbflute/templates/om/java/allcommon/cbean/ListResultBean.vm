@@ -201,7 +201,7 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
         return _selectedList.toArray();
     }
 
-    public ${database.filterGenericsString('T')} T[] toArray(T[] a) {
+    public ${database.filterGenericsString('E')} E[] toArray(E[] a) {
         return _selectedList.toArray(a);
     }
 

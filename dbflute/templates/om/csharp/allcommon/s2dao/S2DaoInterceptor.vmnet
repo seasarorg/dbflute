@@ -193,10 +193,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             if (!${glConditionBeanContextName}.IsTheArgumentConditionBean(args[0])) {// The argument is not condition-bean...
-                if (!${glFetchNarrowingBeanContextName}.IsTheArgumentFetchNarrowingBean(args[0])) {
-                    return null;
-                }
-                if (!IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+                if (${glFetchNarrowingBeanContextName}.IsTheArgumentFetchNarrowingBean(args[0]) && !IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+                    // Fetch-narrowing-bean and Not select count!
                     ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})args[0]);
                 }
                 return null;

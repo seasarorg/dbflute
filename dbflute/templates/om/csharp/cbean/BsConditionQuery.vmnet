@@ -287,9 +287,10 @@ namespace ${glPackageCQ} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
         /// <summary>The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.</summary>
         protected ${relatedCQClassName} _${subQueryPropertyName};
@@ -304,6 +305,7 @@ namespace ${glPackageCQ} {
         public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             _${subQueryPropertyName} = subQuery;
         }
+          #end
         #end
       #end
     #end
@@ -452,9 +454,10 @@ namespace ${glPackageCQ} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
         /// <summary>The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.</summary>
         protected ${relatedCQClassName} _${subQueryPropertyName};
@@ -469,6 +472,7 @@ namespace ${glPackageCQ} {
         public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             _${subQueryPropertyName} = subQuery;
         }
+          #end
         #end
       #end
     #end

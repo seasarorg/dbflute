@@ -23,9 +23,9 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
     /**
      * Set the value of ${uncapitalisedJavaName}.
      * 
-     * @param v The value of ${uncapitalisedJavaName}.
+     * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}.
      */
-    public void set${javaName}(${javaNative} v);
+    public void set${javaName}(${javaNative} ${uncapitalisedJavaName});
 #if ($database.isGenerateDeprecated())
 
     /**

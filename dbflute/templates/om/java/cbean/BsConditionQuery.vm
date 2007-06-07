@@ -316,9 +316,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
     protected ${relatedCQClassName} _${subQueryPropertyName};
@@ -335,6 +336,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _${subQueryPropertyName} = subQuery;
     }
+          #end
         #end
       #end
     #end
@@ -552,9 +554,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
     protected ${relatedCQClassName} _${subQueryPropertyName};
@@ -571,6 +574,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
         _${subQueryPropertyName} = subQuery;
     }
+          #end
         #end
       #end
     #end
