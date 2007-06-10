@@ -1,0 +1,17 @@
+package ${glPackageBaseCommonBhvSetup};
+
+/**
+ * The interface of Value-Label Setupper.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glValueLabelSetupperName}<T> {
+
+    /**
+     * Set up value-label.
+     * 
+     * @param box Value-label box. (NotNull)
+     * @param entity Entity. (NotNull)
+     */
+    public void setup(${glValueLabelBoxName} box, T entity);
+}

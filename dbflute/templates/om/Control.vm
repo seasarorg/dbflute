@@ -47,11 +47,17 @@ targetdatabase = $targetDatabase
     #set ($glBehaviorReadableInterfaceName = "${glProjectPrefix}BehaviorReadable")
     #set ($glBehaviorWritableInterfaceName = "${glProjectPrefix}BehaviorWritable")
 
+    ## [Common-Behavior-Batch]
     #set ($glTokenFileReflectionOptionName = "${glProjectPrefix}TokenFileReflectionOption")
     #set ($glTokenFileReflectionResultName = "${glProjectPrefix}TokenFileReflectionResult")
     #set ($glTokenFileReflectionFailureName = "${glProjectPrefix}TokenFileReflectionFailure")
     #set ($glTokenFileOutputOptionName = "${glProjectPrefix}TokenFileOutputOption")
     #set ($glTokenFileOutputResultName = "${glProjectPrefix}TokenFileOutputResult")
+
+    ## [Common-Behavior-Setup]
+    #set ($glConditionBeanSetupperName = "${glProjectPrefix}ConditionBeanSetupper")
+    #set ($glValueLabelSetupperName = "${glProjectPrefix}ValueLabelSetupper")
+    #set ($glValueLabelBoxName = "${glProjectPrefix}ValueLabelBox")
 
     ## [AccessContext]
     #set ($glAccessContextName = "${glProjectPrefix}AccessContext")
@@ -180,6 +186,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
     #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
     #set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.bhv.batch")
+    #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.bhv.setup")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
     #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
     #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
@@ -290,6 +297,23 @@ targetdatabase = $targetDatabase
       $database.debug("    parseTokenFileOutputResult()")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvBatch})}${glTokenFileOutputResultName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/bhv/batch/TokenFileOutputResult.${glTemplateFileExtension}",$path ,"", "")
+
+      #if ($database.isAvailableGenerics())
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
+        $database.makeDirectory($path)
+
+        $database.debug("    parseConditionBeanSetupper()")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glConditionBeanSetupperName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/bhv/setup/ConditionBeanSetupper.${glTemplateFileExtension}",$path ,"", "")
+
+        $database.debug("    parseValueLabelSetupper()")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glValueLabelSetupperName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/bhv/setup/ValueLabelSetupper.${glTemplateFileExtension}",$path ,"", "")
+
+        $database.debug("    parseValueLabelBox()")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glValueLabelBoxName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/bhv/setup/ValueLabelBox.${glTemplateFileExtension}",$path ,"", "")
+      #end
     #end
 
     ## -----------------------------------------------------------------------------------------------------

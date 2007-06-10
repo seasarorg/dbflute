@@ -88,11 +88,43 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
                         int bindCount = 1;
                         for (String value : valueList) {
-                            statement.setObject(bindCount, value);
+                            try {
+                                statement.setObject(bindCount, value);
+                            } catch (SQLException e) {
+                                if (value != null) {
+                                    throw e;
+                                }
+                                final String message = e.getMessage();
+                                if (!message.contains("null")) {
+                                    throw e;
+                                }
+
+                                // /* * * * * * * * * * * * * * * * Against null!
+                                final int type;
+                                if (message.contains("VARCHAR")) {
+                                    type = java.sql.Types.VARCHAR;
+                                } else if (message.contains("CLOB")) {
+                                    type = java.sql.Types.CLOB;
+                                } else if (message.contains("INTEGER")) {
+                                    type = java.sql.Types.INTEGER;
+                                } else {
+                                    type = java.sql.Types.VARCHAR;
+                                }
+                                try {
+                                    statement.setNull(bindCount, type);
+                                    String msg = "The exception was simple so that it set null as VARCHAR: bindCount=";
+                                    _log.debug(msg + bindCount);
+                                } catch (Exception ignored) {
+                                    _log.debug("The exception was not simple: ignored=" + ignored.getMessage());
+                                    throw e;
+                                }
+                                // * * * * * */
+                            }
                             bindCount++;
                         }
-                        statement.execute();
+                        statement.addBatch();
                     }
+                    statement.executeBatch();
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 } finally {

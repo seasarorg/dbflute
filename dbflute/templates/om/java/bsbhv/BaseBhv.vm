@@ -3,6 +3,11 @@
 package ${glPackageBaseBhv};
 
 import ${glPackageBaseCommon}.*;
+#if ($database.isAvailableGenerics())
+import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
+import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
+import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
+#end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
@@ -577,6 +582,31 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
   #end
 #end
+#if ($database.isAvailableGenerics())
+    // =====================================================================================
+    //                                                                        Various Select
+    //                                                                        ==============
+    /**
+     * Select value-label list.
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @param valueLabelSetupper Value-label-setupper. (NotNull)
+     * @return Value-label list. (NotNull)
+     */
+    public java.util.List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
+        final ${glListResultBeanName}<${myExtendedObjectClassName}> ls = selectList(cb);
+        final java.util.List<java.util.Map<String, Object>> valueLabelList = new java.util.ArrayList<java.util.Map<String, Object>>();
+        final ${glValueLabelBoxName} box = new ${glValueLabelBoxName}();
+        for (${myExtendedObjectClassName} entity : ls) {
+            final java.util.Map<String, Object> valueLabel = new java.util.HashMap<String, Object>();
+            valueLabelSetupper.setup(box, entity);
+            valueLabel.put("value", box.getValue());
+            valueLabel.put("label", box.getLabel());
+            valueLabelList.add(valueLabel);
+        }
+        return valueLabelList;
+    }
+#end
 #if ($table.isUseSequence())
 
     // =====================================================================================
@@ -611,6 +641,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //   ReffererTable    = [${refferer.Table.Name}]
     //   ReffererProperty = [${refferer.ReffererPropertyName}]
     // * * * * * * * * */
+    #if ($database.isAvailableGenerics())
 
     /**
      * Load refferer of ${refferer.ReffererPropertyName}.
@@ -619,7 +650,59 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
      * 
-     *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
+     *     final ${myBaseBhvClassName} bhv = (${myBaseBhvClassName})getDaoSelector().getRBhv(${myBaseBhvClassName}.class);
+     *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
+     *     cb.query().setXxx_Equal("xxx");
+     *     final List&lt;${myExtendedObjectClassName}&gt; ls = bhv.selectList(cb);
+     *     bhv.load${refferer.reffererPropertyNameInitCap}(ls);
+     * 
+     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     * </pre>
+     * 
+     * @param ls Entity list of main table. (NotNull)
+     */
+    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ls) {
+        final ${glConditionBeanSetupperName}<${reffererCBClassName}> cbSetupper = new ${glConditionBeanSetupperName}<${reffererCBClassName}>() {
+            public void setup(${reffererCBClassName} cb) {
+                cb.addOrderBy_PK_Asc();// Default OrderBy for Refferer.
+            }
+        };
+        load${refferer.reffererPropertyNameInitCap}(ls, cbSetupper);
+    }
+
+    /**
+     * Load refferer of ${refferer.ReffererPropertyName}.
+     * <pre>
+     *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
+     * 
+     *     final ${myBaseBhvClassName} bhv = (${myBaseBhvClassName})getDaoSelector().getRBhv(${myBaseBhvClassName}.class);
+     *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
+     *     cb.query().setXxx_Equal("xxx");
+     *     final List&lt;${myExtendedObjectClassName}&gt; ls = bhv.selectList(cb);
+     *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; cbSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
+     *         public void setup(${reffererCBClassName} cb) {
+     *             cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+     *         }
+     *     };
+     *     bhv.load${refferer.reffererPropertyNameInitCap}(ls, cbSetupper);
+     * 
+     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     * </pre>
+     * 
+     * @param ls Entity list of main table. (NotNull)
+     * @param cbSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
+     */
+    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${reffererCBClassName}> cbSetupper) {
+    #else
+
+    /**
+     * Load refferer of ${refferer.ReffererPropertyName}.
+     * <pre>
+     *   Default refferer order-by is 'primary-key asc'.
+     * 
+     *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
+     * 
+     *     final ${myBaseBhvClassName} bhv = (${myBaseBhvClassName})getDaoSelector().getRBhv(${myBaseBhvClassName}.class);
      *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
      *     cb.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.selectList(cb);
@@ -644,7 +727,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * <pre>
      *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
      * 
-     *     final ${myClassName} bhv = (${myClassName})getDaoSelector().getRBhv(${myClassName}.class);
+     *     final ${myBaseBhvClassName} bhv = (${myBaseBhvClassName})getDaoSelector().getRBhv(${myBaseBhvClassName}.class);
      *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
      *     cb.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.selectList(cb);
@@ -662,6 +745,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cbSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
      */
     public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ${reffererBhvClassName}.CBSetupper cbSetupper) {
+    #end
+
         assertObjectNotNull("ls", ls);
         assertObjectNotNull("cbSetupper", cbSetupper);
         if (ls.isEmpty()) {
@@ -1170,10 +1255,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // =====================================================================================
     //                                                                            CBSetupper
     //                                                                            ==========
+#if ($database.isAvailableGenerics())
     /**
      * The interface of condition-bean setupper.
      */
-    public static interface CBSetupper extends SimpleCBSetupper {
+    public static interface CBSetupper extends ${glConditionBeanSetupperName}<${myConditionBeanClassName}> {
+
         /**
          * Set up condition.
          * 
@@ -1181,4 +1268,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
          */
         public void setup(${myConditionBeanClassName} cb);
     }
+#else
+    /**
+     * The interface of condition-bean setupper.
+     */
+    public static interface CBSetupper extends SimpleCBSetupper {
+
+        /**
+         * Set up condition.
+         * 
+         * @param cb Condition-bean. (NotNull)
+         */
+        public void setup(${myConditionBeanClassName} cb);
+    }
+#end
 }

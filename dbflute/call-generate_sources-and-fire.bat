@@ -1,7 +1,6 @@
 
 call mvn generate-sources
 
-
 cd ..\dbflute_ldb\dbflute
 
 @echo off
@@ -27,6 +26,9 @@ rem /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 rem Execute {Generate}.
 rem nnnnnnnnnn/
 call %DBFLUTE_HOME%\etc\cmd\_df-generate.cmd %MY_PROPERTIES_PATH%
+
+
+
 
 
 pause
