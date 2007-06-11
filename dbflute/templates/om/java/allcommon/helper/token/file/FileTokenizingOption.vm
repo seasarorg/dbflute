@@ -14,6 +14,8 @@ public class ${glFileTokenizingOptionName} {
 
     protected boolean _beginFirstLine;
 
+    protected boolean _handleEmptyAsNull;
+
     // =====================================================================================
     //                                                                           Easy-to-Use
     //                                                                           ===========
@@ -42,6 +44,11 @@ public class ${glFileTokenizingOptionName} {
         return this;
     }
 
+    public ${glFileTokenizingOptionName} handleEmptyAsNull() {
+        _handleEmptyAsNull = true;
+        return this;
+    }
+
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
@@ -63,5 +70,9 @@ public class ${glFileTokenizingOptionName} {
 
     public boolean isBeginFirstLine() {
         return _beginFirstLine;
+    }
+
+    public boolean isHandleEmptyAsNull() {
+        return _handleEmptyAsNull;
     }
 }

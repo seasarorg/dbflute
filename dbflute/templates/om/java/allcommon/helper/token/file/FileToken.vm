@@ -20,7 +20,10 @@ public interface ${glFileTokenName} {
 
     /**
      * Tokenize token-file data of a specified file.
-     * 
+     * <pre>
+     * This method uses java.io.InputStreamReader and java.io.BufferedReader that wrap the argument[inputStream].
+     * These objects are closed. (Invoking close() at finally)
+     * </pre>
      * @param inputStream Input target stream. (NotNull)
      * @param fileTokenizingCallback File-tokenizing callback. (NotNull)
      * @param fileTokenizingOption File-tokenizing option. (NotNull and Required{encoding and delimiter})
@@ -42,7 +45,10 @@ public interface ${glFileTokenName} {
 
     /**
      * Make token-file from specified row resources.
-     * 
+     * <pre>
+     * This method uses java.io.BufferedOutputStream and java.io.OutputStreamWriter that wrap the argument[outputStream].
+     * These objects are closed. (Invoking close() at finally)
+     * </pre>
      * @param outputStream Output target stream. (NotNull)
      * @param fileMakingCallback File-making callback. (NotNull)
      * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})

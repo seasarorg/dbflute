@@ -496,6 +496,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         final ${glFileTokenizingOptionName} fileTokenizingOption = new ${glFileTokenizingOptionName}();
         fileTokenizingOption.setEncoding(encoding);
         fileTokenizingOption.setDelimiter(delimiter);
+        if (tokenFileReflectionOption.isHandleEmptyAsNull()) {
+            fileTokenizingOption.handleEmptyAsNull();
+        }
         final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
         fileToken.tokenize(filename, fileTokenizingCallback, fileTokenizingOption);
         return result;

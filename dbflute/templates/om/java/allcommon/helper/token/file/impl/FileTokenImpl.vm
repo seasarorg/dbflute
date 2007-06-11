@@ -67,7 +67,10 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
 
     /**
      * Tokenize token-file data of a specified file.
-     * 
+     * <pre>
+     * This method uses java.io.InputStreamReader and java.io.BufferedReader that wrap the argument[inputStream].
+     * These objects are closed. (Invoking close() at finally)
+     * </pre>
      * @param inputStream Input target stream. (NotNull)
      * @param fileTokenizingCallback File-tokenizing callback. (NotNull)
      * @param fileTokenizingOption File-tokenizing option. (NotNull and Required{encoding and delimiter})
@@ -88,7 +91,8 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
 
         String lineString = null;
         String preContinueString = "";
-        final List${database.filterGenericsString('String')} valueList = new ArrayList${database.filterGenericsString('String')}();
+        final List${database.filterGenericsString('String')} temporaryValueList = new ArrayList${database.filterGenericsString('String')}();
+        final List${database.filterGenericsString('String')} filteredValueList = new ArrayList${database.filterGenericsString('String')}();
 
         try {
             ir = new java.io.InputStreamReader(inputStream, encoding);
@@ -127,21 +131,37 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                 final List${database.filterGenericsString('String')} ls = valueLineInfo.getValueList();
                 if (valueLineInfo.isContinueNextLine()) {
                     preContinueString = (String)ls.remove(ls.size() - 1);
-                    valueList.addAll(ls);
+                    temporaryValueList.addAll(ls);
                     continue;
                 }
-                valueList.addAll(ls);
+                temporaryValueList.addAll(ls);
+
                 try {
                     final ${glFileTokenizingRowResourceName} fileTokenizingRowResource = new ${glFileTokenizingRowResourceName}();
                     fileTokenizingRowResource.setFirstLineInfo(fileTokenizingHeaderInfo);
-                    fileTokenizingRowResource.setValueList(valueList);
+
+                    if (fileTokenizingOption.isHandleEmptyAsNull()) {
+                        for (final java.util.Iterator ite = temporaryValueList.iterator(); ite.hasNext(); ) {
+                            final String value = (String)ite.next();
+                            if ("".equals(value)) {
+                                filteredValueList.add(null);
+                            } else {
+                                filteredValueList.add(value);
+                            }
+                        }
+                        fileTokenizingRowResource.setValueList(filteredValueList);
+                    } else {
+                        fileTokenizingRowResource.setValueList(temporaryValueList);
+                    }
+
                     fileTokenizingRowResource.setRowString(rowString);
                     fileTokenizingRowResource.setRowNumber(rowNumber);
                     fileTokenizingRowResource.setLineNumber(lineNumber);
                     fileTokenizingCallback.handleRowResource(fileTokenizingRowResource);
                 } finally {
                     ++rowNumber;
-                    valueList.clear();
+                    temporaryValueList.clear();
+                    filteredValueList.clear();
                     preContinueString = "";
                 }
             }
@@ -366,7 +386,10 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
 
     /**
      * Make token-file from specified row resources.
-     * 
+     * <pre>
+     * This method uses java.io.BufferedOutputStream and java.io.OutputStreamWriter that wrap the argument[outputStream].
+     * These objects are closed. (Invoking close() at finally)
+     * </pre>
      * @param outputStream Output target stream. (NotNull)
      * @param fileMakingCallback File-making callback. (NotNull)
      * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})

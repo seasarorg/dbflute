@@ -647,11 +647,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Load refferer of ${refferer.ReffererPropertyName}.
      * <pre>
      *   Default refferer order-by is 'primary-key asc'.
+     *   If your logic don't match this, use condition-bean-setupper. The method is as follows:
+     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+     *     load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${reffererCBClassName}> cbSetupper)
+     *     - - - - - - - - - -/
      * 
-     *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
-     * 
-     *     final ${myBaseBhvClassName} bhv = (${myBaseBhvClassName})getDaoSelector().getRBhv(${myBaseBhvClassName}.class);
-     *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
+     *   ex) {Client Example}
+     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
      *     final List&lt;${myExtendedObjectClassName}&gt; ls = bhv.selectList(cb);
      *     bhv.load${refferer.reffererPropertyNameInitCap}(ls);
@@ -673,18 +675,27 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Load refferer of ${refferer.ReffererPropertyName}.
      * <pre>
-     *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
+     *   You can load refferer with your original condition.
      * 
-     *     final ${myBaseBhvClassName} bhv = (${myBaseBhvClassName})getDaoSelector().getRBhv(${myBaseBhvClassName}.class);
-     *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
+     *   ex) {Client Example}: Refferer conditions are 'Xxx' is not null and order-by 'Yyy' desc
+     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
      *     final List&lt;${myExtendedObjectClassName}&gt; ls = bhv.selectList(cb);
      *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; cbSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
      *         public void setup(${reffererCBClassName} cb) {
-     *             cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+     *             cb.query().setXxx_IsNotNull();
+     *             cb.query().addOrderBy_Yyy_Desc();
      *         }
      *     };
      *     bhv.load${refferer.reffererPropertyNameInitCap}(ls, cbSetupper);
+     *     - - - - - - - - - -/
+     * 
+     *   The condition-bean that the setupper provides have settings before you touch it. It is as follows:
+     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+     *     cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     *     cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+     *     - - - - - - - - - -/
      * 
      *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
@@ -700,10 +711,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * <pre>
      *   Default refferer order-by is 'primary-key asc'.
      * 
-     *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
-     * 
-     *     final ${myBaseBhvClassName} bhv = (${myBaseBhvClassName})getDaoSelector().getRBhv(${myBaseBhvClassName}.class);
-     *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
+     *   ex) {Client Example}
+     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.selectList(cb);
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls);
@@ -725,15 +734,16 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Load refferer of ${refferer.ReffererPropertyName}.
      * <pre>
-     *   ex) Refferer order-by is ${refferer.getLocalColumnJavaNameAsOne()}.
+     *   You can load refferer with your original condition.
      * 
-     *     final ${myBaseBhvClassName} bhv = (${myBaseBhvClassName})getDaoSelector().getRBhv(${myBaseBhvClassName}.class);
-     *     final ${myConditionBeanClassName} cb = bhv.newMyConditionBean();
+     *   ex) {Client Example}: Refferer conditions are 'Xxx' is not null and order-by 'Yyy' desc
+     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = bhv.selectList(cb);
      *     final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
      *         public void setup(${reffererCBClassName} cb) {
-     *             cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+     *             cb.query().setXxx_IsNotNull();
+     *             cb.query().addOrderBy_Yyy_Desc();
      *         }
      *     };
      *     bhv.load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
@@ -746,8 +756,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ${reffererBhvClassName}.CBSetupper cbSetupper) {
     #end
-
-        assertObjectNotNull("ls", ls);
+    assertObjectNotNull("ls", ls);
         assertObjectNotNull("cbSetupper", cbSetupper);
         if (ls.isEmpty()) {
             return;

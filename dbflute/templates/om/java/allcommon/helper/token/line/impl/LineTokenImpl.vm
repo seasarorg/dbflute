@@ -20,18 +20,28 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
                 final String before = pureValue;
                 if (before.length() > 1 && before.startsWith("\"") && before.endsWith("\"")) {
                     final String after = before.substring(1, before.length() - 1);
-                    list.add(after);
+                    list.add(filterHandlingEmptyAsNull(after, lineTokenizingOption));
                 } else {
-                    list.add(before);
+                    list.add(filterHandlingEmptyAsNull(before, lineTokenizingOption));
                 }
             } else {
-                list.add(pureValue);
+                list.add(filterHandlingEmptyAsNull(pureValue, lineTokenizingOption));
             }
             i = j + 1;
             j = lineString.indexOf(delimiter, i);
         }
-        list.add(lineString.substring(i));
+        list.add(filterHandlingEmptyAsNull(lineString.substring(i), lineTokenizingOption));
         return list;
+    }
+
+    protected String filterHandlingEmptyAsNull(String target, ${glLineTokenizingOptionName} lineTokenizingOption) {
+        if (target == null) {
+            return null;
+        }
+        if (lineTokenizingOption.isHandleEmtpyAsNull() && "".equals(target)) {
+            return null;
+        }
+        return target;
     }
 
     public String make(java.util.List${database.filterGenericsString('String')} valueList, ${glLineMakingOptionName} lineMakingOption) {

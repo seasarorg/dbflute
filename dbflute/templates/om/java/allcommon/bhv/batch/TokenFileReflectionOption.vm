@@ -37,6 +37,11 @@ public class ${glTokenFileReflectionOptionName} {
         return this;
     }
 
+    public ${glTokenFileReflectionOptionName} handleEmptyAsNull() {
+        _fileTokenizingOption.handleEmptyAsNull();
+        return this;
+    }
+
     public ${glTokenFileReflectionOptionName} interruptIfError() {
         _interruptIfError = true;
         return this;
@@ -59,6 +64,10 @@ public class ${glTokenFileReflectionOptionName} {
 
     public void setEncoding(String encoding) {
         _fileTokenizingOption.setDelimiter(encoding);
+    }
+
+    public boolean isHandleEmptyAsNull() {
+        return _fileTokenizingOption.isHandleEmptyAsNull();
     }
 
     public boolean isInterruptIfError() {
