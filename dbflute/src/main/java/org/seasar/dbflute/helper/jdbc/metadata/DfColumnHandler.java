@@ -49,6 +49,9 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             columnResultSet = dbMeta.getColumns(null, schemaName, tableName, null);
             while (columnResultSet.next()) {
                 final String columnName = columnResultSet.getString(4);
+                if (isColumnExcept(columnName)) {
+                    continue;
+                }
                 final Integer jdbcTypeCode = new Integer(columnResultSet.getString(5));
                 final String dbTypeName = columnResultSet.getString(6);
                 final Integer columnSize = new Integer(columnResultSet.getInt(7));

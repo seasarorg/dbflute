@@ -128,6 +128,11 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 if (primaryColumnNameList.contains(columnName)) {
                     continue;
                 }
+                
+                if (isColumnExcept(columnName)) {
+                    continue;
+                }
+                
 
                 final String indexName = parts.getString(6);
                 final Integer ordinalPosition;

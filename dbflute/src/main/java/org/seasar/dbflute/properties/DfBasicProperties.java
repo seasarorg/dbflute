@@ -368,4 +368,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
         return resultList;
     }
+    
+    // -----------------------------------------------------
+    //                                    Column Except List
+    //                                    ------------------
+    public List<String> getSimpleColumnExceptList() {
+        final List<String> resultList = new ArrayList<String>();
+        final List<Object> listProp = listProp("torque.simple.column.except.list", DEFAULT_EMPTY_LIST);
+        for (Object object : listProp) {
+            resultList.add((String) object);
+        }
+        return resultList;
+    }
 }

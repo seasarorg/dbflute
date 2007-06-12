@@ -60,6 +60,12 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                     fkName = refTableName;
                 }
 
+                final String localColumnName = foreignKeys.getString(8);
+                final String foreignColumnName = foreignKeys.getString(4);
+                if (isColumnExcept(localColumnName) || isColumnExcept(foreignColumnName)) {
+                    continue;
+                }
+                
                 DfForeignKeyMetaInfo metaInfo = fkMap.get(fkName);
                 if (metaInfo == null) {
                     metaInfo = new DfForeignKeyMetaInfo();
@@ -68,7 +74,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                     metaInfo.setForeignTableName(refTableName);
                     fkMap.put(fkName, metaInfo);
                 }
-                metaInfo.putColumnNameMap(foreignKeys.getString(8), foreignKeys.getString(4));
+                metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
             }
         } finally {
             if (foreignKeys != null) {

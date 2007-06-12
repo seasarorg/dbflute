@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.helper.jdbc.metadata;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,6 +35,9 @@ public class DfAbstractMetaDataHandler {
     /** List for target table. */
     protected List<String> _tableTargetList;
 
+    /** Simple list for except column. */
+    protected List<String> _simpleColumnExceptList;
+
     //========================================================================================
     //                                                                                Property
     //                                                                                ========
@@ -43,27 +47,32 @@ public class DfAbstractMetaDataHandler {
 
     protected List<String> getTableExceptList() {
         if (_tableExceptList == null) {
-            final List<String> tableExceptList = getProperties().getBasicProperties().getTableExceptList();
-            _tableExceptList = tableExceptList;
+            _tableExceptList = getProperties().getBasicProperties().getTableExceptList();
         }
         return _tableExceptList;
     }
 
     protected List<String> getTableTargetList() {
         if (_tableTargetList == null) {
-            final List<String> tableTargetList = getProperties().getBasicProperties().getTableTargetList();
-            _tableTargetList = tableTargetList;
+            _tableTargetList = getProperties().getBasicProperties().getTableTargetList();
         }
         return _tableTargetList;
+    }
+
+    protected List<String> getSimpleColumnExceptList() {
+        if (_simpleColumnExceptList == null) {
+            _simpleColumnExceptList = getProperties().getBasicProperties().getSimpleColumnExceptList();
+        }
+        return _simpleColumnExceptList;
     }
 
     //========================================================================================
     //                                                                           Determination
     //                                                                           =======-=====
     /**
-     * Is the table out of sight?
+     * Is the table name out of sight?
      * 
-     * @param tableName Table-name. (NotNull)
+     * @param tableName Table name. (NotNull)
      * @return Determination.
      */
     protected boolean isTableExcept(final String tableName) {
@@ -76,24 +85,39 @@ public class DfAbstractMetaDataHandler {
             throw new IllegalStateException("getTableTargetList() must not return null: + " + tableName);
         }
 
+        final List<String> exceptList = getTableExceptList();
+        return isExceptByHint(tableName, targetList, exceptList);
+    }
+
+    /**
+     * Is the column name out of sight?
+     * 
+     * @param columnName Column name. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isColumnExcept(final String columnName) {
+        if (columnName == null) {
+            throw new NullPointerException("Argument[columnName] is required.");
+        }
+
+        final List<String> columnExceptSimpleList = getSimpleColumnExceptList();
+        return isExceptByHint(columnName, new ArrayList<String>(), columnExceptSimpleList);
+    }
+
+    protected boolean isExceptByHint(final String name, final List<String> targetList, final List<String> exceptList) {
         if (!targetList.isEmpty()) {
             for (final Iterator ite = targetList.iterator(); ite.hasNext();) {
                 final String targetTableHint = (String) ite.next();
-                if (isHintMatchTheName(tableName, targetTableHint)) {
+                if (isHintMatchTheName(name, targetTableHint)) {
                     return false;
                 }
             }
             return true;
         }
 
-        final List<String> exceptList = getTableExceptList();
-        if (exceptList == null) {
-            throw new IllegalStateException("getTableExceptList() must not return null: + " + tableName);
-        }
-
         for (final Iterator ite = exceptList.iterator(); ite.hasNext();) {
             final String tableHint = (String) ite.next();
-            if (isHintMatchTheName(tableName, tableHint)) {
+            if (isHintMatchTheName(name, tableHint)) {
                 return true;
             }
         }
