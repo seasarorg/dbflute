@@ -101,6 +101,12 @@ targetdatabase = $targetDatabase
     #set ($glConditionOptionPartsToSingleByteName = "${glProjectPrefix}ToSingleByteOptionParts")
     #set ($glConditionOptionPartsAgentJapaneseName = "${glProjectPrefix}JapaneseOptionPartsAgent")
 
+    ## [ConditionBean - Grouping]
+    #set ($glGroupingOptionName = "${glProjectPrefix}GroupingOption")
+    #set ($glGroupingRowEndDeterminerName = "${glProjectPrefix}GroupingRowEndDeterminer")
+    #set ($glGroupingRowResourceName = "${glProjectPrefix}GroupingRowResource")
+    #set ($glGroupingRowSetupperName = "${glProjectPrefix}GroupingRowSetupper")
+
     #set ($glSqlClauseName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseInterfaceName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseAbstractName = "${glProjectPrefix}AbstractSqlClause")
@@ -189,6 +195,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.bhv.setup")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
     #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
+    #set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.cbean.grouping")
     #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
     #set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.cbean.cvalue")
     #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
@@ -429,8 +436,6 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glConditionQueryAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/AbstractConditionQuery.${glTemplateFileExtension}",$path ,"", "")
 
-
-
     ## -------------------------------------------------------
     ##                                     Parse condition-key
     ##                                     -------------------
@@ -559,6 +564,33 @@ targetdatabase = $targetDatabase
     $database.debug("    ...Parsing ConditionValue")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCValue})}${glConditionValueName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/cvalue/ConditionValue.${glTemplateFileExtension}",$path ,"", "")
+
+    ## -------------------------------------------------------
+    ##                         Parse condition-bean - grouping
+    ##                         -------------------------------
+    ## Setup java directory for allcommon.
+    $database.setupJavaDir_for_allcommon()
+
+    #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parseGroupingOption();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingOptionName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/grouping/GroupingOption.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parseGroupingRowEndDeterminer();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowEndDeterminerName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/grouping/GroupingRowEndDeterminer.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parseGroupingRowResource();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowResourceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/grouping/GroupingRowResource.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parseGroupingRowSetupper();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowSetupperName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/grouping/GroupingRowSetupper.${glTemplateFileExtension}",$path ,"", "")
+    #end
 
     ## -------------------------------------------------------
     ##                                        Parse sql-clause

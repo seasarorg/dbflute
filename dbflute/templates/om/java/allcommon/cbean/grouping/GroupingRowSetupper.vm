@@ -1,0 +1,17 @@
+package ${glPackageBaseCommonCBeanGrouping};
+
+/**
+ * The interface of grouping row setupper.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glGroupingRowSetupperName}<E, T> {
+
+    /**
+     * Set up grouping row object.
+     * 
+     * @param groupingRowResource Grouping row resource. (NotNull)
+     * @return Grouping row object. (NotNull)
+     */
+    public E setup(${glGroupingRowResourceName}<T> groupingRowResource);
+}

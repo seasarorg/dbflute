@@ -3,7 +3,7 @@ package ${glPackageBaseCommonCBean};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
 /**
- * The condition-bean as interface.
+ * The interface of condition-bean.
  * 
  * @author ${database.ClassAuthor}
  */

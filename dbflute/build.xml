@@ -3,7 +3,7 @@
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
-  <property name="version" value="0.5.1"/>
+  <property name="version" value="0.5.2"/>
   <property name="dbflute.jar.file" value="dbflute.jar"/>
   <property name="dbflute.jar.dirfile" value="dist/${dbflute.jar.file}"/>
   <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>

@@ -1,0 +1,11 @@
+package ${glPackageBaseCommonCBeanGrouping};
+
+/**
+ * The interface of grouping switch point determiner.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glGroupingRowEndDeterminerName}<T> {
+
+    public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<T> rowResource);
+}

@@ -3,7 +3,7 @@ package ${glPackageBaseCommonCBean};
 #set ($myClassName = "${glPagingResultBeanName}")
 
 /**
- * The paging-result-bean of ${myClassName}.
+ * The paging-result-bean for ${myClassName}.
  * 
  * @param <T> The generic template for 'selectedList'.
  * @author ${database.ClassAuthor}

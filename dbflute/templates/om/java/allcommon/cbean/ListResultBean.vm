@@ -3,10 +3,14 @@ package ${glPackageBaseCommonCBean};
 #set ($myClassName = "${glListResultBeanName}")
 #set ($selectedListArgumentGenericDefinition = "${glEntityInterfaceName}")
 
+import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName};
+import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName};
+import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName};
+import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 
 /**
- * The list-result-bean of ${myClassName}.
+ * The list-result-bean for ${myClassName}.
  * 
  * @param ${database.filterGenericsString('T')} The generic template for 'selectedList'.
  * @author ${database.ClassAuthor}
@@ -115,6 +119,71 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
         _orderByClause = orderByClause;
     }
 
+#if ($database.isAvailableGenerics())
+    // =====================================================================================
+    //                                                                              Grouping
+    //                                                                              ========
+    /**
+     * Group the list per your needs.
+     * 
+     * @param groupingRowSetupper Grouping row setupper. (NotNull)
+     * @param groupingOption Grouping option. (NotNull)
+     * @return The list that composed of grouping row object. (NotNull)
+     */
+    public <E> java.util.List<E> groupingList(${glGroupingRowSetupperName}<E, T> groupingRowSetupper, ${glGroupingOptionName}<T> groupingOption) {
+        final java.util.List<E> groupingList = new java.util.ArrayList<E>();
+        ${glGroupingRowEndDeterminerName}<T> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
+        if (rowEndDeterminer == null) {
+            rowEndDeterminer = new ${glGroupingRowEndDeterminerName}<T>() {
+                public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<T> rowResource) {
+                    return columnIndex == (columnCount-1);
+                }
+            };// as Default
+        }
+        ${glGroupingRowResourceName}<T> rowResource = new ${glGroupingRowResourceName}<T>();
+        int columnIndex = 0;
+        int columnCount = groupingOption.getColumnCount();
+        int rowIndex = 0;
+        for (T entity : _selectedList) {
+            // Set up row resource.
+            rowResource.addGroupingRowList(entity);
+
+            if (_selectedList.size() == (rowIndex + 1)) {// Last Loop!
+                // Callback!
+                final E groupingRowObject = groupingRowSetupper.setup(rowResource);
+
+                // Register!
+                groupingList.add(groupingRowObject);
+                break;
+            }
+
+            T nextElement = null;
+            if (_selectedList.size() > (rowIndex + 1)) {;
+                nextElement = _selectedList.get(rowIndex);
+            }
+            rowResource.setNextElement(nextElement);
+
+            // Do at row end.
+            if (rowEndDeterminer.determine(columnIndex, columnCount, rowResource)) {
+                // Callback!
+                final E groupingRowObject = groupingRowSetupper.setup(rowResource);
+
+                // Register!
+                groupingList.add(groupingRowObject);
+
+                // Initialize!
+                rowResource = new ${glGroupingRowResourceName}<T>();
+                columnIndex = 0;
+                ++rowIndex;
+                continue;
+            }
+            ++columnIndex;
+            ++rowIndex;
+        }
+        return groupingList;
+    }
+#end
+
     // =====================================================================================
     //                                                                         Determination
     //                                                                         =============
@@ -131,8 +200,8 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     }
 
     // =====================================================================================
-    //                                                                 Basic-Override Method
-    //                                                                 =====================
+    //                                                                        Basic Override
+    //                                                                        ==============
     /**
      * This method overrides the method that is declared at super.
      * 

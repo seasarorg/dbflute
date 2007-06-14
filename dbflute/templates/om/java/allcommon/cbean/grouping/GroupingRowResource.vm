@@ -1,0 +1,39 @@
+package ${glPackageBaseCommonCBeanGrouping};
+
+/**
+ * The class of row resource for grouping making.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glGroupingRowResourceName}<T> {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected java.util.List<T> _groupingRowList = new java.util.ArrayList<T>();
+
+    protected T _nextElement;
+
+    // =====================================================================================
+    //                                                                           Easy-to-Use
+    //                                                                           ===========
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public java.util.List<T> getGroupingRowList() {
+        return this._groupingRowList;
+    }
+
+    public void addGroupingRowList(T groupingRow) {
+        this._groupingRowList.add(groupingRow);
+    }
+
+    public T getNextElement() {
+        return _nextElement;
+    }
+
+    public void setNextElement(T nextElement) {
+        this._nextElement = nextElement;
+    }
+}

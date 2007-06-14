@@ -1,0 +1,39 @@
+package ${glPackageBaseCommonCBeanGrouping};
+
+/**
+ * The class of option for grouping making.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glGroupingOptionName}<T> {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected int _columnCount;
+
+    protected ${glGroupingRowEndDeterminerName}<T> _groupingRowEndDeterminer;
+
+    // =====================================================================================
+    //                                                                           Easy-to-Use
+    //                                                                           ===========
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public int getColumnCount() {
+        return this._columnCount;
+    }
+
+    public void setColumnCount(int columnCount) {
+        this._columnCount = columnCount;
+    }
+
+    public ${glGroupingRowEndDeterminerName}<T> getGroupingRowEndDeterminer() {
+        return this._groupingRowEndDeterminer;
+    }
+
+    public void setGroupingRowEndDeterminer(${glGroupingRowEndDeterminerName}<T> groupingRowEndDeterminer) {
+        this._groupingRowEndDeterminer = groupingRowEndDeterminer;
+    }
+}
