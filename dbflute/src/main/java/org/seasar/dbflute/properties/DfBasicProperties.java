@@ -272,7 +272,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         if (databaseInfoElement != null) {
             return databaseInfoElement;
         }
-        return stringProp("torque.database.schema");
+        return stringProp("torque.database.schema", "");
     }
 
     public String getDatabaseUser() {
@@ -307,9 +307,17 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
+    protected boolean hasDatabaseInfoMap() {
+        return _databaseInfoMap != null;
+    }
+
     protected String getDatabaseInfoElement(final String key) {
         if (_databaseInfoMap != null) {
-            return (String) _databaseInfoMap.get(key);
+            if (!_databaseInfoMap.containsKey(key)) {
+                return "";
+            }
+            final String value = (String) _databaseInfoMap.get(key);
+            return value != null ? value : "";
         }
         return null;
     }
@@ -368,7 +376,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
         return resultList;
     }
-    
+
     // -----------------------------------------------------
     //                                    Column Except List
     //                                    ------------------
