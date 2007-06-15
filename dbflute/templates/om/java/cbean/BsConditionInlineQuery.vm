@@ -17,7 +17,7 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
 /**
- * The condition-query of {table.Name}.
+ * The condition-query of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
  */

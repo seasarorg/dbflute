@@ -239,20 +239,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertConditionBeanNotNull(cb);
         return getMyDao().selectCount(cb);
     }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Select count ignore fetch scope by condition-bean. (Delegate-Method)
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected count. (NotNull)
-     * @deprecated This method is deprecated. Please use delegateSelectCount()!
-     */
-    public int delegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        return getMyDao().selectCountIgnoreFetchScope(cb);
-    }
-#end
 
     /**
      * Select entity by condition-bean. (Delegate-Method)
@@ -476,7 +462,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
         final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
         return selectEntityWithDeletedCheck(cb);
     }
 #end
@@ -489,12 +475,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Selected entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @deprecated This method is deprecated.
      */
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheckForUpdate(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
         final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
         cb.lockForUpdate();
         return selectEntityWithDeletedCheck(cb);
     }
@@ -546,44 +533,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return invoker.invokeSelectPage(pageCallback);
     }
 
-
-#if ($database.isMakeDeprecated())
-
-    // This is deprecated!!!
-    /**
-     * Select list after checking count(ignore fetch scope).
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @param maxCount Max count.
-     * @return List-result-bean. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-     * @deprecated Please don't use this.
-     */
-    public ${glListResultBeanName} selectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} cb, int maxCount) {
-        assertConditionBeanNotNull(cb);
-        final int selectedCount = selectCount(cb);
-        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb);
-        return selectList(cb);
-    }
-#end
-#if ($table.hasPrimaryKey())
-  #if ($database.isMakeDeprecated())
-
-    // This is deprecated!!!
-    /**
-     * @deprecated Please use selectByPKValueWithDeletedCheck().
-     */
-    public ${myExtendedObjectClassName} selectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
-        return selectEntityWithDeletedCheck(cb);
-    }
-  #end
-#end
 #if ($database.isAvailableGenerics())
-
     // =====================================================================================
     //                                                                        Various Select
     //                                                                        ==============
@@ -705,6 +655,49 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cbSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
      */
     public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${reffererCBClassName}> cbSetupper) {
+        assertObjectNotNull("ls", ls);
+        assertObjectNotNull("cbSetupper", cbSetupper);
+        if (ls.isEmpty()) {
+            return;
+        }
+
+        final java.util.Map${database.filterGenericsString(${genericPKMyEntityMap})} pkMyEntityMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKMyEntityMap})}();
+        final java.util.List${database.filterGenericsString(${table.getPrimaryKeyJavaNativeAsOne()})} pkList = new java.util.ArrayList${database.filterGenericsString(${table.getPrimaryKeyJavaNativeAsOne()})}();
+        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            pkList.add(entity.get${table.getPrimaryKeyJavaNameAsOne()}());
+            pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}()), entity);
+        }
+        final ${reffererBhvClassName} reffererBhv = getDaoSelector().getBehavior(${reffererBhvClassName}.class);
+        final ${reffererCBClassName} cb = reffererBhv.newMyConditionBean();
+        cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+        cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+        cbSetupper.setup(cb);
+        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.selectList(cb);
+
+        final java.util.Map${database.filterGenericsString(${genericPKChildListMap})} pkReffererListMap;
+        pkReffererListMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKChildListMap})}();
+        for (final java.util.Iterator ite = reffererList.iterator(); ite.hasNext(); ) {
+            final ${reffererEntityClassName} reffererEntity = (${reffererEntityClassName})ite.next();
+            if (!pkReffererListMap.containsKey(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))) {
+                pkReffererListMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()), new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
+            }
+            ((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))).add(reffererEntity);
+
+            // for Reverse Reference.
+            final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()));
+            reffererEntity.set${refferer.ForeignPropertyNameInitCap}(myEntity);
+        }
+
+        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            if (pkReffererListMap.containsKey(toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}()))) {
+                entity.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}())));
+            } else {
+                entity.set${refferer.ReffererPropertyNameInitCap}(new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
+            }
+        }
+    }
     #else
 
     /**
@@ -756,8 +749,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cbSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
      */
     public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ${reffererBhvClassName}.CBSetupper cbSetupper) {
-    #end
-    assertObjectNotNull("ls", ls);
+        assertObjectNotNull("ls", ls);
         assertObjectNotNull("cbSetupper", cbSetupper);
         if (ls.isEmpty()) {
             return;
@@ -799,15 +791,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
                 entity.set${refferer.ReffererPropertyNameInitCap}(new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
             }
         }
-    }
-    #if ($database.isMakeDeprecated())
-
-    /**
-     * The interface of refferer condition for ${refferer.ReffererPropertyName}.
-     * 
-     * @deprecated Not for public use in the future. Please use ${reffererBhvClassName}.CBSetupper.
-     */
-    public static interface ReffererCondition${refferer.ReffererPropertyNameInitCap} extends ${reffererBhvClassName}.CBSetupper {
     }
     #end
   #end
@@ -940,7 +923,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public void updateAfterSelect(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
         update(currentEntity);
@@ -1024,7 +1007,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         ${myExtendedObjectClassName} currentEntity = null;
         try {
             final ${myConditionBeanClassName} cb = newMyConditionBean();
-            cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+            cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
             currentEntity = selectEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
             insert(entity);
@@ -1045,11 +1028,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated This method is deprecated.
      */
     public void updateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
         cb.lockForUpdate();
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         mergeEntity(entity, currentEntity);
@@ -1065,6 +1049,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * {update: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @deprecated This method is deprecated.
      */
     public void insertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);
@@ -1075,7 +1060,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         ${myExtendedObjectClassName} currentEntity = null;
         try {
             final ${myConditionBeanClassName} cb = newMyConditionBean();
-            cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+            cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
             cb.lockForUpdate();
             currentEntity = selectEntityWithDeletedCheck(cb);
         } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
@@ -1105,12 +1090,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         final ${myExtendedObjectClassName} destinationMyEntity = (${myExtendedObjectClassName})destinationEntity;
         destinationMyEntity.clearModifiedPropertyNames();
         final java.util.Set${database.filterGenericsString('String')} names = sourceMyEntity.getModifiedPropertyNames();
-  #foreach ($col in $table.Columns)
 
-        if (names.contains("${col.UncapitalisedJavaName}")) {
-            destinationMyEntity.set${col.JavaName}(sourceMyEntity.get${col.JavaName}());
-        }
-  #end
+#foreach ($col in $table.Columns)
+        if (names.contains("${col.UncapitalisedJavaName}")) { destinationMyEntity.set${col.JavaName}(sourceMyEntity.get${col.JavaName}()); }
+#end
 
     }
 
@@ -1145,7 +1128,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public void deleteAfterSelect(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
         selectEntityWithDeletedCheck(cb);
         delete(entity);
     }
@@ -1230,7 +1213,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
         final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(entity.extractPrimaryKeyMapString());
+        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
         final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
         return delegateInsert(currentEntity);
     }

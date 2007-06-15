@@ -5,7 +5,7 @@ package ${glPackageBaseCommonCBeanGrouping};
  * 
  * @author ${database.ClassAuthor}
  */
-public interface ${glGroupingRowEndDeterminerName}<T> {
+public interface ${glGroupingRowEndDeterminerName}<ENTITY> {
 
-    public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<T> rowResource);
+    public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity);
 }

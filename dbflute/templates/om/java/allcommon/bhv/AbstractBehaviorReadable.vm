@@ -98,23 +98,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return ((Integer)result).intValue();
     }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read count. (NotNull)
-     * @deprecated This method is deprecated. Please don't use!
-     */
-    public int callReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCountIgnoreFetchScope", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return ((Integer)result).intValue();
-    }
-#end
 
     /**
      * ${database.ImplementComment}
@@ -143,92 +126,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
         return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
     }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return All count.
-     * @deprecated Please use callGetCountAll().
-     */
-    public int delegateReadCountAll() {
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getCountAll", new Class[]{});
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
-        return ((Integer)result).intValue();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return All list. (NotNull)
-     * @deprecated Please use callReadListAll().
-     */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListAll() {
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getListAll", new Class[]{});
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
-        return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read count. (NotNull)
-     * @deprecated Please use callReadCount().
-     */
-    public int delegateReadCount(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCount", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return ((Integer)result).intValue();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read count. (NotNull)
-     * @deprecated Please use callReadCountIgnoreFetchScope().
-     */
-    public int delegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCountIgnoreFetchScope", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return ((Integer)result).intValue();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read entity. If the select result is zero, it returns null. (Nullable)
-     * @deprecated Please use callReadEntity().
-     */
-    public ${glEntityInterfaceName} delegateReadEntity(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectEntity", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return (${glEntityInterfaceName})result;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-     * @deprecated Please use callReadList().
-     */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadList(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectList", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
-    }
-#end
 
     private java.lang.reflect.Method getMethod(Class clazz, String methodName, Class[] argTypes) {
         try {
@@ -428,28 +325,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
         }
     }
-#if ($database.isMakeDeprecated())
-
-    // =====================================================================================
-    //                                                                        Various Select
-    //                                                                        ==============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean.
-     * @param maxCount Max count.
-     * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-     * @deprecated Please don't use this.
-     */
-    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount) {
-        assertConditionBeanNotNull(cb);
-        final int selectedCount = readCount(cb);
-        assertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb);
-        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(cb, callReadList(cb));
-    }
-#end
-
 
     // =====================================================================================
     //                                                                            Token File

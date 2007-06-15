@@ -5,14 +5,21 @@ package ${glPackageBaseCommonCBeanGrouping};
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${glGroupingOptionName}<T> {
+public class ${glGroupingOptionName}<ENTITY> {
 
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
     protected int _columnCount;
 
-    protected ${glGroupingRowEndDeterminerName}<T> _groupingRowEndDeterminer;
+    protected ${glGroupingRowEndDeterminerName}<ENTITY> _groupingRowEndDeterminer;
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    public ${glGroupingOptionName}(int columnCount) {
+        _columnCount = columnCount;
+    }
 
     // =====================================================================================
     //                                                                           Easy-to-Use
@@ -25,15 +32,11 @@ public class ${glGroupingOptionName}<T> {
         return this._columnCount;
     }
 
-    public void setColumnCount(int columnCount) {
-        this._columnCount = columnCount;
-    }
-
-    public ${glGroupingRowEndDeterminerName}<T> getGroupingRowEndDeterminer() {
+    public ${glGroupingRowEndDeterminerName}<ENTITY> getGroupingRowEndDeterminer() {
         return this._groupingRowEndDeterminer;
     }
 
-    public void setGroupingRowEndDeterminer(${glGroupingRowEndDeterminerName}<T> groupingRowEndDeterminer) {
+    public void setGroupingRowEndDeterminer(${glGroupingRowEndDeterminerName}<ENTITY> groupingRowEndDeterminer) {
         this._groupingRowEndDeterminer = groupingRowEndDeterminer;
     }
 }

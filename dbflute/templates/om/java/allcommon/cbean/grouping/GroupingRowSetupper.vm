@@ -5,7 +5,7 @@ package ${glPackageBaseCommonCBeanGrouping};
  * 
  * @author ${database.ClassAuthor}
  */
-public interface ${glGroupingRowSetupperName}<E, T> {
+public interface ${glGroupingRowSetupperName}<ROW, ENTITY> {
 
     /**
      * Set up grouping row object.
@@ -13,5 +13,5 @@ public interface ${glGroupingRowSetupperName}<E, T> {
      * @param groupingRowResource Grouping row resource. (NotNull)
      * @return Grouping row object. (NotNull)
      */
-    public E setup(${glGroupingRowResourceName}<T> groupingRowResource);
+    public ROW setup(${glGroupingRowResourceName}<ENTITY> groupingRowResource);
 }

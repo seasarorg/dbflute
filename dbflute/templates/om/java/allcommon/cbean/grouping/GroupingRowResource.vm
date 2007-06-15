@@ -5,14 +5,12 @@ package ${glPackageBaseCommonCBeanGrouping};
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${glGroupingRowResourceName}<T> {
+public class ${glGroupingRowResourceName}<ENTITY> {
 
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected java.util.List<T> _groupingRowList = new java.util.ArrayList<T>();
-
-    protected T _nextElement;
+    protected java.util.List<ENTITY> _groupingRowList = new java.util.ArrayList<ENTITY>();
 
     // =====================================================================================
     //                                                                           Easy-to-Use
@@ -21,19 +19,11 @@ public class ${glGroupingRowResourceName}<T> {
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
-    public java.util.List<T> getGroupingRowList() {
+    public java.util.List<ENTITY> getGroupingRowList() {
         return this._groupingRowList;
     }
 
-    public void addGroupingRowList(T groupingRow) {
+    public void addGroupingRowList(ENTITY groupingRow) {
         this._groupingRowList.add(groupingRow);
-    }
-
-    public T getNextElement() {
-        return _nextElement;
-    }
-
-    public void setNextElement(T nextElement) {
-        this._nextElement = nextElement;
     }
 }

@@ -67,63 +67,6 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @return Deleted count.
      */
     public int callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Create entity. (Delegate-Method)
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Inserted count.
-     * @deprecated Please use callCreate().
-     */
-    public int delegateCreate(${glEntityInterfaceName} entity);
-
-    /**
-     * Modify entity. (Delegate-Method)
-     * {modified only}
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Updated count.
-     * @deprecated Please use callModify().
-     */
-    public int delegateModify(${glEntityInterfaceName} entity);
-
-    /**
-     * Remove entity. (Delegate-Method)
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Deleted count.
-     * @deprecated Please use callRemove().
-     */
-    public int delegateRemove(${glEntityInterfaceName} entity);
-
-    /**
-     * Create several entity-list. (Delegate-Method)
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Inserted count.
-     * @deprecated Please use callCreateList().
-     */
-    public int delegateCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
-
-    /**
-     * Modify several entity-list. (Delegate-Method)
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Updated count.
-     * @deprecated Please use callModifyList().
-     */
-    public int delegateModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
-
-    /**
-     * Remove several entity-list. (Delegate-Method)
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Deleted count.
-     * @deprecated Please use callRemoveList().
-     */
-    public int delegateRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
-#end
 
     // =====================================================================================
     //                                                                   Basic Entity Update
@@ -163,6 +106,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * 
      * @param entity Entity.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated This method is deprecated.
      */
     public void modifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
@@ -170,6 +114,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * Create or modify after select-for-update.
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @deprecated This method is deprecated.
      */
     public void createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 #end

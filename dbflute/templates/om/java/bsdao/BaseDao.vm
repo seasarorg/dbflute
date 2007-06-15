@@ -74,6 +74,11 @@ public interface ${myClassName} extends ${InterfaceName} {
     /** Args-Annotation for getEntity(). */
     public static final String getEntity_ARGS = "${table.PrimaryKeyUncapitalisedJavaNameCommaString}";
 
+    /* (non-javadoc)
+     * Get entity by primary key.
+     * 
+     * @param primaryKey Primary key. (NotNull)
+     */
     public ${myExtendedObjectClassName} getEntity(${table.PrimaryKeyArgsString});
 #end
 
@@ -85,33 +90,15 @@ public interface ${myClassName} extends ${InterfaceName} {
      * This select method generates SQL based on condition-bean.
      * 
      * Example)
-     *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
-     *   ${glAttachedCBArgsVariableName}.query().setXxx_GreaterEqual(new BigDecimal(14));
-     *   final int count = dao.selectCount(${glAttachedCBArgsVariableName});
+     *   final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     *   cb.query().setXxx_GreaterEqual(new BigDecimal(14));
+     *   final int count = dao.selectCount(cb);
      * </pre>
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
      */
     public int selectCount(${myAttachedCBArgsString});
-
-    /**
-     * Select count by condition-bean.
-     * <pre>
-     * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
-     * This select method generates SQL based on condition-bean.
-     * 
-     * Example)
-     *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
-     *   ${glAttachedCBArgsVariableName}.query().setXxx_GreaterEqual(new BigDecimal(14));
-     *   final int count = dao.${database.ConditionBeanSelectCountMethodName}(${glAttachedCBArgsVariableName});
-     * </pre>
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Selected count. (NotNull)
-     * @deprecated Please use selectCount().
-     */
-    public int selectCountIgnoreFetchScope(${myAttachedCBArgsString});
 
     /**
      * Select entity '${myExtendedObjectClassName}' by condition-bean.
@@ -119,13 +106,13 @@ public interface ${myClassName} extends ${InterfaceName} {
      * This select method generates SQL based on condition-bean.
      * 
      * Example)
-     *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
-     *   ${glAttachedCBArgsVariableName}.query().setXxxCode_Equal("abc");// It is assumed that this is the primary key...
-     *   ${glAttachedCBArgsVariableName}.lockForUpdate();
-     *   final ${myExtendedObjectClassName} entity = dao.selectEntity(${glAttachedCBArgsVariableName});
+     *   final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     *   cb.query().setXxxCode_Equal("abc");// It is assumed that this is the primary key...
+     *   cb.lockForUpdate();
+     *   final ${myExtendedObjectClassName} entity = dao.selectEntity(cb);
      * </pre>
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Selected entity. If the select result is zero, it returns null. (Nullable)
      */
     public ${myExtendedObjectClassName} selectEntity(${myAttachedCBArgsString});
@@ -136,15 +123,15 @@ public interface ${myClassName} extends ${InterfaceName} {
      * This select method generates SQL based on condition-bean.
      * 
      * Example)
-     *   final ${myConditionBeanClassName} ${glAttachedCBArgsVariableName} = new ${myConditionBeanClassName}();
-     *   ${glAttachedCBArgsVariableName}.setupSelect_Xxx(); // Including the foreign table in select clause
-     *   ${glAttachedCBArgsVariableName}.query().setXxxName_PrefixSearch("abc");
-     *   ${glAttachedCBArgsVariableName}.query().setXxxStartDate_IsNotNull();
-     *   ${glAttachedCBArgsVariableName}.addOrderBy_PK_Asc().fetchFirst(20);
-     *   final List resultList = dao.selectList(${glAttachedCBArgsVariableName});
+     *   final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     *   cb.setupSelect_Xxx(); // Including the foreign table in select clause
+     *   cb.query().setXxxName_PrefixSearch("abc");
+     *   cb.query().setXxxStartDate_IsNotNull();
+     *   cb.addOrderBy_PK_Asc().fetchFirst(20);
+     *   final List resultList = dao.selectList(cb);
      * </pre>
      * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
+     * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
      */
     public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectList(${myAttachedCBArgsString});

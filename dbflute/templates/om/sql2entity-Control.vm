@@ -44,6 +44,7 @@ targetdatabase = $targetDatabase
     ## [DBMeta]
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
+    #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
 
     ## [Helper]
     #set ($glMapListStringName = "${glProjectPrefix}MapListString")
@@ -76,6 +77,9 @@ targetdatabase = $targetDatabase
     ##                                                                                 ---------------------
     ## Setup java directory.
     $database.setupJavaDir_for_sql2entity()
+
+    ## for Sql2Entity
+    #set ($isSql2Entity = true)
 
     #set ($glPackageBaseCustomizeEntity = "${database.Sql2EntityBaseEntityPackage}" )
     #set ($glPackageCustomizeDBMeta = "${database.Sql2EntityDBMetaPackage}")

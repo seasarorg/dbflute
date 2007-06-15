@@ -6,7 +6,7 @@ import ${glPackageCQ}.${myConditionQueryClassName};
 
 
 /**
- * The nest select setupper.
+ * The nest select setupper of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
  */

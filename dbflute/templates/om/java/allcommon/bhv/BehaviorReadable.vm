@@ -127,18 +127,6 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Read count. (NotNull)
      */
     public int callReadCount(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Read count by condition-bean. (Delegate-Method)
-     * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Read count. (NotNull)
-     * @deprecated This method is deprecated. Please don't use!
-     */
-    public int callReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-#end
 
     /**
      * Read entity by condition-bean. (Delegate-Method)
@@ -155,62 +143,6 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */
     public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Read count as all. (Delegate-Method)
-     * 
-     * @return All count. (NotNull)
-     * @deprecated Please use callGetCountAll().
-     */
-    public int delegateReadCountAll();
-
-    /**
-     * Read list as all. (Delegate-Method)
-     * 
-     * @return All list. (NotNull)
-     * @deprecated Please use callReadListAll().
-     */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadListAll();
-
-    /**
-     * Read count by condition-bean. (Delegate-Method)
-     * If the condition-bean is invoked fetchFirst() and fetchScope() and fetchPage(), throw exception.
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Read count. (NotNull)
-     * @deprecated Please use callReadCount().
-     */
-    public int delegateReadCount(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-
-    /**
-     * Read count by condition-bean. (Delegate-Method)
-     * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Read count. (NotNull)
-     * @deprecated Please use callReadCountIgnoreFetchScope().
-     */
-    public int delegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-
-    /**
-     * Read entity by condition-bean. (Delegate-Method)
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Read entity. If the select result is zero, it returns null. (Nullable)
-     * @deprecated Please use callReadEntity().
-     */
-    public ${glEntityInterfaceName} delegateReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-
-    /**
-     * Read list by condition-bean. (Delegate-Method)
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-     * @deprecated Please use callReadList().
-     */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} delegateReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-#end
 
     // =====================================================================================
     //                                                                         Basic Get All
@@ -284,21 +216,6 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Read page. (NotNull)
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker);
-#if ($database.isMakeDeprecated())
-
-    // =====================================================================================
-    //                                                                        Various Select
-    //                                                                        ==============
-    /**
-     * Read list after checking count(ignore fetch scope).
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean.
-     * @param maxCount Max count.
-     * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-     */
-    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, int maxCount);
-#end
 
     // =====================================================================================
     //                                                                            Token File

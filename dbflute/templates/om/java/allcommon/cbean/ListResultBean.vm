@@ -3,6 +3,7 @@ package ${glPackageBaseCommonCBean};
 #set ($myClassName = "${glListResultBeanName}")
 #set ($selectedListArgumentGenericDefinition = "${glEntityInterfaceName}")
 
+import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName};
@@ -12,10 +13,10 @@ import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 /**
  * The list-result-bean for ${myClassName}.
  * 
- * @param ${database.filterGenericsString('T')} The generic template for 'selectedList'.
+ * @param ${database.filterGenericsString('ENTITY')} The generic template for 'selectedList'.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName}${database.filterGenericsString('T')} implements java.util.List${database.filterGenericsString('T')}, java.io.Serializable {
+public class ${myClassName}${database.filterGenericsString('ENTITY')} implements java.util.List${database.filterGenericsString('ENTITY')}, java.io.Serializable {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -30,7 +31,7 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     protected int _allRecordCount;
 
     /** Selected list. */
-    protected java.util.List${database.filterGenericsString('T')} _selectedList = new java.util.ArrayList${database.filterGenericsString('T')}();
+    protected java.util.List${database.filterGenericsString('ENTITY')} _selectedList = new java.util.ArrayList${database.filterGenericsString('ENTITY')}();
 
     /** Order-by clause. */
     protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
@@ -88,7 +89,7 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
      * 
      * @return Selected list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('T')} getSelectedList() {
+    public java.util.List${database.filterGenericsString('ENTITY')} getSelectedList() {
         return _selectedList;
     }
 
@@ -97,7 +98,7 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
      * 
      * @param selectedList Selected list. (NotNull)
      */
-    public void setSelectedList(java.util.List${database.filterGenericsString('T')} selectedList) {
+    public void setSelectedList(java.util.List${database.filterGenericsString('ENTITY')} selectedList) {
         _selectedList = selectedList;
     }
 
@@ -123,56 +124,48 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     // =====================================================================================
     //                                                                              Grouping
     //                                                                              ========
-    /**
-     * Group the list per your needs.
-     * 
-     * @param groupingRowSetupper Grouping row setupper. (NotNull)
-     * @param groupingOption Grouping option. (NotNull)
-     * @return The list that composed of grouping row object. (NotNull)
-     */
-    public <E> java.util.List<E> groupingList(${glGroupingRowSetupperName}<E, T> groupingRowSetupper, ${glGroupingOptionName}<T> groupingOption) {
-        final java.util.List<E> groupingList = new java.util.ArrayList<E>();
-        ${glGroupingRowEndDeterminerName}<T> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
+    public <ROW> java.util.List<ROW> groupingList(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
+        final java.util.List<ROW> groupingList = new java.util.ArrayList<ROW>();
+        ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
         if (rowEndDeterminer == null) {
-            rowEndDeterminer = new ${glGroupingRowEndDeterminerName}<T>() {
-                public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<T> rowResource) {
+            rowEndDeterminer = new ${glGroupingRowEndDeterminerName}<ENTITY>() {
+                public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity) {
                     return columnIndex == (columnCount-1);
                 }
             };// as Default
         }
-        ${glGroupingRowResourceName}<T> rowResource = new ${glGroupingRowResourceName}<T>();
-        int columnIndex = 0;
+        ${glGroupingRowResourceName}<ENTITY> rowResource = new ${glGroupingRowResourceName}<ENTITY>();
         int columnCount = groupingOption.getColumnCount();
+        int columnIndex = 0;
         int rowIndex = 0;
-        for (T entity : _selectedList) {
+        for (ENTITY entity : _selectedList) {
             // Set up row resource.
             rowResource.addGroupingRowList(entity);
 
             if (_selectedList.size() == (rowIndex + 1)) {// Last Loop!
                 // Callback!
-                final E groupingRowObject = groupingRowSetupper.setup(rowResource);
+                final ROW groupingRowObject = groupingRowSetupper.setup(rowResource);
 
                 // Register!
                 groupingList.add(groupingRowObject);
                 break;
             }
 
-            T nextElement = null;
+            ENTITY nextElement = null;
             if (_selectedList.size() > (rowIndex + 1)) {;
                 nextElement = _selectedList.get(rowIndex);
             }
-            rowResource.setNextElement(nextElement);
 
             // Do at row end.
-            if (rowEndDeterminer.determine(columnIndex, columnCount, rowResource)) {
+            if (rowEndDeterminer.determine(columnIndex, columnCount, rowResource, nextElement)) {
                 // Callback!
-                final E groupingRowObject = groupingRowSetupper.setup(rowResource);
+                final ROW groupingRowObject = groupingRowSetupper.setup(rowResource);
 
                 // Register!
                 groupingList.add(groupingRowObject);
 
                 // Initialize!
-                rowResource = new ${glGroupingRowResourceName}<T>();
+                rowResource = new ${glGroupingRowResourceName}<ENTITY>();
                 columnIndex = 0;
                 ++rowIndex;
                 continue;
@@ -181,6 +174,20 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
             ++rowIndex;
         }
         return groupingList;
+    }
+
+    // =====================================================================================
+    //                                                                               Mapping
+    //                                                                               =======
+    public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
+        final ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
+        for (ENTITY entity : _selectedList) {
+            mappingList.add(entityDtoMapper.map(entity));
+        }
+        mappingList.setTableDbName(getTableDbName());
+        mappingList.setAllRecordCount(getAllRecordCount());
+        mappingList.setOrderByClause(getOrderByClause());
+        return mappingList;
     }
 #end
 
@@ -222,11 +229,11 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
     // =====================================================================================
     //                                                                         List Elements
     //                                                                         =============
-    public boolean add(T o) {
+    public boolean add(ENTITY o) {
         return _selectedList.add(o);
     }
 
-    public boolean addAll(java.util.Collection${database.filterGenericsString('? extends T')} c) {
+    public boolean addAll(java.util.Collection${database.filterGenericsString('? extends ENTITY')} c) {
         return _selectedList.addAll(c);
     }
 
@@ -246,7 +253,7 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
         return _selectedList.isEmpty();
     }
 
-    public java.util.Iterator${database.filterGenericsString('T')} iterator() {
+    public java.util.Iterator${database.filterGenericsString('ENTITY')} iterator() {
         return _selectedList.iterator();
     }
 
@@ -270,19 +277,19 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
         return _selectedList.toArray();
     }
 
-    public ${database.filterGenericsString('E')} E[] toArray(E[] a) {
+    public ${database.filterGenericsString('TYPE')} TYPE[] toArray(TYPE[] a) {
         return _selectedList.toArray(a);
     }
 
-    public void add(int index, T element) {
+    public void add(int index, ENTITY element) {
         _selectedList.add(index, element);
     }
 
-    public boolean addAll(int index, java.util.Collection${database.filterGenericsString('? extends T')} c) {
+    public boolean addAll(int index, java.util.Collection${database.filterGenericsString('? extends ENTITY')} c) {
         return _selectedList.addAll(index, c);
     }
 
-    public T get(int index) {
+    public ENTITY get(int index) {
         return _selectedList.get(index);
     }
 
@@ -294,23 +301,23 @@ public class ${myClassName}${database.filterGenericsString('T')} implements java
         return _selectedList.lastIndexOf(o);
     }
 
-    public java.util.ListIterator${database.filterGenericsString('T')} listIterator() {
+    public java.util.ListIterator${database.filterGenericsString('ENTITY')} listIterator() {
         return _selectedList.listIterator();
     }
 
-    public java.util.ListIterator${database.filterGenericsString('T')} listIterator(int index) {
+    public java.util.ListIterator${database.filterGenericsString('ENTITY')} listIterator(int index) {
         return _selectedList.listIterator(index);
     }
 
-    public T remove(int index) {
+    public ENTITY remove(int index) {
         return _selectedList.remove(index);
     }
 
-    public T set(int index, T element) {
+    public ENTITY set(int index, ENTITY element) {
         return _selectedList.set(index, element);
     }
 
-    public java.util.List${database.filterGenericsString('T')} subList(int fromIndex, int toIndex) {
+    public java.util.List${database.filterGenericsString('ENTITY')} subList(int fromIndex, int toIndex) {
         return _selectedList.subList(fromIndex, toIndex);
     }
 #else

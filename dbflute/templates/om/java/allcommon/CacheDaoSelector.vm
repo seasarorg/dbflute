@@ -27,6 +27,54 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
         this._container = container;
     }
 
+#if ($database.isAvailableGenerics())
+    /**
+     * Get dao.
+     * 
+     * @param daoType Dao type. (NotNull)
+     * @return Dao. (NotNull)
+     */
+    public <DAO_TYPE extends ${glDaoReadableInterfaceName}> DAO_TYPE getDao(Class<DAO_TYPE> daoType) {
+        return (DAO_TYPE)_container.getComponent(daoType);
+    }
+
+    /**
+     * Get dao-readable.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Dao-readable. (NotNull)
+     */
+    public ${glDaoReadableInterfaceName} byNameAsDaoReadable(String tableMultiName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
+        return getDao(getDaoType(dbmeta));
+    }
+
+#if ($database.isAvailableBehaviorGeneration())
+    /**
+     * Get behavior.
+     * 
+     * @param behaviorType Behavior type. (NotNull)
+     * @return Behavior. (NotNull)
+     */
+    public <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE getBehavior(Class<BEHAVIOR_TYPE> behaviorType) {
+        return (BEHAVIOR_TYPE)_container.getComponent(behaviorType);
+    }
+
+    /**
+     * Get behavior-readable.
+     * 
+     * @param tableMultiName Table multi-name. (NotNull)
+     * @return Behavior-readable. (NotNull)
+     */
+    public ${glBehaviorReadableInterfaceName} byNameAsBehaviorReadable(String tableMultiName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
+        return getBehavior(getBehaviorType(dbmeta));
+    }
+#end
+#end
+
     /**
      * Get dao-readable by dao type.
      * 
@@ -114,7 +162,7 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
      */
     public ${glBehaviorReadableInterfaceName} getRBhv(${glEntityInterfaceName} entity) {
         assertObjectNotNull("entity", entity);
-        return getRBhv(getBhvType(entity.getDBMeta()));
+        return getRBhv(getBehaviorType(entity.getDBMeta()));
     }
 
     /**
@@ -126,7 +174,7 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     public ${glBehaviorReadableInterfaceName} getRBhv(String tableMultiName) {
         assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
-        return getRBhv(getBhvType(dbmeta));
+        return getRBhv(getBehaviorType(dbmeta));
     }
 
     /**
@@ -163,24 +211,24 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     }
 
     /**
-     * Get bhv-type by dbmeta.
+     * Get behavior-type by dbmeta.
      * 
      * @param dbmeta Dbmeta. (NotNull)
-     * @return Bhv-type. (NotNull)
+     * @return Behavior-type. (NotNull)
      */
-    protected Class getBhvType(${glDBMetaInterfaceName} dbmeta) {
-        final String bhvTypeName = dbmeta.getBehaviorTypeName();
-        if (bhvTypeName == null) {
+    protected Class getBehaviorType(${glDBMetaInterfaceName} dbmeta) {
+        final String behaviorTypeName = dbmeta.getBehaviorTypeName();
+        if (behaviorTypeName == null) {
             String msg = "The dbmeta.getBehaviorTypeName() should not return null: dbmeta=" + dbmeta;
             throw new IllegalStateException(msg);
         }
-        final Class bhvType;
+        final Class behaviorType;
         try {
-            bhvType = Class.forName(bhvTypeName);
+            behaviorType = Class.forName(behaviorTypeName);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("The class does not exist: " + bhvTypeName, e);
+            throw new RuntimeException("The class does not exist: " + behaviorTypeName, e);
         }
-        return bhvType;
+        return behaviorType;
     }
 #end
 

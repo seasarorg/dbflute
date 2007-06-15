@@ -107,6 +107,9 @@ targetdatabase = $targetDatabase
     #set ($glGroupingRowResourceName = "${glProjectPrefix}GroupingRowResource")
     #set ($glGroupingRowSetupperName = "${glProjectPrefix}GroupingRowSetupper")
 
+    ## [ConditionBean - Mapping]
+    #set ($glEntityDtoMapperName = "${glProjectPrefix}EntityDtoMapper")
+
     #set ($glSqlClauseName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseInterfaceName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseAbstractName = "${glProjectPrefix}AbstractSqlClause")
@@ -195,6 +198,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.bhv.setup")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
     #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
+    #set ($glPackageBaseCommonCBeanMapping = "${database.baseCommonPackage}.cbean.mapping")
     #set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.cbean.grouping")
     #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
     #set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.cbean.cvalue")
@@ -590,6 +594,13 @@ targetdatabase = $targetDatabase
       $database.debug("    parseGroupingRowSetupper();")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowSetupperName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/grouping/GroupingRowSetupper.${glTemplateFileExtension}",$path ,"", "")
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanMapping}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parseEntityDtoMapper();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanMapping})}${glEntityDtoMapperName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/mapping/EntityDtoMapper.${glTemplateFileExtension}",$path ,"", "")
     #end
 
     ## -------------------------------------------------------
@@ -1159,9 +1170,11 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                    Parse table object
     ##                                                                                    ------------------
-
     ## Setup java directory for base.
     $database.setupJavaDir_for_base()
+
+    ## for Sql2Entity
+    #set ($isSql2Entity = false)
 
     #if ($database.isAvailableBehaviorGeneration())
       #set ($path = $strings.getPackageAsPath(${glPackageBaseBhv}))

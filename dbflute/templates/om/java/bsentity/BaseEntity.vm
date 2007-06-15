@@ -9,8 +9,9 @@ import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 #end
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${myDBMetaPackageName}.${myDBMetaClassName};
-
+#if (!$isSql2Entity)
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+#end
 #set ($myEntityInterfaceName = "")
 #if (${table.hasAllCommonColumn()})
   #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumnInterfaceName})
@@ -104,6 +105,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public ${myClassName}() {
     }
 
+#if ($isSql2Entity)
     // =====================================================================================
     //                                                                                DBMeta
     //                                                                                ======
@@ -113,8 +115,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return DBMeta. (NotNull)
      */
     public ${glDBMetaInterfaceName} getDBMeta() {
-        return ${myDBMetaClassName}.getInstance();
+        return ${myDBMetaPackageName}.${myDBMetaClassName}.getInstance();
     }
+#else
+
+    // =====================================================================================
+    //                                                                                DBMeta
+    //                                                                                ======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return DBMeta. (NotNull)
+     */
+    public ${glDBMetaInterfaceName} getDBMeta() {
+        return ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
+    }
+#end
 
     // =====================================================================================
     //                                                                            Table Name
@@ -125,7 +141,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Table db-name. (NotNull)
      */
     public String getTableDbName() {
-        return getDBMeta().getTableDbName();
+        return "${table.name}";
     }
 
     /**
@@ -134,7 +150,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Table cap-prop-name. (NotNull)
      */
     public String getTableCapPropName() {
-        return getDBMeta().getTableCapPropName();
+        return "${table.javaName}";
     }
 
     /**
@@ -143,7 +159,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Table uncap-prop-name. (NotNull)
      */
     public String getTableUncapPropName() {
-        return getDBMeta().getTableUncapPropName();
+        return "${table.uncapitalisedJavaName}";
     }
 
     // =====================================================================================
@@ -155,29 +171,18 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final String ${col.JavaBeansRulePropertyName}_COLUMN = "${col.Name}";
 
     /**
-     * Get the value of ${col.UncapitalisedJavaName}.
+     * Get the value of ${col.UncapitalisedJavaName}. <br />
+     * {${col.columnDefinitionLineDisp}}
      * 
      * @return The value of ${col.UncapitalisedJavaName}. (Nullable)
      */
     public ${col.JavaNative} get${col.JavaName}() {
         return _${col.UncapitalisedJavaName};
     }
-  #if ($database.isMakeDeprecated())
 
     /**
-     * Set the value of ${col.UncapitalisedJavaName}.
-     * 
-     * @param ${col.UncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
-     */
-    public void set${col.JavaName}(${col.JavaNative} ${col.UncapitalisedJavaName}) {
-        _isSetterInvoked${col.JavaName} = true;
-        _modifiedProperties.addPropertyName("${col.JavaBeansRulePropertyName}");
-        _${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
-    }
-  #else
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName}.
+     * Set the value of ${col.UncapitalisedJavaName}. <br />
+     * {${col.columnDefinitionLineDisp}}
      * 
      * @param ${col.UncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
      */
@@ -185,25 +190,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         _modifiedProperties.addPropertyName("${col.JavaBeansRulePropertyName}");
         _${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
-  #end
-#end
-
-    // =====================================================================================
-    //                                                                Invoking Determination
-    //                                                                ======================
-#foreach ($col in $table.Columns)
-  #if ($database.isMakeDeprecated())
-
-    /**
-     * Has the setter of ${col.UncapitalisedJavaName} been invoked?
-     * 
-     * @return Determination.
-     * @deprecated Please use modified-properties.
-     */
-    public boolean isSetterInvoked${col.JavaName}() {
-        return _isSetterInvoked${col.JavaName};
-    }
-  #end
 #end
 
     // =====================================================================================
@@ -212,7 +198,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
-      #if (${col.hasClassificationName()})
 
     /**
      * Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
@@ -221,16 +206,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
         set${col.JavaName}(new ${col.JavaNative}(code));
     }
-      #else
-
-    /**
-     * Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
-     */
-    public void classify${col.JavaName}_${classificationMap.get('name')}() {
-        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
-        set${col.JavaName}(new ${col.JavaNative}(code));
-    }
-      #end
     #end
   #end
 #end
@@ -241,7 +216,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
-      #if (${col.hasClassificationName()})
 
     /**
      * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
@@ -251,68 +225,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determanation.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
-        if (_${col.UncapitalisedJavaName} == null) { return false; }
-        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
-        return code.equalsIgnoreCase(_${col.UncapitalisedJavaName}.toString());
+        return helpEqualingIgnoreCaseClassification(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
     }
-        #if ($database.isMakeDeprecated())
-
-    /**
-     * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
-     * The difference of capital letters and small letters is NOT distinguished.
-     * If the value is null, this method throws exception!
-     * 
-     * @return Determanation.
-     * @deprecated This method is deprecated. Sorry!
-     */
-    public boolean is${col.JavaName}${classificationMap.get('name')}IfNullException() {
-        throwExceptionIfTheValueIsNull("${col.UncapitalisedJavaName}", _${col.UncapitalisedJavaName});
-        return is${col.JavaName}${classificationMap.get('name')}();
-    }
-        #end
-      #else
-
-    /**
-     * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
-     * The difference of capital letters and small letters is NOT distinguished.
-     * If the value is null, this method returns false!
-     * 
-     * @return Determanation.
-     */
-    public boolean is${col.JavaName}_${classificationMap.get('name')}() {
-        if (_${col.UncapitalisedJavaName} == null) { return false; }
-        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
-        return code.equalsIgnoreCase(_${col.UncapitalisedJavaName}.toString());
-    }
-        #if ($database.isMakeDeprecated())
-
-    /**
-     * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
-     * The difference of capital letters and small letters is NOT distinguished.
-     * If the value is null, this method throws exception!
-     * 
-     * @return Determanation.
-     * @deprecated This method is deprecated. Sorry!
-     */
-    public boolean is${col.JavaName}_${classificationMap.get('name')}_IfNullException() {
-        throwExceptionIfTheValueIsNull("${col.UncapitalisedJavaName}", _${col.UncapitalisedJavaName});
-        return is${col.JavaName}_${classificationMap.get('name')}();
-    }
-        #end
-      #end
     #end
   #end
 #end
-#if (${table.hasClassification()})
-  #if ($database.isMakeDeprecated())
 
-    private void throwExceptionIfTheValueIsNull(String propertyName, Object value) {
-        if (value == null) {
-            String msg = "If the value of " + propertyName + " is null, this method throws exception!";
-            throw new IllegalStateException(msg + " " + propertyName + "=" + value);
-        }
+#if (${table.hasClassification()})
+    private boolean helpEqualingIgnoreCaseClassification(Object value, String code) {
+        if (value == null) { return false; }
+        return code.equalsIgnoreCase(value.toString());
     }
-  #end
 #end
 
     // =====================================================================================
@@ -328,11 +251,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of ${col.UncapitalisedJavaName} as classification-name. (Nullable)
      */
     public String get${col.JavaName}Name() {
-        if (_${col.UncapitalisedJavaName} == null) {
-            return null;
-        }
-        final java.util.Map${database.filterGenericsString('String, String')} map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
-        return (String)map.get(_${col.UncapitalisedJavaName}.toString());
+        return helpGettingFromClassificationMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName});
     }
     #end
     #if (${col.hasClassificationAlias()})
@@ -343,14 +262,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of ${col.UncapitalisedJavaName} as classification-alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
-        if (_${col.UncapitalisedJavaName} == null) {
-            return null;
-        }
-        final java.util.Map${database.filterGenericsString('String, String')} map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
-        return (String)map.get(_${col.UncapitalisedJavaName}.toString());
+        return helpGettingFromClassificationMap(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName});
     }
     #end
   #end
+#end
+
+#if (${table.hasClassification()})
+    private String helpGettingFromClassificationMap(Object key, java.util.Map${database.filterGenericsString('String, String')} map) {
+        if (key == null) { return null; }
+        return (String)map.get(key.toString()); 
+    }
 #end
 
     // =====================================================================================
@@ -391,12 +313,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @param v The entity of foreign table.
      */
-    public void set${foreignKeys.foreignPropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} v) {
-        ${foreignVariableName} = v;
+    public void set${foreignKeys.foreignPropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} entity) {
+        this.${foreignVariableName} = entity;
     }
 
     /**
-     * Has relation of ${foreignKeys.foreignPropertyName}.
+     * Has relation object of ${foreignKeys.foreignPropertyName}.
      * 
      * @return Determination.
      */
@@ -457,8 +379,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @param value The list of refferer table. (Nullable)
      */
-    public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} value) {
-        ${reffererVariableName} = value;
+    public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} entity) {
+        this.${reffererVariableName} = entity;
     }
   #if (${refferer.isOneToOne()})
 
@@ -515,155 +437,40 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * ${database.ImplementComment}
      * 
      * @param primaryKeyMap Primary key map. (NotNull and NotEmpty)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().acceptPrimaryKeyMap(entity, primaryKeyMap);
      */
     public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
-        MapAssertUtil.assertPrimaryKeyMapNotNullAndNotEmpty(primaryKeyMap);
-#if ($table.hasPrimaryKey())
-  #foreach ($col in $table.PrimaryKey)
-
-        MapAssertUtil.assertColumnExistingInPrimaryKeyMap(primaryKeyMap, "${col.Name}");
-        {
-            final Object obj = primaryKeyMap.get("${col.Name}");
-            if (obj == null) {
-                _${col.UncapitalisedJavaName} = null; _modifiedProperties.remove("${col.JavaBeansRulePropertyName}");
-            } else {
-    #if ($col.isJavaNativeStringObject())
-
-                checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-                set${col.JavaName}((String)obj);
-            }
-        }
-    #else
-      #if ($col.isJavaNativeDateObject())
-
-                if (obj instanceof ${col.JavaNative}) {
-                    set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    set${col.JavaName}(new ${col.JavaNative}(parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
-                }
-            }
-        }
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
-
-                if (obj instanceof ${col.JavaNative}) {
-                    set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    set${col.JavaName}(null);// Binary as String is out of target.
-                }
-            }
-        }
-        #else
-
-                if (obj instanceof ${col.JavaNative}) {
-                    set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    try {
-                        set${col.JavaName}(new ${col.JavaNative}((String)obj));
-                    } catch (RuntimeException e) {
-                        String msg = "set${col.JavaName}(new ${col.JavaNative}((String)obj))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + obj + "]", e);
-                    }
-                }
-            }
-        }
-        #end
-      #end
-    #end
-  #end
-#else
-
-        String msg = "This table has no primary-keys: " + getTableDbName();
-        throw new IllegalStateException(msg);
-#end
-
+        getDBMeta().acceptPrimaryKeyMap(this, primaryKeyMap);
     }
 
     /**
      * ${database.ImplementComment}
      * 
      * @param primaryKeyMapString Primary-key map-string. (NotNull and NotEmpty)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().acceptPrimaryKeyMapString(entity, primaryKeyMapString);
      */
     public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
-        MapStringUtil.acceptPrimaryKeyMapString(primaryKeyMapString, this);
+        getDBMeta().acceptPrimaryKeyMapString(this, primaryKeyMapString);
     }
 
     /**
      * ${database.ImplementComment}
      * 
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().acceptColumnValueMap(entity, columnValueMap);
      */
     public void acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
-        MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
-  #foreach ($col in $table.Columns)
-
-        {
-            final Object obj = columnValueMap.get("${col.Name}");
-            if (obj == null) {
-                _${col.UncapitalisedJavaName} = null; _modifiedProperties.remove("${col.JavaBeansRulePropertyName}");
-            } else {
-    #if ($col.isJavaNativeStringObject())
-
-                checkTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-                set${col.JavaName}((String)obj);
-            }
-        }
-    #else
-      #if ($col.isJavaNativeDateObject())
-
-                if (obj instanceof ${col.JavaNative}) {
-                    set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    set${col.JavaName}(new ${col.JavaNative}(parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
-                }
-            }
-        }
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
-
-                if (obj instanceof ${col.JavaNative}) {
-                    set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    set${col.JavaName}(null);// Binary as String is out of target.
-                }
-            }
-        }
-        #else
-
-                if (obj instanceof ${col.JavaNative}) {
-                    set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    try {
-                        set${col.JavaName}(new ${col.JavaNative}((String)obj));
-                    } catch (RuntimeException e) {
-                        String msg = "set${col.JavaName}(new ${col.JavaNative}((String)obj))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + obj + "]", e);
-                    }
-                }
-            }
-        }
-        #end
-      #end
-    #end
-  #end
-
+        getDBMeta().acceptColumnValueMap(this, columnValueMap);
     }
 
     /**
      * ${database.ImplementComment}
      * 
      * @param columnValueMapString Column-value map-string. (NotNull and NotEmpty)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().acceptColumnValueMap(entity, columnValueMapString);
      */
     public void acceptColumnValueMapString(String columnValueMapString) {
-        MapStringUtil.acceptColumnValueMapString(columnValueMapString, this);
-    }
-
-    private void checkTypeString(Object value, String propertyName, String typeName) {
-        MapStringUtil.checkTypeString(value, propertyName, typeName);
-    }
-
-    private long parseDateString(Object value, String propertyName, String typeName) {
-        return MapStringUtil.parseDateString(value, propertyName, typeName);
+        getDBMeta().acceptColumnValueMapString(this, columnValueMapString);
     }
 
     // =====================================================================================
@@ -673,9 +480,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * ${database.ImplementComment}
      * 
      * @return Primary-key map-string. (NotNull)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractPrimaryKeyMapString(entity);
      */
     public String extractPrimaryKeyMapString() {
-        return MapStringUtil.extractPrimaryKeyMapString(this);
+        return getDBMeta().extractPrimaryKeyMapString(this);
     }
 
     /**
@@ -686,31 +494,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param delimiter Delimiter. (NotNull)
      * @param equal Equal. (NotNull)
      * @return Primary-key map-string. (NotNull)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractPrimaryKeyMapString(entity, startBrace, endBrace, delimiter, equal);
      */
     public String extractPrimaryKeyMapString(String startBrace, String endBrace, String delimiter, String equal) {
-#if ($table.hasPrimaryKey())
-        final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
-        final StringBuffer sb = new StringBuffer();
-  #foreach ($col in $table.PrimaryKey)
-
-        appendColumnValueString(sb, delimiter, equal, "${col.Name}", _${col.UncapitalisedJavaName});
-  #end
-
-        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
-        return sb.toString();
-#else
-        return extractColumnValueMapString(startBrace, endBrace, delimiter, equal);
-#end
-
+        return getDBMeta().extractPrimaryKeyMapString(this, startBrace, endBrace, delimiter, equal);
     }
 
     /**
      * ${database.ImplementComment}
      * 
      * @return Column-value map-string. (NotNull)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractColumnValueMapString(entity);
      */
     public String extractColumnValueMapString() {
-        return MapStringUtil.extractColumnValueMapString(this);
+        return getDBMeta().extractColumnValueMapString(this);
     }
 
     /**
@@ -721,25 +518,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param delimiter Delimiter. (NotNull)
      * @param equal Equal. (NotNull)
      * @return Column-value map-string. (NotNull)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
      */
     public String extractColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal) {
-        final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
-        final StringBuffer sb = new StringBuffer();
-#foreach ($col in $table.Columns)
-        appendColumnValueString(sb, delimiter, equal, "${col.Name}", _${col.UncapitalisedJavaName});
-#end
-
-        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
-        return sb.toString();
-    }
-
-    private void appendColumnValueString(StringBuffer sb, String delimiter, String equal, String colName, Object value) {
-        sb.append(delimiter).append(colName).append(equal);
-        if (value instanceof java.util.Date) {
-            sb.append((value != null ? formatDate((java.util.Date)value) : ""));
-        } else {
-            sb.append((value != null ? value.toString() : ""));
-        }
+        return getDBMeta().extractColumnValueMapString(this, startBrace, endBrace, delimiter, equal);
     }
 
 #if (${table.hasAllCommonColumn()})
@@ -748,13 +530,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * ${database.ImplementComment}
      * 
      * @return Column-value map-string. (NotNull)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractCommonColumnValueMapString(entity);
      */
     public String extractCommonColumnValueMapString() {
-        final String startBrace = MAP_STRING_START_BRACE;
-        final String endBrace = MAP_STRING_END_BRACE;
-        final String delimiter = MAP_STRING_DELIMITER;
-        final String equal = MAP_STRING_EQUAL;
-        return extractCommonColumnValueMapString(startBrace, endBrace, delimiter, equal);
+        return getDBMeta().extractCommonColumnValueMapString(this);
     }
 
     /**
@@ -765,69 +544,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param delimiter Delimiter. (NotNull)
      * @param equal Equal. (NotNull)
      * @return Common-column-value map-string. (NotNull)
+     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractCommonColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
      */
     public String extractCommonColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal) {
-        final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
-        final StringBuffer sb = new StringBuffer();
-  #foreach ($columnName in ${database.CommonColumnNameList})
-    #set ($col = $table.getColumnByFlexibleName($columnName))
-    #if ($col.isJavaNativeDateObject())
-
-        sb.append(delimiter).append("${columnName}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? formatDate(_${col.UncapitalisedJavaName}) : ""));
-    #else
-
-        sb.append(delimiter).append("${columnName}").append(equal);
-        sb.append((_${col.UncapitalisedJavaName} != null ? _${col.UncapitalisedJavaName}.toString() : ""));
-    #end
-  #end
-
-        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
-        return sb.toString();
+        return getDBMeta().extractCommonColumnValueMapString(this, startBrace, endBrace, delimiter, equal);
     }
 #end
-
-## TODO: Is it unnecessary???
-## #foreach ($foreignKeys in $table.ForeignKeys)
-##   #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
-## 
-##         {
-##             sb.append(delimiter);
-##             if (${foreignVariableName} != null) {
-##                 sb.append("${foreignKeys.ForeignPropertyName}").append(equal);
-##                 sb.append(${foreignVariableName}.extractColumnValueMapString(startBrace, endBrace, delimiter, equal));
-##             } else {
-##                 sb.append("${foreignKeys.ForeignPropertyName}").append(equal).append("null");
-##             }
-##         }
-## #end
-## #foreach ($refferer in $table.Referrers)
-##   #set ($reffererTable = $refferer.Table)
-##   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-##   #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
-## 
-##         {
-##             final String listMarkAndStartBrace = MAP_STRING_LIST_MARK + startBrace;
-##             sb.append(delimiter).append("${refferer.ReffererPropertyName}").append(equal);
-##             if (${reffererVariableName} != null) {
-##                 final StringBuffer reffererTmpSb = new StringBuffer();
-##                 for (final java.util.Iterator ite = ${reffererVariableName}.iterator(); ite.hasNext(); ) {
-##                     final ${glPackageExtendedEntity}.${reffererEntityClassName} refferer;
-##                     refferer = (${glPackageExtendedEntity}.${reffererEntityClassName})ite.next();
-##                     reffererTmpSb.append(delimiter);
-##                     reffererTmpSb.append(refferer.extractColumnValueMapString(startBrace, endBrace, delimiter, equal));
-##                 }
-##                 reffererTmpSb.delete(0, delimiter.length()).insert(0, listMarkAndStartBrace).append(endBrace);
-##                 sb.append(reffererTmpSb);
-##             } else {
-##                 sb.append("null");
-##             }
-##         }
-## #end
-
-    protected String formatDate(java.util.Date value) {
-        return MapStringUtil.formatDate(value);
-    }
 
     // =====================================================================================
     //                                                                         Determination
@@ -838,12 +560,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determination.
      */
     public boolean hasPrimaryKeyValue() {
-  #foreach ($col in $table.PrimaryKey)
 
+#foreach ($col in $table.PrimaryKey)
         if (_${col.UncapitalisedJavaName} == null) {
             return false;
         }
-  #end
+#end
 
         return true;
     }
@@ -886,12 +608,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
             return false;
         }
         final $myClassName otherEntity = ($myClassName)other;
-  #foreach ($col in $table.PrimaryKey)
 
+#foreach ($col in $table.PrimaryKey)
         if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
             return false;
         }
-  #end
+#end
 
         return true;
     }
@@ -904,12 +626,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public int hashCode() {
         int result = 0;
-  #foreach ($col in $table.PrimaryKey)
 
+#foreach ($col in $table.PrimaryKey)
         if (this.get${col.JavaName}() != null) {
             result = result + get${col.JavaName}().hashCode();
         }
-  #end
+#end
 
         return result;
     }
@@ -930,12 +652,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
             return false;
         }
         final $myClassName otherEntity = ($myClassName)other;
-  #foreach ($col in $table.Columns)
 
+#foreach ($col in $table.Columns)
         if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
             return false;
         }
-  #end
+#end
 
         return true;
     }
@@ -948,12 +670,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public int hashCode() {
         int result = 0;
-  #foreach ($col in $table.Columns)
 
+#foreach ($col in $table.Columns)
         if (this.get${col.JavaName}() != null) {
             result = result + this.get${col.JavaName}().hashCode();
         }
-  #end
+#end
 
         return result;
     }
@@ -967,8 +689,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public String toString() {
         final String delimiter = ",";
         final StringBuffer sb = new StringBuffer();
-#foreach ($col in $table.Columns)
 
+#foreach ($col in $table.Columns)
         sb.append(delimiter).append(get${col.JavaName}());
 #end
 

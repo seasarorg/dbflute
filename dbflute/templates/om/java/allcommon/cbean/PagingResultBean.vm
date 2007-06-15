@@ -2,13 +2,15 @@ package ${glPackageBaseCommonCBean};
 
 #set ($myClassName = "${glPagingResultBeanName}")
 
+import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
+
 /**
  * The paging-result-bean for ${myClassName}.
  * 
- * @param <T> The generic template for 'selectedList'.
+ * @param ${database.filterGenericsString('ENTITY')} The generic template for 'selectedList'.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName}${database.filterGenericsString('T')} extends ${glListResultBeanName}${database.filterGenericsString('T')} {
+public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${glListResultBeanName}${database.filterGenericsString('ENTITY')} {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -206,6 +208,25 @@ public class ${myClassName}${database.filterGenericsString('T')} extends ${glLis
             _pageGroupSize = pageGroupSize;
         }
     }
+
+#if ($database.isAvailableGenerics())
+    // =====================================================================================
+    //                                                                               Mapping
+    //                                                                               =======
+    public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
+        final ${glListResultBeanName}<DTO> ls = super.mappingList(entityDtoMapper);
+        final ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
+        mappingList.setSelectedList(ls.getSelectedList());
+        mappingList.setTableDbName(getTableDbName());
+        mappingList.setAllRecordCount(getAllRecordCount());
+        mappingList.setOrderByClause(getOrderByClause());
+        mappingList.setPageSize(getPageSize());
+        mappingList.setCurrentPageNumber(getCurrentPageNumber());
+        mappingList.setPageRangeOption(_pageRangeOption);
+        mappingList.setPageGroupOption(_pageGroupOption);
+        return mappingList;
+    }
+#end
 
     // =====================================================================================
     //                                                                             Calculate

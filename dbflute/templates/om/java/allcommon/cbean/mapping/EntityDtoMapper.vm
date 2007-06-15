@@ -1,0 +1,17 @@
+package ${glPackageBaseCommonCBeanMapping};
+
+/**
+ * The interface of entity converter.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glEntityDtoMapperName}<ENTITY, DTO> {
+
+    /**
+     * Map entity to data transfer object.
+     * 
+     * @param entity Entity. (NotNull)
+     * @return Data transfer object. (NotNull)
+     */
+    public DTO map(ENTITY entity);
+}

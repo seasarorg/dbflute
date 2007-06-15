@@ -178,102 +178,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
         return getDaoWritable().removeList(entityList);
     }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Inserted count.
-     * @deprecated Please use callCreate().
-     */
-    public int delegateCreate(${glEntityInterfaceName} entity) {
-        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-        filterEntityOfInsert(entity);
-        assertEntityOfInsert(entity);
-        return getDaoWritable().create(entity);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * {modified only}
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Updated count.
-     * @deprecated Please use callModify().
-     */
-    public int delegateModify(${glEntityInterfaceName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        filterEntityOfUpdate(entity);
-        assertEntityOfUpdate(entity);
-        return getDaoWritable().modifyModifiedOnly(entity);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Deleted count.
-     * @deprecated Please use callRemove().
-     */
-    public int delegateRemove(${glEntityInterfaceName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        filterEntityOfDelete(entity);
-        assertEntityOfDelete(entity);
-        return getDaoWritable().remove(entity);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Inserted count.
-     * @deprecated Please use callCreateList().
-     */
-    public int delegateCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            filterEntityOfInsert(entity);
-            assertEntityOfInsert(entity);
-        }
-        return getDaoWritable().createList(entityList);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Updated count.
-     * @deprecated Please use callModifyList().
-     */
-    public int delegateModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            filterEntityOfUpdate(entity);
-            assertEntityOfUpdate(entity);
-        }
-        return getDaoWritable().modifyList(entityList);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Deleted count.
-     * @deprecated Please use callRemoveList().
-     */
-    public int delegateRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            filterEntityOfDelete(entity);
-            assertEntityOfDelete(entity);
-        }
-        return getDaoWritable().removeList(entityList);
-    }
-#end
 
     // =====================================================================================
     //                                                                   Basic Entity Update
@@ -333,6 +237,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * 
      * @param entity Entity having primary-key value. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated This method is deprecated.
      */
     public void modifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
@@ -346,6 +251,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * {modify: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @deprecated This method is deprecated.
      */
     public void createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
