@@ -21,9 +21,9 @@ import ${glPackageCQ}.*;
  */
 public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -36,9 +36,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
 
-    // =====================================================================================
-    //                                                                            Table name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
     /**
      * ${database.ImplementComment}
      * 
@@ -48,9 +48,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         return "${table.Name}";
     }
 
-    // =====================================================================================
-    //                                                                                 Query
-    //                                                                                 =====
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
   ## --------------------------------------------------------------------------------
   ##                                                  Make getter and setter methods.
   ##                                                  -------------------------------
@@ -670,9 +670,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     abstract protected ${glConditionValueName} getCValue${tmpJavaName}();
   #end
 
-    // =====================================================================================
-    //                                                                 Basic-Override Method
-    //                                                                 =====================
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * This method overrides the method that is declared at super.
      * 

@@ -65,15 +65,15 @@ public final class DfBuildProperties {
     /** The delimiter of map-list-string. */
     private static final String MAP_LIST_STRING_DELIMITER = ";";
 
-    //========================================================================================
-    //                                                                               Attribute
-    //                                                                               =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Build properties. */
     private Properties _buildProperties;
 
-    //========================================================================================
-    //                                                                             Constructor
-    //                                                                             ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor. (Private for Singleton)
      */
@@ -88,10 +88,10 @@ public final class DfBuildProperties {
     public synchronized static DfBuildProperties getInstance() {
         return _instance;
     }
-
-    //========================================================================================
-    //                                                                                Accessor
-    //                                                                                ========
+    
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * Set build-properties.
      * <pre>
@@ -115,9 +115,9 @@ public final class DfBuildProperties {
 
     // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
     // TODO: @jflute - DfAbstractHelperPropertiesに移行中。移行完了後は削除
-    //========================================================================================
-    //                                                                        Property Utility
-    //                                                                        ================
+    // ===================================================================================
+    //                                                                    Property Utility
+    //                                                                    ================
     /**
      * Get property as string. {Delegate method}
      * 
@@ -208,24 +208,24 @@ public final class DfBuildProperties {
 
     // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★s
 
-    //========================================================================================
-    //                                                                      Default Definition
-    //                                                                      ==================
+    // ===================================================================================
+    //                                                                  Default Definition
+    //                                                                  ==================
     public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
     public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
     public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
     public static final String DEFAULT_EMPTY_LIST_STRING = "list:{}";
 
-    //========================================================================================
-    //                                                                                 Handler
-    //                                                                                 =======
+    // ===================================================================================
+    //                                                                    Property Handler
+    //                                                                    ================
     public DfPropertiesHandler getHandler() {
         return DfPropertiesHandler.getInstance();
     }
 
-    //========================================================================================
-    //                                                                         Property Object
-    //                                                                         ===============
+    // ===================================================================================
+    //                                                                     Property Object
+    //                                                                     ===============
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
@@ -368,9 +368,9 @@ public final class DfBuildProperties {
 
     // TODO: @jflute - 削除予定。今後DBFluteではサポートしない。
     // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // ===============================================================================
-    //                                                       Properties - CustomizeDao
-    //                                                       =========================
+    // ===================================================================================
+    //                                                                        CustomizeDao
+    //                                                                        ============
     public static final String KEY_customizeDaoDefinitionMap = "customizeDaoDefinitionMap";
     protected Map<String, Map<String, Map<String, String>>> _customizeDaoDefinitionMap;
 
@@ -493,9 +493,9 @@ public final class DfBuildProperties {
 
     // TODO: @jflute - 削除予定。今後DBFluteではサポートしない。
     // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // ===============================================================================
-    //                                                   Properties - SqlParameterBean
-    //                                                   =============================
+    // =============================================================================
+    //                                                 Properties - SqlParameterBean
+    //                                                   ===========================
     public static final String KEY_sqlParameterBeanDefinitionMap = "sqlParameterBeanDefinitionMap";
     protected Map<String, Object> _sqlParameterBeanDefinitionMap;
 
@@ -887,9 +887,9 @@ public final class DfBuildProperties {
         return getHandler().getSql2EntityProperties(getProperties());
     }
 
-    // ===============================================================================
-    //                                                                          Helper
-    //                                                                          ======
+    // =====================================================================================
+    //                                                                                Helper
+    //                                                                                ======
     private String removeNewLine(String str) {
         return DfPropertyUtil.removeAll(str, System.getProperty("line.separator"));
     }

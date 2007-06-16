@@ -75,9 +75,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final String ${table.IdentityPropertyName}_ID = "identity";
 #end
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Entity modified properties. (for S2Dao) */
     protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
 
@@ -96,9 +96,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #end
 #end
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
@@ -106,9 +106,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
 #if ($isSql2Entity)
-    // =====================================================================================
-    //                                                                                DBMeta
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
     /**
      * ${database.ImplementComment}
      * 
@@ -119,9 +119,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 #else
 
-    // =====================================================================================
-    //                                                                                DBMeta
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
     /**
      * ${database.ImplementComment}
      * 
@@ -132,9 +132,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 #end
 
-    // =====================================================================================
-    //                                                                            Table Name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
     /**
      * ${database.ImplementComment}
      * 
@@ -162,9 +162,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return "${table.uncapitalisedJavaName}";
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
 #foreach ($col in $table.Columns)
 
     /** Column-Annotation for S2Dao. ColumnDefinition -- ${col.columnDefinitionLineDisp}*/
@@ -192,9 +192,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 #end
 
-    // =====================================================================================
-    //                                                                       Classify Method
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                     Classify Method
+    //                                                                     ===============
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
@@ -210,9 +210,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #end
 #end
 
-    // =====================================================================================
-    //                                                          Classification Determination
-    //                                                          ============================
+    // ===================================================================================
+    //                                                        Classification Determination
+    //                                                        ============================
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
@@ -238,9 +238,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 #end
 
-    // =====================================================================================
-    //                                                                 Classification Getter
-    //                                                                 =====================
+    // ===================================================================================
+    //                                                               Classification Getter
+    //                                                               =====================
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #if (${col.hasClassificationName()})
@@ -275,9 +275,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 #end
 
-    // =====================================================================================
-    //                                                                         Foreign Table
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Foreign Table
+    //                                                                       =============
 #set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.ForeignKeys)
   #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
@@ -329,9 +329,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
 
-    // =====================================================================================
-    //                                                                        Refferer Table
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Refferer Table
+    //                                                                      ==============
 #foreach ($refferer in $table.Referrers)
   #set ($reffererTable = $refferer.Table)
   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
@@ -430,9 +430,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #end
 #end
 
-    // =====================================================================================
-    //                                                                                Accept
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     /**
      * ${database.ImplementComment}
      * 
@@ -473,9 +473,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         getDBMeta().acceptColumnValueMapString(this, columnValueMapString);
     }
 
-    // =====================================================================================
-    //                                                                               Extract
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                             Extract
+    //                                                                             =======
     /**
      * ${database.ImplementComment}
      * 
@@ -551,9 +551,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 #end
 
-    // =====================================================================================
-    //                                                                         Determination
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * ${database.ImplementComment}
      * 
@@ -570,13 +570,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return true;
     }
 
-    // =====================================================================================
-    //                                                                   Modified Properties
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    /**
+     * Get modified property names. (S2Dao uses this for updateModifiedProperties())
+     * 
+     * @return Modified property names. (NotNull)
+     */
     public java.util.Set${database.filterGenericsString('String')} getModifiedPropertyNames() {
         return _modifiedProperties.getPropertyNames();
     }
 
+    /**
+     * New entity modified properties. You can override this at the sub-class if you need it.
+     * 
+     * @return Entity modified properties. (NotNull)
+     */
     protected EntityModifiedProperties newEntityModifiedProperties() {
         return new EntityModifiedProperties();
     }
@@ -588,9 +598,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         _modifiedProperties.clear();
     }
 
-    // =====================================================================================
-    //                                                                        Basic Override
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
 #if ($table.hasPrimaryKey())
 
     /**

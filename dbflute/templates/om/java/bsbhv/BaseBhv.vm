@@ -67,24 +67,24 @@ import ${glPackageCB}.*;
  */
 public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExtendClassName} {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Dao instance. */
     protected ${myExtendedDaoClassName} _dao;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
     public ${myClassName}() {
     }
 
-    // =====================================================================================
-    //                                                                            Table name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table name
+    //                                                                          ==========
     /**
      * ${database.ImplementComment}
      * 
@@ -94,9 +94,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return "${table.Name}";
     }
 
-    // =====================================================================================
-    //                                                                                DBMeta
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
     /**
      * ${database.ImplementComment}
      * 
@@ -115,9 +115,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return ${myDBMetaClassName}.getInstance();
     }
 
-    // =====================================================================================
-    //                                                                          Dao Accessor
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Dao Accessor
+    //                                                                        ============
     /**
      * Get my dao.
      * 
@@ -157,9 +157,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
-    // =====================================================================================
-    //                                                                          New Instance
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        New Instance
+    //                                                                        ============
     /**
      * New entity.
      * 
@@ -196,9 +196,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return new ${myConditionBeanClassName}();
     }
 
-    // =====================================================================================
-    //                                                                       Delegate Method
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                     Delegate Method
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                                Select
+    //                                                ------
     /**
      * Get count as all. (Delegate-Method)
      * 
@@ -275,7 +278,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
 #if ($table.isWritable())
-
+    // -----------------------------------------------------
+    //                                                Update
+    //                                                ------
     /**
      * Insert one entity. (Delegate-Method)
      * 
@@ -396,9 +401,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 #end
 
-    // =====================================================================================
-    //                                                                    Basic Select Count
-    //                                                                    ==================
+    // ===================================================================================
+    //                                                                  Basic Select Count
+    //                                                                  ==================
     /**
      * Select count by condition-bean.
      * <pre>
@@ -413,9 +418,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateSelectCount(cb);
     }
 
-    // =====================================================================================
-    //                                                                   Basic Select Entity
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Basic Select Entity
+    //                                                                 ===================
     /**
      * Select entity by condition-bean.
      * 
@@ -487,9 +492,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
-    // =====================================================================================
-    //                                                                     Basic Select List
-    //                                                                     =================
+    // ===================================================================================
+    //                                                                   Basic Select List
+    //                                                                   =================
     /**
      * Select list as result-bean.
      * 
@@ -534,9 +539,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
 #if ($database.isAvailableGenerics())
-    // =====================================================================================
-    //                                                                        Various Select
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Various Select
+    //                                                                      ==============
     /**
      * Select value-label list.
      * 
@@ -560,9 +565,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 #if ($table.isUseSequence())
 
-    // =====================================================================================
-    //                                                                              Sequence
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Sequence
+    //                                                                            ========
     /**
      * Select next value as sequence.
      * 
@@ -574,9 +579,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 #if (${table.hasOnlyOnePrimaryKey()})
 
-    // =====================================================================================
-    //                                                                         Load Refferer
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Load Refferer
+    //                                                                       =============
   #foreach ($refferer in $table.Referrers)
     #set ($reffererTable = $refferer.Table)
     #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
@@ -796,9 +801,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 #end
 
-    // =====================================================================================
-    //                                                                      Pull Out Foreign
-    //                                                                      ================
+    // ===================================================================================
+    //                                                                    Pull Out Foreign
+    //                                                                    ================
 #foreach ($foreignKeys in $table.ForeignKeys)
   #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
 
@@ -849,9 +854,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 #if ($table.isWritable())
 
-    // =====================================================================================
-    //                                                                   Basic Entity Update
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Basic Entity Update
+    //                                                                 ===================
     /**
      * Insert.
      * 
@@ -1160,9 +1165,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
   #end
 
-    // =====================================================================================
-    //                                                                    Basic Batch Update
-    //                                                                    ==================
+    // ===================================================================================
+    //                                                                  Basic Batch Update
+    //                                                                  ==================
     /**
      * Insert list.
      * 
@@ -1196,9 +1201,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateDeleteList(entityList);
     }
 
-    // =====================================================================================
-    //                                                                        Various Insert
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Various Insert
+    //                                                                      ==============
   #if ($table.isUseIdentity())
     #if ($table.hasPrimaryKey())
 
@@ -1230,9 +1235,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #else
   #if ($table.isAvailableNonPrimaryKeyWritable())
 
-    // =====================================================================================
-    //                                                                   Basic Entity Update
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Basic Entity Update
+    //                                                                 ===================
     /**
      * Insert.
      * 
@@ -1245,9 +1250,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 #end
 
-    // =====================================================================================
-    //                                                                            CBSetupper
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          CBSetupper
+    //                                                                          ==========
 #if ($database.isAvailableGenerics())
     /**
      * The interface of condition-bean setupper.

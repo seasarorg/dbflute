@@ -11,9 +11,9 @@ import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
  */
 public interface ${glEntityInterfaceName} {
 
-    // =====================================================================================
-    //                                                                            Definition
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Map-string map-mark. */
     public static final String MAP_STRING_MAP_MARK = "map:";
 
@@ -32,9 +32,9 @@ public interface ${glEntityInterfaceName} {
     /** Map-string equal. */
     public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
 
-    // =====================================================================================
-    //                                                                                DBMeta
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
     /**
      * Get dbmeta.
      * 
@@ -42,9 +42,9 @@ public interface ${glEntityInterfaceName} {
      */
     public ${glDBMetaInterfaceName} getDBMeta();
 
-    // =====================================================================================
-    //                                                                            Table Name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
     /**
      * Get table db-name.
      * 
@@ -66,14 +66,11 @@ public interface ${glEntityInterfaceName} {
      */
     public String getTableUncapPropName();
 
-    // =====================================================================================
-    //                                                                                Accept
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     /**
      * Accept primary-key map.
-     * 
-     * The column that column-value map-string doesn't have the key of or the value of is initialized.
-     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
      * @deprecated Please use ${glDBMetaInterfaceName}#acceptPrimaryKeyMap(entity, primaryKeyMap);
@@ -83,9 +80,6 @@ public interface ${glEntityInterfaceName} {
     /**
      * Accept primary-key map-string.
      * 
-     * The column that column-value map-string doesn't have the key of or the value of is initialized.
-     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
-     * 
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      * @deprecated Please use ${glDBMetaInterfaceName}#acceptPrimaryKeyMapString(entity, primaryKeyMap);
      */
@@ -93,9 +87,6 @@ public interface ${glEntityInterfaceName} {
 
     /**
      * Accept column-value map.
-     * 
-     * The column that column-value map-string doesn't have the key of or the value of is initialized.
-     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
      * 
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
      * @deprecated Please use ${glDBMetaInterfaceName}#acceptColumnValueMap(entity, columnValueMap);
@@ -105,17 +96,14 @@ public interface ${glEntityInterfaceName} {
     /**
      * Accept column-value map-string.
      * 
-     * The column that column-value map-string doesn't have the key of or the value of is initialized.
-     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
-     * 
      * @param columnValueMapString Column-value map-string. (NotNull)
      * @deprecated Please use ${glDBMetaInterfaceName}#acceptColumnValueMapString(entity, columnValueMapString);
      */
     public void acceptColumnValueMapString(String columnValueMapString);
 
-    // =====================================================================================
-    //                                                                               Extract
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                             Extract
+    //                                                                             =======
     /**
      * Extract primary-key map-string. Delimiter is at-mark and semicolon.
      * <p>
@@ -163,9 +151,9 @@ public interface ${glEntityInterfaceName} {
      */
     public String extractColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal);
 
-    // =====================================================================================
-    //                                                                         Determination
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Has primary-key value?
      * 
@@ -173,9 +161,9 @@ public interface ${glEntityInterfaceName} {
      */
     public boolean hasPrimaryKeyValue();
 
-    // =====================================================================================
-    //                                                                   Modified Properties
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
     /**
      * Get modified property names. (JavaBeansRule)
      * 
@@ -188,6 +176,9 @@ public interface ${glEntityInterfaceName} {
      */
     public void clearModifiedPropertyNames();
 
+    /**
+     * Entity modified properties.
+     */
     public static class EntityModifiedProperties implements java.io.Serializable {
 
         /** Serial version UID. (Default) */

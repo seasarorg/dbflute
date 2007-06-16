@@ -12,12 +12,15 @@ import ${glPackageCQ}.${myConditionQueryClassName};
  */
 public class ${myClassName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Base query. */
     protected ${myConditionQueryClassName} _query;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -27,9 +30,9 @@ public class ${myClassName} {
         _query = query;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * @deprecated This method is INTERNAL! Please use cb.query().queryXxx().setXxx_Equal()...
      */
@@ -37,20 +40,37 @@ public class ${myClassName} {
         return _query;
     }
 
+    /**
+     * Has condition query?
+     * 
+     * @return Determination.
+     */
     public boolean hasConditionQuery() {
         return _query != null;
     }
 
-    // =====================================================================================
-    //                                                                           SetupSelect
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                             With...
+    //                                                                             =======
 #foreach ($foreignKeys in $table.ForeignKeys)
+  #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
   #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
 
+    /** Is select ${tmpPropertyName}? */
     protected boolean _isSelect${tmpPropertyNameInitCap};
+
+    /**
+     * Is select ${tmpPropertyName}?
+     * 
+     * @return Determination.
+     */
     public boolean isSelect${tmpPropertyNameInitCap}() {
         return _isSelect${tmpPropertyNameInitCap};
     }
+
+    /**
+     * Set up select with ${tmpPropertyName}.
+     */
     public void with${tmpPropertyNameInitCap}() {
         assertConditionQuery();
         _query.query${tmpPropertyNameInitCap}();
@@ -59,12 +79,24 @@ public class ${myClassName} {
 #end
 #foreach ($refferer in $table.Referrers)
   #if (${refferer.isOneToOne()})
-    #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
+    #set ($tmpPropertyName = "${refferer.reffererPropertyNameAsOne}")
+    #set ($tmpPropertyNameInitCap = "${refferer.reffererPropertyNameInitCapAsOne}")
 
+    /** Is select ${tmpPropertyName}? */
     protected boolean _isSelect${tmpPropertyNameInitCap};
+
+    /**
+     * Is select ${tmpPropertyName}?
+     * 
+     * @return Determination.
+     */
     public boolean isSelect${tmpPropertyNameInitCap}() {
         return _isSelect${tmpPropertyNameInitCap};
     }
+
+    /**
+     * Set up select with ${tmpPropertyName}.
+     */
     public void with${tmpPropertyNameInitCap}() {
         assertConditionQuery();
         query().query${tmpPropertyNameInitCap}();
@@ -73,9 +105,9 @@ public class ${myClassName} {
   #end
 #end
 
-    // =====================================================================================
-    //                                                                                Helper
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
     protected void assertConditionQuery() {
         if (!hasConditionQuery()) {
             String msg = "The query should not be null.";

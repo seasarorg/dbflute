@@ -39,9 +39,6 @@
 		<zipfileset prefix="log" dir="log">
 			<include name="readme.txt"/>
 		</zipfileset>
-		<zipfileset prefix="log" dir="log">
-			<include name="readme.txt"/>
-		</zipfileset>
 		<zipfileset prefix="output/doc" dir="output/doc">
 			<include name="readme.txt"/>
 		</zipfileset>
@@ -49,9 +46,7 @@
 			<include name="readme.txt"/>
 		</zipfileset>
 		<zipfileset prefix="templates" dir="templates">
-			<include name="readme.txt"/>
-		</zipfileset>
-		<zipfileset prefix="templates" dir="templates">
+			<exclude name="**/*---.txt"/>
 		</zipfileset>
 		<zipfileset prefix="" dir="">
 			<include name="build-torque.xml"/>

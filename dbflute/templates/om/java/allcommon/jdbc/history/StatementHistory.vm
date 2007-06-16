@@ -1,0 +1,39 @@
+package ${glPackageBaseCommonJdbcHistory};
+
+/**
+ * The history of statement.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glStatementHistoryName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected java.util.List<${glPreparedExecutionBeanName}> preparedExecutionBeanList = new java.util.ArrayList<${glPreparedExecutionBeanName}>();
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    public void addExecutionBean(${glPreparedExecutionBeanName} parameterBean) {
+        this.preparedExecutionBeanList.add(parameterBean);
+    }
+
+    public ${glPreparedExecutionBeanName} current() {
+        if (preparedExecutionBeanList.isEmpty()) {
+            preparedExecutionBeanList.add(new ${glPreparedExecutionBeanName}());
+        }
+        return preparedExecutionBeanList.get(preparedExecutionBeanList.size() - 1);
+    }
+
+    public int size() {
+        return preparedExecutionBeanList.size();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public java.util.List<${glPreparedExecutionBeanName}> getPreparedExecutionBeanList() {
+        return preparedExecutionBeanList;
+    }
+}

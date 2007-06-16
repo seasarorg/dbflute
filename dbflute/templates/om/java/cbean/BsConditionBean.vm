@@ -16,21 +16,21 @@ import ${glPackageNss}.*;
  */
 public class ${myClassName} extends ${glConditionBeanAbstractName} {
 
-    // =====================================================================================
-    //                                                                            Annotation
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Annotation
+    //                                                                          ==========
     /** TABLE-Annotation */
     public static final String TABLE = "$table.Name";
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Condition query. */
     protected ${myConditionQueryClassName} _conditionQuery;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
@@ -41,9 +41,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //   MyTable = [$table.Name]
     // * * * * * * * * */
 
-    // =====================================================================================
-    //                                                                            Table-Name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
     /**
      * ${database.ImplementComment}
      * 
@@ -53,9 +53,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return "${table.Name}";
     }
 
-    // =====================================================================================
-    //                                                                    Accept Primary-Key
-    //                                                                    ==================
+    // ===================================================================================
+    //                                                                  Accept Primary-Key
+    //                                                                  ==================
     /**
      * ${database.ImplementComment}
      * 
@@ -134,9 +134,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 
     }
 
-    // =====================================================================================
-    //                                                                 Add-OrderBy-PK Method
-    //                                                                 =====================
+    // ===================================================================================
+    //                                                                            Order-By
+    //                                                                            ========
     /**
      * ${database.ImplementComment}
      * 
@@ -185,9 +185,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 
     }
 
-    // =====================================================================================
-    //                                                                                 Query
-    //                                                                                 =====
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
     /**
      * Query.
      * 
@@ -218,9 +218,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return getConditionQuery();
     }
 
-    // =====================================================================================
-    //                                                                           Union-Query
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                               Union
+    //                                                                               =====
     /**
      * Union.
      * <pre>
@@ -247,9 +247,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return query().hasUnionQueryOrUnionAllQuery();
     }
 
-    // =====================================================================================
-    //                                                                          Setup-Select
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Setup-Select
+    //                                                                        ============
   #foreach ($foreignKeys in $table.ForeignKeys)
     #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
     #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
@@ -351,9 +351,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     #end
   #end
 
-    // =====================================================================================
-    //                                                                 Basic-Override Method
-    //                                                                 =====================
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * This method overrides the method that is declared at super.
      * 

@@ -2,10 +2,6 @@
 
 targetdatabase = $targetDatabase
 
-
-#set ( $dbprops = $properties.load("sql/base/$targetDatabase/db.props") )
-#include ( "sql/base/$targetDatabase/db.props" )
-
 ##
 ## Loop by data-model.
 ##

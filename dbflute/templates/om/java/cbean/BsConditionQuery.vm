@@ -30,14 +30,15 @@ import ${glPackageCIQ}.*;
  */
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Corresponding inline query. */
     protected ${myConditionInlineQueryClassName} _inlineQuery;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -50,9 +51,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
 
-    // =====================================================================================
-    //                                                                                Inline
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Inline
+    //                                                                              ======
     /**
      * Get inline query.
      * 
@@ -65,9 +66,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return _inlineQuery;
     }
 
-    // =====================================================================================
-    //                                                                         IncludeAsMine
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                     Include-as-Mine
+    //                                                                     ===============
   #foreach ($col in $table.Columns)
 
     /**
@@ -89,20 +90,19 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
   #end
 
-    // =====================================================================================
-    //                                                                                 Query
-    //                                                                                 =====
-  ## --------------------------------------------------------------------------------
-  ##                                                  Make getter and setter methods.
-  ##                                                  -------------------------------
-
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
     // /* * * * * * * * * * * * * * * * * * * * * * *
     //   MyTable = [$table.Name]
     // * * * * * * * * */
-
   #foreach ($col in $table.Columns)
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+
+    // /- - - - - - - - - - - - - - - - - - - - - - -
+    //   Column = [$col.Name]
+    // - - - - - - - - -/
 
     /** The attribute of ${col.UncapitalisedJavaName}. */
     protected ${glConditionValueName} _${tmpUncapitalisedJavaName};
@@ -670,9 +670,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     #end
   #end
 
-    // =====================================================================================
-    //                                                                           Union-Query
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Union Query
+    //                                                                         ===========
     protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
         final ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
         final ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;
@@ -693,10 +693,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     }
 
-    // =====================================================================================
-    //                                                               Query-SetupOuter-Method
-    //                                                               =======================
-
+    // ===================================================================================
+    //                                                                       Foreign Query
+    //                                                                       =============
   #foreach ($foreignKeys in $table.ForeignKeys)
     #set ($foreignCQClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionQueryInitialName}")
     

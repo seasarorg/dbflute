@@ -10,9 +10,9 @@ package ${glPackageBaseCommon};
  */
 public class ${glAccessContextName} {
 
-    // =====================================================================================
-    //                                                                          Thread Local
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Thread Local
+    //                                                                        ============
     /** The thread-local for this. */
     private static final ThreadLocal${database.filterGenericsString(${glAccessContextName})} threadLocal = new ThreadLocal${database.filterGenericsString(${glAccessContextName})}();
 
@@ -54,9 +54,9 @@ public class ${glAccessContextName} {
         threadLocal.set(null);
     }
 
-    // =====================================================================================
-    //                                                                    Access Information
-    //                                                                    ==================
+    // ===================================================================================
+    //                                                                  Access Information
+    //                                                                  ==================
     /**
      * Get access user on thread.
      * <pre>
@@ -114,18 +114,18 @@ public class ${glAccessContextName} {
         return new java.sql.Timestamp(System.currentTimeMillis());// as Default
     }
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String accessUser;
 
     protected String accessModule;
 
     protected java.sql.Timestamp accessTimestamp;
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getAccessUser() {
         return accessUser;
     }

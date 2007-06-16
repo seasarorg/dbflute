@@ -11,9 +11,9 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
  */
 public interface ${myClassName} {
 
-    // =====================================================================================
-    //                                                                            Definition
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Map-string map-mark. */
     public static final String MAP_STRING_MAP_MARK = "map:";
 
@@ -32,9 +32,9 @@ public interface ${myClassName} {
     /** Map-string equal. */
     public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
 
-    // =====================================================================================
-    //                                                                            Table Name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
     /**
      * Get table db-name.
      * 
@@ -56,9 +56,9 @@ public interface ${myClassName} {
      */
     public String getTableUncapPropName();
 
-    // =====================================================================================
-    //                                                                           Column Name
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Column Name
+    //                                                                         ===========
     public java.util.List${database.filterGenericsString('String')} getColumnDbNameList();
 
     public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList();
@@ -72,9 +72,9 @@ public interface ${myClassName} {
      */
     public String getColumnDbNameCommaString();
 
-    // =====================================================================================
-    //                                                                         Name Handling
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Name Handling
+    //                                                                       =============
     /**
      * Is existing db-name?
      * 
@@ -179,9 +179,9 @@ public interface ${myClassName} {
      */
     public String getUncapPropNameByMultiName(String multiName);
 
-    // =====================================================================================
-    //                                                                    DB-Name-Map Getter
-    //                                                                    ==================
+    // ===================================================================================
+    //                                                                            Name Map
+    //                                                                            ========
     /**
      * ${database.ImplementComment}
      * 
@@ -224,9 +224,9 @@ public interface ${myClassName} {
      */
     public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameCapPropNameMap();
 
-    // =====================================================================================
-    //                                                                      Type Name Getter
-    //                                                                      ================
+    // ===================================================================================
+    //                                                                           Type Name
+    //                                                                           =========
     /**
      * Get the type-name of entity.
      * 
@@ -255,9 +255,9 @@ public interface ${myClassName} {
      */ 
     public String getBehaviorTypeName();
 
-    // =====================================================================================
-    //                                                                           Type Getter
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                                Type
+    //                                                                                ====
     /**
      * Get the type of entity.
      * 
@@ -265,9 +265,9 @@ public interface ${myClassName} {
      */ 
     public Class getEntityType();
 
-    // =====================================================================================
-    //                                                                       Instance Getter
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                            Instance
+    //                                                                            ========
     /**
      * New the instance of entity.
      * 
@@ -275,9 +275,9 @@ public interface ${myClassName} {
      */ 
     public ${glEntityInterfaceName} newEntity();
 
-    // =====================================================================================
-    //                                                                        Foreign DBMeta
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Foreign DBMeta
+    //                                                                      ==============
     /**
      * Get foreign dbmeta.
      * 
@@ -286,9 +286,9 @@ public interface ${myClassName} {
      */ 
     public ${myClassName} getForeignDBMeta(String foreignPropertyName);
 
-    // =====================================================================================
-    //                                                                         Determination
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Has two or more primary-keys?
      * 
@@ -303,14 +303,17 @@ public interface ${myClassName} {
      */
     public boolean hasCommonColumn();
 
-    // =====================================================================================
-    //                                                                                Accept
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                     Entity Handling
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                                Accept
+    //                                                ------
     /**
      * Accept primary-key map.
      * 
-     * The column that column-value map-string doesn't have the key of or the value of is initialized.
-     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
+     * The column that column-value map-string doesn't have the value of is reflected as null.
+     * The column that column-value map-string doesn't have the key of is NOT updated nothing.
      * 
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
@@ -320,8 +323,8 @@ public interface ${myClassName} {
     /**
      * Accept primary-key map-string.
      * 
-     * The column that column-value map-string doesn't have the key of or the value of is initialized.
-     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
+     * The column that column-value map-string doesn't have the value of is reflected as null.
+     * The column that column-value map-string doesn't have the key of is NOT updated nothing.
      * 
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
@@ -331,8 +334,8 @@ public interface ${myClassName} {
     /**
      * Accept column-value map.
      * 
-     * The column that column-value map-string doesn't have the key of or the value of is initialized.
-     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
+     * The column that column-value map-string doesn't have the value of is reflected as null.
+     * The column that column-value map-string doesn't have the key of is NOT updated nothing.
      * 
      * @param entity Target entity. (NotNull)
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
@@ -342,23 +345,23 @@ public interface ${myClassName} {
     /**
      * Accept column-value map-string.
      * 
-     * The column that column-value map-string doesn't have the key of or the value of is initialized.
-     * The instance variable is registered as null, and the isSetterInvoked flag is registered as false.
+     * The column that column-value map-string doesn't have the value of is reflected as null.
+     * The column that column-value map-string doesn't have the key of is NOT updated nothing.
      * 
      * @param entity Target entity. (NotNull)
      * @param columnValueMapString Column-value map-string. (NotNull)
      */
     public void acceptColumnValueMapString(${glEntityInterfaceName} entity, String columnValueMapString);
 
-    // =====================================================================================
-    //                                                                               Extract
-    //                                                                               =======
+    // -----------------------------------------------------
+    //                                               Extract
+    //                                               -------
     /**
      * Extract primary-key map-string. Delimiter is at-mark and semicolon.
      * <p>
      * <pre>
      * ex) Uses that this method have.
-     *   final String primaryKeyMapString = entity.extractPrimaryKeyMapString();
+     *   final String primaryKeyMapString = LdBookDbm.extractPrimaryKeyMapString(entity);
      *   final LdBook entity = dao.selectEntity(new LdBookCB().acceptPrimaryKeyMapString(primaryKeyMapString));
      *   ... // as primary key for condition.
      * </pre>
@@ -416,8 +419,11 @@ public interface ${myClassName} {
      */
     public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
 
-    // =====================================================================================
-    //                                                                       Entity Handling
-    //                                                                       ===============
+    /**
+     * Extract column string-value as list.
+     * 
+     * @param entity Target entity. (NotNull)
+     * @return The list of column string-value. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('String')} extractColumnStringValueList(${glEntityInterfaceName} entity);
 }

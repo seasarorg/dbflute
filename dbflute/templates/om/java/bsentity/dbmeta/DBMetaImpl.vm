@@ -41,18 +41,27 @@ import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
  */
 public class ${myClassName} extends ${glDBMetaAbstractName} {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** The type of entity. */
     protected static final Class ENTITY_TYPE = ${myExtendedObjectClassName}.class;
 
     /** Singleton instance. */
     private static final ${myClassName} _instance = new ${myClassName}();
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
-     * Constructor
+     * Constructor.
      */
     private ${myClassName}() {
     }
 
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
     /**
      * Get instance.
      * 
@@ -62,9 +71,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return _instance;
     }
 
-    // =====================================================================================
-    //                                                                       Name Definition
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                     Name Definition
+    //                                                                     ===============
     /** Table db name. */
     public static final String TABLE_DB_NAME = "$table.Name";
 
@@ -211,9 +220,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return _uncapPropNameCapPropNameMap;
     }
 
-    // =====================================================================================
-    //                                                                            Table Name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
     /**
      * ${database.ImplementComment}
      * 
@@ -241,9 +250,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return TABLE_UNCAP_PROP_NAME;
     }
 
-    // =====================================================================================
-    //                                                                           Column Name
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Column Name
+    //                                                                         ===========
     public java.util.List${database.filterGenericsString('String')} getColumnDbNameList() {
         return new java.util.ArrayList${database.filterGenericsString('String')}(createDbNameCapPropNameMap().keySet());
     }
@@ -265,9 +274,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return "${table.ColumnNameCommaString}";
     }
 
-    // =====================================================================================
-    //                                                                    DB-Name-Map Getter
-    //                                                                    ==================
+    // ===================================================================================
+    //                                                                            Name-Map
+    //                                                                            ========
     /**
      * ${database.ImplementComment}
      * 
@@ -322,9 +331,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return createUncapPropNameCapPropNameMap();
     }
 
-    // =====================================================================================
-    //                                                                      Type Name Getter
-    //                                                                      ================
+    // ===================================================================================
+    //                                                                           Type Name
+    //                                                                           =========
     /**
      * ${database.ImplementComment}
      * 
@@ -397,10 +406,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 #end
 
-
-    // =====================================================================================
-    //                                                                           Type Getter
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                                Type
+    //                                                                                ====
     /**
      * ${database.ImplementComment}
      * 
@@ -410,9 +418,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return ENTITY_TYPE;
     }
 
-    // =====================================================================================
-    //                                                                       Instance Getter
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                            Instance
+    //                                                                            ========
     /**
      * ${database.ImplementComment}
      * 
@@ -431,9 +439,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return new ${myExtendedObjectClassName}();
     }
 
-    // =====================================================================================
-    //                                                                        Foreign DBMeta
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Foreign DBMeta
+    //                                                                      ==============
     /**
      * ${database.ImplementComment}
      * 
@@ -491,9 +499,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
   #end
 #end
 
-    // =====================================================================================
-    //                                                                         Determination
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * ${database.ImplementComment}
      * 
@@ -512,10 +520,13 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return ${table.hasAllCommonColumn()};
     }
 
+    // ===================================================================================
+    //                                                                     Entity Handling
+    //                                                                     ===============
 #if ($database.isAvailableGenerics())
-    // =====================================================================================
-    //                                                                                Accept
-    //                                                                                ======
+    // -----------------------------------------------------
+    //                                                Accept
+    //                                                ------
     /**
      * ${database.ImplementComment}
      * 
@@ -552,9 +563,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
     }
 #else
-    // =====================================================================================
-    //                                                                                Accept
-    //                                                                                ======
+    // -----------------------------------------------------
+    //                                                Accept
+    //                                                ------
     /**
      * ${database.ImplementComment}
      * 
@@ -750,9 +761,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 #end
 
-    // =====================================================================================
-    //                                                                               Extract
-    //                                                                               =======
+    // -----------------------------------------------------
+    //                                               Extract
+    //                                               -------
     /**
      * ${database.ImplementComment}
      * 

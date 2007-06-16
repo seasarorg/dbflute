@@ -1,0 +1,16 @@
+package ${glPackageBaseCommonJdbcHistory};
+
+/**
+ * The interface of statement history witness.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glStatementHistoryWitnessName} {
+
+    /**
+     * Witness the history.
+     * 
+     * @param statementHistory Statement history. (NotNull)
+     */
+    public void witnessTheHistory(${glStatementHistoryName} statementHistory);
+}

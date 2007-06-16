@@ -17,17 +17,21 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
 /**
- * The condition-query of ${table.name}.
+ * The condition-inline-query of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Corresponding condition query. */
     protected ${myCQClassName} _myCQ;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -41,13 +45,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         _myCQ = myCQ;
     }
 
+    // ===================================================================================
+    //                                                             Override about Register
+    //                                                             =======================
     protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
         throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
     }
 
-    // =====================================================================================
-    //                                                                                 Query
-    //                                                                                 =====
     protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
@@ -62,10 +66,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         registerInlineWhereClause(whereClause);
     }
 
-  ## --------------------------------------------------------------------------------
-  ##                                                  Make getter and setter methods.
-  ##                                                  -------------------------------
-
+    // ===================================================================================
+    //                                                                Override about Query
+    //                                                                ====================
     // /* * * * * * * * * * * * * * * * * * * * * * *
     //   MyTable = [$table.Name]
     // * * * * * * * * */
@@ -74,6 +77,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
+    // /- - - - - - - - - - - - - - - - - - - - - - -
+    //   Column = [$col.Name]
+    // - - - - - - - - -/
     protected ${glConditionValueName} getCValue${tmpJavaName}() {
         return _myCQ.get${tmpJavaName}();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2007 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,44 +42,52 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
- * Abstract DB meta texen task for Torque.
+ * The abstract class of texen task.
  * 
- * @author mkubo
+ * @author jflute
  */
 public abstract class DfAbstractTexenTask extends TexenTask {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     public static final Log _log = LogFactory.getLog(DfAbstractTexenTask.class);
 
-    // =========================================================================================
-    //                                                                                 Attribute
-    //                                                                                 =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Target database name. */
     protected String _targetDatabase;
 
     /** DB driver. */
-    protected String _driver = null;
+    protected String _driver;
 
     /** DB url. */
-    protected String _url = null;
+    protected String _url;
 
     /** User name. */
-    protected String _userId = null;
+    protected String _userId;
 
     /** Schema name. */
-    protected String _schema = null;
+    protected String _schema;
 
     /** Password */
-    protected String _password = null;
+    protected String _password;
 
+    /** Data source creator. (for help) */
     protected DfDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
-
-    // =========================================================================================
-    //                                                                                      Main
-    //                                                                                      ====
-    // -----------------------------------
-    //                             Execute
-    //                             -------
+    
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
+    // -----------------------------------------------------
+    //                                               Execute
+    //                                               -------
     @Override
+    /**
+     * The override.
+     */
     final public void execute() {
         long before = System.currentTimeMillis();
         try {
@@ -239,6 +247,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                     }
                 }
             }
+            
+            _log.info("generator.parse(\"" + controlTemplate + "\", c);");
             generator.parse(controlTemplate, c);
 
             // - - - - - - - - - - - - - - - - - - - - 
@@ -289,9 +299,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return contents;
     }
 
-    // -----------------------------------
-    //                         Data Source
-    //                         -----------
+    // -----------------------------------------------------
+    //                                           Data Source
+    //                                           -----------
     abstract protected boolean isUseDataSource();
 
     protected void setupDataSource() {
@@ -312,9 +322,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return DfDataSourceContext.getDataSource();
     }
 
-    // -----------------------------------
-    //                  Context Properties
-    //                  ------------------
+    // -----------------------------------------------------
+    //                                    Context Properties
+    //                                    ------------------
     public void setContextProperties(String file) {
         try {
             // /------------------------------------------------------------
@@ -348,9 +358,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         }
     }
 
-    // =========================================================================================
-    //                                                                                  Accessor
-    //                                                                                  ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getTargetDatabase() {
         return _targetDatabase;
     }
@@ -359,9 +369,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         _targetDatabase = v;
     }
 
-    // =========================================================================================
-    //                                                                                Properties
-    //                                                                                ==========
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
@@ -369,10 +379,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
-
-    // =========================================================================================
-    //                                                                                    Helper
-    //                                                                                    ======
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
     protected String getLineSeparator() {
         return System.getProperty("line.separator");
     }

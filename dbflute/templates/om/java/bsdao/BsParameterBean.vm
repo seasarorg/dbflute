@@ -9,9 +9,9 @@ package ${glPackageBaseParameterBean};
  */
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
   #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
@@ -19,18 +19,18 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     protected ${propertyType} _${propertyName};
 #end
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
     public ${myClassName}() {
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
   #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
@@ -53,9 +53,9 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     }
 #end
 
-    // =====================================================================================
-    //                                                                 Basic Override Method
-    //                                                                 =====================
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * ${database.OverrideComment}
      * 
