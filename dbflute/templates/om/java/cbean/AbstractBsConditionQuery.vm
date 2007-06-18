@@ -97,7 +97,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         #foreach ($classificationMap in $col.ClassificationMapList)
 
     /**
-     * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+     * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = } <br />
+     * ${classificationMap.get('comment')} <br />
      * 
      * @return this. (NotNull)
      */
@@ -313,7 +314,8 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
         #foreach ($classificationMap in $col.ClassificationMapList)
 
     /**
-     * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+     * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = } <br />
+     * ${classificationMap.get('comment')} <br />
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
         final String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};

@@ -1,5 +1,8 @@
 #set ($myClassName = "${myBaseObjectClassName}")
 
+using System;
+using System.Text;
+
 namespace ${myBaseEntityPackageName} {
 
     /**

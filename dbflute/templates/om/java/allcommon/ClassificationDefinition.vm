@@ -16,7 +16,10 @@ public class ${myClassName} {
   #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
   #foreach ($classificationMap in $classificationMapList)
 
-    /** The classification code of ${classificationMap.get('name')}. */
+    /**
+     * The classification code of ${classificationMap.get('name')}. <br />
+     * ${classificationMap.get('comment')} <br />
+     */
     public static final String CODE_${classificationName}_${classificationMap.get('name')} = "$classificationMap.get('code')";
   #end
 #end
