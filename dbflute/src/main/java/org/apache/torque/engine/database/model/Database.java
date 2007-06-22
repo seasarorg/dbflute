@@ -898,6 +898,18 @@ public class Database {
         return getProperties().getCommonColumnProperties().getCommonColumnNameList();
     }
 
+    public List<String> getCommonColumnNameConvertionList() {
+        return getProperties().getCommonColumnProperties().getCommonColumnNameConvertionList();
+    }
+    
+    public boolean isCommonColumnConvertion(String commonColumnName) {
+        return getProperties().getCommonColumnProperties().isCommonColumnConvertion(commonColumnName);
+    }
+    
+    public String filterCommonColumn(String commonColumnName) {
+        return getProperties().getCommonColumnProperties().filterCommonColumn(commonColumnName);
+    }
+    
     public boolean hasCommonColumn() {
         return !getProperties().getCommonColumnProperties().getCommonColumnNameList().isEmpty();
     }

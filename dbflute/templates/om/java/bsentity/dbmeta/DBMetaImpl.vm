@@ -872,16 +872,23 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
         final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         final StringBuffer sb = new StringBuffer();
-  #foreach ($columnName in ${database.CommonColumnNameList})
-    #set ($col = $table.getColumnByFlexibleName($columnName))
+  #foreach ($columnName in ${database.commonColumnNameList})
+    #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+    #set ($commonColumnMap = ${database.commonColumnMap})
+    #set ($columnType = ${commonColumnMap.get(${columnName})})
+    #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+    #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+    #set ($targetColumnName = ${table.findTargetColumnNameByCommonColumnName(${columnName})})
+    #set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
+    #set ($col = $table.getColumnByFlexibleName($targetJavaName))
     #if ($col.isJavaNativeDateObject())
 
-        sb.append(delimiter).append("${columnName}").append(equal);
-        sb.append((myEntity.get${col.JavaName}() != null ? helpFormatingDate(myEntity.get${col.JavaName}()) : ""));
+        sb.append(delimiter).append("${targetColumnName}").append(equal);
+        sb.append((myEntity.get${javaName}() != null ? helpFormatingDate(myEntity.get${javaName}()) : ""));
     #else
 
-        sb.append(delimiter).append("${columnName}").append(equal);
-        sb.append((myEntity.get${col.JavaName}() != null ? myEntity.get${col.JavaName}().toString() : ""));
+        sb.append(delimiter).append("${targetColumnName}").append(equal);
+        sb.append((myEntity.get${javaName}() != null ? myEntity.get${javaName}().toString() : ""));
     #end
   #end
 
@@ -912,8 +919,17 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
 #end
 
+    public java.util.List${database.filterGenericsString('Object')} extractColumnValueList(${glEntityInterfaceName} entity) {
+        final ${myExtendedObjectClassName} myEntity = downcast(entity);
+        final java.util.List${database.filterGenericsString('Object')} valueList = new java.util.ArrayList${database.filterGenericsString('Object')}();
+#foreach ($col in $table.columns)
+        valueList.add(myEntity.get${col.JavaName}());
+#end
+        return valueList;
+    }
+
     public java.util.List${database.filterGenericsString('String')} extractColumnStringValueList(${glEntityInterfaceName} entity) {
-        final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
+        final ${myExtendedObjectClassName} myEntity = downcast(entity);
         final java.util.List${database.filterGenericsString('String')} valueList = new java.util.ArrayList${database.filterGenericsString('String')}();
 #foreach ($col in $table.columns)
         valueList.add(helpGettingColumnStringValue(myEntity.get${col.JavaName}()));
@@ -931,5 +947,33 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
     private String helpFormatingDate(java.util.Date value) {
         return MapStringUtil.formatDate(value);
+    }
+
+    // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    public String getPreparedInsertClause() {
+        return "insert into ${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
+    }
+
+    public String getPreparedInsertClause(String tablePrefix) {
+        return "insert into " + tablePrefix + "${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    protected ${myExtendedObjectClassName} downcast(${glEntityInterfaceName} entity) {
+        assertObjectNotNull("entity", entity);
+        try {
+            return (${myExtendedObjectClassName})entity;
+        } catch (ClassCastException e) {
+            String msg = "The entity should be ${myExtendedObjectClassName} but it was: " + entity.getClass();
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    protected void checkDowncast(${glEntityInterfaceName} entity) {
+        downcast(entity);
     }
 }

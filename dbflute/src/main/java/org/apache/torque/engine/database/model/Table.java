@@ -69,8 +69,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.framework.util.StringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -1061,13 +1063,13 @@ public class Table implements IDMethod {
     }
 
     /**
-     * Get insert clause values with sql comment. {insertClauseValuesWithSqlComment}
+     * Get insert clause values as sql comment. {insertClauseValuesWithSqlComment}
      * <pre>
      * For availableNonPrimaryKeyWritable.
      * </pre>
      * @return Insert clause values with sql comment.
      */
-    public String getInsertClauseValuesWithSqlComment() {
+    public String getInsertClauseValuesAsSqlComment() {
         final StringBuffer sb = new StringBuffer();
 
         final List<Column> ls = _columnList;
@@ -1075,6 +1077,25 @@ public class Table implements IDMethod {
         for (int i = 0; i < size; i++) {
             final Column col = (Column) ls.get(i);
             sb.append(", /*dto.").append(col.getUncapitalisedJavaName()).append("*/null ");
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    /**
+     * Get insert clause values with sql comment. {insertClauseValuesWithSqlComment}
+     * <pre>
+     * For availableNonPrimaryKeyWritable.
+     * </pre>
+     * @return Insert clause values with sql comment.
+     */
+    public String getInsertClauseValuesAsQuetionMark() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<Column> ls = _columnList;
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            sb.append(", ? ");
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -1906,10 +1927,19 @@ public class Table implements IDMethod {
         if (commonColumnNameList.isEmpty()) {
             return false;
         }
+        final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
         final DfFlexibleNameMap<String, Column> flexibleNameMap = new DfFlexibleNameMap<String, Column>(_columnsByName);
         for (String commonColumnName : commonColumnNameList) {
-            if (!flexibleNameMap.containsKey(commonColumnName)) {
-                return false;
+            if (commonColumnProperties.isCommonColumnConvertion(commonColumnName)) {
+                try {
+                    findTargetColumnJavaNameByCommonColumnName(commonColumnName);
+                } catch (IllegalStateException e) {
+                    return false;
+                }
+            } else {
+                if (!flexibleNameMap.containsKey(commonColumnName)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -1925,6 +1955,61 @@ public class Table implements IDMethod {
             ls.add(getColumnByFlexibleName(commonColumnName));
         }
         return ls;
+    }
+
+    public String findTargetColumnJavaNameByCommonColumnName(String commonColumnName) {
+        final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
+        if (commonColumnProperties.isCommonColumnConvertion(commonColumnName)) {
+            String filteredCommonColumn = convertCommonColumnName(commonColumnName, commonColumnProperties);
+            final Column column = getCommonColumnConvertion(commonColumnName, filteredCommonColumn);
+            return column.getJavaName();
+        } else {
+            final Column column = getCommonColumnNormal(commonColumnName);
+            return column.getJavaName();
+        }
+    }
+
+    public String findTargetColumnNameByCommonColumnName(String commonColumnName) {
+        final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
+        if (commonColumnProperties.isCommonColumnConvertion(commonColumnName)) {
+            String filteredCommonColumn = convertCommonColumnName(commonColumnName, commonColumnProperties);
+            final Column column = getCommonColumnConvertion(commonColumnName, filteredCommonColumn);
+            return column.getName();
+        } else {
+            final Column column = getCommonColumnNormal(commonColumnName);
+            return column.getName();
+        }
+    }
+    
+    protected Column getCommonColumnNormal(String commonColumnName) {
+        final Column column = getColumnByFlexibleName(commonColumnName);
+        if (column == null) {
+            String msg = "Not found column by '" + commonColumnName + "'.";
+            throw new IllegalStateException(msg);
+        }
+        return column;
+    }
+
+    protected Column getCommonColumnConvertion(String commonColumnName, String filteredCommonColumn) {
+        final Column column = getColumnByFlexibleName(filteredCommonColumn);
+        if (column == null) {
+            String msg = "Not found column by '" + filteredCommonColumn + "'. Original name is '"
+                    + commonColumnName + "'.";
+            throw new IllegalStateException(msg);
+        }
+        return column;
+    }
+
+    protected String convertCommonColumnName(String commonColumnName, final DfCommonColumnProperties commonColumnProperties) {
+        
+        // TODO: @jflute - この定義を何か指定できれば、TableによってバラバラなCommonColumnを吸収できるかも
+        
+        String filteredCommonColumn = commonColumnProperties.filterCommonColumn(commonColumnName);
+        filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "TABLE_NAME", getName());
+        filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "table_name", getName());
+        filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "TableName", getJavaName());
+        filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "tablename", getJavaName());
+        return filteredCommonColumn;
     }
 
     // ===============================================================================

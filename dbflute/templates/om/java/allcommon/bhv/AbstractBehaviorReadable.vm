@@ -4,6 +4,11 @@ package ${glPackageBaseCommonBhv};
 
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+#if ($database.isAvailableGenerics())
+import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
+import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
+import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
+#end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
@@ -325,6 +330,31 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
         }
     }
+
+#if ($database.isAvailableGenerics())
+    // ===================================================================================
+    //                                                                      Various Select
+    //                                                                      ==============
+    /**
+     * Select value-label list.
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @param valueLabelSetupper Value-label-setupper. (NotNull)
+     * @return Value-label list. (NotNull)
+     */
+    protected <E> java.util.List<java.util.Map<String, Object>> createValueLabelList(${glListResultBeanName}<E> ls, ${glValueLabelSetupperName}<E> valueLabelSetupper) {
+        final java.util.List<java.util.Map<String, Object>> valueLabelList = new java.util.ArrayList<java.util.Map<String, Object>>();
+        final ${glValueLabelBoxName} box = new ${glValueLabelBoxName}();
+        for (E entity : ls) {
+            final java.util.Map<String, Object> valueLabel = new java.util.HashMap<String, Object>();
+            valueLabelSetupper.setup(box, entity);
+            valueLabel.put("value", box.getValue());
+            valueLabel.put("label", box.getLabel());
+            valueLabelList.add(valueLabel);
+        }
+        return valueLabelList;
+    }
+#end
 
     // =====================================================================================
     //                                                                            Token File

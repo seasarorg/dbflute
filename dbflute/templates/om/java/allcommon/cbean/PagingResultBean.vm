@@ -1,9 +1,9 @@
 package ${glPackageBaseCommonCBean};
 
 #set ($myClassName = "${glPagingResultBeanName}")
-
+#if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
-
+#end
 /**
  * The paging-result-bean for ${myClassName}.
  * 
@@ -137,7 +137,7 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
     /**
      * Set the value of pageRangeOption.
      * 
-     * @param value The value of pageRangeOption.
+     * @param pageRangeOption The value of pageRangeOption.
      */
     public void setPageRangeOption(PageRangeOption pageRangeOption) {
         _pageRangeOption = pageRangeOption;

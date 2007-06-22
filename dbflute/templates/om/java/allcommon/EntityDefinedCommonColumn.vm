@@ -6,12 +6,13 @@ package ${glPackageBaseCommon};
  * @author ${database.ClassAuthor}
  */
 public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityInterfaceName} {
-#foreach ($columnName in ${database.CommonColumnNameList})
+#foreach ($columnName in ${database.commonColumnNameList})
+  #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
   #set ($commonColumnMap = ${database.CommonColumnMap})
   #set ($columnType = ${commonColumnMap.get(${columnName})})
   #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
-  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
-  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
 
     /**
      * Get the value of ${uncapitalisedJavaName}.
@@ -36,8 +37,8 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
      */
     public boolean isSetterInvoked${javaName}();
 #end
-  #if (${database.isAllClassificationColumn($columnName)})
-    #set ($classificationName = $database.getAllClassificationName($columnName))
+  #if (${database.isAllClassificationColumn($filteredColumnName)})
+    #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
     #set ($classificationList = $database.getClassificationMapList($classificationName))
     #foreach ($classificationMap in $classificationList)
 

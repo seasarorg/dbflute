@@ -2,12 +2,13 @@ package ${glPackageBaseCommonCBean};
 
 #set ($myClassName = "${glListResultBeanName}")
 #set ($selectedListArgumentGenericDefinition = "${glEntityInterfaceName}")
-
+#if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName};
+#end
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 
 /**

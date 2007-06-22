@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,6 +58,36 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             _commonColumnNameList = new ArrayList<String>(commonColumnMap.keySet());
         }
         return _commonColumnNameList;
+    }
+
+    public static final String COMMON_COLUMN_CONVERTION_PREFIX_MARK = "$-";
+    
+    protected List<String> _commonColumnNameConvertionList;
+
+    public List<String> getCommonColumnNameConvertionList() {
+        if (_commonColumnNameConvertionList == null) {
+            _commonColumnNameConvertionList = new ArrayList<String>();
+            final Map<String, Object> commonColumnMap = getCommonColumnMap();
+            final Set<String> keySet = commonColumnMap.keySet();
+            for (String columnName : keySet) {
+                if (columnName.startsWith(COMMON_COLUMN_CONVERTION_PREFIX_MARK)) {
+                    _commonColumnNameConvertionList.add(columnName);
+                }
+            }
+        }
+        return _commonColumnNameConvertionList;
+    }
+
+    public boolean isCommonColumnConvertion(String commonColumnName) {
+        return commonColumnName.startsWith(COMMON_COLUMN_CONVERTION_PREFIX_MARK);
+    }
+    
+    public String filterCommonColumn(String commonColumnName) {
+        if (commonColumnName.startsWith(COMMON_COLUMN_CONVERTION_PREFIX_MARK)) {
+            return commonColumnName.substring(COMMON_COLUMN_CONVERTION_PREFIX_MARK.length());
+        } else {
+            return commonColumnName;
+        }
     }
 
     // --------------------------------------

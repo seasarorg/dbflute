@@ -25,14 +25,15 @@ public class ${glCommonColumnSetupBeforeInsertInterceptor} extends ${glCommonCol
      */
     protected void setupEntity(${glEntityDefinedCommonColumnInterfaceName} entity) {
         if (_log.isDebugEnabled()) {
-            _log.debug("  before setup : " + entity.extractCommonColumnValueMapString());
+            _log.debug("  before setup : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
         }
 #foreach ($columnName in ${database.CommonColumnNameList})
+  #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
   #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
   #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
-  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
-  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
   #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(${columnName})})
     #set ($logic = ${database.getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(${columnName})})
     #if ($database.isCommonColumnSetupInvokingLogic($logic))
@@ -40,21 +41,21 @@ public class ${glCommonColumnSetupBeforeInsertInterceptor} extends ${glCommonCol
 
         ${filteredLogic}
         if (_log.isDebugEnabled()) {
-            _log.debug("    ${columnName} has been set up: invoking=${filteredLogic}");
+            _log.debug("    ${filteredColumnName} has been set up: invoking=${filteredLogic}");
         }
     #else
 
         final ${javaNative} ${uncapitalisedJavaName} = ${logic};
         entity.set${javaName}(${uncapitalisedJavaName});
         if (_log.isDebugEnabled()) {
-            _log.debug("    ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
+            _log.debug("    ${filteredColumnName} has been set up: value=" + ${uncapitalisedJavaName});
         }
     #end
   #end
 #end
 
         if (_log.isDebugEnabled()) {
-            _log.debug("  after setup  : " + entity.extractCommonColumnValueMapString());
+            _log.debug("  after setup  : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
         }
     }
 }

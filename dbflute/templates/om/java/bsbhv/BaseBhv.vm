@@ -6,7 +6,6 @@ import ${glPackageBaseCommon}.*;
 #if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
-import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
 #end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
@@ -550,17 +549,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Value-label list. (NotNull)
      */
     public java.util.List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
-        final ${glListResultBeanName}<${myExtendedObjectClassName}> ls = selectList(cb);
-        final java.util.List<java.util.Map<String, Object>> valueLabelList = new java.util.ArrayList<java.util.Map<String, Object>>();
-        final ${glValueLabelBoxName} box = new ${glValueLabelBoxName}();
-        for (${myExtendedObjectClassName} entity : ls) {
-            final java.util.Map<String, Object> valueLabel = new java.util.HashMap<String, Object>();
-            valueLabelSetupper.setup(box, entity);
-            valueLabel.put("value", box.getValue());
-            valueLabel.put("label", box.getLabel());
-            valueLabelList.add(valueLabel);
-        }
-        return valueLabelList;
+        return createValueLabelList(selectList(cb), valueLabelSetupper);
     }
 #end
 #if ($table.isUseSequence())

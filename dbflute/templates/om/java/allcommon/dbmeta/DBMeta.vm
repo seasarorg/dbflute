@@ -420,10 +420,26 @@ public interface ${myClassName} {
     public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
 
     /**
+     * Extract column value as list.
+     * 
+     * @param entity Target entity. (NotNull)
+     * @return The list of column value. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString('Object')} extractColumnValueList(${glEntityInterfaceName} entity);
+
+    /**
      * Extract column string-value as list.
      * 
      * @param entity Target entity. (NotNull)
      * @return The list of column string-value. (NotNull)
      */
     public java.util.List${database.filterGenericsString('String')} extractColumnStringValueList(${glEntityInterfaceName} entity);
+
+    // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity);
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, String tablePrefix);
+    public String getPreparedInsertClause();
+    public String getPreparedInsertClause(String tablePrefix);
 }

@@ -217,7 +217,7 @@ public interface ${myClassName} extends ${InterfaceName} {
   #if ($table.isAvailableNonPrimaryKeyWritable())
 
     /** SQL-Annotation for insert(). */
-    public static final String insert_SQL = "insert into ${table.Name}(${table.columnNameCommaString}) values(${table.insertClauseValuesWithSqlComment})";
+    public static final String insert_SQL = "insert into ${table.Name}(${table.columnNameCommaString}) values(${table.insertClauseValuesAsSqlComment})";
 
     /**
      * Insert one entity.

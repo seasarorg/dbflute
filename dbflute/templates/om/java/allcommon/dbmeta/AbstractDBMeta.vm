@@ -225,10 +225,47 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         throw new IllegalStateException(msg);
     }
 
+    // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity) {
+        return insertEntity(conn, entity, "");
+    }
 
-    // =====================================================================================
-    //                                                                            Util Class
-    //                                                                            ==========
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, String tablePrefix) {
+        checkDowncast(entity);
+        final String sql = getPreparedInsertClause(tablePrefix);
+        java.sql.PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            final java.util.List${database.filterGenericsString('Object')} valueList = extractColumnValueList(entity);
+            int settingIndex = 1;
+            for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
+                Object value = ite.next();
+                if (value == null) {
+                    ps.setNull(settingIndex, java.sql.Types.VARCHAR);
+                } else {
+                    ps.setObject(settingIndex, value);
+                }
+                ++settingIndex;
+            }
+            return ps.executeUpdate();
+        } catch (java.sql.SQLException e) {
+            String msg = "The sql threw the exception: sql=" + sql;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (java.sql.SQLException ignored) {
+                }
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                          Util Class
+    //                                                                          ==========
     /**
      * This class is for Internal. Don't use this!
      */
@@ -469,6 +506,8 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // =====================================================================================
     //                                                                                Helper
     //                                                                                ======
+    abstract protected void checkDowncast(${glEntityInterfaceName} entity);
+
     // ----------------------------------------------------------------
     //                                                    Assert Object
     //                                                    -------------

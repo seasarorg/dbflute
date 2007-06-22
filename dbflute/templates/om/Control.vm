@@ -12,65 +12,85 @@ targetdatabase = $targetDatabase
   ##
   #foreach ($database in $dataModel.Databases)
 
+    ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    ## Initialize CustomizeDao and AdditionalForeignKey and ClassificationDeployment and IncludeQuery.
+    ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     ${database.initializeCustomizeDao()}
     ${database.initializeAdditionalForeignKey()}
     ${database.initializeClassificationDeployment()}
     ${database.initializeIncludeQuery()}
 
-    ## ------------------------------------------------------------------
-    ##                                                    Global-Paramter
-    ##                                                    ---------------
-    ## [Language]
-    #set ($glTargetLanguage = ${database.TargetLanguage})
+    ## *****************************************************************************************************************
+    ##                                                                                                   Global Paramter
+    ##                                                                                                   ***************
+    ## ===================================================================================
+    ##                                                                            Language
+    ##                                                                            ========
+    #set ($glTargetLanguage = ${database.targetLanguage})
 
-    ## [Extension]
-    #set ($glTemplateFileExtension = ${database.TemplateFileExtension})
-    #set ($glClassFileExtension = ${database.ClassFileExtension})
+    ## ===================================================================================
+    ##                                                                           Extension
+    ##                                                                           =========
+    #set ($glTemplateFileExtension = ${database.templateFileExtension})
+    #set ($glClassFileExtension = ${database.classFileExtension})
 
-    ## [Prefix-and-Suffix]
-    #set ($glProjectPrefix = ${database.ProjectPrefix})
-    #set ($glBasePrefix = ${database.BasePrefix})
-    #set ($glBaseSuffixForEntity = ${database.BaseSuffixForEntity})
+    ## -----------------------------------------------------
+    ##                                                Prefix
+    ##                                                ------
+    #set ($glProjectPrefix = ${database.projectPrefix})
+    #set ($glBasePrefix = ${database.basePrefix})
+    #set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
 
-    ## [Dicon]
-    #set ($glDaoDiconNamespace = "${database.DaoDiconNamespace}")
-    #set ($glDaoDiconFileName = "${database.DaoDiconFileName}")
-    #set ($glJdbcDiconResourceName = "${database.JdbcDiconResourceName}")
+    ## -----------------------------------------------------
+    ##                                                 Dicon
+    ##                                                 -----
+    #set ($glDaoDiconNamespace = "${database.daoDiconNamespace}")
+    #set ($glDaoDiconFileName = "${database.daoDiconFileName}")
+    #set ($glJdbcDiconResourceName = "${database.jdbcDiconResourceName}")
 
-    ## [Common-Behavior]
+    ## -----------------------------------------------------
+    ##                                            Class Name
+    ##                                            ----------
+    ## [Allcommon-Base-AccessContext]
+    #set ($glAccessContextName = "${glProjectPrefix}AccessContext")
+
+    ## [Allcommon-Base-Dao]
+    #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
+    #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
+
+    ## [Allcommon-Base-Entity]
+    #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
+    #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
+
+    ## [Allcommon-Base-DaoSelector]
+    #set ($glDaoSelectorInterfaceName = "${glProjectPrefix}DaoSelector")
+    #set ($glCacheDaoSelectorName = "${glProjectPrefix}CacheDaoSelector")
+
+    ## [Allcommon-Base-GenMetaData]
+    #set ($glGenMetaDataClassName = "${glProjectPrefix}GenMetaData")
+
+    ## [Allcommon-Base-ClassificationDefinition]
+    #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
+
+    ## [Allcommon-Behavior]
     #set ($glBehaviorReadableAbstractName = "${glProjectPrefix}AbstractBehaviorReadable")
     #set ($glBehaviorWritableAbstractName = "${glProjectPrefix}AbstractBehaviorWritable")
     #set ($glBehaviorReadableInterfaceName = "${glProjectPrefix}BehaviorReadable")
     #set ($glBehaviorWritableInterfaceName = "${glProjectPrefix}BehaviorWritable")
 
-    ## [Common-Behavior-Batch]
+    ## [Allcommon-Behavior-Batch]
     #set ($glTokenFileReflectionOptionName = "${glProjectPrefix}TokenFileReflectionOption")
     #set ($glTokenFileReflectionResultName = "${glProjectPrefix}TokenFileReflectionResult")
     #set ($glTokenFileReflectionFailureName = "${glProjectPrefix}TokenFileReflectionFailure")
     #set ($glTokenFileOutputOptionName = "${glProjectPrefix}TokenFileOutputOption")
     #set ($glTokenFileOutputResultName = "${glProjectPrefix}TokenFileOutputResult")
 
-    ## [Common-Behavior-Setup]
+    ## [Allcommon-Behavior-Setup]
     #set ($glConditionBeanSetupperName = "${glProjectPrefix}ConditionBeanSetupper")
     #set ($glValueLabelSetupperName = "${glProjectPrefix}ValueLabelSetupper")
     #set ($glValueLabelBoxName = "${glProjectPrefix}ValueLabelBox")
 
-    ## [AccessContext]
-    #set ($glAccessContextName = "${glProjectPrefix}AccessContext")
-
-    ## [Common-Dao]
-    #set ($glDaoReadableInterfaceName = "${glProjectPrefix}DaoReadable")
-    #set ($glDaoWritableInterfaceName = "${glProjectPrefix}DaoWritable")
-
-    ## [Common-Entity]
-    #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
-    #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
-
-    ## [Common-DaoSelector]
-    #set ($glDaoSelectorInterfaceName = "${glProjectPrefix}DaoSelector")
-    #set ($glCacheDaoSelectorName = "${glProjectPrefix}CacheDaoSelector")
-
-    ## [ConditionBean]
+    ## [Allcommon-ConditionBean]
     #set ($glFetchNarrowingBeanInterfaceName = "${glProjectPrefix}FetchNarrowingBean")
     #set ($glSimplePagingBeanName = "${glProjectPrefix}SimplePagingBean")
     #set ($glSimpleOrderByBeanName = "${glProjectPrefix}SimpleOrderByBean")
@@ -87,6 +107,8 @@ targetdatabase = $targetDatabase
     #set ($glConditionQueryAbstractName = "${glProjectPrefix}AbstractConditionQuery")
     #set ($glConditionKeyName = "${glProjectPrefix}ConditionKey")
     #set ($glConditionValueName = "${glProjectPrefix}ConditionValue")
+
+    ## [Allcommon-ConditionBean-Option]
     #set ($glConditionOptionInterfaceName = "${glProjectPrefix}ConditionOption")
     #set ($glConditionOptionSimpleStringName = "${glProjectPrefix}SimpleStringOption")
     #set ($glConditionOptionFromToName = "${glProjectPrefix}FromToOption")
@@ -97,38 +119,34 @@ targetdatabase = $targetDatabase
     #set ($glConditionOptionPartsToSingleByteName = "${glProjectPrefix}ToSingleByteOptionParts")
     #set ($glConditionOptionPartsAgentJapaneseName = "${glProjectPrefix}JapaneseOptionPartsAgent")
 
-    ## [ConditionBean - Grouping]
+    ## [Allcommon-ConditionBean-Grouping]
     #set ($glGroupingOptionName = "${glProjectPrefix}GroupingOption")
     #set ($glGroupingRowEndDeterminerName = "${glProjectPrefix}GroupingRowEndDeterminer")
     #set ($glGroupingRowResourceName = "${glProjectPrefix}GroupingRowResource")
     #set ($glGroupingRowSetupperName = "${glProjectPrefix}GroupingRowSetupper")
 
-    ## [ConditionBean - Mapping]
+    ## [Allcommon-ConditionBean-Mapping]
     #set ($glEntityDtoMapperName = "${glProjectPrefix}EntityDtoMapper")
 
+    ## [Allcommon-ConditionBean-SqlClause]
     #set ($glSqlClauseName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseInterfaceName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseAbstractName = "${glProjectPrefix}AbstractSqlClause")
-
     #set ($glOrderByClauseName = "${glProjectPrefix}OrderByClause")
     #set ($glOrderByElementName = "${glProjectPrefix}OrderByElement")
 
-    #set ($glConditionBeanInitialName = "CB")
-    #set ($glConditionQueryInitialName = "CQ")
-    #set ($glAttachedCBArgsVariableName = "cb")
-
-    ## [DBMeta]
+    ## [Allcommon-DBMeta]
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
 
-    ## [Exception]
+    ## [Allcommon-Exception]
     #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
     #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
     #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
     #set ($glSelectedCountExceedMaxCountExceptionName = "${glProjectPrefix}SelectedCountExceedMaxCountException")
 
-    ## [Helper]
+    ## [Allcommon-Helper]
     #set ($glMapListStringName = "${glProjectPrefix}MapListString")
     #set ($glMapListStringImplName = "${glProjectPrefix}MapListStringImpl")
     #set ($glMapStringBuilderName = "${glProjectPrefix}MapStringBuilder")
@@ -160,20 +178,20 @@ targetdatabase = $targetDatabase
     #set ($glFileMakingSimpleFacadeName = "${glProjectPrefix}FileMakingSimpleFacade")
     #set ($glFileMakingSimpleFacadeImplName = "${glProjectPrefix}FileMakingSimpleFacadeImpl")
 
-    ## [Interceptor]
+    ## [Allcommon-Interceptor]
     #set ($glCommonColumnSetupAbstractInterceptor = "${glProjectPrefix}CommonColumnSetupAbstractInterceptor")
     #set ($glCommonColumnSetupBeforeInsertInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeInsertInterceptor")
     #set ($glCommonColumnSetupBeforeUpdateInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeUpdateInterceptor")
     #set ($glCommonColumnSetupBeforeDeleteInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeDeleteInterceptor")
 
-    ## [JDBC-History]
+    ## [Allcommon-JDBC-History]
     #set ($glPreparedExecutionBeanName = "${glProjectPrefix}PreparedExecutionBean")
     #set ($glPreparedParameterElementName = "${glProjectPrefix}PreparedParameterElement")
     #set ($glStatementHistoryName = "${glProjectPrefix}StatementHistory")
     #set ($glStatementHistoryWitnessName = "${glProjectPrefix}StatementHistoryWitness")
     #set ($glTraceablePreparedStatementName = "${glProjectPrefix}TraceablePreparedStatement")
 
-    ## [ExtendedS2DaoClass]
+    ## [Allcommon-S2Dao]
     #set ($glSelectDynamicCommand = "${glProjectPrefix}S2DaoSelectDynamicCommand")
     #set ($glDaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
     #set ($glDaoMetaDataExtension = "${glProjectPrefix}S2DaoMetaDataExtension")
@@ -184,16 +202,19 @@ targetdatabase = $targetDatabase
     #set ($glFetchNarrowingResultSetWrapper = "${glProjectPrefix}FetchNarrowingResultSetWrapper")
     #set ($glOutsideSqlAnnotation = "OutsideSql")
 
-    ## [LazyLoadContainer]
-    #set ($glLazyLoadContainerClassName = "${glProjectPrefix}LazyLoadContainer")
+    ## -----------------------------------------------------
+    ##                                         Variable Name
+    ##                                         -------------
+    #set ($glConditionBeanInitialName = "CB")
+    #set ($glConditionQueryInitialName = "CQ")
+    #set ($glAttachedCBArgsVariableName = "cb")
+    #set ($glParentVariablePrefix = "_parent")
+    #set ($glChildrenVariablePrefix = "_children")
 
-    ## [GenMetaData]
-    #set ($glGenMetaDataClassName = "${glProjectPrefix}GenMetaData")
-
-    ## [ClassificationDefinition]
-    #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
-
-    ## [Package]
+    ## -----------------------------------------------------
+    ##                                          Package Name
+    ##                                          ------------
+    ## [Common]
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
     #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
@@ -221,6 +242,8 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
     #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.jdbc.history")
     #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
+
+    ## [Main]
     #set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
     #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
     #set ($glPackageBaseCustomizeDao = "${database.baseDaoPackage}.customize" )
@@ -243,13 +266,12 @@ targetdatabase = $targetDatabase
     #set ($glPackageExtendedSqlParameterBean = "${database.SqlParameterBeanPackage}.exparam")
     #set ($glPackageArgumentBean = "${database.ArgumentBeanPackage}")
 
-    ## [Other]
-    #set ($glParentVariablePrefix = "_parent")
-    #set ($glChildrenVariablePrefix = "_children")
-
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                      Parse annotation
-    ##                                                                                      ----------------
+    ## *****************************************************************************************************************
+    ##                                                                                                           Parsing
+    ##                                                                                                           *******
+    ## ===================================================================================
+    ##                                                                          annotation
+    ##                                                                          ==========
     #if (($database.isTargetLanguageJava() && $database.isAvailableGenerics()) || $database.isTargetLanguageCSharp())
       ## Setup java directory for allcommon.
       $database.setupJavaDir_for_allcommon()
@@ -257,7 +279,7 @@ targetdatabase = $targetDatabase
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonAnnotation}))
       $database.makeDirectory($path)
 
-      $database.debug("public void parseAnnotation) {")
+      $database.debug("public void parseAllcommonAnnotation) {")
       $database.debug("    parseOutsideSql();")
 
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonAnnotation})}${glOutsideSqlAnnotation}.${glClassFileExtension}" )
@@ -266,26 +288,26 @@ targetdatabase = $targetDatabase
       $database.debug("}")
     #end
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                   Parse behavior-interface & abstract
-    ##                                                                   -----------------------------------
+    ## ===================================================================================
+    ##                                                                            behavior
+    ##                                                                            ========
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhv}))
     $database.makeDirectory($path)
 
-    $database.debug("[behavior-interface & abstract]")
-    $database.debug("    ...Parsing BehaviorReadable")
+    $database.debug("public void parseAllcommonBehavior) {")
+    $database.debug("    parseBehaviorReadable()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhv})}${glBehaviorReadableInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/bhv/BehaviorReadable.${glTemplateFileExtension}",$path ,"", "")
-    $database.debug("    ...Parsing BehaviorWritable")
+    $database.debug("    parseBehaviorWritable()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhv})}${glBehaviorWritableInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/bhv/BehaviorWritable.${glTemplateFileExtension}",$path ,"", "")
-    $database.debug("    ...Parsing AbstractBehaviorReadable")
+    $database.debug("    parseAbstractBehaviorReadable()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhv})}${glBehaviorReadableAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/bhv/AbstractBehaviorReadable.${glTemplateFileExtension}",$path ,"", "")
-    $database.debug("    ...Parsing AbstractBehaviorWritable")
+    $database.debug("    parseAbstractBehaviorWritable()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhv})}${glBehaviorWritableAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/bhv/AbstractBehaviorWritable.${glTemplateFileExtension}",$path ,"", "")
 
@@ -330,10 +352,11 @@ targetdatabase = $targetDatabase
         $generator.parse("om/${glTargetLanguage}/allcommon/bhv/setup/ValueLabelBox.${glTemplateFileExtension}",$path ,"", "")
       #end
     #end
+    $database.debug("}")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                  Parse access-context
-    ##                                                                                  --------------------
+    ## ===================================================================================
+    ##                                                                      access-context
+    ##                                                                      ==============
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
@@ -343,22 +366,23 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glTargetLanguage}/allcommon/AccessContext.${glTemplateFileExtension}",$path ,"", "")
     #end
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                   Parse dao-interface
-    ##                                                                                   -------------------
+    ## -----------------------------------------------------
+    ##                                         allcommon dao
+    ##                                         -------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
-    $database.debug("...Parsing dao-interface")
+    $database.debug("    parseDaoReadable")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoReadableInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/DaoReadable.${glTemplateFileExtension}",$path ,"", "")
 
+    $database.debug("    parseDaoWritable")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoWritableInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/DaoWritable.${glTemplateFileExtension}",$path ,"", "")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                Parse entity-interface
-    ##                                                                                ----------------------
+    ## -----------------------------------------------------
+    ##                                      allcommon entity
+    ##                                      ----------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
@@ -372,9 +396,9 @@ targetdatabase = $targetDatabase
     $generator.parse("om/${glTargetLanguage}/allcommon/EntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
     $database.debug("}")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                        Parse condition-bean framework
-    ##                                                                        ------------------------------
+    ## -----------------------------------------------------
+    ##                              allcommon condition-bean
+    ##                              ------------------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
@@ -382,51 +406,51 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.debug("public void parseConditionBeanFramework() {")
-    $database.debug("    ...Parsing FetchNarrowingBeanContext")
+    $database.debug("    parseFetchNarrowingBeanContext()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glFetchNarrowingBeanContextName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/FetchNarrowingBeanContext.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing FetchNarrowingBean")
+    $database.debug("    parseFetchNarrowingBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glFetchNarrowingBeanInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/FetchNarrowingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing SimpleOrderByBean")
+    $database.debug("    parseSimpleOrderByBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimpleOrderByBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/SimpleOrderByBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing SimplePagingBean")
+    $database.debug("    parseSimplePagingBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimplePagingBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/SimplePagingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing PagingResultBean")
+    $database.debug("    parsePagingResultBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glPagingResultBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/PagingResultBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ListResultBean")
+    $database.debug("    parseListResultBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glListResultBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ListResultBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionBeanContext")
+    $database.debug("    parseConditionBeanContext()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glConditionBeanContextName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ConditionBeanContext.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionBean")
+    $database.debug("    parseConditionBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glConditionBeanInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ConditionBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionQuery")
+    $database.debug("    parseConditionQuery()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glConditionQueryInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ConditionQuery.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing PagingBean")
+    $database.debug("    parsePagingBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glPagingBeanInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/PagingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing OrderByBean")
+    $database.debug("    parseOrderByBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glOrderByBeanInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/OrderByBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing SelectResource")
+    $database.debug("    parseSelectResource()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSelectResourceInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/SelectResource.${glTemplateFileExtension}",$path ,"", "")
 
@@ -436,146 +460,146 @@ targetdatabase = $targetDatabase
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBean}))
     $database.makeDirectory($path)
 
-    $database.debug("    ...Parsing AbstractConditionBean")
+    $database.debug("    parseAbstractConditionBean")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glConditionBeanAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/AbstractConditionBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing AbstractConditionQuery")
+    $database.debug("    parseAbstractConditionQuery")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glConditionQueryAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/AbstractConditionQuery.${glTemplateFileExtension}",$path ,"", "")
 
-    ## -------------------------------------------------------
-    ##                                     Parse condition-key
-    ##                                     -------------------
+    ## -----------------------------------------------------
+    ##                allcommon condition-bean condition-key
+    ##                --------------------------------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCKey}))
     $database.makeDirectory($path)
 
-    $database.debug("    ...Parsing ConditionKey")
+    $database.debug("    parseConditionKey")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_equal")
+    $database.debug("    parseConditionKey_equal")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}Equal.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_equal.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_notEqual")
+    $database.debug("    parseConditionKey_notEqual")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}NotEqual.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_notEqual.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_greaterThan")
+    $database.debug("    parseConditionKey_greaterThan")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}GreaterThan.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_greaterThan.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_lessThan")
+    $database.debug("    parseConditionKey_lessThan")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}LessThan.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_lessThan.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_greaterEqual")
+    $database.debug("    parseConditionKey_greaterEqual")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}GreaterEqual.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_greaterEqual.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_lessEqual")
+    $database.debug("    parseConditionKey_lessEqual")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}LessEqual.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_lessEqual.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_prefixSearch")
+    $database.debug("    parseConditionKey_prefixSearch")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}PrefixSearch.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_prefixSearch.${glTemplateFileExtension}",$path ,"", "")
 
     #if ($database.isTargetLanguageJava())
-      $database.debug("    ...Parsing ConditionKey_likeSearch")
+      $database.debug("    parseConditionKey_likeSearch")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}LikeSearch.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_likeSearch.${glTemplateFileExtension}",$path ,"", "")
     #end
 
-    $database.debug("    ...Parsing ConditionKey_inScope")
+    $database.debug("    parseConditionKey_inScope")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}InScope.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_inScope.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_notInScope")
+    $database.debug("    parseConditionKey_notInScope")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}NotInScope.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_notInScope.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_isNull")
+    $database.debug("    parseConditionKey_isNull")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}IsNull.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_isNull.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    ...Parsing ConditionKey_isNotNull")
+    $database.debug("    parseConditionKey_isNotNull")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCKey})}${glConditionKeyName}IsNotNull.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/ckey/ConditionKey_isNotNull.${glTemplateFileExtension}",$path ,"", "")
 
     #if ($database.isTargetLanguageJava())
-      ## -------------------------------------------------------
-      ##                                   Parse condition-value
-      ##                                   ---------------------
+      ## -----------------------------------------------------
+      ##             allcommon condition-bean condition-option
+      ##             -----------------------------------------
       ## Setup java directory for allcommon.
       $database.setupJavaDir_for_allcommon()
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
       $database.makeDirectory($path)
 
-      $database.debug("    ...Parsing ConditionOption")
+      $database.debug("    parseConditionOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    ...Parsing SimpleStringOption")
+      $database.debug("    parseSimpleStringOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    ...Parsing FromToOption")
+      $database.debug("    parseFromToOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionFromToName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/FromToOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    ...Parsing LikeSearchOption")
+      $database.debug("    parseLikeSearchOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    ...Parsing InScopeOption")
+      $database.debug("    parseInScopeOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInScopeName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/InScopeOption.${glTemplateFileExtension}",$path ,"", "")
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOptionParts}))
       $database.makeDirectory($path)
 
-      $database.debug("    ...Parsing SplitOptionParts")
+      $database.debug("    parseSplitOptionParts")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glConditionOptionPartsSplitName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/parts/SplitOptionParts.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    ...Parsing ToUpperLowerCaseOptionParts")
+      $database.debug("    parseToUpperLowerCaseOptionParts")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glConditionOptionPartsToUpperLowerCaseName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/parts/ToUpperLowerCaseOptionParts.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    ...Parsing ToSingleByteOptionParts")
+      $database.debug("    parseToSingleByteOptionParts")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glConditionOptionPartsToSingleByteName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/parts/ToSingleByteOptionParts.${glTemplateFileExtension}",$path ,"", "")
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOptionPartsLocal}))
       $database.makeDirectory($path)
 
-      $database.debug("    ...Parsing JapaneseOptionPartsAgent")
+      $database.debug("    parseJapaneseOptionPartsAgent")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOptionPartsLocal})}${glConditionOptionPartsAgentJapaneseName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/parts/local/JapaneseOptionPartsAgent.${glTemplateFileExtension}",$path ,"", "")
     #end
 
     ## -------------------------------------------------------
-    ##                                   Parse condition-value
-    ##                                   ---------------------
+    ##                allcommon condition-bean condition-value
+    ##                ----------------------------------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCValue}))
     $database.makeDirectory($path)
 
-    $database.debug("    ...Parsing ConditionValue")
+    $database.debug("    parseConditionValue")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCValue})}${glConditionValueName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/cvalue/ConditionValue.${glTemplateFileExtension}",$path ,"", "")
 
     ## -------------------------------------------------------
-    ##                         Parse condition-bean - grouping
-    ##                         -------------------------------
+    ##                       allcommon condition-bean grouping
+    ##                       ---------------------------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
@@ -608,78 +632,78 @@ targetdatabase = $targetDatabase
     #end
 
     ## -------------------------------------------------------
-    ##                                        Parse sql-clause
-    ##                                        ----------------
+    ##                     allcommon condition-bean sql-clause
+    ##                     -----------------------------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonSqlClause}))
     $database.makeDirectory($path)
 
-    $database.debug("    ...Parsing SqlClause")
+    $database.debug("    parseSqlClause")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause.${glTemplateFileExtension}",$path ,"" ,"")
 
-    $database.debug("    ...Parsing AbstractSqlClause")
+    $database.debug("    parseAbstractSqlClause")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/AbstractSqlClause.${glTemplateFileExtension}",$path ,"" ,"")
 
     #if ($database.isTargetLanguageJava())
-      $database.debug("    ...Parsing SqlClause_derby")
+      $database.debug("    parseSqlClause_derby")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Derby.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_derby.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("    ...Parsing SqlClause_oracle")
+      $database.debug("    parseSqlClause_oracle")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Oracle.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_oracle.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("    ...Parsing SqlClause_firebird")
+      $database.debug("    parseSqlClause_firebird")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Firebird.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_firebird.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("    ...Parsing SqlClause_mysql")
+      $database.debug("    parseSqlClause_mysql")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}MySql.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_mysql.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("    ...Parsing SqlClause_postgresql")
+      $database.debug("    parseSqlClause_postgresql")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}PostgreSql.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_postgresql.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("    ...Parsing SqlClause_mssql")
+      $database.debug("    parseSqlClause_mssql")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}SqlServer.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_mssql.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("    ...Parsing SqlClause_db2")
+      $database.debug("    parseSqlClause_db2")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Db2.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_db2.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("    ...Parsing SqlClause_interbase")
+      $database.debug("    parseSqlClause_interbase")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Interbase.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_interbase.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.debug("    ...Parsing SqlClause_default")
+      $database.debug("    parseSqlClause_default")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Default.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_default.${glTemplateFileExtension}",$path ,"" ,"")
     #end
     #if ($database.isTargetLanguageCSharp())
-      $database.debug("    ...Parsing SqlClause_${database.DatabaseType}")
+      $database.debug("    parseSqlClause_${database.DatabaseType}")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}${database.DaoGenDbName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_${database.DatabaseType}.${glTemplateFileExtension}",$path ,"" ,"")
     #end
 
-    $database.debug("    ...Parsing OrderByClause")
+    $database.debug("    parseOrderByClause")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glOrderByClauseName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/OrderByClause.${glTemplateFileExtension}",$path ,"" ,"")
 
-    $database.debug("    ...Parsing OrderByElement")
+    $database.debug("    parseOrderByElement")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glOrderByElementName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/OrderByElement.${glTemplateFileExtension}",$path ,"" ,"")
 
     $database.debug("}")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                    Parse dbmeta class
-    ##                                                                                    ------------------
+    ## -------------------------------------------------------
+    ##                                        allcommon dbmeta
+    ##                                        ----------------
     ## Setup java directory.
     $database.setupJavaDir_for_allcommon()
 
@@ -705,9 +729,9 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaInstanceHandlerName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/DBMetaInstanceHandler.${glTemplateFileExtension}",$path,"", "")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                 Parse exception class
-    ##                                                                                 ---------------------
+    ## -------------------------------------------------------
+    ##                                     allcommon exception
+    ##                                     -------------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
@@ -734,9 +758,9 @@ targetdatabase = $targetDatabase
     $generator.parse("om/${glTargetLanguage}/allcommon/exception/SelectedCountExceedMaxCountException.${glTemplateFileExtension}",$path,"", "")
     $database.debug("}")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                    Parse helper class
-    ##                                                                                    ------------------
+    ## -------------------------------------------------------
+    ##                                        allcommon helper
+    ##                                        ----------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
@@ -866,9 +890,9 @@ targetdatabase = $targetDatabase
 
     $database.debug("}")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                  Parse classification
-    ##                                                                                  --------------------
+    ## -------------------------------------------------------
+    ##                                allcommon classification
+    ##                                ------------------------
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
@@ -881,9 +905,9 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glTargetLanguage}/allcommon/ClassificationDefinition.${glTemplateFileExtension}",$path ,"" ,"")
     #end
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                       Parse container
-    ##                                                                                       ---------------
+    ## -------------------------------------------------------
+    ##                                     allcommon container
+    ##                                     -------------------
     ## Setup java directory for daoDicon.
     $database.setupJavaDir_for_daoDicon()
 
@@ -898,23 +922,9 @@ targetdatabase = $targetDatabase
     #end
     $database.debug("}")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                             Parse lazy-load container
-    ##                                                                             -------------------------
-    ## Setup java directory for lazyLoadCotainer.
-    $database.setupJavaDir_for_lazyLoadContainer()
-
-    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
-    $database.makeDirectory($path)
-
-    #if ($database.isAvailableEntityLazyLoad())
-        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glLazyLoadContainerClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glTargetLanguage}/allcommon/LazyLoadContainer.${glTemplateFileExtension}",$path,"", "")
-    #end
-
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                                    Parse dao-selector
-    ##                                                                                    ------------------
+    ## -------------------------------------------------------
+    ##                                  allcommon dao-selector
+    ##                                  ----------------------
     ## Setup java directory for daoSelector.
     $database.setupJavaDir_for_daoSelector()
 
