@@ -207,6 +207,7 @@ namespace ${myExtendedEntityPackageName} {
 
         /// <summary>
         /// Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
+        /// ${classificationMap.get('comment')}
         /// </summary>
         public void Classify${col.JavaName}${classificationMap.get('name')}() {
             String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
@@ -223,6 +224,7 @@ namespace ${myExtendedEntityPackageName} {
 
         /// <summary>
         /// Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
+        /// ${classificationMap.get('comment')}
         /// </summary>
         public void Classify${col.JavaName}_${classificationMap.get('name')}() {
             String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
@@ -255,6 +257,7 @@ namespace ${myExtendedEntityPackageName} {
         /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
         /// The difference of capital letters and small letters is NOT distinguished.
         /// If the value is null, this method returns false!
+        /// ${classificationMap.get('comment')}
         /// </summary>
         /// <returns>Determanation.</returns>
         public bool Is${col.JavaName}${classificationMap.get('name')}() {
@@ -274,6 +277,7 @@ namespace ${myExtendedEntityPackageName} {
         /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
         /// The difference of capital letters and small letters is NOT distinguished.
         /// If the value is null, this method throws exception!
+        /// ${classificationMap.get('comment')}
         /// </summary>
         /// <returns>Determanation.</returns>
         [Obsolete("This method is deprecated. Sorry!")]
@@ -296,6 +300,7 @@ namespace ${myExtendedEntityPackageName} {
         /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
         /// The difference of capital letters and small letters is NOT distinguished.
         /// If the value is null, this method returns false!
+        /// ${classificationMap.get('comment')}
         /// </summary>
         /// <returns>Determanation.</returns>
         public bool Is${col.JavaName}_${classificationMap.get('name')}() {
@@ -315,6 +320,7 @@ namespace ${myExtendedEntityPackageName} {
         /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
         /// The difference of capital letters and small letters is NOT distinguished.
         /// If the value is null, this method throws exception!
+        /// ${classificationMap.get('comment')}
         /// </summary>
         /// <returns>Determanation.</returns>
         [Obsolete("This method is deprecated. Sorry!")]

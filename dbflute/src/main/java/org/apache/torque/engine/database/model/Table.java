@@ -82,6 +82,9 @@ public class Table implements IDMethod {
     /** Logging class from commons.logging */
     private static Log _log = LogFactory.getLog(Table.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     //private AttributeListImpl attributes;
     private List<Column> _columnList;
 
@@ -133,6 +136,9 @@ public class Table implements IDMethod {
 
     private boolean _isForReferenceOnly;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Default Constructor
      */
@@ -156,6 +162,9 @@ public class Table implements IDMethod {
         _columnsByJavaName = new Hashtable<String, Column>();
     }
 
+    // ===================================================================================
+    //                                                                         Initializer
+    //                                                                         ===========
     /**
      * Load the table object from an xml tag.
      *
@@ -199,6 +208,9 @@ public class Table implements IDMethod {
         _enterface = attrib.getValue("interface");
     }
 
+    // ===================================================================================
+    //                                                                             Unknown
+    //                                                                             =======
     /**
      * <p>A hook for the SAX XML parser to call when this table has
      * been fully loaded from the XML, and all nested elements have
@@ -207,7 +219,7 @@ public class Table implements IDMethod {
      * <p>Performs heavy indexing and naming of elements which weren't
      * provided with a name.</p>
      */
-    public void doFinalInitialization() {
+    public void doFinalInitialization() {// TODO: @jflute - Unnecessary?
         // Heavy indexing must wait until after all columns composing
         // a table's primary key have been parsed.
         if (_isHeavyIndexing) {
@@ -311,445 +323,9 @@ public class Table implements IDMethod {
         return NameFactory.generateName(NameFactory.CONSTRAINT_GENERATOR, inputs);
     }
 
-    /**
-     * A utility function to create a new column from attrib and add it to this
-     * table.
-     *
-     * @param attrib xml attributes for the column to add
-     * @return the added column
-     */
-    public Column addColumn(Attributes attrib) {
-        Column col = new Column();
-        col.setTable(this);
-        col.loadFromXML(attrib);
-        addColumn(col);
-        return col;
-    }
-
-    /**
-     * Adds a new column to the column list and set the
-     * parent table of the column to the current table
-     *
-     * @param col the column to add
-     */
-    public void addColumn(Column col) {
-        col.setTable(this);
-        if (col.isInheritance()) {
-            _inheritanceColumn = col;
-        }
-        _columnList.add(col);
-        _columnsByName.put(col.getName(), col);
-        _columnsByJavaName.put(col.getJavaName(), col);
-
-        col.setPosition(_columnList.size());
-        _isNeedsTransactionInPostgres |= col.requiresTransactionInPostgres();
-    }
-
-    /**
-     * A utility function to create a new foreign key
-     * from attrib and add it to this table.
-     *
-     * @param attrib the xml attributes
-     * @return the created ForeignKey
-     */
-    public ForeignKey addForeignKey(Attributes attrib) {
-        ForeignKey fk = new ForeignKey();
-        fk.loadFromXML(attrib);
-        addForeignKey(fk);
-        return fk;
-    }
-
-    /**
-     * Gets the column that subclasses of the class representing this
-     * table can be produced from.
-     * 
-     * @return Children column.
-     */
-    public Column getChildrenColumn() {
-        return _inheritanceColumn;
-    }
-
-    /**
-     * Get the objects that can be created from this table.
-     * 
-     * @return Children name list.
-     */
-    public List<String> getChildrenNames() {
-        if (_inheritanceColumn == null || !_inheritanceColumn.isEnumeratedClasses()) {
-            return null;
-        }
-        List children = _inheritanceColumn.getChildren();
-        List<String> names = new ArrayList<String>(children.size());
-        for (int i = 0; i < children.size(); i++) {
-            names.add(((Inheritance) children.get(i)).getClassName());
-        }
-        return names;
-    }
-
-    // ============================================================================
-    //                                                                     Referrer
-    //                                                                     ========
-    /**
-     * Adds the foreign key from another table that refers to this table.
-     *
-     * @param fk A foreign key refering to this table
-     */
-    public void addReferrer(ForeignKey fk) {
-        if (!fk.isForeignColumnsSameAsForeignTablePrimaryKeys()) {
-            return;
-        }
-        if (_referrers == null) {
-            _referrers = new ArrayList<ForeignKey>(5);
-        }
-        _referrers.add(fk);
-    }
-
-    /**
-     * Get list of references to this table.
-     *
-     * @return A list of references to this table
-     */
-    public List<ForeignKey> getReferrers() {
-        return _referrers;
-    }
-
-    protected java.util.List<ForeignKey> _singleKeyRefferrers = null;
-
-    /**
-     * Adds the foreign key from another table that refers to this column.
-     * 
-     * @return Determination.
-     */
-    public boolean hasSingleKeyReferrer() {
-        return !getSingleKeyReferrers().isEmpty();
-    }
-
-    /**
-     * Get list of references to this column.
-     * 
-     * @return Single key refferer list.
-     */
-    public List<ForeignKey> getSingleKeyReferrers() {
-        if (_singleKeyRefferrers != null) {
-            return _singleKeyRefferrers;
-        }
-        _singleKeyRefferrers = new ArrayList<ForeignKey>(5);
-        if (!hasReferrer()) {
-            return _singleKeyRefferrers;
-        }
-        final List<ForeignKey> reffererList = getReferrers();
-        for (ForeignKey refferer : reffererList) {
-            if (!refferer.isSimpleKeyFK()) {
-                continue;
-            }
-            _singleKeyRefferrers.add(refferer);
-        }
-        return _singleKeyRefferrers;
-    }
-
-    /**
-     * Has refferer?
-     * 
-     * @return Determination.
-     */
-    public boolean hasReferrer() {
-        return (getReferrers() != null && !getReferrers().isEmpty());
-    }
-
-    /**
-     * Returns an comma string containing all the foreign table name.
-     * 
-     * @return Refferer table-name comma string.
-     */
-    public String getReferrerTableNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = getReferrers();
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            sb.append(", ").append(fk.getTable().getName());
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * Returns an comma string containing all the foreign table name.
-     * 
-     * @return Refferer table-name comma string.
-     */
-    public String getReferrerTableNameCommaStringWithHtmlHref() {
-        final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = getReferrers();
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            final String name = fk.getTable().getName();
-            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * Returns an comma string containing all the foreign property name.
-     * 
-     * @return Refferer property comma string.
-     */
-    public String getReferrerPropertyNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = getReferrers();
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            sb.append(", ").append(fk.getReffererPropertyName());
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * Set whether this table contains a foreign PK
-     *
-     * @param b
-     */
-    public void setContainsForeignPK(boolean b) {
-        _containsForeignPK = b;
-    }
-
-    /**
-     * Determine if this table contains a foreign PK
-     * 
-     * @return Determination.
-     */
-    public boolean getContainsForeignPK() {
-        return _containsForeignPK;
-    }
-
-    // ============================================================================
-    //                                                                   ForeignKey
-    //                                                                   ==========
-    /**
-     * Returns an Array containing all the FKs in the table
-     * 
-     * @return Foreign-key array.
-     */
-    public ForeignKey[] getForeignKeys() {
-        int size = _foreignKeys.size();
-        ForeignKey[] tbls = new ForeignKey[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (ForeignKey) _foreignKeys.get(i);
-        }
-        return tbls;
-    }
-
-    /**
-     * Returns an comma string containing all the foreign table name.
-     * 
-     * @return Foreign table as comma string.
-     */
-    public String getForeignTableNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = _foreignKeys;
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            sb.append(", ").append(fk.getForeignTableName());
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * Returns an comma string containing all the foreign table name.
-     * 
-     * @return Foreign table as comma string.
-     */
-    public String getForeignTableNameCommaStringWithHtmlHref() {
-        final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = _foreignKeys;
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            final String name = fk.getForeignTableName();
-            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * Returns an comma string containing all the foreign property name.
-     * 
-     * @return Foreign property-name as comma string.
-     */
-    public String getForeignPropertyNameCommaString() {
-        final StringBuffer sb = new StringBuffer();
-
-        final List<ForeignKey> ls = _foreignKeys;
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final ForeignKey fk = ls.get(i);
-            sb.append(", ").append(fk.getForeignPropertyName());
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * A list of tables referenced by foreign keys in this table
-     *
-     * @return A list of tables
-     */
-    public List<String> getForeignTableNames() {
-        if (_foreignTableNames == null) {
-            _foreignTableNames = new ArrayList<String>(1);
-        }
-        return _foreignTableNames;
-    }
-
-    /**
-     * Adds a new FK to the FK list and set the
-     * parent table of the column to the current table
-     *
-     * @param fk A foreign key
-     */
-    public void addForeignKey(ForeignKey fk) {
-        fk.setTable(this);
-        _foreignKeys.add(fk);
-
-        if (_foreignTableNames == null) {
-            _foreignTableNames = new ArrayList<String>(5);
-        }
-        if (_foreignTableNames.contains(fk.getForeignTableName())) {
-            _foreignTableNames.add(fk.getForeignTableName());
-        }
-    }
-
-    public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) {
-
-        final Set<String> localColumnNameSet = new HashSet<String>(localColumnNameList);
-        final Set<String> foreignColumnNameSet = new HashSet<String>(foreignColumnNameList);
-
-        final ForeignKey[] fkArray = getForeignKeys();
-        for (final ForeignKey key : fkArray) {
-            if (key.getForeignTableName().equals(foreignTableName)) {
-                final List<String> currentLocalColumnNameList = key.getLocalColumns();
-                if (currentLocalColumnNameList == null || currentLocalColumnNameList.isEmpty()) {
-                    String msg = "The foreignKey did not have local column name list: " + currentLocalColumnNameList;
-                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
-                    throw new IllegalStateException(msg);
-                }
-                final List<String> currentForeignColumnNameList = key.getForeignColumns();
-                if (currentForeignColumnNameList == null || currentForeignColumnNameList.isEmpty()) {
-                    String msg = "The foreignKey did not have foreign column name list: "
-                            + currentForeignColumnNameList;
-                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
-                    throw new IllegalStateException(msg);
-                }
-
-                final Set<String> currentLocalColumnNameSet = new HashSet<String>(currentLocalColumnNameList);
-                final Set<String> currentForeignColumnNameSet = new HashSet<String>(currentForeignColumnNameList);
-
-                if (localColumnNameSet.equals(currentLocalColumnNameSet)) {
-                    if (foreignColumnNameSet.equals(currentForeignColumnNameSet)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Has foreign key?
-     * 
-     * @return Determination.
-     */
-    public boolean hasForeignKey() {
-        return (getForeignKeys().length != 0);
-    }
-
-    /**
-     * Return true if the column requires a transaction in Postgres
-     */
-    public boolean requiresTransactionInPostgres() {
-        return _isNeedsTransactionInPostgres;
-    }
-
-    /**
-     * A utility function to create a new id method parameter
-     * from attrib and add it to this table.
-     */
-    public IdMethodParameter addIdMethodParameter(Attributes attrib) {
-        IdMethodParameter imp = new IdMethodParameter();
-        imp.loadFromXML(attrib);
-        addIdMethodParameter(imp);
-        return imp;
-    }
-
-    /**
-     * Adds a new ID method parameter to the list and sets the parent
-     * table of the column associated with the supplied parameter to this table.
-     *
-     * @param imp The column to add as an ID method parameter.
-     */
-    public void addIdMethodParameter(IdMethodParameter imp) {
-        imp.setTable(this);
-        if (_idMethodParameters == null) {
-            _idMethodParameters = new ArrayList<IdMethodParameter>(2);
-        }
-        _idMethodParameters.add(imp);
-    }
-
-    /**
-     * Adds a new index to the index list and set the
-     * parent table of the column to the current table
-     */
-    public void addIndex(Index index) {
-        index.setTable(this);
-        _indices.add(index);
-    }
-
-    /**
-     * A utility function to create a new index
-     * from attrib and add it to this table.
-     */
-    public Index addIndex(Attributes attrib) {
-        Index index = new Index();
-        index.loadFromXML(attrib);
-        addIndex(index);
-        return index;
-    }
-
-    /**
-     * Adds a new Unique to the Unique list and set the
-     * parent table of the column to the current table
-     */
-    public void addUnique(Unique unique) {
-        unique.setTable(this);
-        _unices.add(unique);
-    }
-
-    /**
-     * A utility function to create a new Unique
-     * from attrib and add it to this table.
-     *
-     * @param attrib the xml attributes
-     */
-    public Unique addUnique(Attributes attrib) {
-        Unique unique = new Unique();
-        unique.loadFromXML(attrib);
-        addUnique(unique);
-        return unique;
-    }
-
+    // ===================================================================================
+    //                                                                          Basic Info
+    //                                                                          ==========
     // -----------------------------------------------------
     //                                             TableName
     //                                             ---------
@@ -975,65 +551,77 @@ public class Table implements IDMethod {
         return _idMethodParameters;
     }
 
-    // ============================================================================
-    //                                                                     Sequence
-    //                                                                     ========
+    // -----------------------------------------------------
+    //                                               Unknown
+    //                                               -------
     /**
-     * A name to use for creating a sequence if one is not specified.
-     *
-     * @return name of the sequence
+     * Gets the column that subclasses of the class representing this
+     * table can be produced from.
+     * 
+     * @return Children column.
      */
-    public String getSequenceName() {
-        String result = null;
-        if (getIdMethod().equals(NATIVE)) {
-            List idMethodParams = getIdMethodParameters();
-            if (idMethodParams == null) {
-                result = getName() + "_SEQ";
-            } else {
-                result = ((IdMethodParameter) idMethodParams.get(0)).getValue();
-            }
-        }
-        return result;
-    }
-
-    // ============================================================================
-    //                                                                        Index
-    //                                                                        =====
-    /**
-     * Returns an Array containing all the indices in the table
-     *
-     * @return An array containing all the indices
-     */
-    public Index[] getIndices() {
-        int size = _indices.size();
-        Index[] tbls = new Index[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Index) _indices.get(i);
-        }
-        return tbls;
+    public Column getChildrenColumn() {
+        return _inheritanceColumn;
     }
 
     /**
-     * Returns an Array containing all the UKs in the table
-     *
-     * @return An array containing all the UKs
+     * Get the objects that can be created from this table.
+     * 
+     * @return Children name list.
      */
-    public Unique[] getUnices() {
-        int size = _unices.size();
-        Unique[] tbls = new Unique[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Unique) _unices.get(i);
+    public List<String> getChildrenNames() {
+        if (_inheritanceColumn == null || !_inheritanceColumn.isEnumeratedClasses()) {
+            return null;
         }
-        return tbls;
+        List children = _inheritanceColumn.getChildren();
+        List<String> names = new ArrayList<String>(children.size());
+        for (int i = 0; i < children.size(); i++) {
+            names.add(((Inheritance) children.get(i)).getClassName());
+        }
+        return names;
     }
 
-    public List<Unique> getUniqueList() {
-        return _unices;
+
+    // ===================================================================================
+    //                                                                              Column
+    //                                                                              ======
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /**
+     * A utility function to create a new column from attrib and add it to this
+     * table.
+     *
+     * @param attrib xml attributes for the column to add
+     * @return the added column
+     */
+    public Column addColumn(Attributes attrib) {
+        Column col = new Column();
+        col.setTable(this);
+        col.loadFromXML(attrib);
+        addColumn(col);
+        return col;
     }
 
-    // ============================================================================
-    //                                                                       Column
-    //                                                                       ======
+    /**
+     * Adds a new column to the column list and set the
+     * parent table of the column to the current table
+     *
+     * @param col the column to add
+     */
+    public void addColumn(Column col) {
+        col.setTable(this);
+        if (col.isInheritance()) {
+            _inheritanceColumn = col;
+        }
+        _columnList.add(col);
+        _columnsByName.put(col.getName(), col);
+        _columnsByJavaName.put(col.getJavaName(), col);
+
+        col.setPosition(_columnList.size());
+        _isNeedsTransactionInPostgres |= col.requiresTransactionInPostgres();
+    }
+
     /**
      * Returns an Array containing all the columns in the table
      */
@@ -1046,6 +634,9 @@ public class Table implements IDMethod {
         return tbls;
     }
 
+    // -----------------------------------------------------
+    //                                               Arrange
+    //                                               -------
     /**
      * Returns an Array containing all the columns in the table
      */
@@ -1132,36 +723,10 @@ public class Table implements IDMethod {
         final DfFlexibleNameMap<String, Column> flexibleNameMap = new DfFlexibleNameMap<String, Column>(_columnsByName);
         return flexibleNameMap.get(flexibleName);
     }
-
-    /**
-     * Return the first foreign key that includes col in it's list
-     * of local columns.  Eg. Foreign key (a,b,c) refrences tbl(x,y,z)
-     * will be returned of col is either a,b or c.
-     *
-     * @param col column name included in the key
-     * @return Return a Column object or null if it does not exist.
-     */
-    public ForeignKey getForeignKey(String col) {
-        ForeignKey firstFK = null;
-        for (Iterator iter = _foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = (ForeignKey) iter.next();
-            if (key.getLocalColumns().contains(col)) {
-                if (firstFK == null) {
-                    firstFK = key;
-                } else {
-                    //System.out.println(col+" is in multiple FKs.  This is not"
-                    //                   + " being handled properly.");
-                    //throw new IllegalStateException("Cannot call method if " +
-                    //    "column is referenced multiple times");
-                }
-            }
-        }
-        return firstFK;
-    }
-
-    // ============================================================================
-    //                                                              Contains Column
-    //                                                              ===============
+    
+    // -----------------------------------------------------
+    //                                         Determination
+    //                                         -------------
     /**
      * Returns true if the table contains a specified column
      *
@@ -1196,10 +761,482 @@ public class Table implements IDMethod {
         }
         return true;
     }
+    
+    // ===================================================================================
+    //                                                                         Foreign Key
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /**
+     * Returns an Array containing all the FKs in the table
+     * 
+     * @return Foreign-key array.
+     */
+    public ForeignKey[] getForeignKeys() {
+        int size = _foreignKeys.size();
+        ForeignKey[] tbls = new ForeignKey[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (ForeignKey) _foreignKeys.get(i);
+        }
+        return tbls;
+    }
 
-    // ============================================================================
-    //                                                                     Database
-    //                                                                     ========
+    /**
+     * Return the first foreign key that includes col in it's list
+     * of local columns.  Eg. Foreign key (a,b,c) refrences tbl(x,y,z)
+     * will be returned of col is either a,b or c.
+     *
+     * @param col column name included in the key
+     * @return Return a Column object or null if it does not exist.
+     */
+    public ForeignKey getForeignKey(String col) {
+        ForeignKey firstFK = null;
+        for (Iterator iter = _foreignKeys.iterator(); iter.hasNext();) {
+            ForeignKey key = (ForeignKey) iter.next();
+            if (key.getLocalColumns().contains(col)) {
+                if (firstFK == null) {
+                    firstFK = key;
+                } else {
+                    //System.out.println(col+" is in multiple FKs.  This is not"
+                    //                   + " being handled properly.");
+                    //throw new IllegalStateException("Cannot call method if " +
+                    //    "column is referenced multiple times");
+                }
+            }
+        }
+        return firstFK;
+    }
+    
+    /**
+     * A utility function to create a new foreign key
+     * from attrib and add it to this table.
+     *
+     * @param attrib the xml attributes
+     * @return the created ForeignKey
+     */
+    public ForeignKey addForeignKey(Attributes attrib) {
+        ForeignKey fk = new ForeignKey();
+        fk.loadFromXML(attrib);
+        addForeignKey(fk);
+        return fk;
+    }
+
+    // -----------------------------------------------------
+    //                                               Arrange
+    //                                               -------
+    /**
+     * Returns an comma string containing all the foreign table name.
+     * 
+     * @return Foreign table as comma string.
+     */
+    public String getForeignTableNameCommaString() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<ForeignKey> ls = _foreignKeys;
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            sb.append(", ").append(fk.getForeignTableName());
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    /**
+     * Returns an comma string containing all the foreign table name.
+     * 
+     * @return Foreign table as comma string.
+     */
+    public String getForeignTableNameCommaStringWithHtmlHref() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<ForeignKey> ls = _foreignKeys;
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            final String name = fk.getForeignTableName();
+            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    /**
+     * Returns an comma string containing all the foreign property name.
+     * 
+     * @return Foreign property-name as comma string.
+     */
+    public String getForeignPropertyNameCommaString() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<ForeignKey> ls = _foreignKeys;
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            sb.append(", ").append(fk.getForeignPropertyName());
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    /**
+     * A list of tables referenced by foreign keys in this table
+     *
+     * @return A list of tables
+     */
+    public List<String> getForeignTableNames() {
+        if (_foreignTableNames == null) {
+            _foreignTableNames = new ArrayList<String>(1);
+        }
+        return _foreignTableNames;
+    }
+
+    /**
+     * Adds a new FK to the FK list and set the
+     * parent table of the column to the current table
+     *
+     * @param fk A foreign key
+     */
+    public void addForeignKey(ForeignKey fk) {
+        fk.setTable(this);
+        _foreignKeys.add(fk);
+
+        if (_foreignTableNames == null) {
+            _foreignTableNames = new ArrayList<String>(5);
+        }
+        if (_foreignTableNames.contains(fk.getForeignTableName())) {
+            _foreignTableNames.add(fk.getForeignTableName());
+        }
+    }
+
+    public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList) {
+
+        final Set<String> localColumnNameSet = new HashSet<String>(localColumnNameList);
+        final Set<String> foreignColumnNameSet = new HashSet<String>(foreignColumnNameList);
+
+        final ForeignKey[] fkArray = getForeignKeys();
+        for (final ForeignKey key : fkArray) {
+            if (key.getForeignTableName().equals(foreignTableName)) {
+                final List<String> currentLocalColumnNameList = key.getLocalColumns();
+                if (currentLocalColumnNameList == null || currentLocalColumnNameList.isEmpty()) {
+                    String msg = "The foreignKey did not have local column name list: " + currentLocalColumnNameList;
+                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
+                    throw new IllegalStateException(msg);
+                }
+                final List<String> currentForeignColumnNameList = key.getForeignColumns();
+                if (currentForeignColumnNameList == null || currentForeignColumnNameList.isEmpty()) {
+                    String msg = "The foreignKey did not have foreign column name list: "
+                            + currentForeignColumnNameList;
+                    msg = msg + " key.getForeignTableName()=" + key.getForeignTableName();
+                    throw new IllegalStateException(msg);
+                }
+
+                final Set<String> currentLocalColumnNameSet = new HashSet<String>(currentLocalColumnNameList);
+                final Set<String> currentForeignColumnNameSet = new HashSet<String>(currentForeignColumnNameList);
+
+                if (localColumnNameSet.equals(currentLocalColumnNameSet)) {
+                    if (foreignColumnNameSet.equals(currentForeignColumnNameSet)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Has foreign key?
+     * 
+     * @return Determination.
+     */
+    public boolean hasForeignKey() {
+        return (getForeignKeys().length != 0);
+    }
+
+    /**
+     * Return true if the column requires a transaction in Postgres
+     */
+    public boolean requiresTransactionInPostgres() {
+        return _isNeedsTransactionInPostgres;
+    }
+
+    /**
+     * A utility function to create a new id method parameter
+     * from attrib and add it to this table.
+     */
+    public IdMethodParameter addIdMethodParameter(Attributes attrib) {
+        IdMethodParameter imp = new IdMethodParameter();
+        imp.loadFromXML(attrib);
+        addIdMethodParameter(imp);
+        return imp;
+    }
+
+    /**
+     * Adds a new ID method parameter to the list and sets the parent
+     * table of the column associated with the supplied parameter to this table.
+     *
+     * @param imp The column to add as an ID method parameter.
+     */
+    public void addIdMethodParameter(IdMethodParameter imp) {
+        imp.setTable(this);
+        if (_idMethodParameters == null) {
+            _idMethodParameters = new ArrayList<IdMethodParameter>(2);
+        }
+        _idMethodParameters.add(imp);
+    }
+
+    /**
+     * Adds a new index to the index list and set the
+     * parent table of the column to the current table
+     */
+    public void addIndex(Index index) {
+        index.setTable(this);
+        _indices.add(index);
+    }
+
+    /**
+     * A utility function to create a new index
+     * from attrib and add it to this table.
+     */
+    public Index addIndex(Attributes attrib) {
+        Index index = new Index();
+        index.loadFromXML(attrib);
+        addIndex(index);
+        return index;
+    }
+
+    /**
+     * Adds a new Unique to the Unique list and set the
+     * parent table of the column to the current table
+     */
+    public void addUnique(Unique unique) {
+        unique.setTable(this);
+        _unices.add(unique);
+    }
+
+    /**
+     * A utility function to create a new Unique
+     * from attrib and add it to this table.
+     *
+     * @param attrib the xml attributes
+     */
+    public Unique addUnique(Attributes attrib) {
+        Unique unique = new Unique();
+        unique.loadFromXML(attrib);
+        addUnique(unique);
+        return unique;
+    }
+    
+    // ===================================================================================
+    //                                                                            Referrer
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /**
+     * Adds the foreign key from another table that refers to this table.
+     *
+     * @param fk A foreign key refering to this table
+     */
+    public void addReferrer(ForeignKey fk) {
+        if (!fk.isForeignColumnsSameAsForeignTablePrimaryKeys()) {
+            return;
+        }
+        if (_referrers == null) {
+            _referrers = new ArrayList<ForeignKey>(5);
+        }
+        _referrers.add(fk);
+    }
+
+    /**
+     * Get list of references to this table.
+     *
+     * @return A list of references to this table
+     */
+    public List<ForeignKey> getReferrers() {
+        return _referrers;
+    }
+    
+    /**
+     * Has refferer?
+     * 
+     * @return Determination.
+     */
+    public boolean hasReferrer() {
+        return (getReferrers() != null && !getReferrers().isEmpty());
+    }
+
+    // -----------------------------------------------------
+    //                                               Arrange
+    //                                               -------
+    protected java.util.List<ForeignKey> _singleKeyRefferrers = null;
+
+    /**
+     * Adds the foreign key from another table that refers to this column.
+     * 
+     * @return Determination.
+     */
+    public boolean hasSingleKeyReferrer() {
+        return !getSingleKeyReferrers().isEmpty();
+    }
+
+    /**
+     * Get list of references to this column.
+     * 
+     * @return Single key refferer list.
+     */
+    public List<ForeignKey> getSingleKeyReferrers() {
+        if (_singleKeyRefferrers != null) {
+            return _singleKeyRefferrers;
+        }
+        _singleKeyRefferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _singleKeyRefferrers;
+        }
+        final List<ForeignKey> reffererList = getReferrers();
+        for (ForeignKey refferer : reffererList) {
+            if (!refferer.isSimpleKeyFK()) {
+                continue;
+            }
+            _singleKeyRefferrers.add(refferer);
+        }
+        return _singleKeyRefferrers;
+    }
+
+    /**
+     * Returns an comma string containing all the foreign table name.
+     * 
+     * @return Refferer table-name comma string.
+     */
+    public String getReferrerTableNameCommaString() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<ForeignKey> ls = getReferrers();
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            sb.append(", ").append(fk.getTable().getName());
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    /**
+     * Returns an comma string containing all the foreign table name.
+     * 
+     * @return Refferer table-name comma string.
+     */
+    public String getReferrerTableNameCommaStringWithHtmlHref() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<ForeignKey> ls = getReferrers();
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            final String name = fk.getTable().getName();
+            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    /**
+     * Returns an comma string containing all the foreign property name.
+     * 
+     * @return Refferer property comma string.
+     */
+    public String getReferrerPropertyNameCommaString() {
+        final StringBuffer sb = new StringBuffer();
+
+        final List<ForeignKey> ls = getReferrers();
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = ls.get(i);
+            sb.append(", ").append(fk.getReffererPropertyName());
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    /**
+     * Set whether this table contains a foreign PK
+     *
+     * @param b
+     */
+    public void setContainsForeignPK(boolean b) {
+        _containsForeignPK = b;
+    }
+
+    /**
+     * Determine if this table contains a foreign PK
+     * 
+     * @return Determination.
+     */
+    public boolean getContainsForeignPK() {
+        return _containsForeignPK;
+    }
+
+    // ===================================================================================
+    //                                                                            Sequence
+    //                                                                            ========
+    /**
+     * A name to use for creating a sequence if one is not specified.
+     *
+     * @return name of the sequence
+     */
+    public String getSequenceName() {// TODO: @jflute - Unnecessary?
+        String result = null;
+        if (getIdMethod().equals(NATIVE)) {
+            List idMethodParams = getIdMethodParameters();
+            if (idMethodParams == null) {
+                result = getName() + "_SEQ";
+            } else {
+                result = ((IdMethodParameter) idMethodParams.get(0)).getValue();
+            }
+        }
+        return result;
+    }
+
+    // ===================================================================================
+    //                                                                               Index
+    //                                                                               =====
+    /**
+     * Returns an Array containing all the indices in the table
+     *
+     * @return An array containing all the indices
+     */
+    public Index[] getIndices() {// TODO: @jflute - Unnecessary?
+        int size = _indices.size();
+        Index[] tbls = new Index[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (Index) _indices.get(i);
+        }
+        return tbls;
+    }
+
+    /**
+     * Returns an Array containing all the UKs in the table
+     *
+     * @return An array containing all the UKs
+     */
+    public Unique[] getUnices() {
+        int size = _unices.size();
+        Unique[] tbls = new Unique[size];
+        for (int i = 0; i < size; i++) {
+            tbls[i] = (Unique) _unices.get(i);
+        }
+        return tbls;
+    }
+
+    public List<Unique> getUniqueList() {
+        return _unices;
+    }
+
+    // ===================================================================================
+    //                                                                            Database
+    //                                                                            ========
     /**
      * Set the parent of the table
      *
@@ -1243,66 +1280,6 @@ public class Table implements IDMethod {
      */
     public boolean hasRelation() {
         return (hasForeignKey() || hasReferrer());
-    }
-
-    /**
-     * Returns a XML representation of this table.
-     *
-     * @return XML representation of this table
-     */
-    public String toString() {
-        StringBuffer result = new StringBuffer();
-
-        result.append("<table name=\"").append(getName()).append('\"');
-
-        if (_javaName != null) {
-            result.append(" javaName=\"").append(_javaName).append('\"');
-        }
-
-        if (_idMethod != null) {
-            result.append(" idMethod=\"").append(_idMethod).append('\"');
-        }
-
-        if (_skipSql) {
-            result.append(" skipSql=\"").append(new Boolean(_skipSql)).append('\"');
-        }
-
-        if (_abstractValue) {
-            result.append(" abstract=\"").append(new Boolean(_abstractValue)).append('\"');
-        }
-
-        //        if (_baseClass != null) {
-        //            result.append(" baseClass=\"").append(_baseClass).append('\"');
-        //        }
-        //
-        //        if (_basePeer != null) {
-        //            result.append(" basePeer=\"").append(_basePeer).append('\"');
-        //        }
-
-        result.append(">\n");
-
-        if (_columnList != null) {
-            for (Iterator iter = _columnList.iterator(); iter.hasNext();) {
-                result.append(iter.next());
-            }
-        }
-
-        if (_foreignKeys != null) {
-            for (Iterator iter = _foreignKeys.iterator(); iter.hasNext();) {
-                result.append(iter.next());
-            }
-        }
-
-        if (_idMethodParameters != null) {
-            Iterator iter = _idMethodParameters.iterator();
-            while (iter.hasNext()) {
-                result.append(iter.next());
-            }
-        }
-
-        result.append("</table>\n");
-
-        return result.toString();
     }
 
     // ==============================================================================
@@ -1555,9 +1532,9 @@ public class Table implements IDMethod {
         }
     }
 
-    // ==============================================================================
-    //                                                            Attached-PrimaryKey
-    //                                                            ===================
+    // ===================================================================================
+    //                                                                 Attached-PrimaryKey
+    //                                                                 ===================
     /**
      * Returns AttachedPKArgsSetupString. 
      *     [setRcvlcqNo(pk.rcvlcqNo);setSprlptTp(pk.sprlptTp);]
@@ -1582,9 +1559,9 @@ public class Table implements IDMethod {
         return result;
     }
 
-    // ============================================================================
-    //                                                                      Utility
-    //                                                                      =======
+    // ===================================================================================
+    //                                                                             Utility
+    //                                                                             =======
     protected String makeJavaName(String fieldName) {
         String result = null;
         List<String> inputs = new ArrayList<String>(2);
@@ -1621,9 +1598,9 @@ public class Table implements IDMethod {
         return result.toString();
     }
 
-    // ============================================================================
-    //                                                                 CustomizeDao
-    //                                                                 ============
+    // ===================================================================================
+    //                                                                        CustomizeDao
+    //                                                                        ============
     protected Map<String, String> _customizeDaoMethodMap = new LinkedHashMap<String, String>();
 
     public Map<String, String> getCustomizeDaoMethodMap() {
@@ -1712,9 +1689,9 @@ public class Table implements IDMethod {
         return false;
     }
 
-    // ===============================================================================
-    //                                                                 SequenceNextSql
-    //                                                                 ===============
+    // ===================================================================================
+    //                                                                     SequenceNextSql
+    //                                                                     ===============
     /**
      * Determine whether this table uses a sequence.
      * 
@@ -1756,9 +1733,9 @@ public class Table implements IDMethod {
         return result;
     }
 
-    // ===============================================================================
-    //                                                                        Identity
-    //                                                                        ========
+    // ===================================================================================
+    //                                                                            Identity
+    //                                                                            ========
     /**
      * Determine whether this table uses an identity.
      * 
@@ -1806,9 +1783,9 @@ public class Table implements IDMethod {
         return col.getUncapitalisedJavaName();
     }
 
-    // ===============================================================================
-    //                                                                      UpdateDate
-    //                                                                      ==========
+    // ===================================================================================
+    //                                                                          UpdateDate
+    //                                                                          ==========
     /**
      * Determine whether this table uses a update date column.
      * 
@@ -1868,9 +1845,9 @@ public class Table implements IDMethod {
         return column.getJavaNative();
     }
 
-    // ===============================================================================
-    //                                                                       VersionNo
-    //                                                                       =========
+    // ===================================================================================
+    //                                                                           VersionNo
+    //                                                                           =========
     /**
      * Determine whether this table uses a version-no column.
      * 
@@ -1914,9 +1891,9 @@ public class Table implements IDMethod {
         return StringUtils.uncapitalise(getVersionNoJavaName());
     }
 
-    // ===============================================================================
-    //                                                                   Common-Column
-    //                                                                   =============
+    // ===================================================================================
+    //                                                                       Common Column
+    //                                                                       =============
     /**
      * Is this table defined all common columns?
      * 
@@ -2012,10 +1989,74 @@ public class Table implements IDMethod {
         return filteredCommonColumn;
     }
 
-    // ===============================================================================
-    //                                                         Non PrimaryKey Writable
-    //                                                         =======================
+    // ===================================================================================
+    //                                                             Non PrimaryKey Writable
+    //                                                             =======================
     public boolean isAvailableNonPrimaryKeyWritable() {
         return getProperties().getOtherProperties().isAvailableNonPrimaryKeyWritable();
     }
+    
+    // ===================================================================================
+    //                                                                            toString
+    //                                                                            ========
+    /**
+     * Returns a XML representation of this table.
+     *
+     * @return XML representation of this table
+     */
+    public String toString() {
+        StringBuffer result = new StringBuffer();
+
+        result.append("<table name=\"").append(getName()).append('\"');
+
+        if (_javaName != null) {
+            result.append(" javaName=\"").append(_javaName).append('\"');
+        }
+
+        if (_idMethod != null) {
+            result.append(" idMethod=\"").append(_idMethod).append('\"');
+        }
+
+        if (_skipSql) {
+            result.append(" skipSql=\"").append(new Boolean(_skipSql)).append('\"');
+        }
+
+        if (_abstractValue) {
+            result.append(" abstract=\"").append(new Boolean(_abstractValue)).append('\"');
+        }
+
+        //        if (_baseClass != null) {
+        //            result.append(" baseClass=\"").append(_baseClass).append('\"');
+        //        }
+        //
+        //        if (_basePeer != null) {
+        //            result.append(" basePeer=\"").append(_basePeer).append('\"');
+        //        }
+
+        result.append(">\n");
+
+        if (_columnList != null) {
+            for (Iterator iter = _columnList.iterator(); iter.hasNext();) {
+                result.append(iter.next());
+            }
+        }
+
+        if (_foreignKeys != null) {
+            for (Iterator iter = _foreignKeys.iterator(); iter.hasNext();) {
+                result.append(iter.next());
+            }
+        }
+
+        if (_idMethodParameters != null) {
+            Iterator iter = _idMethodParameters.iterator();
+            while (iter.hasNext()) {
+                result.append(iter.next());
+            }
+        }
+
+        result.append("</table>\n");
+
+        return result.toString();
+    }
+
 }

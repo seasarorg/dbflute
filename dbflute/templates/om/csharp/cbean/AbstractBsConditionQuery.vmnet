@@ -89,6 +89,7 @@ namespace ${glPackageBaseCQ} {
 
         /// <summary>
         /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+        /// ${classificationMap.get('comment')}
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
             Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
@@ -267,6 +268,7 @@ namespace ${glPackageBaseCQ} {
 
         /// <summary>
         /// Set the value od ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = }
+        /// ${classificationMap.get('comment')}
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
             String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};

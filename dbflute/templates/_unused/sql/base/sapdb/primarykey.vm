@@ -1,0 +1,4 @@
+#if ($table.hasPrimaryKey())
+ALTER TABLE $table.Name
+    ADD PRIMARY KEY ($table.printPrimaryKey()) ;
+#end

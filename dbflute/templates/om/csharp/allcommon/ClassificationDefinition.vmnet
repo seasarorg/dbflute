@@ -18,7 +18,10 @@ namespace ${glPackageBaseCommon} {
   #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
   #foreach ($classificationMap in $classificationMapList)
 
-        /** The classification code of ${classificationMap.get('name')}. */
+        /// <summary>
+        /// The classification code of ${classificationMap.get('name')}.
+        /// ${classificationMap.get('comment')}
+        // </summary>
         public const String CODE_${classificationName}_${classificationMap.get('name')} = "$classificationMap.get('code')";
   #end
 #end
