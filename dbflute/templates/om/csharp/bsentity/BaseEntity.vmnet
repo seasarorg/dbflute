@@ -792,35 +792,6 @@ namespace ${myExtendedEntityPackageName} {
             return sb.ToString();
         }
 
-## TODO: Is it unnecessary???
-## #foreach ($foreignKeys in $table.ForeignKeys)
-##   #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
-## 
-##             sb.Append(delimiter);
-##             if (${foreignVariableName} != null) {
-##                 sb.Append("${foreignKeys.ForeignPropertyName}").Append(equal).Append(${foreignVariableName}.ExtractColumnValueMapString());
-##             } else {
-##                 sb.Append("${foreignKeys.ForeignPropertyName}").Append(equal).Append("null");
-##             }
-## #end
-## #foreach ($refferer in $table.Referrers)
-##   #set ($reffererTable = $refferer.Table)
-##   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-##   #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
-## 
-##             sb.Append(delimiter).Append("${refferer.ReffererPropertyName}").Append(equal);
-##             if (${reffererVariableName} != null) {
-##                 StringBuilder reffererTmpSb = new StringBuilder();
-##                 foreach (${reffererEntityClassName} refferer in ${reffererVariableName}) {
-##                     reffererTmpSb.Append(delimiter).Append(refferer.ExtractColumnValueMapString());
-##                 }
-##                 reffererTmpSb.Remove(0, delimiter.Length).Insert(0, listMarkAndStartBrace).Append(endBrace);
-##                 sb.Append(reffererTmpSb);
-##             } else {
-##                 sb.Append("null");
-##             }
-## #end
-
 #if (${table.hasAllCommonColumn()})
 
         /// <summary>
