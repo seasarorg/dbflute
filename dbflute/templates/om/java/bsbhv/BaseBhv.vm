@@ -4,6 +4,7 @@ package ${glPackageBaseBhv};
 
 import ${glPackageBaseCommon}.*;
 #if ($database.isAvailableGenerics())
+import ${glPackageBaseCommonBhvLoad}.${glLoadReffererOptionName};
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 #end
@@ -594,27 +595,27 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   Default refferer order-by is 'primary-key asc'.
      *   If your logic don't match this, use condition-bean-setupper. The method is as follows:
      *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${reffererCBClassName}> cbSetupper)
+     *     load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> entityList, ${glConditionBeanSetupperName}<${reffererCBClassName}> cbSetupper)
      *     - - - - - - - - - -/
      * 
      *   ex) {Client Example}
      *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
-     *     final List&lt;${myExtendedObjectClassName}&gt; ls = bhv.selectList(cb);
-     *     bhv.load${refferer.reffererPropertyNameInitCap}(ls);
+     *     final List&lt;${myExtendedObjectClassName}&gt; entityList = bhv.selectList(cb);
+     *     bhv.load${refferer.reffererPropertyNameInitCap}(entityList);
      * 
      *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
-     * @param ls Entity list of main table. (NotNull)
+     * @param entityList Entity list of main table. (NotNull)
      */
-    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ls) {
-        final ${glConditionBeanSetupperName}<${reffererCBClassName}> cbSetupper = new ${glConditionBeanSetupperName}<${reffererCBClassName}>() {
+    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> entityList) {
+        final ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper = new ${glConditionBeanSetupperName}<${reffererCBClassName}>() {
             public void setup(${reffererCBClassName} cb) {
                 cb.addOrderBy_PK_Asc();// Default OrderBy for Refferer.
             }
         };
-        load${refferer.reffererPropertyNameInitCap}(ls, cbSetupper);
+        load${refferer.reffererPropertyNameInitCap}(entityList, conditionBeanSetupper);
     }
 
     /**
@@ -626,14 +627,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
      *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
-     *     final List&lt;${myExtendedObjectClassName}&gt; ls = bhv.selectList(cb);
-     *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; cbSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
+     *     final List&lt;${myExtendedObjectClassName}&gt; entityList = bhv.selectList(cb);
+     *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; conditionBeanSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
      *         public void setup(${reffererCBClassName} cb) {
      *             cb.query().setXxx_IsNotNull();
      *             cb.query().addOrderBy_Yyy_Desc();
      *         }
      *     };
-     *     bhv.load${refferer.reffererPropertyNameInitCap}(ls, cbSetupper);
+     *     bhv.load${refferer.reffererPropertyNameInitCap}(entityList, conditionBeanSetupper);
      *     - - - - - - - - - -/
      * 
      *   The condition-bean that the setupper provides have settings before you touch it. It is as follows:
@@ -645,50 +646,90 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
-     * @param ls Entity list of main table. (NotNull)
-     * @param cbSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
+     * @param entityList Entity list of main table. (NotNull)
+     * @param conditionBeanSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
      */
-    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${reffererCBClassName}> cbSetupper) {
-        assertObjectNotNull("ls", ls);
-        assertObjectNotNull("cbSetupper", cbSetupper);
-        if (ls.isEmpty()) {
+    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> entityList, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
+        assertObjectNotNull("entityList<${myExtendedObjectClassName}>", entityList);
+        assertObjectNotNull("conditionBeanSetupper<${reffererCBClassName}>", conditionBeanSetupper);
+        if (entityList.isEmpty()) {
+            return;
+        }
+        load${refferer.ReffererPropertyNameInitCap}(entityList, new ${glLoadReffererOptionName}<${reffererCBClassName}>(conditionBeanSetupper));
+    }
+
+    /**
+     * Load refferer of ${refferer.ReffererPropertyName}.
+     * <pre>
+     *   You can load refferer with your original condition.
+     * 
+     *   ex) {Client Example}: Refferer conditions are 'Xxx' is not null and order-by 'Yyy' desc
+     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     *     cb.query().setXxx_Equal("xxx");
+     *     final List&lt;${myExtendedObjectClassName}&gt; entityList = bhv.selectList(cb);
+     *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; cbSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
+     *         public void setup(${reffererCBClassName} cb) {
+     *             cb.query().setXxx_IsNotNull();
+     *             cb.query().addOrderBy_Yyy_Desc();
+     *         }
+     *     };
+     *     bhv.load${refferer.reffererPropertyNameInitCap}(entityList, new ${glLoadReffererOptionName}<${reffererCBClassName}>(cbSetupper));
+     *     - - - - - - - - - -/
+     * 
+     *   The condition-bean that the setupper provides have settings before you touch it. It is as follows:
+     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+     *     cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     *     cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+     *     - - - - - - - - - -/
+     * 
+     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     * </pre>
+     * 
+     * @param entityList Entity list of main table. (NotNull)
+     * @param loadReffererOption Load-refferer option. (NotNull)
+     */
+    public void load${refferer.reffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> entityList, ${glLoadReffererOptionName}<${reffererCBClassName}> loadReffererOption) {
+        assertObjectNotNull("entityList<${myExtendedObjectClassName}>", entityList);
+        assertObjectNotNull("loadReffererOption<${reffererCBClassName}>", loadReffererOption);
+        if (entityList.isEmpty()) {
             return;
         }
 
-        final java.util.Map${database.filterGenericsString(${genericPKMyEntityMap})} pkMyEntityMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKMyEntityMap})}();
-        final java.util.List${database.filterGenericsString(${table.getPrimaryKeyJavaNativeAsOne()})} pkList = new java.util.ArrayList${database.filterGenericsString(${table.getPrimaryKeyJavaNativeAsOne()})}();
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+        final java.util.Map<${genericPKMyEntityMap}> pkMyEntityMap = new java.util.LinkedHashMap<${genericPKMyEntityMap}>();
+        final java.util.List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList = new java.util.ArrayList<${table.getPrimaryKeyJavaNativeAsOne()}>();
+        for (${myExtendedObjectClassName} entity : entityList) {
             pkList.add(entity.get${table.getPrimaryKeyJavaNameAsOne()}());
             pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}()), entity);
         }
         final ${reffererBhvClassName} reffererBhv = getDaoSelector().getBehavior(${reffererBhvClassName}.class);
-        final ${reffererCBClassName} cb = reffererBhv.newMyConditionBean();
+        final ${reffererCBClassName} cb = loadReffererOption.getReffererConditionBean() != null ? loadReffererOption.getReffererConditionBean() : reffererBhv.newMyConditionBean();
         cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-        cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-        cbSetupper.setup(cb);
+        loadReffererOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
+        if (!loadReffererOption.isStopOrderByKey()) {
+            cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
+            cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
+        }
+        loadReffererOption.delegateConditionBeanSettingUp(cb);
         final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.selectList(cb);
 
-        final java.util.Map${database.filterGenericsString(${genericPKChildListMap})} pkReffererListMap;
-        pkReffererListMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKChildListMap})}();
-        for (final java.util.Iterator ite = reffererList.iterator(); ite.hasNext(); ) {
-            final ${reffererEntityClassName} reffererEntity = (${reffererEntityClassName})ite.next();
+        final java.util.Map<${genericPKChildListMap}> pkReffererListMap = new java.util.LinkedHashMap<${genericPKChildListMap}>();
+        for (${reffererEntityClassName} reffererEntity : reffererList) {
             if (!pkReffererListMap.containsKey(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))) {
-                pkReffererListMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()), new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
+                pkReffererListMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()), new java.util.ArrayList<${reffererEntityClassName}>());
             }
-            ((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))).add(reffererEntity);
+            (pkReffererListMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))).add(reffererEntity);
 
             // for Reverse Reference.
-            final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()));
+            final ${myExtendedObjectClassName} myEntity = pkMyEntityMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()));
             reffererEntity.set${refferer.ForeignPropertyNameInitCap}(myEntity);
         }
 
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+        for (${myExtendedObjectClassName} entity : entityList) {
             if (pkReffererListMap.containsKey(toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}()))) {
                 entity.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(entity.get${table.getPrimaryKeyJavaNameAsOne()}())));
             } else {
-                entity.set${refferer.ReffererPropertyNameInitCap}(new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
+                entity.set${refferer.ReffererPropertyNameInitCap}(new java.util.ArrayList<${reffererEntityClassName}>());
             }
         }
     }

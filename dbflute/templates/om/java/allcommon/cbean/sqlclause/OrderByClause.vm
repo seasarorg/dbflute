@@ -29,14 +29,37 @@ public class ${myClassName} implements java.io.Serializable {
     // =====================================================================================
     //                                                                              Behavior
     //                                                                              ========
-    public void addOrderByElement(${glOrderByElementName} value) {
-        _orderByList.add(value);
+    /**
+     * Add order-by element.
+     * 
+     * @param orderByElement Order-by element. (NotNull)
+     */
+    public void addOrderByElement(${glOrderByElementName} orderByElement) {
+        _orderByList.add(orderByElement);
+    }
+
+    /**
+     * Insert first order-by element .
+     * 
+     * @param orderByElement Order-by element. (NotNull)
+     */
+    public void insertFirstOrderByElement(${glOrderByElementName} orderByElement) {
+        _orderByList.add(0, orderByElement);
     }
 
     public void reverseAll() {
         for (final java.util.Iterator ite = _orderByList.iterator(); ite.hasNext(); ) {
             final ${glOrderByElementName} element = (${glOrderByElementName})ite.next();
             element.reverse();
+        }
+    }
+
+    public void exchangeFirstOrderByElementForLastOne() {
+        if (_orderByList.size() > 1) {
+            final ${glOrderByElementName} first = (${glOrderByElementName})_orderByList.get(0);
+            final ${glOrderByElementName} last = (${glOrderByElementName})_orderByList.get(_orderByList.size() - 1);
+            _orderByList.set(0, last);
+            _orderByList.set(_orderByList.size() - 1, first);
         }
     }
 

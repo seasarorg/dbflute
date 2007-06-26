@@ -451,6 +451,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
+    /**
+     * Exchange first where clause for last one.
+     */
+    public void exchangeFirstWhereClauseForLastOne() {
+        if (_whereList.size() > 1) {
+            final String first = (String)_whereList.get(0);
+            final String last = (String)_whereList.get(_whereList.size() - 1);
+            _whereList.set(0, last);
+            _whereList.set(_whereList.size() - 1, first);
+        }
+    }
+
     // =====================================================================================
     //                                                                           InlineWhere
     //                                                                           ===========

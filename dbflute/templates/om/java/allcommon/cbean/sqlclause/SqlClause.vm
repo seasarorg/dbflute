@@ -176,6 +176,11 @@ public interface ${myClassName} {
      */
     public void registerWhereClause(String clause);
 
+    /**
+     * Exchange first where clause for last one.
+     */
+    public void exchangeFirstWhereClauseForLastOne();
+
     // =====================================================================================
     //                                                                           InlineWhere
     //                                                                           ===========

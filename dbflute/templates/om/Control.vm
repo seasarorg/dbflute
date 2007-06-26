@@ -85,6 +85,9 @@ targetdatabase = $targetDatabase
     #set ($glTokenFileOutputOptionName = "${glProjectPrefix}TokenFileOutputOption")
     #set ($glTokenFileOutputResultName = "${glProjectPrefix}TokenFileOutputResult")
 
+    ## [Allcommon-Behavior-Load]
+    #set ($glLoadReffererOptionName = "${glProjectPrefix}LoadReffererOption")
+
     ## [Allcommon-Behavior-Setup]
     #set ($glConditionBeanSetupperName = "${glProjectPrefix}ConditionBeanSetupper")
     #set ($glValueLabelSetupperName = "${glProjectPrefix}ValueLabelSetupper")
@@ -219,6 +222,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
     #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
     #set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.bhv.batch")
+    #set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.bhv.load")
     #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.bhv.setup")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
     #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
@@ -336,6 +340,13 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glTargetLanguage}/allcommon/bhv/batch/TokenFileOutputResult.${glTemplateFileExtension}",$path ,"", "")
 
       #if ($database.isAvailableGenerics())
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
+        $database.makeDirectory($path)
+
+        $database.debug("    parseLoadReffererOption()")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadReffererOptionName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/bhv/load/LoadReffererOption.${glTemplateFileExtension}",$path ,"", "")
+
         #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
         $database.makeDirectory($path)
 
