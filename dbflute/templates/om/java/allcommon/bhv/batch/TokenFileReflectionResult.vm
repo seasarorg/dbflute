@@ -10,7 +10,7 @@ public class ${glTokenFileReflectionResultName} {
     //                                                                             =========
     protected java.util.List${database.filterGenericsString('String')} _columnNameList;
     protected int _successCount;
-    protected java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} _tokenFileReflectionFailureList;
+    protected java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} _failureList;
 
     // =====================================================================================
     //                                                                           Easy-to-Use
@@ -38,11 +38,11 @@ public class ${glTokenFileReflectionResultName} {
         _successCount = successCount;
     }
 
-    public java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} getTokenFileReflectionFailureList() {
-        return _tokenFileReflectionFailureList;
+    public java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} getFailureList() {
+        return _failureList;
     }
 
-    public void setTokenFileReflectionFailureList(java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} tokenFileReflectionFailureList) {
-        this._tokenFileReflectionFailureList = tokenFileReflectionFailureList;
+    public void setFailureList(java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList) {
+        this._failureList = failureList;
     }
 }

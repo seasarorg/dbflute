@@ -81,7 +81,7 @@ public class DfInternalSqlBuilder {
         for (String columnName : columnNameSet) {
             sb.append(", ").append(columnName);
         }
-        sb.delete(0, ", ".length()).insert(0, "insert into " + _tableName + "(").append(")");
+        sb.delete(0, ", ".length()).insert(0, "insert into " + _tableName + " (").append(")");
         sb.append(getValuesString(columnNameSet, columnValueMap, sqlBuildingResult));
         sqlBuildingResult.setSql(sb.toString());
         return sqlBuildingResult;
@@ -112,7 +112,7 @@ public class DfInternalSqlBuilder {
                 throw new RuntimeException("valueList.get(columnCount) threw the exception: valueList=" + _valueList
                         + " columnCount=" + columnCount, e);
             }
-            columnValueMap.put(columnName.toLowerCase(), value);
+            columnValueMap.put(columnName, value);
         }
         return columnValueMap;
     }
@@ -139,7 +139,7 @@ public class DfInternalSqlBuilder {
                 }
             }
         }
-        sbValues.delete(0, ", ".length()).insert(0, " values(").append(");");
+        sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
         return sbValues.toString();
     }
 

@@ -86,10 +86,11 @@ targetdatabase = $targetDatabase
     #set ($glTokenFileOutputResultName = "${glProjectPrefix}TokenFileOutputResult")
 
     ## [Allcommon-Behavior-Load]
-    #set ($glLoadReffererOptionName = "${glProjectPrefix}LoadReffererOption")
+    #set ($glLoadRefererOptionName = "${glProjectPrefix}LoadRefererOption")
 
     ## [Allcommon-Behavior-Setup]
     #set ($glConditionBeanSetupperName = "${glProjectPrefix}ConditionBeanSetupper")
+    #set ($glEntityListSetupperName = "${glProjectPrefix}EntityListSetupper")
     #set ($glValueLabelSetupperName = "${glProjectPrefix}ValueLabelSetupper")
     #set ($glValueLabelBoxName = "${glProjectPrefix}ValueLabelBox")
 
@@ -343,9 +344,9 @@ targetdatabase = $targetDatabase
         #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhvLoad}))
         $database.makeDirectory($path)
 
-        $database.debug("    parseLoadReffererOption()")
-        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadReffererOptionName}.${glClassFileExtension}" )
-        $generator.parse("om/${glTargetLanguage}/allcommon/bhv/load/LoadReffererOption.${glTemplateFileExtension}",$path ,"", "")
+        $database.debug("    parseLoadRefererOption()")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvLoad})}${glLoadRefererOptionName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/bhv/load/LoadRefererOption.${glTemplateFileExtension}",$path ,"", "")
 
         #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
         $database.makeDirectory($path)
@@ -353,6 +354,10 @@ targetdatabase = $targetDatabase
         $database.debug("    parseConditionBeanSetupper()")
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glConditionBeanSetupperName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/allcommon/bhv/setup/ConditionBeanSetupper.${glTemplateFileExtension}",$path ,"", "")
+
+        $database.debug("    parseEntityListSetupper()")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glEntityListSetupperName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/bhv/setup/EntityListSetupper.${glTemplateFileExtension}",$path ,"", "")
 
         $database.debug("    parseValueLabelSetupper()")
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glValueLabelSetupperName}.${glClassFileExtension}" )

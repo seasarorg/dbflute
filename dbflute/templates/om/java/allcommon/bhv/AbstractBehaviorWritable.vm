@@ -347,6 +347,54 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public ${glTokenFileReflectionResultName} reflectTokenFile(String filename, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
+        assertFileTokenReflectionOption(tokenFileReflectionOption);
+
+        final ${glTokenFileReflectionResultName} result = buildTokenFileReflectionResult();
+        final ${glFileTokenizingCallbackName} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
+        final ${glFileTokenizingOptionName} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
+        final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
+        fileToken.tokenize(filename, fileTokenizingCallback, fileTokenizingOption);
+        return result;
+    }
+
+    /**
+     * Reflect(insert or update) token-file to this table.
+     * 
+     * @param inputStream Input stream. (NotNull and NotClosed)
+     * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
+     * @return Token-file-reflection-result. (NotNull)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public ${glTokenFileReflectionResultName} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+        assertObjectNotNull("inputStream", inputStream);
+        assertFileTokenReflectionOption(tokenFileReflectionOption);
+
+        final ${glTokenFileReflectionResultName} result = buildTokenFileReflectionResult();
+        final ${glFileTokenizingCallbackName} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
+        final ${glFileTokenizingOptionName} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
+        final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
+        fileToken.tokenize(inputStream, fileTokenizingCallback, fileTokenizingOption);
+        return result;
+    }
+
+    protected void assertFileTokenReflectionOption(${glTokenFileReflectionOptionName} tokenFileReflectionOption) {
+        assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
+
+        final String encoding = tokenFileReflectionOption.getEncoding();
+        final String delimiter = tokenFileReflectionOption.getDelimiter();
+        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+        assertObjectNotNull("delimiter", delimiter);
+    }
+
+    protected ${glTokenFileReflectionResultName} buildTokenFileReflectionResult() {
+        final ${glTokenFileReflectionResultName} result = new ${glTokenFileReflectionResultName}();
+        final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList = new java.util.ArrayList${database.filterGenericsString(${glTokenFileReflectionFailureName})}();
+        result.setFailureList(failureList);
+        return result;
+    }
+
+    protected ${glFileTokenizingCallbackName} buildFileTokenReflectionFileTokenizingCallback(${glTokenFileReflectionOptionName} tokenFileReflectionOption, final ${glTokenFileReflectionResultName} result) throws java.io.FileNotFoundException, java.io.IOException {
         assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
 
         final String encoding = tokenFileReflectionOption.getEncoding();
@@ -354,11 +402,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         final boolean interruptIfError = tokenFileReflectionOption.isInterruptIfError();
         assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
         assertObjectNotNull("delimiter", delimiter);
-
-        // Initialize result object!
-        final ${glTokenFileReflectionResultName} result = new ${glTokenFileReflectionResultName}();
-        final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList = new java.util.ArrayList${database.filterGenericsString(${glTokenFileReflectionFailureName})}();
-        result.setTokenFileReflectionFailureList(failureList);
+        final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList = result.getFailureList();
+        assertObjectNotNull("failureList", failureList);
 
         final ${glFileTokenizingCallbackName} fileTokenizingCallback = new ${glFileTokenizingCallbackName}() {
             public void handleRowResource(${glFileTokenizingRowResourceName} fileTokenizingRowResource) {
@@ -399,15 +444,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                 }
             }
         };
-        final ${glFileTokenizingOptionName} fileTokenizingOption = new ${glFileTokenizingOptionName}();
-        fileTokenizingOption.setEncoding(encoding);
-        fileTokenizingOption.setDelimiter(delimiter);
-        if (tokenFileReflectionOption.isHandleEmptyAsNull()) {
-            fileTokenizingOption.handleEmptyAsNull();
-        }
-        final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
-        fileToken.tokenize(filename, fileTokenizingCallback, fileTokenizingOption);
-        return result;
+        return fileTokenizingCallback;
     }
 
     protected ${glEntityInterfaceName} createEntityByStringValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
@@ -421,8 +458,25 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         final String mapString = builder.buildFromList(valueList);
 
         final ${glEntityInterfaceName} entity = getDBMeta().newEntity();
-        entity.acceptColumnValueMapString(mapString);
+        getDBMeta().acceptColumnValueMapString(entity, mapString);
         return entity;
+    }
+
+    protected ${glFileTokenizingOptionName} buildFileTokenReflectionFileTokenizingOption(${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+        assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
+
+        final String encoding = tokenFileReflectionOption.getEncoding();
+        final String delimiter = tokenFileReflectionOption.getDelimiter();
+        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+        assertObjectNotNull("delimiter", delimiter);
+
+        final ${glFileTokenizingOptionName} fileTokenizingOption = new ${glFileTokenizingOptionName}();
+        fileTokenizingOption.setEncoding(encoding);
+        fileTokenizingOption.setDelimiter(delimiter);
+        if (tokenFileReflectionOption.isHandleEmptyAsNull()) {
+            fileTokenizingOption.handleEmptyAsNull();
+        }
+        return fileTokenizingOption;
     }
 
     abstract protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity);

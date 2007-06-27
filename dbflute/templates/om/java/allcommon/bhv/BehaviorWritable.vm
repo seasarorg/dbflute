@@ -168,6 +168,17 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
     public ${glTokenFileReflectionResultName} reflectTokenFile(String filename, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
 
     /**
+     * Reflect(insert or update) token-file to this table.
+     * 
+     * @param inputStream Input stream. (NotNull and NotClosed)
+     * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
+     * @return Token-file-reflection-result. (NotNull)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public ${glTokenFileReflectionResultName} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
+
+    /**
      * Reflect(insert or update) from separated-file.
      * 
      * @param filename Name of the file. (NotNull and NotEmpty)

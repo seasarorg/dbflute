@@ -190,6 +190,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     try {
                         final String sql = sqlBuildingResult.getSql();
                         final List<Object> bindParameters = sqlBuildingResult.getBindParameters();
+                        _log.info(sql);
                         _log.info(getSql4Log(tableName, columnNameList, bindParameters));
                         statement = _dataSource.getConnection().prepareStatement(sql);
                         int bindCount = 1;
@@ -255,7 +256,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         columnNameString = columnNameString.substring(1, columnNameString.length() - 1);
         String bindParameterString = bindParameters.toString();
         bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
-        return "insert into " + tableName + "(" + columnNameString + ") values(" + bindParameterString + ")";
+        return "insert into " + tableName + " (" + columnNameString + ") values(" + bindParameterString + ")";
     }
 
     protected List<String> getAppendDefaultColumnNameList(FirstLineInfo firstLineInfo) {

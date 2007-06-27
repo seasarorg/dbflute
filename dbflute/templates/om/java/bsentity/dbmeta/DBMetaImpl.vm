@@ -757,7 +757,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     private long helpParsingDateString(Object value, String propertyName, String typeName) {
-        return MapStringUtil.parseDateString(value, propertyName, typeName);
+        return MapStringUtil.parseDateStringAsMillis(value, propertyName, typeName);
     }
 #end
 
@@ -835,11 +835,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
     private void helpAppendingColumnValueString(StringBuffer sb, String delimiter, String equal, String colName, Object value) {
         sb.append(delimiter).append(colName).append(equal);
-        if (value instanceof java.util.Date) {
-            sb.append((value != null ? helpFormatingDate((java.util.Date)value) : ""));
-        } else {
-            sb.append((value != null ? value.toString() : ""));
-        }
+        sb.append(helpGettingColumnStringValue(value));
     }
 
 #if (${table.hasAllCommonColumn()})
@@ -919,34 +915,33 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
 #end
 
-    public java.util.List${database.filterGenericsString('Object')} extractColumnValueList(${glEntityInterfaceName} entity) {
+    // -----------------------------------------------------
+    //                                               Convert
+    //                                               -------
+    public java.util.List${database.filterGenericsString('Object')} convertToColumnValueList(${glEntityInterfaceName} entity) {
+        return new java.util.ArrayList${database.filterGenericsString('Object')}(convertToColumnValueMap(entity).values());
+    }
+
+    public java.util.Map${database.filterGenericsString('String, Object')} convertToColumnValueMap(${glEntityInterfaceName} entity) {
         final ${myExtendedObjectClassName} myEntity = downcast(entity);
-        final java.util.List${database.filterGenericsString('Object')} valueList = new java.util.ArrayList${database.filterGenericsString('Object')}();
+        final java.util.Map${database.filterGenericsString('String, Object')} valueMap = new java.util.LinkedHashMap${database.filterGenericsString('String, Object')}();
 #foreach ($col in $table.columns)
-        valueList.add(myEntity.get${col.JavaName}());
+        valueMap.put("${col.name}", myEntity.get${col.JavaName}());
 #end
-        return valueList;
+        return valueMap;
     }
 
-    public java.util.List${database.filterGenericsString('String')} extractColumnStringValueList(${glEntityInterfaceName} entity) {
+    public java.util.List${database.filterGenericsString('String')} convertToColumnStringValueList(${glEntityInterfaceName} entity) {
+        return new java.util.ArrayList${database.filterGenericsString('String')}(convertToColumnStringValueMap(entity).values());
+    }
+
+    public java.util.Map${database.filterGenericsString('String, String')} convertToColumnStringValueMap(${glEntityInterfaceName} entity) {
         final ${myExtendedObjectClassName} myEntity = downcast(entity);
-        final java.util.List${database.filterGenericsString('String')} valueList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        final java.util.Map${database.filterGenericsString('String, String')} valueMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
 #foreach ($col in $table.columns)
-        valueList.add(helpGettingColumnStringValue(myEntity.get${col.JavaName}()));
+        valueMap.put("${col.name}", helpGettingColumnStringValue(myEntity.get${col.JavaName}()));
 #end
-        return valueList;
-    }
-
-    private String helpGettingColumnStringValue(Object value) {
-        if (value instanceof java.util.Date) {
-            return (value != null ? helpFormatingDate((java.util.Date)value) : "");
-        } else {
-            return (value != null ? value.toString() : "");
-        }
-    }
-
-    private String helpFormatingDate(java.util.Date value) {
-        return MapStringUtil.formatDate(value);
+        return valueMap;
     }
 
     // ===================================================================================

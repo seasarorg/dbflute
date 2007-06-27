@@ -1,16 +1,18 @@
 package ${glPackageBaseCommonBhvSetup};
 
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+
 /**
- * The interface of Condition-Bean Setupper.
+ * The interface of condition-bean setupper.
  * 
  * @author ${database.ClassAuthor}
  */
-public interface ${glConditionBeanSetupperName}<T> {
+public interface ${glConditionBeanSetupperName}<CONDITION_BEAN extends ${glConditionBeanInterfaceName}> {
 
     /**
      * Set up condition.
      * 
      * @param cb Condition-bean. (NotNull)
      */
-    public void setup(T cb);
+    public void setup(CONDITION_BEAN cb);
 }

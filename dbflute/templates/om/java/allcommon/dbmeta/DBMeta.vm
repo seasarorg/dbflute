@@ -3,6 +3,8 @@ package ${glPackageBaseCommonDBMeta};
 #set ($myClassName = "${glDBMetaInterfaceName}")
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonHelper}.${glMapListStringName};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 
 /**
  * The interface of dbmeta.
@@ -419,21 +421,40 @@ public interface ${myClassName} {
      */
     public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);
 
+    // -----------------------------------------------------
+    //                                               Convert
+    //                                               -------
     /**
-     * Extract column value as list.
+     * Convert entity to column value as list.
      * 
      * @param entity Target entity. (NotNull)
      * @return The list of column value. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('Object')} extractColumnValueList(${glEntityInterfaceName} entity);
+    public java.util.List${database.filterGenericsString('Object')} convertToColumnValueList(${glEntityInterfaceName} entity);
 
     /**
-     * Extract column string-value as list.
+     * Convert entity to column value as map.
+     * 
+     * @param entity Target entity. (NotNull)
+     * @return The map of column value. (NotNull)
+     */
+    public java.util.Map${database.filterGenericsString('String, Object')} convertToColumnValueMap(${glEntityInterfaceName} entity);
+
+    /**
+     * Convert entity to column string-value as list.
      * 
      * @param entity Target entity. (NotNull)
      * @return The list of column string-value. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('String')} extractColumnStringValueList(${glEntityInterfaceName} entity);
+    public java.util.List${database.filterGenericsString('String')} convertToColumnStringValueList(${glEntityInterfaceName} entity);
+
+    /**
+     * Convert entity to column string-value as map.
+     * 
+     * @param entity Target entity. (NotNull)
+     * @return The map of column string-value. (NotNull)
+     */
+    public java.util.Map${database.filterGenericsString('String, String')} convertToColumnStringValueMap(${glEntityInterfaceName} entity);
 
     // ===================================================================================
     //                                                                        JDBC Support
@@ -442,4 +463,11 @@ public interface ${myClassName} {
     public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, String tablePrefix);
     public String getPreparedInsertClause();
     public String getPreparedInsertClause(String tablePrefix);
+
+    // ===================================================================================
+    //                                                                          Map String
+    //                                                                          ==========
+    public ${glMapListStringName} createMapListString();
+
+    public ${glMapStringBuilderName} createMapStringBuilder();
 }

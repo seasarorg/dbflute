@@ -5,6 +5,8 @@ package ${glPackageBaseCommonDBMeta};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
 
 /**
  * The abstract class of dbmeta.
@@ -238,7 +240,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         java.sql.PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sql);
-            final java.util.List${database.filterGenericsString('Object')} valueList = extractColumnValueList(entity);
+            final java.util.List${database.filterGenericsString('Object')} valueList = convertToColumnValueList(entity);
             int settingIndex = 1;
             for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
                 Object value = ite.next();
@@ -264,6 +266,17 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     // ===================================================================================
+    //                                                                          Map String
+    //                                                                          ==========
+    public ${glMapListStringName} createMapListString() {
+        return MapStringUtil.createMapListString();
+    }
+
+    public ${glMapStringBuilderName} createMapStringBuilder() {
+        return MapStringUtil.createMapStringBuilder(getColumnDbNameList());
+    }
+
+    // ===================================================================================
     //                                                                          Util Class
     //                                                                          ==========
     /**
@@ -283,13 +296,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             if (!primaryKeyMapString.trim().endsWith(suffix)) {
                 primaryKeyMapString = primaryKeyMapString + suffix;
             }
-            ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
-            mapListString.setMapMark(MAP_STRING_MAP_MARK);
-            mapListString.setListMark(MAP_STRING_LIST_MARK);
-            mapListString.setStartBrace(MAP_STRING_START_BRACE);
-            mapListString.setEndBrace(MAP_STRING_END_BRACE);
-            mapListString.setEqual(MAP_STRING_EQUAL);
-            mapListString.setDelimiter(MAP_STRING_DELIMITER);
+            ${glMapListStringName} mapListString = createMapListString();
             entity.getDBMeta().acceptPrimaryKeyMap(entity, mapListString.generateMap(primaryKeyMapString));
         }
 
@@ -306,13 +313,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             if (!columnValueMapString.trim().endsWith(suffix)) {
                 columnValueMapString = columnValueMapString + suffix;
             }
-            ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
-            mapListString.setMapMark(MAP_STRING_MAP_MARK);
-            mapListString.setListMark(MAP_STRING_LIST_MARK);
-            mapListString.setStartBrace(MAP_STRING_START_BRACE);
-            mapListString.setEndBrace(MAP_STRING_END_BRACE);
-            mapListString.setEqual(MAP_STRING_EQUAL);
-            mapListString.setDelimiter(MAP_STRING_DELIMITER);
+            ${glMapListStringName} mapListString = createMapListString();
             entity.getDBMeta().acceptColumnValueMap(entity, mapListString.generateMap(columnValueMapString));
         }
 
@@ -343,10 +344,15 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             }
         }
 
-        public static long parseDateString(Object value, String propertyName, String typeName) {
+        public static long parseDateStringAsMillis(Object value, String propertyName, String typeName) {
             checkTypeString(value, propertyName, typeName);
             try {
-                return getDateFormat().parse((String)value).getTime();
+                final String valueString = (String)value;
+                if (valueString.indexOf("-") >= 0 && valueString.indexOf("-") != valueString.lastIndexOf("-")) {
+                    return java.sql.Timestamp.valueOf(valueString).getTime();
+                } else {
+                    return getParseDateFormat().parse((String)value).getTime();
+                }
             } catch (java.text.ParseException e) {
                 String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
                 throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
@@ -357,11 +363,41 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
 
         public static String formatDate(java.util.Date value) {
-            return getDateFormat().format(value);
+            return getFormatDateFormat().format(value);
         }
 
-        public static java.text.DateFormat getDateFormat() {
+        public static String formatTimestamp(java.sql.Timestamp value) {
+            return getFormatDateFormat().format(value);
+        }
+
+        public static java.text.DateFormat getParseDateFormat() {
+            return java.text.DateFormat.getDateTimeInstance();
+        }
+
+        public static java.text.DateFormat getFormatDateFormat() {
             return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        }
+
+        public static ${glMapListStringName} createMapListString() {
+            final ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+            mapListString.setMapMark(MAP_STRING_MAP_MARK);
+            mapListString.setListMark(MAP_STRING_LIST_MARK);
+            mapListString.setStartBrace(MAP_STRING_START_BRACE);
+            mapListString.setEndBrace(MAP_STRING_END_BRACE);
+            mapListString.setEqual(MAP_STRING_EQUAL);
+            mapListString.setDelimiter(MAP_STRING_DELIMITER);
+            return mapListString;
+        }
+
+        public static ${glMapStringBuilderName} createMapStringBuilder(java.util.List${database.filterGenericsString('String')} columnNameList) {
+            ${glMapStringBuilderName} mapStringBuilder = new ${glMapStringBuilderImplName}();
+            mapStringBuilder.setMsMapMark(MAP_STRING_MAP_MARK);
+            mapStringBuilder.setMsStartBrace(MAP_STRING_START_BRACE);
+            mapStringBuilder.setMsEndBrace(MAP_STRING_END_BRACE);
+            mapStringBuilder.setMsEqual(MAP_STRING_EQUAL);
+            mapStringBuilder.setMsDelimiter(MAP_STRING_DELIMITER);
+            mapStringBuilder.setColumnNameList(columnNameList);
+            return mapStringBuilder;
         }
     }
 
@@ -469,7 +505,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
 	    }
 
 	    private long helpParsingDateString(Object value, String uncapPropName, String typeName) {
-	        return MapStringUtil.parseDateString(value, uncapPropName, typeName);
+	        return MapStringUtil.parseDateStringAsMillis(value, uncapPropName, typeName);
 	    }
 
         protected Object newInstanceByConstructor(Class targetType, Class argType, Object arg) {
@@ -507,6 +543,24 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     //                                                                                Helper
     //                                                                                ======
     abstract protected void checkDowncast(${glEntityInterfaceName} entity);
+
+    protected String helpGettingColumnStringValue(Object value) {
+        if (value instanceof java.sql.Timestamp) {
+            return (value != null ? helpFormatingTimestamp((java.sql.Timestamp)value) : "");
+        } else if (value instanceof java.util.Date) {
+            return (value != null ? helpFormatingDate((java.util.Date)value) : "");
+        } else {
+            return (value != null ? value.toString() : "");
+        }
+    }
+
+    protected String helpFormatingDate(java.util.Date date) {
+        return MapStringUtil.formatDate(date);
+    }
+
+    protected String helpFormatingTimestamp(java.sql.Timestamp timestamp) {
+        return MapStringUtil.formatTimestamp(timestamp);
+    }
 
     // ----------------------------------------------------------------
     //                                                    Assert Object

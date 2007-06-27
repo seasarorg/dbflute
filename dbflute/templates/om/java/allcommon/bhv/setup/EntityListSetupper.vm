@@ -1,0 +1,18 @@
+package ${glPackageBaseCommonBhvSetup};
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+
+/**
+ * The interface of entity list setupper.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glEntityListSetupperName}<ENTITY extends ${glEntityInterfaceName}> {
+
+    /**
+     * Set up entity list.
+     * 
+     * @param entityList Entity list. (NotNull)
+     */
+    public void setup(java.util.List<ENTITY> entityList);
+}
