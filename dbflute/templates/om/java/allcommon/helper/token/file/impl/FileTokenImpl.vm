@@ -83,8 +83,8 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
         assertObjectNotNull("fileTokenizingOption", fileTokenizingOption);
         final String delimiter = fileTokenizingOption.getDelimiter();
         final String encoding = fileTokenizingOption.getEncoding();
-        assertStringNotNullAndNotTrimmedEmpty("encoding", delimiter);
-        assertStringNotNullAndNotTrimmedEmpty("delimiter", encoding);
+        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+        assertObjectNotNull("delimiter", delimiter);
 
         java.io.InputStreamReader ir = null;
         java.io.BufferedReader br = null;
@@ -403,7 +403,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
         final String encoding = fileMakingOption.getEncoding();
         final String delimiter = fileMakingOption.getDelimiter();
         assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-        assertStringNotNullAndNotTrimmedEmpty("delimiter", delimiter);
+        assertObjectNotNull("delimiter", delimiter);
         final String lineSeparator;
         if (fileMakingOption.getLineSeparator() != null && !fileMakingOption.getLineSeparator().equals("")) {
             lineSeparator = fileMakingOption.getLineSeparator();
@@ -426,7 +426,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                     lineMakingOption.setDelimiter(delimiter);
                     lineMakingOption.trimSpace();// Trimming is Header Only!
                     final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
-                    writer.write(columnHeaderString);
+                    writer.write(columnHeaderString + lineSeparator);
                 }
             }
 
@@ -440,7 +440,9 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                 final java.util.List${database.filterGenericsString('String')} valueList = rowResource.getValueList();
                 final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
                 lineMakingOption.setDelimiter(delimiter);
-                lineMakingOption.quoteByDoubleQuotation();
+                if (!fileMakingOption.isGoodByeDoubleQuotation()) {
+                    lineMakingOption.quoteByDoubleQuotation();
+                }
                 final String lineString = _lineToken.make(valueList, lineMakingOption);
                 writer.write(lineString + lineSeparator);
             }

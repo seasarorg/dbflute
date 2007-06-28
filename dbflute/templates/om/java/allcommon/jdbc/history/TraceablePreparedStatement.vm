@@ -62,6 +62,7 @@ public class ${glTraceablePreparedStatementName} implements PreparedStatement {
     //                                             Add-Batch
     //                                             ---------
     public void addBatch() throws SQLException {
+        moveNextBatchPoint();
         preparedStatement.addBatch();
     }
 
@@ -418,6 +419,9 @@ public class ${glTraceablePreparedStatementName} implements PreparedStatement {
     //                                                                               Trace
     //                                                                               =====
     protected void traceSql(String sql) {
+        if (statementHistory.current().isEmpty()) {
+            statementHistory.removeLast();
+        }
         setupSqlDisplayList(sql);
         statementHistoryWitness.witnessTheHistory(statementHistory);
     }
@@ -427,8 +431,7 @@ public class ${glTraceablePreparedStatementName} implements PreparedStatement {
         statementHistory.current().addParameterElement(parameterElement);
     }
 
-    protected ${glPreparedParameterElementName} createPreparedParameterElement(int settingIndex, int jdbcType,
-            Object parameterValue) {
+    protected ${glPreparedParameterElementName} createPreparedParameterElement(int settingIndex, int jdbcType, Object parameterValue) {
         final ${glPreparedParameterElementName} element = new ${glPreparedParameterElementName}();
         element.setSettingIndex(settingIndex);
         element.setJdbcType(jdbcType);
@@ -442,6 +445,9 @@ public class ${glTraceablePreparedStatementName} implements PreparedStatement {
     protected void setupSqlDisplayList(String realSql) {
         final java.util.List<${glPreparedExecutionBeanName}> executionBeanList = statementHistory.getPreparedExecutionBeanList();
         for (${glPreparedExecutionBeanName} executionBean : executionBeanList) {
+            if (executionBean.isEmpty()) {
+                continue;
+            }
             final Object[] args = new Object[executionBean.size()];
             int index = 0;
             final java.util.List<${glPreparedParameterElementName}> parameterElementList = executionBean.getPreparedParameterElementList();
@@ -453,6 +459,13 @@ public class ${glTraceablePreparedStatementName} implements PreparedStatement {
             final String displaySql = getCompleteSql(realSql, args);
             executionBean.setDisplaySql(displaySql);
         }
+    }
+
+    // ===================================================================================
+    //                                                                               Batch
+    //                                                                               =====
+    protected void moveNextBatchPoint() {
+        statementHistory.next();
     }
 
     // ===================================================================================

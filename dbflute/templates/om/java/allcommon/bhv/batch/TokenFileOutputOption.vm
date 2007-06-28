@@ -45,6 +45,11 @@ public class ${glTokenFileOutputOptionName} {
         return this;
     }
 
+    public ${glTokenFileOutputOptionName} goodByeDoubleQuotation() {
+        _fileMakingOption.goodByeDoubleQuotation();
+        return this;
+    }
+
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
@@ -70,5 +75,13 @@ public class ${glTokenFileOutputOptionName} {
 
     public void setLineSeparator(String lineSeparator) {
         _fileMakingOption.setLineSeparator(lineSeparator);
+    }
+
+    public boolean isGoodByeDoubleQuotation() {
+        return _fileMakingOption.isGoodByeDoubleQuotation();
+    }
+
+    public ${glFileMakingOptionName} getFileMakingOption() {
+        return _fileMakingOption;
     }
 }

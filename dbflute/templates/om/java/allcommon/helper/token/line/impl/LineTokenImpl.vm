@@ -48,7 +48,7 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
         assertObjectNotNull("valueList", valueList);
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
-        assertStringNotNullAndNotTrimmedEmpty("lineMakingOption.getDelimiter()", delimiter);
+        assertObjectNotNull("lineMakingOption.getDelimiter()", delimiter);
         return createLineString(valueList, delimiter, lineMakingOption.isQuoteByDoubleQuotation(), lineMakingOption.isTrimSpace());
     }
 

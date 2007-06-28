@@ -21,6 +21,10 @@ public class ${glPreparedExecutionBeanName} {
         this.preparedParameterElementList.add(parameterElement);
     }
 
+    public boolean isEmpty() {
+        return preparedParameterElementList.isEmpty();
+    }
+
     public int size() {
         return preparedParameterElementList.size();
     }

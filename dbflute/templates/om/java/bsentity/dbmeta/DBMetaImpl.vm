@@ -221,60 +221,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                          Table Name
-    //                                                                          ==========
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Table db-name. (NotNull)
-     */
-    public String getTableDbName() {
-        return TABLE_DB_NAME;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Table cap-prop-name. (NotNull)
-     */
-    public String getTableCapPropName() {
-        return TABLE_CAP_PROP_NAME;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Table property-name. (NotNull)
-     */
-    public String getTableUncapPropName() {
-        return TABLE_UNCAP_PROP_NAME;
-    }
-
-    // ===================================================================================
-    //                                                                         Column Name
-    //                                                                         ===========
-    public java.util.List${database.filterGenericsString('String')} getColumnDbNameList() {
-        return new java.util.ArrayList${database.filterGenericsString('String')}(createDbNameCapPropNameMap().keySet());
-    }
-
-    public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList() {
-        return new java.util.ArrayList${database.filterGenericsString('String')}(createCapPropNameDbNameMap().keySet());
-    }
-
-    public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList() {
-        return new java.util.ArrayList${database.filterGenericsString('String')}(createUncapPropNameDbNameMap().keySet());
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Column-db-name comma-string. (NotNull)
-     */
-    public String getColumnDbNameCommaString() {
-        return "${table.ColumnNameCommaString}";
-    }
-
-    // ===================================================================================
     //                                                                            Name-Map
     //                                                                            ========
     /**
@@ -329,6 +275,75 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */
     public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameCapPropNameMap() {
         return createUncapPropNameCapPropNameMap();
+    }
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    public String getTableDbName() {
+        return TABLE_DB_NAME;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table cap-prop-name. (NotNull)
+     */
+    public String getTableCapPropName() {
+        return TABLE_CAP_PROP_NAME;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table property-name. (NotNull)
+     */
+    public String getTableUncapPropName() {
+        return TABLE_UNCAP_PROP_NAME;
+    }
+
+    // ===================================================================================
+    //                                                                         Column Name
+    //                                                                         ===========
+    public java.util.List${database.filterGenericsString('String')} getColumnDbNameList() {
+        final String[] columns = getColumnDbNameCommaString().split(",");
+        final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        for (int i=0; i < columns.length; i++) {
+            resultList.add(columns[i].trim());
+        }
+        return resultList;
+    }
+
+    public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList() {
+        final java.util.List${database.filterGenericsString('String')} columnDbNameList = getColumnDbNameList();
+        final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        for (final java.util.Iterator ite = columnDbNameList.iterator(); ite.hasNext(); ) {
+            resultList.add(getDbNameCapPropNameMap().get((String)ite.next()));
+        }
+        return resultList;
+    }
+
+    public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList() {
+        final java.util.List${database.filterGenericsString('String')} columnDbNameList = getColumnDbNameList();
+        final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        for (final java.util.Iterator ite = columnDbNameList.iterator(); ite.hasNext(); ) {
+            resultList.add(getDbNameUncapPropNameMap().get((String)ite.next()));
+        }
+        return resultList;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Column-db-name comma-string. (NotNull)
+     */
+    public String getColumnDbNameCommaString() {
+        return "${table.columnNameCommaString}";
     }
 
     // ===================================================================================

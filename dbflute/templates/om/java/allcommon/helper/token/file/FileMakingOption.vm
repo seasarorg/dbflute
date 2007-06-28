@@ -17,6 +17,9 @@ public class ${glFileMakingOptionName} {
     /** Line separator. (NotRequired) */
     protected String _lineSeparator;
 
+    /** Good bye double quotation. (NotRequired) */
+    protected boolean _goodByeDoubleQuotation;
+
     /** File-making header information. (NotRequired) */
     protected ${glFileMakingHeaderInfoName} _fileMakingHeaderInfo;
 
@@ -53,6 +56,11 @@ public class ${glFileMakingOptionName} {
         return this;
     }
 
+    public ${glFileMakingOptionName} goodByeDoubleQuotation() {
+        _goodByeDoubleQuotation = true;
+        return this;
+    }
+
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
@@ -78,6 +86,10 @@ public class ${glFileMakingOptionName} {
 
     public void setLineSeparator(String lineSeparator) {
         _lineSeparator = lineSeparator;
+    }
+
+    public boolean isGoodByeDoubleQuotation() {
+        return _goodByeDoubleQuotation;
     }
 
     public ${glFileMakingHeaderInfoName} getFileMakingHeaderInfo() {

@@ -26,6 +26,15 @@ public class ${glStatementHistoryName} {
         return preparedExecutionBeanList.get(preparedExecutionBeanList.size() - 1);
     }
 
+    public ${glPreparedExecutionBeanName} next() {
+        preparedExecutionBeanList.add(new ${glPreparedExecutionBeanName}());
+        return current();
+    }
+
+    public ${glPreparedExecutionBeanName} removeLast() {
+        return preparedExecutionBeanList.remove(preparedExecutionBeanList.size() - 1);
+    }
+
     public int size() {
         return preparedExecutionBeanList.size();
     }

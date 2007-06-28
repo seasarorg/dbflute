@@ -43,11 +43,23 @@ public class ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN extends ${glCondi
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
+    /**
+     * Specify that the key condition is added as last condition. <br />
+     * This method is valid only after you use reffererConditionBean and add your original condition to it. <br />
+     * 
+     * @return this. (NotNull)
+     */
     public ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN, REFERER_ENTITY> toLastKeyCondtion() {
         _toLastKeyCondtion = true;
         return this;
     }
 
+    /**
+     * Specify that it stops adding order-by of the key. <br />
+     * This method is valid only after you use reffererConditionBean and add your original order-by to it. <br />
+     * 
+     * @return this. (NotNull)
+     */
     public ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN, REFERER_ENTITY> stopOrderByKey() {
         _stopOrderByKey = true;
         return this;

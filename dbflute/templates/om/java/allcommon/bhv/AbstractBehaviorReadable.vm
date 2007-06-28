@@ -29,24 +29,24 @@ import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImplN
  */
 public abstract class $myClassName implements ${glBehaviorReadableInterfaceName} {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Dao-selector instance. */
     protected ${glDaoSelectorInterfaceName} _daoSelector;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
     public ${myClassName}() {
     }
 
-    // =====================================================================================
-    //                                                                          Dao Accessor
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Dao Accessor
+    //                                                                        ============
     /**
      * ${database.ImplementComment}
      * 
@@ -65,9 +65,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         _daoSelector = value;
     }
 
-    // =====================================================================================
-    //                                                                       Delegate Method
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                     Delegate Method
+    //                                                                     ===============
     /**
      * ${database.ImplementComment}
      * 
@@ -382,12 +382,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             rowList.add(valueList);
         }
         final ${glFileMakingSimpleFacadeName} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImplName}();
-        final ${glFileMakingOptionName} fileMakingOption = new ${glFileMakingOptionName}();
+        final ${glFileMakingOptionName} fileMakingOption = tokenFileOutputOption.getFileMakingOption();
         final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
         fileMakingHeaderInfo.setColumnNameList(getDBMeta().getColumnDbNameList());
         fileMakingOption.setFileMakingHeaderInfo(fileMakingHeaderInfo);
-        fileMakingOption.setEncoding(tokenFileOutputOption.getEncoding());
-        fileMakingOption.setDelimiter(tokenFileOutputOption.getDelimiter());
         fileMakingSimpleFacade.makeFromRowList(filename, rowList, fileMakingOption);
         final ${glTokenFileOutputResultName} tokeFileOutputResult = new ${glTokenFileOutputResultName}();
         tokeFileOutputResult.setSelectedList(ls);

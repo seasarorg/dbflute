@@ -103,6 +103,10 @@ targetdatabase = $targetDatabase
       #set ($myDBMetaClassName = "${glProjectPrefix}${table.JavaName}Dbm")
       #set ($myDBMetaPackageName = "${glPackageCustomizeDBMeta}")
 
+      #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")
+      #set ($myEntityListVariableName = "${table.uncapitalisedJavaName}List")
+      #set ($myCBVariableName = "${table.uncapitalisedJavaName}")
+
       #set ($isExistDao = false)
       #set ($isExistConditionBean = false)
 

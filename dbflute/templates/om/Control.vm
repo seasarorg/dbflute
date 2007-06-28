@@ -1327,6 +1327,11 @@ targetdatabase = $targetDatabase
 
         #set ($myAttachedCBArgsString = "${glPackageCB}.${myConditionBeanClassName} ${glAttachedCBArgsVariableName}")
 
+        #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")
+        #set ($myEntityListVariableName = "${table.uncapitalisedJavaName}List")
+        #set ($myCBVariableName = "${table.uncapitalisedJavaName}")
+        #set ($myBehaviorVariableName = "${table.uncapitalisedJavaName}Bhv")
+
         #set ($isExistBehavior = false)
         #if ($database.isAvailableBehaviorGeneration())
           #set ($isExistBehavior = true)
