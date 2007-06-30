@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
@@ -19,6 +20,9 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
  */
 public final class DfBasicProperties extends DfAbstractHelperProperties {
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -28,16 +32,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         super(prop);
     }
 
-    //========================================================================================
-    //                                                                                 Project
-    //                                                                                 =======
+    // ===================================================================================
+    //                                                                             Project
+    //                                                                             =======
     public String getProjectName() {
         return stringProp("torque.project", "");
     }
 
-    //========================================================================================
-    //                                                                                Database
-    //                                                                                ========
+    // ===================================================================================
+    //                                                                            Database
+    //                                                                            ========
     public String getDatabaseName() {
         return stringProp("torque.database", "");
     }
@@ -58,9 +62,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseName().equalsIgnoreCase("sybase");
     }
 
-    //========================================================================================
-    //                                                                                 JavaDir
-    //                                                                                 =======
+    // ===================================================================================
+    //                                                                             JavaDir
+    //                                                                             =======
     public String getJavaDir() {
         return stringProp("torque.java.dir", "../src/main/java");
     }
@@ -119,9 +123,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getJavaDir_for_gen().equals(getJavaDir_for_main());
     }
 
-    //========================================================================================
-    //                                                                                Language
-    //                                                                                ========
+    // ===================================================================================
+    //                                                                            Language
+    //                                                                            ========
     public String getTargetLanguage() {
         return stringProp("torque.targetLanguage", DEFAULT_targetLanguage);
     }
@@ -150,9 +154,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return _languageDependencyInfo;
     }
 
-    //========================================================================================
-    //                                                                               Extension
-    //                                                                               =========
+    // ===================================================================================
+    //                                                                           Extension
+    //                                                                           =========
     public String getTemplateFileExtension() {
         return getLanguageDependencyInfo().getTemplateFileExtension();
     }
@@ -161,9 +165,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getLanguageDependencyInfo().getGrammarInfo().getClassFileExtension();
     }
 
-    //========================================================================================
-    //                                                                                Encoding
-    //                                                                                ========
+    // ===================================================================================
+    //                                                                            Encoding
+    //                                                                            ========
     public String getTemplateFileEncoding() {
         return stringProp("torque.templateFileEncoding", DEFAULT_templateFileEncoding);
     }
@@ -172,16 +176,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return stringProp("torque.sourceFileEncoding", DEFAULT_sourceFileEncoding);
     }
 
-    //========================================================================================
-    //                                                                            Class Author
-    //                                                                            ============
+    // ===================================================================================
+    //                                                                        Class Author
+    //                                                                        ============
     public String getClassAuthor() {
         return stringProp("torque.classAuthor", "DBFlute(AutoGenerator)");
     }
 
-    //========================================================================================
-    //                                                                                  Naming
-    //                                                                                  ======
+    // ===================================================================================
+    //                                                                              Naming
+    //                                                                              ======
     public boolean isJavaNameOfTableSameAsDbName() {
         return booleanProp("torque.isJavaNameOfTableSameAsDbName", false);
     }
@@ -190,16 +194,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return booleanProp("torque.isJavaNameOfColumnSameAsDbName", false);
     }
 
-    //========================================================================================
-    //                                                                                Behavior
-    //                                                                                ========
+    // ===================================================================================
+    //                                                                            Behavior
+    //                                                                            ========
     public boolean isAvailableBehaviorGeneration() {
         return booleanProp("torque.isAvailableBehaviorGeneration", true);
     }
 
-    //========================================================================================
-    //                                                                                Generics
-    //                                                                                ========
+    // ===================================================================================
+    //                                                                            Generics
+    //                                                                            ========
     public boolean isAvailableGenerics() {
         return booleanProp("torque.isAvailableGenerics", true);
     }
@@ -228,9 +232,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
-    //========================================================================================
-    //                                                                                  Prefix
-    //                                                                                  ======
+    // ===================================================================================
+    //                                                                              Prefix
+    //                                                                              ======
     public String getProjectPrefix() {
         return stringProp("torque.projectPrefix", "");
     }
@@ -239,87 +243,141 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return booleanProp("torque.isAppendProjectSuffixToComponentName", true);
     }
 
-    //========================================================================================
-    //                                                                           Database Info
-    //                                                                           =============
-    /** Database info map. (for cache) */
-    protected Map<String, Object> _databaseInfoMap;
+    // ===================================================================================
+    //                                                                       Database Info
+    //                                                                       =============
+    protected DatabaseInfo _databaseInfo = new DatabaseInfo();
 
     public String getDatabaseDriver() {
-        initializeDatabaseInfoMap();
-        final String key = "driver";
-        final String databaseInfoElement = getDatabaseInfoElement(key);
-        if (databaseInfoElement != null) {
-            return databaseInfoElement;
-        }
-        return stringProp("torque.database.driver");
+        return _databaseInfo.getDatabaseDriver();
     }
 
     public String getDatabaseUri() {
-        initializeDatabaseInfoMap();
-        final String key = "url";
-        final String databaseInfoElement = getDatabaseInfoElement(key);
-        if (databaseInfoElement != null) {
-            return databaseInfoElement;
-        }
-        return stringProp("torque.database.url");
+        return _databaseInfo.getDatabaseUri();
     }
 
     public String getDatabaseSchema() {
-        initializeDatabaseInfoMap();
-        final String key = "schema";
-        final String databaseInfoElement = getDatabaseInfoElement(key);
-        if (databaseInfoElement != null) {
-            return databaseInfoElement;
-        }
-        return stringProp("torque.database.schema", "");
+        return _databaseInfo.getDatabaseSchema();
     }
 
     public String getDatabaseUser() {
-        initializeDatabaseInfoMap();
-        final String key = "user";
-        final String databaseInfoElement = getDatabaseInfoElement(key);
-        if (databaseInfoElement != null) {
-            return databaseInfoElement;
-        }
-        return stringProp("torque.database.user");
+        return _databaseInfo.getDatabaseUser();
     }
 
     public String getDatabasePassword() {
-        initializeDatabaseInfoMap();
-        final String key = "password";
-        final String databaseInfoElement = getDatabaseInfoElement(key);
-        if (databaseInfoElement != null) {
-            return databaseInfoElement;
-        }
-        return stringProp("torque.database.password");
+        return _databaseInfo.getDatabasePassword();
     }
 
-    protected void initializeDatabaseInfoMap() {
-        if (_databaseInfoMap == null) {
-            Map<String, Object> databaseInfoMap = getOutsidePropMap("databaseInfo");
-            if (databaseInfoMap.isEmpty()) {
-                databaseInfoMap = getOutsidePropMap("databaseInfoMap");
+    public class DatabaseInfo {
+        private static final String KEY_DRIVER = "driver";
+        private static final String KEY_URL = "url";
+        private static final String KEY_SCHEMA = "schema";
+        private static final String KEY_USER = "user";
+        private static final String KEY_PASSWORD = "password";
+
+        /** Database info map. (for cache) */
+        protected Map<String, Object> _databaseInfoMap;
+
+        public String getDatabaseDriver() {
+            initializeDatabaseInfoMap();
+            final String key = KEY_DRIVER;
+            final String databaseInfoElement = getDatabaseInfoElement(key);
+            if (databaseInfoElement != null) {
+                return databaseInfoElement;
             }
-            if (!databaseInfoMap.isEmpty()) {
-                _databaseInfoMap = databaseInfoMap;
+            return stringProp("torque.database.driver");
+        }
+
+        public String getDatabaseUri() {
+            initializeDatabaseInfoMap();
+            final String key = KEY_URL;
+            final String databaseInfoElement = getDatabaseInfoElement(key);
+            if (databaseInfoElement != null) {
+                return databaseInfoElement + getDatabaseUriProperty();
+            }
+            return stringProp("torque.database.url");
+        }
+
+        private String getDatabaseUriProperty() {
+            initializeDatabaseInfoMap();
+
+            final StringBuilder sb = new StringBuilder();
+            final Set<String> keySet = _databaseInfoMap.keySet();
+            for (String key : keySet) {
+                if (equalsKeys(key, KEY_DRIVER, KEY_URL, KEY_SCHEMA, KEY_USER, KEY_PASSWORD)) {
+                    continue;
+                }
+                final Object value = _databaseInfoMap.get(key);
+                sb.append(";").append(key).append("=").append(value);
+            }
+            return sb.toString();
+        }
+
+        private boolean equalsKeys(String target, String... keys) {
+            for (String key : keys) {
+                if (target.equals(key)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public String getDatabaseSchema() {
+            initializeDatabaseInfoMap();
+            final String key = KEY_SCHEMA;
+            final String databaseInfoElement = getDatabaseInfoElement(key);
+            if (databaseInfoElement != null) {
+                return databaseInfoElement;
+            }
+            return stringProp("torque.database.schema", "");
+        }
+
+        public String getDatabaseUser() {
+            initializeDatabaseInfoMap();
+            final String key = KEY_USER;
+            final String databaseInfoElement = getDatabaseInfoElement(key);
+            if (databaseInfoElement != null) {
+                return databaseInfoElement;
+            }
+            return stringProp("torque.database.user");
+        }
+
+        public String getDatabasePassword() {
+            initializeDatabaseInfoMap();
+            final String key = KEY_PASSWORD;
+            final String databaseInfoElement = getDatabaseInfoElement(key);
+            if (databaseInfoElement != null) {
+                return databaseInfoElement;
+            }
+            return stringProp("torque.database.password");
+        }
+
+        protected void initializeDatabaseInfoMap() {
+            if (_databaseInfoMap == null) {
+                Map<String, Object> databaseInfoMap = getOutsidePropMap("databaseInfo");
+                if (databaseInfoMap.isEmpty()) {
+                    databaseInfoMap = getOutsidePropMap("databaseInfoMap");
+                }
+                if (!databaseInfoMap.isEmpty()) {
+                    _databaseInfoMap = databaseInfoMap;
+                }
             }
         }
-    }
 
-    protected boolean hasDatabaseInfoMap() {
-        return _databaseInfoMap != null;
-    }
-
-    protected String getDatabaseInfoElement(final String key) {
-        if (_databaseInfoMap != null) {
-            if (!_databaseInfoMap.containsKey(key)) {
-                return "";
-            }
-            final String value = (String) _databaseInfoMap.get(key);
-            return value != null ? value : "";
+        protected boolean hasDatabaseInfoMap() {
+            return _databaseInfoMap != null;
         }
-        return null;
+
+        protected String getDatabaseInfoElement(final String key) {
+            if (_databaseInfoMap != null) {
+                if (!_databaseInfoMap.containsKey(key)) {
+                    return "";
+                }
+                final String value = (String) _databaseInfoMap.get(key);
+                return value != null ? value : "";
+            }
+            return null;
+        }
     }
 
     // -----------------------------------------------------

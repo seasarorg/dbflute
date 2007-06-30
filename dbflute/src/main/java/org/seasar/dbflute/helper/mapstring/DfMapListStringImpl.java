@@ -167,15 +167,11 @@ public class DfMapListStringImpl implements DfMapListString {
                 return;
             }
 
-            // *** ���̎��_�Ŏc��̕�����̓}�b�v�v�f�̃L�[�l�Ŏn�܂�B ***
-
             final int equalIndex = _remainderString.indexOf(_equal);
             assertEqualIndex(_remainderString, equalIndex, _topString, currentMap);
             final String mapKey = _remainderString.substring(0, equalIndex).trim();
             removePrefixTargetIndexPlusOne(equalIndex);
             removeBothSideSpaceAndTabAndNewLine();
-
-            // *** ���̎��_�Ŏc��̕�����̓}�b�v�v�f�̃o�����[�l�Ŏn�܂�B ***
 
             if (isStartsWithMapPrefix(_remainderString)) {
                 removePrefixMapMarkAndStartBrace();
@@ -199,22 +195,17 @@ public class DfMapListStringImpl implements DfMapListString {
             final int endBraceIndex = _remainderString.indexOf(_endBrace);
             assertEndBracekIndex(_remainderString, endBraceIndex, _topString, currentMap);
 
-            // �f���~�^�����݂��āA���A�f���~�^�������ʕ�����߂��ꍇ�A
-            // ���݂̎c��̕�����̐擪����f���~�^�܂ł��}�b�v�o�����[�ƂȂ�B�� ex) value1,key2=value2}
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) {
                 final String mapValue = _remainderString.substring(0, delimiterIndex);
                 currentMap.put(mapKey, filterMapListValue(mapValue));
 
-                // �f���~�^�ȍ~�Ƀ}�b�v�v�f�������̂ŁA�f���~�^���΂��ăR���e�B�j���[�I
                 removePrefixTargetIndexPlusOne(delimiterIndex);
                 continue;
             }
 
-            // ���݂̎c��̕�����̐擪���璆���ʕ��܂ł��}�b�v�o�����[�ƂȂ�B�� ex) value1}, key2=value2}
             final String mapValue = _remainderString.substring(0, endBraceIndex);
             currentMap.put(mapKey, filterMapListValue(mapValue));
 
-            // ����̃}�b�v�v�f��͂͏I���Ƃ��邽�߃��^�[���Iwith �N���[�W���O����
             closingByEndBraceIndex(endBraceIndex);
             return;
         }
@@ -225,8 +216,6 @@ public class DfMapListStringImpl implements DfMapListString {
             if (initializeAtLoopBeginning()) {
                 return;
             }
-
-            // *** ���̎��_�Ŏc��̕�����̓��X�g�v�f�̃o�����[�l�Ŏn�܂�B ***
 
             if (isStartsWithMapPrefix(_remainderString)) {
                 removePrefixMapMarkAndStartBrace();
@@ -250,22 +239,17 @@ public class DfMapListStringImpl implements DfMapListString {
             final int endBraceIndex = _remainderString.indexOf(_endBrace);
             assertEndBraceIndex(_remainderString, endBraceIndex, _topString, currentList);
 
-            // �f���~�^�����݂��āA���A�f���~�^�������ʕ�����߂��ꍇ�A
-            // ���݂̎c��̕�����̐擪����f���~�^�܂ł����X�g�o�����[�ƂȂ�B�� ex) value1,value2,value3}
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) {
                 final String listValue = _remainderString.substring(0, delimiterIndex);
                 currentList.add(filterMapListValue(listValue));
 
-                // �f���~�^�ȍ~�Ƀ��X�g�v�f�������̂ŁA�f���~�^���΂��ăR���e�B�j���[�I
                 removePrefixTargetIndexPlusOne(delimiterIndex);
                 continue;
             }
 
-            // ���݂̎c��̕�����̐擪���璆���ʕ��܂ł����X�g�o�����[�ƂȂ�B�� ex) value1}, value2, }
             final String listValue = _remainderString.substring(0, endBraceIndex);
             currentList.add(filterMapListValue(listValue));
 
-            // ����̃}�b�v�v�f��͂͏I���Ƃ��邽�߃��^�[���Iwith �N���[�W���O����
             closingByEndBraceIndex(endBraceIndex);
             return;
         }
@@ -275,17 +259,12 @@ public class DfMapListStringImpl implements DfMapListString {
      * @return Is return?
      */
     protected boolean initializeAtLoopBeginning() {
-        // �擪�̃f���~�^�͑S�ď�������B
-        //   - �߂�l�͓Ք�I�ɕK���g���������B
         removePrefixAllDelimiter();
 
-        // �c��̕����񂪋󕶎��Ȃ�΁A�S�Ẳ�͂��I���Ȃ̂Ń��^�[���I
         if (_remainderString.equals("")) {
             return true;
         }
 
-        // �c��̕����񂪒����ʕ��Ŏn�܂�Ȃ�΁A����̃}�b�v�v�f��͂��I���Ȃ̂Ń��^�[���I
-        //   - ���̎��ɒ����ʕ�������B
         if (isStartsWithEndBrace(_remainderString)) {
             removePrefixEndBrace();
             return true;
@@ -297,7 +276,6 @@ public class DfMapListStringImpl implements DfMapListString {
      * @return Is return?
      */
     protected boolean closingAfterParseNestMapList() {
-        // �����ʕ��Ŏn�܂BĂ���ꍇ�A��������Ďc��̕�����Ƃ��Đݒ肷��B
         if (isStartsWithEndBrace(_remainderString)) {
             removePrefixEndBrace();
             return true;
@@ -306,7 +284,6 @@ public class DfMapListStringImpl implements DfMapListString {
     }
 
     protected void closingByEndBraceIndex(int endBraceIndex) {
-        // �c��̕�����̐擪�����͍ς݂̃o�����[�ƒ����ʕ�������B
         _remainderString = _remainderString.substring(endBraceIndex);
         removePrefixEndBrace();
     }
@@ -697,13 +674,6 @@ public class DfMapListStringImpl implements DfMapListString {
         return NEW_LINE + "    ";
     }
 
-    /**
-     * Get count that target string exist in the base string.
-     * 
-     * @param targetString �Ώە�����
-     * @param delimiter �f���~�^
-     * @return �c��̕�����Ɋ܂܂�Ă���f���~�^�̐�
-     */
     protected int getDelimiterCount(String targetString, String delimiter) {
         int result = 0;
         for (int i = 0;;) {
