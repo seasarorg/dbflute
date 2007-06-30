@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2007 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,13 +47,18 @@ import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
+/**
+ * 
+ * @author jflute
+ */
 public class DfSql2EntityTask extends DfAbstractTexenTask {
 
+    /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 
-    // =========================================================================================
-    //                                                                                  MetaInfo
-    //                                                                                  ========
+    // ===================================================================================
+    //                                                                           Meta Info
+    //                                                                           =========
     protected final Map<String, Map<String, Integer>> _entityInfoMap = new LinkedHashMap<String, Map<String, Integer>>();
     protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = new LinkedHashMap<String, DfParameterBeanMetaData>();
     protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
@@ -61,14 +66,25 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
 
+    // ===================================================================================
+    //                                                                            Override
+    //                                                                            ========
+    @Override
+    /**
+     * The override. <br />
+     * Using data source.
+     */
     protected boolean isUseDataSource() {
         return true;
     }
 
-    // =========================================================================================
-    //                                                                                   Execute
-    //                                                                                   =======
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     @Override
+    /**
+     * The override.
+     */
     protected void doExecute() {
         setupDataSource();
 
@@ -78,15 +94,22 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
 
-        final DfSqlFileRunner runner = getSqlFileRunner(runInfo);
+        final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        fireMan.execute(runner, getSqlFileList());
+        final List<File> sqlFileList = collectSqlFileIntoList();
+        fireMan.execute(runner, sqlFileList);
 
         fireSuperExecute();
         showMethodDefinitionCandidate();
         handleException();
     }
 
+    // ===================================================================================
+    //                                                                   Executing Element
+    //                                                                   =================
+    /**
+     * Show method definition candidate.
+     */
     protected void showMethodDefinitionCandidate() {
         _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
         _log.info("                         Method Definition Candidate");
@@ -123,15 +146,32 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected List<File> getSqlFileList() {
+    /**
+     * Collent sql files into the list.
+     * 
+     * @return The list of sql files. (NotNull)
+     */
+    protected List<File> collectSqlFileIntoList() {
         final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
         return new DfSqlFileGetter().getSqlFileList(sqlDirectory);
     }
 
-    protected DfSqlFileRunner getSqlFileRunner(DfRunnerInformation runInfo) {
+    /**
+     * Create sql file runner.
+     * 
+     * @param runInfo Run informantion. (NotNull)
+     * @return Sql file runner. (NotNull)
+     */
+    protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
+        final Log log4inner = _log;
+
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
+        // Implementing SqlFileRunnerBase as inner class.
+        // - - - - - - - - - -/
         return new DfSqlFileRunnerBase(runInfo, getDataSource()) {
             protected String filterSql(String sql) {
 
+                // TODO: @jflute - At the future....
                 //                final SqlTokenizerImpl tokenizer = new SqlTokenizerImpl(sql);
                 //                while (true) {
                 //                    final int result = tokenizer.next();
@@ -153,35 +193,38 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
                 ResultSet rs = null;
                 try {
-                    rs = statement.executeQuery(sql);
-                    _goodSqlCount++;
+                    if (isTargetEntityMakingSql(sql)) {
+                        rs = statement.executeQuery(sql);
+                        _goodSqlCount++;
 
-                    final Map<String, Integer> columnJdbcTypeMap = new LinkedHashMap<String, Integer>();
-                    final ResultSetMetaData md = rs.getMetaData();
-                    for (int i = 1; i <= md.getColumnCount(); i++) {
-                        final String columnName = md.getColumnName(i);
-                        if (columnName == null || columnName.trim().length() == 0) {
-                            String msg = "The columnName is invalid: " + columnName;
-                            msg = msg + " sql=" + sql;
-                            throw new IllegalArgumentException(msg);
+                        final Map<String, Integer> columnJdbcTypeMap = new LinkedHashMap<String, Integer>();
+                        final ResultSetMetaData md = rs.getMetaData();
+                        for (int i = 1; i <= md.getColumnCount(); i++) {
+                            final String columnName = md.getColumnName(i);
+                            if (columnName == null || columnName.trim().length() == 0) {
+                                String msg = "The columnName is invalid: " + columnName;
+                                msg = msg + " sql=" + sql;
+                                throw new IllegalArgumentException(msg);
+                            }
+                            final int columnType = md.getColumnType(i);
+                            columnJdbcTypeMap.put(columnName, columnType);
                         }
-                        final int columnType = md.getColumnType(i);
-                        columnJdbcTypeMap.put(columnName, columnType);
-                    }
 
-                    // for Customize Entity
-                    final String entityName = getEntityName(sql);
-                    if (entityName != null) {
-                        _entityInfoMap.put(entityName, columnJdbcTypeMap);
-                        _entitySqlFileMap.put(entityName, _srcFile);
-                        _primaryKeyMap.put(entityName, getPrimaryKeyColumnNameList(sql));
+                        // for Customize Entity
+                        final String entityName = getEntityName(sql);
+                        if (entityName != null) {
+                            _entityInfoMap.put(entityName, columnJdbcTypeMap);
+                            _entitySqlFileMap.put(entityName, _srcFile);
+                            _primaryKeyMap.put(entityName, getPrimaryKeyColumnNameList(sql));
+                        }
                     }
-                    // for Parameter Bean
-                    final DfParameterBeanMetaData parameterBeanMetaData = getParameterBeanMetaData(sql);
-                    if (parameterBeanMetaData != null) {
-                        _pmbMetaDataMap.put(parameterBeanMetaData.getClassName(), parameterBeanMetaData);
+                    if (isTargetParameterBeanMakingSql(sql)) {
+                        // for Parameter Bean
+                        final DfParameterBeanMetaData parameterBeanMetaData = getParameterBeanMetaData(sql);
+                        if (parameterBeanMetaData != null) {
+                            _pmbMetaDataMap.put(parameterBeanMetaData.getClassName(), parameterBeanMetaData);
+                        }
                     }
-
                 } catch (SQLException e) {
                     String msg = "Failed to execute: " + sql;
                     if (!_runInfo.isErrorContinue()) {
@@ -193,7 +236,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         try {
                             rs.close();
                         } catch (SQLException ignored) {
-                            _log.warn("rs.close() threw the exception!", ignored);
+                            log4inner.warn("Ignored exception: " + ignored.getMessage());
                         }
                     }
                 }
@@ -203,6 +246,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 final String entityName = getEntityName(sql);
                 final String parameterBeanClassDefinition = getParameterBeanClassDefinition(sql);
                 return entityName != null || parameterBeanClassDefinition != null;
+            }
+
+            protected boolean isTargetEntityMakingSql(String sql) {
+                final String entityName = getEntityName(sql);
+                return entityName != null;
+            }
+
+            protected boolean isTargetParameterBeanMakingSql(String sql) {
+                final String parameterBeanClassDefinition = getParameterBeanClassDefinition(sql);
+                return parameterBeanClassDefinition != null;
             }
 
             protected DfParameterBeanMetaData getParameterBeanMetaData(String sql) {
@@ -257,11 +310,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             @Override
             protected void traceSql(String sql) {
-                _log.info("{SQL}" + getLineSeparator() + sql);
+                log4inner.info("{SQL}" + getLineSeparator() + sql);
             }
         };
     }
 
+    /**
+     * Handle exceptions in exception info map.
+     */
     protected void handleException() {
         final Set<String> nameSet = _exceptionInfoMap.keySet();
         final StringBuilder sb = new StringBuilder();
@@ -276,6 +332,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         _log.warn(sb.toString());
     }
 
+    // ===================================================================================
+    //                                                                           Analyzing
+    //                                                                           =========
     protected String getEntityName(final String sql) {
         return getTargetString(sql, "#");
     }
@@ -302,7 +361,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (!betweenBeginEndMarkList.isEmpty()) {
             return betweenBeginEndMarkList;
         } else {
-            // TODO: Oops! Temporary modification for MySQL. 
+            // for MySQL. 
             return getListBetweenBeginEndMark(sql, "-- " + mark, mark);
         }
     }
@@ -336,6 +395,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return DfSqlStringUtil.removeBeginEndComment(sql);
     }
 
+    // ===================================================================================
+    //                                                                     Meta Data Class
+    //                                                                     ===============
     public static class DfParameterBeanMetaData {
         protected String className;
         protected String superClassName;
@@ -375,9 +437,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    // =========================================================================================
-    //                                                                                   Context
-    //                                                                                   =======
+    // ===================================================================================
+    //                                                                       Task Override
+    //                                                                       =============
     public Context initControlContext() throws Exception {
         final Database db = new Database();
         db.setPmbMetaDataMap(_pmbMetaDataMap);
