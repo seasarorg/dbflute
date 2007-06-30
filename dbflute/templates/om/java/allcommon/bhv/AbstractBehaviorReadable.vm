@@ -5,7 +5,6 @@ package ${glPackageBaseCommonBhv};
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 #if ($database.isAvailableGenerics())
-import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
 #end

@@ -762,18 +762,17 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param fetchPageNumber Page-number. 1 origin. (NotMinus & NotZero)
+     * @param fetchPageNumber Page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} fetchPage(int fetchPageNumber) {
         _isFetchScopeEffective = true;
         if (fetchPageNumber <= 0) {
-            String msg = "Argument[fetchPageNumber] must be plus: " + fetchPageNumber;
-            throw new IllegalArgumentException(msg);
+            fetchPageNumber = 1;
         }
         if (_fetchSize <= 0) {
-            String msg = "Fetch size must not be minus or zero when you invoke this method. ";
-            msg = msg + "When you invoke this, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. ";
+            String msg = "Fetch size should not be minus or zero when you invoke this method. ";
+            msg = msg + "When you invoke this method, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. ";
             msg = msg + ": fetchPageNumber=" + fetchPageNumber + " _fetchSize=" + _fetchSize;
             throw new IllegalStateException(msg);
         }

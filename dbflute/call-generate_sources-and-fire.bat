@@ -1,7 +1,7 @@
 
 call mvn generate-sources
 
-cd ..\dbflute_ldb\dbflute
+cd ..\dbflute_ldb\dbflute_ldb
 
 @echo off
 

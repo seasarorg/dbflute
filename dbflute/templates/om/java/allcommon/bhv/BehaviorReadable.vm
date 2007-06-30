@@ -319,8 +319,9 @@ public interface ${glBehaviorReadableInterfaceName} {
             assertObjectNotNull("callback", callback);
             assertObjectNotNull("callback.getPagingBean()", callback.getPagingBean());
             if (!callback.getPagingBean().isFetchScopeEffective()) {
-                String msg = "When you invoke select page, you should set up fetch-scope of paging bean.";
-                msg = msg + " But the paging bean is not effective about fetch-scope: " + callback.getPagingBean();
+                String msg = "The paging bean is not effective about fetch-scope!";
+                msg = msg + " When you select page, you should set up fetch-scope of paging bean(Should invoke fetchFirst() and fetchPage()!).";
+                msg = msg + " The paging bean is: " + callback.getPagingBean();
                 throw new IllegalStateException(msg);
             }
             final int allRecordCount = callback.selectCountIgnoreFetchScope();
