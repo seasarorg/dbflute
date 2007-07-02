@@ -231,7 +231,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
     /**
      * Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
-     * ${classificationMap.get('comment')} <br />
+     * ${database.getMapValue($classificationMap, 'comment')} <br />
      */
     public void classify${col.JavaName}${classificationMap.get('name')}() {
         String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
@@ -244,13 +244,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                        Classification Determination
     //                                                        ============================
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
   #if (${col.hasClassification()})
-    #foreach ($classificationMap in $col.ClassificationMapList)
+    #foreach ($classificationMap in $col.classificationMapList)
 
     /**
      * Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
-     * ${classificationMap.get('comment')} <br />
+     * ${database.getMapValue($classificationMap, 'comment')} <br />
      * <pre>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!
@@ -463,6 +463,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
   #end
 #end
+#if ($database.isMakeRecentlyDeprecated())
 
     // ===================================================================================
     //                                                                              Accept
@@ -583,6 +584,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public String extractCommonColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal) {
         return getDBMeta().extractCommonColumnValueMapString(this, startBrace, endBrace, delimiter, equal);
     }
+#end
 #end
 
     // ===================================================================================

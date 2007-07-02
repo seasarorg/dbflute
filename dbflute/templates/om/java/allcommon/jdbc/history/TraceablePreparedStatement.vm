@@ -415,6 +415,100 @@ public class ${glTraceablePreparedStatementName} implements PreparedStatement {
         preparedStatement.setURL(parameterIndex, x);
     }
 
+#if ($database.isJavaVersionGreaterEqualMustang())
+    public void setAsciiStream(int arg0, InputStream arg1) throws SQLException {
+        preparedStatement.setAsciiStream(arg0, arg1);
+    }
+
+    public void setAsciiStream(int arg0, InputStream arg1, long arg2) throws SQLException {
+        preparedStatement.setAsciiStream(arg0, arg1, arg2);
+    }
+
+    public void setBinaryStream(int arg0, InputStream arg1) throws SQLException {
+        preparedStatement.setBinaryStream(arg0, arg1);
+    }
+
+    public void setBinaryStream(int arg0, InputStream arg1, long arg2) throws SQLException {
+        preparedStatement.setBinaryStream(arg0, arg1, arg2);
+    }
+
+    public void setBlob(int arg0, InputStream arg1) throws SQLException {
+        preparedStatement.setBlob(arg0, arg1);
+    }
+
+    public void setBlob(int arg0, InputStream arg1, long arg2) throws SQLException {
+        preparedStatement.setBlob(arg0, arg1, arg2);
+    }
+
+    public void setCharacterStream(int arg0, Reader arg1) throws SQLException {
+        preparedStatement.setCharacterStream(arg0, arg1);
+    }
+
+    public void setCharacterStream(int arg0, Reader arg1, long arg2) throws SQLException {
+        preparedStatement.setCharacterStream(arg0, arg1, arg2);
+    }
+
+    public void setClob(int arg0, Reader arg1) throws SQLException {
+        preparedStatement.setClob(arg0, arg1);
+    }
+
+    public void setClob(int arg0, Reader arg1, long arg2) throws SQLException {
+        preparedStatement.setClob(arg0, arg1, arg2);
+    }
+
+    public void setNCharacterStream(int arg0, Reader arg1) throws SQLException {
+        preparedStatement.setNCharacterStream(arg0, arg1);
+    }
+
+    public void setNCharacterStream(int arg0, Reader arg1, long arg2) throws SQLException {
+        preparedStatement.setNCharacterStream(arg0, arg1, arg2);
+    }
+
+    public void setNClob(int arg0, NClob arg1) throws SQLException {
+        preparedStatement.setNClob(arg0, arg1);
+    }
+
+    public void setNClob(int arg0, Reader arg1) throws SQLException {
+        preparedStatement.setNClob(arg0, arg1);
+    }
+
+    public void setNClob(int arg0, Reader arg1, long arg2) throws SQLException {
+        preparedStatement.setNClob(arg0, arg1, arg2);
+    }
+
+    public void setNString(int arg0, String arg1) throws SQLException {
+        preparedStatement.setNString(arg0, arg1);
+    }
+
+    public void setRowId(int arg0, RowId arg1) throws SQLException {
+        preparedStatement.setRowId(arg0, arg1);
+    }
+
+    public void setSQLXML(int arg0, SQLXML arg1) throws SQLException {
+        preparedStatement.setSQLXML(arg0, arg1);
+    }
+
+    public boolean isClosed() throws SQLException {
+        return preparedStatement.isClosed();
+    }
+
+    public boolean isPoolable() throws SQLException {
+        return preparedStatement.isPoolable();
+    }
+
+    public void setPoolable(boolean arg0) throws SQLException {
+        preparedStatement.setPoolable(arg0);
+    }
+
+    public boolean isWrapperFor(Class<?> arg0) throws SQLException {
+        return preparedStatement.isWrapperFor(arg0);
+    }
+
+    public <T> T unwrap(Class<T> arg0) throws SQLException {
+        return preparedStatement.unwrap(arg0);
+    }
+#end
+
     // ===================================================================================
     //                                                                               Trace
     //                                                                               =====

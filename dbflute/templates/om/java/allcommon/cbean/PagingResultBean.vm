@@ -15,39 +15,45 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** The value of current page number. */
     protected int _pageSize;
 
     /** The value of current page number. */
     protected int _currentPageNumber;
 
-    // -----------------------------------------
-    //                                Page Range
-    //                                ----------
+    // -----------------------------------------------------
+    //                                            Page Range
+    //                                            ----------
     /** The value of page-range option. */
     protected PageRangeOption _pageRangeOption;
 
-    // -----------------------------------------
-    //                                Page Group
-    //                                ----------
+    /** The value of page-range bean. */
+    protected PageRangeBean _pageRangeBean;
+
+    // -----------------------------------------------------
+    //                                            Page Group
+    //                                            ----------
     /** The value of page-group option. */
     protected PageGroupOption _pageGroupOption;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    /** The value of page-group bean. */
+    protected PageGroupBean _pageGroupBean;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
     public ${myClassName}() {
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * Get the value of pageSize.
      * 
@@ -111,9 +117,9 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
         return calculateCurrentEndRecordNumber(_currentPageNumber, _pageSize);
     }
 
-    // -----------------------------------------
-    //                                Page Range
-    //                                ----------
+    // -----------------------------------------------------
+    //                                            Page Range
+    //                                            ----------
     /**
      * Get the value of pageRangeSize.
      * 
@@ -143,31 +149,37 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
         _pageRangeOption = pageRangeOption;
     }
 
-    public static class PageRangeOption {
-        protected int _pageRangeSize;
-
-        protected boolean _fillLimit;
-        
-        public int getPageRangeSize() {
-            return _pageRangeSize;
+    /**
+     * Get the value of pageRangeBean.
+     * 
+     * @return The value of pageRangeBean.
+     */
+    public PageRangeBean pageRange() {
+        assertPageRangeValid();
+        if (_pageRangeBean == null) {
+            _pageRangeBean = new PageRangeBean();
         }
+        _pageRangeBean.setPageRangeOption(_pageRangeOption);
+        _pageRangeBean.setCurrentPageNumber(getCurrentPageNumber());
+        _pageRangeBean.setAllPageCount(getAllPageCount());
+        return _pageRangeBean;
+    }
 
-        public void setPageRangeSize(int pageRangeSize) {
-            _pageRangeSize = pageRangeSize;
+    protected void assertPageRangeValid() {
+        if (_pageRangeOption == null) {
+            String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
+            throw new IllegalStateException(msg);
         }
-
-        public boolean isFillLimit() {
-            return _fillLimit;
-        }
-
-        public void setFillLimit(boolean fillLimit) {
-            _fillLimit = fillLimit;
+        final int pageRangeSize = _pageRangeOption.getPageRangeSize();
+        if (pageRangeSize == 0) {
+            String msg = "The pageRangeSize should be greater than 1. But the value is zero.";
+            throw new IllegalStateException(msg);
         }
     }
 
-    // -----------------------------------------
-    //                                Page Group
-    //                                ----------
+    // -----------------------------------------------------
+    //                                            Page Group
+    //                                            ----------
     /**
      * Get the value of pageGroupSize.
      * 
@@ -197,22 +209,43 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
         _pageGroupOption = pageGroupOption;
     }
 
-    public static class PageGroupOption {
-        protected int _pageGroupSize;
-
-        public int getPageGroupSize() {
-            return _pageGroupSize;
+    /**
+     * Get the value of pageGroupBean.
+     * 
+     * @return The value of pageGroupBean.
+     */
+    public PageGroupBean pageGroup() {
+        assertPageGroupValid();
+        if (_pageGroupBean == null) {
+            _pageGroupBean = new PageGroupBean();
         }
+        _pageGroupBean.setPageGroupOption(_pageGroupOption);
+        _pageGroupBean.setCurrentPageNumber(getCurrentPageNumber());
+        _pageGroupBean.setAllPageCount(getAllPageCount());
+        return _pageGroupBean;
+    }
 
-        public void setPageGroupSize(int pageGroupSize) {
-            _pageGroupSize = pageGroupSize;
+    protected void assertPageGroupValid() {
+        if (_pageGroupOption == null) {
+            String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
+            throw new IllegalStateException(msg);
+        }
+        if (_pageGroupOption.getPageGroupSize() == 0) {
+            String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
+            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+            throw new IllegalStateException(msg);
+        }
+        if (_pageGroupOption.getPageGroupSize() == 1) {
+            String msg = "The pageGroupSize should be greater than 1. But the value is one.";
+            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+            throw new IllegalStateException(msg);
         }
     }
 
 #if ($database.isAvailableGenerics())
-    // =====================================================================================
-    //                                                                               Mapping
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
     public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
         final ${glListResultBeanName}<DTO> ls = super.mappingList(entityDtoMapper);
         final ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
@@ -228,12 +261,12 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
     }
 #end
 
-    // =====================================================================================
-    //                                                                             Calculate
-    //                                                                             =========
-    // -------------------------------------------
-    //                                        Page
-    //                                        ----
+    // ===================================================================================
+    //                                                                           Calculate
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                                  Page
+    //                                                  ----
     /**
      * Calculate all page count.
      * 
@@ -280,51 +313,20 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
         return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
     }
 
-    // -------------------------------------------
-    //                                  Page Range
-    //                                  ----------
+#if ($database.isMakeRecentlyDeprecated())
+
+    // -----------------------------------------------------
+    //                                            Page Range
+    //                                            ----------
     /**
      * Get current page-range page-number-list.
      * Using values are pageRangeOption and currentPageNumber and allPageCount.
      * 
      * @return Current page-range page-number-list. (NotNull)
+     * @deprecated Please use PagingResultBean#pageRange().getCurrentPageRangePageNumberList();
      */
     public java.util.List${database.filterGenericsString('Integer')} getCurrentPageRangePageNumberList() {
-        assertPageRangeValid();
-        final int pageRangeSize = _pageRangeOption.getPageRangeSize();
-        final int allPageCount = this.getAllPageCount();
-        final int currentPageNumber = _currentPageNumber;
-
-        final java.util.List${database.filterGenericsString('Integer')} resultList = new java.util.ArrayList${database.filterGenericsString('Integer')}();
-        for (int i = currentPageNumber - pageRangeSize; i < currentPageNumber; i++) {
-            if (i < 1) {
-                continue;
-            }
-            resultList.add(new Integer(i));
-        }
-
-        resultList.add(new Integer(currentPageNumber));
-
-        final int endPageNumber = (currentPageNumber + pageRangeSize);
-        for (int i = currentPageNumber + 1 ; i <= endPageNumber && i <= allPageCount; i++) {
-            resultList.add(new Integer(i));
-        }
-
-        final boolean fillLimit = _pageRangeOption.isFillLimit();
-        final int limitSize = (pageRangeSize * 2) + 1;
-        if (fillLimit && !resultList.isEmpty() && resultList.size() < limitSize) {
-            final Integer firstElements = (Integer)resultList.get(0);
-            final Integer lastElements = (Integer)resultList.get(resultList.size() - 1);
-            if (firstElements.intValue() > 1) {
-                for (int i = firstElements.intValue() - 1 ; resultList.size() < limitSize && i > 0; i--) {
-                    resultList.add(0, new Integer(i));
-                }
-            }
-            for (int i = lastElements.intValue() + 1 ; resultList.size() < limitSize && i <= allPageCount; i++) {
-                resultList.add(new Integer(i));
-            }
-        }
-        return resultList;
+        return pageRange().getCurrentPageRangePageNumberList();
     }
 
     /**
@@ -332,21 +334,10 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
      * Using values are pageRangeOption and currentPageNumber and allPageCount.
      * 
      * @return Current page-range page-number-array.
+     * @deprecated Please use PagingResultBean#pageRange().getCurrentPageRangePageNumberArray();
      */
     public int[] getCurrentPageRangePageNumberArray() {
-        assertPageRangeValid();
-        return convertListToIntArray(getCurrentPageRangePageNumberList());
-    }
-
-    protected int[] convertListToIntArray(java.util.List${database.filterGenericsString('Integer')} ls) {
-        final int[] resultArray = new int[ls.size()];
-        int arrayIndex = 0;
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
-            final Integer tmpPageNumber = (Integer)ite.next();
-            resultArray[arrayIndex] = tmpPageNumber.intValue();
-            arrayIndex++;
-        }
-        return resultArray;
+        return pageRange().getCurrentPageRangePageNumberArray();
     }
 
     /**
@@ -354,14 +345,10 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
      * Using values are pageRangeOption and currentPageNumber and allPageCount.
      * 
      * @return Determination.
+     * @deprecated Please use PagingResultBean#pageRange().isExistPrePageRange();
      */
     public boolean isExistPrePageRange() {
-        assertPageRangeValid();
-        final int[] array = getCurrentPageRangePageNumberArray();
-        if (array.length == 0) {
-            return false;
-        }
-        return array[0] > 1;
+        return pageRange().isExistPrePageRange();
     }
 
     /**
@@ -369,55 +356,24 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
      * Using values are pageRangeOption and currentPageNumber and allPageCount.
      * 
      * @return Determination.
+     * @deprecated Please use PagingResultBean#pageRange().isExistNextPageRange();
      */
     public boolean isExistNextPageRange() {
-        assertPageRangeValid();
-        final int[] array = getCurrentPageRangePageNumberArray();
-        if (array.length == 0) {
-            return false;
-        }
-        return array[array.length-1] < getAllPageCount();
+        return pageRange().isExistNextPageRange();
     }
 
-    protected void assertPageRangeValid() {
-        if (_pageRangeOption == null) {
-            String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
-            throw new IllegalStateException(msg);
-        }
-        final int pageRangeSize = _pageRangeOption.getPageRangeSize();
-        if (pageRangeSize == 0) {
-            String msg = "The pageRangeSize should be greater than 1. But the value is zero.";
-            throw new IllegalStateException(msg);
-        }
-    }
-
-    // -------------------------------------------
-    //                                  Page Group
-    //                                  ----------
+    // -----------------------------------------------------
+    //                                            Page Group
+    //                                            ----------
     /**
      * Calculate current page-group start-page-number.
      * Using values are currentPageNumber and pageGroupSize.
      * 
      * @return Current page-group start-page-number.
+     * @deprecated Please use PagingResultBean#pageGroup().calculateCurrentPageGroupStartPageNumber();
      */
     public int calculateCurrentPageGroupStartPageNumber() {
-        assertPageGroupValid();
-        final int pageGroupSize = _pageGroupOption.getPageGroupSize();
-        final int currentPageNumber = _currentPageNumber;
-
-        int currentPageGroupNumber = (currentPageNumber / pageGroupSize);
-        if ((currentPageNumber % pageGroupSize) == 0)
-        {
-            currentPageGroupNumber--;
-        }
-        final int currentPageGroupStartPageNumber = (pageGroupSize * currentPageGroupNumber) + 1;
-        if (!(currentPageNumber >= currentPageGroupStartPageNumber)) {
-            String msg = "currentPageNumber should be greater equal currentPageGroupStartPageNumber. But:";
-            msg = msg + " currentPageNumber=" + currentPageNumber;
-            msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
-            throw new IllegalStateException(msg);
-        }
-        return currentPageGroupStartPageNumber;
+        return pageGroup().calculateCurrentPageGroupStartPageNumber();
     }
 
     /**
@@ -425,24 +381,10 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
      * Using values are currentPageNumber and pageGroupSize and allPageCount.
      * 
      * @return Current page-group page-number-list.
+     * @deprecated Please use PagingResultBean#pageGroup().getCurrentPageGroupPageNumberList();
      */
     public java.util.List${database.filterGenericsString('Integer')} getCurrentPageGroupPageNumberList() {
-        assertPageGroupValid();
-        final int pageGroupSize = _pageGroupOption.getPageGroupSize();
-        final int allPageCount = getAllPageCount();
-        final int currentPageGroupStartPageNumber = calculateCurrentPageGroupStartPageNumber();
-        if (!(currentPageGroupStartPageNumber > 0)) {
-            String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
-            msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
-            throw new IllegalStateException(msg);
-        }
-        final int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + pageGroupSize;
-
-        final java.util.List${database.filterGenericsString('Integer')} resultList = new java.util.ArrayList${database.filterGenericsString('Integer')}();
-        for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
-            resultList.add(new Integer(i));
-        }
-        return resultList;
+        return pageGroup().getCurrentPageGroupPageNumberList();
     }
 
     /**
@@ -450,10 +392,10 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
      * Using values are currentPageNumber and pageGroupSize and allPageCount.
      * 
      * @return Current page-group page-number-array.
+     * @deprecated Please use PagingResultBean#pageGroup().getCurrentPageGroupPageNumberArray();
      */
     public int[] getCurrentPageGroupPageNumberArray() {
-        assertPageGroupValid();
-        return convertListToIntArray(getCurrentPageGroupPageNumberList());
+        return pageGroup().getCurrentPageGroupPageNumberArray();
     }
 
     /**
@@ -461,10 +403,10 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
      * Using values are currentPageNumber and pageGroupSize.
      * 
      * @return Determination.
+     * @deprecated Please use PagingResultBean#pageGroup().isExistPrePageGroup();
      */
     public boolean isExistPrePageGroup() {
-        assertPageGroupValid();
-        return (_currentPageNumber > _pageGroupOption.getPageGroupSize());
+        return pageGroup().isExistPrePageGroup();
     }
 
     /**
@@ -472,39 +414,327 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
      * Using values are currentPageNumber and pageGroupSize and allPageCount.
      * 
      * @return Determination.
+     * @deprecated Please use PagingResultBean#pageGroup().isExistNextPageGroup();
      */
     public boolean isExistNextPageGroup() {
-        assertPageGroupValid();
-        int currentPageGroupStartPageNumber = calculateCurrentPageGroupStartPageNumber();
-        if (!(currentPageGroupStartPageNumber > 0)) {
-            String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
-            msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
-            throw new IllegalStateException(msg);
+        return pageGroup().isExistNextPageGroup();
+    }
+#end
+
+    /**
+     * The option of page range.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public static class PageRangeOption {
+        protected int _pageRangeSize;
+
+        protected boolean _fillLimit;
+
+        public int getPageRangeSize() {
+            return _pageRangeSize;
         }
-        int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupOption.getPageGroupSize();
-        return (nextPageGroupStartPageNumber <= getAllPageCount());
+
+        public void setPageRangeSize(int pageRangeSize) {
+            _pageRangeSize = pageRangeSize;
+        }
+
+        public boolean isFillLimit() {
+            return _fillLimit;
+        }
+
+        public void setFillLimit(boolean fillLimit) {
+            _fillLimit = fillLimit;
+        }
     }
 
-    protected void assertPageGroupValid() {
-        if (_pageGroupOption == null) {
-            String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
-            throw new IllegalStateException(msg);
+    /**
+     * The bean of page range.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public static class PageRangeBean {
+        protected PageRangeOption _pageRangeOption;
+        protected int _currentPageNumber;
+        protected int _allPageCount;
+        public void setPageRangeOption(PageRangeOption pageRangeOption) {
+            this._pageRangeOption = pageRangeOption;
         }
-        if (_pageGroupOption.getPageGroupSize() == 0) {
-            String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
-            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
-            throw new IllegalStateException(msg);
+        public void setCurrentPageNumber(int currentPageNumber) {
+            this._currentPageNumber = currentPageNumber;
         }
-        if (_pageGroupOption.getPageGroupSize() == 1) {
-            String msg = "The pageGroupSize should be greater than 1. But the value is one.";
-            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
-            throw new IllegalStateException(msg);
+        public void setAllPageCount(int allPageCount) {
+            this._allPageCount = allPageCount;
+        }
+
+        /**
+         * Get current page-range page-number-list.
+         * Using values are pageRangeOption and currentPageNumber and allPageCount.
+         * 
+         * @return Current page-range page-number-list. (NotNull)
+         */
+        public java.util.List${database.filterGenericsString('Integer')} getCurrentPageRangePageNumberList() {
+            assertPageRangeValid();
+            final int pageRangeSize = _pageRangeOption.getPageRangeSize();
+            final int allPageCount = _allPageCount;
+            final int currentPageNumber = _currentPageNumber;
+
+            final java.util.List${database.filterGenericsString('Integer')} resultList = new java.util.ArrayList${database.filterGenericsString('Integer')}();
+            for (int i = currentPageNumber - pageRangeSize; i < currentPageNumber; i++) {
+                if (i < 1) {
+                    continue;
+                }
+                resultList.add(new Integer(i));
+            }
+
+            resultList.add(new Integer(currentPageNumber));
+
+            final int endPageNumber = (currentPageNumber + pageRangeSize);
+            for (int i = currentPageNumber + 1 ; i <= endPageNumber && i <= allPageCount; i++) {
+                resultList.add(new Integer(i));
+            }
+
+            final boolean fillLimit = _pageRangeOption.isFillLimit();
+            final int limitSize = (pageRangeSize * 2) + 1;
+            if (fillLimit && !resultList.isEmpty() && resultList.size() < limitSize) {
+                final Integer firstElements = (Integer)resultList.get(0);
+                final Integer lastElements = (Integer)resultList.get(resultList.size() - 1);
+                if (firstElements.intValue() > 1) {
+                    for (int i = firstElements.intValue() - 1 ; resultList.size() < limitSize && i > 0; i--) {
+                        resultList.add(0, new Integer(i));
+                    }
+                }
+                for (int i = lastElements.intValue() + 1 ; resultList.size() < limitSize && i <= allPageCount; i++) {
+                    resultList.add(new Integer(i));
+                }
+            }
+            return resultList;
+        }
+
+        /**
+         * Get current page-range page-number-array.
+         * Using values are pageRangeOption and currentPageNumber and allPageCount.
+         * 
+         * @return Current page-range page-number-array.
+         */
+        public int[] getCurrentPageRangePageNumberArray() {
+            assertPageRangeValid();
+            return convertListToIntArray(getCurrentPageRangePageNumberList());
+        }
+
+        /**
+         * Is existing previous page-range?
+         * Using values are pageRangeOption and currentPageNumber and allPageCount.
+         * 
+         * @return Determination.
+         */
+        public boolean isExistPrePageRange() {
+            assertPageRangeValid();
+            final int[] array = getCurrentPageRangePageNumberArray();
+            if (array.length == 0) {
+                return false;
+            }
+            return array[0] > 1;
+        }
+
+        /**
+         * Is existing next page-range?
+         * Using values are pageRangeOption and currentPageNumber and allPageCount.
+         * 
+         * @return Determination.
+         */
+        public boolean isExistNextPageRange() {
+            assertPageRangeValid();
+            final int[] array = getCurrentPageRangePageNumberArray();
+            if (array.length == 0) {
+                return false;
+            }
+            return array[array.length-1] < _allPageCount;
+        }
+
+        protected int[] convertListToIntArray(java.util.List${database.filterGenericsString('Integer')} ls) {
+            final int[] resultArray = new int[ls.size()];
+            int arrayIndex = 0;
+            for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+                final Integer tmpPageNumber = (Integer)ite.next();
+                resultArray[arrayIndex] = tmpPageNumber.intValue();
+                arrayIndex++;
+            }
+            return resultArray;
+        }
+
+        protected void assertPageRangeValid() {
+            if (_pageRangeOption == null) {
+                String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
+                throw new IllegalStateException(msg);
+            }
+            final int pageRangeSize = _pageRangeOption.getPageRangeSize();
+            if (pageRangeSize == 0) {
+                String msg = "The pageRangeSize should be greater than 1. But the value is zero.";
+                throw new IllegalStateException(msg);
+            }
         }
     }
 
-    // =====================================================================================
-    //                                                                 Basic-Override Method
-    //                                                                 =====================
+    /**
+     * The option of page group.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public static class PageGroupOption {
+        protected int _pageGroupSize;
+
+        public int getPageGroupSize() {
+            return _pageGroupSize;
+        }
+
+        public void setPageGroupSize(int pageGroupSize) {
+            _pageGroupSize = pageGroupSize;
+        }
+    }
+
+    /**
+     * The bean of page group.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public static class PageGroupBean {
+        protected PageGroupOption _pageGroupOption;
+        protected int _currentPageNumber;
+        protected int _allPageCount;
+        public void setPageGroupOption(PageGroupOption pageGroupOption) {
+            this._pageGroupOption = pageGroupOption;
+        }
+        public void setCurrentPageNumber(int currentPageNumber) {
+            this._currentPageNumber = currentPageNumber;
+        }
+        public void setAllPageCount(int allPageCount) {
+            this._allPageCount = allPageCount;
+        }
+
+        /**
+         * Calculate current page-group start-page-number.
+         * Using values are currentPageNumber and pageGroupSize.
+         * 
+         * @return Current page-group start-page-number.
+         */
+        public int calculateCurrentPageGroupStartPageNumber() {
+            assertPageGroupValid();
+            final int pageGroupSize = _pageGroupOption.getPageGroupSize();
+            final int currentPageNumber = _currentPageNumber;
+
+            int currentPageGroupNumber = (currentPageNumber / pageGroupSize);
+            if ((currentPageNumber % pageGroupSize) == 0)
+            {
+                currentPageGroupNumber--;
+            }
+            final int currentPageGroupStartPageNumber = (pageGroupSize * currentPageGroupNumber) + 1;
+            if (!(currentPageNumber >= currentPageGroupStartPageNumber)) {
+                String msg = "currentPageNumber should be greater equal currentPageGroupStartPageNumber. But:";
+                msg = msg + " currentPageNumber=" + currentPageNumber;
+                msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+                throw new IllegalStateException(msg);
+            }
+            return currentPageGroupStartPageNumber;
+        }
+
+        /**
+         * Get current page-group page-number-list.
+         * Using values are currentPageNumber and pageGroupSize and allPageCount.
+         * 
+         * @return Current page-group page-number-list.
+         */
+        public java.util.List${database.filterGenericsString('Integer')} getCurrentPageGroupPageNumberList() {
+            assertPageGroupValid();
+            final int pageGroupSize = _pageGroupOption.getPageGroupSize();
+            final int allPageCount = _allPageCount;
+            final int currentPageGroupStartPageNumber = calculateCurrentPageGroupStartPageNumber();
+            if (!(currentPageGroupStartPageNumber > 0)) {
+                String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
+                msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+                throw new IllegalStateException(msg);
+            }
+            final int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + pageGroupSize;
+
+            final java.util.List${database.filterGenericsString('Integer')} resultList = new java.util.ArrayList${database.filterGenericsString('Integer')}();
+            for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
+                resultList.add(new Integer(i));
+            }
+            return resultList;
+        }
+
+        /**
+         * Get current page-group page-number-array.
+         * Using values are currentPageNumber and pageGroupSize and allPageCount.
+         * 
+         * @return Current page-group page-number-array.
+         */
+        public int[] getCurrentPageGroupPageNumberArray() {
+            assertPageGroupValid();
+            return convertListToIntArray(getCurrentPageGroupPageNumberList());
+        }
+
+        /**
+         * Is existing previous page-group?
+         * Using values are currentPageNumber and pageGroupSize.
+         * 
+         * @return Determination.
+         */
+        public boolean isExistPrePageGroup() {
+            assertPageGroupValid();
+            return (_currentPageNumber > _pageGroupOption.getPageGroupSize());
+        }
+
+        /**
+         * Is existing next page-group?
+         * Using values are currentPageNumber and pageGroupSize and allPageCount.
+         * 
+         * @return Determination.
+         */
+        public boolean isExistNextPageGroup() {
+            assertPageGroupValid();
+            int currentPageGroupStartPageNumber = calculateCurrentPageGroupStartPageNumber();
+            if (!(currentPageGroupStartPageNumber > 0)) {
+                String msg = "currentPageGroupStartPageNumber should be greater than 0. {> 0} But:";
+                msg = msg + " currentPageGroupStartPageNumber=" + currentPageGroupStartPageNumber;
+                throw new IllegalStateException(msg);
+            }
+            int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupOption.getPageGroupSize();
+            return (nextPageGroupStartPageNumber <= _allPageCount);
+        }
+
+        protected int[] convertListToIntArray(java.util.List${database.filterGenericsString('Integer')} ls) {
+            final int[] resultArray = new int[ls.size()];
+            int arrayIndex = 0;
+            for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+                final Integer tmpPageNumber = (Integer)ite.next();
+                resultArray[arrayIndex] = tmpPageNumber.intValue();
+                arrayIndex++;
+            }
+            return resultArray;
+        }
+
+        protected void assertPageGroupValid() {
+            if (_pageGroupOption == null) {
+                String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
+                throw new IllegalStateException(msg);
+            }
+            if (_pageGroupOption.getPageGroupSize() == 0) {
+                String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
+                msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+                throw new IllegalStateException(msg);
+            }
+            if (_pageGroupOption.getPageGroupSize() == 1) {
+                String msg = "The pageGroupSize should be greater than 1. But the value is one.";
+                msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+                throw new IllegalStateException(msg);
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * This method overrides the method that is declared at super.
      * 
@@ -518,8 +748,8 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
         sb.append(" listSize=").append(getSelectedList() != null ? new Integer(getSelectedList().size()) : null);
         sb.append(" pageSize=").append(getPageSize());
         sb.append(" page:{").append(isExistPrePage()).append("/").append(isExistNextPage()).append("}");
-        sb.append(" groupSize=").append(getPageGroupSize());
         sb.append(" rangeSize=").append(getPageRangeSize());
+        sb.append(" groupSize=").append(getPageGroupSize());
 
         return sb.toString();
     }

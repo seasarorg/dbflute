@@ -27,16 +27,6 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
      * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}.
      */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName});
-#if ($database.isGenerateDeprecated())
-
-    /**
-     * Has the setter of ${uncapitalisedJavaName} been invoked?
-     * 
-     * @return Determination.
-     * @deprecated This method is out of date because S2Dao supported modified-properties.
-     */
-    public boolean isSetterInvoked${javaName}();
-#end
   #if (${database.isAllClassificationColumn($filteredColumnName)})
     #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
     #set ($classificationList = $database.getClassificationMapList($classificationName))
@@ -68,6 +58,7 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
   #end
 #end
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Extract common-column-value map-string.
      * 
@@ -75,4 +66,6 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
      * @deprecated Please use ${glDBMetaInterfaceName}#extractCommonColumnValueMapString(entity);
      */
     public String extractCommonColumnValueMapString();
+#end
+
 }

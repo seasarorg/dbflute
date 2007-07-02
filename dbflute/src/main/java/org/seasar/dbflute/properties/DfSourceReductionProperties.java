@@ -25,6 +25,10 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
         return booleanProp("torque.isMakeDeprecated", false);
     }
 
+    public boolean isMakeRecentlyDeprecated() {
+        return booleanProp("torque.isMakeRecentlyDeprecated", true);
+    }
+
     // ===============================================================================
     //                                                     Properties - ConditionQuery
     //                                                     ===========================
@@ -41,5 +45,12 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     //                                                           =====================
     public boolean isMakeBehaviorForUpdate() {
         return booleanProp("torque.isMakeBehaviorForUpdate", false);
+    }
+
+    // ===============================================================================
+    //                                                          Properties - Traceable
+    //                                                          ======================
+    public boolean isMakeTraceablePreparedStatement() {
+        return booleanProp("torque.isMakeTraceablePreparedStatement", false);
     }
 }

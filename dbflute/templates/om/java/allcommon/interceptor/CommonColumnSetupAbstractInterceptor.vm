@@ -38,7 +38,7 @@ public abstract class ${glCommonColumnSetupAbstractInterceptor} extends org.seas
             final ${glEntityDefinedCommonColumnInterfaceName} entity = (${glEntityDefinedCommonColumnInterfaceName})firstArgument;
             if (_log.isDebugEnabled()) {
                 String msg = "Intercepted the method '" + getShortClassName(method.getDeclaringClass()) + "." + method.getName() + "()'";
-                msg = msg + ": entity=" + entity.extractPrimaryKeyMapString();
+                msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity);
                 _log.debug(msg);
             }
             setupEntity(entity);

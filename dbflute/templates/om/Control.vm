@@ -1006,35 +1006,35 @@ targetdatabase = $targetDatabase
     $generator.parse("om/${glTargetLanguage}/allcommon/interceptor/CommonColumnSetupBeforeDeleteInterceptor.${glTemplateFileExtension}",$path,"", "")
     $database.debug("}")
 
-
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                      Parse jdbc class
     ##                                                                                      ----------------
     #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
       $database.setupJavaDir_for_allcommon()
+      #if ($database.isMakeTraceablePreparedStatement())
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory}))
+        $database.makeDirectory($path)
 
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory}))
-      $database.makeDirectory($path)
+        $database.debug("    parsePreparedExecutionBeanName();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glPreparedExecutionBeanName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/PreparedExecutionBean.${glTemplateFileExtension}",$path,"", "")
 
-      $database.debug("    parsePreparedExecutionBeanName();")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glPreparedExecutionBeanName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/PreparedExecutionBean.${glTemplateFileExtension}",$path,"", "")
+        $database.debug("    parsePreparedParameterElement();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glPreparedParameterElementName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/PreparedParameterElement.${glTemplateFileExtension}",$path,"", "")
 
-      $database.debug("    parsePreparedParameterElement();")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glPreparedParameterElementName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/PreparedParameterElement.${glTemplateFileExtension}",$path,"", "")
+        $database.debug("    parseStatementHistory();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glStatementHistoryName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/StatementHistory.${glTemplateFileExtension}",$path,"", "")
 
-      $database.debug("    parseStatementHistory();")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glStatementHistoryName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/StatementHistory.${glTemplateFileExtension}",$path,"", "")
+        $database.debug("    parseStatementHistoryWitness();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glStatementHistoryWitnessName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/StatementHistoryWitness.${glTemplateFileExtension}",$path,"", "")
 
-      $database.debug("    parseStatementHistoryWitness();")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glStatementHistoryWitnessName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/StatementHistoryWitness.${glTemplateFileExtension}",$path,"", "")
-
-      $database.debug("    parseTraceablePreparedStatement();")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glTraceablePreparedStatementName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/TraceablePreparedStatement.${glTemplateFileExtension}",$path,"", "")
+        $database.debug("    parseTraceablePreparedStatement();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory})}${glTraceablePreparedStatementName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/TraceablePreparedStatement.${glTemplateFileExtension}",$path,"", "")
+      #end
     #end
 
     ## -----------------------------------------------------------------------------------------------------

@@ -673,6 +673,10 @@ public class Database {
         return getBasicProperties().isTargetLanguageCSharp();
     }
 
+    public boolean isJavaVersionGreaterEqualMustang() {
+        return getBasicProperties().isJavaVersionGreaterEqualMustang();
+    }
+
     // ===============================================================================
     //                                                          Properties - Extension
     //                                                          ======================
@@ -901,15 +905,15 @@ public class Database {
     public List<String> getCommonColumnNameConvertionList() {
         return getProperties().getCommonColumnProperties().getCommonColumnNameConvertionList();
     }
-    
+
     public boolean isCommonColumnConvertion(String commonColumnName) {
         return getProperties().getCommonColumnProperties().isCommonColumnConvertion(commonColumnName);
     }
-    
+
     public String filterCommonColumn(String commonColumnName) {
         return getProperties().getCommonColumnProperties().filterCommonColumn(commonColumnName);
     }
-    
+
     public boolean hasCommonColumn() {
         return !getProperties().getCommonColumnProperties().getCommonColumnNameList().isEmpty();
     }
@@ -1236,10 +1240,14 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                   Properties - Source Reduction
-    //                                                   =============================
+    //                                                      Properties - Making Option
+    //                                                      ==========================
     public boolean isMakeDeprecated() {
         return getProperties().getSourceReductionProperties().isMakeDeprecated();
+    }
+
+    public boolean isMakeRecentlyDeprecated() {
+        return getProperties().getSourceReductionProperties().isMakeRecentlyDeprecated();
     }
 
     public boolean isMakeConditionQueryEqualEmptyString() {
@@ -1252,6 +1260,10 @@ public class Database {
 
     public boolean isMakeBehaviorForUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorForUpdate();
+    }
+
+    public boolean isMakeTraceablePreparedStatement() {
+        return getProperties().getSourceReductionProperties().isMakeTraceablePreparedStatement();
     }
 
     // ===============================================================================
@@ -1525,7 +1537,15 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                                   Common-Column
+    //                                                                             Map
+    //                                                                             ===
+    public String getMapValue(Map map, String key) {
+        final Object value = map.get(key);
+        return value != null ? (String) value : "";
+    }
+
+    // ===============================================================================
+    //                                                                   Common Column
     //                                                                   =============
     public boolean isCommonColumnSetupInvokingLogic(String logic) {
         return logic.startsWith("$");

@@ -481,6 +481,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     abstract protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity);
 
+#if ($database.isMakeRecentlyDeprecated())
+
     /**
      * Reflect(insert or update) from separated-file.
      * 
@@ -598,4 +600,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
         return exceptionList;
     }
+#end
+
 }

@@ -154,6 +154,15 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return _languageDependencyInfo;
     }
 
+    public String getTargetLanguageVersion() {
+        return stringProp("torque.targetLanguageVersion", "5.0");
+    }
+
+    public boolean isJavaVersionGreaterEqualMustang() {
+        final String targetLanguageVersion = getBasicProperties().getTargetLanguageVersion();
+        return isTargetLanguageJava() && targetLanguageVersion.compareToIgnoreCase("6.0") >= 0;
+    }
+
     // ===================================================================================
     //                                                                           Extension
     //                                                                           =========

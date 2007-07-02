@@ -1,8 +1,6 @@
 package ${glPackageBaseCommon};
 
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-import ${glPackageBaseCommonHelper}.${glMapListStringName};
-import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 
 /**
  * The interface of entity.
@@ -11,26 +9,41 @@ import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
  */
 public interface ${glEntityInterfaceName} {
 
+#if ($database.isMakeRecentlyDeprecated())
+
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Map-string map-mark. */
+    /**
+     * @deprecated
+     */
     public static final String MAP_STRING_MAP_MARK = "map:";
 
-    /** Map-string list-mark. */
+    /**
+     * @deprecated
+     */
     public static final String MAP_STRING_LIST_MARK = "list:";
 
-    /** Map-string start-brace. */
+    /**
+     * @deprecated
+     */
     public static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
 
-    /** Map-string end-brace. */
+    /**
+     * @deprecated
+     */
     public static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
 
-    /** Map-string delimiter. */
+    /**
+     * @deprecated
+     */
     public static final String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
 
-    /** Map-string equal. */
+    /**
+     * @deprecated
+     */
     public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
+#end
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -65,6 +78,8 @@ public interface ${glEntityInterfaceName} {
      * @return Table uncap-prop-name. (NotNull)
      */
     public String getTableUncapPropName();
+
+#if ($database.isMakeRecentlyDeprecated())
 
     // ===================================================================================
     //                                                                              Accept
@@ -150,6 +165,7 @@ public interface ${glEntityInterfaceName} {
      * @deprecated Please use ${glDBMetaInterfaceName}#extractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
      */
     public String extractColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal);
+#end
 
     // ===================================================================================
     //                                                                       Determination
