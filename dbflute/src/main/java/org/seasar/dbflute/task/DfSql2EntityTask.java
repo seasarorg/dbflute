@@ -283,7 +283,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 final List<String> parameterBeanElement = getParameterBeanProperties(sql);
                 for (String element : parameterBeanElement) {
                     final String delimiter = " ";
-                    final int idx = element.indexOf(delimiter);
+                    element = element.trim();
+                    final int idx = element.lastIndexOf(delimiter);
                     if (idx > 0) {
                         final String typeName = element.substring(0, idx).trim();
                         final String propertyName = element.substring(idx + delimiter.length()).trim();

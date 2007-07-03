@@ -39,6 +39,9 @@ import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+#if ($database.isAvailableGenerics())
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+#end
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
 
 /**
@@ -53,9 +56,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
 #end
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Root node. */
     private Node rootNode;// Override!
 
@@ -71,9 +74,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     /** Cache of select clause PK-only command. */
     protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -92,12 +95,12 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         this.resultSetFactory = resultSetFactory;
     }
 
-    // =====================================================================================
-    //                                                                                  Main
-    //                                                                                  ====
-    // --------------------------------------
-    //                Very Important Override
-    //                -----------------------
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
+    // -----------------------------------------------------
+    //                               Very Important Override
+    //                               -----------------------
     public void setSql(String sql) {// Override!
         super.setSql(sql);
         this.rootNode = new InternalSqlParserImpl(sql).parse();
@@ -129,9 +132,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         super.setArgTypes(argTypes);
     }
 
-    // --------------------------------------
-    //                             For Public
-    //                             ----------
+    // -----------------------------------------------------
+    //                                            For Public
+    //                                            ----------
     /**
      * Do apply. {for delegating to apply()}
      * 
@@ -142,9 +145,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return apply(args);
     }
 
-    // --------------------------------------
-    //                          Select-Clause
-    //                          -------------
+    // -----------------------------------------------------
+    //                                         Select Clause
+    //                                         -------------
     /**
      * Set select clause.
      * 
@@ -169,18 +172,29 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return this;
     }
 
-    // --------------------------------------
-    //          SelectDynamicCommand Creation
-    //          -----------------------------
+    // -----------------------------------------------------
+    //                         SelectDynamicCommand Creation
+    //                         -----------------------------
     protected ${glSelectDynamicCommand} createMySelectDynamicCommand() {
         return new ${glSelectDynamicCommand}(getDataSource(), getStatementFactory(), resultSetHandler, resultSetFactory);
     }
 
-    // --------------------------------------
-    //                                Execute
-    //                                -------
+    // -----------------------------------------------------
+    //                                               Execute
+    //                                               -------
     public Object execute(Object[] args) {
         if (!${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+
+#if ($database.isAvailableGenerics())
+            if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+                if (!outsideSqlContext.isDynamicAnalysis() || args == null || args.length == 0 || args[0] == null) {
+                    return super.execute(args);
+                }
+                return executeOutsideSql(args, outsideSqlContext);
+            }
+#end
+
             return super.execute(args);
         }
         assertSelectClauseCommand();
@@ -216,9 +230,44 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
 
-    // --------------------------------------
-    //                           Setup Clause
-    //                           ------------
+#if ($database.isAvailableGenerics())
+    // -----------------------------------------------------
+    //                                           Outside-Sql
+    //                                           -----------
+    protected Object executeOutsideSql(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+        final Object firstArg = args[0];
+        final org.seasar.framework.beans.BeanDesc beanDesc = org.seasar.framework.beans.factory.BeanDescFactory.getBeanDesc(firstArg.getClass());
+        String filteredSql = getSql();
+        for (int i = 0; i < beanDesc.getPropertyDescSize(); i++) {
+            final PropertyDesc propertyDesc = beanDesc.getPropertyDesc(i);
+            final Class propertyType = propertyDesc.getPropertyType();
+            if (!propertyType.equals(String.class)) {
+                continue;
+            }
+            final String outsideSqlPiece = (String) propertyDesc.getValue(firstArg);
+            if (outsideSqlPiece == null) {
+                continue;
+            }
+            final String embeddedComment = "/*$pmb." + propertyDesc.getPropertyName() + "*/";
+            filteredSql = InternalStringUtil.replace(filteredSql, embeddedComment, outsideSqlPiece);
+        }
+        final ${glSelectDynamicCommand} outsideSqlCommand = createMySelectDynamicCommand();
+        outsideSqlCommand.setArgNames(getArgNames());
+        outsideSqlCommand.setArgTypes(getArgTypes());
+        outsideSqlCommand.setSql(filteredSql);
+        final org.seasar.dao.CommandContext ctx = outsideSqlCommand.doApply(args);
+        final java.util.List<Object> bindVariableList = new java.util.ArrayList<Object>();
+        final java.util.List<Class> bindVariableTypeList = new java.util.ArrayList<Class>();
+        addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
+        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql());
+        selectHandler.setFetchSize(-1);
+        return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
+    }
+#end
+
+    // -----------------------------------------------------
+    //                                          Setup Clause
+    //                                          ------------
     protected String setupRealSelectClause(Object[] args, List${database.filterGenericsString('Object')} bindVariableList, List${database.filterGenericsString('Class')} bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realSelectClause;

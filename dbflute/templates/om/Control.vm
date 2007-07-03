@@ -132,6 +132,9 @@ targetdatabase = $targetDatabase
     ## [Allcommon-ConditionBean-Mapping]
     #set ($glEntityDtoMapperName = "${glProjectPrefix}EntityDtoMapper")
 
+    ## [Allcommon-ConditionBean-Mapping]
+    #set ($glOutsideSqlContextName = "${glProjectPrefix}OutsideSqlContext")
+
     ## [Allcommon-ConditionBean-SqlClause]
     #set ($glSqlClauseName = "${glProjectPrefix}SqlClause")
     #set ($glSqlClauseInterfaceName = "${glProjectPrefix}SqlClause")
@@ -229,6 +232,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
     #set ($glPackageBaseCommonCBeanMapping = "${database.baseCommonPackage}.cbean.mapping")
     #set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.cbean.grouping")
+    #set ($glPackageBaseCommonCBeanOutsidesql = "${database.baseCommonPackage}.cbean.outsidesql")
     #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
     #set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.cbean.cvalue")
     #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
@@ -645,6 +649,18 @@ targetdatabase = $targetDatabase
       $database.debug("    parseEntityDtoMapper();")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanMapping})}${glEntityDtoMapperName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/mapping/EntityDtoMapper.${glTemplateFileExtension}",$path ,"", "")
+    #end
+
+    ## -------------------------------------------------------
+    ##                       allcommon condition-bean grouping
+    ##                       ---------------------------------
+    #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parseOutsideSqlContext()")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlContextName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/outsidesql/OutsideSqlContext.${glTemplateFileExtension}",$path ,"", "")
     #end
 
     ## -------------------------------------------------------

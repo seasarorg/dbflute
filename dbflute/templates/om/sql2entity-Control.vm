@@ -142,8 +142,8 @@ targetdatabase = $targetDatabase
     $database.debug("    final List<DfParameterBeanMetaData> parameterBeanList = getParameterBeanList();")
     $database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanList) {")
 
-    #set ($glPackageBaseParameterBean = "${database.Sql2EntityBaseParameterBeanPackage}" )
-    #set ($glPackageExtendedParameterBean = "${database.Sql2EntityExtendedParameterBeanPackage}" )
+    #set ($glPackageBaseParameterBean = "${database.sql2EntityBaseParameterBeanPackage}" )
+    #set ($glPackageExtendedParameterBean = "${database.sql2EntityExtendedParameterBeanPackage}" )
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseParameterBean}))
       $database.makeDirectory($path)

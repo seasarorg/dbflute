@@ -9,6 +9,11 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+#if ($database.isAvailableGenerics())
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
+#end
+
 
 /**
  * My-DaoInterceptor.
@@ -24,9 +29,15 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     /** Log-instance. */
     private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Dao meta data factory. */
     private org.seasar.dao.DaoMetaDataFactory daoMetaDataFactory_;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -36,6 +47,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         daoMetaDataFactory_ = daoMetaDataFactory;
     }
 
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     /**
      * Invoke.
      * 
@@ -174,9 +188,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
-    // =====================================================================================
-    //                                                                      Pre&Post Process
-    //                                                                      ================
+    // ===================================================================================
+    //                                                                    Pre Post Process
+    //                                                                    ================
     /**
      * Preprocess condition-bean.
      * <p>
@@ -189,6 +203,15 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      */
     protected ${glConditionBeanInterfaceName} preprocessConditionBean(MethodInvocation invocation, org.seasar.dao.SqlCommand cmd) {
         clearThreadLocal();
+
+#if ($database.isAvailableGenerics())
+        final OutsideSql outsideSql = invocation.getMethod().getAnnotation(OutsideSql.class);
+        if (outsideSql != null && outsideSql.dynamicAnalysis()) {
+            final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+            outsideSqlContext.setDynamicAnalysis(true);
+            ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+        }
+#end
 
         final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName};
         {
@@ -243,6 +266,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected void clearThreadLocal() {
+#if ($database.isAvailableGenerics())
+        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            ${glOutsideSqlContextName}.clearOutsideSqlContextOnThread();
+        }
+#end
         if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             ${glFetchNarrowingBeanContextName}.clearFetchNarrowingBeanOnThread();
         }
@@ -251,9 +279,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
-    // =====================================================================================
-    //                                                                         Determination
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Is select count ignore-fetch-scope method?
      * 
@@ -272,9 +300,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
-    // =====================================================================================
-    //                                                                                Helper
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
     /**
      * Get short class name.
      * 
