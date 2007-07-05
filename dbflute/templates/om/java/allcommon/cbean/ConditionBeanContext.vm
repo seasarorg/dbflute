@@ -79,6 +79,22 @@ public class ${glConditionBeanContextName} {
             final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
             _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
         }
+        {
+            final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName}.class;
+            _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
+        {
+            final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName}.class;
+            _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
+        {
+            final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName}.class;
+            _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
+        {
+            final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName}.class;
+            _log.debug("Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
     }
 
     // =====================================================================================
