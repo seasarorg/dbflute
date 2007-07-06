@@ -363,8 +363,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
         if (Types.OTHER != sqlTypeCode) {
-            final String torqueType = TypeMap.getTorqueType(sqlTypeCode);
-            return torqueType;
+            try {
+                return TypeMap.getTorqueType(sqlTypeCode);
+            } catch (RuntimeException e) {
+                String msg = "Not found the sqlTypeCode in TypeMap: sqlTypeCode=";
+                msg = msg + sqlTypeCode + " message=" + e.getMessage();
+                _log.warn(msg);
+            }
         }
 
         // If other
