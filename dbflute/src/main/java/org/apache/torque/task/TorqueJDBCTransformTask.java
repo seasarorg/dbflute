@@ -62,6 +62,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -320,7 +321,16 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
 
             // Unique keys for this table.
-            final Map<String, Map<Integer, String>> uniqueMap = getUniqueColumnNameList(dbMetaData, tableMataInfo);
+            Map<String, Map<Integer, String>> uniqueMap = null;
+            try {
+                uniqueMap = getUniqueColumnNameList(dbMetaData, tableMataInfo);
+            } catch (SQLException e) {
+                _log.warn("Failed to get unique column information! But continue...", e);
+            } finally {
+                if (uniqueMap == null) {
+                    uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
+                }
+            }
             final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
             for (final String uniqueIndexName : uniqueKeySet) {
                 final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
