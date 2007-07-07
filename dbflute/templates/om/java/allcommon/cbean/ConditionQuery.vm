@@ -10,9 +10,9 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
  */
 public interface ${glConditionQueryInterfaceName} {
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * Get table db-name.
      * 
@@ -78,25 +78,82 @@ public interface ${glConditionQueryInterfaceName} {
      */
     public boolean isBaseQuery(${glConditionQueryInterfaceName} query);
 
-    // =====================================================================================
-    //                                                                                Invoke
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Invoke
+    //                                                                              ======
+    /**
+     * Invoke getter.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @return Condition-value. (NotNull)
+     */
     public ${glConditionValueName} invokeGetter(String columnMultiName);
 
+    /**
+     * Invoke setter for equal.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @param value Value. (Nullable)
+     */
     public void invokeSetterEqual(String columnMultiName, Object value);
+
+    /**
+     * Invoke setter for notEqual.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @param value Value. (Nullable)
+     */
     public void invokeSetterNotEqual(String columnMultiName, Object value);
+
+    /**
+     * Invoke setter for greaterThan.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @param value Value. (Nullable)
+     */
     public void invokeSetterGreaterThan(String columnMultiName, Object value);
+
+    /**
+     * Invoke setter for lessThan.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @param value Value. (Nullable)
+     */
     public void invokeSetterLessThan(String columnMultiName, Object value);
+
+    /**
+     * Invoke setter for greaterThan.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @param value Value. (Nullable)
+     */
     public void invokeSetterGreaterEqual(String columnMultiName, Object value);
+
+    /**
+     * Invoke setter for lessThan.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @param value Value. (Nullable)
+     */
     public void invokeSetterLessEqual(String columnMultiName, Object value);
 
+    /**
+     * Invoke add order-by asc.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     */
     public void invokeAddOrderByAsc(String columnMultiName);
+
+    /**
+     * Invoke add order-by desc.
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     */
     public void invokeAddOrderByDesc(String columnMultiName);
 
-    // =====================================================================================
-    //                                                                         Foregin Query
-    //                                                                         =============
-
+    // ===================================================================================
+    //                                                                       Foregin Query
+    //                                                                       =============
     /**
      * Get foreign condition query contains referer-as-one.
      * 

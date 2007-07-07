@@ -488,6 +488,12 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // ===================================================================================
     //                                                                              Invoke
     //                                                                              ======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @return Condition-value. (NotNull)
+     */
     public ${glConditionValueName} invokeGetter(String columnMultiName) {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
         final String columnCapPropName = dbmeta.getCapPropNameByMultiName(columnMultiName);
@@ -648,7 +654,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
-
     protected final String replaceString(String text, String fromText, String toText) {
         if(text == null || fromText == null || toText == null)
             return null;

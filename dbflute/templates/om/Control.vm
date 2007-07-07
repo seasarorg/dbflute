@@ -736,6 +736,10 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Derby.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_derby.${glTemplateFileExtension}",$path ,"" ,"")
 
+      $database.debug("    parseSqlClause_h2")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}H2.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_h2.${glTemplateFileExtension}",$path ,"" ,"")
+
       $database.debug("    parseSqlClause_oracle")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Oracle.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_oracle.${glTemplateFileExtension}",$path ,"" ,"")

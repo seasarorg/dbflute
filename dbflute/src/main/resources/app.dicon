@@ -7,6 +7,7 @@
 		<property name="databaseBaseInfo">"
             map:{
                 ; derby      = map:{daoGenDbName = Derby      ; wildCard = % ; sequenceNextSql = Unsupported}
+                ; h2         = map:{daoGenDbName = H2         ; wildCard = % ; sequenceNextSql = Unsupported}
                 ; firebird   = map:{daoGenDbName = Firebird   ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}
                 ; oracle     = map:{daoGenDbName = Oracle     ; wildCard = % ; sequenceNextSql = select $$sequenceName$$.nextval from dual}
                 ; mysql      = map:{daoGenDbName = MySql      ; wildCard = % ; sequenceNextSql = Unsupported}
@@ -21,6 +22,7 @@
 		<property name="databaseBaseInfoOgnlTest">
             #{
                   "derby"     : #{"daoGenDbName": "Derby"     , "wildCard": "%", "sequenceNextSql": "Unsupported"}
+                , "derby"     : #{"daoGenDbName": "H2"        , "wildCard": "%", "sequenceNextSql": "Unsupported"}
                 , "firebird"  : #{"daoGenDbName": "Firebird"  , "wildCard": "%", "sequenceNextSql": "select gen_id($$sequenceName$$, 1) from RDB$DATABASE"}
                 , "oracle"    : #{"daoGenDbName": "Oracle"    , "wildCard": "%", "sequenceNextSql": "select $$sequenceName$$.nextval from dual"}
                 , "mysql"     : #{"daoGenDbName": "MySql"     , "wildCard": "%", "sequenceNextSql": "Unsupported"}
