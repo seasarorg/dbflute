@@ -27,69 +27,9 @@ public class ${myClassName} {
         return _instance;
     }
 
-    // =========================================================================================
-    //                                                                     Generated method name
-    //                                                                     =====================
-    /**
-     * Get the method name of 'getCountAll'.
-     *
-     * @return The method name of 'getCountAll'. (NotNull)
-     */
-    public String getMethodNameOfGetCountAll() {
-        return "getCountAll";
-    }
-
-    /**
-     * Get the method name of 'getListAll'.
-     *
-     * @return The method name of 'getListAll'. (NotNull)
-     */
-    public String getMethodNameOfGetListAll() {
-        return "getListAll";
-    }
-
-    /**
-     * Get the method name of 'getEntity'.
-     *
-     * @return The method name of 'getEntity'. (NotNull)
-     */
-    public String getMethodNameOfGetEntity() {
-        return "getEntity";
-    }
-
-    /**
-     * Get the method name of 'selectCountIgnoreFetchNarrowing'.
-     *
-     * @return The method name of 'selectCountIgnoreFetchNarrowing'. (NotNull)
-     */
-    public String getMethodNameOfSelectCountIgnoreFetchScope() {
-        return "selectCountIgnoreFetchScope";
-    }
-
-    /**
-     * Get the method name of 'selectEntity'.
-     *
-     * @return The method name of 'selectEntity'. (NotNull)
-     */
-    public String getMethodNameOfSelectEntity() {
-        return "selectEntity";
-    }
-
-    /**
-     * Get the method name of 'selectList'.
-     *
-     * @return The method name of 'selectList'. (NotNull)
-     */
-    public String getMethodNameOfSelectList() {
-        return "selectList";
-    }
-
-    // =========================================================================================
-    //                                             Only when having generated, the effective one
-    //                                             =============================================
-    // -------------------------------------------------------------------------------
-    //                                                                           Basic
-    //                                                                           -----
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
     /**
      * Get the property-value of targetLanguage.
      *
@@ -135,9 +75,9 @@ public class ${myClassName} {
         return "${database.ClassAuthor}";
     }
 
-    // -------------------------------------------------------------------------------
-    //                                                                       Available
-    //                                                                       ---------
+    // ===================================================================================
+    //                                                                              Naming
+    //                                                                              ======
     /**
      * Is java name of table same as db name? Answer is ${database.isJavaNameOfTableSameAsDbName()}!
      *
@@ -156,45 +96,9 @@ public class ${myClassName} {
         return ${database.isJavaNameOfColumnSameAsDbName()};
     }
 
-    /**
-     * Is available behavior generation? Answer is ${database.isAvailableBehaviorGeneration()}!
-     *
-     * @return The property-value.
-     */
-    public boolean isAvailableBehaviorGeneration() {
-        return ${database.isAvailableBehaviorGeneration()};
-    }
-
-    /**
-     * Is available common-column-setup interceptor to behavior? Answer is ${database.isAvailableCommonColumnSetupInterceptorToBehavior()}!
-     *
-     * @return The property-value.
-     */
-    public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
-        return ${database.isAvailableCommonColumnSetupInterceptorToBehavior()};
-    }
-
-    /**
-     * Is available common-column-setup interceptor to dao? Answer is ${database.isAvailableCommonColumnSetupInterceptorToDao()}!
-     *
-     * @return The property-value.
-     */
-    public boolean isAvailableCommonColumnSetupInterceptorToDao() {
-        return ${database.isAvailableCommonColumnSetupInterceptorToDao()};
-    }
-
-    /**
-     * Is available generics? Answer is ${database.isAvailableGenerics()}!
-     *
-     * @return The property-value.
-     */
-    public boolean isAvailableGenerics() {
-        return ${database.isAvailableGenerics()};
-    }
-
-    // -------------------------------------------------------------------------------
-    //                                                                          Prefix
-    //                                                                          ------
+    // ===================================================================================
+    //                                                                              Prefix
+    //                                                                              ======
     /**
      * Get the property-value of projectPrefix.
      *
@@ -213,57 +117,9 @@ public class ${myClassName} {
         return "${database.BasePrefix}";
     }
 
-    // -------------------------------------------------------------------------------
-    //                                                                        DaoDicon
-    //                                                                        --------
-    /**
-     * Get the property-value of daoDiconNamespace.
-     *
-     * @return The property-value.
-     */
-    public String getDaoDiconNamespace() {
-        return "${database.DaoDiconNamespace}";
-    }
-
-    /**
-     * Get the property-value of daoDiconPackageName.
-     *
-     * @return The property-value.
-     */
-    public String getDaoDiconPackageName() {
-        return "${database.DaoDiconPackageName}";
-    }
-
-    /**
-     * Get the property-value of daoDiconFileName.
-     *
-     * @return The property-value.
-     */
-    public String getDaoDiconFileName() {
-        return "${database.DaoDiconFileName}";
-    }
-
-    /**
-     * Get the property-value of jdbcDiconResourceName.
-     *
-     * @return The property-value.
-     */
-    public String getJdbcDiconResourceName() {
-        return "${database.JdbcDiconResourceName}";
-    }
-
-    /**
-     * Get the property-value of requiredTxComponentName.
-     *
-     * @return The property-value.
-     */
-    public String getRequiredTxComponentName() {
-        return "${database.requiredTxComponentName}";
-    }
-
-    // -------------------------------------------------------------------------------
-    //                                                                         Package
-    //                                                                         -------
+    // ===================================================================================
+    //                                                                             Package
+    //                                                                             =======
     /**
      * Get the property-value of baseCommonPackage.
      *
@@ -336,9 +192,9 @@ public class ${myClassName} {
         return "${database.ExtendedEntityPackage}";
     }
 
-    // -------------------------------------------------------------------------------
-    //                                                                 Optimistic Lock
-    //                                                                 ---------------
+    // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
     /**
      * Get the property-value of updateDateFieldName.
      *
@@ -357,21 +213,9 @@ public class ${myClassName} {
         return "${database.VersionNoFieldName}";
     }
 
-    // -------------------------------------------------------------------------------
-    //                                                                    Select Param
-    //                                                                    ------------
-    /**
-     * Get the property-value of selectQueryTimeout.
-     *
-     * @return The property-value.
-     */
-    public int getSelectQueryTimeout() {
-        return ${database.SelectQueryTimeout};
-    }
-
-    // -------------------------------------------------------------------------------
-    //                                                                         Extract
-    //                                                                         -------
+    // ===================================================================================
+    //                                                                             Extract
+    //                                                                             =======
     /**
      * Get the value of 'extractAcceptStartBrace'.
      *

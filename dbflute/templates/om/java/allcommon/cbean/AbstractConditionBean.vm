@@ -90,10 +90,15 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         }
     }
 
-    protected long parseDateString(Object value, String propertyName, String typeName) {
+    protected long parseDateStringAsMillis(Object value, String propertyName, String typeName) {
         checkTypeString(value, propertyName, typeName);
         try {
-            return getDateFormat().parse((String)value).getTime();
+            final String valueString = (String)value;
+            if (valueString.indexOf("-") >= 0 && valueString.indexOf("-") != valueString.lastIndexOf("-")) {
+                return java.sql.Timestamp.valueOf(valueString).getTime();
+            } else {
+                return getParseDateFormat().parse((String)value).getTime();
+            }
         } catch (java.text.ParseException e) {
             String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
             throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
@@ -103,8 +108,8 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         }
     }
 
-    protected java.text.DateFormat getDateFormat() {
-        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private java.text.DateFormat getParseDateFormat() {
+        return java.text.DateFormat.getDateTimeInstance();
     }
 
     // =====================================================================================
@@ -184,7 +189,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero)
+     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
     public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber) {
@@ -357,7 +362,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
             final String orderBySlashElement = (String)ite.next();
 	        final java.util.List${database.filterGenericsString('String')} orderByDotList = new java.util.ArrayList${database.filterGenericsString('String')}();
 	        {
-	            final java.util.StringTokenizer st = new java.util.StringTokenizer(orderBySlashElement, "/");
+	            final java.util.StringTokenizer st = new java.util.StringTokenizer(orderBySlashElement, ".");
 	            while (st.hasMoreElements()) {
 	                orderByDotList.add(st.nextToken());
 	            }

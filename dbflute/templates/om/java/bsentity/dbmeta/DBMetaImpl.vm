@@ -3,7 +3,6 @@ package ${myDBMetaPackageName};
 #set ($myClassName = "${myDBMetaClassName}")
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 
@@ -74,48 +73,109 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                     Name Definition
     //                                                                     ===============
+    // -----------------------------------------------------
+    //                                                 Table
+    //                                                 -----
     /** Table db name. */
-    public static final String TABLE_DB_NAME = "$table.Name";
+    public static final String TABLE_DB_NAME = "$table.name";
 
     /** Table cap-prop name. */
-    public static final String TABLE_CAP_PROP_NAME = "$table.JavaName";
+    public static final String TABLE_CAP_PROP_NAME = "$table.javaName";
 
     /** Table uncap-prop name. */
-    public static final String TABLE_UNCAP_PROP_NAME = "$table.UncapitalisedJavaName";
+    public static final String TABLE_UNCAP_PROP_NAME = "$table.uncapitalisedJavaName";
 
+    // -----------------------------------------------------
+    //                                        Column DB-Name
+    //                                        --------------
 #foreach ($col in $table.Columns)
-    /** Db-name of ${col.JavaName}. */
-    public static final String COLUMN_DB_NAME_OF_${col.JavaName} = "$col.Name";
+    /** Db-name of ${col.name}. ${col.columnDefinitionLineDisp} */
+    public static final String DB_NAME_${col.name} = "$col.name";
 #end
 
 #foreach ($col in $table.Columns)
-    /** Cap-prop-name of ${col.JavaName}. */
+    /** @deprecated Deprecated! So use DB_NAME_${col.javaName}. */
+    public static final String COLUMN_DB_NAME_OF_${col.javaName} = "$col.Name";
+#end
+
+    // -----------------------------------------------------
+    //                                  Column Cap-Prop-Name
+    //                                  --------------------
+#foreach ($col in $table.Columns)
+    /** Cap-prop-name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
+    public static final String CAP_PROP_NAME_${col.javaName} = "$col.javaName";
+#end
+
+#if ($database.isMakeRecentlyDeprecated())
+#foreach ($col in $table.Columns)
+    /** @deprecated Deprecated! So use CAP_PROP_NAME_${col.javaName}. */
     public static final String COLUMN_CAP_PROP_NAME_OF_${col.JavaName} = "$col.JavaName";
 #end
+#end
 
-#foreach ($foreignKeys in $table.ForeignKeys)
-    /** Cap-prop-name of ${foreignKeys.ForeignPropertyName}. */
+    // -----------------------------------------------------
+    //                                Column Uncap-Prop-Name
+    //                                ----------------------
+#foreach ($col in $table.Columns)
+    /** Uncap-prop-name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
+    public static final String UNCAP_PROP_NAME_${col.uncapitalisedJavaName} = "$col.uncapitalisedJavaName";
+#end
+
+#if ($database.isMakeRecentlyDeprecated())
+#foreach ($col in $table.Columns)
+    /** @deprecated Deprecated! So use UNCAP_PROP_NAME_${col.javaName}. */
+    public static final String COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName} = "$col.uncapitalisedJavaName";
+#end
+#end
+
+    // -----------------------------------------------------
+    //                                      Foreign Property
+    //                                      ----------------
+#foreach ($foreignKeys in $table.foreignKeys)
+    /** Cap-prop-name of ${foreignKeys.foreignPropertyName}. */
+    public static final String FOREIGN_CAP_PROP_NAME_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.foreignPropertyNameInitCap";
+#end
+
+#foreach ($foreignKeys in $table.foreignKeys)
+    /** Uncap-prop-name of ${foreignKeys.foreignPropertyName}. */
+    public static final String FOREIGN_UNCAP_PROP_NAME_${foreignKeys.foreignPropertyName} = "$foreignKeys.foreignPropertyName";
+#end
+
+#if ($database.isMakeRecentlyDeprecated())
+#foreach ($foreignKeys in $table.foreignKeys)
+    /** @deprecated Use FOREIGN_CAP_PROP_${foreignKeys.foreignPropertyNameInitCap}. */
     public static final String COLUMN_CAP_PROP_NAME_OF_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.ForeignPropertyNameInitCap";
 #end
 
-#foreach ($children in $table.Referrers)
-    /** Cap-prop-name of ${children.ReffererPropertyNameInitCap}. */
-    public static final String COLUMN_CAP_PROP_NAME_OF_${children.ReffererPropertyNameInitCap} = "$children.ReffererPropertyNameInitCap";
-#end
-
-#foreach ($col in $table.Columns)
-    /** Uncap-prop-name of ${col.JavaName}. */
-    public static final String COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName} = "$col.UncapitalisedJavaName";
-#end
-
-#foreach ($foreignKeys in $table.ForeignKeys)
-    /** Uncap-prop-name of ${foreignKeys.ForeignPropertyName}. */
+#foreach ($foreignKeys in $table.foreignKeys)
+    /** @deprecated Use FOREIGN_UNCAP_PROP_NAME_${children.foreignPropertyNameInitCap} */
     public static final String COLUMN_UNCAP_PROP_NAME_OF_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.ForeignPropertyName";
 #end
+#end
 
-#foreach ($children in $table.Referrers)
-    /** Uncap-prop-name of ${children.ReffererPropertyName}. */
-    public static final String COLUMN_UNCAP_PROP_NAME_OF_${children.ReffererPropertyNameInitCap} = "$children.ReffererPropertyName";
+    // -----------------------------------------------------
+    //                                      Referer Property
+    //                                      ----------------
+#foreach ($children in $table.referrers)
+    /** Cap-prop-name of ${children.reffererPropertyName}. */
+    public static final String REFERER_CAP_PROP_NAME_${children.reffererPropertyNameInitCap} = "$children.reffererPropertyNameInitCap";
+#end
+
+#foreach ($children in $table.referrers)
+    /** Uncap-prop-name of ${children.reffererPropertyName}. */
+    public static final String REFERER_UNCAP_PROP_NAME_${children.reffererPropertyName} = "$children.reffererPropertyName";
+#end
+
+#if ($database.isMakeRecentlyDeprecated())
+#foreach ($children in $table.referrers)
+    /** @deprecated Use REFERER_CAP_PROP_NAME_${children.reffererPropertyNameInitCap} */
+    public static final String COLUMN_CAP_PROP_NAME_OF_${children.reffererPropertyNameInitCap} = "$children.reffererPropertyNameInitCap";
+#end
+
+#foreach ($children in $table.referrers)
+    /** @deprecated Use REFERER_UNCAP_PROP_NAME_${children.reffererPropertyName} */
+    public static final String COLUMN_UNCAP_PROP_NAME_OF_${children.reffererPropertyNameInitCap} = "$children.ReffererPropertyName";
+#end
 #end
 
     /** {db-name : cap-prop-name} map. */
@@ -128,7 +188,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(TABLE_DB_NAME, TABLE_CAP_PROP_NAME);
 
 #foreach ($col in $table.Columns)
-        map.put(COLUMN_DB_NAME_OF_${col.JavaName}, COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
+        map.put(DB_NAME_${col.name}, CAP_PROP_NAME_${col.javaName});
 #end
 
         _dbNameCapPropNameMap = java.util.Collections.unmodifiableMap(map);
@@ -145,7 +205,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(TABLE_DB_NAME, TABLE_UNCAP_PROP_NAME);
 
 #foreach ($col in $table.Columns)
-        map.put(COLUMN_DB_NAME_OF_${col.JavaName}, COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName});
+        map.put(DB_NAME_${col.name}, UNCAP_PROP_NAME_${col.uncapitalisedJavaName});
 #end
 
         _dbNameUncapPropNameMap = java.util.Collections.unmodifiableMap(map);
@@ -162,7 +222,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(TABLE_CAP_PROP_NAME, TABLE_DB_NAME);
 
 #foreach ($col in $table.Columns)
-        map.put(COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, COLUMN_DB_NAME_OF_${col.JavaName});
+        map.put(CAP_PROP_NAME_${col.javaName}, DB_NAME_${col.name});
 #end
 
         _capPropNameDbNameMap = java.util.Collections.unmodifiableMap(map);
@@ -179,7 +239,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(TABLE_CAP_PROP_NAME, TABLE_UNCAP_PROP_NAME);
 
 #foreach ($col in $table.Columns)
-        map.put(COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName});
+        map.put(CAP_PROP_NAME_${col.javaName}, UNCAP_PROP_NAME_${col.uncapitalisedJavaName});
 #end
 
         _capPropNameUncapPropNameMap = java.util.Collections.unmodifiableMap(map);
@@ -196,7 +256,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(TABLE_UNCAP_PROP_NAME, TABLE_DB_NAME);
 
 #foreach ($col in $table.Columns)
-        map.put(COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName}, COLUMN_DB_NAME_OF_${col.JavaName});
+        map.put(UNCAP_PROP_NAME_${col.uncapitalisedJavaName}, DB_NAME_${col.name});
 #end
 
         _uncapPropNameDbNameMap = java.util.Collections.unmodifiableMap(map);
@@ -213,7 +273,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(TABLE_UNCAP_PROP_NAME, TABLE_CAP_PROP_NAME);
 
 #foreach ($col in $table.Columns)
-        map.put(COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName}, COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
+        map.put(UNCAP_PROP_NAME_${col.uncapitalisedJavaName}, CAP_PROP_NAME_${col.javaName});
 #end
 
         _uncapPropNameCapPropNameMap = java.util.Collections.unmodifiableMap(map);
@@ -310,6 +370,11 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                         Column Name
     //                                                                         ===========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The list of column db-name. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('String')} getColumnDbNameList() {
         final String[] columns = getColumnDbNameCommaString().split(",");
         final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
@@ -319,6 +384,11 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return resultList;
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The list of column db-name. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList() {
         final java.util.List${database.filterGenericsString('String')} columnDbNameList = getColumnDbNameList();
         final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
@@ -328,6 +398,11 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return resultList;
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The list of column db-name. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList() {
         final java.util.List${database.filterGenericsString('String')} columnDbNameList = getColumnDbNameList();
         final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
@@ -422,8 +497,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
 
     // ===================================================================================
-    //                                                                                Type
-    //                                                                                ====
+    //                                                                         Object Type
+    //                                                                         ===========
     /**
      * ${database.ImplementComment}
      * 
@@ -434,8 +509,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                            Instance
-    //                                                                            ========
+    //                                                                     Object Instance
+    //                                                                     ===============
     /**
      * ${database.ImplementComment}
      * 
@@ -457,34 +532,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                      Foreign DBMeta
     //                                                                      ==============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param foreignPropertyName Foreign-property-name(Both OK - InitCap or not). (NotNull)
-     * @return Foreign DBMeta. (NotNull)
-     */ 
-    public ${glDBMetaInterfaceName} getForeignDBMeta(String foreignPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final String methodName = "getForeignDBMeta_" + foreignPropertyName.substring(0, 1) + foreignPropertyName.substring(1);
-
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            String msg = "The foreignPropertyName is not found: foreignPropertyName=" + foreignPropertyName;
-            msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
-    }
 #foreach ($foreignKeys in $table.ForeignKeys)
-
     /**
      * Get foreign dbmeta of ${foreignKeys.foreignPropertyNameInitCap}.
      * 
@@ -933,10 +981,22 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // -----------------------------------------------------
     //                                               Convert
     //                                               -------
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Target entity. (NotNull)
+     * @return The list of column value. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('Object')} convertToColumnValueList(${glEntityInterfaceName} entity) {
         return new java.util.ArrayList${database.filterGenericsString('Object')}(convertToColumnValueMap(entity).values());
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Target entity. (NotNull)
+     * @return The map of column value. (NotNull)
+     */
     public java.util.Map${database.filterGenericsString('String, Object')} convertToColumnValueMap(${glEntityInterfaceName} entity) {
         final ${myExtendedObjectClassName} myEntity = downcast(entity);
         final java.util.Map${database.filterGenericsString('String, Object')} valueMap = new java.util.LinkedHashMap${database.filterGenericsString('String, Object')}();
@@ -946,10 +1006,22 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return valueMap;
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Target entity. (NotNull)
+     * @return The list of column string-value. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('String')} convertToColumnStringValueList(${glEntityInterfaceName} entity) {
         return new java.util.ArrayList${database.filterGenericsString('String')}(convertToColumnStringValueMap(entity).values());
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Target entity. (NotNull)
+     * @return The map of column string-value. (NotNull)
+     */
     public java.util.Map${database.filterGenericsString('String, String')} convertToColumnStringValueMap(${glEntityInterfaceName} entity) {
         final ${myExtendedObjectClassName} myEntity = downcast(entity);
         final java.util.Map${database.filterGenericsString('String, String')} valueMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
@@ -962,12 +1034,27 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                        JDBC Support
     //                                                                        ============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
     public String getPreparedInsertClause() {
-        return "insert into ${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
+        return getPreparedInsertClause(new PreparedInsertClauseOption());
     }
 
-    public String getPreparedInsertClause(String tablePrefix) {
-        return "insert into " + tablePrefix + "${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
+    public String getPreparedInsertClause(PreparedInsertClauseOption preparedInsertClauseOption) {
+        if (preparedInsertClauseOption.getTablePrefix() != null) {
+            final String tablePrefix = preparedInsertClauseOption.getTablePrefix();
+            return "insert into " + tablePrefix + "${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
+        }
+        return "insert into ${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
     }
 
     // ===================================================================================

@@ -29,33 +29,6 @@ namespace ${glPackageBaseCommon} {
         }
 
         // =========================================================================================
-        //                                                                     Generated method name
-        //                                                                     =====================
-        public String GetMethodNameOfGetCountAll() {
-            return "GetCountAll";
-        }
-
-        public String GetMethodNameOfGetListAll() {
-            return "GetListAll";
-        }
-
-        public String GetMethodNameOfGetEntity() {
-            return "GetEntity";
-        }
-
-        public String GetMethodNameOfSelectCountIgnoreFetchScope() {
-            return "SelectCountIgnoreFetchScope";
-        }
-
-        public String GetMethodNameOfSelectEntity() {
-            return "SelectEntity";
-        }
-
-        public String GetMethodNameOfSelectList() {
-            return "SelectList";
-        }
-
-        // =========================================================================================
         //                                             Only when having generated, the effective one
         //                                             =============================================
         // -------------------------------------------------------------------------------
@@ -120,38 +93,6 @@ namespace ${glPackageBaseCommon} {
             return ${database.isJavaNameOfColumnSameAsDbName()};
         }
 
-        /// <sumarry>
-        /// Is available behavior generation? Answer is ${database.isAvailableBehaviorGeneration()}!
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public bool isAvailableBehaviorGeneration() {
-            return ${database.isAvailableBehaviorGeneration()};
-        }
-
-        /// <sumarry>
-        /// Is available common-column-setup interceptor to behavior? Answer is ${database.isAvailableCommonColumnSetupInterceptorToBehavior()}!
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public bool IsAvailableCommonColumnSetupInterceptorToBehavior() {
-            return ${database.isAvailableCommonColumnSetupInterceptorToBehavior()};
-        }
-
-        /// <sumarry>
-        /// Is available common-column-setup interceptor to dao? Answer is ${database.isAvailableCommonColumnSetupInterceptorToDao()}!
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public bool IsAvailableCommonColumnSetupInterceptorToDao() {
-            return ${database.isAvailableCommonColumnSetupInterceptorToDao()};
-        }
-
-        /// <sumarry>
-        /// Is available generics? Answer is ${database.isAvailableGenerics()}!
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public bool IsAvailableGenerics() {
-            return ${database.isAvailableGenerics()};
-        }
-
         // -------------------------------------------------------------------------------
         //                                                                          Prefix
         //                                                                          ------
@@ -169,49 +110,6 @@ namespace ${glPackageBaseCommon} {
         /// <returns>The property-value.</returns>
         public String GetBasePrefix() {
             return "${database.BasePrefix}";
-        }
-
-        // -------------------------------------------------------------------------------
-        //                                                                        DaoDicon
-        //                                                                        --------
-        /// <sumarry>
-        /// Get the property-value of daoDiconNamespace.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetDaoDiconNamespace() {
-            return "${database.DaoDiconNamespace}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of daoDiconPackageName.
-        /// </sumarry>
-        /// <returns>The property-value.</sumarry>
-        public String GetDaoDiconPackageName() {
-            return "${database.DaoDiconPackageName}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of daoDiconFileName.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetDaoDiconFileName() {
-            return "${database.DaoDiconFileName}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of jdbcDiconResourceName.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetJdbcDiconResourceName() {
-            return "${database.JdbcDiconResourceName}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of requiredTxComponentName.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetRequiredTxComponentName() {
-            return "${database.requiredTxComponentName}";
         }
 
         // -------------------------------------------------------------------------------
@@ -298,18 +196,6 @@ namespace ${glPackageBaseCommon} {
         /// <returns>The property-value.</returns>
         public String GetVersionNoFieldName() {
             return "${database.VersionNoFieldName}";
-        }
-
-
-        // -------------------------------------------------------------------------------
-        //                                                                    Select Param
-        //                                                                    ------------
-        /// <sumarry>
-        /// Get the property-value of selectQueryTimeout.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public int GetSelectQueryTimeout() {
-            return ${database.SelectQueryTimeout};
         }
 
         // -------------------------------------------------------------------------------

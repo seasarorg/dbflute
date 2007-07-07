@@ -94,12 +94,14 @@ public interface ${glConditionQueryInterfaceName} {
     public void invokeAddOrderByDesc(String columnMultiName);
 
     // =====================================================================================
-    //                                                                         Foregin-Query
+    //                                                                         Foregin Query
     //                                                                         =============
-    /// <summary>
-    /// Get foreign condition-query.
-    /// </summary>
-    /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
-    /// <returns>Foreign condition-query as interface.</returns>
+
+    /**
+     * Get foreign condition query contains referer-as-one.
+     * 
+     * @param foreignPropertyName Foreign property name. (NotNull and NotEmpty and Both OK -- InitCap or not)
+     * @return Foreign condition-query. (NotNull)
+     */
     public ${glConditionQueryInterfaceName} getForeignConditionQuery(String foreignPropertyName);
 }

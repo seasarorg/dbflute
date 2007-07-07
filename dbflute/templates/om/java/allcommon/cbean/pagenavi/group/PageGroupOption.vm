@@ -1,0 +1,46 @@
+package ${glPackageBaseCommonCBeanPagenaviGroup};
+
+#set ($myClassName = "${glPageGroupOptionName}")
+
+/**
+ * The option of page group.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} implements java.io.Serializable {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected int _pageGroupSize;
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public int getPageGroupSize() {
+        return _pageGroupSize;
+    }
+
+    public void setPageGroupSize(int pageGroupSize) {
+        this._pageGroupSize = pageGroupSize;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * The override.
+     * 
+     * @return View string. (NotNull)
+     */
+    public String toString() {
+        final StringBuffer sb = new StringBuffer();
+
+        sb.append(" pageGroupSize=").append(_pageGroupSize);
+
+        return sb.toString();
+    }
+}

@@ -1,0 +1,20 @@
+package ${glPackageBaseCommonCBeanPagenavi};
+
+#set ($myClassName = "${glPageNumberLinkSetupperName}")
+
+/**
+ * The setupper of page number link.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${myClassName}<LINK_TYPE extends ${glPageNumberLinkName}> {
+
+    /**
+     * Set up.
+     * 
+     * @param pageNumberElement Page number element.
+     * @param current Is current page?
+     * @return Page number link. (NotNull)
+     */
+    public LINK_TYPE setup(int pageNumberElement, boolean current);
+}

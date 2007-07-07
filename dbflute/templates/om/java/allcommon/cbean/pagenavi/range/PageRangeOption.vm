@@ -1,0 +1,57 @@
+package ${glPackageBaseCommonCBeanPagenaviRange};
+
+#set ($myClassName = "${glPageRangeOptionName}")
+
+/**
+ * The option of page range.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} implements java.io.Serializable {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected int _pageRangeSize;
+
+    protected boolean _fillLimit;
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public int getPageRangeSize() {
+        return _pageRangeSize;
+    }
+
+    public void setPageRangeSize(int pageRangeSize) {
+        this._pageRangeSize = pageRangeSize;
+    }
+
+    public boolean isFillLimit() {
+        return _fillLimit;
+    }
+
+    public void setFillLimit(boolean fillLimit) {
+        this._fillLimit = fillLimit;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * The override.
+     * 
+     * @return View string. (NotNull)
+     */
+    public String toString() {
+        final StringBuffer sb = new StringBuffer();
+
+        sb.append(" pageRangeSize=").append(_pageRangeSize);
+        sb.append(" fillLimit=").append(_fillLimit);
+
+        return sb.toString();
+    }
+}

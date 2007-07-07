@@ -228,15 +228,60 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     // ===================================================================================
-    //                                                                        JDBC Support
-    //                                                                        ============
-    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity) {
-        return insertEntity(conn, entity, "");
+    //                                                                      Foreign DBMeta
+    //                                                                      ==============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param foreignPropertyName Foreign-property-name(Both OK - InitCap or not). (NotNull)
+     * @return Foreign DBMeta. (NotNull)
+     */ 
+    public ${glDBMetaInterfaceName} getForeignDBMeta(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        final String methodName = "getForeignDBMeta_" + foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
+
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "The foreignPropertyName is not found: foreignPropertyName=" + foreignPropertyName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
     }
 
-    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, String tablePrefix) {
+    // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param conn Connection. (NotNull)
+     * @param entity Entity. (NotNull)
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity) {
+        return insertEntity(conn, entity, new PreparedInsertClauseOption());
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param conn Connection. (NotNull)
+     * @param entity Entity. (NotNull)
+     * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, PreparedInsertClauseOption preparedInsertClauseOption) {
         checkDowncast(entity);
-        final String sql = getPreparedInsertClause(tablePrefix);
+        final String sql = getPreparedInsertClause(preparedInsertClauseOption);
         java.sql.PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sql);
@@ -245,7 +290,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
                 Object value = ite.next();
                 if (value == null) {
-                    ps.setNull(settingIndex, java.sql.Types.VARCHAR);
+                    ps.setNull(settingIndex, java.sql.Types.VARCHAR);// Giving a clear-cut attitude!
                 } else {
                     ps.setObject(settingIndex, value);
                 }
@@ -268,10 +313,20 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // ===================================================================================
     //                                                                          Map String
     //                                                                          ==========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Map list string that is prepared. (NotNull)
+     */
     public ${glMapListStringName} createMapListString() {
         return MapStringUtil.createMapListString();
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Map string builder that is prepared. (NotNull)
+     */
     public ${glMapStringBuilderName} createMapStringBuilder() {
         return MapStringUtil.createMapStringBuilder(getColumnDbNameList());
     }

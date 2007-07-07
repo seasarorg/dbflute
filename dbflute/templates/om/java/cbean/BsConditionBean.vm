@@ -94,7 +94,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
                 if (obj instanceof ${col.JavaNative}) {
                     query().set${col.JavaName}_Equal((${col.JavaNative})obj);
                 } else {
-                    query().set${col.JavaName}_Equal(new ${col.JavaNative}(parseDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
+                    query().set${col.JavaName}_Equal(new ${col.JavaNative}(parseDateStringAsMillis(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
                 }
             }
         }
@@ -222,10 +222,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                               Union
     //                                                                               =====
     /**
-     * Union.
-     * <pre>
-     * Add union query to condition bean.
-     * </pre>
+     * Union. <br />
+     * Add union query to condition bean. <br />
+     * 
      * @param unionQuery Union query. (NotNull)
      */
     public void union(${myConditionQueryClassName} unionQuery) {
@@ -233,16 +232,20 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     /**
-     * Union all.
-     * <pre>
-     * Add union all query to condition bean.
-     * </pre>
+     * Union all. <br />
+     * Add union all query to condition bean. <br />
+     * 
      * @param unionAllQuery Union all query. (NotNull)
      */
     public void unionAll(${myConditionQueryClassName} unionAllQuery) {
         query().xsetUnionAllQuery(unionAllQuery);
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
     public boolean hasUnionQueryOrUnionAllQuery() {
         return query().hasUnionQueryOrUnionAllQuery();
     }

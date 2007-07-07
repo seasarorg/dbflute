@@ -265,7 +265,7 @@ public interface ${myClassName} {
      * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
      * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
      * 
-     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero)
+     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
     public ${myClassName} fetchPage(int fetchPageNumber);

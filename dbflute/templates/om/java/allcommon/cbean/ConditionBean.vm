@@ -97,6 +97,11 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     // =====================================================================================
     //                                                                           Union-Query
     //                                                                           ===========
+    /**
+     * Has union query or union all query?
+     * 
+     * @return Determination.
+     */
     public boolean hasUnionQueryOrUnionAllQuery();
 
     // =====================================================================================

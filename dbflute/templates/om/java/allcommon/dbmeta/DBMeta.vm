@@ -61,10 +61,25 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                         Column Name
     //                                                                         ===========
+    /**
+     * Get the list of column db-name.
+     * 
+     * @return The list of column db-name. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('String')} getColumnDbNameList();
 
+    /**
+     * Get the list of column cap-prop-name.
+     * 
+     * @return The list of column cap-prop-name. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList();
 
+    /**
+     * Get the list of column uncap-prop-name.
+     * 
+     * @return The list of column uncap-prop-name. (NotNull)
+     */
     public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList();
 
     /**
@@ -78,106 +93,106 @@ public interface ${myClassName} {
     //                                                                       Name Handling
     //                                                                       =============
     /**
-     * Is existing db-name?
+     * Is existing db-name? {Target objects are TABLE and COLUMN}
      * 
-     * @param dbName Db-name. (NotNull)
+     * @param dbName Db-name. (NotNull and NotEmpty)
      * @return Determination.
      */
     public boolean isExistDbName(String dbName);
 
     /**
-     * Is existing cap-prop-name?
+     * Is existing cap-prop-name? {Target objects are TABLE and COLUMN}
      * 
-     * @param capPropName Cap-prop-name. (NotNull)
+     * @param capPropName Cap-prop-name. (NotNull and NotEmpty)
      * @return Determination.
      */
     public boolean isExistCapPropName(String capPropName);
 
     /**
-     * Is existing uncap-prop-name?
+     * Is existing uncap-prop-name? {Target objects are TABLE and COLUMN}
      * 
-     * @param uncapPropName Uncap-prop-name. (NotNull)
+     * @param uncapPropName Uncap-prop-name. (NotNull and NotEmpty)
      * @return Determination.
      */
     public boolean isExistUncapPropName(String uncapPropName);
 
     /**
-     * Is existing multi-name?
+     * Is existing multi-name? {Target objects are TABLE and COLUMN}
      * 
-     * @param multiName Multi-name. (NotNull)
+     * @param multiName Multi-name. (NotNull and NotEmpty)
      * @return Determination.
      */
     public boolean isExistMultiName(String multiName);
 
     /**
-     * Get db-name by property-name.
+     * Get db-name by property-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param capPropName Cap-prop-name.
-     * @return Db-name.
+     * @param capPropName Cap-prop-name. (NotNull and NotEmpty)
+     * @return Db-name. (NotNull and NotEmpty)
      */
     public String getDbNameByCapPropName(String capPropName);
 
     /**
-     * Get db-name by property-name.
+     * Get db-name by property-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param propertyName Uncap-prop-name.
-     * @return {db-name : cap-prop-name} map.
+     * @param propertyName Uncap-prop-name. (NotNull and NotEmpty)
+     * @return Db-name. (NotNull and NotEmpty)
      */
     public String getDbNameByUncapPropName(String propertyName);
 
     /**
-     * Get cap-prop-name by db-name.
+     * Get cap-prop-name by db-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param dbName Db-name.
-     * @return Cap-prop-name.
+     * @param dbName Db-name. (NotNull and NotEmpty)
+     * @return Cap-prop-name. (NotNull and NotEmpty)
      */
     public String getCapPropNameByDbName(String dbName);
 
     /**
-     * Get cap-prop-name by property-name.
+     * Get cap-prop-name by property-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param propertyName Uncap-prop-name.
-     * @return Cap-prop-name.
+     * @param propertyName Uncap-prop-name. (NotNull and NotEmpty)
+     * @return Cap-prop-name. (NotNull and NotEmpty)
      */
     public String getCapPropNameByUncapPropName(String propertyName);
 
     /**
-     * Get property-name by db-name.
+     * Get property-name by db-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param dbName Db-name.
-     * @return Uncap-prop-name.
+     * @param dbName Db-name. (NotNull and NotEmpty)
+     * @return Uncap-prop-name. (NotNull and NotEmpty)
      */
     public String getUncapPropNameByDbName(String dbName);
 
     /**
-     * Get property-name by cap-prop-name.
+     * Get property-name by cap-prop-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param capPropName Cap-prop-name.
-     * @return Uncap-prop-name.
+     * @param capPropName Cap-prop-name. (NotNull and NotEmpty)
+     * @return Uncap-prop-name. (NotNull and NotEmpty)
      */
     public String getUncapPropNameByCapPropName(String capPropName);
 
     /**
-     * Get db-name by multi-name.
+     * Get db-name by multi-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param multiName Multi-name.
-     * @return Db-name.
+     * @param multiName Multi-name. (NotNull and NotEmpty)
+     * @return Db-name. (NotNull and NotEmpty)
      */
     public String getDbNameByMultiName(String multiName);
 
     /**
-     * Get cap-prop-name by multi-name.
+     * Get cap-prop-name by multi-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param multiName Multi-name.
-     * @return Cap-prop-name.
+     * @param multiName Multi-name. (NotNull and NotEmpty)
+     * @return Cap-prop-name. (NotNull and NotEmpty)
      */
     public String getCapPropNameByMultiName(String multiName);
 
     /**
-     * Get property-name by multi-name.
+     * Get property-name by multi-name. {Target objects are TABLE and COLUMN}
      * 
-     * @param multiName Multi-name.
-     * @return Uncap-prop-name.
+     * @param multiName Multi-name. (NotNull and NotEmpty)
+     * @return Uncap-prop-name. (NotNull and NotEmpty)
      */
     public String getUncapPropNameByMultiName(String multiName);
 
@@ -185,44 +200,44 @@ public interface ${myClassName} {
     //                                                                            Name Map
     //                                                                            ========
     /**
-     * ${database.ImplementComment}
+     * Get db-name cap-prop-name map. {Target objects are TABLE and COLUMN}
      * 
-     * @return {db-name : cap-prop-name} map.
+     * @return {db-name : cap-prop-name} map. (NotNull)
      */
     public java.util.Map${database.filterGenericsString('String, String')} getDbNameCapPropNameMap();
 
     /**
-     * ${database.ImplementComment}
+     * Get db-name uncap-prop-name map. {Target objects are TABLE and COLUMN}
      * 
-     * @return {db-name : uncap-prop-name} map.
+     * @return {db-name : uncap-prop-name} map. (NotNull)
      */
     public java.util.Map${database.filterGenericsString('String, String')} getDbNameUncapPropNameMap();
 
     /**
-     * ${database.ImplementComment}
+     * Get cap-prop-name db-name map. {Target objects are TABLE and COLUMN}
      * 
-     * @return {cap-prop-name : db-name} map.
+     * @return {cap-prop-name : db-name} map. (NotNull)
      */
     public java.util.Map${database.filterGenericsString('String, String')} getCapPropNameDbNameMap();
 
     /**
-     * ${database.ImplementComment}
+     * Get cap-prop-name uncap-cap-name map. {Target objects are TABLE and COLUMN}
      * 
-     * @return {cap-prop-name : uncap-prop-name} map.
+     * @return {cap-prop-name : uncap-prop-name} map. (NotNull)
      */
     public java.util.Map${database.filterGenericsString('String, String')} getCapPropNameUncapPropNameMap();
 
     /**
-     * ${database.ImplementComment}
+     * Get uncap-prop-name db-name map. {Target objects are TABLE and COLUMN}
      * 
-     * @return {uncap-prop-name : db-name} map.
+     * @return {uncap-prop-name : db-name} map. (NotNull)
      */
     public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameDbNameMap();
 
     /**
-     * ${database.ImplementComment}
+     * Get uncap-prop-name cap-prop-name map. {Target objects are TABLE and COLUMN}
      * 
-     * @return {uncap-prop-name : cap-prop-name} map.
+     * @return {uncap-prop-name : cap-prop-name} map. (NotNull)
      */
     public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameCapPropNameMap();
 
@@ -258,8 +273,8 @@ public interface ${myClassName} {
     public String getBehaviorTypeName();
 
     // ===================================================================================
-    //                                                                                Type
-    //                                                                                ====
+    //                                                                         Object Type
+    //                                                                         ===========
     /**
      * Get the type of entity.
      * 
@@ -268,8 +283,8 @@ public interface ${myClassName} {
     public Class getEntityType();
 
     // ===================================================================================
-    //                                                                            Instance
-    //                                                                            ========
+    //                                                                     Object Instance
+    //                                                                     ===============
     /**
      * New the instance of entity.
      * 
@@ -459,15 +474,81 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                        JDBC Support
     //                                                                        ============
+    /**
+     * Insert entity using specified connection.
+     * 
+     * @param conn Connection. (NotNull)
+     * @param entity Entity. (NotNull)
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
     public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity);
-    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, String tablePrefix);
+
+    /**
+     * Insert entity using specified connection.
+     * 
+     * @param conn Connection. (NotNull)
+     * @param entity Entity. (NotNull)
+     * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, PreparedInsertClauseOption preparedInsertClauseOption);
+
+    /**
+     * Get prepared insert clause.
+     * 
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
     public String getPreparedInsertClause();
-    public String getPreparedInsertClause(String tablePrefix);
+
+    /**
+     * Get prepared insert clause.
+     * 
+     * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
+    public String getPreparedInsertClause(PreparedInsertClauseOption preparedInsertClauseOption);
+
+    /**
+     * The option of prepared insert clause.
+     */
+    public static class PreparedInsertClauseOption {
+
+        /** Table prefix. */
+        protected String _tablePrefix;
+
+        /**
+         * Get table prefix.
+         * 
+         * @return Table prefix. (Nullable)
+         */
+        public String getTablePrefix() {
+            return this._tablePrefix;
+        }
+
+        /**
+         * Set table prefix.
+         * 
+         * @param tablePrefix Table prefix. (Nullable)
+         */
+        public void setTablePrefix(String tablePrefix) {
+            this._tablePrefix = tablePrefix;
+        }
+    }
 
     // ===================================================================================
     //                                                                          Map String
     //                                                                          ==========
+    /**
+     * Create map list string that is prepared.
+     * 
+     * @return Map list string that is prepared. (NotNull)
+     */
     public ${glMapListStringName} createMapListString();
 
+    /**
+     * Create map string builder that is prepared.
+     * 
+     * @return Map string builder that is prepared. (NotNull)
+     */
     public ${glMapStringBuilderName} createMapStringBuilder();
 }

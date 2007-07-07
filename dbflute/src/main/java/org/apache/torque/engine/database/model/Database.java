@@ -1490,11 +1490,11 @@ public class Database {
     }
 
     public String getOverrideComment() {
-        return "This method overrides the method that is declared at super.";
+        return "The override.";
     }
 
     public String getImplementComment() {
-        return "This method implements the method that is declared at super.";
+        return "The implementation.";
     }
 
     // **********************************************************************************************

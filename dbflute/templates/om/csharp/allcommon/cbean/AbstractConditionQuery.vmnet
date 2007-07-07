@@ -344,7 +344,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
         /// <returns>Foreign condition-query as interface.</returns>
         public ${glConditionQueryInterfaceName} GetForeignConditionQuery(String foreignPropertyName) {
-            String methodName = "Query" + foreignPropertyName.Substring(0, 1) + foreignPropertyName.Substring(1);
+            String methodName = "Query" + foreignPropertyName.Substring(0, 1).ToUpper() + foreignPropertyName.Substring(1);
             MethodInfo methodInfo = this.GetType().GetMethod(methodName);
             if (methodInfo == null) {
                 String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;

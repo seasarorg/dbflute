@@ -96,15 +96,31 @@ namespace ${myDBMetaPackageName} {
 
     #foreach ($col in $table.Columns)
 
-        /// <summary>DB name of ${col.JavaName}.</summary>
+        /// <summary>Deprecated so Use DB_NAME_${col.name}.</summary>
         public static readonly String COLUMN_DB_NAME_OF_${col.JavaName} = "$col.Name";
+
+        /// <summary>DB name of ${col.name}.</summary>
+        public static readonly String DB_NAME_${col.name} = "$col.Name";
     #end
 
     #foreach ($col in $table.Columns)
 
-        /// <summary>Java name of ${col.JavaName}.</summary>
+        /// <summary>Deprecated so Use CAP_PROP_NAME_${col.name}.</summary>
         public static readonly String COLUMN_CAP_PROP_NAME_OF_${col.JavaName} = "$col.JavaName";
+
+        /// <summary>Cap-prop-name of ${col.javaName}.</summary>
+        public static readonly String CAP_PROP_NAME_${col.javaName} = "$col.javaName";
     #end
+
+    #foreach ($col in $table.Columns)
+
+        /// <summary>Deprecated so Use UNCAP_PROP_NAME_${col.name}.</summary>
+        public static readonly String COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName} = "$col.UncapitalisedJavaName";
+
+        /// <summary>Uncap-prop-name of ${col.uncapitalisedJavaName}.</summary>
+        public static readonly String UNCAP_PROP_NAME_${col.uncapitalisedJavaName} = "$col.uncapitalisedJavaName";
+    #end
+
     #foreach ($foreignKeys in $table.ForeignKeys)
 
         /// <summary>Java name of ${foreignKeys.ForeignPropertyName}.</summary>
@@ -116,11 +132,6 @@ namespace ${myDBMetaPackageName} {
         public static readonly String COLUMN_CAP_PROP_NAME_OF_${children.ReffererPropertyNameInitCap} = "$children.ReffererPropertyNameInitCap";
     #end
 
-    #foreach ($col in $table.Columns)
-
-        /// <summary>Property name of ${col.JavaName}.</summary>
-        public static readonly String COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName} = "$col.UncapitalisedJavaName";
-    #end
     #foreach ($foreignKeys in $table.ForeignKeys)
 
         /// <summary>Property name of ${foreignKeys.ForeignPropertyName}.</summary>
@@ -445,7 +456,7 @@ namespace ${myDBMetaPackageName} {
         /// <returns>Foreign DBMeta. (NotNull)</returns>
         public override ${glDBMetaInterfaceName} GetForeignDBMeta(String foreignPropertyName) {
             AssertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-            String methodName = "GetForeignDBMeta_" + foreignPropertyName.Substring(0, 1) + foreignPropertyName.Substring(1);
+            String methodName = "GetForeignDBMeta_" + foreignPropertyName.Substring(0, 1).ToUpper() + foreignPropertyName.Substring(1);
             MethodInfo method = this.GetType().GetMethod(methodName);
             if (method == null) {
                 String msg = "The foreignPropertyName is not existing: foreignPropertyName=" + foreignPropertyName;
