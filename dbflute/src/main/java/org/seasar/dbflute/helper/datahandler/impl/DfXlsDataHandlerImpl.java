@@ -88,6 +88,17 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
                         int bindCount = 1;
                         for (String value : valueList) {
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Timestamp Headache
+                            // - - - - - - - - - - - - - -
+                            if (isTimestampValue(value)) {
+                                final Timestamp timestampValue = getTimestampValue(value);
+                                statement.setTimestamp(bindCount, timestampValue);
+                                bindCount++;
+                                continue;
+                            }
+
                             try {
                                 statement.setObject(bindCount, value);
                             } catch (SQLException e) {
@@ -141,6 +152,41 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             //            final SqlWriter sqlWriter = new SqlWriter(dataSource);
             //            sqlWriter.write(dataSet);
         }
+    }
+
+    protected boolean isTimestampValue(String value) {
+        if (value == null) {
+            return false;
+        }
+        value = filterTimestampValue(value);
+        try {
+            Timestamp.valueOf(value);
+            return true;
+        } catch (RuntimeException e) {
+        }
+        return false;
+    }
+
+    protected Timestamp getTimestampValue(String value) {
+        final String filteredTimestampValue = filterTimestampValue(value);
+        try {
+            return Timestamp.valueOf(filteredTimestampValue);
+        } catch (RuntimeException e) {
+            throw e;
+        }
+    }
+
+    protected String filterTimestampValue(String value) {
+        value = value.trim();
+        if (value.indexOf("/") == 4 && value.lastIndexOf("/") == 7) {
+            value = value.replaceAll("/", "-");
+        }
+        if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
+            if (value.length() == "2007-07-09".length()) {
+                value = value + " 00:00:00";
+            }
+        }
+        return value;
     }
 
     public void writeSeveralDataForSqlServer(String dataDirectoryName, final DataSource dataSource) {

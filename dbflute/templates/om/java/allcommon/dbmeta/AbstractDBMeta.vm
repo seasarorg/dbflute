@@ -402,19 +402,25 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         public static long parseDateStringAsMillis(Object value, String propertyName, String typeName) {
             checkTypeString(value, propertyName, typeName);
             try {
-                final String valueString = (String)value;
-                if (valueString.indexOf("-") >= 0 && valueString.indexOf("-") != valueString.lastIndexOf("-")) {
-                    return java.sql.Timestamp.valueOf(valueString).getTime();
-                } else {
-                    return getParseDateFormat().parse((String)value).getTime();
-                }
-            } catch (java.text.ParseException e) {
-                String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
-                throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+                final String valueString = filterTimestampValue(((String)value).trim());
+                return java.sql.Timestamp.valueOf(valueString).getTime();
             } catch (RuntimeException e) {
                 String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
                 throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
             }
+        }
+
+        public static String filterTimestampValue(String value) {
+            value = value.trim();
+            if (value.indexOf("/") == 4 && value.lastIndexOf("/") == 7) {
+                value = value.replaceAll("/", "-");
+            }
+            if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
+                if (value.length() == "2007-07-09".length()) {
+                    value = value + " 00:00:00";
+                }
+            }
+            return value;
         }
 
         public static String formatDate(java.util.Date value) {
@@ -426,7 +432,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
 
         public static java.text.DateFormat getParseDateFormat() {
-            return java.text.DateFormat.getDateTimeInstance();
+            return java.text.DateFormat.getDateInstance();
         }
 
         public static java.text.DateFormat getFormatDateFormat() {
