@@ -140,9 +140,69 @@ public class ${glConditionBeanContextName} {
         }
     }
 
+#set ($columnAliasGeneric = "Class, java.util.Map<String, String>")
+    // ===================================================================================
+    //                                                                        Column Alias
+    //                                                                        ============
+    public static final java.util.Map${database.filterGenericsString('Class, java.util.Map<String, String>')} _selectClauseColumnAliasContainerMap = new java.util.HashMap${database.filterGenericsString('Class, java.util.Map<String, String>')}();
+
+    public static void addColumnAliasInfo(Class conditionBeanClass, String columnFullName, String columnAliasName) {
+        if (_selectClauseColumnAliasContainerMap.containsKey(conditionBeanClass)) {
+            final java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap = (java.util.Map${database.filterGenericsString('String, String')})_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
+            selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
+        } else {
+            final java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap = new java.util.HashMap${database.filterGenericsString('String, String')}();
+            _selectClauseColumnAliasContainerMap.put(conditionBeanClass, selectClauseColumnAliasMap);
+            selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
+        }
+    }
+
+    public static java.util.Map${database.filterGenericsString('String, String')} getSelectClauseColumnAliasMap(Class conditionBeanClass) {
+        return (java.util.Map${database.filterGenericsString('String, String')})_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
+    }
+
     // ===================================================================================
     //                                                                        Product Name
     //                                                                        ============
+    public static final String DB_NAME_DERBY = "derby";
+    public static final String DB_NAME_H2 = "h2";
+    public static final String DB_NAME_ORACLE = "oracle";
+    public static final String DB_NAME_MYSQL = "mysql";
+    public static final String DB_NAME_POSTGRESQL = "postgresql";
+    public static final String DB_NAME_FIREBIRD = "firebird";
+    public static final String DB_NAME_MSSQL = "mssql";
+    public static final String DB_NAME_SYBASE = "sybase";
+    public static final String DB_NAME_DB2 = "db2";
+
+    protected static final java.util.Map${database.filterGenericsString('String, String')} _driverHintDatabaseProductNameMap;
+    protected static final java.util.List${database.filterGenericsString('String')} _targetDatabaseProductNameList = new java.util.ArrayList${database.filterGenericsString('String')}();
+    static {
+        final java.util.Map${database.filterGenericsString('String, String')} tmpMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        tmpMap.put("org.apache.derby", DB_NAME_DERBY);
+        tmpMap.put("org.h2", DB_NAME_H2);
+        tmpMap.put("oracle", DB_NAME_ORACLE);
+        tmpMap.put("mysql", DB_NAME_MYSQL);
+        tmpMap.put("postgresql", DB_NAME_POSTGRESQL);
+        tmpMap.put("firebird", DB_NAME_FIREBIRD);
+        tmpMap.put("sqlserver", DB_NAME_MSSQL);
+        tmpMap.put("sybase", DB_NAME_SYBASE);
+        tmpMap.put("db2", DB_NAME_DB2);
+        _driverHintDatabaseProductNameMap = java.util.Collections.unmodifiableMap(tmpMap);
+    }
+
+    public static boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
+        final java.util.Set${database.filterGenericsString('String')} keySet = _driverHintDatabaseProductNameMap.keySet();
+        for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
+            final String driverHint = (String)ite.next();
+            if (driverClassName.contains(driverHint)) {
+                final String databaseProductName = (String)_driverHintDatabaseProductNameMap.get(driverHint);
+                setDatabaseProductName(databaseProductName);
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** The database product name. */
     private static String _databaseProductName;
 
@@ -167,31 +227,10 @@ public class ${glConditionBeanContextName} {
         }
         _databaseProductName = name;
     }
-#set ($columnAliasGeneric = "Class, java.util.Map<String, String>")
 
     // ===================================================================================
-    //                                                                        Column Alias
-    //                                                                        ============
-    public static final java.util.Map${database.filterGenericsString('Class, java.util.Map<String, String>')} _selectClauseColumnAliasContainerMap = new java.util.HashMap${database.filterGenericsString('Class, java.util.Map<String, String>')}();
-
-    public static void addColumnAliasInfo(Class conditionBeanClass, String columnFullName, String columnAliasName) {
-        if (_selectClauseColumnAliasContainerMap.containsKey(conditionBeanClass)) {
-            final java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap = (java.util.Map${database.filterGenericsString('String, String')})_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
-            selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
-        } else {
-            final java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap = new java.util.HashMap${database.filterGenericsString('String, String')}();
-            _selectClauseColumnAliasContainerMap.put(conditionBeanClass, selectClauseColumnAliasMap);
-            selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
-        }
-    }
-
-    public static java.util.Map${database.filterGenericsString('String, String')} getSelectClauseColumnAliasMap(Class conditionBeanClass) {
-        return (java.util.Map${database.filterGenericsString('String, String')})_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
-    }
-
-    // ===================================================================================
-    //                                                                             Creator
-    //                                                                             =======
+    //                                                                   SqlClause Creator
+    //                                                                   =================
     public static ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb) {
         final String tableDbName = cb.getTableDbName();
         return createSqlClause(tableDbName);
@@ -203,19 +242,21 @@ public class ${glConditionBeanContextName} {
             return new ${glSqlClauseName}${database.DaoGenDbName}(tableDbName);
         }
         final String name = databaseProductName.toLowerCase();
-        if (name.startsWith("derby")) {
+        if (name.equalsIgnoreCase(DB_NAME_DERBY)) {
             return new ${glSqlClauseName}Derby(tableDbName);
-        } else if (name.startsWith("oracle")) {
+        } else if (name.equalsIgnoreCase(DB_NAME_H2)) {
+            return new ${glSqlClauseName}H2(tableDbName);
+        } else if (name.equalsIgnoreCase(DB_NAME_ORACLE)) {
             return new ${glSqlClauseName}Oracle(tableDbName);
-        } else if (name.startsWith("firebird")) {
+        } else if (name.equalsIgnoreCase(DB_NAME_FIREBIRD)) {
             return new ${glSqlClauseName}Firebird(tableDbName);
-        } else if (name.startsWith("mysql")) {
+        } else if (name.equalsIgnoreCase(DB_NAME_MYSQL)) {
             return new ${glSqlClauseName}MySql(tableDbName);
-        } else if (name.startsWith("postgre")) {
+        } else if (name.equalsIgnoreCase(DB_NAME_POSTGRESQL)) {
             return new ${glSqlClauseName}PostgreSql(tableDbName);
-        } else if (name.startsWith("mssql")) {
+        } else if (name.equalsIgnoreCase(DB_NAME_MSSQL)) {
             return new ${glSqlClauseName}SqlServer(tableDbName);
-        } else if (name.startsWith("db2")) {
+        } else if (name.equalsIgnoreCase(DB_NAME_DB2)) {
             return new ${glSqlClauseName}Db2(tableDbName);
         } else {
             return new ${glSqlClauseName}${database.DaoGenDbName}(tableDbName);

@@ -116,6 +116,7 @@ targetdatabase = $targetDatabase
     #set ($glConditionOptionInterfaceName = "${glProjectPrefix}ConditionOption")
     #set ($glConditionOptionSimpleStringName = "${glProjectPrefix}SimpleStringOption")
     #set ($glConditionOptionFromToName = "${glProjectPrefix}FromToOption")
+    #set ($glConditionOptionDateFromToName = "${glProjectPrefix}DateFromToOption")
     #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
     #set ($glConditionOptionInScopeName = "${glProjectPrefix}InScopeOption")
     #set ($glConditionOptionPartsSplitName = "${glProjectPrefix}SplitOptionParts")
@@ -580,9 +581,13 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parseFromToOption")
+      $database.debug("    parse('FromToOption');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionFromToName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/FromToOption.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('DateFromToOption');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionDateFromToName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/coption/DateFromToOption.${glTemplateFileExtension}",$path ,"", "")
 
       $database.debug("    parseLikeSearchOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )

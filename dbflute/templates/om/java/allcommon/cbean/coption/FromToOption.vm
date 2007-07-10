@@ -3,7 +3,7 @@ package ${glPackageBaseCommonCOption};
 #set ($myClassName = "${glConditionOptionFromToName}")
 
 /**
- * The class of from-to-option.
+ * The option of from-to.
  * <pre>
  * ex) fromDate:{2007/04/10 08:24:53} toDate:{2007/04/16 14:36:29}
  *
@@ -29,26 +29,26 @@ package ${glPackageBaseCommonCOption};
  */
 public class ${myClassName} implements ${glConditionOptionInterfaceName} {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected boolean _fromDateGreaterThan;
 
     protected boolean _toDateLessThan;
 
     protected boolean _compareAsDate;
 
-    // =====================================================================================
-    //                                                              Interface Implementation
-    //                                                              ========================
+    // ===================================================================================
+    //                                                            Interface Implementation
+    //                                                            ========================
     public String getRearOption() {
         String msg = "Thie option does not use getRearOption()!";
         throw new UnsupportedOperationException(msg);
     }
 
-    // =====================================================================================
-    //                                                                                  Main
-    //                                                                                  ====
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public ${myClassName} greaterThan() {
         _fromDateGreaterThan = true; return this;
     }
@@ -73,9 +73,9 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         _compareAsDate = true; return this;
     }
 
-    // =====================================================================================
-    //                                                                         Internal Main
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Internal Main
+    //                                                                       =============
     public java.util.Date filterFromDate(java.util.Date fromDate) {
         if (fromDate == null) {
             return null;
@@ -129,9 +129,9 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
         }
     }
 
-    // =====================================================================================
-    //                                                                       Calendar Helper
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                     Calendar Helper
+    //                                                                     ===============
     protected void addCalendarNextDay(java.util.Calendar cal) {
         cal.add(java.util.Calendar.DAY_OF_MONTH, 1);
     }

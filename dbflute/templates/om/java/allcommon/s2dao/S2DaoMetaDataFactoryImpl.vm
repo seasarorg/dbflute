@@ -1,6 +1,5 @@
 package ${glPackageBaseCommonS2Dao};
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import javax.sql.DataSource;
 
@@ -44,17 +43,17 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
     /** Log-instance. */
     private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
-#if ($database.isVersionAfter1040() && $database.isAvailableOtherConnectionDaoInitialization())
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+#if ($database.isVersionAfter1040() && $database.isAvailableOtherConnectionDaoInitialization())
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private TransactionManager transactionManager;
 #end
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -66,42 +65,42 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     public ${glDaoMetaDataFactoryImpl}(DataSource dataSource,
             StatementFactory statementFactory,
             ResultSetFactory resultSetFactory,
-            AnnotationReaderFactory readerFactory) {
+            AnnotationReaderFactory readerFactory,
+            javax.sql.XADataSource xaDataSource) {
         super(dataSource, statementFactory, resultSetFactory, readerFactory);
 
         // Stop the LinkageError!
         ${glConditionBeanContextName}.initialize();
 
-        initializeDatabaseProductNameOfContext(dataSource);
+        initializeDatabaseProductNameOfContext(xaDataSource, dataSource);
     }
 
-    // --------------------------------------
-    //                  Database Product Name
-    //                  ---------------------
-    protected void initializeDatabaseProductNameOfContext(DataSource dataSource) {
+    // -----------------------------------------------------
+    //                                 Database Product Name
+    //                                 ---------------------
+    protected void initializeDatabaseProductNameOfContext(javax.sql.XADataSource xaDataSource, DataSource dataSource) {
         if (getDatabaseProductNameFromContext() != null) {
             return;
         }
-        String suffix = null;
-        try {
-            final Connection con = DataSourceUtil.getConnection(dataSource);
-            try {
-                final DatabaseMetaData dbMetaData = ConnectionUtil.getMetaData(con);
-                final Dbms dbms = DbmsManager.getDbms(dbMetaData);
-                suffix = dbms.getSuffix();
-            } finally {
-                ConnectionUtil.close(con);
+
+        // From JDBC Driver!
+        if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
+            final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
+            final String driverClassName = xaDataSourceImpl.getDriverClassName();
+            if (driverClassName != null) {
+                if (setupDatabaseProductNameByDriverClassName(driverClassName)) {
+                    _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
+                    _log.info("...Initializing database product name from driverClassName: " + getDatabaseProductNameFromContext());
+                    _log.info("* * * * */");
+                    return;
+                }
             }
-            if (suffix == null) {
-                setDatabaseProductNameToContext("${database.DaoGenDbName}");
-                return;
-            }
-        } catch (RuntimeException e) {
-            _log.info("initializeDatabaseProductNameOfContext threw the exception: " + e.getClass(), e);
-            return;
         }
-        suffix = suffix.startsWith("_") ? suffix.substring("_".length()) : suffix;
-        setDatabaseProductNameToContext(suffix);
+
+        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
+        _log.info("...Initializing database product name as default: ${database.daoGenDbName}");
+        _log.info("* * * * */");
+        setDatabaseProductNameToContext("${database.daoGenDbName}");
     }
 
     protected String getDatabaseProductNameFromContext() {
@@ -112,11 +111,14 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         ${glConditionBeanContextName}.setDatabaseProductName(name);
     }
 
+    protected boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
+        return ${glConditionBeanContextName}.setupDatabaseProductNameByDriverClassName(driverClassName);
+    }
 #if ($database.isVersionAfter1040())
 
-    // =====================================================================================
-    //                                                        DataMetaData Creation Override
-    //                                                        ==============================
+    // ===================================================================================
+    //                                                      DataMetaData Creation Override
+    //                                                      ==============================
     protected BeanEnhancer beanEnhancer;
 
     public BeanEnhancer getBeanEnhancer() {
@@ -135,9 +137,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         return dmdExtension;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public TransactionManager getTransactionManager() {
         return transactionManager;
     }
@@ -155,9 +157,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
   #end
 #else
 
-    // =====================================================================================
-    //                                                                           DaoMetaData
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         DaoMetaData
+    //                                                                         ===========
     /**
      * Create data meta data.
      * 
