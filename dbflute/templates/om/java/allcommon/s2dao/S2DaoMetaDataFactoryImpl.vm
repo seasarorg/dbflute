@@ -1,6 +1,5 @@
 package ${glPackageBaseCommonS2Dao};
 
-import java.sql.DatabaseMetaData;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -26,11 +25,6 @@ import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.StatementFactory;
 #end
-
-import org.seasar.dao.Dbms;
-import org.seasar.dao.dbms.DbmsManager;
-import org.seasar.extension.jdbc.util.ConnectionUtil;
-import org.seasar.extension.jdbc.util.DataSourceUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 
@@ -69,16 +63,37 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             javax.sql.XADataSource xaDataSource) {
         super(dataSource, statementFactory, resultSetFactory, readerFactory);
 
+        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
+        showInformation(dataSource, xaDataSource);
+
         // Stop the LinkageError!
         ${glConditionBeanContextName}.initialize();
 
-        initializeDatabaseProductNameOfContext(xaDataSource, dataSource);
+        initializeDatabaseProductNameOfContext(xaDataSource);
+
+        _log.info("* * * * */");
+    }
+
+    protected void showInformation(DataSource dataSource, javax.sql.XADataSource xaDataSource) {
+        if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
+            final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
+            final String driverClassName = xaDataSourceImpl.getDriverClassName();
+            final String url = xaDataSourceImpl.getURL();
+            final String user = xaDataSourceImpl.getUser();
+            _log.info("[XADataSource]: " + xaDataSourceImpl);
+            _log.info("    driver = " + driverClassName);
+            _log.info("    url    = " + url);
+            _log.info("    user   = " + user);
+        }
+        _log.info("[StatementFactory]: " + statementFactory);
+        _log.info("[ResultSetFactory]: " + resultSetFactory);
+        _log.info("[BeanEnhancer]: " + beanEnhancer);
     }
 
     // -----------------------------------------------------
     //                                 Database Product Name
     //                                 ---------------------
-    protected void initializeDatabaseProductNameOfContext(javax.sql.XADataSource xaDataSource, DataSource dataSource) {
+    protected void initializeDatabaseProductNameOfContext(javax.sql.XADataSource xaDataSource) {
         if (getDatabaseProductNameFromContext() != null) {
             return;
         }
@@ -89,17 +104,13 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             final String driverClassName = xaDataSourceImpl.getDriverClassName();
             if (driverClassName != null) {
                 if (setupDatabaseProductNameByDriverClassName(driverClassName)) {
-                    _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
                     _log.info("...Initializing database product name from driverClassName: " + getDatabaseProductNameFromContext());
-                    _log.info("* * * * */");
                     return;
                 }
             }
         }
 
-        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
         _log.info("...Initializing database product name as default: ${database.daoGenDbName}");
-        _log.info("* * * * */");
         setDatabaseProductNameToContext("${database.daoGenDbName}");
     }
 
