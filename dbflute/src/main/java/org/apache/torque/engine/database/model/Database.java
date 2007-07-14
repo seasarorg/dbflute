@@ -752,8 +752,15 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                           Properties - DaoDicon
-    //                                                           =====================
+    //                                                          Properties - HotDeploy
+    //                                                          ======================
+    public boolean isAvailableHotDeploy() {
+        return getBasicProperties().isAvailableHotDeploy();
+    }
+    
+    // ===============================================================================
+    //                                                       Properties - DBFluteDicon
+    //                                                       =========================
     public String getDaoDiconNamespace() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconNamespace();
     }
@@ -761,11 +768,31 @@ public class Database {
     public String getDaoDiconPackageName() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageName();
     }
+    
+    public String getDBFluteDiconPackageName() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageName();
+    }
 
+    public List<String> getDBFluteDiconPackageNameList() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageNameList();
+    }
+    
     public List<String> getDaoDiconPackageNameList() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageNameList();
     }
 
+    public String getDBFluteCreatorDiconFileName() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteCreatorDiconFileName();
+    }
+    
+    public String getDBFluteCustomizerDiconFileName() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteCustomizerDiconFileName();
+    }
+    
+    public String getDBFluteDiconFileName() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteDiconFileName();
+    }
+    
     public String getDaoDiconFileName() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconFileName();
     }
@@ -1433,6 +1460,30 @@ public class Database {
         return sequenceNextSql;
     }
 
+    public String getColumnSetupBeforeInsertInterceptorPointcut() {
+        if (isAvailableCommonColumnSetupInterceptorToBehavior()) {
+            return getColumnSetupBeforeInsertInterceptorToBehaviorPointcut();
+        } else {
+            return getColumnSetupBeforeInsertInterceptorToDaoPointcut();
+        }
+    }
+    
+    public String getColumnSetupBeforeUpdateInterceptorPointcut() {
+        if (isAvailableCommonColumnSetupInterceptorToBehavior()) {
+            return getColumnSetupBeforeUpdateInterceptorToBehaviorPointcut();
+        } else {
+            return getColumnSetupBeforeUpdateInterceptorToDaoPointcut();
+        }
+    }
+    
+    public String getColumnSetupBeforeDeleteInterceptorPointcut() {
+        if (isAvailableCommonColumnSetupInterceptorToBehavior()) {
+            return getColumnSetupBeforeDeleteInterceptorToBehaviorPointcut();
+        } else {
+            return getColumnSetupBeforeDeleteInterceptorToDaoPointcut();
+        }
+    }
+    
     public String getColumnSetupBeforeInsertInterceptorToBehaviorPointcut() {
         return "delegateInsert.*, delegateCreate.*, delegateAdd.*, callInsert.*, callCreate.*, callAdd.*";
     }

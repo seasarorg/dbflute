@@ -19,7 +19,7 @@ public class ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN extends ${glCondi
 
     protected ${glEntityListSetupperName}<REFERER_ENTITY> _entityListSetupper;
 
-    protected REFERER_CONDITION_BEAN _reffererConditionBean;
+    protected REFERER_CONDITION_BEAN _refererConditionBean;
 
     protected boolean _toLastKeyCondtion;
 
@@ -102,12 +102,26 @@ public class ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN extends ${glCondi
         this._entityListSetupper = entityListSetupper;
     }
 
+    /**
+     * @deprecated Sorry! This methid have typo! Please use getRefererConditionBean().
+     */
     public REFERER_CONDITION_BEAN getReffererConditionBean() {
-        return _reffererConditionBean;
+        return _refererConditionBean;
     }
 
-    public void setReffererConditionBean(REFERER_CONDITION_BEAN reffererConditionBean) {
-        this._reffererConditionBean = reffererConditionBean;
+    /**
+     * @deprecated Sorry! This methid have typo! Please use setRefererConditionBean().
+     */
+    public void setReffererConditionBean(REFERER_CONDITION_BEAN refererConditionBean) {
+        this._refererConditionBean = refererConditionBean;
+    }
+
+    public REFERER_CONDITION_BEAN getRefererConditionBean() {
+        return _refererConditionBean;
+    }
+
+    public void setRefererConditionBean(REFERER_CONDITION_BEAN refererConditionBean) {
+        this._refererConditionBean = refererConditionBean;
     }
 
     public boolean isToLastKeyCondtion() {

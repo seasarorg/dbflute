@@ -45,12 +45,19 @@ targetdatabase = $targetDatabase
     ##                                                 Dicon
     ##                                                 -----
     #set ($glDaoDiconNamespace = "${database.daoDiconNamespace}")
+    #set ($glDBFluteDiconNamespace = "${database.daoDiconNamespace}")
     #set ($glDaoDiconFileName = "${database.daoDiconFileName}")
+    #set ($glDBFluteDiconFileName = "${database.DBFluteDiconFileName}")
+    #set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
+    #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
     #set ($glJdbcDiconResourceName = "${database.jdbcDiconResourceName}")
 
     ## -----------------------------------------------------
     ##                                            Class Name
     ##                                            ----------
+    ## [Allcommon-Annotation]
+    #set ($glOutsideSqlAnnotation = "OutsideSql")
+
     ## [Allcommon-Base-AccessContext]
     #set ($glAccessContextName = "${glProjectPrefix}AccessContext")
 
@@ -207,6 +214,9 @@ targetdatabase = $targetDatabase
     #set ($glStatementHistoryWitnessName = "${glProjectPrefix}StatementHistoryWitness")
     #set ($glTraceablePreparedStatementName = "${glProjectPrefix}TraceablePreparedStatement")
 
+    ## [Allcommon-S2Container]
+    #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
+
     ## [Allcommon-S2Dao]
     #set ($glSelectDynamicCommand = "${glProjectPrefix}S2DaoSelectDynamicCommand")
     #set ($glDaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
@@ -216,20 +226,19 @@ targetdatabase = $targetDatabase
     #set ($glDaoStatementFactory = "${glProjectPrefix}S2DaoStatementFactory")
     #set ($glFetchNarrowingResultSetFactory = "${glProjectPrefix}FetchNarrowingResultSetFactory")
     #set ($glFetchNarrowingResultSetWrapper = "${glProjectPrefix}FetchNarrowingResultSetWrapper")
-    #set ($glOutsideSqlAnnotation = "OutsideSql")
 
-    ## -----------------------------------------------------
-    ##                                         Variable Name
-    ##                                         -------------
+    ## ===================================================================================
+    ##                                                                            Variable
+    ##                                                                            ========
     #set ($glConditionBeanInitialName = "CB")
     #set ($glConditionQueryInitialName = "CQ")
     #set ($glAttachedCBArgsVariableName = "cb")
     #set ($glParentVariablePrefix = "_parent")
     #set ($glChildrenVariablePrefix = "_children")
 
-    ## -----------------------------------------------------
-    ##                                          Package Name
-    ##                                          ------------
+    ## ===================================================================================
+    ##                                                                             Package
+    ##                                                                             =======
     ## [Common]
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
@@ -262,6 +271,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.helper.token.file.impl")
     #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
     #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.jdbc.history")
+    #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
     #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
 
     ## [Main]
@@ -992,27 +1002,66 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     #if ($database.hasClassificationDefinitionMap())
-      $database.debug("parseClassification();")
+      $database.debug("parseAllcommonClassification() {")
+      $database.debug("    parse('ClassificationDefinition');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glClassificationDefinition}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/ClassificationDefinition.${glTemplateFileExtension}",$path ,"" ,"")
+      $database.debug("}")
     #end
 
     ## -------------------------------------------------------
-    ##                                     allcommon container
-    ##                                     -------------------
+    ##                                   allcommon s2container
+    ##                                   ---------------------
     ## Setup java directory for daoDicon.
     $database.setupJavaDir_for_daoDicon()
+    #if ($database.isTargetLanguageJava())
+      $database.debug("parseAllcommonS2Container() {")
+      #if ($database.isAvailableHotDeploy())
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2Container}))
+        $database.makeDirectory($path)
 
-    $database.debug("parseDaoDicon() {")
-    #foreach ($daoDiconPackageName in $database.daoDiconPackageNameList)
-      #set ($path = "${daoDiconPackageName}" )
-      $database.makeDirectory($path)
+        $database.debug("    parse('BehaviorCreator');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Container})}${glBehaviorCreator}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/s2container/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
 
-      #set ($path = "${daoDiconPackageName}/${glDaoDiconFileName}" )
-      $database.debug("    ${path}")
-      $generator.parse("om/${glTargetLanguage}/allcommon/DaoDicon.${glTemplateFileExtension}", $path, "", "")
+        #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+          #set ($path = "${dbfluteDiconPackageName}" )
+          $database.makeDirectory($path)
+
+          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+          $database.debug("    ${path}")
+          $generator.parse("om/${glTargetLanguage}/allcommon/s2container/DBFluteHotDeployDicon.${glTemplateFileExtension}", $path, "", "")
+
+          #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
+          $database.debug("    ${path}")
+          $generator.parse("om/${glTargetLanguage}/allcommon/s2container/DBFluteCreatorDicon.${glTemplateFileExtension}", $path, "", "")
+
+          #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
+          $database.debug("    ${path}")
+          $generator.parse("om/${glTargetLanguage}/allcommon/s2container/DBFluteCustomizerDicon.${glTemplateFileExtension}", $path, "", "")
+        #end
+      #else
+        #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+          #set ($path = "${dbfluteDiconPackageName}" )
+          $database.makeDirectory($path)
+
+          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+          $database.debug("    ${path}")
+          $generator.parse("om/${glTargetLanguage}/allcommon/s2container/DBFluteNormalDicon.${glTemplateFileExtension}", $path, "", "")
+        #end
+      #end
+      $database.debug("}")
+    #else
+      $database.debug("parseDBFluteDicon() {")
+      #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+        #set ($path = "${dbfluteDiconPackageName}" )
+        $database.makeDirectory($path)
+
+        #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+        $database.debug("    ${path}")
+        $generator.parse("om/${glTargetLanguage}/allcommon/DaoDicon.${glTemplateFileExtension}", $path, "", "")
+      #end
     #end
-    $database.debug("}")
 
     ## -------------------------------------------------------
     ##                                  allcommon dao-selector

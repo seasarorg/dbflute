@@ -65,6 +65,14 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
             return stringProp("torque.daoDiconFileName", "dbflute.dicon");
         }
     }
+    
+    public String getDBFluteCreatorDiconFileName() {
+        return stringProp("torque.dbfluteCreatorDiconFileName", "dbflute-creator.dicon");
+    }
+    
+    public String getDBFluteCustomizerDiconFileName() {
+        return stringProp("torque.dbfluteCustomizerDiconFileName", "dbflute-customizer.dicon");
+    }
 
     public String getJdbcDiconResourceName() {
         final String prop = stringProp("torque.j2eeDiconResourceName", null);

@@ -918,13 +918,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         }
     }
 
-    protected void doModify(${glEntityInterfaceName} ${myEntityVariableName}) {
-        update((${myExtendedObjectClassName})${myEntityVariableName});
+    protected void doModify(${glEntityInterfaceName} entity) {
+        update((${myExtendedObjectClassName})entity);
     }
-  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
 
+#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
     /**
-     * Update non stritct.
+     * Update non stritct. <br />
+     * {update: modified only}
      * <pre>
      * This update ignores concurrency control.
      * This method is faster than updateAfterSelect().
@@ -943,11 +944,26 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
         }
     }
-  #end
+#end
+
+    protected void doModifyNonstrict(${glEntityInterfaceName} entity) {
+#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+        updateNonstrict((${myExtendedObjectClassName})entity);
+#else
+        update((${myExtendedObjectClassName})entity);
+#end
+    }
 
     /**
-     * Update after select.
-     * 
+     * Update after select. <br />
+     * {update: modified only}
+     * <pre>
+     * The merit of this method is only Deleted-Check before updating!
+     * If you don't want the merit, please use update().
+     * And the demerit of this method is as follows:
+     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
+     *   : it does not throw optimistic lock exception. It can updates.
+     * </pre>
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
@@ -960,17 +976,54 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         update(currentEntity);
     }
 
-    protected void doModifyAfterSelect(${glEntityInterfaceName} ${myEntityVariableName}) {
-        updateAfterSelect((${myExtendedObjectClassName})${myEntityVariableName});
+    protected void doModifyAfterSelect(${glEntityInterfaceName} entity) {
+        updateAfterSelect((${myExtendedObjectClassName})entity);
     }
-  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
 
     /**
-     * Insert or update non strict.
+     * Insert or update. <br />
      * {update: modified only}
-     * <pre>
+     * 
+     * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     */
+    public void insertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        assertEntityNotNull(${myEntityVariableName});
+        if (!${myEntityVariableName}.hasPrimaryKeyValue()) {
+            insert(${myEntityVariableName});
+        } else {
+            RuntimeException exception = null;
+            try {
+                update(${myEntityVariableName});
+            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
+                if (e.getRows() > 1) {
+                    throw e;
+                }
+                exception = e;
+            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+                exception = e;
+            }
+            if (exception != null) {
+                final ${myConditionBeanClassName} cb = newMyConditionBean();
+                cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
+                if (selectCount(cb) == 0) {
+                    insert(${myEntityVariableName});
+                } else {
+                    throw exception;
+                }
+            }
+        }
+    }
+
+    protected void doCreateOrUpdate(${glEntityInterfaceName} ${myEntityVariableName}) {
+        insertOrUpdate((${myExtendedObjectClassName})${myEntityVariableName});
+    }
+
+#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+    /**
+     * Insert or update non strict. <br />
+     * {update: modified only} <br />
      * This method is faster than insertOrUpdateAfterSelect().
-     * </pre>
+     * 
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
@@ -988,45 +1041,26 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             }
         }
     }
-  #else
+#end
 
-    /**
-     * Insert or update.
-     * {update: modified only}
-     * 
-     * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
-     */
-    public void insertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        if (!${myEntityVariableName}.hasPrimaryKeyValue()) {
-            insert(${myEntityVariableName});
-        } else {
-            try {
-                update(${myEntityVariableName});
-            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
-                insert(${myEntityVariableName});
-            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
-                insert(${myEntityVariableName});
-            }
-        }
-    }
-  #end
-
-    protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} ${myEntityVariableName}) {
-  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
-
-        insertOrUpdateNonStrict((${myExtendedObjectClassName})${myEntityVariableName});
-  #else
-
-        insertOrUpdate((${myExtendedObjectClassName})${myEntityVariableName});
-  #end
-
+    protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity) {
+#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+        insertOrUpdateNonStrict((${myExtendedObjectClassName})entity);
+#else
+        insertOrUpdate((${myExtendedObjectClassName})entity);
+#end
     }
 
     /**
-     * Insert or update after select.
+     * Insert or update after select. <br />
      * {update: modified only}
-     * 
+     * <pre>
+     * The merit of this method is only Deleted-Check before updating!
+     * If you don't want the merit, please use update().
+     * And the demerit of this method is as follows:
+     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
+     *   : it does not throw optimistic lock exception. It can updates.
+     * </pre>
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
      */
     public void insertOrUpdateAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -1052,7 +1086,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity) {
         insertOrUpdateAfterSelect((${myExtendedObjectClassName})entity);
     }
-  #if ($database.isMakeBehaviorForUpdate())
+  #if ($database.isMakeBehaviorForUpdate() && $database.isMakeRecentlyDeprecated())
 
     /**
      * Update after select-for-update.
@@ -1077,7 +1111,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Insert or update after select-for-update.
-     * {update: modified only}
+     * {update: modified only} <br />
      * 
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @deprecated This method is deprecated.
@@ -1152,7 +1186,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Delete after select.
-     * 
+     * <pre>
+     * The merit of this method is only Deleted-Check before deleting!
+     * If you don't want the merit, please use update().
+     * And the demerit of this method is as follows:
+     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
+     *   : it does not throw optimistic lock exception. It can updates.
+     * </pre>
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
@@ -1164,8 +1204,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         delete(${myEntityVariableName});
     }
 
-    protected void doRemoveAfterSelect(${glEntityInterfaceName} ${myEntityVariableName}) {
-        deleteAfterSelect((${myExtendedObjectClassName})${myEntityVariableName});
+    protected void doRemoveAfterSelect(${glEntityInterfaceName} entity) {
+        deleteAfterSelect((${myExtendedObjectClassName})entity);
     }
   #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
 
@@ -1180,6 +1220,27 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
     public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        assertEntityNotNull(${myEntityVariableName});
+        final int deletedCount = delegateDeleteNonstrict(${myEntityVariableName});
+        if (deletedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(${myEntityVariableName}.toString());
+        } else if (deletedCount > 1) {
+            String msg = "deletedCount=" + deletedCount + ": " + ${myEntityVariableName}.toString();
+            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+        }
+    }
+
+    /**
+     * Delete non stritct ignoring deleted.
+     * <pre>
+     * This delete ignores concurrency control.
+     * This method is faster than deleteAfterSelect().
+     * </pre>
+     * @param ${myEntityVariableName} Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
         final int deletedCount = delegateDeleteNonstrict(${myEntityVariableName});
         if (deletedCount == 0) {

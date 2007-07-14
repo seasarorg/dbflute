@@ -207,6 +207,19 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     abstract protected void doModify(${glEntityInterfaceName} entity);
 
     /**
+     * Modify non strict.
+     * 
+     * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public void modifyNonstrict(${glEntityInterfaceName} entity) {
+        doModifyNonstrict(entity);
+    }
+
+    abstract protected void doModifyNonstrict(${glEntityInterfaceName} entity);
+
+    /**
      * ${database.ImplementComment}
      * 
      * @param entity Entity having primary-key value. (NotNull)
@@ -219,7 +232,31 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     abstract protected void doModifyAfterSelect(${glEntityInterfaceName} entity);
 
     /**
-     * Create or modify after select.
+     * ${database.ImplementComment}
+     * 
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     */
+    public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        doCreateOrUpdate(entity);
+    }
+
+    abstract protected void doCreateOrUpdate(${glEntityInterfaceName} entity);
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     */
+    public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        doCreateOrUpdateNonstrict(entity);
+    }
+
+    abstract protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity);
+
+    /**
+     * Create or modify after select. <br />
      * {modify: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
@@ -230,7 +267,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     abstract protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity);
-#if ($database.isMakeBehaviorForUpdate())
+#if ($database.isMakeBehaviorForUpdate() && $database.isMakeRecentlyDeprecated())
 
     /**
      * ${database.ImplementComment}
@@ -478,8 +515,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
         return fileTokenizingOption;
     }
-
-    abstract protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity);
 
 #if ($database.isMakeRecentlyDeprecated())
 
