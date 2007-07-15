@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.framework.util.StringUtil;
 
 /**
  * Common column properties.
@@ -37,9 +38,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         super(prop);
     }
 
-    // ===============================================================================
-    //                                                      Properties - Common-Column
-    //                                                      ==========================
+    // ===================================================================================
+    //                                                          Properties - Common-Column
+    //                                                          ==========================
     public static final String KEY_commonColumnMap = "commonColumnMap";
     protected Map<String, Object> _commonColumnMap;
 
@@ -61,7 +62,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public static final String COMMON_COLUMN_CONVERTION_PREFIX_MARK = "$-";
-    
+
     protected List<String> _commonColumnNameConvertionList;
 
     public List<String> getCommonColumnNameConvertionList() {
@@ -81,7 +82,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     public boolean isCommonColumnConvertion(String commonColumnName) {
         return commonColumnName.startsWith(COMMON_COLUMN_CONVERTION_PREFIX_MARK);
     }
-    
+
     public String filterCommonColumn(String commonColumnName) {
         if (commonColumnName.startsWith(COMMON_COLUMN_CONVERTION_PREFIX_MARK)) {
             return commonColumnName.substring(COMMON_COLUMN_CONVERTION_PREFIX_MARK.length());
@@ -90,9 +91,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         }
     }
 
-    // --------------------------------------
-    //                           aspect point
-    //                           ------------
+    // -----------------------------------------------------
+    //                                          aspect point
+    //                                          ------------
     public String getCommonColumnSetupInterceptorAspectPoint() {
         return stringProp("torque.commonColumnSetupInterceptorAspectPoint", "behavior");
     }
@@ -139,9 +140,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return true;
     }
 
-    // --------------------------------------
-    //                                 insert
-    //                                 ------
+    // -----------------------------------------------------
+    //                                                insert
+    //                                                ------
     public static final String KEY_commonColumnSetupBeforeInsertInterceptorLogicMap = "commonColumnSetupBeforeInsertInterceptorLogicMap";
     protected Map<String, Object> _commonColumnSetupBeforeInsertInterceptorLogicMap;
 
@@ -149,8 +150,27 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         if (_commonColumnSetupBeforeInsertInterceptorLogicMap == null) {
             final String key = "torque." + KEY_commonColumnSetupBeforeInsertInterceptorLogicMap;
             _commonColumnSetupBeforeInsertInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
+            filterCommonColumnSetupValue(_commonColumnSetupBeforeInsertInterceptorLogicMap);
         }
         return _commonColumnSetupBeforeInsertInterceptorLogicMap;
+    }
+
+    protected void filterCommonColumnSetupValue(Map<String, Object> map) {
+        final String baseCommonPackage = getGeneratedClassPackageProperties().getBaseCommonPackage();
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            final String value = (String) map.get(key);
+            if (value != null && value.contains("$$allcommon$$")) {
+                final String replaced = StringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
+                map.put(key, replaced);
+            }
+            if (value != null && value.contains("$$AccessContext$$")) {
+                final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
+                final String replaced = StringUtil.replace(value, "$$AccessContext$$", accessContext);
+                map.put(key, replaced);
+            }
+        }
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
@@ -168,9 +188,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return (String) map.get(columnName);
     }
 
-    // --------------------------------------
-    //                                 update
-    //                                 ------
+    // -----------------------------------------------------
+    //                                                update
+    //                                                ------
     public static final String KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap = "commonColumnSetupBeforeUpdateInterceptorLogicMap";
     protected Map<String, Object> _commonColumnSetupBeforeUpdateInterceptorLogicMap;
 
@@ -178,6 +198,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         if (_commonColumnSetupBeforeUpdateInterceptorLogicMap == null) {
             final String key = "torque." + KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap;
             _commonColumnSetupBeforeUpdateInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
+            filterCommonColumnSetupValue(_commonColumnSetupBeforeUpdateInterceptorLogicMap);
         }
         return _commonColumnSetupBeforeUpdateInterceptorLogicMap;
     }
@@ -197,9 +218,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return (String) map.get(columnName);
     }
 
-    // --------------------------------------
-    //                                 delete
-    //                                 ------
+    // -----------------------------------------------------
+    //                                                delete
+    //                                                ------
     public static final String KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap = "commonColumnSetupBeforeDeleteInterceptorLogicMap";
     protected Map<String, Object> _commonColumnSetupBeforeDeleteInterceptorLogicMap;
 
@@ -207,6 +228,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         if (_commonColumnSetupBeforeDeleteInterceptorLogicMap == null) {
             final String key = "torque." + KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap;
             _commonColumnSetupBeforeDeleteInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
+            filterCommonColumnSetupValue(_commonColumnSetupBeforeDeleteInterceptorLogicMap);
         }
         return _commonColumnSetupBeforeDeleteInterceptorLogicMap;
     }
