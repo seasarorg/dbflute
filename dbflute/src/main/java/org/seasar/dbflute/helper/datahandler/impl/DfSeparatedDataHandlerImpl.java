@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
-import org.seasar.dbflute.util.DfMapStringFileUtil;
+import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 
 public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
@@ -99,7 +99,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
     private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final String path = info.getBasePath() + "/" + encoding + "/default-value.txt";
-        return DfMapStringFileUtil.getSimpleMapAsStringValue(path, encoding);
+        return DfMapStringFileReader.readMapAsStringValue(path, encoding);
     }
 
     protected FilenameFilter createFilenameFilter(final String typeName) {

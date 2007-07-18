@@ -260,6 +260,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
     
     // ===================================================================================
+    //                                                                           Copyright
+    //                                                                           =========
+    public String getCopyrightForAllClass() {
+        return stringProp("torque.copyrightForAllClass", "");
+    }
+    
+    // ===================================================================================
     //                                                                       Database Info
     //                                                                       =============
     protected DatabaseInfo _databaseInfo = new DatabaseInfo();

@@ -23,7 +23,7 @@ import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
 import org.seasar.dbflute.helper.datahandler.impl.internal.DfSybaseSqlWriter;
 import org.seasar.dbflute.helper.excel.DfXlsReader;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
-import org.seasar.dbflute.util.DfMapStringFileUtil;
+import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 import org.seasar.extension.dataset.ColumnType;
 import org.seasar.extension.dataset.DataColumn;
 import org.seasar.extension.dataset.DataRow;
@@ -303,12 +303,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/default-value.txt";
-        return DfMapStringFileUtil.getSimpleMapAsStringValue(path, "UTF-8");
+        return DfMapStringFileReader.readMapAsStringValue(path, "UTF-8");
     }
 
     private DfFlexibleNameMap<String, String> getTableNameMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/table-name.txt";
-        final Map<String, String> targetMap = DfMapStringFileUtil.getSimpleMapAsStringValue(path, "UTF-8");
+        final Map<String, String> targetMap = DfMapStringFileReader.readMapAsStringValue(path, "UTF-8");
         return new DfFlexibleNameMap<String, String>(targetMap);
     }
 

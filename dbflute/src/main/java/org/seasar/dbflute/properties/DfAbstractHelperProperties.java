@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.NameFactory;
+import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
+import org.seasar.dbflute.helper.io.fileread.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
-import org.seasar.dbflute.util.DfMapStringFileUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
@@ -25,12 +24,33 @@ import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
  */
 public abstract class DfAbstractHelperProperties {
 
+    // ===============================================================================
+    //                                                                      Definition
+    //                                                                      ==========
     /** Log-instance */
     private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
 
+    public static final String JAVA_targetLanguage = "java";
+    public static final String CSHARP_targetLanguage = "csharp";
+    public static final String DEFAULT_targetLanguage = JAVA_targetLanguage;
+
+    public static final String DEFAULT_templateFileEncoding = "UTF-8";
+    public static final String DEFAULT_sourceFileEncoding = "UTF-8";
+
+    public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
+    public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
+    public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
+    public static final String DEFAULT_EMPTY_LIST_STRING = "list:{}";
+
+    // ===============================================================================
+    //                                                                       Attribute
+    //                                                                       =========
     /** TorqueContextProperties */
     protected Properties _buildProperties;
 
+    // ===============================================================================
+    //                                                                     Constructor
+    //                                                                     ===========
     /**
      * Constructor.
      */
@@ -42,9 +62,12 @@ public abstract class DfAbstractHelperProperties {
         return _buildProperties;
     }
 
-    // **********************************************************************************************
-    //                                                                                       Delegate
-    //                                                                                       ********
+    // ===============================================================================
+    //                                                                      Properties
+    //                                                                      ==========
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
     /**
      * Get property as string. {Delegate method}
      * 
@@ -53,6 +76,10 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected String stringProp(String key) {
         try {
+            final String outsidePropString = getOutsidePropString(key);
+            if (outsidePropString != null && outsidePropString.trim().length() != 0) {
+                return outsidePropString;
+            }
             return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (RuntimeException e) {
             _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
@@ -69,6 +96,10 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected String stringProp(String key, String defaultValue) {
         try {
+            final String outsidePropString = getOutsidePropString(key);
+            if (outsidePropString != null && outsidePropString.trim().length() != 0) {
+                return outsidePropString;
+            }
             return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
@@ -78,6 +109,9 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
+    // -----------------------------------------------------
+    //                                               Boolean
+    //                                               -------
     /**
      * Get property as boolean. {Delegate method}
      * 
@@ -113,6 +147,9 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
+    // -----------------------------------------------------
+    //                                               Integer
+    //                                               -------
     /**
      * Get property as integer. {Delegate method}
      * 
@@ -148,6 +185,9 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                  List
+    //                                                  ----
     /**
      * Get property as list. {Delegate method}
      * 
@@ -158,7 +198,7 @@ public abstract class DfAbstractHelperProperties {
         try {
             return DfPropertyUtil.listProp(_buildProperties, key, ";");
         } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
+            _log.warn("DfPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
             throw e;
         }
     }
@@ -181,11 +221,14 @@ public abstract class DfAbstractHelperProperties {
         } catch (PropertyNotFoundException e) {
             return defaultValue;
         } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
+            _log.warn("DfPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
             throw e;
         }
     }
 
+    // -----------------------------------------------------
+    //                                                   Map
+    //                                                   ---
     /**
      * Get property as map. {Delegate method}
      * 
@@ -200,7 +243,7 @@ public abstract class DfAbstractHelperProperties {
             }
             return DfPropertyUtil.mapProp(_buildProperties, key, ";");// TODO: DelimiterはDefaultでOK
         } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
+            _log.warn("DfPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
             throw e;
         }
     }
@@ -218,7 +261,7 @@ public abstract class DfAbstractHelperProperties {
             if (!outsidePropMap.isEmpty()) {
                 return outsidePropMap;
             }
-            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, ";");// TODO: DelimiterはDefaultでOK
+            final Map<String, Object> result = DfPropertyUtil.mapProp(_buildProperties, key, ";");
             if (result.isEmpty()) {
                 return defaultValue;
             } else {
@@ -227,16 +270,24 @@ public abstract class DfAbstractHelperProperties {
         } catch (PropertyNotFoundException e) {
             return defaultValue;
         } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
+            _log.warn("DfPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
             throw e;
         }
     }
 
-    protected Map<String, Object> getOutsidePropMap(String key) {
+    protected String getOutsidePropString(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
-        return DfMapStringFileUtil.getSimpleMap("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
+        return DfStringFileReader.readString("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
     }
 
+    protected Map<String, Object> getOutsidePropMap(String key) {
+        final String filteredKey = DfStringUtil.replace(key, "torque.", "");
+        return DfMapStringFileReader.readMap("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
+    }
+
+    // ===============================================================================
+    //                                                               Properties Object
+    //                                                               =================
     protected DfPropertiesHandler getPropertiesHandler() {
         return DfPropertiesHandler.getInstance();
     }
@@ -249,28 +300,8 @@ public abstract class DfAbstractHelperProperties {
         return DfPropertiesHandler.getInstance().getGeneratedClassPackageProperties(getProperties());
     }
 
-    // **********************************************************************************************
-    //                                                                                        Default
-    //                                                                                        *******
-
-    public static final String JAVA_targetLanguage = "java";
-    public static final String CSHARP_targetLanguage = "csharp";
-    public static final String DEFAULT_targetLanguage = JAVA_targetLanguage;
-
-    public static final String DEFAULT_templateFileEncoding = "UTF-8";
-    public static final String DEFAULT_sourceFileEncoding = "UTF-8";
-
-    public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
-    public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
-    public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
-    public static final String DEFAULT_EMPTY_LIST_STRING = "list:{}";
-
-    // **********************************************************************************************
-    //                                                                                         Helper
-    //                                                                                         ******
-
     // ===============================================================================
-    //                                                                          String
+    //                                                                          Helper
     //                                                                          ======
     public String filterDoubleQuotation(String str) {
         return DfPropertyUtil.convertAll(str, "\"", "'");

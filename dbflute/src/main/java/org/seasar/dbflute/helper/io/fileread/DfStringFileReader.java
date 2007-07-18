@@ -1,20 +1,16 @@
-package org.seasar.dbflute.util;
+package org.seasar.dbflute.helper.io.fileread;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 
 /**
  * @author jflute
+ * @since 0.5.4 (2007/07/18)
  */
-public class DfMapStringFileUtil {
+public class DfStringFileReader {
 
-    public static Map<String, Object> getSimpleMap(String path, String encoding) {
+    public static String readString(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
         if (file.exists()) {
@@ -40,7 +36,7 @@ public class DfMapStringFileUtil {
                     if (lineString.trim().startsWith("#")) {// If the line is comment...
                         continue;
                     }
-                    sb.append(lineString);
+                    sb.append(lineString + System.getProperty("line.separator"));
                 }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -48,20 +44,6 @@ public class DfMapStringFileUtil {
                 throw new RuntimeException(e);
             }
         }
-        if (sb.toString().trim().length() == 0) {
-            return new LinkedHashMap<String, Object>();
-        }
-        final DfMapListStringImpl mapListString = new DfMapListStringImpl();
-        return mapListString.generateMap(sb.toString());
-    }
-
-    public static Map<String, String> getSimpleMapAsStringValue(String path, String encoding) {
-        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        final Map<String, Object> map = getSimpleMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (String) map.get(key));
-        }
-        return resultMap;
+        return sb.toString();
     }
 }

@@ -540,45 +540,12 @@ public class Database {
     // ===============================================================================
     //                                                                    CustomizeDao
     //                                                                    ============
-    protected java.util.List<Table> _customizeTableList = new ArrayList<Table>(100);
-
     public void initializeCustomizeDao() {
-        _log.debug("/=============================");
-        _log.debug("...Initializing customize dao.");
-
-        final Map<String, Map<String, Map<String, String>>> customizeDaoDefinitionMap = getCustomizeDaoDefinitionMap();
-        final Set<String> tableNameKeySet = customizeDaoDefinitionMap.keySet();
-        for (String tableName : tableNameKeySet) {
-            final Table table = new Table(tableName);
-            _customizeTableList.add(table);
-            table.setDatabase(this);
-            table.setCustomizeDaoMethodMap(getCustomizeDaoComponentMethodMap(tableName));
-            table.setCustomizeDaoImportMap(getCustomizeDaoComponentImportMap(tableName));
-            table.setCustomizeDaoRelationMap(getCustomizeDaoComponentRelationMap(tableName));
-
-            final Map<String, String> columnMap = getCustomizeDaoComponentColumnMap(tableName);
-            final Set<String> columnNameKeySet = columnMap.keySet();
-            for (String columnName : columnNameKeySet) {
-                final String columnType = columnMap.get(columnName);
-                boolean isPrimaryKey = false;
-                if (columnName.startsWith("*")) {
-                    columnName = columnName.substring("*".length());
-                    isPrimaryKey = true;
-                }
-                final Column col = new Column(columnName);
-                col.setName(columnName);
-                col.setPrimaryKey(isPrimaryKey);
-                col.setTorqueType(columnType);
-                col.setTable(table);
-                table.addColumn(col);
-            }
-            _log.debug("    " + table.getName());
-        }
-        _log.debug("========/");
+        // Not support so do nothing!
     }
 
     public java.util.List<Table> getCustomizeTableList() {
-        return _customizeTableList;
+        return new ArrayList<Table>(100);
     }
 
     // ===============================================================================
@@ -757,7 +724,7 @@ public class Database {
     public boolean isAvailableHotDeploy() {
         return getBasicProperties().isAvailableHotDeploy();
     }
-    
+
     // ===============================================================================
     //                                                       Properties - DBFluteDicon
     //                                                       =========================
@@ -768,7 +735,7 @@ public class Database {
     public String getDaoDiconPackageName() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageName();
     }
-    
+
     public String getDBFluteDiconPackageName() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageName();
     }
@@ -776,7 +743,7 @@ public class Database {
     public List<String> getDBFluteDiconPackageNameList() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageNameList();
     }
-    
+
     public List<String> getDaoDiconPackageNameList() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconPackageNameList();
     }
@@ -784,15 +751,15 @@ public class Database {
     public String getDBFluteCreatorDiconFileName() {
         return getProperties().getDBFluteDiconProperties().getDBFluteCreatorDiconFileName();
     }
-    
+
     public String getDBFluteCustomizerDiconFileName() {
         return getProperties().getDBFluteDiconProperties().getDBFluteCustomizerDiconFileName();
     }
-    
+
     public String getDBFluteDiconFileName() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconFileName();
     }
-    
+
     public String getDaoDiconFileName() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconFileName();
     }
@@ -1115,119 +1082,6 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                       Properties - CustomizeDao
-    //                                                       =========================
-    public Map<String, Map<String, Map<String, String>>> getCustomizeDaoDefinitionMap() {
-        return getProperties().getCustomizeDaoDifinitionMap();
-    }
-
-    public Map<String, String> getCustomizeDaoComponentColumnMap(String tableName) {
-        return getProperties().getCustomizeDaoComponentColumnMap(tableName);
-    }
-
-    public Map<String, String> getCustomizeDaoComponentMethodMap(String tableName) {
-        return getProperties().getCustomizeDaoComponentMethodMap(tableName);
-    }
-
-    public String getCustomizeDaoComponentMethodArgumentVariableCommaString(String tableName, String methodName) {
-        return getProperties().getCustomizeDaoComponentMethodArgumentVariableCommaString(tableName, methodName);
-    }
-
-    public Map<String, String> getCustomizeDaoComponentImportMap(String tableName) {
-        return getProperties().getCustomizeDaoComponentImportMap(tableName);
-    }
-
-    public Map<String, String> getCustomizeDaoComponentRelationMap(String tableName) {
-        return getProperties().getCustomizeDaoComponentRelationMap(tableName);
-    }
-
-    public boolean isAvailableCustomizeDaoGeneration() {
-        return getProperties().isAvailableCustomizeDaoGeneration();
-    }
-
-    // ===============================================================================
-    //                                                   Properties - SqlParameterBean
-    //                                                   =============================
-    public String getSqlParameterBeanPackage() {
-        return getProperties().getSqlParameterBeanPackage();
-    }
-
-    public Map<String, Object> getSqlParameterBeanDefinitionMap() {
-        return getProperties().getSqlParameterBeanDefinitionMap();
-    }
-
-    public List<String> getSqlParameterBeanClassNameList() {
-        return getProperties().getSqlParameterBeanClassNameList();
-    }
-
-    public Map<String, String> getSqlParameterBeanClassDefinitionMap(String className) {
-        return getProperties().getSqlParameterBeanClassDefinitionMap(className);
-    }
-
-    public String getSqlParameterBeanPropertyType(String className, String property) {
-        return getProperties().getSqlParameterBeanPropertyType(className, property);
-    }
-
-    public boolean isSqlParameterBeanPropertyDefaultValueEffective(String className, String property) {
-        return getProperties().isSqlParameterBeanPropertyDefaultValueEffective(className, property);
-    }
-
-    public String getSqlParameterBeanPropertyDefaultValue(String className, String property) {
-        return getProperties().getSqlParameterBeanPropertyDefaultValue(className, property);
-    }
-
-    public boolean isAvailableSqlParameterBeanGeneration() {
-        return getProperties().isAvailableSqlParameterBeanGeneration();
-    }
-
-    public boolean isSqlParameterBeanHaveTheProperty(String className, String property) {
-        return getProperties().isSqlParameterBeanHaveTheProperty(className, property);
-    }
-
-    // ===============================================================================
-    //                                                       Properties - ArgumentBean
-    //                                                       =========================
-    public String getArgumentBeanPackage() {
-        return getProperties().getArgumentBeanPackage();
-    }
-
-    public Map<String, Object> getArgumentBeanDefinitionMap() {
-        return getProperties().getArgumentBeanDefinitionMap();
-    }
-
-    public List<String> getArgumentBeanClassNameList() {
-        return getProperties().getArgumentBeanClassNameList();
-    }
-
-    public Map<String, String> getArgumentBeanClassDefinitionMap(String className) {
-        return getProperties().getArgumentBeanClassDefinitionMap(className);
-    }
-
-    public String getArgumentBeanPropertyType(String className, String property) {
-        return getProperties().getArgumentBeanPropertyType(className, property);
-    }
-
-    public boolean isArgumentBeanPropertyDefaultValueEffective(String className, String property) {
-        return getProperties().isArgumentBeanPropertyDefaultValueEffective(className, property);
-    }
-
-    public String getArgumentBeanPropertyDefaultValue(String className, String property) {
-        return getProperties().getArgumentBeanPropertyDefaultValue(className, property);
-    }
-
-    public boolean isAvailableArgumentBeanGeneration() {
-        return getProperties().isAvailableArgumentBeanGeneration();
-    }
-
-    public Map<String, Object> getArgumentBeanRelatedSqlParameterMap() {
-        return getProperties().getArgumentBeanRelatedSqlParameterMap();
-    }
-
-    public List<String> getArgumentBeanRelatedSqlParameterSqlParameterNameList(String argumentBeanName) {
-        return getProperties().getArgumentBeanRelatedSqlParameterSqlParameterNameList(argumentBeanName);
-    }
-
-    // ===============================================================================
     //                                             Properties - OriginalBehaviorAspect
     //                                             ===================================
     public Map<String, Map<String, String>> getOriginalBehaviorAspectMap() {
@@ -1246,29 +1100,9 @@ public class Database {
         return getProperties().getOriginalBehaviorAspectPointcut(componentName);
     }
 
-    // ===============================================================================
-    //                                                      Properties - ExtractAccept
-    //                                                      ==========================
-
-    public String getExtractAcceptStartBrace() {
-        return getProperties().getExtractAcceptStartBrace();
-    }
-
-    public String getExtractAcceptEndBrace() {
-        return getProperties().getExtractAcceptEndBrace();
-    }
-
-    public String getExtractAcceptDelimiter() {
-        return getProperties().getExtractAcceptDelimiter();
-    }
-
-    public String getExtractAcceptEqual() {
-        return getProperties().getExtractAcceptEqual();
-    }
-
-    // ===============================================================================
-    //                                                      Properties - Making Option
-    //                                                      ==========================
+    // -----------------------------------------------------
+    //                                         Making Option
+    //                                         -------------
     public boolean isMakeDeprecated() {
         return getProperties().getSourceReductionProperties().isMakeDeprecated();
     }
@@ -1293,9 +1127,28 @@ public class Database {
         return getProperties().getSourceReductionProperties().isMakeTraceablePreparedStatement();
     }
 
-    // ===============================================================================
-    //                                                              Properties - Other
-    //                                                              ==================
+    // -----------------------------------------------------
+    //                                      S2Dao Adjustment
+    //                                      ----------------
+    public boolean isVersionAfter1043() {
+        return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1043();
+    }
+
+    public boolean isVersionAfter1040() {
+        return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1040();
+    }
+
+    public boolean isAvailableOtherConnectionDaoInitialization() {
+        return getProperties().getS2DaoAdjustmentProperties().isAvailableOtherConnectionDaoInitialization();
+    }
+
+    public boolean isAvailableDaoMethodLazyInitializing() {
+        return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodLazyInitializing();
+    }
+
+    // -----------------------------------------------------
+    //                                                 Other
+    //                                                 -----
     public boolean isStopGenerateExtendedBhv() {
         return getProperties().getOtherProperties().isStopGenerateExtendedBhv();
     }
@@ -1308,20 +1161,20 @@ public class Database {
         return getProperties().getOtherProperties().isStopGenerateExtendedEntity();
     }
 
-    public boolean isVersionAfter1043() {
-        return getProperties().getOtherProperties().isVersionAfter1043();
+    public String getExtractAcceptStartBrace() {
+        return getProperties().getOtherProperties().getExtractAcceptStartBrace();
     }
 
-    public boolean isVersionAfter1040() {
-        return getProperties().getOtherProperties().isVersionAfter1040();
+    public String getExtractAcceptEndBrace() {
+        return getProperties().getOtherProperties().getExtractAcceptEndBrace();
     }
 
-    public boolean isAvailableOtherConnectionDaoInitialization() {
-        return getProperties().getOtherProperties().isAvailableOtherConnectionDaoInitialization();
+    public String getExtractAcceptDelimiter() {
+        return getProperties().getOtherProperties().getExtractAcceptDelimiter();
     }
 
-    public boolean isAvailableDaoMethodLazyInitializing() {
-        return getProperties().getOtherProperties().isAvailableDaoMethodLazyInitializing();
+    public String getExtractAcceptEqual() {
+        return getProperties().getOtherProperties().getExtractAcceptEqual();
     }
 
     // ===============================================================================
@@ -1467,7 +1320,7 @@ public class Database {
             return getColumnSetupBeforeInsertInterceptorToDaoPointcut();
         }
     }
-    
+
     public String getColumnSetupBeforeUpdateInterceptorPointcut() {
         if (isAvailableCommonColumnSetupInterceptorToBehavior()) {
             return getColumnSetupBeforeUpdateInterceptorToBehaviorPointcut();
@@ -1475,7 +1328,7 @@ public class Database {
             return getColumnSetupBeforeUpdateInterceptorToDaoPointcut();
         }
     }
-    
+
     public String getColumnSetupBeforeDeleteInterceptorPointcut() {
         if (isAvailableCommonColumnSetupInterceptorToBehavior()) {
             return getColumnSetupBeforeDeleteInterceptorToBehaviorPointcut();
@@ -1483,7 +1336,7 @@ public class Database {
             return getColumnSetupBeforeDeleteInterceptorToDaoPointcut();
         }
     }
-    
+
     public String getColumnSetupBeforeInsertInterceptorToBehaviorPointcut() {
         return "delegateInsert.*, delegateCreate.*, delegateAdd.*, callInsert.*, callCreate.*, callAdd.*";
     }

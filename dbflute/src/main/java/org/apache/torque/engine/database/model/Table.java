@@ -58,9 +58,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -581,7 +579,6 @@ public class Table implements IDMethod {
         return names;
     }
 
-
     // ===================================================================================
     //                                                                              Column
     //                                                                              ======
@@ -723,7 +720,7 @@ public class Table implements IDMethod {
         final DfFlexibleNameMap<String, Column> flexibleNameMap = new DfFlexibleNameMap<String, Column>(_columnsByName);
         return flexibleNameMap.get(flexibleName);
     }
-    
+
     // -----------------------------------------------------
     //                                         Determination
     //                                         -------------
@@ -761,7 +758,7 @@ public class Table implements IDMethod {
         }
         return true;
     }
-    
+
     // ===================================================================================
     //                                                                         Foreign Key
     //                                                                         ===========
@@ -807,7 +804,7 @@ public class Table implements IDMethod {
         }
         return firstFK;
     }
-    
+
     /**
      * A utility function to create a new foreign key
      * from attrib and add it to this table.
@@ -1028,7 +1025,7 @@ public class Table implements IDMethod {
         addUnique(unique);
         return unique;
     }
-    
+
     // ===================================================================================
     //                                                                            Referrer
     //                                                                            ========
@@ -1058,7 +1055,7 @@ public class Table implements IDMethod {
     public List<ForeignKey> getReferrers() {
         return _referrers;
     }
-    
+
     /**
      * Has refferer?
      * 
@@ -1525,11 +1522,7 @@ public class Table implements IDMethod {
      * @return Annotation table name. (NotNull)
      */
     public String getAnnotationTableName() {
-        if (getCustomizeDaoTableName() != null) {
-            return getCustomizeDaoTableName();
-        } else {
-            return getName();
-        }
+        return getName();
     }
 
     // ===================================================================================
@@ -1596,80 +1589,6 @@ public class Table implements IDMethod {
             }
         }
         return result.toString();
-    }
-
-    // ===================================================================================
-    //                                                                        CustomizeDao
-    //                                                                        ============
-    protected Map<String, String> _customizeDaoMethodMap = new LinkedHashMap<String, String>();
-
-    public Map<String, String> getCustomizeDaoMethodMap() {
-        return _customizeDaoMethodMap;
-    }
-
-    public void setCustomizeDaoMethodMap(Map<String, String> value) {
-        _customizeDaoMethodMap = value;
-    }
-
-    public java.util.List<String> getCustomizeDaoMethodNameList() {
-        return new ArrayList<String>(_customizeDaoMethodMap.keySet());
-    }
-
-    public String getCustomizeDaoArgument(String methodName) {
-        return _customizeDaoMethodMap.get(methodName);
-    }
-
-    public String getCustomizeDaoArgumentVariableCommaString(String methodName) {
-        return getDatabase().getCustomizeDaoComponentMethodArgumentVariableCommaString(getName(), methodName);
-    }
-
-    public String getCustomizeDaoReturnType(String methodName) {
-        final String entityName = getDatabase().getProjectPrefix() + getJavaName();
-        if (methodName.startsWith("selectList") || methodName.startsWith("readList")) {
-            return "java.util.List" + getDatabase().filterGenericsString(entityName);
-        } else if (methodName.startsWith("selectEntity") || methodName.startsWith("readEntity")) {
-            return entityName;
-        } else if (methodName.startsWith("selectCount") || methodName.startsWith("readCount")) {
-            return "int";
-        } else {
-            return "java.util.List" + getDatabase().filterGenericsString(entityName);
-        }
-    }
-
-    public String getCustomizeDaoReturnTypeCSharp(String methodName) {
-        final String entityName = getDatabase().getProjectPrefix() + getJavaName();
-        if (methodName.startsWith("SelectList") || methodName.startsWith("ReadList")) {
-            return "System.Collections.IList";
-        } else if (methodName.startsWith("SelectEntity") || methodName.startsWith("ReadEntity")) {
-            return entityName;
-        } else if (methodName.startsWith("SelectCount") || methodName.startsWith("ReadCount")) {
-            return "int";
-        } else {
-            return "System.Collections.IList";
-        }
-    }
-
-    protected Map<String, String> _customizeDaoImportMap = new LinkedHashMap<String, String>();
-
-    public void setCustomizeDaoImportMap(Map<String, String> value) {
-        _customizeDaoImportMap = value;
-    }
-
-    protected Map<String, String> _customizeDaoRelationMap = new LinkedHashMap<String, String>();
-
-    public void setCustomizeDaoRelationMap(Map<String, String> value) {
-        _customizeDaoRelationMap = value;
-    }
-
-    public String getCustomizeDaoTableName() {
-        if (_customizeDaoRelationMap == null) {
-            return null;
-        }
-        return _customizeDaoRelationMap.get("tableName");
-    }
-
-    public java.util.List<String> getCustomizeDaoImportList() {
-        return new ArrayList<String>(_customizeDaoImportMap.keySet());
     }
 
     // **********************************************************************************************
@@ -1957,7 +1876,7 @@ public class Table implements IDMethod {
             return column.getName();
         }
     }
-    
+
     protected Column getCommonColumnNormal(String commonColumnName) {
         final Column column = getColumnByFlexibleName(commonColumnName);
         if (column == null) {
@@ -1970,17 +1889,18 @@ public class Table implements IDMethod {
     protected Column getCommonColumnConvertion(String commonColumnName, String filteredCommonColumn) {
         final Column column = getColumnByFlexibleName(filteredCommonColumn);
         if (column == null) {
-            String msg = "Not found column by '" + filteredCommonColumn + "'. Original name is '"
-                    + commonColumnName + "'.";
+            String msg = "Not found column by '" + filteredCommonColumn + "'. Original name is '" + commonColumnName
+                    + "'.";
             throw new IllegalStateException(msg);
         }
         return column;
     }
 
-    protected String convertCommonColumnName(String commonColumnName, final DfCommonColumnProperties commonColumnProperties) {
-        
+    protected String convertCommonColumnName(String commonColumnName,
+            final DfCommonColumnProperties commonColumnProperties) {
+
         // TODO: @jflute - この定義を何か指定できれば、TableによってバラバラなCommonColumnを吸収できるかも
-        
+
         String filteredCommonColumn = commonColumnProperties.filterCommonColumn(commonColumnName);
         filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "TABLE_NAME", getName());
         filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "table_name", getName());
@@ -1995,7 +1915,7 @@ public class Table implements IDMethod {
     public boolean isAvailableNonPrimaryKeyWritable() {
         return getProperties().getOtherProperties().isAvailableNonPrimaryKeyWritable();
     }
-    
+
     // ===================================================================================
     //                                                                            toString
     //                                                                            ========

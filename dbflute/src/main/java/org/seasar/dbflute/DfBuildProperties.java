@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +36,7 @@ import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
@@ -88,7 +88,7 @@ public final class DfBuildProperties {
     public synchronized static DfBuildProperties getInstance() {
         return _instance;
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -234,8 +234,15 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                              DaoDicon
-    //                                              --------
+    //                                      S2Dao Adjustment
+    //                                      ----------------
+    public DfS2DaoAdjustmentProperties getS2DaoAdjustmentProperties() {
+        return getHandler().getS2DaoAdjustmentProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                         DBFlute Dicon
+    //                                         -------------
     public DfDBFluteDiconProperties getDBFluteDiconProperties() {
         return getHandler().getDBFluteDiconProperties(getProperties());
     }
@@ -330,31 +337,15 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                                        Extract Accept
-    //                                        --------------
-    public String getExtractAcceptStartBrace() {
-        return stringProp("torque.extractAcceptStartBrace", "@{");
-    }
-
-    public String getExtractAcceptEndBrace() {
-        return stringProp("torque.extractAcceptEndBrace", "@}");
-    }
-
-    public String getExtractAcceptDelimiter() {
-        return stringProp("torque.extractAcceptDelimiter", "@;");
-    }
-
-    public String getExtractAcceptEqual() {
-        return stringProp("torque.extractAcceptEqual", "@=");
-    }
-
-    // -----------------------------------------------------
-    //                                      Source Reduction
-    //                                      ----------------
+    //                                         Making Option
+    //                                         -------------
     public DfSourceReductionProperties getSourceReductionProperties() {
         return getHandler().getSourceReductionProperties(getProperties());
     }
 
+    // -----------------------------------------------------
+    //                                         Include Query
+    //                                         -------------
     public DfIncludeQueryProperties getIncludeQueryProperties() {
         return getHandler().getIncludeQueryProperties(getProperties());
     }
@@ -365,287 +356,6 @@ public final class DfBuildProperties {
     public DfOtherProperties getOtherProperties() {
         return getHandler().getOtherProperties(getProperties());
     }
-
-    // TODO: @jflute - 削除予定。今後DBFluteではサポートしない。
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // ===================================================================================
-    //                                                                        CustomizeDao
-    //                                                                        ============
-    public static final String KEY_customizeDaoDefinitionMap = "customizeDaoDefinitionMap";
-    protected Map<String, Map<String, Map<String, String>>> _customizeDaoDefinitionMap;
-
-    public Map<String, Map<String, Map<String, String>>> getCustomizeDaoDifinitionMap() {
-        if (_customizeDaoDefinitionMap == null) {
-            _customizeDaoDefinitionMap = new LinkedHashMap<String, Map<String, Map<String, String>>>();
-            final Map<String, Object> generatedMap = mapProp("torque." + KEY_customizeDaoDefinitionMap,
-                    DEFAULT_EMPTY_MAP);
-            final Set fisrtKeySet = generatedMap.keySet();
-            for (Object tableName : fisrtKeySet) {
-                final Object firstValue = generatedMap.get(tableName);
-                if (!(firstValue instanceof Map)) {
-                    String msg = "The value type should be Map: tableName=" + tableName + " property=CustomizeDao";
-                    msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
-                    throw new IllegalStateException(msg);
-                }
-                final Map tableDefinitionMap = (Map) firstValue;
-                Set secondKeySet = tableDefinitionMap.keySet();
-                final Map<String, Map<String, String>> genericTableDefinitiontMap = new LinkedHashMap<String, Map<String, String>>();
-                for (Object componentName : secondKeySet) {
-                    final Object secondValue = tableDefinitionMap.get(componentName);
-                    if (secondValue == null) {
-                        continue;
-                    }
-                    if (!(componentName instanceof String)) {
-                        String msg = "The key type should be String: tableName=" + tableName + " property=CustomizeDao";
-                        msg = msg + " actualType=" + componentName.getClass() + " actualKey=" + componentName;
-                        throw new IllegalStateException(msg);
-                    }
-                    if (!(secondValue instanceof Map)) {
-                        String msg = "The value type should be Map: tableName=" + tableName + " property=CustomizeDao";
-                        msg = msg + " actualType=" + secondValue.getClass() + " actualValue=" + secondValue;
-                        throw new IllegalStateException(msg);
-                    }
-
-                    final Map componentMap = (Map) secondValue;
-                    Set thirdKeySet = componentMap.keySet();
-                    final Map<String, String> genericComponentMap = new LinkedHashMap<String, String>();
-                    for (Object componentKey : thirdKeySet) {
-                        final Object componentValue = componentMap.get(componentKey);
-                        if (!(componentKey instanceof String)) {
-                            String msg = "The key type should be String: tableName=" + tableName
-                                    + " property=CustomizeDao";
-                            msg = msg + " actualType=" + componentKey.getClass() + " actualKey=" + componentKey;
-                            throw new IllegalStateException(msg);
-                        }
-                        if (!(componentValue instanceof String)) {
-                            String msg = "The value type should be String: tableName=" + tableName
-                                    + " property=CustomizeDao";
-                            msg = msg + " actualType=" + componentValue.getClass() + " actualValue=" + componentValue;
-                            throw new IllegalStateException(msg);
-                        }
-                        genericComponentMap.put((String) componentKey, (String) componentValue);
-                    }
-                    genericTableDefinitiontMap.put((String) componentName, genericComponentMap);
-                }
-                _customizeDaoDefinitionMap.put((String) tableName, genericTableDefinitiontMap);
-            }
-        }
-        return _customizeDaoDefinitionMap;
-    }
-
-    public Map<String, String> getCustomizeDaoComponentColumnMap(String tableName) {
-        final Map<String, Map<String, String>> componentDefinitionMap = getCustomizeDaoDifinitionMap().get(tableName);
-        final Map<String, String> columnMap = componentDefinitionMap.get("columnMap");
-        if (columnMap == null) {
-            String msg = "The table did not have 'columnMap': tableName=" + tableName;
-            msg = msg + " componentDefinitionMap=" + componentDefinitionMap;
-            msg = msg + " " + KEY_customizeDaoDefinitionMap + "=" + getCustomizeDaoDifinitionMap();
-            throw new IllegalStateException(msg);
-        }
-        return columnMap;
-    }
-
-    public Map<String, String> getCustomizeDaoComponentMethodMap(String tableName) {
-        final Map<String, Map<String, String>> componentDefinitionMap = getCustomizeDaoDifinitionMap().get(tableName);
-        final Map<String, String> methodMap = componentDefinitionMap.get("methodMap");
-        if (methodMap == null) {
-            String msg = "The table did not have 'methodMap': tableName=" + tableName;
-            msg = msg + " componentDefinitionMap=" + componentDefinitionMap;
-            msg = msg + " " + KEY_customizeDaoDefinitionMap + "=" + getCustomizeDaoDifinitionMap();
-            throw new IllegalStateException(msg);
-        }
-        return methodMap;
-    }
-
-    public String getCustomizeDaoComponentMethodArgumentVariableCommaString(String tableName, String methodName) {
-        final Map<String, String> methodMap = getCustomizeDaoComponentMethodMap(tableName);
-        final StringBuffer sb = new StringBuffer();
-        final String argumentString = methodMap.get(methodName);
-        final StringTokenizer st = new StringTokenizer(argumentString, ",");
-        while (st.hasMoreTokens()) {
-            final String trimmedToken = st.nextToken().trim();
-            if (trimmedToken.indexOf(" ") == -1) {
-                String msg = "The trimmedToken should have one blank: trimmedToken" + trimmedToken + " methodMap="
-                        + methodMap;
-                throw new IllegalStateException(msg);
-            }
-            sb.append(", ").append(trimmedToken.substring(trimmedToken.indexOf(" ") + 1));
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    public Map<String, String> getCustomizeDaoComponentImportMap(String tableName) {
-        final Map<String, Map<String, String>> componentDefinitionMap = getCustomizeDaoDifinitionMap().get(tableName);
-        return componentDefinitionMap.get("importMap");
-    }
-
-    public Map<String, String> getCustomizeDaoComponentRelationMap(String tableName) {
-        final Map<String, Map<String, String>> componentDefinitionMap = getCustomizeDaoDifinitionMap().get(tableName);
-        return componentDefinitionMap.get("relationMap");
-    }
-
-    public boolean isAvailableCustomizeDaoGeneration() {
-        return !getCustomizeDaoDifinitionMap().isEmpty();
-    }
-
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-
-    // TODO: @jflute - 削除予定。今後DBFluteではサポートしない。
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // =============================================================================
-    //                                                 Properties - SqlParameterBean
-    //                                                   ===========================
-    public static final String KEY_sqlParameterBeanDefinitionMap = "sqlParameterBeanDefinitionMap";
-    protected Map<String, Object> _sqlParameterBeanDefinitionMap;
-
-    public String getSqlParameterBeanPackage() {
-        return stringProp("torque.sqlParameterBeanPackage", "");
-    }
-
-    public Map<String, Object> getSqlParameterBeanDefinitionMap() {
-        if (_sqlParameterBeanDefinitionMap == null) {
-            _sqlParameterBeanDefinitionMap = mapProp("torque." + KEY_sqlParameterBeanDefinitionMap, DEFAULT_EMPTY_MAP);
-        }
-        return _sqlParameterBeanDefinitionMap;
-    }
-
-    public List<String> getSqlParameterBeanClassNameList() {
-        return new ArrayList<String>(getSqlParameterBeanDefinitionMap().keySet());
-    }
-
-    public Map<String, String> getSqlParameterBeanClassDefinitionMap(String className) {
-        final Map<String, String> map = (Map<String, String>) getSqlParameterBeanDefinitionMap().get(className);
-        if (map == null) {
-            String msg = "getSqlParameterBeanDefinitionMap().get(className) returned null: " + className;
-            throw new IllegalArgumentException(msg);
-        }
-        return map;
-    }
-
-    public String getSqlParameterBeanPropertyType(String className, String property) {
-        final String str = (String) getSqlParameterBeanClassDefinitionMap(className).get(property);
-        if (str == null) {
-            String msg = "getSqlParameterBeanClassDefinitionMap(className).get(property) returned null";
-            msg = msg + ": className=" + className + " property=" + property;
-            throw new IllegalArgumentException(msg);
-        }
-        if (str.indexOf("-") == -1) {
-            return str;
-        }
-        return str.substring(0, str.indexOf("-"));
-    }
-
-    public boolean isSqlParameterBeanPropertyDefaultValueEffective(String className, String property) {
-        return getSqlParameterBeanPropertyDefaultValue(className, property).trim().length() != 0;
-    }
-
-    public String getSqlParameterBeanPropertyDefaultValue(String className, String property) {
-        final String str = (String) getSqlParameterBeanClassDefinitionMap(className).get(property);
-        if (str == null) {
-            String msg = "getSqlParameterBeanClassDefinitionMap(className).get(property) returned null";
-            msg = msg + ": className=" + className + " property=" + property;
-            throw new IllegalArgumentException(msg);
-        }
-        if (str.indexOf("-") == -1) {
-            return "";
-        }
-        return str.substring(str.indexOf("-") + 1);
-    }
-
-    public boolean isAvailableSqlParameterBeanGeneration() {
-        return !getSqlParameterBeanDefinitionMap().isEmpty();
-    }
-
-    public boolean isSqlParameterBeanHaveTheProperty(String className, String property) {
-        final String str = (String) getSqlParameterBeanClassDefinitionMap(className).get(property);
-        return str != null;
-    }
-
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-
-    // TODO: @jflute - 削除予定。今後DBFluteではサポートしない。
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // ===============================================================================
-    //                                                       Properties - ArguemntBean
-    //                                                       =========================
-    public static final String KEY_argumentBeanDefinitionMap = "argumentBeanDefinitionMap";
-    protected Map<String, Object> _argumentBeanDefinitionMap;
-
-    public String getArgumentBeanPackage() {
-        return stringProp("torque.argumentBeanPackage", "");
-    }
-
-    public Map<String, Object> getArgumentBeanDefinitionMap() {
-        if (_argumentBeanDefinitionMap == null) {
-            _argumentBeanDefinitionMap = mapProp("torque." + KEY_argumentBeanDefinitionMap, DEFAULT_EMPTY_MAP);
-        }
-        return _argumentBeanDefinitionMap;
-    }
-
-    public List<String> getArgumentBeanClassNameList() {
-        return new ArrayList<String>(getArgumentBeanDefinitionMap().keySet());
-    }
-
-    public Map<String, String> getArgumentBeanClassDefinitionMap(String className) {
-        final Map<String, String> map = (Map<String, String>) getArgumentBeanDefinitionMap().get(className);
-        if (map == null) {
-            String msg = "getArgumentBeanDifinitionMap().get(className) returned null: " + className;
-            throw new IllegalArgumentException(msg);
-        }
-        return map;
-    }
-
-    public String getArgumentBeanPropertyType(String className, String property) {
-        final String str = (String) getArgumentBeanClassDefinitionMap(className).get(property);
-        if (str == null) {
-            String msg = "getArgumentBeanClassDefinitionMap(className).get(property) returned null";
-            msg = msg + ": className=" + className + " property=" + property;
-            throw new IllegalArgumentException(msg);
-        }
-        if (str.indexOf("-") == -1) {
-            return str;
-        }
-        return str.substring(0, str.indexOf("-"));
-    }
-
-    public boolean isArgumentBeanPropertyDefaultValueEffective(String className, String property) {
-        return getArgumentBeanPropertyDefaultValue(className, property).trim().length() != 0;
-    }
-
-    public String getArgumentBeanPropertyDefaultValue(String className, String property) {
-        final String str = (String) getArgumentBeanClassDefinitionMap(className).get(property);
-        if (str == null) {
-            String msg = "getArgumentBeanClassDefinitionMap(className).get(property) returned null";
-            msg = msg + ": className=" + className + " property=" + property;
-            throw new IllegalArgumentException(msg);
-        }
-        if (str.indexOf("-") == -1) {
-            return "";
-        }
-        return str.substring(str.indexOf("-") + 1);
-    }
-
-    public boolean isAvailableArgumentBeanGeneration() {
-        return !getArgumentBeanDefinitionMap().isEmpty();
-    }
-
-    public static final String KEY_argumentBeanRelatedSqlParameterMap = "argumentBeanRelatedSqlParameterMap";
-    protected Map<String, Object> _argumentBeanRelatedSqlParameterMap;
-
-    public Map<String, Object> getArgumentBeanRelatedSqlParameterMap() {
-        if (_argumentBeanRelatedSqlParameterMap == null) {
-            _argumentBeanRelatedSqlParameterMap = mapProp("torque." + KEY_argumentBeanRelatedSqlParameterMap,
-                    DEFAULT_EMPTY_MAP);
-        }
-        return _argumentBeanRelatedSqlParameterMap;
-    }
-
-    public List<String> getArgumentBeanRelatedSqlParameterSqlParameterNameList(String argumentBeanName) {
-        return (List<String>) getArgumentBeanRelatedSqlParameterMap().get(argumentBeanName);
-    }
-
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
     // -----------------------------------------------------
     //                                          Table Except

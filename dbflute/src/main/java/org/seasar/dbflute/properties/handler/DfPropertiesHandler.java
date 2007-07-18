@@ -12,6 +12,7 @@ import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.DfS2DaoAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
@@ -20,7 +21,7 @@ import org.seasar.dbflute.properties.DfSql2EntityProperties;
 /**
  * Build properties for Torque.
  * 
- * @author mkubo
+ * @author jflute
  */
 public final class DfPropertiesHandler {
 
@@ -33,6 +34,9 @@ public final class DfPropertiesHandler {
         return _insntace;
     }
 
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected DfBasicProperties _basicProperties;
 
     public DfBasicProperties getBasicProperties(Properties prop) {
@@ -42,15 +46,21 @@ public final class DfPropertiesHandler {
         return _basicProperties;
     }
 
-    protected DfCommonColumnProperties _commonColumnProperties;
+    // -----------------------------------------------------
+    //                                      S2Dao Adjustment
+    //                                      ----------------
+    protected DfS2DaoAdjustmentProperties _s2daoAdjustmentPropertiess;
 
-    public DfCommonColumnProperties getCommonColumnProperties(Properties prop) {
-        if (_commonColumnProperties == null) {
-            _commonColumnProperties = new DfCommonColumnProperties(prop);
+    public DfS2DaoAdjustmentProperties getS2DaoAdjustmentProperties(Properties prop) {
+        if (_s2daoAdjustmentPropertiess == null) {
+            _s2daoAdjustmentPropertiess = new DfS2DaoAdjustmentProperties(prop);
         }
-        return _commonColumnProperties;
+        return _s2daoAdjustmentPropertiess;
     }
 
+    // -----------------------------------------------------
+    //                                         DBFlute Dicon
+    //                                         -------------
     protected DfDBFluteDiconProperties _dbfluteDiconProperties;
 
     public DfDBFluteDiconProperties getDBFluteDiconProperties(Properties prop) {
@@ -60,6 +70,9 @@ public final class DfPropertiesHandler {
         return _dbfluteDiconProperties;
     }
 
+    // -----------------------------------------------------
+    //                               Generated Class Package
+    //                               -----------------------
     protected DfGeneratedClassPackageProperties _generatedClassPackageProperties;
 
     public DfGeneratedClassPackageProperties getGeneratedClassPackageProperties(Properties prop) {
@@ -67,6 +80,18 @@ public final class DfPropertiesHandler {
             _generatedClassPackageProperties = new DfGeneratedClassPackageProperties(prop);
         }
         return _generatedClassPackageProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                         Common Column
+    //                                         -------------
+    protected DfCommonColumnProperties _commonColumnProperties;
+
+    public DfCommonColumnProperties getCommonColumnProperties(Properties prop) {
+        if (_commonColumnProperties == null) {
+            _commonColumnProperties = new DfCommonColumnProperties(prop);
+        }
+        return _commonColumnProperties;
     }
 
     protected DfOptimisticLockProperties _optimisticLockProperties;

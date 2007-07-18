@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
-import org.seasar.framework.util.StringUtil;
 
 /**
  * Build properties for Torque.
@@ -23,8 +22,8 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
     }
 
     // ===============================================================================
-    //                                                              Properties - Other
-    //                                                              ==================
+    //                                                                   Stop Generate
+    //                                                                   =============
     public boolean isStopGenerateExtendedBhv() {
         return booleanProp("torque.isStopGenerateExtendedBhv", false);
     }
@@ -38,46 +37,22 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
     }
 
     // ===============================================================================
-    //                                                                   S2Dao Version
-    //                                                                   =============
-    public boolean isVersionAfter1043() {
-        if (!hasS2DaoVersion()) {
-            return true;
-        }
-        return isS2DaoVersionGreaterEqual("1.0.43");
-    }
-
-    public boolean isVersionAfter1040() {
-        if (!hasS2DaoVersion()) {
-            return booleanProp("torque.isVersionAfter1040", true);
-        }
-        return isS2DaoVersionGreaterEqual("1.0.40");
-    }
-
-    protected boolean hasS2DaoVersion() {
-        return stringProp("torque.s2daoVersion", null) != null;
-    }
-
-    protected String getS2DaoVersion() {
-        final String s2daoVersion = stringProp("torque.s2daoVersion", null);
-        return s2daoVersion != null ? StringUtil.replace(s2daoVersion, ".", "") : "9.9.99";// If null, return the latest version!
-    }
-
-    protected boolean isS2DaoVersionGreaterEqual(String targetVersion) {
-        final String s2daoVersion = getS2DaoVersion();
-        final String filteredTargetVersion = StringUtil.replace(targetVersion, ".", "");
-        return s2daoVersion.compareToIgnoreCase(filteredTargetVersion) >= 0;
-    }
-
-    // ===============================================================================
-    //                                                                  S2Dao Override
+    //                                                                  Extract Accept
     //                                                                  ==============
-    public boolean isAvailableOtherConnectionDaoInitialization() {
-        return booleanProp("torque.isAvailableOtherConnectionDaoInitialization", false);
+    public String getExtractAcceptStartBrace() {
+        return stringProp("torque.extractAcceptStartBrace", "@{");
     }
 
-    public boolean isAvailableDaoMethodLazyInitializing() {
-        return booleanProp("torque.isAvailableDaoMethodLazyInitializing", false);
+    public String getExtractAcceptEndBrace() {
+        return stringProp("torque.extractAcceptEndBrace", "@}");
+    }
+
+    public String getExtractAcceptDelimiter() {
+        return stringProp("torque.extractAcceptDelimiter", "@;");
+    }
+
+    public String getExtractAcceptEqual() {
+        return stringProp("torque.extractAcceptEqual", "@=");
     }
     
     // ===============================================================================
