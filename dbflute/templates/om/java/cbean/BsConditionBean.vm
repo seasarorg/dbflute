@@ -1,4 +1,4 @@
-package ${glPackageBaseCB};
+${database.allClassCopyright}package ${glPackageBaseCB};
 
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 

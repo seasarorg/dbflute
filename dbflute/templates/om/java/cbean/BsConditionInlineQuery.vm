@@ -1,4 +1,4 @@
-package ${glPackageCIQ};
+${database.allClassCopyright}package ${glPackageCIQ};
 
 #set ($myClassName = "${myConditionInlineQueryClassName}")
 #set ($myCQClassName = "")

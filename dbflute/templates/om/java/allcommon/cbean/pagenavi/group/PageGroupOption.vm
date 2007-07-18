@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCBeanPagenaviGroup};
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenaviGroup};
 
 #set ($myClassName = "${glPageGroupOptionName}")
 

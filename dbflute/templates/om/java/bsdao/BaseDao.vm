@@ -1,6 +1,6 @@
-#set ($myClassName = "${myBaseDaoClassName}")
+${database.allClassCopyright}package ${myBaseDaoPackageName};
 
-package ${myBaseDaoPackageName};
+#set ($myClassName = "${myBaseDaoClassName}")
 
 import ${glPackageExtendedEntity}.${myExtendedObjectClassName};
 #set ($InterfaceName = "")

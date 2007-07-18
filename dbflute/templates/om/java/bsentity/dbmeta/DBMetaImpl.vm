@@ -1,4 +1,4 @@
-package ${myDBMetaPackageName};
+${database.allClassCopyright}package ${myDBMetaPackageName};
 
 #set ($myClassName = "${myDBMetaClassName}")
 

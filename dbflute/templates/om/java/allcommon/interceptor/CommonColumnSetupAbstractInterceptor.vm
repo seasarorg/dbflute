@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonInterceptor};
+${database.allClassCopyright}package ${glPackageBaseCommonInterceptor};
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;

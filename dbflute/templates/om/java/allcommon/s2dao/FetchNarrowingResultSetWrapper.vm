@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonS2Dao};
+${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

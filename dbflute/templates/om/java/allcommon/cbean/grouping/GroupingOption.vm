@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCBeanGrouping};
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
 
 /**
  * The class of option for grouping making.

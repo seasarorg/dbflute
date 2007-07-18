@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCBean};
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};

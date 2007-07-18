@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCKey};
+${database.allClassCopyright}package ${glPackageBaseCommonCKey};
 
 #set ($myClassName = "${glConditionKeyName}GreaterEqual")
 

@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCOptionPartsLocal};
+${database.allClassCopyright}package ${glPackageBaseCommonCOptionPartsLocal};
 
 #set ($myClassName = "${glConditionOptionPartsAgentJapaneseName}")
 

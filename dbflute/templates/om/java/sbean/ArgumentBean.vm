@@ -1,4 +1,4 @@
-package ${glPackageArgumentBean};
+${database.allClassCopyright}package ${glPackageArgumentBean};
 
 #set ($myClassName = "${myArgumentBeanClassName}")
 

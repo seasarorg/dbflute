@@ -1,4 +1,4 @@
-package ${glPackageExtendedBhv};
+${database.allClassCopyright}package ${glPackageExtendedBhv};
 
 #set ($myClassName = "${myExtendedBhvClassName}")
 

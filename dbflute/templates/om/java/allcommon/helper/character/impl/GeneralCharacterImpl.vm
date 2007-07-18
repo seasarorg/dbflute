@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonHelperCharacterImpl};
+${database.allClassCopyright}package ${glPackageBaseCommonHelperCharacterImpl};
 
 import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacterName};
 

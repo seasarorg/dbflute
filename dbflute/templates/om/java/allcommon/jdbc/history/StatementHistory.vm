@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonJdbcHistory};
+${database.allClassCopyright}package ${glPackageBaseCommonJdbcHistory};
 
 /**
  * The history of statement.

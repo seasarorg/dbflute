@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonException};
+${database.allClassCopyright}package ${glPackageBaseCommonException};
 
 /**
  * The exception when the record has overlapped.

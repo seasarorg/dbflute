@@ -1,4 +1,4 @@
-package ${glPackageNss};
+${database.allClassCopyright}package ${glPackageNss};
 
 #set ($myClassName = "${myNestSelectSetupperClassName}")
 

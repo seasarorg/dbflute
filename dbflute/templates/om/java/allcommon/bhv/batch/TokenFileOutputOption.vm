@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonBhvBatch};
+${database.allClassCopyright}package ${glPackageBaseCommonBhvBatch};
 
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
 

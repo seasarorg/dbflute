@@ -1,4 +1,4 @@
-package ${glPackageBaseCommon};
+${database.allClassCopyright}package ${glPackageBaseCommon};
 #if ($database.isAvailableBehaviorGeneration())
 
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};

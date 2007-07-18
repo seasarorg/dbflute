@@ -1,8 +1,8 @@
-package ${myBaseEntityPackageName};
+${database.allClassCopyright}package ${myBaseEntityPackageName};
+
 #set ($myClassName = "${myBaseObjectClassName}")
 
 #if (${table.hasAllCommonColumn()})
-
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
 #else
 

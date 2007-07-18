@@ -14,6 +14,8 @@ import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
  */
 public class DfMapStringFileReader {
 
+    // TODO: @jflute - staticじゃないように修正すること
+    
     public static Map<String, Object> readMap(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();

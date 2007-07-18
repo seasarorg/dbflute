@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonInterceptor};
+${database.allClassCopyright}package ${glPackageBaseCommonInterceptor};
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

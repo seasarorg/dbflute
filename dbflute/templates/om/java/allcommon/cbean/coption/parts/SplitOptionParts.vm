@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCOptionParts};
+${database.allClassCopyright}package ${glPackageBaseCommonCOptionParts};
 
 #set ($myClassName = "${glConditionOptionPartsSplitName}")
 

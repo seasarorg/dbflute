@@ -1,6 +1,6 @@
-#set ($myClassName = "${myBaseBhvClassName}")
+${database.allClassCopyright}package ${glPackageBaseBhv};
 
-package ${glPackageBaseBhv};
+#set ($myClassName = "${myBaseBhvClassName}")
 
 import ${glPackageBaseCommon}.*;
 #if ($database.isAvailableGenerics())

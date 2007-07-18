@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonSqlClause};
+${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 #set ($myClassName = "${glSqlClauseInterfaceName}H2")
 

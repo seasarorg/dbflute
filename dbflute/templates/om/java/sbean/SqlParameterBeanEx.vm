@@ -1,4 +1,4 @@
-package ${glPackageExtendedSqlParameterBean};
+${database.allClassCopyright}package ${glPackageExtendedSqlParameterBean};
 
 #set ($myClassName = "${myExtendedSqlParameterClassName}")
 

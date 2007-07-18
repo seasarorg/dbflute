@@ -1,4 +1,4 @@
-package ${myExtendedDaoPackageName};
+${database.allClassCopyright}package ${myExtendedDaoPackageName};
 
 #set ($myClassName = "${myExtendedDaoClassName}")
 

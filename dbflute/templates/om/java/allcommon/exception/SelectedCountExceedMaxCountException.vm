@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonException};
+${database.allClassCopyright}package ${glPackageBaseCommonException};
 
 /**
  * The exception when selected count exceeds max count.

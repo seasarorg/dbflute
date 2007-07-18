@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCBean};
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 /**
  * Fetch-Narrowing-Bean context. (referring to s2pager)

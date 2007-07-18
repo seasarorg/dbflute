@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonJdbcHistory};
+${database.allClassCopyright}package ${glPackageBaseCommonJdbcHistory};
 
 import java.io.InputStream;
 import java.io.Reader;

@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCBean};
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 /**
  * The select-resource as marker-interface.

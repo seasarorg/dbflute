@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonS2Container};
+${database.allClassCopyright}package ${glPackageBaseCommonS2Container};
 
 import org.seasar.framework.container.ComponentCustomizer;
 import org.seasar.framework.container.creator.ComponentCreatorImpl;

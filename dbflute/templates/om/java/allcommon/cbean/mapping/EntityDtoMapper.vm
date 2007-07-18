@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCBeanMapping};
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanMapping};
 
 /**
  * The interface of entity converter.

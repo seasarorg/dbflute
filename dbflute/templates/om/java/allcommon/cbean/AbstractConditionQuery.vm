@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCBean};
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 #set ($myClassName = "${glConditionQueryAbstractName}")
 

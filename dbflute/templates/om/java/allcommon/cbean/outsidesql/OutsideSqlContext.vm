@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCBeanOutsidesql};
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
 
 /**
  * The context of outside-sql.

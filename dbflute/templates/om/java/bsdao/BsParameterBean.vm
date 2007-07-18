@@ -1,4 +1,4 @@
-package ${glPackageBaseParameterBean};
+${database.allClassCopyright}package ${glPackageBaseParameterBean};
 
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 

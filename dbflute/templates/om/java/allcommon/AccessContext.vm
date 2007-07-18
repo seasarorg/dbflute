@@ -1,4 +1,4 @@
-package ${glPackageBaseCommon};
+${database.allClassCopyright}package ${glPackageBaseCommon};
 
 /**
  * Access-Context.

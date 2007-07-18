@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonHelperTokenLine};
+${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenLine};
 
 /**
  * @author ${database.ClassAuthor}

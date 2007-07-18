@@ -1,6 +1,5 @@
 #if ($database.isVersionAfter1040())
-
-package ${glPackageBaseCommonS2Dao};
+${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 #if ($database.isAvailableGenerics())
 
@@ -697,8 +696,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 }
 #else
-
-package ${glPackageBaseCommonS2Dao};
+${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;

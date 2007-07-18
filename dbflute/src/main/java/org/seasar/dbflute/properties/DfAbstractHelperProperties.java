@@ -20,7 +20,7 @@ import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 /**
  * Build properties for Torque.
  * 
- * @author mkubo
+ * @author jflute
  */
 public abstract class DfAbstractHelperProperties {
 
@@ -30,6 +30,9 @@ public abstract class DfAbstractHelperProperties {
     /** Log-instance */
     private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
 
+    // -----------------------------------------------------
+    //                                         Default Value
+    //                                         -------------
     public static final String JAVA_targetLanguage = "java";
     public static final String CSHARP_targetLanguage = "csharp";
     public static final String DEFAULT_targetLanguage = JAVA_targetLanguage;
@@ -37,6 +40,9 @@ public abstract class DfAbstractHelperProperties {
     public static final String DEFAULT_templateFileEncoding = "UTF-8";
     public static final String DEFAULT_sourceFileEncoding = "UTF-8";
 
+    // -----------------------------------------------------
+    //                                   Empty Default Value
+    //                                   -------------------
     public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
     public static final List<Object> DEFAULT_EMPTY_LIST = new ArrayList<Object>();
     public static final String DEFAULT_EMPTY_MAP_STRING = "map:{}";
@@ -58,6 +64,9 @@ public abstract class DfAbstractHelperProperties {
         _buildProperties = prop;
     }
 
+    // ===============================================================================
+    //                                                                        Accessor
+    //                                                                        ========
     protected Properties getProperties() {
         return _buildProperties;
     }

@@ -1,16 +1,14 @@
 #set ($myClassName = "")
 #if ($database.isJavaDirOnlyOne())
-
-package ${glPackageBaseCQ};
+${database.allClassCopyright}package ${glPackageBaseCQ};
 
 import ${glPackageCQ}.*;
-  #set ($myClassName = "${myBaseConditionQueryClassName}")
+#set ($myClassName = "${myBaseConditionQueryClassName}")
 #else
-
-package ${glPackageCQ};
+${database.allClassCopyright}package ${glPackageCQ};
 
 import ${glPackageBaseCQ}.*;
-  #set ($myClassName = "${myConditionQueryClassName}")
+#set ($myClassName = "${myConditionQueryClassName}")
 #end
 #if ($database.hasClassificationDefinitionMap())
 

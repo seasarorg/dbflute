@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCOption};
+${database.allClassCopyright}package ${glPackageBaseCommonCOption};
 
 #set ($myClassName = "${glConditionOptionDateFromToName}")
 

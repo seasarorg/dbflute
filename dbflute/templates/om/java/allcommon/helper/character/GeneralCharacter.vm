@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonHelperCharacter};
+${database.allClassCopyright}package ${glPackageBaseCommonHelperCharacter};
 
 /**
  * The interface of general character.

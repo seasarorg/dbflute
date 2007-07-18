@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonCValue};
+${database.allClassCopyright}package ${glPackageBaseCommonCValue};
 
 #set ($myClassName = "${glConditionValueName}")
 

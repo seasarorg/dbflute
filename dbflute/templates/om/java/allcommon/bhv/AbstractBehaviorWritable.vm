@@ -1,6 +1,6 @@
-#set ($myClassName = "${glBehaviorWritableAbstractName}")
+${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
-package ${glPackageBaseCommonBhv};
+#set ($myClassName = "${glBehaviorWritableAbstractName}")
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};

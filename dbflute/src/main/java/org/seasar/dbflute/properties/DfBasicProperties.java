@@ -258,14 +258,14 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isAvailableHotDeploy() {
         return booleanProp("torque.isAvailableHotDeploy", false);
     }
-    
+
     // ===================================================================================
     //                                                                           Copyright
     //                                                                           =========
-    public String getCopyrightForAllClass() {
-        return stringProp("torque.copyrightForAllClass", "");
+    public String getAllClassCopyright() {
+        return stringProp("torque.allClassCopyright", "");
     }
-    
+
     // ===================================================================================
     //                                                                       Database Info
     //                                                                       =============

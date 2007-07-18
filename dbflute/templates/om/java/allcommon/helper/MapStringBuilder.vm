@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonHelper};
+${database.allClassCopyright}package ${glPackageBaseCommonHelper};
 
 /**
  * The interface of map-string-builder.

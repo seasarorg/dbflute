@@ -601,28 +601,30 @@ public class Database {
         _log.debug("========/");
     }
 
-    // **********************************************************************************************
-    //                                                                                     Properties
-    //                                                                                     **********
-
+    // ===============================================================================
+    //                                                                      Properties
+    //                                                                      ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
+    // ===============================================================================
+    //                                                                Basic Properties
+    //                                                                ================
     protected DfBasicProperties getBasicProperties() {
         return getProperties().getBasicProperties();
     }
 
-    // ===============================================================================
-    //                                                            Properties - JavaDir
-    //                                                            ====================
+    // -----------------------------------------------------
+    //                                               JavaDir
+    //                                               -------
     public String getJavaDir() {
         return getBasicProperties().getJavaDir();
     }
 
-    // ===============================================================================
-    //                                                           Properties - Language
-    //                                                           =====================
+    // -----------------------------------------------------
+    //                                              Language
+    //                                              --------
     public String getTargetLanguage() {
         return getBasicProperties().getTargetLanguage();
     }
@@ -644,9 +646,9 @@ public class Database {
         return getBasicProperties().isJavaVersionGreaterEqualMustang();
     }
 
-    // ===============================================================================
-    //                                                          Properties - Extension
-    //                                                          ======================
+    // -----------------------------------------------------
+    //                                             Extension
+    //                                             ---------
     public String getTemplateFileExtension() {
         return getBasicProperties().getTemplateFileExtension();
     }
@@ -655,23 +657,30 @@ public class Database {
         return getBasicProperties().getClassFileExtension();
     }
 
-    // ===============================================================================
-    //                                                           Properties - Encoding
-    //                                                           =====================
+    // -----------------------------------------------------
+    //                                              Encoding
+    //                                              --------
     public String getTemplateFileEncoding() {
         return getBasicProperties().getTemplateFileEncoding();
     }
 
-    // ===============================================================================
-    //                                                             Properties - Author
-    //                                                             ===================
+    // -----------------------------------------------------
+    //                                                Author
+    //                                                ------
     public String getClassAuthor() {
         return getBasicProperties().getClassAuthor();
     }
 
-    // ===============================================================================
-    //                                                             Properties - SameAs
-    //                                                             ===================
+    // -----------------------------------------------------
+    //                                             Copyright
+    //                                             ---------
+    public String getAllClassCopyright() {
+        return getBasicProperties().getAllClassCopyright();
+    }
+    
+    // -----------------------------------------------------
+    //                                                Naming
+    //                                                ------
     public boolean isJavaNameOfTableSameAsDbName() {
         return getBasicProperties().isJavaNameOfTableSameAsDbName();
     }
@@ -680,9 +689,9 @@ public class Database {
         return getBasicProperties().isJavaNameOfColumnSameAsDbName();
     }
 
-    // ===============================================================================
-    //                                                          Properties - Available
-    //                                                          ======================
+    // -----------------------------------------------------
+    //                                             Available
+    //                                             ---------
     public boolean isAvailableBehaviorGeneration() {
         return getBasicProperties().isAvailableBehaviorGeneration();
     }

@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonHelperTokenFileImpl};
+${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFileImpl};
 
 import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenName};
 

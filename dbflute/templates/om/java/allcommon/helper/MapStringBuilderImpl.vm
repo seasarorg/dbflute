@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonHelper};
+${database.allClassCopyright}package ${glPackageBaseCommonHelper};
 
 import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
 import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};

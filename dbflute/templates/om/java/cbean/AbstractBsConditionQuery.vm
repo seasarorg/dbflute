@@ -1,5 +1,4 @@
-
-package ${glPackageBaseCQ};
+${database.allClassCopyright}package ${glPackageBaseCQ};
 
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
 

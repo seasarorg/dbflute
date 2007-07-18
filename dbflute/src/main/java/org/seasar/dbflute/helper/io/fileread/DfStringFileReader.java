@@ -10,6 +10,8 @@ import java.io.IOException;
  */
 public class DfStringFileReader {
 
+    // TODO: @jflute - staticじゃないように修正すること
+    
     public static String readString(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
@@ -29,12 +31,6 @@ public class DfStringFileReader {
                     final String lineString = br.readLine();
                     if (lineString == null) {
                         break;
-                    }
-                    if (lineString.trim().length() == 0) {
-                        continue;
-                    }
-                    if (lineString.trim().startsWith("#")) {// If the line is comment...
-                        continue;
                     }
                     sb.append(lineString + System.getProperty("line.separator"));
                 }

@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonBhvLoad};
+${database.allClassCopyright}package ${glPackageBaseCommonBhvLoad};
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};

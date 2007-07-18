@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonDBMeta};
+${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaInterfaceName}")
 

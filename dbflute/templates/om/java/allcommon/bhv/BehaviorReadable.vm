@@ -1,4 +1,4 @@
-package ${glPackageBaseCommonBhv};
+${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};

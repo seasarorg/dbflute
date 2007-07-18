@@ -1,6 +1,6 @@
-#set ($myClassName = "${glBehaviorReadableAbstractName}")
+${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
-package ${glPackageBaseCommonBhv};
+#set ($myClassName = "${glBehaviorReadableAbstractName}")
 
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};

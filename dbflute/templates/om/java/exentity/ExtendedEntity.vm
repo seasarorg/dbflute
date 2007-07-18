@@ -1,4 +1,4 @@
-package ${myExtendedEntityPackageName};
+${database.allClassCopyright}package ${myExtendedEntityPackageName};
 
 #set ($myClassName = "${myExtendedObjectClassName}")
 
