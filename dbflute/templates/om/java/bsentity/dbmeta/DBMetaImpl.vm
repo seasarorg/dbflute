@@ -93,9 +93,11 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String DB_NAME_${col.name} = "$col.name";
 #end
 
+#if ($database.isMakeRecentlyDeprecated())
 #foreach ($col in $table.Columns)
     /** @deprecated Deprecated! So use DB_NAME_${col.javaName}. */
     public static final String COLUMN_DB_NAME_OF_${col.javaName} = "$col.Name";
+#end
 #end
 
     // -----------------------------------------------------
