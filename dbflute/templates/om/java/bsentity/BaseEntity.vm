@@ -20,7 +20,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 #end
 
 /**
- * The entity of ${table.Name}.
+ * The entity of ${table.basicInfoDispString}. <br />
  * 
  * <pre>
  * [primary-key]
@@ -56,18 +56,18 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    /** TABLE-Annotation for S2Dao */
-    public static final String TABLE = "${table.AnnotationTableName}";
+    /** TABLE-Annotation for S2Dao. The value is ${table.annotationTableName}. */
+    public static final String TABLE = "${table.annotationTableName}";
 
 #if ($table.isUseUpdateDate())
     
     /** TIMESTAMP-Annotation */
-    public static final String TIMESTAMP_PROPERTY = "$table.UpdateDateUncapitalisedJavaName";
+    public static final String TIMESTAMP_PROPERTY = "$table.updateDateUncapitalisedJavaName";
 #end
 #if ($table.isUseVersionNo())
     
     /** VERSION_NO-Annotation */
-    public static final String VERSION_NO_PROPERTY = "$table.VersionNoUncapitalisedJavaName";
+    public static final String VERSION_NO_PROPERTY = "$table.versionNoUncapitalisedJavaName";
 #end
 #if ($table.isUseIdentity())
     
@@ -138,7 +138,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /**
      * ${database.ImplementComment}
      * 
-     * @return Table db-name. (NotNull)
+     * @return Table db-name of ${table.basicInfoDispString}. (NotNull)
      */
     public String getTableDbName() {
         return "${table.name}";
@@ -147,7 +147,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /**
      * ${database.ImplementComment}
      * 
-     * @return Table cap-prop-name. (NotNull)
+     * @return Table cap-prop-name of ${table.basicInfoDispString}. (NotNull)
      */
     public String getTableCapPropName() {
         return "${table.javaName}";
@@ -156,7 +156,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /**
      * ${database.ImplementComment}
      * 
-     * @return Table uncap-prop-name. (NotNull)
+     * @return Table uncap-prop-name of ${table.basicInfoDispString}. (NotNull)
      */
     public String getTableUncapPropName() {
         return "${table.uncapitalisedJavaName}";
@@ -319,8 +319,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
   #set ($parentCBClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionBeanInitialName}")
 
-    // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ForeignTable    = [${foreignKeys.foreignTable.name}]
+    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    //   ForeignTable    = [${foreignKeys.foreignTable.basicInfoDispString}]
     //   ForeignProperty = [${foreignKeys.foreignPropertyName}]
     // * * * * * * * * */
 
@@ -376,8 +376,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
   #if (${refferer.isOneToOne()})
 
-    // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   ReffererTable    = [${refferer.Table.Name}]
+    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
+    //   ReffererTable    = [${refferer.Table.basicInfoDispString}]
     //   ReffererProperty = [${refferer.ReffererPropertyName}]
     // * * * * * * * * */
 
@@ -389,8 +389,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     #set ($foreignKeysIndex = $foreignKeysIndex + 1)
   #else
 
-    // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ReffererTable    = [${refferer.Table.Name}]
+    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    //   ReffererTable    = [${refferer.Table.basicInfoDispString}]
     //   ReffererProperty = [${refferer.ReffererPropertyName}]
     // * * * * * * * * */
   #end

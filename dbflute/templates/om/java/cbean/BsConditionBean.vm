@@ -10,7 +10,7 @@ import ${glPackageCQ}.*;
 import ${glPackageNss}.*;
 
 /**
- * The condition-bean of ${table.Name}.
+ * The condition-bean of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
  */
@@ -20,7 +20,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                          Annotation
     //                                                                          ==========
     /** TABLE-Annotation */
-    public static final String TABLE = "$table.Name";
+    public static final String TABLE = "$table.name";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -38,7 +38,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   MyTable = [$table.Name]
+    //   MyTable = [$table.name]
     // * * * * * * * * */
 
     // ===================================================================================
@@ -50,7 +50,16 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * @return Table db-name. (NotNull)
      */
     final public String getTableDbName() {
-        return "${table.Name}";
+        return "${table.name}";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Table sql-name. (NotNull)
+     */
+    final public String getTableSqlName() {
+        return "${table.tableSqlName}";
     }
 
     // ===================================================================================

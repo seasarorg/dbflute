@@ -40,6 +40,13 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public String getTableDbName();
 
+    /**
+     * Get table sql-name.
+     * 
+     * @return Table sql-name. (NotNull)
+     */
+    public String getTableSqlName();
+
     // =====================================================================================
     //                                                                            Sql-Clause
     //                                                                            ==========

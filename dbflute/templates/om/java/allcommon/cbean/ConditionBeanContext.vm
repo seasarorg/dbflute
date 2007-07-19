@@ -234,8 +234,8 @@ public class ${glConditionBeanContextName} {
     //                                                                   SqlClause Creator
     //                                                                   =================
     public static ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb) {
-        final String tableDbName = cb.getTableDbName();
-        return createSqlClause(tableDbName);
+        final String tableSqlName = cb.getTableSqlName();
+        return createSqlClause(tableSqlName);
     }
 
     public static ${glSqlClauseName} createSqlClause(String tableDbName) {

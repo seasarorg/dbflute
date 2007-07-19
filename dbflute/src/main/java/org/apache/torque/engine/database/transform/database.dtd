@@ -55,6 +55,9 @@ Java class or method name.
 <!ELEMENT table (column+,(foreign-key|index|unique|id-method-parameter)*)>
 <!ATTLIST table
   name CDATA #REQUIRED
+  type CDATA #IMPLIED
+  schema CDATA #IMPLIED
+  comment CDATA #IMPLIED
   javaName CDATA #IMPLIED
   idMethod (idbroker|native|autoincrement|sequence|none|null) "null"
   skipSql (true|false) "false"

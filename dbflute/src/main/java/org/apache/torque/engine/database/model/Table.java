@@ -414,6 +414,28 @@ public class Table implements IDMethod {
     }
 
     // -----------------------------------------------------
+    //                                  Exclusive Table Name
+    //                                  --------------------
+    /**
+     * Get annotation table name. (for S2Dao)
+     * 
+     * @return Annotation table name. (NotNull)
+     */
+    public String getAnnotationTableName() {
+        return getTableSqlName();
+    }
+
+    /**
+     * Get table sql-name.
+     * 
+     * @return Table sql-name. (NotNull)
+     */
+    public String getTableSqlName() {
+        // TODO: @jflute -- 複数Schema対応時に指定によってSchema名を付与すること。
+        return getName();
+    }
+
+    // -----------------------------------------------------
     //                                           Description
     //                                           -----------
     /**
@@ -1586,15 +1608,6 @@ public class Table implements IDMethod {
      */
     public boolean isWritable() {
         return hasPrimaryKey();
-    }
-
-    /**
-     * Get annotation table name. (for S2Dao)
-     * 
-     * @return Annotation table name. (NotNull)
-     */
-    public String getAnnotationTableName() {
-        return getName();
     }
 
     // ===================================================================================
