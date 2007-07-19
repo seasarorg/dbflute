@@ -34,32 +34,6 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
 
     private static final Log _log = LogFactory.getLog(DfTableNameHandler.class);
 
-    public static class DfTableMetaInfo {
-        protected String _tableName;
-
-        protected String _tableType;
-
-        public boolean isTableTypeView() {
-            return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
-        }
-
-        public String getTableName() {
-            return _tableName;
-        }
-
-        public void setTableName(String tableName) {
-            this._tableName = tableName;
-        }
-
-        public String getTableType() {
-            return _tableType;
-        }
-
-        public void setTableType(String tableType) {
-            this._tableType = tableType;
-        }
-    }
-
     /**
      * Get all the table names in the current database that are not
      * system tables.
@@ -83,6 +57,8 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
             while (resultSet.next()) {
                 final String tableName = resultSet.getString(3);
                 final String tableType = resultSet.getString(4);
+                final String tableSchema = resultSet.getString("TABLE_SCHEM");
+                final String tableComment = resultSet.getString("REMARKS");
 
                 if (isTableExcept(tableName)) {
                     _log.debug("$ isTableExcept(" + tableName + ") == true");
@@ -96,6 +72,8 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
                 final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
                 tableMetaInfo.setTableName(tableName);
                 tableMetaInfo.setTableType(tableType);
+                tableMetaInfo.setTableSchema(tableSchema);
+                tableMetaInfo.setTableComment(tableComment);
                 tables.add(tableMetaInfo);
             }
         } finally {
@@ -142,4 +120,51 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
         return DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle();
     }
 
+    public static class DfTableMetaInfo {
+
+        protected String _tableName;
+
+        protected String _tableType;
+
+        protected String _tableSchema;
+
+        protected String _tableComment;
+
+        public boolean isTableTypeView() {
+            return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
+        }
+
+        public String getTableName() {
+            return _tableName;
+        }
+
+        public void setTableName(String tableName) {
+            this._tableName = tableName;
+        }
+
+        public String getTableType() {
+            return _tableType;
+        }
+
+        public void setTableType(String tableType) {
+            this._tableType = tableType;
+        }
+
+        public String getTableSchema() {
+            return _tableSchema;
+        }
+
+        public void setTableSchema(String tableSchema) {
+            this._tableSchema = tableSchema;
+        }
+
+        public String getTableComment() {
+            return _tableComment;
+        }
+
+        public void setTableComment(String tableComment) {
+            this._tableComment = tableComment;
+        }
+
+    }
 }

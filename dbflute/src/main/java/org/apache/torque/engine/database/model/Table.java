@@ -96,6 +96,12 @@ public class Table implements IDMethod {
 
     private String _name;
 
+    private String _type;
+
+    private String _schema;
+
+    private String _comment;
+
     private String _description;
 
     private String _javaName;
@@ -171,6 +177,10 @@ public class Table implements IDMethod {
      */
     public void loadFromXML(Attributes attrib, String defaultIdMethod) {
         _name = attrib.getValue("name");
+        _type = attrib.getValue("type");
+        _schema = attrib.getValue("schema");
+        _comment = attrib.getValue("comment");
+
         _javaName = attrib.getValue("javaName");
         _idMethod = attrib.getValue("idMethod");
 
@@ -325,8 +335,8 @@ public class Table implements IDMethod {
     //                                                                          Basic Info
     //                                                                          ==========
     // -----------------------------------------------------
-    //                                             TableName
-    //                                             ---------
+    //                                            Table Name
+    //                                            ----------
     /**
      * Get the name of the Table
      */
@@ -337,8 +347,70 @@ public class Table implements IDMethod {
     /**
      * Set the name of the Table
      */
-    public void setName(String newName) {
-        _name = newName;
+    public void setName(String name) {
+        this._name = name;
+    }
+
+    // -----------------------------------------------------
+    //                                            Table Type
+    //                                            ----------
+    /**
+     * Get the type of the Table
+     */
+    public String getType() {
+        return _type;
+    }
+
+    /**
+     * Set the type of the Table
+     */
+    public void setType(String type) {
+        this._type = type;
+    }
+
+    // -----------------------------------------------------
+    //                                          Table Schema
+    //                                          ------------
+    // Schema名を直接利用することは許さないためCommentOut。
+    // 基本的には自動生成時のSchema名なので本番とは食い違う可能性がある。
+    // PostgreSQLなどの複数Schema対応時にのみの利用であり、必ず別のMethodを経由して利用する。
+    // 
+    //    /**
+    //     * Get the schema of the Table
+    //     */
+    //    public String getSchema() {
+    //        return _schema;
+    //    }
+
+    /**
+     * Set the schema of the Table
+     */
+    public void setSchema(String schema) {
+        this._schema = schema;
+    }
+
+    // -----------------------------------------------------
+    //                                         Table Comment
+    //                                         -------------
+    /**
+     * Get the comment of the Table
+     */
+    public String getComment() {
+        return _comment;
+    }
+
+    /**
+     * Set the comment of the Table
+     */
+    public void setComment(String comment) {
+        this._comment = comment;
+    }
+
+    // -----------------------------------------------------
+    //                                Basic Info Disp String
+    //                                ----------------------
+    public String getBasicInfoDispString() {
+        return _name + "(" + _type + ")";
     }
 
     // -----------------------------------------------------

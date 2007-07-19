@@ -240,19 +240,30 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMataInfo = tableList.get(i);
-            final String currentTable = (String) tableMataInfo.getTableName();
+            final String currentTableName = tableMataInfo.getTableName();
+            final String currentTableType = tableMataInfo.getTableType();
+            final String currentTableSchema = tableMataInfo.getTableSchema();
+            final String currentTableComment = tableMataInfo.getTableComment();
 
-            _log.info("...Processing table: " + currentTable);
+            _log.info("...Processing table: " + currentTableName);
 
             final Element tableElement = _doc.createElement("table");
-            tableElement.setAttribute("name", currentTable);
-            if (isSameJavaName()) {
-                tableElement.setAttribute("javaName", currentTable);
+            tableElement.setAttribute("name", currentTableName);
+            tableElement.setAttribute("type", currentTableType);
+            if (currentTableSchema != null && currentTableSchema.trim().length() != 0) {
+                tableElement.setAttribute("schema", currentTableSchema);
+            }
+            if (currentTableComment != null && currentTableComment.trim().length() != 0) {
+                tableElement.setAttribute("comment", currentTableComment);
             }
 
-            final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMetaData, currentTable);
+            if (isSameJavaName()) {
+                tableElement.setAttribute("javaName", currentTableName);
+            }
 
-            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, currentTable);
+            final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMetaData, currentTableName);
+
+            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, currentTableName);
             for (int j = 0; j < columns.size(); j++) {
                 final DfColumnMetaInfo columnMetaInfo = columns.get(j);
                 final String columnName = columnMetaInfo.getColumnName();
@@ -292,7 +303,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 }
 
                 if (primaryColumnNameList.contains(columnName)) {
-                    if (isAutoIncrementColumn(conn, currentTable, columnName)) {
+                    if (isAutoIncrementColumn(conn, currentTableName, columnName)) {
                         columnElement.setAttribute("autoIncrement", "true");
                     }
                 }
@@ -301,7 +312,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
 
             // Foreign keys for this table.
-            final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = getForeignKeys(dbMetaData, currentTable);
+            final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = getForeignKeys(dbMetaData, currentTableName);
             final Set<String> foreignKeyMetaInfoKeySet = foreignKeyMetaInfoMap.keySet();
             for (String foreignKeyName : foreignKeyMetaInfoKeySet) {
                 final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
