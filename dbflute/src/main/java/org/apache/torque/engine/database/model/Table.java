@@ -431,8 +431,12 @@ public class Table implements IDMethod {
      * @return Table sql-name. (NotNull)
      */
     public String getTableSqlName() {
-        // TODO: @jflute -- 複数Schema対応時に指定によってSchema名を付与すること。
-        return getName();
+        if (isAvailableAddingSchemaToTableSqlName()) {
+            if (_schema != null && _schema.trim().length() != 0) {
+                return _schema + "." + _name;
+            }
+        }
+        return _name;
     }
 
     // -----------------------------------------------------
@@ -1994,11 +1998,18 @@ public class Table implements IDMethod {
         return filteredCommonColumn;
     }
 
-    // ===================================================================================
-    //                                                             Non PrimaryKey Writable
-    //                                                             =======================
+    // ===============================================================================
+    //                                                         Non PrimaryKey Writable
+    //                                                         =======================
     public boolean isAvailableNonPrimaryKeyWritable() {
-        return getProperties().getOtherProperties().isAvailableNonPrimaryKeyWritable();
+        return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
+    }
+
+    // ===============================================================================
+    //                                                 Adding Schema to Table Sql-Name
+    //                                                 ===============================
+    protected boolean isAvailableAddingSchemaToTableSqlName() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
     }
 
     // ===================================================================================

@@ -21,34 +21,46 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 
 /**
- * This class generates an XML schema of an existing database from JDBC metadata..
- * <p>
+ * The handler of auto increment. 
+ * 
  * @author jflute
  */
 public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
 
-    public static final Log _log = LogFactory.getLog(DfAutoIncrementHandler.class);
-
     /**
      * Is auto-increment column?
-     * <p>
+     * 
      * @param conn Connection.
-     * @param tableName Table from which to retrieve PK information.
+     * @param tableMetaInfo The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnName Primary-key column-name.
      * @return Auto-increment column name. (Nullable)
      * @throws SQLException
      */
-    public boolean isAutoIncrementColumn(Connection conn, String tableName, String primaryKeyColumnName)
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName)
             throws SQLException {
+        final String tableName = tableMetaInfo.getTableName();
         Statement stmt = null;
         ResultSet rs = null;
+        String ignoredMessage = null;
         try {
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT " + primaryKeyColumnName + " FROM " + tableName);
+            try {
+                rs = stmt.executeQuery("SELECT " + primaryKeyColumnName + " FROM " + tableName);
+            } catch (SQLException e) {
+                // ここでSQLExceptionが発生した場合は、Schema名を付けていないことによるSQLExceptionの
+                // 可能性があるので、Schema名を付けたTable名でもう一度実行する。
+                try {
+                    final String tableNameWithSchema = tableMetaInfo.getTableNameWithSchema();
+                    rs = stmt.executeQuery("SELECT " + primaryKeyColumnName + " FROM " + tableNameWithSchema);
+                } catch (SQLException ignored) {
+                    // やっぱりだめだった...の場合
+                    ignoredMessage = ignored.getMessage();
+                    throw e;
+                }
+            }
             final ResultSetMetaData md = rs.getMetaData();
 
             for (int i = 1; i <= md.getColumnCount(); i++) {
@@ -57,6 +69,11 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                     return md.isAutoIncrement(i);
                 }
             }
+        } catch (SQLException e) {
+            String msg = "The handling for AutoIncrement threw the SQLException:";
+            msg = msg + " primaryKeyColumnName=" + primaryKeyColumnName + " tableMetaInfo=" + tableMetaInfo;
+            msg = msg + " ignoredMessage=" + ignoredMessage;
+            throw new IllegalStateException(msg, e);
         } finally {
             if (stmt != null) {
                 stmt.close();
@@ -67,23 +84,38 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
         }
         String msg = "The primaryKeyColumnName is not found in the table: ";
         msg = msg + tableName + " - " + primaryKeyColumnName;
-        throw new RuntimeException(msg);
+        throw new IllegalStateException(msg);
     }
 
     /**
      * Has auto-increment at the table?
-     * <p>
+     * 
      * @param conn Connection.
-     * @param tableName Table from which to retrieve PK information.
+     * @param tableMetaInfo The meta information of table.
      * @return Determination. (Nullable)
      * @throws SQLException
      */
-    public boolean hasAutoIncrement(Connection conn, String tableName) throws SQLException {
+    public boolean hasAutoIncrement(Connection conn, DfTableMetaInfo tableMetaInfo) throws SQLException {
+        final String tableName = tableMetaInfo.getTableName();
         Statement stmt = null;
         ResultSet rs = null;
+        String ignoredMessage = null;
         try {
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT * FROM " + tableName);
+            try {
+                rs = stmt.executeQuery("SELECT * FROM " + tableName);
+            } catch (SQLException e) {
+                // ここでSQLExceptionが発生した場合は、Schema名を付けていないことによるSQLExceptionの
+                // 可能性があるので、Schema名を付けたTable名でもう一度実行する。
+                try {
+                    final String tableNameWithSchema = tableMetaInfo.getTableNameWithSchema();
+                    rs = stmt.executeQuery("SELECT * FROM " + tableNameWithSchema);
+                } catch (SQLException ignored) {
+                    // やっぱりだめだった...の場合
+                    ignoredMessage = ignored.getMessage();
+                    throw e;
+                }
+            }
             final ResultSetMetaData md = rs.getMetaData();
 
             for (int i = 1; i <= md.getColumnCount(); i++) {
@@ -91,6 +123,11 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                     return true;
                 }
             }
+        } catch (SQLException e) {
+            String msg = "The handling for AutoIncrement threw the SQLException:";
+            msg = msg + " tableMetaInfo=" + tableMetaInfo;
+            msg = msg + " ignoredMessage=" + ignoredMessage;
+            throw new IllegalStateException(msg, e);
         } finally {
             if (stmt != null) {
                 stmt.close();

@@ -85,7 +85,7 @@ import org.xml.sax.Attributes;
 /**
  * A class for holding application data structures.
  * 
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class Database {
 
@@ -677,7 +677,7 @@ public class Database {
     public String getAllClassCopyright() {
         return getBasicProperties().getAllClassCopyright();
     }
-    
+
     // -----------------------------------------------------
     //                                                Naming
     //                                                ------
@@ -1151,10 +1151,6 @@ public class Database {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableOtherConnectionDaoInitialization();
     }
 
-    public boolean isAvailableDaoMethodLazyInitializing() {
-        return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodLazyInitializing();
-    }
-
     // -----------------------------------------------------
     //                                                 Other
     //                                                 -----
@@ -1185,6 +1181,7 @@ public class Database {
     public String getExtractAcceptEqual() {
         return getProperties().getOtherProperties().getExtractAcceptEqual();
     }
+
 
     // ===============================================================================
     //                                        Properties - jdbcToJavaNative (Internal)

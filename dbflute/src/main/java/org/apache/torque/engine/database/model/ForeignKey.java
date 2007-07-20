@@ -59,17 +59,14 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfOtherProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.xml.sax.Attributes;
-
-import sun.security.action.GetBooleanAction;
 
 /**
  * A class for information about foreign keys of a table.
@@ -237,7 +234,7 @@ public class ForeignKey {
     public boolean isSimpleKeyFK() {
         return _localColumns.size() == 1;
     }
-    
+
     public boolean isSelfReference() {
         return _baseTable.getName().equals(_foreignTableName);
     }
@@ -550,7 +547,7 @@ public class ForeignKey {
     }
 
     protected String getMultipleFKPropertyColumnAliasName(String tableName, List<String> columnNameList) {
-        final DfOtherProperties prop = DfBuildProperties.getInstance().getOtherProperties();
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         final String columnAliasName = prop.getMultipleFKPropertyColumnAliasName(getTable().getName(), columnNameList);
         return columnAliasName;
     }

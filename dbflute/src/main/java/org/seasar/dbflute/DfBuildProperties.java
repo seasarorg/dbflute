@@ -33,6 +33,7 @@ import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -350,6 +351,13 @@ public final class DfBuildProperties {
         return getHandler().getIncludeQueryProperties(getProperties());
     }
 
+    // -----------------------------------------------------
+    //                                     Little Adjustment
+    //                                     -----------------
+    public DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getHandler().getLittleAdjustmentProperties(getProperties());
+    }
+    
     // -----------------------------------------------------
     //                                                 Other
     //                                                 -----

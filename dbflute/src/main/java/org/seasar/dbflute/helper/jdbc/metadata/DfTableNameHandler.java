@@ -134,6 +134,14 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
             return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
         }
 
+        public String getTableNameWithSchema() {
+            if (_tableSchema != null && _tableSchema.trim().length() != 0) {
+                return _tableSchema + "." + _tableName;
+            } else {
+                return _tableName;
+            }
+        }
+
         public String getTableName() {
             return _tableName;
         }
@@ -166,5 +174,9 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
             this._tableComment = tableComment;
         }
 
+        @Override
+        public String toString() {
+            return _tableSchema + "." + _tableName + "(" + _tableType + "): " + _tableComment;
+        }
     }
 }

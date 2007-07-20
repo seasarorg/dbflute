@@ -9,6 +9,7 @@ import org.seasar.dbflute.properties.DfDBFluteDiconProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOptimisticLockProperties;
 import org.seasar.dbflute.properties.DfOtherProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -130,6 +131,21 @@ public final class DfPropertiesHandler {
         return _additionalForeignKeyProperties;
     }
 
+    // -----------------------------------------------------
+    //                                     Little Adjustment
+    //                                     -----------------
+    protected DfLittleAdjustmentProperties _littleAdjustmentPropertiess;
+
+    public DfLittleAdjustmentProperties getLittleAdjustmentProperties(Properties prop) {
+        if (_littleAdjustmentPropertiess == null) {
+            _littleAdjustmentPropertiess = new DfLittleAdjustmentProperties(prop);
+        }
+        return _littleAdjustmentPropertiess;
+    }
+    
+    // -----------------------------------------------------
+    //                                      Other Adjustment
+    //                                      ----------------
     protected DfOtherProperties _otherProperties;
 
     public DfOtherProperties getOtherProperties(Properties prop) {
