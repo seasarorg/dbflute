@@ -65,12 +65,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
 
             final DfTableNameHandler tableNameHandler = new DfTableNameHandler();
-            final List<DfTableMetaInfo> tableNameList = tableNameHandler.getTableNames(dbMeta, schema);
-            for (DfTableMetaInfo tableNameMetaInfo : tableNameList) {
-                final String tableName = tableNameMetaInfo.getTableName();
+            final List<DfTableMetaInfo> tableNameList = tableNameHandler.getTableNameList(dbMeta, schema);
+            for (DfTableMetaInfo tableMetaInfo : tableNameList) {
                 final DfForeignKeyHandler handler = new DfForeignKeyHandler();
                 final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = handler.getForeignKeyMetaInfo(dbMeta,
-                        schema, tableName);
+                        schema, tableMetaInfo);
                 final Set<String> keySet = foreignKeyMetaInfoMap.keySet();
                 for (String foreignKeyName : keySet) {
                     final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
@@ -124,7 +123,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
 
             final DfTableNameHandler tableNameHandler = new DfTableNameHandler();
-            final List<DfTableMetaInfo> tableNameList = tableNameHandler.getTableNames(dbMeta, schema);
+            final List<DfTableMetaInfo> tableNameList = tableNameHandler.getTableNameList(dbMeta, schema);
             for (DfTableMetaInfo metaInfo : tableNameList) {
                 final String dropTableSql = callback.buildDropTableSql(metaInfo);
                 _log.info(dropTableSql);

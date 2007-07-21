@@ -121,9 +121,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /** Name of XML database schema produced. */
     protected String _xmlSchema;
 
-    /** Is same java name? */
-    protected boolean _isSameJavaName;
-
     // ------------------------------------
     //                        Document Info
     //                        -------------
@@ -150,14 +147,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                       ========
     public void setOutputFile(String v) {
         _xmlSchema = v;
-    }
-
-    public void setSameJavaName(boolean v) {
-        this._isSameJavaName = v;
-    }
-
-    public boolean isSameJavaName() {
-        return this._isSameJavaName;
     }
 
     // ==============================================================================
@@ -240,39 +229,27 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMataInfo = tableList.get(i);
-            final String currentTableName = tableMataInfo.getTableName();
-            final String currentTableType = tableMataInfo.getTableType();
-            final String currentTableSchema = tableMataInfo.getTableSchema();
-            final String currentTableComment = tableMataInfo.getTableComment();
-
-            _log.info("...Processing table: " + currentTableName);
+            _log.info("...Processing table: " + tableMataInfo);
 
             final Element tableElement = _doc.createElement("table");
-            tableElement.setAttribute("name", currentTableName);
-            tableElement.setAttribute("type", currentTableType);
-            if (currentTableSchema != null && currentTableSchema.trim().length() != 0) {
-                tableElement.setAttribute("schema", currentTableSchema);
+            tableElement.setAttribute("name", tableMataInfo.getTableName());
+            tableElement.setAttribute("type", tableMataInfo.getTableType());
+            if (tableMataInfo.getTableSchema() != null && tableMataInfo.getTableSchema().trim().length() != 0) {
+                tableElement.setAttribute("schema", tableMataInfo.getTableSchema());
             }
-            if (currentTableComment != null && currentTableComment.trim().length() != 0) {
-                tableElement.setAttribute("comment", currentTableComment);
-            }
-
-            if (isSameJavaName()) {
-                tableElement.setAttribute("javaName", currentTableName);
+            if (tableMataInfo.getTableComment() != null && tableMataInfo.getTableComment().trim().length() != 0) {
+                tableElement.setAttribute("comment", tableMataInfo.getTableComment());
             }
 
-            final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMetaData, currentTableName);
+            final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMetaData, tableMataInfo);
 
-            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, currentTableName);
+            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, tableMataInfo);
             for (int j = 0; j < columns.size(); j++) {
                 final DfColumnMetaInfo columnMetaInfo = columns.get(j);
                 final String columnName = columnMetaInfo.getColumnName();
 
                 final Element columnElement = _doc.createElement("column");
                 columnElement.setAttribute("name", columnName);
-                if (isSameJavaName()) {
-                    columnElement.setAttribute("javaName", columnName);
-                }
 
                 setupColumnType(columnMetaInfo, columnElement);
                 setupColumnDbType(columnMetaInfo, columnElement);
@@ -312,7 +289,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
 
             // Foreign keys for this table.
-            final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = getForeignKeys(dbMetaData, currentTableName);
+            final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = getForeignKeys(dbMetaData, tableMataInfo);
             final Set<String> foreignKeyMetaInfoKeySet = foreignKeyMetaInfoMap.keySet();
             for (String foreignKeyName : foreignKeyMetaInfoKeySet) {
                 final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
@@ -426,21 +403,21 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * Set up column-table map. 
      * <p>
      * @param dbMetaData JDBC metadata.
-     * @param tableList A list of table-name.
+     * @param tableMetaInfoList A list of table-name.
      * @throws SQLException
      */
-    protected void setupColumnTableMap(DatabaseMetaData dbMetaData, List<DfTableMetaInfo> tableList)
+    protected void setupColumnTableMap(DatabaseMetaData dbMetaData, List<DfTableMetaInfo> tableMetaInfoList)
             throws SQLException {
         // Build a database-wide column -> table map.
         _columnTableMap = new Hashtable<String, String>();
-        for (int i = 0; i < tableList.size(); i++) {
-            final DfTableMetaInfo tableMetaInfo = tableList.get(i);
-            final String curTable = tableMetaInfo.getTableName();
-            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, curTable);
+        for (int i = 0; i < tableMetaInfoList.size(); i++) {
+            final DfTableMetaInfo tableMetaInfo = tableMetaInfoList.get(i);
+            final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, tableMetaInfo);
 
+            final String tableName = tableMetaInfo.getTableName();
             for (int j = 0; j < columns.size(); j++) {
                 final DfColumnMetaInfo columnMetaInfo = columns.get(j);
-                _columnTableMap.put(columnMetaInfo.getColumnName(), curTable);
+                _columnTableMap.put(columnMetaInfo.getColumnName(), tableName);
             }
         }
     }
@@ -449,19 +426,20 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * Retrieves a list of the columns composing the primary key for a given table.
      * 
      * @param dbMeta JDBC metadata.
-     * @param tableName Table from which to retrieve PK information.
+     * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of the primary key parts for <code>tableName</code>.
      * @throws SQLException
      */
-    protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        return _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, _schema, tableName);
+    protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
+            throws SQLException {
+        return _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, _schema, tableMetaInfo);
     }
 
     /**
      * Get unique column name list.
      * 
      * @param dbMeta
-     * @param tableMetaInfo
+     * @param tableMetaInfo The meta information of table. (NotNull)
      * @return Unique column name list.
      * @throws SQLException
      */
@@ -488,13 +466,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * Retrieves a list of foreign key columns for a given table.
      *
      * @param dbMeta JDBC metadata.
-     * @param tableName Table from which to retrieve FK information.
+     * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, String tableName)
+    protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
-        return _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta, _schema, tableName);
+        return _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta, _schema, tableMetaInfo);
     }
 
     /**
@@ -506,7 +484,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        return _tableNameHandler.getTableNames(dbMeta, _schema);
+        return _tableNameHandler.getTableNameList(dbMeta, _schema);
     }
 
     /**
@@ -515,11 +493,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * of the returned List is a List with:
      *
      * @param dbMeta JDBC metadata.
-     * @param tableName Table from which to retrieve column information.
+     * @param tableMetaInfo The meta information of table. (NotNull)
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException
      */
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String tableName) throws SQLException {
-        return _columnHandler.getColumns(dbMeta, _schema, tableName);
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
+            throws SQLException {
+        return _columnHandler.getColumns(dbMeta, _schema, tableMetaInfo);
     }
 }

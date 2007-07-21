@@ -53,7 +53,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 // ここでSQLExceptionが発生した場合は、Schema名を付けていないことによるSQLExceptionの
                 // 可能性があるので、Schema名を付けたTable名でもう一度実行する。
                 try {
-                    final String tableNameWithSchema = tableMetaInfo.getTableNameWithSchema();
+                    final String tableNameWithSchema = tableMetaInfo.buildTableNameWithSchema();
                     rs = stmt.executeQuery("SELECT " + primaryKeyColumnName + " FROM " + tableNameWithSchema);
                 } catch (SQLException ignored) {
                     // やっぱりだめだった...の場合
@@ -108,7 +108,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 // ここでSQLExceptionが発生した場合は、Schema名を付けていないことによるSQLExceptionの
                 // 可能性があるので、Schema名を付けたTable名でもう一度実行する。
                 try {
-                    final String tableNameWithSchema = tableMetaInfo.getTableNameWithSchema();
+                    final String tableNameWithSchema = tableMetaInfo.buildTableNameWithSchema();
                     rs = stmt.executeQuery("SELECT * FROM " + tableNameWithSchema);
                 } catch (SQLException ignored) {
                     // やっぱりだめだった...の場合

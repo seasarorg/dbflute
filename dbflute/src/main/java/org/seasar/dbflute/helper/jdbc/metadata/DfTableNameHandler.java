@@ -19,7 +19,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +44,7 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
-    public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
+    public List<DfTableMetaInfo> getTableNameList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
         // /---------------------------------------------------- [My Extension]
         // Get DatabaseTypes from ContextProperties.
         // These are the entity types we want from the database
@@ -50,7 +52,7 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
         logDatabaseTypes(types);
         // -------------------/
 
-        final List<DfTableMetaInfo> tables = new ArrayList<DfTableMetaInfo>();
+        final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
             resultSet = dbMeta.getTables(null, schemaName, "%", types);
@@ -74,14 +76,46 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
                 tableMetaInfo.setTableType(tableType);
                 tableMetaInfo.setTableSchema(tableSchema);
                 tableMetaInfo.setTableComment(tableComment);
-                tables.add(tableMetaInfo);
+                tableList.add(tableMetaInfo);
             }
         } finally {
             if (resultSet != null) {
                 resultSet.close();
             }
         }
-        return tables;
+
+        resolveSameNameTable(tableList);
+        return tableList;
+    }
+
+    /**
+     * Resolve same name table.
+     * <pre>
+     * 同じ名前のTableが存在するTableに関しては、
+     * それを示すFlagをtrueにする。
+     * </pre>
+     * @param tableMetaInfoList The list of table meta info. (NotNull)
+     */
+    protected void resolveSameNameTable(final List<DfTableMetaInfo> tableMetaInfoList) {
+        final Set<String> tableNameSet = new HashSet<String>();
+        final Set<String> sameNameTableNameSet = new HashSet<String>();
+        for (DfTableMetaInfo info : tableMetaInfoList) {
+            final String tableName = info.getTableName();
+            if (tableNameSet.contains(tableName)) {
+                sameNameTableNameSet.add(tableName);
+            }
+            tableNameSet.add(tableName);
+        }
+        if (tableNameSet.size() == tableMetaInfoList.size()) {
+            return;
+        }
+        for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
+            final String tableName = tableMetaInfo.getTableName();
+            if (sameNameTableNameSet.contains(tableName)) {
+                _log.info("$ sameNameTable --> " + tableMetaInfo);
+                tableMetaInfo.setExistSameNameTable(true);
+            }
+        }
     }
 
     /**
@@ -130,11 +164,21 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
 
         protected String _tableComment;
 
+        protected boolean _existSameNameTable;
+
         public boolean isTableTypeView() {
             return _tableType != null ? _tableType.equalsIgnoreCase("VIEW") : false;
         }
 
-        public String getTableNameWithSchema() {
+        public String selectRealSchemaName(String schemaName) {
+            if (isExistSameNameTable()) {
+                return _tableSchema;
+            } else {
+                return schemaName;
+            }
+        }
+
+        public String buildTableNameWithSchema() {
             if (_tableSchema != null && _tableSchema.trim().length() != 0) {
                 return _tableSchema + "." + _tableName;
             } else {
@@ -174,9 +218,34 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
             this._tableComment = tableComment;
         }
 
+        public boolean isExistSameNameTable() {
+            return _existSameNameTable;
+        }
+
+        public void setExistSameNameTable(boolean existSameNameTable) {
+            this._existSameNameTable = existSameNameTable;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj != null && obj instanceof DfTableMetaInfo) {
+                return getTableName().equals(((DfTableMetaInfo) obj).getTableName());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return getTableName().hashCode();
+        }
+
         @Override
         public String toString() {
-            return _tableSchema + "." + _tableName + "(" + _tableType + "): " + _tableComment;
+            if (_tableSchema != null && _tableSchema.trim().length() != 0) {
+                return _tableSchema + "." + _tableName + "(" + _tableType + "): " + _tableComment;
+            } else {
+                return _tableName + "(" + _tableType + "): " + _tableComment;
+            }
         }
     }
 }

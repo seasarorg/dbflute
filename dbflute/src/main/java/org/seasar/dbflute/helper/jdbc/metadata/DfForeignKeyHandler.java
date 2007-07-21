@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 
 /**
  * This class generates an XML schema of an existing database from JDBC metadata..
@@ -38,16 +39,18 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
      * Retrieves a list of foreign key columns for a given table.
      *
      * @param dbMeta JDBC metadata.
-     * @param tableName Table from which to retrieve FK information.
+     * @param tableMetaInfo The meta information of table.
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
-            String tableName) throws SQLException {
+            DfTableMetaInfo tableMetaInfo) throws SQLException {
+        final String tableName = tableMetaInfo.getTableName();
         final Map<String, DfForeignKeyMetaInfo> fkMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
         ResultSet foreignKeys = null;
         try {
-            foreignKeys = dbMeta.getImportedKeys(null, schemaName, tableName);
+            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
+            foreignKeys = dbMeta.getImportedKeys(null, realSchemaName, tableName);
             while (foreignKeys.next()) {
                 String refTableName = foreignKeys.getString(3);
 
@@ -65,7 +68,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 if (isColumnExcept(localColumnName) || isColumnExcept(foreignColumnName)) {
                     continue;
                 }
-                
+
                 DfForeignKeyMetaInfo metaInfo = fkMap.get(fkName);
                 if (metaInfo == null) {
                     metaInfo = new DfForeignKeyMetaInfo();

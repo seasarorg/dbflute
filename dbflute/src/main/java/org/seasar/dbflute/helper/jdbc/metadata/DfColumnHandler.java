@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 
 /**
  * @author jflute
@@ -37,16 +38,19 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      * of the returned List is a List with:
      *
      * @param dbMeta JDBC metadata.
-     * @param tableName Table from which to retrieve column information.
+     * @param schemaName Schema name. (NotNull & AllowedEmpty)
+     * @param tableMetaInfo The meta information of table. (NotNull)
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException
      */
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName)
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
+        final String tableName = tableMetaInfo.getTableName();
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
         try {
-            columnResultSet = dbMeta.getColumns(null, schemaName, tableName, null);
+            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
+            columnResultSet = dbMeta.getColumns(null, realSchemaName, tableName, null);
             while (columnResultSet.next()) {
                 final String columnName = columnResultSet.getString(4);
                 if (isColumnExcept(columnName)) {

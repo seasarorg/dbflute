@@ -40,16 +40,19 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      * Retrieves a list of the columns composing the primary key for a given table.
      * <p>
      * @param dbMeta JDBC metadata.
-     * @param tableName Table from which to retrieve PK information.
+     * @param schemaName Schema name. (NotNull & AllowedEmpty)
+     * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of the primary key parts for <code>tableName</code>.
      * @throws SQLException
      */
-    public List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String schemaName, String tableName)
-            throws SQLException {
+    public List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, String schemaName,
+            DfTableMetaInfo tableMetaInfo) throws SQLException {
         final List<String> primaryKeyColumnNameList = new ArrayList<String>();
         ResultSet parts = null;
         try {
-            parts = getPrimaryKeyResultSetFromDBMeta(dbMeta, schemaName, tableName);
+            final String tableName = tableMetaInfo.getTableName();
+            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
+            parts = getPrimaryKeyResultSetFromDBMeta(dbMeta, realSchemaName, tableName);
             while (parts.next()) {
                 primaryKeyColumnNameList.add(getPrimaryKeyColumnNameFromDBMeta(parts));
             }
@@ -98,13 +101,14 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();
         }
-        final String tableName = tableMetaInfo.getTableName();
-        final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMeta, schemaName, tableName);
+        final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMeta, schemaName, tableMetaInfo);
         final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
 
         ResultSet parts = null;
         try {
-            parts = dbMeta.getIndexInfo(null, schemaName, tableName, true, true);
+            final String tableName = tableMetaInfo.getTableName();
+            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
+            parts = dbMeta.getIndexInfo(null, realSchemaName, tableName, true, true);
             while (parts.next()) {
                 final boolean isNonUnique;
                 {
@@ -128,11 +132,10 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 if (primaryColumnNameList.contains(columnName)) {
                     continue;
                 }
-                
+
                 if (isColumnExcept(columnName)) {
                     continue;
                 }
-                
 
                 final String indexName = parts.getString(6);
                 final Integer ordinalPosition;
