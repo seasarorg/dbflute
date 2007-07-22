@@ -1266,36 +1266,39 @@ targetdatabase = $targetDatabase
 
         $database.debug("        parseTable(tbl); // ${table.Name} : ${table.JavaName}")
         ##
-        ## Java name of the current table.
+        ## The name of objects
         ##
-        #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
-        #set ($myBaseBhvPackageName = "${glPackageBaseBhv}")
-        #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}Bhv")
-        #set ($myExtendedBhvPackageName = "${glPackageExtendedBhv}")
-
-        #set ($myBaseDaoClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Dao")
-        #set ($myBaseDaoPackageName = "${glPackageBaseDao}")
-
-        #set ($myExtendedDaoClassName = "${glProjectPrefix}${table.JavaName}Dao")
+        #set ($myExtendedDaoClassName = "${table.extendedDaoClassName}")
         #set ($myExtendedDaoPackageName = "${glPackageExtendedDao}")
 
-        #set ($myBaseObjectClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}${glBaseSuffixForEntity}")
+        #set ($myBaseDaoClassName = "${table.baseDaoClassName}")
+        #set ($myBaseDaoPackageName = "${glPackageBaseDao}")
+
+        #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
+        #set ($myBaseBhvPackageName = "${glPackageBaseBhv}")
+        #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
+        #set ($myExtendedBhvPackageName = "${glPackageExtendedBhv}")
+
+        #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
         #set ($myBaseEntityPackageName = "${glPackageBaseEntity}")
 
-        #set ($myExtendedObjectClassName = "${glProjectPrefix}${table.JavaName}")
+        #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
         #set ($myExtendedEntityPackageName = "${glPackageExtendedEntity}")
 
-        #set ($myBaseConditionBeanClassName = "${myBaseObjectClassName}${glConditionBeanInitialName}")
-        #set ($myConditionBeanClassName = "${myExtendedObjectClassName}${glConditionBeanInitialName}")
-        #set ($myAbstractBaseConditionQueryClassName = "${glProjectPrefix}Abstract${glBasePrefix}${table.JavaName}${glConditionQueryInitialName}")
-        #set ($myBaseConditionQueryClassName = "${myBaseObjectClassName}${glConditionQueryInitialName}")
-        #set ($myConditionQueryClassName = "${myExtendedObjectClassName}${glConditionQueryInitialName}")
-        #set ($myConditionInlineQueryClassName = "${myExtendedObjectClassName}CIQ")
-        #set ($myNestSelectSetupperClassName = "${myExtendedObjectClassName}Nss")
+        #set ($myBaseConditionBeanClassName = "${table.baseConditionBeanClassName}")
+        #set ($myConditionBeanClassName = "${table.extendedConditionBeanClassName}")
+        #set ($myAbstractBaseConditionQueryClassName = "${table.abstractBaseConditionQueryClassName}")
+        #set ($myBaseConditionQueryClassName = "${table.baseConditionQueryClassName}")
+        #set ($myConditionQueryClassName = "${table.extendedConditionQueryClassName}")
+        #set ($myConditionInlineQueryClassName = "${table.extendedConditionInlineQueryClassName}")
+        #set ($myNestSelectSetupperClassName = "${table.nestSelectSetupperClassName}")
 
-        #set ($myDBMetaClassName = "${glProjectPrefix}${table.JavaName}Dbm")
+        #set ($myDBMetaClassName = "${table.DBMetaClassName}")
         #set ($myDBMetaPackageName = "${glPackageBaseDBMeta}")
 
+        ##
+        ## The variable name
+        ##
         #set ($myAttachedCBArgsString = "${glPackageCB}.${myConditionBeanClassName} ${glAttachedCBArgsVariableName}")
 
         #set ($myEntityVariableName = "${table.uncapitalisedJavaName}")
@@ -1303,6 +1306,9 @@ targetdatabase = $targetDatabase
         #set ($myCBVariableName = "${table.uncapitalisedJavaName}")
         #set ($myBehaviorVariableName = "${table.uncapitalisedJavaName}Bhv")
 
+        ##
+        ## Determination
+        ##
         #set ($isExistBehavior = false)
         #if ($database.isAvailableBehaviorGeneration())
           #set ($isExistBehavior = true)
@@ -1315,10 +1321,10 @@ targetdatabase = $targetDatabase
 
         #if ($database.isAvailableBehaviorGeneration())
           #if ($database.isTargetLanguageCSharp())
-            #set ($myBaseBhvInterfaceName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
-            #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
-            #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
-            #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
+            #set ($myBaseBhvInterfaceName = "${table.baseBehaviorClassName}")
+            #set ($myExtendedBhvInterfaceName = "${table.extendedBehaviorClassName}")
+            #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}Impl")
+            #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}Impl")
 
             #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
             $generator.parse("om/${glTargetLanguage}/bsbhv/BaseBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
@@ -1346,7 +1352,7 @@ targetdatabase = $targetDatabase
         #if (!$database.isStopGenerateExtendedBhv())
           #if ($database.isAvailableBehaviorGeneration())
             #if ($database.isTargetLanguageCSharp())
-              #set ($myBaseBhvInterfaceName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}Bhv")
+              #set ($myBaseBhvInterfaceName = "${table.baseBehaviorClassName}")
               #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
               #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
               #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")

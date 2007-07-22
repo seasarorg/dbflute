@@ -19,7 +19,7 @@ public class ${myClassName} {
         Map${database.filterGenericsString(${instanceMapGenericDefinition})} tmpMap = new LinkedHashMap${database.filterGenericsString(${instanceMapGenericDefinition})}();
 
 #foreach ($table in $database.Tables)
-        tmpMap.put("${table.Name}", getDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+        tmpMap.put("${table.Name}", getDBMeta("${table.DBMetaFullClassName}"));
 #end
 
         _tableDbNameInstanceMap = java.util.Collections.unmodifiableMap(tmpMap);
@@ -31,7 +31,7 @@ public class ${myClassName} {
         Map${database.filterGenericsString(${instanceMapGenericDefinition})} tmpMap = new LinkedHashMap${database.filterGenericsString(${instanceMapGenericDefinition})}();
 
 #foreach ($table in $database.Tables)
-        tmpMap.put("${table.JavaName}", getDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+        tmpMap.put("${table.JavaName}", getDBMeta("${table.DBMetaFullClassName}"));
 #end
 
         _tableCapPropNameInstanceMap = java.util.Collections.unmodifiableMap(tmpMap);
@@ -43,7 +43,7 @@ public class ${myClassName} {
         Map${database.filterGenericsString(${instanceMapGenericDefinition})} tmpMap = new LinkedHashMap${database.filterGenericsString(${instanceMapGenericDefinition})}();
 
 #foreach ($table in $database.Tables)
-        tmpMap.put("${table.UncapitalisedJavaName}", getDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+        tmpMap.put("${table.UncapitalisedJavaName}", getDBMeta("${table.DBMetaFullClassName}"));
 #end
 
         _tableUncapPropNameInstanceMap = java.util.Collections.unmodifiableMap(tmpMap);

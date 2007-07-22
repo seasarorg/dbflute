@@ -65,7 +65,7 @@
     <!-- ${table.Name} -->
   #if (${database.isAvailableCommonColumnSetupInterceptorToDao()})
 
-    <component name="${database.filterProjectSuffixForComponentName($table.UncapitalisedJavaName)}Dao" class="${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao">
+    <component name="${table.daoComponentName}" class="${table.extendedDaoFullClassName}">
         <aspect pointcut="${database.ColumnSetupBeforeInsertInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeInsertInterceptor</aspect>
         <aspect pointcut="${database.ColumnSetupBeforeUpdateInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor</aspect>
         <aspect pointcut="${database.ColumnSetupBeforeDeleteInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeDeleteInterceptor</aspect>
@@ -73,14 +73,14 @@
     </component>
   #else
 
-    <component name="${database.filterProjectSuffixForComponentName($table.UncapitalisedJavaName)}Dao" class="${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao">
+    <component name="${table.daoComponentName}" class="${table.extendedDaoFullClassName}">
         <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>
   #end
   #if (${database.isAvailableBehaviorGeneration()})
     #if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
 
-    <component name="${database.filterProjectSuffixForComponentName($table.UncapitalisedJavaName)}Bhv" class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv">
+    <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}">
 #if (${database.isAvailableBehaviorRequiresNewTx()})
         <aspect pointcut="${database.RequiresNewTransactionToBehaviorPointcut}">${database.requiresNewTxComponentName}</aspect>
 #end
@@ -99,7 +99,7 @@
     </component>
     #else
 
-    <component name="${database.filterProjectSuffixForComponentName($table.UncapitalisedJavaName)}Bhv" class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv">
+    <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}">
 #if (${database.isAvailableBehaviorRequiresNewTx()})
         <aspect pointcut="${database.RequiresNewTransactionToBehaviorPointcut}">${database.RequiresNewTxComponentName}</aspect>
 #end
@@ -115,15 +115,6 @@
     </component>
     #end
   #end
-#end
-
-#foreach ($table in $database.CustomizeTableList)
-
-    <!-- ${table.Name} (as customize dao) -->
-
-    <component name="${database.filterProjectSuffixForComponentName($table.UncapitalisedJavaName)}Dao" class="${glPackageExtendedCustomizeDao}.${glProjectPrefix}${table.JavaName}Dao">
-        <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
-    </component>
 #end
 
 </components>

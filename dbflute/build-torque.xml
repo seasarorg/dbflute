@@ -314,13 +314,11 @@
     <echo message="+-------------------------------------------------------------------------------+"/>
     <echo message="contextProperties = ${torque.contextProperties}"/>
     <echo message="outputFile        = ${torque.schema.dir}/project-schema-${torque.project}.xml"/>
-    <echo message="sameJavaName      = ${torque.sameJavaName}"/>
     <echo message="+-----------------+"/>
 
     <torque-jdbc-transform
       contextProperties="${torque.contextProperties}"
       outputFile="${torque.schema.dir}/project-schema-${torque.project}.xml"
-      sameJavaName="${torque.sameJavaName}"
     >
     </torque-jdbc-transform>
   </target>

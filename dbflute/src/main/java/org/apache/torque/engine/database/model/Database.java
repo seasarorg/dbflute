@@ -1146,6 +1146,10 @@ public class Database {
     public boolean isVersionAfter1040() {
         return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1040();
     }
+    
+    public boolean isAvailableDaoMethodLazyInitializing() {
+        return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodLazyInitializing();
+    }
 
     public boolean isAvailableOtherConnectionDaoInitialization() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableOtherConnectionDaoInitialization();

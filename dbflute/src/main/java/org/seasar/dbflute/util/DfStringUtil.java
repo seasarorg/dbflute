@@ -10,7 +10,7 @@ public abstract class DfStringUtil {
     public static String replace(String text, String fromText, String toText) {
         return StringUtil.replace(text, fromText, toText);
     }
-    
+
     public static String getStringBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
         final String ret;
         {
@@ -44,5 +44,19 @@ public abstract class DfStringUtil {
             tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
         }
         return resultList;
+    }
+
+    public static String initCapAfterTrimming(String str) {
+        if (str == null) {
+            return null;
+        }
+        str = str.trim();
+        if (str.length() == 0) {
+            return str;
+        }
+        if (str.length() == 1) {
+            return str.toUpperCase();
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 }

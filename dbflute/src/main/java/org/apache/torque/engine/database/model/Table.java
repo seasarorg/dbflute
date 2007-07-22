@@ -70,6 +70,7 @@ import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.framework.util.StringUtil;
 import org.xml.sax.Attributes;
 
@@ -139,6 +140,8 @@ public class Table implements IDMethod {
     private boolean _isHeavyIndexing;
 
     private boolean _isForReferenceOnly;
+
+    private boolean _existSameNameTable;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -459,14 +462,15 @@ public class Table implements IDMethod {
     }
 
     // -----------------------------------------------------
-    //                                              JavaName
-    //                                              --------
+    //                                             Java Name
+    //                                             ---------
     protected boolean _needsJavaNameConvert = true;
 
     public void setupNeedsJavaNameConvertFalse() {
         _needsJavaNameConvert = false;
     }
 
+    // TODO: @jflute -- 不要のはず
     public boolean needsJavaNameConvert() {
         return _needsJavaNameConvert;
     }
@@ -504,6 +508,138 @@ public class Table implements IDMethod {
      */
     public void setJavaName(String javaName) {
         this._javaName = javaName;
+    }
+
+    // -----------------------------------------------------
+    //                                            Class Name
+    //                                            ----------
+    public String getBaseEntityClassName() {
+        final String projectPrefix = getDatabase().getProjectPrefix();
+        final String basePrefix = getDatabase().getBasePrefix();
+        final String baseSuffixForEntity = getDatabase().getBaseSuffixForEntity();
+        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
+            return projectPrefix + basePrefix + getSchemaPrefix() + getJavaName() + baseSuffixForEntity;
+        } else {
+            return projectPrefix + basePrefix + getJavaName() + baseSuffixForEntity;
+        }
+    }
+
+    public String getBaseDaoClassName() {
+        return getBaseEntityClassName() + "Dao";
+    }
+
+    public String getBaseBehaviorClassName() {
+        return getBaseEntityClassName() + "Bhv";
+    }
+
+    public String getBaseConditionBeanClassName() {
+        return getBaseEntityClassName() + "CB";
+    }
+
+    public String getAbstractBaseConditionQueryClassName() {
+        final String projectPrefix = getDatabase().getProjectPrefix();
+        final String basePrefix = getDatabase().getBasePrefix();
+        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
+            return projectPrefix + "Abstract" + basePrefix + getSchemaPrefix() + getJavaName() + "CQ";
+        } else {
+            return projectPrefix + "Abstract" + basePrefix + getJavaName() + "CQ";
+        }
+    }
+
+    public String getBaseConditionQueryClassName() {
+        return getBaseEntityClassName() + "CQ";
+    }
+
+    public String getExtendedEntityClassName() {
+        final String projectPrefix = getDatabase().getProjectPrefix();
+        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
+            return projectPrefix + getSchemaPrefix() + getJavaName();
+        } else {
+            return projectPrefix + getJavaName();
+        }
+    }
+
+    public String getDBMetaClassName() {
+        return getExtendedEntityClassName() + "Dbm";
+    }
+
+    public String getDBMetaFullClassName() {
+        return getDatabase().getBaseEntityPackage() + ".dbmeta." + getDBMetaClassName();
+    }
+
+    public String getExtendedDaoClassName() {
+        return getExtendedEntityClassName() + "Dao";
+    }
+
+    public String getExtendedDaoFullClassName() {
+        final String extendedDaoPackage = getDatabase().getExtendedDaoPackage();
+        return extendedDaoPackage + "." + getExtendedDaoClassName();
+    }
+
+    public String getExtendedBehaviorClassName() {
+        return getExtendedEntityClassName() + "Bhv";
+    }
+
+    public String getExtendedBehaviorFullClassName() {
+        final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
+        return extendedBehaviorPackage + "." + getExtendedBehaviorClassName();
+    }
+
+    public String getExtendedConditionBeanClassName() {
+        return getExtendedEntityClassName() + "CB";
+    }
+
+    public String getExtendedConditionQueryClassName() {
+        return getExtendedEntityClassName() + "CQ";
+    }
+
+    public String getExtendedConditionInlineQueryClassName() {
+        return getExtendedEntityClassName() + "CIQ";
+    }
+
+    public String getNestSelectSetupperClassName() {
+        return getExtendedEntityClassName() + "Nss";
+    }
+
+    protected String getSchemaPrefix() {
+        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
+            return DfStringUtil.initCapAfterTrimming(_schema);
+        }
+        return "";
+    }
+
+    protected boolean _alreadyCheckedExistingSameNameTable;
+
+    protected boolean isExistSameNameTable() {
+        if (_alreadyCheckedExistingSameNameTable) {
+            return _existSameNameTable;
+        }
+        _alreadyCheckedExistingSameNameTable = true;
+        final List<Table> tableList = getDatabase().getTableList();
+        int count = 0;
+        for (Table table : tableList) {
+            final String name = table.getName();
+            if (_name.equals(name)) {
+                ++count;
+                if (count > 1) {
+                    _existSameNameTable = true;
+                    return _existSameNameTable;
+                }
+            }
+        }
+        _existSameNameTable = false;
+        return _existSameNameTable;
+    }
+
+    // -----------------------------------------------------
+    //                                        Component Name
+    //                                        --------------
+    public String getDaoComponentName() {
+        return getDatabase().filterProjectSuffixForComponentName(getUncapitalisedJavaName()) + "Dao";
+    }
+
+    public String getBehaviorComponentName() {
+        return getDatabase().filterProjectSuffixForComponentName(getUncapitalisedJavaName()) + "Bhv";
     }
 
     // -----------------------------------------------------
