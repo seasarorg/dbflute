@@ -574,10 +574,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                        ============
   #foreach ($refferer in $table.Referrers)
     #set ($reffererTable = $refferer.Table)
-    #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-    #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
-    #set ($reffererBhvClassName = "${reffererEntityClassName}Bhv")
-    #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
+    #set ($reffererEntityClassName = "${refferer.refererTableExtendedEntityClassName}")
+    #set ($reffererBhvClassName = "${refferer.refererTableExtendedBehaviorClassName}")
+    #set ($reffererCBClassName = "${refferer.refererTableExtendedConditionBeanClassName}")
     #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
     #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
     #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
@@ -698,7 +697,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()), ${myEntityVariableName});
         }
         final ${reffererBhvClassName} refererBhv = getDaoSelector().getBehavior(${reffererBhvClassName}.class);
-        final ${reffererCBClassName} cb = loadRefererOption.getReffererConditionBean() != null ? loadRefererOption.getReffererConditionBean() : refererBhv.newMyConditionBean();
+        final ${reffererCBClassName} cb = loadRefererOption.getRefererConditionBean() != null ? loadRefererOption.getRefererConditionBean() : refererBhv.newMyConditionBean();
         cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
         loadRefererOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
         if (!loadRefererOption.isStopOrderByKey()) {
@@ -831,7 +830,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                    Pull Out Foreign
     //                                                                    ================
 #foreach ($foreignKeys in $table.ForeignKeys)
-  #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
+  #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
 
     /**
      * Pull out the list of foreign table '${foreignEntityClassName}'.

@@ -10,6 +10,7 @@
   <property name="dbflute.zip.dirfile" value="dist/${dbflute.zip.file}"/>
   <property name="dbflute.deploy.dir" value="/pj/java/dbflute-${version}"/>
   <property name="dbflute.example.dir" value="/pj/ws/dbflute-example"/>
+  <property name="dbflute.postgresdemo.dir" value="/pj/ws/dbflute-postgresdemo"/>
 
   <target name="dist" description="==> generates distribution">
 
@@ -23,42 +24,46 @@
     <delete file="${dbflute.jar.dirfile}"/>
     <jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
     <delete file="${dbflute.zip.dirfile}"/>
-	<zip zipfile="${dbflute.zip.dirfile}">
-		<zipfileset prefix="etc/cmd" dir="etc/cmd">
-			<include name="*.cmd"/>
-			<include name="*.sh"/>
-		</zipfileset>
-		<zipfileset prefix="etc/client_directory-template" dir="etc/client_directory-template"/>
-		<zipfileset prefix="lib/forExecute" dir="dist">
-			<include name="${dbflute.jar.file}"/>
-		</zipfileset>
-		<zipfileset prefix="lib/forExecute" dir="lib/forExecute">
-			<include name="*.jar"/>
-			<include name="*.zip"/>
-		</zipfileset>
-		<zipfileset prefix="log" dir="log">
-			<include name="readme.txt"/>
-		</zipfileset>
-		<zipfileset prefix="output/doc" dir="output/doc">
-			<include name="readme.txt"/>
-		</zipfileset>
-		<zipfileset prefix="schema" dir="schema">
-			<include name="readme.txt"/>
-		</zipfileset>
-		<zipfileset prefix="templates" dir="templates">
-			<exclude name="**/*---.txt"/>
-		</zipfileset>
-		<zipfileset prefix="" dir="">
-			<include name="build-torque.xml"/>
-		</zipfileset>
-	</zip>
+    <zip zipfile="${dbflute.zip.dirfile}">
+        <zipfileset prefix="etc/cmd" dir="etc/cmd">
+            <include name="*.cmd"/>
+            <include name="*.sh"/>
+        </zipfileset>
+        <zipfileset prefix="etc/client_directory-template" dir="etc/client_directory-template"/>
+        <zipfileset prefix="lib/forExecute" dir="dist">
+            <include name="${dbflute.jar.file}"/>
+        </zipfileset>
+        <zipfileset prefix="lib/forExecute" dir="lib/forExecute">
+            <include name="*.jar"/>
+            <include name="*.zip"/>
+        </zipfileset>
+        <zipfileset prefix="log" dir="log">
+            <include name="readme.txt"/>
+        </zipfileset>
+        <zipfileset prefix="output/doc" dir="output/doc">
+            <include name="readme.txt"/>
+        </zipfileset>
+        <zipfileset prefix="schema" dir="schema">
+            <include name="readme.txt"/>
+        </zipfileset>
+        <zipfileset prefix="templates" dir="templates">
+            <exclude name="**/*---.txt"/>
+        </zipfileset>
+        <zipfileset prefix="" dir="">
+            <include name="build-torque.xml"/>
+        </zipfileset>
+    </zip>
     <delete dir="${dbflute.deploy.dir}"/>
-	<unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+    <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+  </target>
 
-	<copy todir="${dbflute.example.dir}/mydbflute/dbflute-${version}">
-		<fileset dir="${dbflute.deploy.dir}"/>
-	</copy>
-
+  <target name="reflect" description="==> reflect to test application">
+    <copy todir="${dbflute.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.postgresdemo.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
   </target>
 
 </project>

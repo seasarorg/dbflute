@@ -47,16 +47,16 @@ namespace ${glPackageBaseCommonSqlClause} {
             if (!IsFetchStartIndexSupported && !IsFetchSizeSupported) {
                 return;
             }
-            _fetchScopeSelectHint = " * from (select";
+            _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (select";
             _fetchScopeSqlSuffix = "";
             if (IsFetchStartIndexSupported) {
-                _fetchScopeSqlSuffix = ") where rownum > " + this.PageStartIndex;
+                _fetchScopeSqlSuffix = ") base ) where rn > " + this.PageStartIndex;
             }
             if (IsFetchSizeSupported) {
                 if (IsFetchStartIndexSupported) {
-                    _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rownum <= " + this.PageEndIndex;
+                    _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + this.PageEndIndex;
                 } else {
-                    _fetchScopeSqlSuffix = ") where rownum <= " + this.FetchSize;
+                    _fetchScopeSqlSuffix = ") base ) where rn <= " + this.PageEndIndex;
                 }
             }
         }
@@ -85,7 +85,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @return Select-hint. (NotNull)
          */
         protected override String CreateSelectHint() {
-            return _fetchFirstSelectHint;
+            return _fetchScopeSelectHint;
         }
 
         /**
@@ -94,7 +94,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
          */
         protected override String CreateFromBaseTableHint() {
-            return _fetchScopeSelectHint;
+            return "";
         }
 
         /**

@@ -31,10 +31,10 @@
               <tasks>
 
             <property refid="maven.compile.classpath" name="maven.classpath"/>
-			<ant inheritRefs="true" antfile="${basedir}/build.xml">
-			  <target name="dist">
-			  </target>
-			</ant>
+            <ant inheritRefs="true" antfile="${basedir}/build.xml">
+              <target name="dist">
+              </target>
+            </ant>
 
               </tasks>
             </configuration>

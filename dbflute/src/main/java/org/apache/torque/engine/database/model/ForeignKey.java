@@ -207,6 +207,57 @@ public class ForeignKey {
         _foreignColumns.addAll(foreignColumnNameList);
     }
 
+    // -----------------------------------------------------
+    //                                    Foreign Class Name
+    //                                    ------------------
+    public String getForeignTableExtendedEntityClassName() {
+        return getForeignTable().getExtendedEntityClassName();
+    }
+    
+    public String getForeignTableDBMetaClassName() {
+        return getForeignTable().getDBMetaClassName();
+    }
+
+    public String getForeignTableExtendedConditionBeanClassName() {
+        return getForeignTable().getExtendedConditionBeanClassName();
+    }
+    
+    public String getForeignTableExtendedConditionQueryClassName() {
+        return getForeignTable().getExtendedConditionQueryClassName();
+    }
+
+    public String getForeignTableNestSelectSetupperClassName() {
+        return getForeignTable().getNestSelectSetupperClassName();
+    }
+    
+    // -----------------------------------------------------
+    //                                    Referer Class Name
+    //                                    ------------------
+    public String getRefererTableExtendedEntityClassName() {
+        return getTable().getExtendedEntityClassName();
+    }
+
+    public String getRefererTableExtendedBehaviorClassName() {
+        return getTable().getExtendedBehaviorClassName();
+    }
+
+    
+    public String getRefererTableDBMetaClassName() {
+        return getTable().getDBMetaClassName();
+    }
+    
+    public String getRefererTableExtendedConditionBeanClassName() {
+        return getTable().getExtendedConditionBeanClassName();
+    }
+    
+    public String getRefererTableExtendedConditionQueryClassName() {
+        return getTable().getExtendedConditionQueryClassName();
+    }
+    
+    public String getRefererTableNestSelectSetupperClassName() {
+        return getTable().getNestSelectSetupperClassName();
+    }
+
     // ==========================================================================================
     //                                                                              Determination
     //                                                                              =============

@@ -123,7 +123,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     #if (${col.isJavaNativeStringObject()})
       #if (${col.isSingleKeyForeignKey()})
-        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
@@ -145,7 +145,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
@@ -169,7 +169,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
           #if (!$refferer.isSelfReference())
-            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+            #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
             #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
             #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
@@ -194,7 +194,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     #end
     #if (${col.isJavaNativeNumberObject()})
       #if (${col.isSingleKeyForeignKey()})
-        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
@@ -216,7 +216,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
@@ -240,7 +240,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
           #if (!$refferer.isSelfReference())
-            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+            #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
             #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
             #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
@@ -320,11 +320,11 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                       Foreign Query
     //                                                                       =============
   #foreach ($foreignKeys in $table.ForeignKeys)
-    #set ($foreignCQClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionQueryInitialName}")
+    #set ($foreignCQClassName = "${foreignKeys.foreignTableExtendedConditionQueryClassName}")
     
     // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ForeignTable    = [${foreignKeys.ForeignTable.Name}]
-    //   ForeignProperty = [${foreignKeys.ForeignPropertyName}]
+    //   ForeignTable    = [${foreignKeys.foreignTable.name}]
+    //   ForeignProperty = [${foreignKeys.foreignPropertyName}]
     // * * * * * * * * */
 
     /**
@@ -393,12 +393,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
   #end
 
   #foreach ($refferer in $table.Referrers)
-    #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+    #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
     #if (${refferer.isOneToOne()})
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   ReffererTable    = [${refferer.Table.Name}]
-    //   ReffererProperty = [${refferer.ReffererPropertyNameAsOne}]
+    //   RefererTable    = [${refferer.Table.Name}]
+    //   RefererProperty = [${refferer.ReffererPropertyNameAsOne}]
     // * * * * * * * * */
 
     /**

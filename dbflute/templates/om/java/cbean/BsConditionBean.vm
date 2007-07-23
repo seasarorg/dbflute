@@ -265,7 +265,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
   #foreach ($foreignKeys in $table.ForeignKeys)
     #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
     #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-    #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${foreignKeys.foreignTable.javaName}Nss")
+    #set ($nestSelectSetuppperClassName = "${foreignKeys.foreignTableNestSelectSetupperClassName}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
     //   ForeignTable    = [${foreignKeys.foreignTable.name}]
@@ -315,7 +315,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     #if (${refferer.isOneToOne()})
       #set ($tmpPropertyName = "${refferer.ReffererPropertyNameAsOne}")
       #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
-      #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${refferer.table.javaName}Nss")
+      #set ($nestSelectSetuppperClassName = "${refferer.refererTableNestSelectSetupperClassName}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
     //   RefferTable    = [${refferer.table.name}]

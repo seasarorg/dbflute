@@ -314,10 +314,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                       =============
 #set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.ForeignKeys)
-  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.ForeignPropertyNameInitCap}")
-  #set ($foreignDaoClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}Dao")
-  #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
-  #set ($parentCBClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionBeanInitialName}")
+  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
+  #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
+  #set ($parentCBClassName = "${foreignKeys.foreignTableExtendedConditionBeanClassName}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     //   ForeignTable    = [${foreignKeys.foreignTable.basicInfoDispString}]
@@ -345,7 +344,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /**
      * Set the entity of foreign table.
      * 
-     * @param v The entity of foreign table.
+     * @param entity The entity of foreign table.
      */
     public void set${foreignKeys.foreignPropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} entity) {
         this.${foreignVariableName} = entity;
@@ -364,34 +363,33 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
 
     // ===================================================================================
-    //                                                                      Refferer Table
-    //                                                                      ==============
+    //                                                                       Referer Table
+    //                                                                       =============
 #foreach ($refferer in $table.Referrers)
   #set ($reffererTable = $refferer.Table)
-  #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-  #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
-  #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
+  #set ($reffererEntityClassName = "${refferer.refererTableExtendedEntityClassName}")
+  #set ($reffererCBClassName = "${refferer.refererTableExtendedConditionBeanClassName}")
   #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
   #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
 
   #if (${refferer.isOneToOne()})
 
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   ReffererTable    = [${refferer.Table.basicInfoDispString}]
-    //   ReffererProperty = [${refferer.ReffererPropertyName}]
+    //   RefererTable    = [${refferer.Table.basicInfoDispString}]
+    //   RefererProperty = [${refferer.ReffererPropertyName}]
     // * * * * * * * * */
 
     /** RELNO of foreign table for s2dao. */
     public static final int ${refferer.ReffererJavaBeansRulePropertyNameAsOne}_RELNO = ${foreignKeysIndex};
 
     /** RELKEYS of foreign table for s2dao. */
-    public static final String ${refferer.ReffererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$refferer.RelationKeysCommaStringForOneToOneRefferer";
+    public static final String ${refferer.ReffererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$refferer.relationKeysCommaStringForOneToOneRefferer";
     #set ($foreignKeysIndex = $foreignKeysIndex + 1)
   #else
 
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   ReffererTable    = [${refferer.Table.basicInfoDispString}]
-    //   ReffererProperty = [${refferer.ReffererPropertyName}]
+    //   RefererTable    = [${refferer.table.basicInfoDispString}]
+    //   RefererProperty = [${refferer.reffererPropertyName}]
     // * * * * * * * * */
   #end
 
