@@ -66,6 +66,15 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         registerInlineWhereClause(whereClause);
     }
 
+    protected String getInScopeSubQueryRealColumnName(String columnName) {
+        return columnName;// No append alias name!
+    }
+
+    protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String relatedColumnName, String propertyName) {
+        throw new UnsupportedOperationException("Sorry! ExistsSubQuery at inline view is unsupported. So please use InScopeSubQyery.");
+    }
+
     // ===================================================================================
     //                                                                Override about Query
     //                                                                ====================

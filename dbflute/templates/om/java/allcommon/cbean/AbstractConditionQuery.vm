@@ -390,14 +390,18 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    // ----------------------------------------
-    //                          InScopeSubQuery
-    //                          ---------------
+    // -----------------------------------------------------
+    //                                       InScopeSubQuery
+    //                                       ---------------
     protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
-        final String realColumnName = getRealColumnName(columnName);
+        final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
         registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
+    }
+
+    protected String getInScopeSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
     }
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
@@ -408,14 +412,18 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return replaceString(clause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
     }
 
-    // ----------------------------------------
-    //                           ExistsSubQuery
-    //                           --------------
+    // -----------------------------------------------------
+    //                                        ExistsSubQuery
+    //                                        --------------
     protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
-        final String realColumnName = getRealColumnName(columnName);
+        final String realColumnName = getExistsSubQueryRealColumnName(columnName);
         final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         registerWhereClause("exists (" + subQueryClause + ")");
+    }
+
+    protected String getExistsSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
