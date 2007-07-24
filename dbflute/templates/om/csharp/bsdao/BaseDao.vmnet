@@ -57,11 +57,11 @@ namespace ${myExtendedDaoPackageName} {
         /// It is necessary that sub interface of this have SQL-Annotation.
         /// </summary>
         /// <returns>List of all records.</returns>
-        [Seasar.Dao.Attrs.Sql("select * from ${table.Name}")]
+        [Seasar.Dao.Attrs.Sql("select ${table.columnNameCommaString} from ${table.Name}")]
         System.Collections.IList GetListAll();
 #if ($table.hasPrimaryKey())
 
-        [Seasar.Dao.Attrs.Sql("select * from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}")]
+        [Seasar.Dao.Attrs.Sql("select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}")]
         ${myExtendedObjectClassName} GetEntity(${table.PrimaryKeyArgsString});
 #end
 

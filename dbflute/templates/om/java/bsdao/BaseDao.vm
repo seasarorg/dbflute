@@ -58,7 +58,7 @@ public interface ${myClassName} extends ${InterfaceName} {
     public int getCountAll();
 
     /** SQL-Annotation for getListAll(). */
-    public static final String getListAll_SQL = "select * from ${table.Name}";
+    public static final String getListAll_SQL = "select ${table.columnNameCommaString} from ${table.Name}";
 
     /**
      * Get list as all.
@@ -69,7 +69,7 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if ($table.isWritable())
 
     /** SQL-Annotation for getEntity(). */
-    public static final String getEntity_SQL = "select * from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}";
+    public static final String getEntity_SQL = "select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}";
 
     /** Args-Annotation for getEntity(). */
     public static final String getEntity_ARGS = "${table.PrimaryKeyUncapitalisedJavaNameCommaString}";
