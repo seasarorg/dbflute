@@ -375,7 +375,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The list of column db-name. (NotNull)
+     * @return The list of column db-name. (NotNull and NotEmpty)
      */
     public java.util.List${database.filterGenericsString('String')} getColumnDbNameList() {
         final String[] columns = getColumnDbNameCommaString().split(",");
@@ -389,7 +389,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The list of column db-name. (NotNull)
+     * @return The list of column db-name. (NotNull and NotEmpty)
      */
     public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList() {
         final java.util.List${database.filterGenericsString('String')} columnDbNameList = getColumnDbNameList();
@@ -403,7 +403,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The list of column db-name. (NotNull)
+     * @return The list of column db-name. (NotNull and NotEmpty)
      */
     public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList() {
         final java.util.List${database.filterGenericsString('String')} columnDbNameList = getColumnDbNameList();
@@ -417,10 +417,22 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return Column-db-name comma-string. (NotNull)
+     * @return Column-db-name comma-string. (NotNull and NotEmpty)
      */
     public String getColumnDbNameCommaString() {
         return "${table.columnNameCommaString}";
+    }
+
+    // -----------------------------------------------------
+    //                                           Primary Key
+    //                                           -----------
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return First primary key column db-name. (Nullable: If null, this table has no primary key.)
+     */
+    public String getPrimaryKeyColumnDbNameOnlyFirstOne() {
+        return "${table.primaryKeyColumnDbNameOnlyFirstOne}";
     }
 
     // ===================================================================================
@@ -562,6 +574,15 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean hasPrimaryKey() {
+        return ${table.hasPrimaryKey()};
+    }
+
     /**
      * ${database.ImplementComment}
      * 

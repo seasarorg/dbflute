@@ -1556,6 +1556,14 @@ public class Table implements IDMethod {
         return getPrimaryKeyAsOne().getJavaNative();
     }
 
+    public String getPrimaryKeyColumnDbNameOnlyFirstOne() {
+        if (hasPrimaryKey()) {
+            return getPrimaryKey().get(0).getName();
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Returns PrimaryKeyArgsString. 
      *     [BigDecimal rcvlcqNo, String sprlptTp]

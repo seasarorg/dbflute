@@ -168,6 +168,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // Implementing SqlFileRunnerBase as inner class.
         // - - - - - - - - - -/
+        final Log innerLog = _log;
         return new DfSqlFileRunnerBase(runInfo, getDataSource()) {
             protected String filterSql(String sql) {
 
@@ -222,7 +223,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         // for Parameter Bean
                         final DfParameterBeanMetaData parameterBeanMetaData = getParameterBeanMetaData(sql);
                         if (parameterBeanMetaData != null) {
-                            _pmbMetaDataMap.put(parameterBeanMetaData.getClassName(), parameterBeanMetaData);
+                            final String parameterBeanMetaDataKey = parameterBeanMetaData.getClassName();
+                            if (_pmbMetaDataMap.containsKey(parameterBeanMetaDataKey)) {
+                                final String lineSeparator = System.getProperty("line.separator");
+                                String msg = "Waning!" + lineSeparator;
+                                msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
+                                msg = msg + "The meta data of parameter-bean already bean registered." + lineSeparator;
+                                msg = msg + "It overrides the old one by NEW parameter-bean: name="
+                                        + parameterBeanMetaDataKey + lineSeparator;
+                                msg = msg + "- - - - - - - - - - -" + lineSeparator;
+                                msg = msg + " sql=" + sql + lineSeparator;
+                                msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
+                                innerLog.warn(msg);
+                            }
+                            _pmbMetaDataMap.put(parameterBeanMetaDataKey, parameterBeanMetaData);
                         }
                     }
                 } catch (SQLException e) {
@@ -320,6 +334,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      * Handle exceptions in exception info map.
      */
     protected void handleException() {
+        if (_exceptionInfoMap.isEmpty()) {
+            return;
+        }
         final Set<String> nameSet = _exceptionInfoMap.keySet();
         final StringBuilder sb = new StringBuilder();
         final String lineSeparator = System.getProperty("line.separator");
@@ -453,7 +470,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             tbl.setName(entityName);
             tbl.setupNeedsJavaNameConvertFalse();
             db.addTable(tbl);
-            _log.debug(entityName + " --> " + tbl.getName() + " : " + tbl.getJavaName() + " : "
+            _log.info(entityName + " --> " + tbl.getName() + " : " + tbl.getJavaName() + " : "
                     + tbl.getUncapitalisedJavaName());
 
             final Set<String> columnNameSet = columnJdbcTypeMap.keySet();
@@ -464,10 +481,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupPrimaryKey(entityName, columnName, col);
 
                 tbl.addColumn(col);
-                _log.debug("   " + (col.isPrimaryKey() ? "*" : " ") + columnName + " --> " + col.getName() + " : "
+                _log.info("   " + (col.isPrimaryKey() ? "*" : " ") + columnName + " --> " + col.getName() + " : "
                         + col.getJavaName() + " : " + col.getUncapitalisedJavaName());
             }
-            _log.debug("");
+            _log.info("");
         }
         final String databaseType = getBasicProperties().getDatabaseName();
         final AppData appData = new AppData(databaseType, null);

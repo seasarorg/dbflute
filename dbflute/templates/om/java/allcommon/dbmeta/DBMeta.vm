@@ -64,30 +64,40 @@ public interface ${myClassName} {
     /**
      * Get the list of column db-name.
      * 
-     * @return The list of column db-name. (NotNull)
+     * @return The list of column db-name. (NotNull and NotEmpty)
      */
     public java.util.List${database.filterGenericsString('String')} getColumnDbNameList();
 
     /**
      * Get the list of column cap-prop-name.
      * 
-     * @return The list of column cap-prop-name. (NotNull)
+     * @return The list of column cap-prop-name. (NotNull and NotEmpty)
      */
     public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList();
 
     /**
      * Get the list of column uncap-prop-name.
      * 
-     * @return The list of column uncap-prop-name. (NotNull)
+     * @return The list of column uncap-prop-name. (NotNull and NotEmpty)
      */
     public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList();
 
     /**
      * Get column-db-name comma-string.
      * 
-     * @return Column-db-name comma-string. (NotNull)
+     * @return Column-db-name comma-string. (NotNull and NotEmpty)
      */
     public String getColumnDbNameCommaString();
+
+    // -----------------------------------------------------
+    //                                           Primary Key
+    //                                           -----------
+    /**
+     * Get primary key column db-name only first one.
+     * 
+     * @return First primary key column db-name. (Nullable: If null, this table has no primary key.)
+     */
+    public String getPrimaryKeyColumnDbNameOnlyFirstOne();
 
     // ===================================================================================
     //                                                                       Name Handling
@@ -306,6 +316,13 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
+    /**
+     * Has primary-key?
+     * 
+     * @return Determination.
+     */
+    public boolean hasPrimaryKey();
+
     /**
      * Has two or more primary-keys?
      * 
