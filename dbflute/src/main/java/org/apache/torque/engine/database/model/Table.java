@@ -1560,7 +1560,7 @@ public class Table implements IDMethod {
         if (hasPrimaryKey()) {
             return getPrimaryKey().get(0).getName();
         } else {
-            return null;
+            return "";
         }
     }
 
