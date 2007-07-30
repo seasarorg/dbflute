@@ -84,8 +84,6 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Set the empty-string of ${col.UncapitalisedJavaName} as equal. { = }
-     * 
-     * @return this. (NotNull)
      */
     public void set${tmpJavaName}_Equal_EmptyString() {
         register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, "");
@@ -97,8 +95,6 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     /**
      * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as equal. { = } <br />
      * ${classificationMap.get('comment')} <br />
-     * 
-     * @return this. (NotNull)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
         register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
@@ -185,7 +181,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * You can invoke this method several times and the conditions are set up.
      * 
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as likeSearch.
-     * @param likeSearchOption Like search option. (NotNull)
+     * @param likeSearchOption The option of like-search. (NotNull)
      */
     public void set${tmpJavaName}_LikeSearch($col.JavaNative ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
         registerLikeSearchQuery(${glConditionKeyName}.CK_LIKE_SEARCH, filterRemoveEmptyString(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, likeSearchOption);
@@ -208,9 +204,10 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * If the element in the list is null or empty-string, the condition-element is ignored.
      * 
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as inScope.
+     * @param inScopeOption The option of in-scope. (NotNull)
      */
-    public void set${tmpJavaName}_InScope(${col.JavaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName} option) {
-        registerInScopeQuery(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyString(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, option);
+    public void set${tmpJavaName}_InScope(${col.JavaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName} inScopeOption) {
+        registerInScopeQuery(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyString(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, inScopeOption);
     }
       #end
       #if (${col.isAvailableStringNotInScope()})
@@ -609,8 +606,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     /**
      * Set the value of ${col.UncapitalisedJavaName} using from-to. { $fromDate <= COLUMN_NAME <= $toDate }
      * 
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as from-to.
-     * @param fromToOption From-To option. (NotNull)
+     * @param fromDate The from-date of ${col.UncapitalisedJavaName}. (Nullable)
+     * @param toDate The to-date of ${col.UncapitalisedJavaName}. (Nullable)
+     * @param fromToOption The option of from-to. (NotNull)
      */
     public void set${tmpJavaName}_FromTo($col.JavaNative fromDate, $col.JavaNative toDate, ${glPackageBaseCommonCOption}.${glConditionOptionFromToName} fromToOption) {
         registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName}, fromToOption);

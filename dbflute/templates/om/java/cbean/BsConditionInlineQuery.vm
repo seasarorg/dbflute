@@ -5,6 +5,7 @@ ${database.allClassCopyright}package ${glPackageCIQ};
 #if ($database.isJavaDirOnlyOne())
   #set ($myCQClassName = "${myBaseConditionQueryClassName}")
 #else
+import ${glPackageCQ}.*;
   #set ($myCQClassName = "${myConditionQueryClassName}")
 #end
 import ${glPackageBaseCQ}.*;
@@ -38,6 +39,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @param sqlClause SQL clause instance. (NotNull)
      * @param aliasName My alias name. (NotNull)
      * @param nestLevel Nest level.
+     * @param myCQ Target wrapped condition-qyery. (NotNull)
      */
     public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
         super(childQuery, sqlClause, aliasName, nestLevel);

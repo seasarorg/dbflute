@@ -399,7 +399,7 @@ public class Table implements IDMethod {
      * Get the comment of the Table
      */
     public String getComment() {
-        return _comment;
+        return _comment != null ? _comment : "";
     }
 
     /**
