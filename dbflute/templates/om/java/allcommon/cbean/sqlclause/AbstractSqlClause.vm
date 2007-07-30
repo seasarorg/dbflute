@@ -771,9 +771,13 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             fetchPageNumber = 1;
         }
         if (_fetchSize <= 0) {
-            String msg = "Fetch size should not be minus or zero when you invoke this method. ";
-            msg = msg + "When you invoke this method, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. ";
-            msg = msg + ": fetchPageNumber=" + fetchPageNumber + " _fetchSize=" + _fetchSize;
+            String msg = "Fetch size should not be minus or zero!" + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "When you invoke this method, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. " + getLineSeparator();
+            msg = msg + "Please confirm your program. Does it really invoke 'fetchPage()' with 'fetchFirst()' or 'fetchScope()'?" + getLineSeparator();
+            msg = msg + "- - - - -" + getLineSeparator();
+            msg = msg + "fetchPageNumber=" + fetchPageNumber + " _fetchSize=" + _fetchSize + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
             throw new IllegalStateException(msg);
         }
         _fetchPageNumber = fetchPageNumber;
@@ -965,12 +969,21 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return _isFetchScopeEffective;
     }
 
-    // =====================================================================================
-    //                                                                         Helper Method
-    //                                                                         =============
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    // ===================================================================================
+    //                                                                       Helper Method
+    //                                                                       =============
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
     /**
      * Assert that the object is not null.
      * 
@@ -989,9 +1002,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         }
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert String
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
      * 

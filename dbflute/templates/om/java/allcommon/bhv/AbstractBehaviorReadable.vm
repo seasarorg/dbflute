@@ -276,7 +276,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected void assertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
         if (entity == null) {
-            String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+            String msg = buildRecordHasBeenDeletedMessage(searchKey4log);
             throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
         }
     }
@@ -290,7 +290,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4log) {
         if (ls == null || ls.isEmpty()) {
-            String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+            String msg = buildRecordHasBeenDeletedMessage(searchKey4log);
             throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
         }
     }
@@ -305,14 +305,32 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4log) {
         if (ls == null || ls.isEmpty()) {
-            String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+            String msg = buildRecordHasBeenDeletedMessage(searchKey4log);
             throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
         }
         if (ls.size() != 1) {
-            String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
-            msg = msg + " resultCount=" + ls.size();
+            String msg = "This selected contents should be only one! But the resultCount=" + ls.size() + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "Please confirm your condition. Does it really select only one?" + getLineSeparator();
+            msg = msg + "And please confirm your database. Does it really exist only one?" + getLineSeparator();
+            msg = msg + "- - - - -" + getLineSeparator();
+            msg = msg + "The searchKey is as follows:" + getLineSeparator() + searchKey4log + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
             throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
         }
+    }
+
+    private String buildRecordHasBeenDeletedMessage(Object searchKey4log) {
+        String msg = "The record has already been deleted!" + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Please confirm the existence of your target record." + getLineSeparator();
+        msg = msg + "Does the target record really created before this operation?" + getLineSeparator();
+        msg = msg + "Has the target record been deleted by other thread?" + getLineSeparator();
+        msg = msg + "It is precondition that the record exists on database." + getLineSeparator();
+        msg = msg + "- - - - -" + getLineSeparator();
+        msg = msg + "The searchKey is as follows:" + getLineSeparator() + searchKey4log + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        return msg;
     }
 
     /**
@@ -405,6 +423,15 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             return ((String)obj).toLowerCase();
         }
         return obj;
+    }
+
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 
     // ----------------------------------------------------------------
