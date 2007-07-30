@@ -2,7 +2,7 @@
 #if ($database.isJavaDirOnlyOne())
 ${database.allClassCopyright}package ${glPackageBaseCQ};
 
-#if ($table.hasPrimaryKey())
+#if ($table.hasPrimaryKey() && $table.hasForeignKeyOrReferer())
 import ${glPackageCQ}.*;
 #end
 #set ($myClassName = "${myBaseConditionQueryClassName}")

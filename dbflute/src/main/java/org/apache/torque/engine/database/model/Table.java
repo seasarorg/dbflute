@@ -1261,12 +1261,21 @@ public class Table implements IDMethod {
     }
 
     /**
+     * Has foreign key or referer?
+     * 
+     * @return Determination.
+     */
+    public boolean hasForeignKeyOrReferer() {
+        return hasForeignKey() || hasReferrer();
+    }
+    
+    /**
      * Has foreign key or referer as one?
      * 
      * @return Determination.
      */
     public boolean hasForeignKeyOrRefererAsOne() {
-        return hasForeignKey() || hasReferrerAsOne();
+        return hasForeignKey() || hasRefererAsOne();
     }
 
     // ===================================================================================
@@ -1313,7 +1322,7 @@ public class Table implements IDMethod {
      * 
      * @return Determination.
      */
-    public boolean hasReferrerAsOne() {
+    protected boolean hasRefererAsOne() {
         final List<ForeignKey> referrers = getReferrers();
         if (referrers == null || referrers.isEmpty()) {
             return false;

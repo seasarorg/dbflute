@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 #if ($database.isAvailableBehaviorGeneration())
 
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
-import ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName};
 #end
 
 /**
@@ -138,7 +137,7 @@ public interface ${glDaoSelectorInterfaceName} {
      * @return Bhv-writable. (NotNull)
      * @deprecated
      */
-    public ${glBehaviorWritableInterfaceName} getWBhv(Class bhvType);
+    public ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName} getWBhv(Class bhvType);
 
     /**
      * Get bhv-writable by entity.
@@ -147,7 +146,7 @@ public interface ${glDaoSelectorInterfaceName} {
      * @return Bhv-writable. (NotNull)
      * @deprecated
      */
-    public ${glBehaviorWritableInterfaceName} getWBhv(${glEntityInterfaceName} entity);
+    public ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName} getWBhv(${glEntityInterfaceName} entity);
 
     /**
      * Get bhv-writable by table multi-name.
@@ -156,7 +155,7 @@ public interface ${glDaoSelectorInterfaceName} {
      * @return Bhv-writable. (NotNull)
      * @deprecated
      */
-    public ${glBehaviorWritableInterfaceName} getWBhv(String tableMultiName);
+    public ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName} getWBhv(String tableMultiName);
 #end
 #end
 }

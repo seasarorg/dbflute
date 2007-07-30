@@ -464,7 +464,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
   #end
 #end
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     // ===================================================================================
     //                                                                              Accept

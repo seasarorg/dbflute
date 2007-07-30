@@ -17,18 +17,12 @@ import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingHeaderInfoName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenizingOptionName};
 import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImplName};
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * The abstract class of behavior-writable.
  * 
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} implements ${glBehaviorWritableInterfaceName} {
-
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${myClassName}.class);
 
     // =====================================================================================
     //                                                                           Constructor
@@ -516,7 +510,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return fileTokenizingOption;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * Reflect(insert or update) from separated-file.
@@ -600,7 +594,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                     br.close();
                 }
             } catch (java.io.IOException ignored) {
-                _log.warn("File-close threw the exception: ", ignored);
             }
         }
         return exceptionList;
