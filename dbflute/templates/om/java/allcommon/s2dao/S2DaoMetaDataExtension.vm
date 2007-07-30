@@ -67,7 +67,7 @@ import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
  * DaoMetaDataImpl for DBFlute.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     // ===================================================================================

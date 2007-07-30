@@ -18,7 +18,7 @@ import org.seasar.framework.container.S2Container;
  * So now this object don't have cache.
  * </pre>
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} {
 
     protected S2Container _container;

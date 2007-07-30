@@ -711,7 +711,11 @@ public class Database {
     public String filterGenericsGeneralOutput(String genericsGeneralOutput) {// It is very important!
         return getBasicProperties().filterGenericsGeneralOutput(genericsGeneralOutput);
     }
-
+    
+    public String outputSuppressWarningsAfterLineSeparator() {
+        return getBasicProperties().outputSuppressWarningsAfterLineSeparator();
+    }
+    
     // ===============================================================================
     //                                                             Properties - Prefix
     //                                                             ===================

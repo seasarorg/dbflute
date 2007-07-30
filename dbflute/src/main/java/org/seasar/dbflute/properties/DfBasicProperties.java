@@ -227,18 +227,34 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     public String filterGenericsDowncast(String genericsDowncast) {
         if (isAvailableGenerics()) {
-            return "";
-        } else {
             return "(" + genericsDowncast + ")";
+        } else {
+            return "";
         }
     }
 
     public String filterGenericsGeneralOutput(String genericsGeneralOutput) {
         if (isAvailableGenerics()) {
-            return "";
-        } else {
             return genericsGeneralOutput;
+        } else {
+            return "";
         }
+    }
+    
+    public String filterGenericsGeneralOutputAfterNewLineOutput(String genericsGeneralOutput) {
+        if (isAvailableGenerics()) {
+            return getLineSeparator() + filterGenericsGeneralOutput(genericsGeneralOutput);
+        } else {
+            return "";
+        }
+    }
+    
+    public String outputSuppressWarningsAfterLineSeparator() {
+        return filterGenericsGeneralOutputAfterNewLineOutput("@SuppressWarnings(\"unchecked\")");
+    }
+    
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 
     // ===================================================================================

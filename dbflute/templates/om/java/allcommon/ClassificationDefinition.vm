@@ -6,7 +6,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
  * The definition class that has classification.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
 
     // =====================================================================================

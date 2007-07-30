@@ -25,7 +25,7 @@ import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImplN
  * The abstract class of behavior-readable.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class $myClassName implements ${glBehaviorReadableInterfaceName} {
 
     // ===================================================================================

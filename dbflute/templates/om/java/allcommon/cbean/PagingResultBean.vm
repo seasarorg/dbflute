@@ -428,12 +428,14 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
      * @deprecated Please use ${glPackageBaseCommonCBeanPagenavi}.${glPageRangeOptionName}
      */
     public static class PageRangeOption extends ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName} {
+        private static final long serialVersionUID = 1L;
     }
 
     /**
      * @deprecated Please use ${glPackageBaseCommonCBeanPagenavi}.${glPageGroupOptionName}
      */
     public static class PageGroupOption extends ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupOptionName} {
+        private static final long serialVersionUID = 1L;
     }
 #end
 

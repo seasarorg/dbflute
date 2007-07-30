@@ -48,7 +48,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
  * SelectDynamicCommand for DBFlute.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 #if ($database.isSelectQueryTimeoutValid())
 

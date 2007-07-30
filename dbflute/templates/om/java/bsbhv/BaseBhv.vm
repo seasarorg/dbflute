@@ -4,7 +4,6 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 
 import ${glPackageBaseCommon}.*;
 #if ($database.isAvailableGenerics())
-import ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName};
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 #end
@@ -64,7 +63,7 @@ import ${glPackageCB}.*;
  * </pre>
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExtendClassName} {
 
     // ===================================================================================
@@ -649,7 +648,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         if (${myEntityListVariableName}.isEmpty()) {
             return;
         }
-        load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
+        load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
     }
 
     /**
@@ -683,7 +682,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} Entity list of ${table.uncapitalisedJavaName}. (NotNull)
      * @param loadRefererOption Load-referer option. (NotNull)
      */
-    public void load${refferer.reffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
+    public void load${refferer.reffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("loadRefererOption<${reffererEntityClassName}, ${reffererCBClassName}>", loadRefererOption);
         if (${myEntityListVariableName}.isEmpty()) {

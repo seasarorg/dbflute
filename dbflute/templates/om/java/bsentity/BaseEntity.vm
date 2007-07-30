@@ -50,7 +50,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
  * </pre>
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.Serializable {
 
     /** Serial version UID. (Default) */
@@ -275,9 +275,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                               Classification Getter
     //                                                               =====================
+#set ($isUseHelpGettingFromClassificationMap = false)
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #if (${col.hasClassificationName()})
+      #set ($isUseHelpGettingFromClassificationMap = true)
 
     /**
      * Get the value of ${col.UncapitalisedJavaName} as classification-name.
@@ -289,6 +291,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
     #end
     #if (${col.hasClassificationAlias()})
+      #set ($isUseHelpGettingFromClassificationMap = true)
 
     /**
      * Get the value of ${col.UncapitalisedJavaName} as classification-alias.
@@ -302,7 +305,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #end
 #end
 
-#if (${table.hasClassification()})
+#if (${isUseHelpGettingFromClassificationMap})
     private String helpGettingFromClassificationMap(Object key, java.util.Map${database.filterGenericsString('String, String')} map) {
         if (key == null) { return null; }
         return (String)map.get(key.toString()); 

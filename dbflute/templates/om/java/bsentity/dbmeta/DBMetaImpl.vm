@@ -866,8 +866,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @return Primary-key map-string. (NotNull)
      */
     public String extractPrimaryKeyMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal) {
-        final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
 #if ($table.hasPrimaryKey())
+        final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
         final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         final StringBuffer sb = new StringBuffer();
 #foreach ($col in $table.PrimaryKey)
@@ -879,7 +879,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #else
         return extractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
 #end
-
     }
 
     /**
