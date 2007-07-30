@@ -58,7 +58,7 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
   #end
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Extract common-column-value map-string.
      * 

@@ -218,7 +218,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @throws java.io.IOException
      */
     public ${glTokenFileReflectionResultName} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * Reflect(insert or update) from separated-file.
