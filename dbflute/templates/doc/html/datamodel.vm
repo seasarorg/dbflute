@@ -17,14 +17,16 @@ ${database.initializeClassificationDeployment()}
       <th class="normalFont">Table Name</th>
       <th class="normalFont">Entity Name</th>
       <th class="normalFont">Foreign Table</th>
-      <th class="normalFont">Refferer Table</th>
+      <th class="normalFont">Referer Table</th>
+      <th class="normalFont">Comment</th>
     </tr>
   #foreach ($tbl in $database.tables)
     <tr>
       <td class="normalFont"><a href="#$tbl.Name">$tbl.Name</a></td>
-      <td class="normalFont">$tbl.JavaName</td>
-      <td class="normalFont">$tbl.ForeignTableNameCommaStringWithHtmlHref</td>
-      <td class="normalFont">$tbl.ReferrerTableNameCommaStringWithHtmlHref</td>
+      <td class="normalFont">$tbl.javaName</td>
+      <td class="normalFont">$tbl.foreignTableNameCommaStringWithHtmlHref</td>
+      <td class="normalFont">$tbl.referrerTableNameCommaStringWithHtmlHref</td>
+      <td class="normalFont">$tbl.comment</td>
     </tr>
   #end
   </table>
