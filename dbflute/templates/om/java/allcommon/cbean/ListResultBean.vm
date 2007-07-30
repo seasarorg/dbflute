@@ -14,7 +14,7 @@ import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 /**
  * The list-result-bean for ${myClassName}.
  * 
- * @param ${database.filterGenericsString('ENTITY')} The generic template for 'selectedList'.
+ * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity for the element of selectedList()')}
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName}${database.filterGenericsString('ENTITY')} implements java.util.List${database.filterGenericsString('ENTITY')}, java.io.Serializable {

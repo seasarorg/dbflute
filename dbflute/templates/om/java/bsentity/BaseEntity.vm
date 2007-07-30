@@ -372,7 +372,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #set ($reffererTable = $refferer.Table)
   #set ($reffererEntityClassName = "${refferer.refererTableExtendedEntityClassName}")
   #set ($reffererCBClassName = "${refferer.refererTableExtendedConditionBeanClassName}")
-  #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+  #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.reffererPropertyNameInitCap}")
   #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
 
   #if (${refferer.isOneToOne()})
@@ -412,10 +412,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /**
      * Set the list of refferer table.
      * 
-     * @param value The list of refferer table. (Nullable)
+     * @param ${refferer.reffererPropertyName} The list of refferer table. (Nullable)
      */
-    public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} entity) {
-        this.${reffererVariableName} = entity;
+    public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ${refferer.reffererPropertyName}) {
+        this.${reffererVariableName} = ${refferer.reffererPropertyName};
     }
   #if (${refferer.isOneToOne()})
 

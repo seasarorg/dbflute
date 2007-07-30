@@ -12,7 +12,7 @@ import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName};
 /**
  * The paging-result-bean for ${myClassName}.
  * 
- * @param ${database.filterGenericsString('ENTITY')} The generic template for 'selectedList'.
+ * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity for the element of selectedList()')}
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${glListResultBeanName}${database.filterGenericsString('ENTITY')} {
@@ -137,7 +137,7 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
     /**
      * Set the value of pageGroupSize.
      * 
-     * @param value The value of pageGroupSize.
+     * @param pageGroupSize The value of pageGroupSize.
      */
     public void setPageGroupSize(int pageGroupSize) {
         final ${glPageGroupOptionName} option = new ${glPageGroupOptionName}();

@@ -5,6 +5,7 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 /**
  * The interface of entity list setupper.
  * 
+ * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
  * @author ${database.ClassAuthor}
  */
 public interface ${glEntityListSetupperName}<ENTITY extends ${glEntityInterfaceName}> {

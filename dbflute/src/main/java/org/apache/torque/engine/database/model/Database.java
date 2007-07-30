@@ -708,6 +708,10 @@ public class Database {
         return getBasicProperties().filterGenericsDowncast(genericsDowncast);
     }
 
+    public String filterGenericsParamOutput(String variableName, String description) {
+        return getBasicProperties().filterGenericsParamOutput(variableName, description);
+    }
+    
     public String filterGenericsGeneralOutput(String genericsGeneralOutput) {// It is very important!
         return getBasicProperties().filterGenericsGeneralOutput(genericsGeneralOutput);
     }

@@ -3,6 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanMapping};
 /**
  * The interface of entity converter.
  * 
+ * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
+ * ${database.filterGenericsParamOutput('<DTO>', 'The type of dto.')}
  * @author ${database.ClassAuthor}
  */
 public interface ${glEntityDtoMapperName}<ENTITY, DTO> {

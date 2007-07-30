@@ -449,6 +449,10 @@ public interface ${myClassName} {
      * Extract common-column-value map-string.
      * 
      * @param entity Target entity. (NotNull)
+     * @param startBrace Start-brace. (NotNull)
+     * @param endBrace End-brace. (NotNull)
+     * @param delimiter Delimiter. (NotNull)
+     * @param equal Equal. (NotNull)
      * @return Common-column-value map-string. (NotNull)
      */
     public String extractCommonColumnValueMapString(${glEntityInterfaceName} entity, String startBrace, String endBrace, String delimiter, String equal);

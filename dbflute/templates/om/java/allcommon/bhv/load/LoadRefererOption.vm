@@ -8,6 +8,8 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 /**
  * The class of load referer option.
  * 
+ * ${database.filterGenericsParamOutput('<REFERER_CONDITION_BEAN>', 'The type of referer condition-bean.')}
+ * ${database.filterGenericsParamOutput('<REFERER_ENTITY>', 'The type of referer entity.')}
  * @author ${database.ClassAuthor}
  */
 public class ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN extends ${glConditionBeanInterfaceName}, REFERER_ENTITY extends ${glEntityInterfaceName}> {
@@ -103,6 +105,7 @@ public class ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN extends ${glCondi
     }
 
     /**
+     * @return The condition-bean of referer.
      * @deprecated Sorry! This methid have typo! Please use getRefererConditionBean().
      */
     public REFERER_CONDITION_BEAN getReffererConditionBean() {
@@ -110,6 +113,7 @@ public class ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN extends ${glCondi
     }
 
     /**
+     * @param refererConditionBean The condition-bean of referer.
      * @deprecated Sorry! This methid have typo! Please use setRefererConditionBean().
      */
     public void setReffererConditionBean(REFERER_CONDITION_BEAN refererConditionBean) {

@@ -3,6 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
 /**
  * The class of option for grouping making.
  * 
+ * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
  * @author ${database.ClassAuthor}
  */
 public class ${glGroupingOptionName}<ENTITY> {

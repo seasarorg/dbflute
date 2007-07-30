@@ -50,6 +50,7 @@ public class ${glTraceablePreparedStatementName} implements PreparedStatement {
      * 
      * @param preparedStatement Wrap target prepared statement. (NotNull)
      * @param preparedSql Prepared sql. (NotNull)
+     * @param statementHistoryWitness Statement history witness. (NotNull)
      */
     public ${glTraceablePreparedStatementName}(PreparedStatement preparedStatement, String preparedSql, ${glStatementHistoryWitnessName} statementHistoryWitness) {
         this._preparedStatement = preparedStatement;

@@ -5,9 +5,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenavi};
 /**
  * The setupper of page number link.
  * 
+ * ${database.filterGenericsParamOutput('<LINK>', 'The type of link.')}
  * @author ${database.ClassAuthor}
  */
-public interface ${myClassName}<LINK_TYPE extends ${glPageNumberLinkName}> {
+public interface ${myClassName}<LINK extends ${glPageNumberLinkName}> {
 
     /**
      * Set up.
@@ -16,5 +17,5 @@ public interface ${myClassName}<LINK_TYPE extends ${glPageNumberLinkName}> {
      * @param current Is current page?
      * @return Page number link. (NotNull)
      */
-    public LINK_TYPE setup(int pageNumberElement, boolean current);
+    public LINK setup(int pageNumberElement, boolean current);
 }

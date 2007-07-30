@@ -111,6 +111,8 @@ public interface ${myClassName} {
     //                                                                            ==========
     /**
      * Copy included-select-column.
+     * 
+     * @param sqlClause Sql-clause. (NotNull)
      */
     public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause);
 

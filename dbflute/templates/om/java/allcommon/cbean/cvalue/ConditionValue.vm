@@ -598,6 +598,7 @@ public class ${myClassName} {
      * Set the value of likeSearch.
      * 
      * @param value The value of likeSearch. (Nullable)
+     * @param option The option of likeSearch. (Nullable)
      * @return this. (NotNull)
      */
     public ${myClassName} setLikeSearch(String value, ${glConditionOptionLikeSearchName} option) {

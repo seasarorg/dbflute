@@ -15,6 +15,7 @@ public interface ${glDaoSelectorInterfaceName} {
     /**
      * Get dao.
      * 
+     * ${database.filterGenericsParamOutput('<DAO_TYPE>', 'The type of dao.')}
      * @param daoType Dao type. (NotNull)
      * @return Dao. (NotNull)
      */
@@ -32,6 +33,7 @@ public interface ${glDaoSelectorInterfaceName} {
     /**
      * Get behavior.
      * 
+     * ${database.filterGenericsParamOutput('<BEHAVIOR_TYPE>', 'The type of behavior.')}
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
      */

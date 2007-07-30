@@ -355,14 +355,15 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /**
      * Select value-label list.
      * 
+     * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
      * @param cb Condition-bean. (NotNull)
      * @param valueLabelSetupper Value-label-setupper. (NotNull)
      * @return Value-label list. (NotNull)
      */
-    protected <E> java.util.List<java.util.Map<String, Object>> createValueLabelList(${glListResultBeanName}<E> ls, ${glValueLabelSetupperName}<E> valueLabelSetupper) {
+    protected <ENTITY extends ${glEntityInterfaceName}> java.util.List<java.util.Map<String, Object>> createValueLabelList(${glListResultBeanName}<ENTITY> ls, ${glValueLabelSetupperName}<ENTITY> valueLabelSetupper) {
         final java.util.List<java.util.Map<String, Object>> valueLabelList = new java.util.ArrayList<java.util.Map<String, Object>>();
         final ${glValueLabelBoxName} box = new ${glValueLabelBoxName}();
-        for (E entity : ls) {
+        for (ENTITY entity : ls) {
             final java.util.Map<String, Object> valueLabel = new java.util.HashMap<String, Object>();
             valueLabelSetupper.setup(box, entity);
             valueLabel.put("value", box.getValue());

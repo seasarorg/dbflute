@@ -3,6 +3,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
 /**
  * The interface of grouping row setupper.
  * 
+ * ${database.filterGenericsParamOutput('<ROW>', 'The type of row.')}
+ * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
  * @author ${database.ClassAuthor}
  */
 public interface ${glGroupingRowSetupperName}<ROW, ENTITY> {

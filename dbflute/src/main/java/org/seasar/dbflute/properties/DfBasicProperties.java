@@ -233,6 +233,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
+    public String filterGenericsParamOutput(String variableName, String description) {
+        return filterGenericsGeneralOutput("@param " + variableName + " " + description);
+    }
+
     public String filterGenericsGeneralOutput(String genericsGeneralOutput) {
         if (isAvailableGenerics()) {
             return genericsGeneralOutput;
@@ -240,7 +244,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             return "";
         }
     }
-    
+
     public String filterGenericsGeneralOutputAfterNewLineOutput(String genericsGeneralOutput) {
         if (isAvailableGenerics()) {
             return getLineSeparator() + filterGenericsGeneralOutput(genericsGeneralOutput);
@@ -248,11 +252,11 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             return "";
         }
     }
-    
+
     public String outputSuppressWarningsAfterLineSeparator() {
         return filterGenericsGeneralOutputAfterNewLineOutput("@SuppressWarnings(\"unchecked\")");
     }
-    
+
     protected String getLineSeparator() {
         return System.getProperty("line.separator");
     }

@@ -55,6 +55,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
      * @param statementFactory Statement factory.
      * @param resultSetFactory Result set factory.
      * @param readerFactory Annotation reader factory.
+     * @param xaDataSource XA data source.
      */
     public ${glDaoMetaDataFactoryImpl}(DataSource dataSource,
             StatementFactory statementFactory,

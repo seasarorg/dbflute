@@ -46,7 +46,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     /**
      * Set the value of ${propertyName}.
      * 
-     * @param value The value of ${propertyName}.
+     * @param ${propertyName} The value of ${propertyName}.
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
         _${propertyName} = ${propertyName};
