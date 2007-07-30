@@ -5,9 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCB};
 import ${glPackageBaseCommonCBean}.${glConditionBeanAbstractName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
-
 import ${glPackageCQ}.*;
-import ${glPackageNss}.*;
 
 /**
  * The condition-bean of ${table.name}.
@@ -275,7 +273,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     /** Is select for ${tmpPropertyName}? */
     protected boolean _isSelect${tmpPropertyNameInitCap};
     /** Nest select setupper for ${tmpPropertyName}. */
-    protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+    protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     /**
      * Is select for ${tmpPropertyName}? {For Internal}
      * 
@@ -289,9 +287,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * 
      * @return Nest select setupper. (NotNull)
      */
-    public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
+    public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) {
-            _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null);// for Dummy
+            _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(null);// for Dummy
         }
         return _nss${tmpPropertyNameInitCap};
     }
@@ -301,10 +299,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * 
      * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
      */
-    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
+    public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         query().query${tmpPropertyNameInitCap}();// For setting outer join.
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
-            _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
+            _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
         }
         _isSelect${tmpPropertyNameInitCap} = true;
         limitSelect_Off();
@@ -325,7 +323,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     /** Is select for ${tmpPropertyName}? */
     protected boolean _isSelect${tmpPropertyNameInitCap};
     /** Nest select setupper for ${tmpPropertyName}. */
-    protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
+    protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     /**
      * Is select for ${tmpPropertyName}? {For Internal}
      * 
@@ -339,9 +337,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * 
      * @return Nest select setupper. (NotNull)
      */
-    public ${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
+    public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) {
-            _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(null);// for Dummy
+            _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(null);// for Dummy
         }
         return _nss${tmpPropertyNameInitCap};
     }
@@ -351,10 +349,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * 
      * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
      */
-    public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
+    public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         query().query${tmpPropertyNameInitCap}();// For setting outer join.
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
-            _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
+            _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
         }
         _isSelect${tmpPropertyNameInitCap} = true;
         limitSelect_Off();

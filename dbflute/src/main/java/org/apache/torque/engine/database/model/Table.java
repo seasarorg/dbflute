@@ -1260,6 +1260,15 @@ public class Table implements IDMethod {
         return unique;
     }
 
+    /**
+     * Has foreign key or referer as one?
+     * 
+     * @return Determination.
+     */
+    public boolean hasForeignKeyOrRefererAsOne() {
+        return hasForeignKey() || hasReferrerAsOne();
+    }
+
     // ===================================================================================
     //                                                                            Referrer
     //                                                                            ========
@@ -1297,6 +1306,24 @@ public class Table implements IDMethod {
      */
     public boolean hasReferrer() {
         return (getReferrers() != null && !getReferrers().isEmpty());
+    }
+
+    /**
+     * Has refferer as one?
+     * 
+     * @return Determination.
+     */
+    public boolean hasReferrerAsOne() {
+        final List<ForeignKey> referrers = getReferrers();
+        if (referrers == null || referrers.isEmpty()) {
+            return false;
+        }
+        for (ForeignKey key : referrers) {
+            if (key.isOneToOne()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // -----------------------------------------------------

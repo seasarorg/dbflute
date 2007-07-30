@@ -8,7 +8,6 @@ ${database.allClassCopyright}package ${glPackageCIQ};
   #set ($myCQClassName = "${myConditionQueryClassName}")
 #end
 import ${glPackageBaseCQ}.*;
-import ${glPackageCQ}.*;
 
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
@@ -99,7 +98,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
       #end
@@ -109,7 +108,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
         #end
@@ -121,7 +120,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
             #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
             #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         throw new UnsupportedOperationException("ExistsSubQuery at inline() is unsupported! Sorry!");
         // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
@@ -135,7 +134,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
       #end
@@ -145,7 +144,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }
         #end
@@ -157,7 +156,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
             #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
             #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+    public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         throw new UnsupportedOperationException("ExistsSubQuery at inline() is unsupported! Sorry!");
         // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
     }

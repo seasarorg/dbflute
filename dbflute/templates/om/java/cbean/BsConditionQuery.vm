@@ -2,7 +2,9 @@
 #if ($database.isJavaDirOnlyOne())
 ${database.allClassCopyright}package ${glPackageBaseCQ};
 
+#if ($table.hasPrimaryKey())
 import ${glPackageCQ}.*;
+#end
 #set ($myClassName = "${myBaseConditionQueryClassName}")
 #else
 ${database.allClassCopyright}package ${glPackageCQ};
@@ -10,13 +12,8 @@ ${database.allClassCopyright}package ${glPackageCQ};
 import ${glPackageBaseCQ}.*;
 #set ($myClassName = "${myConditionQueryClassName}")
 #end
-#if ($database.hasClassificationDefinitionMap())
-
-import ${glPackageBaseCommon}.${glClassificationDefinition};
-#end
 
 import ${glPackageBaseCommonCBean}.*;
-import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageCIQ}.*;
@@ -297,22 +294,22 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                         Union Query
     //                                                                         ===========
     protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+#if ($table.hasForeignKeyOrRefererAsOne())
         final ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
         final ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;
-  #foreach ($foreignKeys in $table.ForeignKeys)
-
+#end
+#foreach ($foreignKeys in $table.ForeignKeys)
         if (baseQuery.hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
             unionQuery.query${foreignKeys.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(baseQuery.query${foreignKeys.foreignPropertyNameInitCap}(), unionQuery.query${foreignKeys.foreignPropertyNameInitCap}());
         }
-  #end
-  #foreach ($refferer in $table.Referrers)
-    #if (${refferer.isOneToOne()})
-
+#end
+#foreach ($refferer in $table.Referrers)
+#if (${refferer.isOneToOne()})
         if (baseQuery.hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
             unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.query${refferer.reffererPropertyNameInitCapAsOne}(), unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}());
         }
-    #end
-  #end
+#end
+#end
 
     }
 
