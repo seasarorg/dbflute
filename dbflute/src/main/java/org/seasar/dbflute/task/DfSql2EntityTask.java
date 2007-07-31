@@ -164,6 +164,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
         final Log log4inner = _log;
+        final boolean sql2entityUseColumnNameNotLabel = getProperties().getOtherProperties().isSql2EntityUseColumnNameNotLabel();
 
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // Implementing SqlFileRunnerBase as inner class.
@@ -201,10 +202,18 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         final Map<String, Integer> columnJdbcTypeMap = new LinkedHashMap<String, Integer>();
                         final ResultSetMetaData md = rs.getMetaData();
                         for (int i = 1; i <= md.getColumnCount(); i++) {
-                            final String columnName = md.getColumnName(i);
+                            String columnName = null;
+                            if (!sql2entityUseColumnNameNotLabel) {
+                                columnName = md.getColumnLabel(i);
+                            }
                             if (columnName == null || columnName.trim().length() == 0) {
-                                String msg = "The columnName is invalid: " + columnName;
-                                msg = msg + " sql=" + sql;
+                                columnName = md.getColumnName(i);
+                            }
+                            if (columnName == null || columnName.trim().length() == 0) {
+                                final String lineSeparator = System.getProperty("line.separator");
+                                String msg = "The columnName is invalid: columnName=" + columnName + lineSeparator;
+                                msg = msg + "ResultSetMetaData returned invalid value." + lineSeparator;
+                                msg = msg + "sql=" + sql;
                                 throw new IllegalArgumentException(msg);
                             }
                             final int columnType = md.getColumnType(i);

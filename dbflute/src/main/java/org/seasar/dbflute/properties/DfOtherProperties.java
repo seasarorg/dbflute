@@ -51,4 +51,11 @@ public final class DfOtherProperties extends DfAbstractHelperProperties {
     public String getExtractAcceptEqual() {
         return stringProp("torque.extractAcceptEqual", "@=");
     }
+
+    // ===============================================================================
+    //                                                                  
+    //                                                                  ==============
+    public boolean isSql2EntityUseColumnNameNotLabel() {
+        return booleanProp("torque.isSql2EntityUseColumnNameNotLabel", false);
+    }
 }
