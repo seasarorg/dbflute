@@ -99,6 +99,13 @@ public interface ${myClassName} {
      */
     public String getPrimaryKeyColumnDbNameOnlyFirstOne();
 
+    /**
+     * Get the list of primary key column db-name.
+     * 
+     * @return The list of primary key column db-name. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString('String')} getPrimaryKeyColumnDbNameList();
+
     // ===================================================================================
     //                                                                       Name Handling
     //                                                                       =============
@@ -303,7 +310,7 @@ public interface ${myClassName} {
     public ${glEntityInterfaceName} newEntity();
 
     // ===================================================================================
-    //                                                                      Foreign DBMeta
+    //                                                                      Related DBMeta
     //                                                                      ==============
     /**
      * Get foreign dbmeta.
@@ -312,6 +319,22 @@ public interface ${myClassName} {
      * @return Foreign DBMeta. (NotNull)
      */ 
     public ${myClassName} getForeignDBMeta(String foreignPropertyName);
+
+    /**
+     * Get referer dbmeta.
+     * 
+     * @param refererPropertyName Referer-property-name(Both OK - InitCap or not). (NotNull)
+     * @return Referer DBMeta. (NotNull)
+     */ 
+    public ${myClassName} getRefererDBMeta(String refererPropertyName);
+
+    /**
+     * Get referer info.
+     * 
+     * @param refererPropertyName Referer-property-name(Both OK - InitCap or not). (NotNull)
+     * @return Referer info. (NotNull)
+     */ 
+    public ${glRefererInfoName} getRefererInfo(String refererPropertyName);
 
     // ===================================================================================
     //                                                                       Determination

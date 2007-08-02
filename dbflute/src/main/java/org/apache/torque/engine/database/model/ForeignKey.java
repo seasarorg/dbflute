@@ -831,7 +831,8 @@ public class ForeignKey {
     }
 
     /**
-     * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (LOCAL:FOREIGN)
+     * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (LOCAL:FOREIGN) <br />
+     * (for s2dao)
      * 
      * @return Generated string.
      */
@@ -853,7 +854,8 @@ public class ForeignKey {
     }
 
     /**
-     * Returns RelationKeysCommaString for OneToOneRefferer. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL)
+     * Returns RelationKeysCommaString for OneToOneRefferer. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL) <br />
+     * (for s2dao)
      * 
      * @return Generated string.
      */
@@ -875,6 +877,30 @@ public class ForeignKey {
         return result;
     }
 
+    /**
+     * Returns RelationKeysCommaString. [RECLCQ_NO:RECLCQ_NO, SPRLPT_TP:...] (FOREIGN:LOCAL) <br />
+     * (for s2dao)
+     * 
+     * @return Generated string.
+     */
+    public String getChildKeysCommaString() {
+        final List foreignColumnList = getForeignColumnObjectList();
+        String result = "";
+        for (final Iterator ite = foreignColumnList.iterator(); ite.hasNext();) {
+            final Column foreignCol = (Column) ite.next();
+            final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
+            final String foreignName = foreignCol.getName();
+            final String localName = localCol.getName();
+
+            if ("".equals(result)) {
+                result = foreignName + ":" + localName;
+            } else {
+                result = result + ", " + foreignName + ":" + localName;
+            }
+        }
+        return result;
+    }
+    
     // ==========================================================================================
     //                                                                            toString Method
     //                                                                            ===============

@@ -228,7 +228,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     // ===================================================================================
-    //                                                                      Foreign DBMeta
+    //                                                                      Related DBMeta
     //                                                                      ==============
     /**
      * ${database.ImplementComment}
@@ -250,6 +250,60 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
         try {
             return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param refererPropertyName Referer-property-name(Both OK - InitCap or not). (NotNull)
+     * @return Referer DBMeta. (NotNull)
+     */ 
+    public ${glDBMetaInterfaceName} getRefererDBMeta(String refererPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+        final String methodName = "getRefererDBMeta_" + refererPropertyName.substring(0, 1).toUpperCase() + refererPropertyName.substring(1);
+
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "The refererPropertyName is not found: refererPropertyName=" + refererPropertyName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param refererPropertyName Referer-property-name(Both OK - InitCap or not). (NotNull)
+     * @return Referer info. (NotNull)
+     */ 
+    public ${glRefererInfoName} getRefererInfo(String refererPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+        final String methodName = "getRefererInfo_" + refererPropertyName.substring(0, 1).toUpperCase() + refererPropertyName.substring(1);
+
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "The refererPropertyName is not found: refererPropertyName=" + refererPropertyName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glRefererInfoName})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {

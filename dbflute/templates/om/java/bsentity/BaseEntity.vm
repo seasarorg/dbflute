@@ -378,8 +378,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #if (${refferer.isOneToOne()})
 
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   RefererTable    = [${refferer.Table.basicInfoDispString}]
-    //   RefererProperty = [${refferer.ReffererPropertyName}]
+    //   RefererTable    = [${refferer.table.basicInfoDispString}]
+    //   RefererProperty = [${refferer.reffererPropertyName}]
     // * * * * * * * * */
 
     /** RELNO of foreign table for s2dao. */
@@ -394,23 +394,33 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //   RefererTable    = [${refferer.table.basicInfoDispString}]
     //   RefererProperty = [${refferer.reffererPropertyName}]
     // * * * * * * * * */
+
+    #if ($database.isAvailableChildNoAnnotationGenerating())
+
+    /** CHILDNO of referer table for s2dao. */
+    public static final int ${refferer.reffererJavaBeansRulePropertyName}_CHILDNO = ${foreignKeysIndex};
+
+    /** CHILDKEYS of referer table for s2dao. */
+    public static final String ${refferer.reffererJavaBeansRulePropertyName}_CHILDKEYS = "$refferer.childKeysCommaString";
+      #set ($foreignKeysIndex = $foreignKeysIndex + 1)
+    #end
   #end
 
-    /** The list of refferer table. */
+    /** The list of referer table. */
     protected java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} $reffererVariableName;
 
     /**
-     * Get the list of refferer table without lazyload.
+     * Get the list of referer table without lazyload.
      * If it's not loaded yet, returns null.
      * 
-     * @return The list of refferer table. (Nullable)
+     * @return The list of referer table. (Nullable)
      */
     public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.ReffererPropertyNameInitCap}() {
         return ${reffererVariableName};
     }
 
     /**
-     * Set the list of refferer table.
+     * Set the list of referer table.
      * 
      * @param ${refferer.reffererPropertyName} The list of refferer table. (Nullable)
      */
@@ -420,11 +430,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #if (${refferer.isOneToOne()})
 
     /**
-     * Get the entity of refferer table as one without lazyload.
+     * Get the entity of referer table as one without lazyload.
      * If it's not loaded yet, returns null.
-     * If the size of the refferer table list is zero, throws the exception.
+     * If the size of the referer table list is zero, throws the exception.
      * 
-     * @return The entity of refferer table. (Nullable)
+     * @return The entity of referer table. (Nullable)
      */
     public ${reffererEntityLongClassName} get${refferer.reffererPropertyNameInitCapAsOne}() {
         final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}();
@@ -440,9 +450,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Set the entity of refferer table as one.
+     * Set the entity of referer table as one.
      * 
-     * @param entity The entity of refferer table. (Nullable)
+     * @param entity The entity of referer table. (Nullable)
      */
     public void set${refferer.reffererPropertyNameInitCapAsOne}(${reffererEntityLongClassName} entity) {
         if (entity == null) {

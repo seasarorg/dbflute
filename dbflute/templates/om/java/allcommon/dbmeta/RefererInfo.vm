@@ -1,0 +1,63 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
+
+#set ($myClassName = "${glRefererInfoName}")
+
+/**
+ * The class of referer information.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected String refererName;
+    protected ${glDBMetaInterfaceName} localDBMeta;
+    protected ${glDBMetaInterfaceName} refererDBMeta;
+    protected java.util.Map${database.filterGenericsString('String, String')} localRefererColumnMap;
+    protected boolean oneToOne;
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getRefererName() {
+        return refererName;
+    }
+
+    public void setRefererName(String refererName) {
+        this.refererName = refererName;
+    }
+
+    public ${glDBMetaInterfaceName} getLocalDBMeta() {
+        return localDBMeta;
+    }
+
+    public void setLocalDBMeta(${glDBMetaInterfaceName} localDBMeta) {
+        this.localDBMeta = localDBMeta;
+    }
+
+    public ${glDBMetaInterfaceName} getRefererDBMeta() {
+        return refererDBMeta;
+    }
+
+    public void setRefererDBMeta(${glDBMetaInterfaceName} refererDBMeta) {
+        this.refererDBMeta = refererDBMeta;
+    }
+
+    public java.util.Map${database.filterGenericsString('String, String')} getLocalRefererColumnMap() {
+        return localRefererColumnMap;
+    }
+
+    public void setLocalRefererColumnMap(java.util.Map${database.filterGenericsString('String, String')} localRefererColumnMap) {
+        this.localRefererColumnMap = localRefererColumnMap;
+    }
+
+    public boolean isOneToOne() {
+        return oneToOne;
+    }
+
+    public void setOneToOne(boolean oneToOne) {
+        this.oneToOne = oneToOne;
+    }
+}

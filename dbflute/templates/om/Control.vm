@@ -162,6 +162,7 @@ targetdatabase = $targetDatabase
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
+    #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
 
     ## [Allcommon-Exception]
     #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
@@ -820,6 +821,12 @@ targetdatabase = $targetDatabase
     $database.debug("    parseAbstractDBMeta();")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/AbstractDBMeta.${glTemplateFileExtension}",$path,"", "")
+
+    #if ($database.isTargetLanguageJava())
+      $database.debug("    parse('RefererInfo');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glRefererInfoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/RefererInfo.${glTemplateFileExtension}",$path,"", "")
+    #end
 
     ## Setup java directory.
     $database.setupJavaDir_for_dbmetaInstanceHandler()

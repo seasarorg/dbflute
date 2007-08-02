@@ -41,6 +41,7 @@ targetdatabase = $targetDatabase
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
+    #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
 
     ## [Helper]
     #set ($glMapListStringName = "${glProjectPrefix}MapListString")

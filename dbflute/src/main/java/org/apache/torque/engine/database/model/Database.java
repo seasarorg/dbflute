@@ -1162,6 +1162,10 @@ public class Database {
     public boolean isAvailableOtherConnectionDaoInitialization() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableOtherConnectionDaoInitialization();
     }
+    
+    public boolean isAvailableChildNoAnnotationGenerating() {
+        return getProperties().getS2DaoAdjustmentProperties().isAvailableChildNoAnnotationGenerating();
+    }
 
     // -----------------------------------------------------
     //                                                 Other

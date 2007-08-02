@@ -435,6 +435,19 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return "${table.primaryKeyColumnDbNameOnlyFirstOne}";
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The list of primary key column db-name. (NotNull)
+     */
+    public java.util.List${database.filterGenericsString('String')} getPrimaryKeyColumnDbNameList() {
+        final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
+#foreach ($col in $table.primaryKey)
+        resultList.add("$col.name");
+#end
+        return resultList;
+    }
+
     // ===================================================================================
     //                                                                           Type Name
     //                                                                           =========
@@ -544,9 +557,12 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                      Foreign DBMeta
+    //                                                                      Related DBMeta
     //                                                                      ==============
-#foreach ($foreignKeys in $table.ForeignKeys)
+    // -----------------------------------------------------
+    //                                       Foreign Element
+    //                                       ---------------
+#foreach ($foreignKeys in $table.foreignKeys)
     /**
      * Get foreign dbmeta of ${foreignKeys.foreignPropertyNameInitCap}.
      * 
@@ -556,19 +572,52 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return ${foreignKeys.foreignTableDBMetaClassName}.getInstance();
     }
 #end
-#foreach ($refferer in $table.Referrers)
-  #set ($reffererTable = $refferer.Table)
-  #if (${refferer.isOneToOne()})
+#foreach ($referer in $table.referrers)
+  #if (${referer.isOneToOne()})
 
     /**
-     * Get foreign dbmeta of ${refferer.reffererPropertyNameInitCapAsOne}.
+     * Get foreign dbmeta of ${referer.reffererPropertyNameInitCapAsOne}.
      * 
      * @return Foreign DBMeta. (NotNull)
      */
-    public ${refferer.refererTableDBMetaClassName} getForeignDBMeta_${refferer.reffererPropertyNameInitCapAsOne}() {
-        return ${refferer.refererTableDBMetaClassName}.getInstance();
+    public ${referer.refererTableDBMetaClassName} getForeignDBMeta_${referer.reffererPropertyNameInitCapAsOne}() {
+        return ${referer.refererTableDBMetaClassName}.getInstance();
     }
   #end
+#end
+
+    // -----------------------------------------------------
+    //                                       Referer Element
+    //                                       ---------------
+#foreach ($referer in $table.referrers)
+#set ($refererTable = $referer.table)
+    /**
+     * Get referer dbmeta of ${referer.reffererPropertyNameInitCap}.
+     * 
+     * @return Referer DBMeta. (NotNull)
+     */
+    public ${referer.refererTableDBMetaClassName} getRefererDBMeta_${referer.reffererPropertyNameInitCap}() {
+        return ${referer.refererTableDBMetaClassName}.getInstance();
+    }
+
+    /**
+     * Get referer info of ${referer.reffererPropertyNameInitCap}.
+     * 
+     * @return Referer info. (NotNull)
+     */
+    public ${glPackageBaseCommonDBMeta}.${glRefererInfoName} getRefererInfo_${referer.reffererPropertyNameInitCap}() {
+        final ${glPackageBaseCommonDBMeta}.${glRefererInfoName} refererInfo = new ${glPackageBaseCommonDBMeta}.${glRefererInfoName}();
+        refererInfo.setRefererName("${referer.reffererPropertyName}");
+        refererInfo.setLocalDBMeta(${referer.foreignTableDBMetaClassName}.getInstance());
+        refererInfo.setRefererDBMeta(${referer.refererTableDBMetaClassName}.getInstance());
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+#foreach ($columnName in $referer.foreignColumns)
+        map.put("${columnName}", "${referer.foreignLocalMapping.get(${columnName})}");
+#end
+        refererInfo.setLocalRefererColumnMap(map);
+        refererInfo.setOneToOne(${referer.isOneToOne()});
+        return refererInfo;
+    }
 #end
 
     // ===================================================================================

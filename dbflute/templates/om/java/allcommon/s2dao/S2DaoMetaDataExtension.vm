@@ -598,25 +598,23 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 #end
 
-    protected static class ResultSetHandlerFactoryExtension extends ResultSetHandlerFactoryImpl {
-  #if ($database.isVersionAfter1043())
-
+    public static class ResultSetHandlerFactoryExtension extends ResultSetHandlerFactoryImpl {
+#if ($database.isVersionAfter1043())
         public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData, DaoAnnotationReader annotationReader, DtoMetaDataFactory dtoMetaDataFactory) {
             super(beanMetaData, annotationReader, dtoMetaDataFactory);
         }
-  #else
-
+#else
         public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData) {
             super(beanMetaData);
         }
-  #end
+#end
 
         protected RelationRowCreator createRelationRowCreator() {
             return new RelationRowCreatorExtension();
         }
     }
 
-    protected static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
+    public static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
         public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues)
                 throws SQLException {
             return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
