@@ -5,6 +5,10 @@ ${database.allClassCopyright}package ${myDBMetaPackageName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
+#if (${table.hasPrimaryKey()})
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+#end
+import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
 
 /**
  * The dbmeta of ${table.Name}. (Singleton)
@@ -388,7 +392,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                         Column Name
+    //                                                                         Column Info
     //                                                                         ===========
     /**
      * ${database.ImplementComment}
@@ -439,31 +443,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */
     public String getColumnDbNameCommaString() {
         return "${table.columnNameCommaString}";
-    }
-
-    // -----------------------------------------------------
-    //                                           Primary Key
-    //                                           -----------
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return First primary key column db-name. (Nullable: If null, this table has no primary key.)
-     */
-    public String getPrimaryKeyColumnDbNameOnlyFirstOne() {
-        return "${table.primaryKeyColumnDbNameOnlyFirstOne}";
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The list of primary key column db-name. (NotNull)
-     */
-    public java.util.List${database.filterGenericsString('String')} getPrimaryKeyColumnDbNameList() {
-        final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
-#foreach ($col in $table.primaryKey)
-        resultList.add("$col.name");
-#end
-        return resultList;
     }
 
     // ===================================================================================
@@ -572,6 +551,24 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */ 
     public ${myExtendedObjectClassName} newMyEntity() {
         return new ${myExtendedObjectClassName}();
+    }
+
+    // ===================================================================================
+    //                                                                         Unique Info
+    //                                                                         ===========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The primary unique info. (NotNull)
+     */
+    public ${glUniqueInfoName} getPrimaryUniqueInfo() {
+        final ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
+        uniqueInfo.setDBMeta(this);
+#foreach ($col in $table.primaryKey)
+        uniqueInfo.addUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}"));
+#end
+        uniqueInfo.setPrimary(true);
+        return uniqueInfo;
     }
 
     // ===================================================================================

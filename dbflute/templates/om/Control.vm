@@ -167,6 +167,8 @@ targetdatabase = $targetDatabase
     #set ($glForeignInfoName = "${glProjectPrefix}ForeignInfo")
     #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
     #set ($glRelationInfoName = "${glProjectPrefix}RelationInfo")
+    #set ($glUniqueInfoName = "${glProjectPrefix}UniqueInfo")
+    #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
 
     ## [Allcommon-Exception]
     #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
@@ -842,6 +844,14 @@ targetdatabase = $targetDatabase
       $database.debug("    parse('RelationInfo');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glRelationInfoName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/info/RelationInfo.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('UniqueInfo');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glUniqueInfoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/info/UniqueInfo.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('ColumnInfo');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glColumnInfoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/info/ColumnInfo.${glTemplateFileExtension}",$path,"", "")
     #end
 
     ## Setup java directory.

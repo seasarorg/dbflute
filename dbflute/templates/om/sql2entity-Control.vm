@@ -41,7 +41,13 @@ targetdatabase = $targetDatabase
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
+
+    ## [Allcommon-DBMetaInfo]
+    #set ($glForeignInfoName = "${glProjectPrefix}ForeignInfo")
     #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
+    #set ($glRelationInfoName = "${glProjectPrefix}RelationInfo")
+    #set ($glUniqueInfoName = "${glProjectPrefix}UniqueInfo")
+    #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
 
     ## [Helper]
     #set ($glMapListStringName = "${glProjectPrefix}MapListString")
@@ -56,6 +62,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
     #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
+    #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.dbmeta.info")
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
     #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
     #set ($glPackageBaseEntity = "${database.baseEntityPackage}")

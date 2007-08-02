@@ -1,0 +1,79 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
+
+#set ($myClassName = "${glColumnInfoName}")
+
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+
+/**
+ * The class of column info.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glDBMetaInterfaceName} dbmeta;
+    protected String columnDbName;
+    protected String propertyName;
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName) {
+        this.dbmeta = dbmeta;
+        this.columnDbName = columnDbName;
+        this.propertyName = propertyName;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ${glDBMetaInterfaceName} getDBMeta() {
+        return dbmeta;
+    }
+
+    public void setDBMeta(${glDBMetaInterfaceName} dbmeta) {
+        this.dbmeta = dbmeta;
+    }
+
+    public String getColumnDbName() {
+        return this.columnDbName;
+    }
+
+    public void setColumnDbName(String columnDbName) {
+        this.columnDbName = columnDbName;
+    }
+
+    public String getPropertyName() {
+        return this.propertyName;
+    }
+
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ${myClassName})) {
+            return false;
+        }
+        final ${myClassName} target = (${myClassName})obj;
+        if (this.dbmeta == null || target.getDBMeta() == null) {
+            return false;
+        }
+        if (!this.dbmeta.equals(target.getDBMeta())) {
+            return false;
+        }
+        if (this.columnDbName == null || target.getColumnDbName() == null) {
+            return false;
+        }
+        if (!this.columnDbName.equals(target.getColumnDbName())) {
+            return false;
+        }
+        return true;
+    }
+}

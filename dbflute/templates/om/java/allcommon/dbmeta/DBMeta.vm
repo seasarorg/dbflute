@@ -7,6 +7,7 @@ import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
 
 /**
  * The interface of dbmeta.
@@ -61,7 +62,7 @@ public interface ${myClassName} {
     public String getTableUncapPropName();
 
     // ===================================================================================
-    //                                                                         Column Name
+    //                                                                         Column Info
     //                                                                         ===========
     /**
      * Get the list of column db-name.
@@ -90,23 +91,6 @@ public interface ${myClassName} {
      * @return Column-db-name comma-string. (NotNull and NotEmpty)
      */
     public String getColumnDbNameCommaString();
-
-    // -----------------------------------------------------
-    //                                           Primary Key
-    //                                           -----------
-    /**
-     * Get primary key column db-name only first one.
-     * 
-     * @return First primary key column db-name. (Nullable: If null, this table has no primary key.)
-     */
-    public String getPrimaryKeyColumnDbNameOnlyFirstOne();
-
-    /**
-     * Get the list of primary key column db-name.
-     * 
-     * @return The list of primary key column db-name. (NotNull)
-     */
-    public java.util.List${database.filterGenericsString('String')} getPrimaryKeyColumnDbNameList();
 
     // ===================================================================================
     //                                                                       Name Handling
@@ -312,6 +296,16 @@ public interface ${myClassName} {
     public ${glEntityInterfaceName} newEntity();
 
     // ===================================================================================
+    //                                                                         Unique Info
+    //                                                                         ===========
+    /**
+     * Get primary unique info.
+     * 
+     * @return Primary unique info. (NotNull)
+     */
+    public ${glUniqueInfoName} getPrimaryUniqueInfo();
+
+    // ===================================================================================
     //                                                                       Relation Info
     //                                                                       =============
     /**
@@ -328,7 +322,7 @@ public interface ${myClassName} {
      * @param foreignPropertyName Foreign property name. (Both OK - InitCap or not). (NotNull)
      * @return Foreign info. (NotNull)
      */ 
-    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo(String foreignPropertyName);
+    public ${glForeignInfoName} getForeignInfo(String foreignPropertyName);
 
     /**
      * Get referer dbmeta.
@@ -344,7 +338,7 @@ public interface ${myClassName} {
      * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
      * @return Referer info. (NotNull)
      */ 
-    public ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} getRefererInfo(String refererPropertyName);
+    public ${glRefererInfoName} getRefererInfo(String refererPropertyName);
 
     // ===================================================================================
     //                                                                       Determination
