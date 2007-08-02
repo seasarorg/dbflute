@@ -101,6 +101,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
 
     // -----------------------------------------------------
+    //                                      Column Prop-Name
+    //                                      ----------------
+#foreach ($col in $table.Columns)
+    /** Prop-name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
+    public static final String PROP_NAME_${col.uncapitalisedJavaName} = "$col.uncapitalisedJavaName";
+#end
+
+    // -----------------------------------------------------
     //                                  Column Cap-Prop-Name
     //                                  --------------------
 #foreach ($col in $table.Columns)
@@ -131,51 +139,61 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
 
     // -----------------------------------------------------
-    //                                      Foreign Property
-    //                                      ----------------
+    //                                          Foreign Name
+    //                                          ------------
 #foreach ($foreignKeys in $table.foreignKeys)
-    /** Cap-prop-name of ${foreignKeys.foreignPropertyName}. */
+    /** The foreign property name of ${foreignKeys.foreignPropertyName}. */
+    public static final String FOREIGN_PROP_NAME_${foreignKeys.foreignPropertyName} = "$foreignKeys.foreignPropertyName";
+#end
+#if ($database.isMakeRecentlyDeprecated())
+#foreach ($foreignKeys in $table.foreignKeys)
+    /** @deprecated Use FOREIGN_NAME_${foreignKeys.foreignPropertyName}. */
     public static final String FOREIGN_CAP_PROP_NAME_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.foreignPropertyNameInitCap";
 #end
 
 #foreach ($foreignKeys in $table.foreignKeys)
-    /** Uncap-prop-name of ${foreignKeys.foreignPropertyName}. */
+    /** @deprecated Use FOREIGN_NAME_${foreignKeys.foreignPropertyName}. */
     public static final String FOREIGN_UNCAP_PROP_NAME_${foreignKeys.foreignPropertyName} = "$foreignKeys.foreignPropertyName";
 #end
-
-#if ($database.isMakeRecentlyDeprecated())
+#end
+#if ($database.isMakeDeprecated())
 #foreach ($foreignKeys in $table.foreignKeys)
-    /** @deprecated Use FOREIGN_CAP_PROP_${foreignKeys.foreignPropertyNameInitCap}. */
+    /** @deprecated Use FOREIGN_NAME_${foreignKeys.foreignPropertyName}. */
     public static final String COLUMN_CAP_PROP_NAME_OF_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.ForeignPropertyNameInitCap";
 #end
 
 #foreach ($foreignKeys in $table.foreignKeys)
-    /** @deprecated Use FOREIGN_UNCAP_PROP_NAME_${children.foreignPropertyNameInitCap} */
+    /** @deprecated Use FOREIGN_NAME_${foreignKeys.foreignPropertyName}. */
     public static final String COLUMN_UNCAP_PROP_NAME_OF_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.ForeignPropertyName";
 #end
 #end
 
     // -----------------------------------------------------
-    //                                      Referer Property
-    //                                      ----------------
+    //                                          Referer Name
+    //                                          ------------
 #foreach ($children in $table.referrers)
-    /** Cap-prop-name of ${children.reffererPropertyName}. */
+    /** The referer property name of ${children.reffererPropertyName}. */
+    public static final String REFERER_PROP_NAME_${children.reffererPropertyName} = "$children.reffererPropertyName";
+#end
+#if ($database.isMakeRecentlyDeprecated())
+#foreach ($children in $table.referrers)
+    /** @deprecated Use REFERER_NAME_${children.reffererPropertyName} */
     public static final String REFERER_CAP_PROP_NAME_${children.reffererPropertyNameInitCap} = "$children.reffererPropertyNameInitCap";
 #end
 
 #foreach ($children in $table.referrers)
-    /** Uncap-prop-name of ${children.reffererPropertyName}. */
+    /** @deprecated Use REFERER_NAME_${children.reffererPropertyName} */
     public static final String REFERER_UNCAP_PROP_NAME_${children.reffererPropertyName} = "$children.reffererPropertyName";
 #end
-
-#if ($database.isMakeRecentlyDeprecated())
+#end
+#if ($database.isMakeDeprecated())
 #foreach ($children in $table.referrers)
-    /** @deprecated Use REFERER_CAP_PROP_NAME_${children.reffererPropertyNameInitCap} */
+    /** @deprecated Use REFERER_NAME_${children.reffererPropertyName} */
     public static final String COLUMN_CAP_PROP_NAME_OF_${children.reffererPropertyNameInitCap} = "$children.reffererPropertyNameInitCap";
 #end
 
 #foreach ($children in $table.referrers)
-    /** @deprecated Use REFERER_UNCAP_PROP_NAME_${children.reffererPropertyName} */
+    /** @deprecated Use REFERER_NAME_${children.reffererPropertyName} */
     public static final String COLUMN_UNCAP_PROP_NAME_OF_${children.reffererPropertyNameInitCap} = "$children.ReffererPropertyName";
 #end
 #end
@@ -557,31 +575,51 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                      Related DBMeta
-    //                                                                      ==============
+    //                                                                       Relation Info
+    //                                                                       =============
     // -----------------------------------------------------
     //                                       Foreign Element
     //                                       ---------------
 #foreach ($foreignKeys in $table.foreignKeys)
     /**
-     * Get foreign dbmeta of ${foreignKeys.foreignPropertyNameInitCap}.
+     * Get foreign info of ${foreignKeys.foreignPropertyName}.
      * 
-     * @return Foreign DBMeta. (NotNull)
+     * @return Referer info. (NotNull)
      */
-    public ${foreignKeys.foreignTableDBMetaClassName} getForeignDBMeta_${foreignKeys.foreignPropertyNameInitCap}() {
-        return ${foreignKeys.foreignTableDBMetaClassName}.getInstance();
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo_${foreignKeys.foreignPropertyName}() {
+        final ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
+        foreignInfo.setForeignPropertyName("${foreignKeys.foreignPropertyName}");
+        foreignInfo.setLocalDBMeta(${table.DBMetaClassName}.getInstance());
+        foreignInfo.setForeignDBMeta(${foreignKeys.foreignTableDBMetaClassName}.getInstance());
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+#foreach ($columnName in $foreignKeys.localColumns)
+        map.put("${columnName}", "${foreignKeys.localForeignMapping.get(${columnName})}");
+#end
+        foreignInfo.setLocalForeignColumnMap(map);
+        foreignInfo.setOneToOne(${foreignKeys.isOneToOne()});
+        return foreignInfo;
     }
 #end
 #foreach ($referer in $table.referrers)
   #if (${referer.isOneToOne()})
 
     /**
-     * Get foreign dbmeta of ${referer.reffererPropertyNameInitCapAsOne}.
+     * Get foreign info of ${referer.reffererPropertyNameAsOne}.
      * 
-     * @return Foreign DBMeta. (NotNull)
+     * @return Foreign info. (NotNull)
      */
-    public ${referer.refererTableDBMetaClassName} getForeignDBMeta_${referer.reffererPropertyNameInitCapAsOne}() {
-        return ${referer.refererTableDBMetaClassName}.getInstance();
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo_${referer.reffererPropertyNameAsOne}() {
+        final ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
+        foreignInfo.setForeignPropertyName("${referer.reffererPropertyNameAsOne}");
+        foreignInfo.setLocalDBMeta(${referer.foreignTableDBMetaClassName}.getInstance());
+        foreignInfo.setForeignDBMeta(${referer.refererTableDBMetaClassName}.getInstance());
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+#foreach ($columnName in $referer.foreignColumns)
+        map.put("${columnName}", "${referer.foreignLocalMapping.get(${columnName})}");
+#end
+        foreignInfo.setLocalForeignColumnMap(map);
+        foreignInfo.setOneToOne(${referer.isOneToOne()});
+        return foreignInfo;
     }
   #end
 #end
@@ -592,22 +630,22 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #foreach ($referer in $table.referrers)
 #set ($refererTable = $referer.table)
     /**
-     * Get referer dbmeta of ${referer.reffererPropertyNameInitCap}.
+     * Get referer dbmeta of ${referer.reffererPropertyName}.
      * 
      * @return Referer DBMeta. (NotNull)
      */
-    public ${referer.refererTableDBMetaClassName} getRefererDBMeta_${referer.reffererPropertyNameInitCap}() {
+    public ${referer.refererTableDBMetaClassName} getRefererDBMeta_${referer.reffererPropertyName}() {
         return ${referer.refererTableDBMetaClassName}.getInstance();
     }
 
     /**
-     * Get referer info of ${referer.reffererPropertyNameInitCap}.
+     * Get referer info of ${referer.reffererPropertyName}.
      * 
      * @return Referer info. (NotNull)
      */
-    public ${glPackageBaseCommonDBMeta}.${glRefererInfoName} getRefererInfo_${referer.reffererPropertyNameInitCap}() {
-        final ${glPackageBaseCommonDBMeta}.${glRefererInfoName} refererInfo = new ${glPackageBaseCommonDBMeta}.${glRefererInfoName}();
-        refererInfo.setRefererName("${referer.reffererPropertyName}");
+    public ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} getRefererInfo_${referer.reffererPropertyName}() {
+        final ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} refererInfo = new ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName}();
+        refererInfo.setRefererPropertyName("${referer.reffererPropertyName}");
         refererInfo.setLocalDBMeta(${referer.foreignTableDBMetaClassName}.getInstance());
         refererInfo.setRefererDBMeta(${referer.refererTableDBMetaClassName}.getInstance());
         final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();

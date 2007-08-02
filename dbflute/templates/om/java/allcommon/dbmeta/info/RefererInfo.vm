@@ -1,0 +1,84 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
+
+#set ($myClassName = "${glRefererInfoName}")
+
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+
+/**
+ * The class of referer information.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} implements ${glRelationInfoName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected String refererPropertyName;
+    protected ${glDBMetaInterfaceName} localDBMeta;
+    protected ${glDBMetaInterfaceName} refererDBMeta;
+    protected java.util.Map${database.filterGenericsString('String, String')} localRefererColumnMap;
+    protected boolean oneToOne;
+
+    // ===================================================================================
+    //                                                                           Implement
+    //                                                                           =========
+    public String getRelationPropertyName() {
+        return getRefererPropertyName();
+    }
+
+    public ${glDBMetaInterfaceName} getTargetDBMeta() {
+        return getRefererDBMeta();
+    }
+
+    public java.util.Map${database.filterGenericsString('String, String')} getLocalTargetColumnMap() {
+        return getLocalRefererColumnMap();
+    }
+
+    public boolean isReferer() {
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getRefererPropertyName() {
+        return refererPropertyName;
+    }
+
+    public void setRefererPropertyName(String refererPropertyName) {
+        this.refererPropertyName = refererPropertyName;
+    }
+
+    public ${glDBMetaInterfaceName} getLocalDBMeta() {
+        return localDBMeta;
+    }
+
+    public void setLocalDBMeta(${glDBMetaInterfaceName} localDBMeta) {
+        this.localDBMeta = localDBMeta;
+    }
+
+    public ${glDBMetaInterfaceName} getRefererDBMeta() {
+        return refererDBMeta;
+    }
+
+    public void setRefererDBMeta(${glDBMetaInterfaceName} refererDBMeta) {
+        this.refererDBMeta = refererDBMeta;
+    }
+
+    public java.util.Map${database.filterGenericsString('String, String')} getLocalRefererColumnMap() {
+        return localRefererColumnMap;
+    }
+
+    public void setLocalRefererColumnMap(java.util.Map${database.filterGenericsString('String, String')} localRefererColumnMap) {
+        this.localRefererColumnMap = localRefererColumnMap;
+    }
+
+    public boolean isOneToOne() {
+        return oneToOne;
+    }
+
+    public void setOneToOne(boolean oneToOne) {
+        this.oneToOne = oneToOne;
+    }
+}

@@ -415,7 +415,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @return The list of referer table. (Nullable)
      */
-    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.ReffererPropertyNameInitCap}() {
+    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.reffererPropertyNameInitCap}() {
         return ${reffererVariableName};
     }
 

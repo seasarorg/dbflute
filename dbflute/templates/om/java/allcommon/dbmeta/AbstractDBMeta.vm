@@ -7,6 +7,8 @@ import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
+import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
 
 /**
  * The abstract class of dbmeta.
@@ -233,12 +235,22 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param foreignPropertyName Foreign-property-name(Both OK - InitCap or not). (NotNull)
+     * @param foreignPropertyName Foreign property name. (Both OK - InitCap or not). (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */ 
     public ${glDBMetaInterfaceName} getForeignDBMeta(String foreignPropertyName) {
+        return getForeignInfo(foreignPropertyName).getForeignDBMeta();
+    }
+
+    /**
+     * Get foreign info.
+     * 
+     * @param foreignPropertyName Foreign property name. (Both OK - InitCap or not). (NotNull)
+     * @return Foreign info. (NotNull)
+     */ 
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final String methodName = "getForeignDBMeta_" + foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
+        final String methodName = "getForeignDBMeta_" + foreignPropertyName.substring(0, 1).toLowerCase() + foreignPropertyName.substring(1);
 
         java.lang.reflect.Method method = null;
         try {
@@ -249,7 +261,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             throw new RuntimeException(msg, e);
         }
         try {
-            return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
+            return (${glForeignInfoName})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -260,39 +272,23 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param refererPropertyName Referer-property-name(Both OK - InitCap or not). (NotNull)
+     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
      * @return Referer DBMeta. (NotNull)
      */ 
     public ${glDBMetaInterfaceName} getRefererDBMeta(String refererPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-        final String methodName = "getRefererDBMeta_" + refererPropertyName.substring(0, 1).toUpperCase() + refererPropertyName.substring(1);
-
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            String msg = "The refererPropertyName is not found: refererPropertyName=" + refererPropertyName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            return (${glDBMetaInterfaceName})method.invoke(this, new Object[]{});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
+        return getRefererInfo(refererPropertyName).getRefererDBMeta();
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param refererPropertyName Referer-property-name(Both OK - InitCap or not). (NotNull)
+     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
      * @return Referer info. (NotNull)
      */ 
     public ${glRefererInfoName} getRefererInfo(String refererPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-        final String methodName = "getRefererInfo_" + refererPropertyName.substring(0, 1).toUpperCase() + refererPropertyName.substring(1);
+        final String methodName = "getRefererInfo_" + refererPropertyName.substring(0, 1).toLowerCase() + refererPropertyName.substring(1);
 
         java.lang.reflect.Method method = null;
         try {

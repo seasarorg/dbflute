@@ -162,7 +162,11 @@ targetdatabase = $targetDatabase
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
+
+    ## [Allcommon-DBMetaInfo]
+    #set ($glForeignInfoName = "${glProjectPrefix}ForeignInfo")
     #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
+    #set ($glRelationInfoName = "${glProjectPrefix}RelationInfo")
 
     ## [Allcommon-Exception]
     #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
@@ -261,6 +265,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonCOptionParts = "${database.baseCommonPackage}.cbean.coption.parts")
     #set ($glPackageBaseCommonCOptionPartsLocal = "${database.baseCommonPackage}.cbean.coption.parts.local")
     #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
+    #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.dbmeta.info")
     #set ($glPackageBaseCommonException = "${database.baseCommonPackage}.exception")
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
     #set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.helper.character")
@@ -822,10 +827,21 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/AbstractDBMeta.${glTemplateFileExtension}",$path,"", "")
 
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo}))
+    $database.makeDirectory($path)
+
     #if ($database.isTargetLanguageJava())
+      $database.debug("    parse('ForeignInfo');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glForeignInfoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/info/ForeignInfo.${glTemplateFileExtension}",$path,"", "")
+
       $database.debug("    parse('RefererInfo');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glRefererInfoName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/RefererInfo.${glTemplateFileExtension}",$path,"", "")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glRefererInfoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/info/RefererInfo.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('RelationInfo');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glRelationInfoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/info/RelationInfo.${glTemplateFileExtension}",$path,"", "")
     #end
 
     ## Setup java directory.

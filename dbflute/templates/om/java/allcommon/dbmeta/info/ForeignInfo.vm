@@ -1,0 +1,84 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
+
+#set ($myClassName = "${glForeignInfoName}")
+
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+
+/**
+ * The class of foreign information.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} implements ${glRelationInfoName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected String foreignPropertyName;
+    protected ${glDBMetaInterfaceName} localDBMeta;
+    protected ${glDBMetaInterfaceName} foreignDBMeta;
+    protected java.util.Map${database.filterGenericsString('String, String')} localForeignColumnMap;
+    protected boolean oneToOne;
+
+    // ===================================================================================
+    //                                                                           Implement
+    //                                                                           =========
+    public String getRelationPropertyName() {
+        return getForeignPropertyName();
+    }
+
+    public ${glDBMetaInterfaceName} getTargetDBMeta() {
+        return getForeignDBMeta();
+    }
+
+    public java.util.Map${database.filterGenericsString('String, String')} getLocalTargetColumnMap() {
+        return getLocalForeignColumnMap();
+    }
+
+    public boolean isReferer() {
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getForeignPropertyName() {
+        return foreignPropertyName;
+    }
+
+    public void setForeignPropertyName(String foreignPropertyName) {
+        this.foreignPropertyName = foreignPropertyName;
+    }
+
+    public ${glDBMetaInterfaceName} getLocalDBMeta() {
+        return localDBMeta;
+    }
+
+    public void setLocalDBMeta(${glDBMetaInterfaceName} localDBMeta) {
+        this.localDBMeta = localDBMeta;
+    }
+
+    public ${glDBMetaInterfaceName} getForeignDBMeta() {
+        return foreignDBMeta;
+    }
+
+    public void setForeignDBMeta(${glDBMetaInterfaceName} foreignDBMeta) {
+        this.foreignDBMeta = foreignDBMeta;
+    }
+
+    public java.util.Map${database.filterGenericsString('String, String')} getLocalForeignColumnMap() {
+        return localForeignColumnMap;
+    }
+
+    public void setLocalForeignColumnMap(java.util.Map${database.filterGenericsString('String, String')} localForeignColumnMap) {
+        this.localForeignColumnMap = localForeignColumnMap;
+    }
+
+    public boolean isOneToOne() {
+        return oneToOne;
+    }
+
+    public void setOneToOne(boolean oneToOne) {
+        this.oneToOne = oneToOne;
+    }
+}

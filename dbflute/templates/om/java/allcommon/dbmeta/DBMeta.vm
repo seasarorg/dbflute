@@ -5,6 +5,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
+import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
 
 /**
  * The interface of dbmeta.
@@ -310,20 +312,28 @@ public interface ${myClassName} {
     public ${glEntityInterfaceName} newEntity();
 
     // ===================================================================================
-    //                                                                      Related DBMeta
-    //                                                                      ==============
+    //                                                                       Relation Info
+    //                                                                       =============
     /**
      * Get foreign dbmeta.
      * 
-     * @param foreignPropertyName Foreign-property-name(Both OK - InitCap or not). (NotNull)
+     * @param foreignPropertyName Foreign property name. (Both OK - InitCap or not). (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */ 
     public ${myClassName} getForeignDBMeta(String foreignPropertyName);
 
     /**
+     * Get foreign info.
+     * 
+     * @param foreignPropertyName Foreign property name. (Both OK - InitCap or not). (NotNull)
+     * @return Foreign info. (NotNull)
+     */ 
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo(String foreignPropertyName);
+
+    /**
      * Get referer dbmeta.
      * 
-     * @param refererPropertyName Referer-property-name(Both OK - InitCap or not). (NotNull)
+     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
      * @return Referer DBMeta. (NotNull)
      */ 
     public ${myClassName} getRefererDBMeta(String refererPropertyName);
@@ -331,10 +341,10 @@ public interface ${myClassName} {
     /**
      * Get referer info.
      * 
-     * @param refererPropertyName Referer-property-name(Both OK - InitCap or not). (NotNull)
+     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
      * @return Referer info. (NotNull)
      */ 
-    public ${glRefererInfoName} getRefererInfo(String refererPropertyName);
+    public ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} getRefererInfo(String refererPropertyName);
 
     // ===================================================================================
     //                                                                       Determination
