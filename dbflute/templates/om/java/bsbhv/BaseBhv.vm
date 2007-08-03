@@ -601,18 +601,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
-     * @param ${myEntityListVariableName} Entity list of ${table.uncapitalisedJavaName}. (NotNull)
+     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      */
-    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         final ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper = new ${glConditionBeanSetupperName}<${reffererCBClassName}>() {
             public void setup(${reffererCBClassName} cb) {
             }
         };
-        load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
+        load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
     }
 
     /**
-     * Load referer of ${refferer.ReffererPropertyName}.
+     * Load referer of ${refferer.refererJavaBeansRulePropertyName}.
      * <pre>
      *   You can load referer with your original condition.
      * 
@@ -639,20 +639,20 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
-     * @param ${myEntityListVariableName} Entity list of ${table.uncapitalisedJavaName}. (NotNull)
+     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param conditionBeanSetupper Referer condition setupper instance for registering referer condition. (NotNull)
      */
-    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("conditionBeanSetupper<${reffererCBClassName}>", conditionBeanSetupper);
         if (${myEntityListVariableName}.isEmpty()) {
             return;
         }
-        load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
+        load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
     }
 
     /**
-     * Load referer of ${refferer.ReffererPropertyName}.
+     * Load referer of ${refferer.refererJavaBeansRulePropertyName}.
      * <pre>
      *   You can load referer with your original condition.
      * 
@@ -679,10 +679,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
-     * @param ${myEntityListVariableName} Entity list of ${table.uncapitalisedJavaName}. (NotNull)
+     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadRefererOption Load-referer option. (NotNull)
      */
-    public void load${refferer.reffererPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("loadRefererOption<${reffererEntityClassName}, ${reffererCBClassName}>", loadRefererOption);
         if (${myEntityListVariableName}.isEmpty()) {
@@ -730,7 +730,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     #else
 
     /**
-     * Load refferer of ${refferer.ReffererPropertyName}.
+     * Load refferer of ${refferer.refererJavaBeansRulePropertyName}.
      * <pre>
      *   Default refferer order-by is 'primary-key asc'.
      * 
@@ -738,24 +738,24 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
      *     final List<${myExtendedObjectClassName}> ls = ${myBehaviorVariableName}.selectList(cb);
-     *     ${myBehaviorVariableName}.load${refferer.ReffererPropertyNameInitCap}(ls);
+     *     ${myBehaviorVariableName}.load${refferer.refererJavaBeansRulePropertyNameInitCap}(ls);
      * 
      *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
      * 
      * @param ls Entity list of main table. (NotNull)
      */
-    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls) {
         final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
             public void setup(${reffererCBClassName} cb) {
                 cb.addOrderBy_PK_Asc();// Default OrderBy for Refferer.
             }
         };
-        load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
+        load${refferer.refererJavaBeansRulePropertyNameInitCap}(ls, cbSetupper);
     }
 
     /**
-     * Load refferer of ${refferer.ReffererPropertyName}.
+     * Load refferer of ${refferer.refererJavaBeansRulePropertyName}.
      * <pre>
      *   You can load refferer with your original condition.
      * 
@@ -769,7 +769,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *             cb.query().addOrderBy_Yyy_Desc();
      *         }
      *     };
-     *     ${myBehaviorVariableName}.load${refferer.ReffererPropertyNameInitCap}(ls, cbSetupper);
+     *     ${myBehaviorVariableName}.load${refferer.refererJavaBeansRulePropertyNameInitCap}(ls, cbSetupper);
      * 
      *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * </pre>
@@ -777,7 +777,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ls Entity list of main table. (NotNull)
      * @param cbSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
      */
-    public void load${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ${reffererBhvClassName}.CBSetupper cbSetupper) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ${reffererBhvClassName}.CBSetupper cbSetupper) {
         assertObjectNotNull("ls", ls);
         assertObjectNotNull("cbSetupper", cbSetupper);
         if (ls.isEmpty()) {

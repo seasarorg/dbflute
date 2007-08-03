@@ -11,28 +11,29 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  */
 public class ${myClassName} implements ${glRelationInfoName} {
 
+#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String refererPropertyName;
+    protected String refererPropName;
     protected ${glDBMetaInterfaceName} localDBMeta;
     protected ${glDBMetaInterfaceName} refererDBMeta;
-    protected java.util.Map${database.filterGenericsString('String, String')} localRefererColumnMap;
+    protected java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} localRefererColumnInfoMap;
     protected boolean oneToOne;
 
     // ===================================================================================
     //                                                                           Implement
     //                                                                           =========
-    public String getRelationPropertyName() {
-        return getRefererPropertyName();
+    public String getRelationPropName() {
+        return getRefererPropName();
     }
 
     public ${glDBMetaInterfaceName} getTargetDBMeta() {
         return getRefererDBMeta();
     }
 
-    public java.util.Map${database.filterGenericsString('String, String')} getLocalTargetColumnMap() {
-        return getLocalRefererColumnMap();
+    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalTargetColumnInfoMap() {
+        return getLocalRefererColumnInfoMap();
     }
 
     public boolean isReferer() {
@@ -42,12 +43,12 @@ public class ${myClassName} implements ${glRelationInfoName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getRefererPropertyName() {
-        return refererPropertyName;
+    public String getRefererPropName() {
+        return refererPropName;
     }
 
-    public void setRefererPropertyName(String refererPropertyName) {
-        this.refererPropertyName = refererPropertyName;
+    public void setRefererPropName(String refererPropName) {
+        this.refererPropName = refererPropName;
     }
 
     public ${glDBMetaInterfaceName} getLocalDBMeta() {
@@ -66,12 +67,12 @@ public class ${myClassName} implements ${glRelationInfoName} {
         this.refererDBMeta = refererDBMeta;
     }
 
-    public java.util.Map${database.filterGenericsString('String, String')} getLocalRefererColumnMap() {
-        return localRefererColumnMap;
+    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalRefererColumnInfoMap() {
+        return localRefererColumnInfoMap;
     }
 
-    public void setLocalRefererColumnMap(java.util.Map${database.filterGenericsString('String, String')} localRefererColumnMap) {
-        this.localRefererColumnMap = localRefererColumnMap;
+    public void setLocalRefererColumnInfoMap(java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} localRefererColumnInfoMap) {
+        this.localRefererColumnInfoMap = localRefererColumnInfoMap;
     }
 
     public boolean isOneToOne() {

@@ -147,6 +147,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /**
      * ${database.ImplementComment}
      * 
+     * @return Table prop-name(JavaBeansRule) of ${table.basicInfoDispString}. (NotNull)
+     */
+    public String getTablePropName() {
+        return "${table.javaBeansRulePropertyName}";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
      * @return Table cap-prop-name of ${table.basicInfoDispString}. (NotNull)
      */
     public String getTableCapPropName() {
@@ -168,7 +177,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #foreach ($col in $table.Columns)
 
     /** Column Annotation for S2Dao. ${col.columnDefinitionLineDisp} */
-    public static final String ${col.JavaBeansRulePropertyName}_COLUMN = "${col.Name}";
+    public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.Name}";
 
     /**
      * Get the value of ${col.UncapitalisedJavaName}. <br />
@@ -177,7 +186,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The value of ${col.UncapitalisedJavaName}. (Nullable)
      */
     public ${col.JavaNative} get${col.JavaName}() {
-        return _${col.UncapitalisedJavaName};
+        return _${col.uncapitalisedJavaName};
     }
 
     /**
@@ -187,7 +196,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param ${col.UncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
      */
     public void set${col.JavaName}(${col.JavaNative} ${col.UncapitalisedJavaName}) {
-        _modifiedProperties.addPropertyName("${col.JavaBeansRulePropertyName}");
+        _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
         _${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
 #end
@@ -327,10 +336,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // * * * * * * * * */
 
     /** RELNO of foreign table for s2dao. */
-    public static final int ${foreignKeys.ForeignJavaBeansRulePropertyName}_RELNO = ${foreignKeysIndex};
+    public static final int ${foreignKeys.foreignJavaBeansRulePropertyName}_RELNO = ${foreignKeysIndex};
 
     /** RELKEYS of foreign table for s2dao. */
-    public static final String ${foreignKeys.ForeignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.RelationKeysCommaString";
+    public static final String ${foreignKeys.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.RelationKeysCommaString";
 
     /** The entity of foreign table. */
     protected ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
@@ -340,7 +349,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @return The entity of foreign table.
      */
-    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignPropertyNameInitCap}() {
+    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
@@ -349,7 +358,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @param entity The entity of foreign table.
      */
-    public void set${foreignKeys.foreignPropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} entity) {
+    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} entity) {
         this.${foreignVariableName} = entity;
     }
 
@@ -379,29 +388,29 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
     //   RefererTable    = [${refferer.table.basicInfoDispString}]
-    //   RefererProperty = [${refferer.reffererPropertyName}]
+    //   RefererProperty = [${refferer.refererJavaBeansRulePropertyNameAsOne}]
     // * * * * * * * * */
 
     /** RELNO of foreign table for s2dao. */
-    public static final int ${refferer.ReffererJavaBeansRulePropertyNameAsOne}_RELNO = ${foreignKeysIndex};
+    public static final int ${refferer.refererJavaBeansRulePropertyNameAsOne}_RELNO = ${foreignKeysIndex};
 
     /** RELKEYS of foreign table for s2dao. */
-    public static final String ${refferer.ReffererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$refferer.relationKeysCommaStringForOneToOneRefferer";
+    public static final String ${refferer.refererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$refferer.relationKeysCommaStringForOneToOneRefferer";
     #set ($foreignKeysIndex = $foreignKeysIndex + 1)
   #else
 
     // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     //   RefererTable    = [${refferer.table.basicInfoDispString}]
-    //   RefererProperty = [${refferer.reffererPropertyName}]
+    //   RefererProperty = [${refferer.refererJavaBeansRulePropertyName}]
     // * * * * * * * * */
 
     #if ($database.isAvailableChildNoAnnotationGenerating())
 
     /** CHILDNO of referer table for s2dao. */
-    public static final int ${refferer.reffererJavaBeansRulePropertyName}_CHILDNO = ${foreignKeysIndex};
+    public static final int ${refferer.refererJavaBeansRulePropertyName}_CHILDNO = ${foreignKeysIndex};
 
     /** CHILDKEYS of referer table for s2dao. */
-    public static final String ${refferer.reffererJavaBeansRulePropertyName}_CHILDKEYS = "$refferer.childKeysCommaString";
+    public static final String ${refferer.refererJavaBeansRulePropertyName}_CHILDKEYS = "$refferer.childKeysCommaString";
       #set ($foreignKeysIndex = $foreignKeysIndex + 1)
     #end
   #end
@@ -415,7 +424,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @return The list of referer table. (Nullable)
      */
-    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.reffererPropertyNameInitCap}() {
+    public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.refererJavaBeansRulePropertyNameInitCap}() {
         return ${reffererVariableName};
     }
 
@@ -424,7 +433,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @param ${refferer.reffererPropertyName} The list of refferer table. (Nullable)
      */
-    public void set${refferer.ReffererPropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ${refferer.reffererPropertyName}) {
+    public void set${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ${refferer.reffererPropertyName}) {
         this.${reffererVariableName} = ${refferer.reffererPropertyName};
     }
   #if (${refferer.isOneToOne()})
@@ -436,7 +445,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @return The entity of referer table. (Nullable)
      */
-    public ${reffererEntityLongClassName} get${refferer.reffererPropertyNameInitCapAsOne}() {
+    public ${reffererEntityLongClassName} get${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
         final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = get${refferer.ReffererPropertyNameInitCap}();
         if (ls == null || ls.isEmpty()) {
             return null;
@@ -454,7 +463,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @param entity The entity of referer table. (Nullable)
      */
-    public void set${refferer.reffererPropertyNameInitCapAsOne}(${reffererEntityLongClassName} entity) {
+    public void set${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}(${reffererEntityLongClassName} entity) {
         if (entity == null) {
             ${reffererVariableName} = null;
             return;
@@ -469,7 +478,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * 
      * @return Determination.
      */
-    public boolean hasRelation${refferer.reffererPropertyNameInitCapAsOne}() {
+    public boolean hasRelation${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
         return get${refferer.reffererPropertyNameInitCapAsOne}() != null && get${refferer.reffererPropertyNameInitCapAsOne}().hasPrimaryKeyValue();
     }
   #end

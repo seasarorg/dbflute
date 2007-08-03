@@ -213,7 +213,7 @@ public class ForeignKey {
     public String getForeignTableExtendedEntityClassName() {
         return getForeignTable().getExtendedEntityClassName();
     }
-    
+
     public String getForeignTableDBMetaClassName() {
         return getForeignTable().getDBMetaClassName();
     }
@@ -221,7 +221,7 @@ public class ForeignKey {
     public String getForeignTableExtendedConditionBeanClassName() {
         return getForeignTable().getExtendedConditionBeanClassName();
     }
-    
+
     public String getForeignTableExtendedConditionQueryClassName() {
         return getForeignTable().getExtendedConditionQueryClassName();
     }
@@ -229,7 +229,7 @@ public class ForeignKey {
     public String getForeignTableNestSelectSetupperClassName() {
         return getForeignTable().getNestSelectSetupperClassName();
     }
-    
+
     // -----------------------------------------------------
     //                                    Referer Class Name
     //                                    ------------------
@@ -241,19 +241,18 @@ public class ForeignKey {
         return getTable().getExtendedBehaviorClassName();
     }
 
-    
     public String getRefererTableDBMetaClassName() {
         return getTable().getDBMetaClassName();
     }
-    
+
     public String getRefererTableExtendedConditionBeanClassName() {
         return getTable().getExtendedConditionBeanClassName();
     }
-    
+
     public String getRefererTableExtendedConditionQueryClassName() {
         return getTable().getExtendedConditionQueryClassName();
     }
-    
+
     public String getRefererTableNestSelectSetupperClassName() {
         return getTable().getNestSelectSetupperClassName();
     }
@@ -293,6 +292,9 @@ public class ForeignKey {
     // ==========================================================================================
     //                                                            Get Columns & ColumnList Method
     //                                                            ===============================
+    // -----------------------------------------------------
+    //                                         Local Element
+    //                                         -------------
 
     /**
      * Returns the list of local column names. You should not edit this List.
@@ -301,6 +303,15 @@ public class ForeignKey {
      */
     public List<String> getLocalColumns() {
         return _localColumns;
+    }
+
+    /**
+     * Returns the list of local column names. You should not edit this List.
+     * 
+     * @return the local columns
+     */
+    public List<Column> getLocalColumnList() {
+        return getLocalColumnObjectList();
     }
 
     public String getLocalColumnNameAsOne() {
@@ -349,6 +360,14 @@ public class ForeignKey {
         return resultList;
     }
 
+    public Column getLocalColumnByForeignColumn(Column foreignColumn) {
+        final String localColumnName = getForeignLocalMapping().get(foreignColumn.getName());
+        return getTable().getColumnByFlexibleName(localColumnName);
+    }
+    
+    // -----------------------------------------------------
+    //                                       Foreign Element
+    //                                       ---------------
     /**
      * Returns the list of foreign column names. You should not edit this List.
      * 
@@ -356,6 +375,10 @@ public class ForeignKey {
      */
     public List<String> getForeignColumns() {
         return _foreignColumns;
+    }
+
+    public List<Column> getForeignColumnList() {
+        return getForeignColumnObjectList();
     }
 
     public String getForeignColumnNameAsOne() {
@@ -407,6 +430,11 @@ public class ForeignKey {
             throw new IllegalStateException(msg);
         }
         return foreignTable;
+    }
+
+    public Column getForeignColumnByLocalColumn(Column localColumn) {
+        final String foreignColumnName = getLocalForeignMapping().get(localColumn.getName());
+        return getForeignTable().getColumnByFlexibleName(foreignColumnName);
     }
 
     // ==========================================================================================
@@ -545,6 +573,15 @@ public class ForeignKey {
     /**
      * Get the value of foreign property name.
      * 
+     * @return Generated string.
+     */
+    public String getForeignJavaBeansRulePropertyNameInitCap() {
+        return initCap(getForeignPropertyName(true));
+    }
+
+    /**
+     * Get the value of foreign property name.
+     * 
      * @param isJavaBeansRule Is java-beans rule.
      * @return Generated string.
      */
@@ -613,12 +650,35 @@ public class ForeignKey {
     }
 
     /**
-     * Get the value of foreign property name.
+     * Get the value of referer property name.
      * 
      * @return Generated string.
      */
     public String getReffererJavaBeansRulePropertyName() {
         return getReffererPropertyName(true);
+    }
+
+    /**
+     * Get the value of referer property name.
+     * 
+     * @return Generated string.
+     */
+    public String getRefererJavaBeansRulePropertyName() {
+        return getReffererPropertyName(true);
+    }
+
+    /**
+     * Get the value of referer property name.
+     * 
+     * @return Generated string.
+     */
+    public String getRefererJavaBeansRulePropertyNameInitCap() {
+        final String refererPropertyName = getReffererPropertyName(true);
+        return initCap(refererPropertyName);
+    }
+
+    protected String initCap(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     /**
@@ -673,7 +733,7 @@ public class ForeignKey {
     }
 
     /**
-     * Get the value of foreign property name.
+     * Get the value of referer property name.
      * 
      * @return Generated string.
      */
@@ -682,12 +742,30 @@ public class ForeignKey {
     }
 
     /**
+     * Get the value of referer property name.
+     * 
+     * @return Generated string.
+     */
+    public String getRefererJavaBeansRulePropertyNameAsOne() {
+        return getReffererPropertyNameAsOne(true);
+    }
+
+    /**
+     * Get the value of referer property name as one init cap.
+     * 
+     * @return Generated string.
+     */
+    public String getRefererJavaBeansRulePropertyNameAsOneInitCap() {
+        return initCap(getReffererPropertyNameAsOne(true));
+    }
+
+    /**
      * Get thr value of refferer property name.
      * 
      * @param isJavaBeansRule Is java-beans rule.
      * @return Generated string.
      */
-    public String getReffererPropertyNameAsOne(boolean isJavaBeansRule) {
+    protected String getReffererPropertyNameAsOne(boolean isJavaBeansRule) {
         final List localColumnList = getLocalColumnObjectList();
 
         String result = "";
@@ -737,6 +815,16 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getReffererPropertyNameInitCapAsOne() {
+        final String reffererPropertyName = getReffererPropertyNameAsOne();
+        return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
+    }
+
+    /**
+     * Get the value of referer property name with capitalising the initial character.
+     * 
+     * @return Generated string.
+     */
+    public String getRefererPropertyNameInitCapAsOne() {
         final String reffererPropertyName = getReffererPropertyNameAsOne();
         return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
     }
@@ -900,7 +988,7 @@ public class ForeignKey {
         }
         return result;
     }
-    
+
     // ==========================================================================================
     //                                                                            toString Method
     //                                                                            ===============

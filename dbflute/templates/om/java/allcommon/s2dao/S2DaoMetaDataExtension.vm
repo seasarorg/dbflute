@@ -28,16 +28,10 @@ import org.seasar.framework.exception.EmptyRuntimeException;
 import org.seasar.dao.BeanEnhancer;
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
-#if ($database.isVersionAfter1043())
-
-import org.seasar.dao.DaoAnnotationReader;
-import org.seasar.dao.DtoMetaDataFactory;
-#end
 
 import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
-import org.seasar.dao.ResultSetHandlerFactory;
 import org.seasar.dao.SqlCommand;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
@@ -78,6 +72,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      */
     public ${glDaoMetaDataExtension}() {
     }
+
+#if ($database.isVersionAfter1046())
+    // ===================================================================================
+    //                                                           Annotation Reader Factory
+    //                                                           =========================
+    protected org.seasar.dao.AnnotationReaderFactory annotationReaderFactory;
+
+    public void setAnnotationReaderFactory(org.seasar.dao.AnnotationReaderFactory annotationReaderFactory) {
+        this.annotationReaderFactory = annotationReaderFactory;
+    }
+#end
 
 #if ($database.isAvailableOtherConnectionDaoInitialization())
 
@@ -191,23 +196,35 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         super.setupMethodByAuto(method);
     }
 #end
-  #if ($database.isVersionAfter1043())
+#if ($database.isVersionAfter1046())
+    // ===================================================================================
+    //                                                           ResultSetHandler Override
+    //                                                           =========================
+    protected ResultSetHandler createResultSetHandler(Method method) {
+        return this.resultSetHandlerFactory.getResultSetHandler(this, method);
+    }
 
+//    protected ResultSetHandler createResultSetHandler(BeanMetaData specifiedBeanMetaData, Method method) {
+//        return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReade, specifiedBeanMetaData, method);
+//    }
+#else
+#if ($database.isVersionAfter1043())
     // ===================================================================================
     //                                                    ResultSetHandlerFactory Override
     //                                                    ================================
-    protected ResultSetHandlerFactory createResultSetHandlerFactory() {
+    protected org.seasar.dao.ResultSetHandlerFactory createResultSetHandlerFactory() {
         return new ResultSetHandlerFactoryExtension(beanMetaData, annotationReader, dtoMetaDataFactory);
     }
-  #else
+#else
 
     // ===================================================================================
     //                                                    ResultSetHandlerFactory Override
     //                                                    ================================
-    protected ResultSetHandlerFactory createResultSetHandlerFactory(final BeanMetaData beanMetaData) {
+    protected org.seasar.dao.ResultSetHandlerFactory createResultSetHandlerFactory(final BeanMetaData beanMetaData) {
         return new ResultSetHandlerFactoryExtension(beanMetaData);
     }
-  #end
+#end
+#end
 #if ($database.isAvailableDaoMethodLazyInitializing())
 
     // ===================================================================================
@@ -484,11 +501,20 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                                   ByManual Override
     //                                                                   =================
     protected void setupSelectMethodByManual(Method method, String sql) {
-        final BeanMetaData beanMetaData = buildBeanMetaData(method);
-#if ($database.isVersionAfter1043())
-        final ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(beanMetaData, annotationReader, dtoMetaDataFactory);
+        final BeanMetaData myBeanMetaData = buildBeanMetaData(method);
+#if ($database.isVersionAfter1046())
+// TODO
+//        final SelectDynamicCommand cmd = newMySelectDynamicCommand(createResultSetHandler(myBeanMetaData, method));
+        final SelectDynamicCommand cmd = newMySelectDynamicCommand(createResultSetHandler(method));
+        cmd.setSql(sql);
+        cmd.setArgNames(this.daoAnnotationReader.getArgNames(method));
+        cmd.setArgTypes(method.getParameterTypes());
+        this.sqlCommands.put(method.getName(), cmd);
 #else
-        final ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(beanMetaData);
+#if ($database.isVersionAfter1043())
+        final org.seasar.dao.ResultSetHandlerFactory factory = new org.seasar.dao.ResultSetHandlerFactoryExtension(myBeanMetaData, annotationReader, dtoMetaDataFactory);
+#else
+        final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData);
 #end
 
         final SelectDynamicCommand cmd = newMySelectDynamicCommand(factory.createResultSetHandler(method));
@@ -496,6 +522,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         cmd.setArgNames(this.annotationReader.getArgNames(method));
         cmd.setArgTypes(method.getParameterTypes());
         this.sqlCommands.put(method.getName(), cmd);
+#end
     }
 
     protected BeanMetaData buildBeanMetaData(Method method) {
@@ -598,9 +625,19 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 #end
 
+#if ($database.isVersionAfter1046())
+    public static class ResultSetHandlerFactoryExtension extends org.seasar.dao.impl.ResultSetHandlerFactoryImpl {
+        public ResultSetHandlerFactoryExtension() {
+            super();
+        }
+        protected RelationRowCreator createRelationRowCreator() {
+            return new RelationRowCreatorExtension();
+        }
+    }
+#else
     public static class ResultSetHandlerFactoryExtension extends ResultSetHandlerFactoryImpl {
 #if ($database.isVersionAfter1043())
-        public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData, DaoAnnotationReader annotationReader, DtoMetaDataFactory dtoMetaDataFactory) {
+        public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData, org.seasar.dao.DaoAnnotationReader annotationReader, org.seasar.dao.DtoMetaDataFactory dtoMetaDataFactory) {
             super(beanMetaData, annotationReader, dtoMetaDataFactory);
         }
 #else
@@ -608,11 +645,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             super(beanMetaData);
         }
 #end
-
         protected RelationRowCreator createRelationRowCreator() {
             return new RelationRowCreatorExtension();
         }
     }
+#end
 
     public static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
         public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues)

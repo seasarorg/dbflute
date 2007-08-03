@@ -126,6 +126,23 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     protected boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
         return ${glConditionBeanContextName}.setupDatabaseProductNameByDriverClassName(driverClassName);
     }
+
+#if ($database.isVersionAfter1046())
+    public void initialize() {
+        if (dtoMetaDataFactory == null) {
+            final org.seasar.dao.impl.DtoMetaDataFactoryImpl factory = new org.seasar.dao.impl.DtoMetaDataFactoryImpl();
+            factory.setAnnotationReaderFactory(this.annotationReaderFactory);
+            factory.setValueTypeFactory(valueTypeFactory);
+            dtoMetaDataFactory = factory;
+        }
+        if (resultSetHandlerFactory == null) {
+            final org.seasar.dao.impl.ResultSetHandlerFactoryImpl factory = new ${glDaoMetaDataExtension}.ResultSetHandlerFactoryExtension();
+            factory.setDtoMetaDataFactory(dtoMetaDataFactory);
+            resultSetHandlerFactory = factory;
+        }
+    }
+#end
+
 #if ($database.isVersionAfter1040())
 
     // ===================================================================================
@@ -146,6 +163,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         ${glDaoMetaDataExtension} dmdExtension = new ${glDaoMetaDataExtension}();
         dmdExtension.setBeanEnhancer(this.beanEnhancer);
         dmdExtension.setTransactionManager(this.transactionManager);
+#if ($database.isVersionAfter1046())
+        dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
+#end
         return dmdExtension;
     }
 

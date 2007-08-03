@@ -369,8 +369,8 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
 	        }
 
             if (orderByDotList.size() == 1) {
-                if (dbmeta.isExistMultiName(orderBySlashElement)) {
-                    sb.append("/").append(query.getRealColumnName(dbmeta.getDbNameByMultiName(orderBySlashElement)));
+                if (dbmeta.isExistByFlexibleName(orderBySlashElement)) {
+                    sb.append("/").append(query.getRealColumnName(dbmeta.getDbNameByFlexibleName(orderBySlashElement)));
                 } else {
                     sb.append("/").append(orderBySlashElement);
                 }
@@ -383,12 +383,12 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
                     count++;
 
                     if (orderByDotList.size() == count) {// Last Loop!
-                        if (!foreignDBMeta.isExistMultiName(orderByDotElement)) {
+                        if (!foreignDBMeta.isExistByFlexibleName(orderByDotElement)) {
                             String msg = "The name for order-by is not existing: name=" + orderByDotElement;
                             msg = msg + " orderBySlashElement=" + orderBySlashElement + " orderByProperty=" + orderByProperty;
                             throw new IllegalStateException(msg);
                         }
-                        sb.append("/").append(foreignQuery.getRealColumnName(foreignDBMeta.getDbNameByMultiName(orderByDotElement)));
+                        sb.append("/").append(foreignQuery.getRealColumnName(foreignDBMeta.getDbNameByFlexibleName(orderByDotElement)));
                         break;
                     }
 

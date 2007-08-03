@@ -499,18 +499,18 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     /**
      * ${database.ImplementComment}
      * 
-     * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
      * @return Condition-value. (NotNull)
      */
-    public ${glConditionValueName} invokeGetter(String columnMultiName) {
+    public ${glConditionValueName} invokeGetter(String columnFlexibleName) {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
-        final String columnCapPropName = dbmeta.getCapPropNameByMultiName(columnMultiName);
+        final String columnCapPropName = initCap(dbmeta.getPropNameByFlexibleName(columnFlexibleName));
         String methodName = "get" + columnCapPropName;
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
-            String msg = "The columnMultiName is not existing in this table: columnMultiName=" + columnMultiName;
+            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
@@ -524,42 +524,43 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    public void invokeSetterEqual(String columnMultiName, Object value) {
-        invokeSetter(columnMultiName, value, "equal");
+
+    public void invokeSetterEqual(String columnFlexibleName, Object value) {
+        invokeSetter(columnFlexibleName, value, "equal");
     }
 
-    public void invokeSetterNotEqual(String columnMultiName, Object value) {
-        invokeSetter(columnMultiName, value, "notEqual");
+    public void invokeSetterNotEqual(String columnFlexibleName, Object value) {
+        invokeSetter(columnFlexibleName, value, "notEqual");
     }
 
-    public void invokeSetterGreaterThan(String columnMultiName, Object value) {
-        invokeSetter(columnMultiName, value, "greaterThan");
+    public void invokeSetterGreaterThan(String columnFlexibleName, Object value) {
+        invokeSetter(columnFlexibleName, value, "greaterThan");
     }
 
-    public void invokeSetterLessThan(String columnMultiName, Object value) {
-        invokeSetter(columnMultiName, value, "lessThan");
+    public void invokeSetterLessThan(String columnFlexibleName, Object value) {
+        invokeSetter(columnFlexibleName, value, "lessThan");
     }
 
-    public void invokeSetterGreaterEqual(String columnMultiName, Object value) {
-        invokeSetter(columnMultiName, value, "greaterEqual");
+    public void invokeSetterGreaterEqual(String columnFlexibleName, Object value) {
+        invokeSetter(columnFlexibleName, value, "greaterEqual");
     }
 
-    public void invokeSetterLessEqual(String columnMultiName, Object value) {
-        invokeSetter(columnMultiName, value, "lessEqual");
+    public void invokeSetterLessEqual(String columnFlexibleName, Object value) {
+        invokeSetter(columnFlexibleName, value, "lessEqual");
     }
 
-    protected void invokeSetter(String columnMultiName, Object value, String conditionKeyName) {
+    protected void invokeSetter(String columnFlexibleName, Object value, String conditionKeyName) {
         if (value == null) {
             return;
         }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
-        final String columnCapPropName = dbmeta.getCapPropNameByMultiName(columnMultiName);
+        final String columnCapPropName = initCap(dbmeta.getPropNameByFlexibleName(columnFlexibleName));
         String methodName = "set" + columnCapPropName + "_" + conditionKeyName.substring(0, 1).toUpperCase() + conditionKeyName.substring(1);
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{value.getClass()});
         } catch (NoSuchMethodException e) {
-            String msg = "The columnMultiName is not existing in this table: columnMultiName=" + columnMultiName;
+            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
@@ -572,18 +573,18 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    protected void invokeSetterLikeSearch(String columnMultiName, Object value, ${glConditionOptionLikeSearchName} option) {
+    protected void invokeSetterLikeSearch(String columnFlexibleName, Object value, ${glConditionOptionLikeSearchName} option) {
         if (value == null) {
             return;
         }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
-        final String columnCapPropName = dbmeta.getCapPropNameByMultiName(columnMultiName);
+        final String columnCapPropName = initCap(dbmeta.getPropNameByFlexibleName(columnFlexibleName));
         String methodName = "set" + columnCapPropName + "_" + "likeSearch".substring(0, 1).toUpperCase() + "likeSearch".substring(1);
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{value.getClass(), ${glConditionOptionLikeSearchName}.class});
         } catch (NoSuchMethodException e) {
-            String msg = "The columnMultiName is not existing in this table: columnMultiName=" + columnMultiName;
+            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
@@ -596,15 +597,15 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    public void invokeAddOrderByAsc(String columnMultiName) {
-        invokeOrderBy(columnMultiName, true);
+    public void invokeAddOrderByAsc(String columnFlexibleName) {
+        invokeOrderBy(columnFlexibleName, true);
     }
 
-    public void invokeAddOrderByDesc(String columnMultiName) {
-        invokeOrderBy(columnMultiName, false);
+    public void invokeAddOrderByDesc(String columnFlexibleName) {
+        invokeOrderBy(columnFlexibleName, false);
     }
 
-    protected void invokeOrderBy(String columnMultiName, boolean isAsc) {
+    protected void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
         String ascDesc = null;
         if (isAsc) {
             ascDesc = "Asc";
@@ -612,13 +613,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             ascDesc = "Desc";
         }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
-        final String methodName = "addOrderBy_" + dbmeta.getCapPropNameByMultiName(columnMultiName) + "_" + ascDesc;
+        final String columnCapPropName = initCap(dbmeta.getPropNameByFlexibleName(columnFlexibleName));
+        final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
 
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
-            String msg = "The columnMultiName is not existing in this table: columnMultiName=" + columnMultiName;
+            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
@@ -716,6 +718,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             newList.add(str);
         }
         return newList;
+    }
+
+    protected String initCap(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     // ----------------------------------------------------------------

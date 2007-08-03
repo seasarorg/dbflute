@@ -17,14 +17,38 @@ public class ${myClassName} {
     protected ${glDBMetaInterfaceName} dbmeta;
     protected String columnDbName;
     protected String propertyName;
+    protected Class propertyType;
 
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName) {
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName) {
         this.dbmeta = dbmeta;
         this.columnDbName = columnDbName;
+    }
+
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Class propertyType) {
+        this(dbmeta, columnDbName);
         this.propertyName = propertyName;
+        this.propertyType = propertyType;
+    }
+
+    // ===================================================================================
+    //                                                                             Builder
+    //                                                                             =======
+    public String buildInitCapPropertyName() {
+        return initCap(this.propertyName);
+    }
+
+    // ===================================================================================
+    //                                                                              Finder
+    //                                                                              ======
+    public java.lang.reflect.Method findSetter() {
+        return findMethod(dbmeta.getEntityType(), "set" + buildInitCapPropertyName(), new Class[] { this.propertyType });
+    }
+
+    public java.lang.reflect.Method findGetter() {
+        return findMethod(dbmeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class[] {});
     }
 
     // ===================================================================================
@@ -55,8 +79,28 @@ public class ${myClassName} {
     }
 
     // ===================================================================================
+    //                                                                     Internal Helper
+    //                                                                     ===============
+    protected String initCap(final String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
+    protected java.lang.reflect.Method findMethod(Class clazz, String methodName, Class[] argTypes) {
+        try {
+            return clazz.getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException ex) {
+            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
+            throw new IllegalStateException(msg, ex);
+        }
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    public int hashCode() {
+        return dbmeta.hashCode() + columnDbName.hashCode();
+    }
+
     public boolean equals(Object obj) {
         if (!(obj instanceof ${myClassName})) {
             return false;

@@ -24,6 +24,13 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
     // ===============================================================================
     //                                                                   S2Dao Version
     //                                                                   =============
+    public boolean isVersionAfter1046() {
+        if (!hasS2DaoVersion()) {
+            return true;
+        }
+        return isS2DaoVersionGreaterEqual("1.0.46");
+    }
+    
     public boolean isVersionAfter1043() {
         if (!hasS2DaoVersion()) {
             return true;

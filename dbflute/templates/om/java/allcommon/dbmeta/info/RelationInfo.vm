@@ -11,13 +11,14 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  */
 public interface ${myClassName} {
 
-    public String getRelationPropertyName();
+    public String getRelationPropName();
 
     public ${glDBMetaInterfaceName} getLocalDBMeta();
 
     public ${glDBMetaInterfaceName} getTargetDBMeta();
 
-    public java.util.Map${database.filterGenericsString('String, String')} getLocalTargetColumnMap();
+#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalTargetColumnInfoMap();
 
     public boolean isOneToOne();
 

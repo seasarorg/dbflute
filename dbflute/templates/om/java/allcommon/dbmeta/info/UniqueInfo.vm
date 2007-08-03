@@ -22,11 +22,17 @@ public class ${myClassName} {
     //                                                                         Easy-to-Use
     //                                                                         ===========
     public boolean containsColumn(String columnName) {
-        return this.uniqueColumnList.contains(new ${glColumnInfoName}(dbmeta, columnName, "dummy"));
+        for (final java.util.Iterator ite = uniqueColumnList.iterator(); ite.hasNext(); ) {
+            final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+            if (columnInfo.getColumnDbName().equals(columnName)) {
+                return true;
+            }
+        }
+        return this.uniqueColumnList.contains(new ${glColumnInfoName}(dbmeta, columnName, "dummy", String.class));
     }
 
     public boolean containsColumn(${glColumnInfoName} column) {
-        return this.uniqueColumnList.contains(column);
+        return this.uniqueColumnList.contains(column.getColumnDbName());
     }
 
     // ===================================================================================
