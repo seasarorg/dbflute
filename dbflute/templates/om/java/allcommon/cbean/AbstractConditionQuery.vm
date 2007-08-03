@@ -504,7 +504,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      */
     public ${glConditionValueName} invokeGetter(String columnFlexibleName) {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.getPropNameByFlexibleName(columnFlexibleName));
+        final String columnCapPropName = initCap(dbmeta.getPropertyNameByFlexibleName(columnFlexibleName));
         String methodName = "get" + columnCapPropName;
         java.lang.reflect.Method method = null;
         try {
@@ -554,7 +554,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             return;
         }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.getPropNameByFlexibleName(columnFlexibleName));
+        final String columnCapPropName = initCap(dbmeta.getPropertyNameByFlexibleName(columnFlexibleName));
         String methodName = "set" + columnCapPropName + "_" + conditionKeyName.substring(0, 1).toUpperCase() + conditionKeyName.substring(1);
         java.lang.reflect.Method method = null;
         try {
@@ -578,7 +578,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             return;
         }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.getPropNameByFlexibleName(columnFlexibleName));
+        final String columnCapPropName = initCap(dbmeta.getPropertyNameByFlexibleName(columnFlexibleName));
         String methodName = "set" + columnCapPropName + "_" + "likeSearch".substring(0, 1).toUpperCase() + "likeSearch".substring(1);
         java.lang.reflect.Method method = null;
         try {
@@ -613,7 +613,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             ascDesc = "Desc";
         }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.getPropNameByFlexibleName(columnFlexibleName));
+        final String columnCapPropName = initCap(dbmeta.getPropertyNameByFlexibleName(columnFlexibleName));
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
 
         java.lang.reflect.Method method = null;

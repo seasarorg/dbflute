@@ -29,10 +29,10 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      */
     public boolean isExistByFlexibleName(String flexibleName) {
         final String key = flexibleName.toLowerCase();
-        if (getDbNamePropNameKeyToLowerMap().containsKey(key)) {
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
             return true;
         }
-        if (getPropNameDbNameKeyToLowerMap().containsKey(key)) {
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
             return true;
         }
         return false;
@@ -100,13 +100,13 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      */
     public String getDbNameByFlexibleName(String flexibleName) {
         final String key = flexibleName.toLowerCase();
-        if (getPropNameDbNameKeyToLowerMap().containsKey(key)) {
-            return (String)getPropNameDbNameKeyToLowerMap().get(key);
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
+            return (String)getPropertyNameDbNameKeyToLowerMap().get(key);
         }
-        if (getDbNamePropNameKeyToLowerMap().containsKey(key)) {
-            final String dbNameKeyToLower = ((String)getDbNamePropNameKeyToLowerMap().get(key)).toLowerCase();
-            if (getPropNameDbNameKeyToLowerMap().containsKey(dbNameKeyToLower)) {
-                return getPropNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
+            final String dbNameKeyToLower = ((String)getDbNamePropertyNameKeyToLowerMap().get(key)).toLowerCase();
+            if (getPropertyNameDbNameKeyToLowerMap().containsKey(dbNameKeyToLower)) {
+                return getPropertyNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
             }
         }
         String msg = "Nof found object by the flexible name: flexibleName=" + flexibleName;
@@ -119,15 +119,15 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
      * @return Db-name. (NotNull and NotEmpty)
      */
-    public String getPropNameByFlexibleName(String flexibleName) {
+    public String getPropertyNameByFlexibleName(String flexibleName) {
         final String key = flexibleName.toLowerCase();
-        if (getDbNamePropNameKeyToLowerMap().containsKey(key)) {
-            return (String)getDbNamePropNameKeyToLowerMap().get(key);
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
+            return (String)getDbNamePropertyNameKeyToLowerMap().get(key);
         }
-        if (getPropNameDbNameKeyToLowerMap().containsKey(key)) {
-            final String dbNameToLower = ((String)getPropNameDbNameKeyToLowerMap().get(key)).toLowerCase();
-            if (getDbNamePropNameKeyToLowerMap().containsKey(dbNameToLower)) {
-                return getDbNamePropNameKeyToLowerMap().get(dbNameToLower);
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
+            final String dbNameToLower = ((String)getPropertyNameDbNameKeyToLowerMap().get(key)).toLowerCase();
+            if (getDbNamePropertyNameKeyToLowerMap().containsKey(dbNameToLower)) {
+                return getDbNamePropertyNameKeyToLowerMap().get(dbNameToLower);
             }
         }
         String msg = "Nof found object by the flexible name: flexibleName=" + flexibleName;
@@ -313,12 +313,12 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * Get relation information.
      * 
-     * @param relationPropName Relation property name. (Both OK - InitCap or not). (NotNull)
+     * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
      * @return Relation information. (NotNull)
      */ 
-    public ${glRelationInfoName} getRelationInfo(String relationPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("relationPropName", relationPropName);
-        return hasForeign(relationPropName) ? getForeignInfo(relationPropName) : getRefererInfo(relationPropName);
+    public ${glRelationInfoName} getRelationInfo(String relationPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
+        return hasForeign(relationPropertyName) ? getForeignInfo(relationPropertyName) : getRefererInfo(relationPropertyName);
     }
 
     // -----------------------------------------------------
@@ -327,17 +327,17 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param foreignPropName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
      */ 
-    public boolean hasForeign(String foreignPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropName", foreignPropName);
-        String methodName = buildRelationInfoGetterMethodNameInitUncap("Foreign", foreignPropName);
+    public boolean hasForeign(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        String methodName = buildRelationInfoGetterMethodNameInitUncap("Foreign", foreignPropertyName);
         try {
             this.getClass().getMethod(methodName, new Class[]{});
             return true;
         } catch (NoSuchMethodException ignored) {
-            methodName = buildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropName);
+            methodName = buildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropertyName);
             try {
                 this.getClass().getMethod(methodName, new Class[]{});
                 return true;
@@ -350,33 +350,33 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param foreignPropName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */ 
-    public ${glDBMetaInterfaceName} getForeignDBMeta(String foreignPropName) {
-        return getForeignInfo(foreignPropName).getForeignDBMeta();
+    public ${glDBMetaInterfaceName} getForeignDBMeta(String foreignPropertyName) {
+        return getForeignInfo(foreignPropertyName).getForeignDBMeta();
     }
 
     /**
      * Get foreign information.
      * 
-     * @param foreignPropName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
      * @return Foreign information. (NotNull)
      */ 
-    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo(String foreignPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropName", foreignPropName);
-        String methodName = buildRelationInfoGetterMethodNameInitUncap("Foreign", foreignPropName);
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        String methodName = buildRelationInfoGetterMethodNameInitUncap("Foreign", foreignPropertyName);
         try {
             this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
-            methodName = buildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropName);
+            methodName = buildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropertyName);
         }
 
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
-            String msg = "The foreignPropertyName is not found: foreignPropName=" + foreignPropName;
+            String msg = "The foreignPropertyName is not found: foreignPropertyName=" + foreignPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
@@ -395,17 +395,17 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param refererPropName The property name of referer. (Both OK - InitCap or not). (NotNull)
+     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
      */ 
-    public boolean hasReferer(String refererPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("refererPropName", refererPropName);
-        String methodName = buildRelationInfoGetterMethodNameInitUncap("Referer", refererPropName);
+    public boolean hasReferer(String refererPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+        String methodName = buildRelationInfoGetterMethodNameInitUncap("Referer", refererPropertyName);
         try {
             this.getClass().getMethod(methodName, new Class[]{});
             return true;
         } catch (NoSuchMethodException ignored) {
-            methodName = buildRelationInfoGetterMethodNameInitCap("Referer", refererPropName);
+            methodName = buildRelationInfoGetterMethodNameInitCap("Referer", refererPropertyName);
             try {
                 this.getClass().getMethod(methodName, new Class[]{});
                 return true;
@@ -418,34 +418,34 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param refererPropName The property name of referer. (Both OK - InitCap or not). (NotNull)
+     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
      * @return Referer DBMeta. (NotNull)
      */ 
-    public ${glDBMetaInterfaceName} getRefererDBMeta(String refererPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("refererPropName", refererPropName);
-        return getRefererInfo(refererPropName).getRefererDBMeta();
+    public ${glDBMetaInterfaceName} getRefererDBMeta(String refererPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+        return getRefererInfo(refererPropertyName).getRefererDBMeta();
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param refererPropName The property name of referer. (Both OK - InitCap or not). (NotNull)
+     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
      * @return Referer information. (NotNull)
      */ 
-    public ${glRefererInfoName} getRefererInfo(String refererPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("refererPropName", refererPropName);
-        String methodName = buildRelationInfoGetterMethodNameInitUncap("Referer", refererPropName);
+    public ${glRefererInfoName} getRefererInfo(String refererPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+        String methodName = buildRelationInfoGetterMethodNameInitUncap("Referer", refererPropertyName);
         try {
             this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
-            methodName = buildRelationInfoGetterMethodNameInitCap("Referer", refererPropName);
+            methodName = buildRelationInfoGetterMethodNameInitCap("Referer", refererPropertyName);
         }
 
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
-            String msg = "The refererPropertyName is not found: refererPropName=" + refererPropName;
+            String msg = "The refererPropertyName is not found: refererPropertyName=" + refererPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
@@ -458,12 +458,12 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
-    private String buildRelationInfoGetterMethodNameInitUncap(String targetName, String relationPropName) {
-        return  "get" + targetName + "Info_" + relationPropName.substring(0, 1).toLowerCase() + relationPropName.substring(1);
+    private String buildRelationInfoGetterMethodNameInitUncap(String targetName, String relationPropertyName) {
+        return  "get" + targetName + "Info_" + relationPropertyName.substring(0, 1).toLowerCase() + relationPropertyName.substring(1);
     }
 
-    private String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropName) {
-        return  "get" + targetName + "Info_" + relationPropName.substring(0, 1).toUpperCase() + relationPropName.substring(1);
+    private String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
+        return  "get" + targetName + "Info_" + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
     }
 
     // ===================================================================================

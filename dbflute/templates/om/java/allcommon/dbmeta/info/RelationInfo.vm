@@ -11,7 +11,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  */
 public interface ${myClassName} {
 
-    public String getRelationPropName();
+    public String getRelationPropertyName();
 
     public ${glDBMetaInterfaceName} getLocalDBMeta();
 

@@ -28,11 +28,11 @@ public class ${myClassName} {
                 return true;
             }
         }
-        return this.uniqueColumnList.contains(new ${glColumnInfoName}(dbmeta, columnName, "dummy", String.class));
+        return false;
     }
 
     public boolean containsColumn(${glColumnInfoName} column) {
-        return this.uniqueColumnList.contains(column.getColumnDbName());
+        return containsColumn(column.getColumnDbName());
     }
 
     // ===================================================================================

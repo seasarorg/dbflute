@@ -82,7 +82,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String TABLE_DB_NAME = "$table.name";
 
     /** Table prop name(JavaBeansRule). */
-    public static final String TABLE_PROP_NAME = "$table.javaBeansRulePropertyName";
+    public static final String TABLE_PROPERTY_NAME = "$table.javaBeansRulePropertyName";
 
     /** Table cap-prop name. */
     public static final String TABLE_CAP_PROP_NAME = "$table.javaName";
@@ -110,7 +110,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                       -------------------------------
 #foreach ($col in $table.Columns)
     /** Prop-name(JavaBeansRule) of ${col.javaBeansRulePropertyName}. ${col.columnDefinitionLineDisp} */
-    public static final String PROP_NAME_${col.javaBeansRulePropertyName} = "$col.javaBeansRulePropertyName";
+    public static final String PROPERTY_NAME_${col.javaBeansRulePropertyName} = "$col.javaBeansRulePropertyName";
 #end
 
     // -----------------------------------------------------
@@ -148,7 +148,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                          ------------
 #foreach ($foreignKeys in $table.foreignKeys)
     /** The foreign property name(JavaBeansRule) of ${foreignKeys.foreignJavaBeansRulePropertyName}. */
-    public static final String FOREIGN_PROP_NAME_${foreignKeys.foreignJavaBeansRulePropertyName} = "$foreignKeys.foreignJavaBeansRulePropertyName";
+    public static final String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignJavaBeansRulePropertyName} = "$foreignKeys.foreignJavaBeansRulePropertyName";
 #end
 #if ($database.isMakeRecentlyDeprecated())
 #foreach ($foreignKeys in $table.foreignKeys)
@@ -178,7 +178,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                          ------------
 #foreach ($children in $table.referrers)
     /** The referer property name(JavaBeansRule) of ${children.refererJavaBeansRulePropertyName}. */
-    public static final String REFERER_PROP_NAME_${children.refererJavaBeansRulePropertyName} = "$children.refererJavaBeansRulePropertyName";
+    public static final String REFERER_PROPERTY_NAME_${children.refererJavaBeansRulePropertyName} = "$children.refererJavaBeansRulePropertyName";
 #end
 #if ($database.isMakeRecentlyDeprecated())
 #foreach ($children in $table.referrers)
@@ -204,37 +204,37 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
 
     /** The map of {db-name : prop-name} key-to-lower. */
-    private static java.util.Map${database.filterGenericsString('String, String')} _dbNamePropNameKeyToLowerMap;
-    protected static java.util.Map${database.filterGenericsString('String, String')} createDbNamePropNameKeyToLowerMap() {
-        if (_dbNamePropNameKeyToLowerMap != null) {
-            return _dbNamePropNameKeyToLowerMap;
+    private static java.util.Map${database.filterGenericsString('String, String')} _dbNamePropertyNameKeyToLowerMap;
+    protected static java.util.Map${database.filterGenericsString('String, String')} createDbNamePropertyNameKeyToLowerMap() {
+        if (_dbNamePropertyNameKeyToLowerMap != null) {
+            return _dbNamePropertyNameKeyToLowerMap;
         }
         final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
-        map.put(TABLE_DB_NAME.toLowerCase(), TABLE_PROP_NAME);
+        map.put(TABLE_DB_NAME.toLowerCase(), TABLE_PROPERTY_NAME);
 
 #foreach ($col in $table.Columns)
-        map.put(DB_NAME_${col.name}.toLowerCase(), PROP_NAME_${col.javaBeansRulePropertyName});
+        map.put(DB_NAME_${col.name}.toLowerCase(), PROPERTY_NAME_${col.javaBeansRulePropertyName});
 #end
 
-        _dbNamePropNameKeyToLowerMap = java.util.Collections.unmodifiableMap(map);
-        return _dbNamePropNameKeyToLowerMap;
+        _dbNamePropertyNameKeyToLowerMap = java.util.Collections.unmodifiableMap(map);
+        return _dbNamePropertyNameKeyToLowerMap;
     }
 
     /** The map of {prop-name : db-name} key-to-lower. */
-    private static java.util.Map${database.filterGenericsString('String, String')} _propNameDbNameKeyToLowerMap;
-    protected static java.util.Map${database.filterGenericsString('String, String')} createPropNameDbNameKeyToLowerMap() {
-        if (_propNameDbNameKeyToLowerMap != null) {
-            return _propNameDbNameKeyToLowerMap;
+    private static java.util.Map${database.filterGenericsString('String, String')} _propertyNameDbNameKeyToLowerMap;
+    protected static java.util.Map${database.filterGenericsString('String, String')} createPropertyNameDbNameKeyToLowerMap() {
+        if (_propertyNameDbNameKeyToLowerMap != null) {
+            return _propertyNameDbNameKeyToLowerMap;
         }
         final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
-        map.put(TABLE_PROP_NAME.toLowerCase(), TABLE_DB_NAME.toLowerCase());
+        map.put(TABLE_PROPERTY_NAME.toLowerCase(), TABLE_DB_NAME);
 
 #foreach ($col in $table.Columns)
-        map.put(PROP_NAME_${col.javaBeansRulePropertyName}.toLowerCase(), DB_NAME_${col.name});
+        map.put(PROPERTY_NAME_${col.javaBeansRulePropertyName}.toLowerCase(), DB_NAME_${col.name});
 #end
 
-        _propNameDbNameKeyToLowerMap = java.util.Collections.unmodifiableMap(map);
-        return _propNameDbNameKeyToLowerMap;
+        _propertyNameDbNameKeyToLowerMap = java.util.Collections.unmodifiableMap(map);
+        return _propertyNameDbNameKeyToLowerMap;
     }
 
 #if ($database.isMakeRecentlyDeprecated())
@@ -356,12 +356,12 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                            Name Map
     //                                                                            ========
-    public java.util.Map${database.filterGenericsString('String, String')} getDbNamePropNameKeyToLowerMap() {
-        return createDbNamePropNameKeyToLowerMap();
+    public java.util.Map${database.filterGenericsString('String, String')} getDbNamePropertyNameKeyToLowerMap() {
+        return createDbNamePropertyNameKeyToLowerMap();
     }
 
-    public java.util.Map${database.filterGenericsString('String, String')} getPropNameDbNameKeyToLowerMap() {
-        return createPropNameDbNameKeyToLowerMap();
+    public java.util.Map${database.filterGenericsString('String, String')} getPropertyNameDbNameKeyToLowerMap() {
+        return createPropertyNameDbNameKeyToLowerMap();
     }
 
 #if ($database.isMakeRecentlyDeprecated())
@@ -441,10 +441,10 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return Table prop-name(JavaBeansRule). (NotNull)
+     * @return Table property-name(JavaBeansRule). (NotNull)
      */
-    public String getTablePropName() {
-        return TABLE_PROP_NAME;
+    public String getTablePropertyName() {
+        return TABLE_PROPERTY_NAME;
     }
 
     /**
@@ -651,7 +651,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @return Column information of ${col.uncapitalisedJavaName}. (NotNull)
      */
     public ${glColumnInfoName} getColumnInfo_${col.javaBeansRulePropertyName}() {
-        return new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class);
+        return new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()});
     }
 #end
 
@@ -667,7 +667,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         final ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
         uniqueInfo.setDBMeta(this);
 #foreach ($col in $table.primaryKey)
-        uniqueInfo.addUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
+        uniqueInfo.addUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", ${col.javaNative}.class, true));
 #end
         uniqueInfo.setPrimary(true);
         return uniqueInfo;
@@ -688,7 +688,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */
     public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo_${foreignKeys.foreignJavaBeansRulePropertyName}() {
         final ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
-        foreignInfo.setForeignPropName("${foreignKeys.foreignJavaBeansRulePropertyName}");
+        foreignInfo.setForeignPropertyName("${foreignKeys.foreignJavaBeansRulePropertyName}");
         foreignInfo.setLocalDBMeta(${table.DBMetaClassName}.getInstance());
         foreignInfo.setForeignDBMeta(${foreignKeys.foreignTableDBMetaClassName}.getInstance());
         final java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} map = new java.util.LinkedHashMap${database.filterGenericsString($genericsColumnInfoMap)}();
@@ -711,7 +711,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */
     public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo_${referer.refererJavaBeansRulePropertyNameAsOne}() {
         final ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
-        foreignInfo.setForeignPropName("${referer.refererJavaBeansRulePropertyNameAsOne}");
+        foreignInfo.setForeignPropertyName("${referer.refererJavaBeansRulePropertyNameAsOne}");
         foreignInfo.setLocalDBMeta(${referer.foreignTableDBMetaClassName}.getInstance());
         foreignInfo.setForeignDBMeta(${referer.refererTableDBMetaClassName}.getInstance());
         final java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} map = new java.util.LinkedHashMap${database.filterGenericsString($genericsColumnInfoMap)}();
@@ -738,7 +738,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */
     public ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} getRefererInfo_${referer.refererJavaBeansRulePropertyName}() {
         final ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} refererInfo = new ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName}();
-        refererInfo.setRefererPropName("${referer.refererJavaBeansRulePropertyName}");
+        refererInfo.setRefererPropertyName("${referer.refererJavaBeansRulePropertyName}");
         refererInfo.setLocalDBMeta(${referer.foreignTableDBMetaClassName}.getInstance());
         refererInfo.setRefererDBMeta(${referer.refererTableDBMetaClassName}.getInstance());
         final java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} map = new java.util.LinkedHashMap${database.filterGenericsString($genericsColumnInfoMap)}();

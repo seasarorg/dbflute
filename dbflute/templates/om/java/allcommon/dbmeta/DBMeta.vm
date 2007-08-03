@@ -52,9 +52,9 @@ public interface ${myClassName} {
     /**
      * Get table prop-name(JavaBeansRule).
      * 
-     * @return Table prop-name(JavaBeansRule). (NotNull)
+     * @return Table property-name(JavaBeansRule). (NotNull)
      */
-    public String getTablePropName();
+    public String getTablePropertyName();
 
     /**
      * Get table cap-prop-name.
@@ -133,7 +133,7 @@ public interface ${myClassName} {
      * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
      * @return Db-name. (NotNull and NotEmpty)
      */
-    public String getPropNameByFlexibleName(String flexibleName);
+    public String getPropertyNameByFlexibleName(String flexibleName);
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
@@ -221,9 +221,9 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                            Name Map
     //                                                                            ========
-    public java.util.Map${database.filterGenericsString('String, String')} getDbNamePropNameKeyToLowerMap();
+    public java.util.Map${database.filterGenericsString('String, String')} getDbNamePropertyNameKeyToLowerMap();
 
-    public java.util.Map${database.filterGenericsString('String, String')} getPropNameDbNameKeyToLowerMap();
+    public java.util.Map${database.filterGenericsString('String, String')} getPropertyNameDbNameKeyToLowerMap();
 
 #if ($database.isMakeRecentlyDeprecated())
     /**

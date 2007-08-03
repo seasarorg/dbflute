@@ -201,12 +201,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                           ResultSetHandler Override
     //                                                           =========================
     protected ResultSetHandler createResultSetHandler(Method method) {
-        return this.resultSetHandlerFactory.getResultSetHandler(this, method);
+        return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, beanMetaData, method);
     }
 
-//    protected ResultSetHandler createResultSetHandler(BeanMetaData specifiedBeanMetaData, Method method) {
-//        return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReade, specifiedBeanMetaData, method);
-//    }
+    protected ResultSetHandler createResultSetHandler(BeanMetaData specifiedBeanMetaData, Method method) {
+        return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, specifiedBeanMetaData, method);
+    }
 #else
 #if ($database.isVersionAfter1043())
     // ===================================================================================
@@ -503,9 +503,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected void setupSelectMethodByManual(Method method, String sql) {
         final BeanMetaData myBeanMetaData = buildBeanMetaData(method);
 #if ($database.isVersionAfter1046())
-// TODO
-//        final SelectDynamicCommand cmd = newMySelectDynamicCommand(createResultSetHandler(myBeanMetaData, method));
-        final SelectDynamicCommand cmd = newMySelectDynamicCommand(createResultSetHandler(method));
+        final SelectDynamicCommand cmd = newMySelectDynamicCommand(createResultSetHandler(myBeanMetaData, method));
         cmd.setSql(sql);
         cmd.setArgNames(this.daoAnnotationReader.getArgNames(method));
         cmd.setArgTypes(method.getParameterTypes());
