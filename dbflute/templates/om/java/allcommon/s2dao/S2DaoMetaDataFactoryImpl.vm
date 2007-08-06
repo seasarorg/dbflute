@@ -157,10 +157,10 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
         this.beanEnhancer = beanEnhancer;
     }
-  #if ($database.isAvailableOtherConnectionDaoInitialization())
+#if ($database.isAvailableOtherConnectionDaoInitialization())
 
     protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
-        ${glDaoMetaDataExtension} dmdExtension = new ${glDaoMetaDataExtension}();
+        ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
         dmdExtension.setBeanEnhancer(this.beanEnhancer);
         dmdExtension.setTransactionManager(this.transactionManager);
 #if ($database.isVersionAfter1046())
@@ -179,14 +179,19 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
-  #else
+#else
 
     protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
-        ${glDaoMetaDataExtension} dmdExtension = new ${glDaoMetaDataExtension}();
+        ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
         dmdExtension.setBeanEnhancer(this.beanEnhancer);
         return dmdExtension;
     }
-  #end
+#end
+
+    protected ${glDaoMetaDataExtension} newDaoMetaDataExtension() {
+        return new ${glDaoMetaDataExtension}();
+    }
+
 #else
 
     // ===================================================================================

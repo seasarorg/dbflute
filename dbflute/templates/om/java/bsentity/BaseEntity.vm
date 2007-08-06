@@ -336,7 +336,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // * * * * * * * * */
 
     /** RELNO of foreign table for s2dao. */
-    public static final int ${foreignKeys.foreignJavaBeansRulePropertyName}_RELNO = ${foreignKeysIndex};
+    public static final int ${foreignKeys.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKeys)};
 
     /** RELKEYS of foreign table for s2dao. */
     public static final String ${foreignKeys.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.RelationKeysCommaString";
@@ -392,7 +392,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // * * * * * * * * */
 
     /** RELNO of foreign table for s2dao. */
-    public static final int ${refferer.refererJavaBeansRulePropertyNameAsOne}_RELNO = ${foreignKeysIndex};
+    public static final int ${refferer.refererJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveRefererIndexAsOne($refferer)};
 
     /** RELKEYS of foreign table for s2dao. */
     public static final String ${refferer.refererJavaBeansRulePropertyNameAsOne}_RELKEYS = "$refferer.relationKeysCommaStringForOneToOneRefferer";
@@ -407,7 +407,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     #if ($database.isAvailableChildNoAnnotationGenerating())
 
     /** CHILDNO of referer table for s2dao. */
-    public static final int ${refferer.refererJavaBeansRulePropertyName}_CHILDNO = ${foreignKeysIndex};
+    public static final int ${refferer.refererJavaBeansRulePropertyName}_CHILDNO = ${table.resolveRefererIndex($refferer)};
 
     /** CHILDKEYS of referer table for s2dao. */
     public static final String ${refferer.refererJavaBeansRulePropertyName}_CHILDKEYS = "$refferer.childKeysCommaString";

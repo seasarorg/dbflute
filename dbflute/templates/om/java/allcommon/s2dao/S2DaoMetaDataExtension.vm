@@ -498,10 +498,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     // ===================================================================================
-    //                                                                   ByManual Override
-    //                                                                   =================
+    //                                                                 OutsideSql Override
+    //                                                                 ===================
     protected void setupSelectMethodByManual(Method method, String sql) {
-        final BeanMetaData myBeanMetaData = buildBeanMetaData(method);
+        final BeanMetaData myBeanMetaData = getOutsideSqlBeanMetaData(method);
 #if ($database.isVersionAfter1046())
         final SelectDynamicCommand cmd = newMySelectDynamicCommand(createResultSetHandler(myBeanMetaData, method));
         cmd.setSql(sql);
@@ -523,22 +523,26 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #end
     }
 
-    protected BeanMetaData buildBeanMetaData(Method method) {
-        final Class beanClass4SelectMethodByManual = getOriginalBeanClass(method);
+    protected BeanMetaData getOutsideSqlBeanMetaData(Method method) {
+        final Class beanClass4SelectMethodByManual = getOutsideSqlDefaultBeanClass(method);
         if (beanClass4SelectMethodByManual.equals(getBeanClass())) {
-            return getBeanMetaData();
+            return getOutsideSqlDefaultBeanMetaData(method);
         }
-        return createOriginalBmdFactory().createBeanMetaData(getOriginalBeanClass(method));
+        return getOutsideSqlCustomizeBeanMetaData(method);
     }
 
-    protected BeanMetaDataFactory createOriginalBmdFactory() {
+    protected BeanMetaData getOutsideSqlDefaultBeanMetaData(Method method) {
+        return getBeanMetaData();
+    }
+
+    protected BeanMetaData getOutsideSqlCustomizeBeanMetaData(Method method) {
+        return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(getOutsideSqlDefaultBeanClass(method));
+    }
+
+    protected BeanMetaDataFactory createOutsideSqlCustomizeBeanMetaDataFactory() {
         final ${glBeanMetaDataFactoryImpl} originalBmdFactory = new ${glBeanMetaDataFactoryImpl}() {
             protected BeanMetaDataImpl createBeanMetaDataImpl() {
-                return new BeanMetaDataImpl() {
-                    protected void setupDatabaseMetaData(BeanDesc beanDesc, DatabaseMetaData dbMetaData, Dbms dbms) {
-                        // Nothing.
-                    }
-                };
+                return newOutsideSqlCustomizeBeanMetaDataImpl();
             }
         };
         originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
@@ -549,7 +553,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return originalBmdFactory;
     }
 
-    protected Class getOriginalBeanClass(Method method) {
+    protected BeanMetaDataImpl newOutsideSqlCustomizeBeanMetaDataImpl() {
+        return new OutsideSqlCustomizeBeanMetaDataImpl();
+    }
+
+    public static class OutsideSqlCustomizeBeanMetaDataImpl extends BeanMetaDataImpl {
+        protected void setupDatabaseMetaData(BeanDesc beanDesc, DatabaseMetaData dbMetaData, Dbms dbms) {
+            // Nothing.
+        }
+    }
+
+    protected Class getOutsideSqlDefaultBeanClass(Method method) {
         final Class retType = method.getReturnType();
         if (java.util.List.class.isAssignableFrom(retType)) {
             final Class elementType = InternalMethodUtil.getElementTypeOfListFromReturnMethod(method);

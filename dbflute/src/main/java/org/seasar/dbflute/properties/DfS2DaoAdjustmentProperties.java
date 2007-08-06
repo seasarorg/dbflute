@@ -30,7 +30,7 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
         }
         return isS2DaoVersionGreaterEqual("1.0.46");
     }
-    
+
     public boolean isVersionAfter1043() {
         if (!hasS2DaoVersion()) {
             return true;
@@ -70,12 +70,21 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
     public boolean isAvailableDaoMethodLazyInitializing() {
         return booleanProp("torque.isAvailableDaoMethodLazyInitializing", false);
     }
-    
+
     // ===============================================================================
     //                                                                    S2Dao Follow
     //                                                                    ============
     public boolean isAvailableChildNoAnnotationGenerating() {
         return booleanProp("torque.isAvailableChildNoAnnotationGenerating", false);
     }
-    
+
+    public String getExtendedDaoMetaDataFactoryImplClassName() {
+        final DfBasicProperties basicProperties = getBasicProperties();
+        final DfGeneratedClassPackageProperties generatedClassPackageProperties = getGeneratedClassPackageProperties();
+        final String baseCommonPackage = generatedClassPackageProperties.getBaseCommonPackage();
+        final String projectPrefix = basicProperties.getProjectPrefix();
+        final String defaultClassName = baseCommonPackage + ".s2dao." + projectPrefix + "S2DaoMetaDataFactoryImpl";
+        return stringProp("torque.extendedDaoMetaDataFactoryImplClassName", defaultClassName);
+    }
+
 }

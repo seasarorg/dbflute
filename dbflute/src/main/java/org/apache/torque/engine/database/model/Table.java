@@ -1186,6 +1186,69 @@ public class Table implements IDMethod {
         return (getForeignKeys().length != 0);
     }
 
+    // ===================================================================================
+    //                                                                      Relation Index
+    //                                                                      ==============
+    protected java.util.Map<String, Integer> _relationIndexMap = new java.util.LinkedHashMap<String, Integer>();
+
+    public int resolveForeignIndex(ForeignKey foreignKey) {
+        return doResolveRelationIndex(foreignKey, false, false);// Ignore oneToOne
+    }
+
+    public int resolveRefererIndexAsOne(ForeignKey foreignKey) {// oneToOne!
+        return doResolveRelationIndex(foreignKey, true, true);
+    }
+
+    public int resolveRefererIndex(ForeignKey foreignKey) {
+        return doResolveRelationIndex(foreignKey, true, false);
+    }
+
+    protected int doResolveRelationIndex(ForeignKey foreignKey, boolean referer, boolean oneToOne) {
+        final String relationIndexKey = buildRefererIndexKey(foreignKey, referer, oneToOne);
+        final Integer realIndex = _relationIndexMap.get(relationIndexKey);
+        if (realIndex != null) {
+            return realIndex;
+        }
+        final int minimumRelationIndex = extractMinimumRelationIndex(_relationIndexMap);
+        _relationIndexMap.put(relationIndexKey, minimumRelationIndex);
+        return minimumRelationIndex;
+    }
+
+    protected String buildRefererIndexKey(ForeignKey foreignKey, boolean referer, boolean oneToOne) {
+        if (!referer) {
+            return getName() + "." + foreignKey.getForeignJavaBeansRulePropertyName();
+        } else {
+            if (oneToOne) {
+                return getName() + "." + foreignKey.getRefererJavaBeansRulePropertyNameAsOne();
+            } else {
+                return getName() + "." + foreignKey.getRefererJavaBeansRulePropertyName();
+            }
+        }
+    }
+
+    protected int extractMinimumRelationIndex(java.util.Map<String, Integer> relationIndexMap) {
+        final Set<String> keySet = relationIndexMap.keySet();
+        final List<Integer> indexList = new ArrayList<Integer>();
+        for (String key : keySet) {
+            final Integer index = relationIndexMap.get(key);
+            indexList.add(index);
+        }
+        if (indexList.isEmpty()) {
+            return 0;
+        }
+        Integer minimumIndex = -1;
+        for (Integer currentIndex : indexList) {
+            if (minimumIndex + 1 < currentIndex) {
+                return minimumIndex + 1;
+            }
+            minimumIndex = currentIndex;
+        }
+        return indexList.size();
+    }
+
+    // ===================================================================================
+    //                                                                      ???
+    //                                                                      ==============
     /**
      * Return true if the column requires a transaction in Postgres
      */
@@ -1268,7 +1331,7 @@ public class Table implements IDMethod {
     public boolean hasForeignKeyOrReferer() {
         return hasForeignKey() || hasReferrer();
     }
-    
+
     /**
      * Has foreign key or referer as one?
      * 

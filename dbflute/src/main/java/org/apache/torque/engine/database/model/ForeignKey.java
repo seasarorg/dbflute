@@ -364,7 +364,7 @@ public class ForeignKey {
         final String localColumnName = getForeignLocalMapping().get(foreignColumn.getName());
         return getTable().getColumnByFlexibleName(localColumnName);
     }
-    
+
     // -----------------------------------------------------
     //                                       Foreign Element
     //                                       ---------------

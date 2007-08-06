@@ -1171,6 +1171,10 @@ public class Database {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableChildNoAnnotationGenerating();
     }
 
+    public String getExtendedDaoMetaDataFactoryImplClassName() {
+        return getProperties().getS2DaoAdjustmentProperties().getExtendedDaoMetaDataFactoryImplClassName();
+    }
+    
     // -----------------------------------------------------
     //                                                 Other
     //                                                 -----

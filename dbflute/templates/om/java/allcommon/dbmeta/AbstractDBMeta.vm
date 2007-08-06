@@ -106,7 +106,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
             final String dbNameKeyToLower = ((String)getDbNamePropertyNameKeyToLowerMap().get(key)).toLowerCase();
             if (getPropertyNameDbNameKeyToLowerMap().containsKey(dbNameKeyToLower)) {
-                return getPropertyNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
+                return (String)getPropertyNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
             }
         }
         String msg = "Nof found object by the flexible name: flexibleName=" + flexibleName;
@@ -127,7 +127,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
             final String dbNameToLower = ((String)getPropertyNameDbNameKeyToLowerMap().get(key)).toLowerCase();
             if (getDbNamePropertyNameKeyToLowerMap().containsKey(dbNameToLower)) {
-                return getDbNamePropertyNameKeyToLowerMap().get(dbNameToLower);
+                return (String)getDbNamePropertyNameKeyToLowerMap().get(dbNameToLower);
             }
         }
         String msg = "Nof found object by the flexible name: flexibleName=" + flexibleName;
@@ -318,7 +318,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      */ 
     public ${glRelationInfoName} getRelationInfo(String relationPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-        return hasForeign(relationPropertyName) ? getForeignInfo(relationPropertyName) : getRefererInfo(relationPropertyName);
+        return hasForeign(relationPropertyName) ? (${glRelationInfoName})getForeignInfo(relationPropertyName) : (${glRelationInfoName})getRefererInfo(relationPropertyName);
     }
 
     // -----------------------------------------------------
