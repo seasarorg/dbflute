@@ -510,7 +510,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         this.sqlCommands.put(method.getName(), cmd);
 #else
 #if ($database.isVersionAfter1043())
-        final org.seasar.dao.ResultSetHandlerFactory factory = new org.seasar.dao.ResultSetHandlerFactoryExtension(myBeanMetaData, annotationReader, dtoMetaDataFactory);
+        final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData, annotationReader, dtoMetaDataFactory);
 #else
         final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData);
 #end
