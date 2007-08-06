@@ -1216,12 +1216,12 @@ public class Table implements IDMethod {
 
     protected String buildRefererIndexKey(ForeignKey foreignKey, boolean referer, boolean oneToOne) {
         if (!referer) {
-            return getName() + "." + foreignKey.getForeignJavaBeansRulePropertyName();
+            return foreignKey.getForeignJavaBeansRulePropertyName();
         } else {
             if (oneToOne) {
-                return getName() + "." + foreignKey.getRefererJavaBeansRulePropertyNameAsOne();
+                return foreignKey.getRefererJavaBeansRulePropertyNameAsOne();
             } else {
-                return getName() + "." + foreignKey.getRefererJavaBeansRulePropertyName();
+                return foreignKey.getRefererJavaBeansRulePropertyName();
             }
         }
     }
