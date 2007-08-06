@@ -437,6 +437,14 @@ public interface ${myClassName} {
      */ 
     public ${glRefererInfoName} getRefererInfo(String refererPropName);
 
+    /**
+     * Relation trace.
+     */
+    public static interface RelationTrace {
+        public java.util.List${database.filterGenericsString($glRelationInfoName)} end();
+        public void recycle();
+    }
+
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============

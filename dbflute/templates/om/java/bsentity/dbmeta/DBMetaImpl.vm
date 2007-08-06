@@ -6,6 +6,7 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaAbstractName};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
 
 /**
@@ -585,7 +586,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public java.util.List${database.filterGenericsString(${glColumnInfoName})} getColumnInfoList() {
         final java.util.List${database.filterGenericsString(${glColumnInfoName})} columnInfoList = new java.util.ArrayList${database.filterGenericsString(${glColumnInfoName})}();
 #foreach ($col in $table.Columns)
-        columnInfoList.add(getColumnInfo_${col.javaBeansRulePropertyName}());
+        columnInfoList.add(column${col.javaBeansRulePropertyNameInitCap}());
 #end
         return columnInfoList;
     }
@@ -650,7 +651,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * @return Column information of ${col.uncapitalisedJavaName}. (NotNull)
      */
-    public ${glColumnInfoName} getColumnInfo_${col.javaBeansRulePropertyName}() {
+    public ${glColumnInfoName} column${col.javaBeansRulePropertyNameInitCap}() {
         return new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()});
     }
 #end
@@ -686,14 +687,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * 
      * @return Referer information. (NotNull)
      */
-    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo_${foreignKeys.foreignJavaBeansRulePropertyName}() {
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         final ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
         foreignInfo.setForeignPropertyName("${foreignKeys.foreignJavaBeansRulePropertyName}");
         foreignInfo.setLocalDBMeta(${table.DBMetaClassName}.getInstance());
         foreignInfo.setForeignDBMeta(${foreignKeys.foreignTableDBMetaClassName}.getInstance());
         final java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} map = new java.util.LinkedHashMap${database.filterGenericsString($genericsColumnInfoMap)}();
 #foreach ($column in $foreignKeys.localColumnList)
-        map.put(getColumnInfo_${column.javaBeansRulePropertyName}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().getColumnInfo_${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyName}());
+        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #end
         foreignInfo.setLocalForeignColumnInfoMap(map);
         foreignInfo.setOneToOne(${foreignKeys.isOneToOne()});
@@ -709,14 +710,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * 
      * @return Foreign information. (NotNull)
      */
-    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo_${referer.refererJavaBeansRulePropertyNameAsOne}() {
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreign${referer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
         final ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
         foreignInfo.setForeignPropertyName("${referer.refererJavaBeansRulePropertyNameAsOne}");
         foreignInfo.setLocalDBMeta(${referer.foreignTableDBMetaClassName}.getInstance());
         foreignInfo.setForeignDBMeta(${referer.refererTableDBMetaClassName}.getInstance());
         final java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} map = new java.util.LinkedHashMap${database.filterGenericsString($genericsColumnInfoMap)}();
 #foreach ($column in $referer.foreignColumnList)
-        map.put(getColumnInfo_${column.javaBeansRulePropertyName}(), ${referer.refererTableDBMetaClassName}.getInstance().getColumnInfo_${referer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyName}());
+        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referer.refererTableDBMetaClassName}.getInstance().column${referer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #end
         foreignInfo.setLocalForeignColumnInfoMap(map);
         foreignInfo.setOneToOne(${referer.isOneToOne()});
@@ -736,20 +737,85 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * 
      * @return Referer information. (NotNull)
      */
-    public ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} getRefererInfo_${referer.refererJavaBeansRulePropertyName}() {
+    public ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} referer${referer.refererJavaBeansRulePropertyNameInitCap}() {
         final ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName} refererInfo = new ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName}();
         refererInfo.setRefererPropertyName("${referer.refererJavaBeansRulePropertyName}");
         refererInfo.setLocalDBMeta(${referer.foreignTableDBMetaClassName}.getInstance());
         refererInfo.setRefererDBMeta(${referer.refererTableDBMetaClassName}.getInstance());
         final java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} map = new java.util.LinkedHashMap${database.filterGenericsString($genericsColumnInfoMap)}();
 #foreach ($column in $referer.foreignColumnList)
-        map.put(getColumnInfo_${column.javaBeansRulePropertyName}(), ${referer.refererTableDBMetaClassName}.getInstance().getColumnInfo_${referer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyName}());
+        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referer.refererTableDBMetaClassName}.getInstance().column${referer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #end
         refererInfo.setLocalRefererColumnInfoMap(map);
         refererInfo.setOneToOne(${referer.isOneToOne()});
         return refererInfo;
     }
 #end
+
+    // -----------------------------------------------------
+    //                                        Relation Trace
+    //                                        --------------
+    public ${table.javaName}RelationTrace createRelationTrace() {
+        return new ${table.javaName}RelationTrace();
+    }
+
+    public ${table.javaName}RelationTrace createRelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('RelationTrace')} relationTraceList) {
+        return new ${table.javaName}RelationTrace(relationList, relationTraceList);
+    }
+
+    /**
+     * Relation trace.
+     */
+    public static class ${table.javaName}RelationTrace implements RelationTrace {
+        protected java.util.List${database.filterGenericsString($glRelationInfoName)} _relationList;
+        protected java.util.List${database.filterGenericsString('RelationTrace')} _relationTraceList;
+        public ${table.javaName}RelationTrace() {
+            this(new java.util.ArrayList${database.filterGenericsString($glRelationInfoName)}(), new java.util.ArrayList${database.filterGenericsString('RelationTrace')}());
+        }
+        public ${table.javaName}RelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('RelationTrace')} relationTraceList) {
+            this._relationList = relationList;
+            this._relationTraceList = relationTraceList;
+            this._relationTraceList.add(this);
+        }
+#foreach ($foreignKeys in $table.foreignKeys)
+
+        public ${foreignKeys.foreignTableDBMetaClassName}.${foreignKeys.foreignTable.javaName}RelationTrace foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+            _relationList.add(${myDBMetaClassName}.getInstance().foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}());
+            return ${foreignKeys.foreignTableDBMetaClassName}.getInstance().createRelationTrace(this._relationList, this._relationTraceList);
+        }
+#end
+#foreach ($referer in $table.referrers)
+  #if (${referer.isOneToOne()})
+
+        public ${referer.refererTableDBMetaClassName}.${referer.table.javaName}RelationTrace foreign${referer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+            _relationList.add(${myDBMetaClassName}.getInstance().foreign${referer.refererJavaBeansRulePropertyNameAsOneInitCap}());
+            return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(this._relationList, this._relationTraceList);
+        }
+  #end
+#end
+#foreach ($referer in $table.referrers)
+
+        public ${referer.refererTableDBMetaClassName}.${referer.table.javaName}RelationTrace referer${referer.refererJavaBeansRulePropertyNameInitCap}() {
+            _relationList.add(${myDBMetaClassName}.getInstance().referer${referer.refererJavaBeansRulePropertyNameInitCap}());
+            return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(this._relationList, this._relationTraceList);
+        }
+#end
+
+        public java.util.List${database.filterGenericsString($glRelationInfoName)} end() {
+            final java.util.List<LdRelationInfo> resultList = this._relationList;
+            for (final java.util.Iterator ite = this._relationTraceList.iterator(); ite.hasNext(); ) {
+                final RelationTrace relationTrace = (RelationTrace)ite.next();
+                relationTrace.recycle();
+            }
+            return resultList;
+        }
+
+        public void recycle() {
+            this._relationList = new java.util.ArrayList${database.filterGenericsString($glRelationInfoName)}();
+            this._relationTraceList = new java.util.ArrayList${database.filterGenericsString('RelationTrace')}();
+            this._relationTraceList.add(this);
+        }
+    }
 
     // ===================================================================================
     //                                                                       Determination

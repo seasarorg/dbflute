@@ -332,18 +332,12 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      */ 
     public boolean hasForeign(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        String methodName = buildRelationInfoGetterMethodNameInitUncap("Foreign", foreignPropertyName);
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
         try {
             this.getClass().getMethod(methodName, new Class[]{});
             return true;
         } catch (NoSuchMethodException ignored) {
-            methodName = buildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropertyName);
-            try {
-                this.getClass().getMethod(methodName, new Class[]{});
-                return true;
-            } catch (NoSuchMethodException ignored2) {
-                return false;
-            }
+            return false;
         }
     }
 
@@ -365,13 +359,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      */ 
     public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} getForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        String methodName = buildRelationInfoGetterMethodNameInitUncap("Foreign", foreignPropertyName);
-        try {
-            this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            methodName = buildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropertyName);
-        }
-
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
@@ -400,18 +388,12 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      */ 
     public boolean hasReferer(String refererPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-        String methodName = buildRelationInfoGetterMethodNameInitUncap("Referer", refererPropertyName);
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("referer", refererPropertyName);
         try {
             this.getClass().getMethod(methodName, new Class[]{});
             return true;
         } catch (NoSuchMethodException ignored) {
-            methodName = buildRelationInfoGetterMethodNameInitCap("Referer", refererPropertyName);
-            try {
-                this.getClass().getMethod(methodName, new Class[]{});
-                return true;
-            } catch (NoSuchMethodException ignored2) {
-                return false;
-            }
+            return false;
         }
     }
 
@@ -434,13 +416,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      */ 
     public ${glRefererInfoName} getRefererInfo(String refererPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-        String methodName = buildRelationInfoGetterMethodNameInitUncap("Referer", refererPropertyName);
-        try {
-            this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            methodName = buildRelationInfoGetterMethodNameInitCap("Referer", refererPropertyName);
-        }
-
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("referer", refererPropertyName);
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
@@ -458,12 +434,8 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
-    private String buildRelationInfoGetterMethodNameInitUncap(String targetName, String relationPropertyName) {
-        return  "get" + targetName + "Info_" + relationPropertyName.substring(0, 1).toLowerCase() + relationPropertyName.substring(1);
-    }
-
     private String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
-        return  "get" + targetName + "Info_" + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
+        return  targetName + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
     }
 
     // ===================================================================================

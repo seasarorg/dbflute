@@ -295,7 +295,16 @@ public class Column {
         final Database db = getTable().getDatabase();
         return db.decapitalizePropertyName(db.convertJavaNameByJdbcNameAsTable(getName()));
     }
+    
+    public String getJavaBeansRulePropertyNameInitCap() {
+        final Database db = getTable().getDatabase();
+        return initCap(db.decapitalizePropertyName(db.convertJavaNameByJdbcNameAsTable(getName())));
+    }
 
+    protected String initCap(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+    
     /**
      * Set name to use in Java sources
      */
