@@ -163,12 +163,29 @@ targetdatabase = $targetDatabase
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
     #set ($glDBMetaInstanceHandlerName = "${glProjectPrefix}DBMetaInstanceHandler")
 
+    ## [Allcommon-DBMetaHierarchy]
+    #set ($glHierarchyArrangerName = "${glProjectPrefix}HierarchyArranger")
+    #set ($glHierarchyRequestName = "${glProjectPrefix}HierarchyRequest")
+    #set ($glHierarchyRequestElementName = "${glProjectPrefix}HierarchyRequestElement")
+    #set ($glHierarchySourceColumnName = "${glProjectPrefix}HierarchySourceColumn")
+    #set ($glHierarchySourceIteratorName = "${glProjectPrefix}HierarchySourceIterator")
+    #set ($glHierarchySourceRowName = "${glProjectPrefix}HierarchySourceRow")
+
+    ## [Allcommon-DBMetaHierarchyBasic]
+    #set ($glHierarchySourceEntityColumnName = "${glProjectPrefix}HierarchySourceEntityColumn")
+    #set ($glHierarchySourceEntityListIteratorName = "${glProjectPrefix}HierarchySourceEntityListIterator")
+    #set ($glHierarchySourceEntityRowName = "${glProjectPrefix}HierarchySourceEntityRow")
+    #set ($glHierarchySourceListIteratorName = "${glProjectPrefix}HierarchySourceListIterator")
+    #set ($glHierarchySourceRowSetupperName = "${glProjectPrefix}HierarchySourceRowSetupper")
+
     ## [Allcommon-DBMetaInfo]
     #set ($glForeignInfoName = "${glProjectPrefix}ForeignInfo")
     #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
     #set ($glRelationInfoName = "${glProjectPrefix}RelationInfo")
     #set ($glUniqueInfoName = "${glProjectPrefix}UniqueInfo")
     #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
+
+
 
     ## [Allcommon-Exception]
     #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
@@ -267,6 +284,8 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonCOptionParts = "${database.baseCommonPackage}.cbean.coption.parts")
     #set ($glPackageBaseCommonCOptionPartsLocal = "${database.baseCommonPackage}.cbean.coption.parts.local")
     #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
+    #set ($glPackageBaseCommonDBMetaHierarchy = "${database.baseCommonPackage}.dbmeta.hierarchy")
+    #set ($glPackageBaseCommonDBMetaHierarchyBasic = "${database.baseCommonPackage}.dbmeta.hierarchy.basic")
     #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.dbmeta.info")
     #set ($glPackageBaseCommonException = "${database.baseCommonPackage}.exception")
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
@@ -829,10 +848,62 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glDBMetaAbstractName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/AbstractDBMeta.${glTemplateFileExtension}",$path,"", "")
 
-    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo}))
-    $database.makeDirectory($path)
-
     #if ($database.isTargetLanguageJava())
+      #if ($database.isAvailableGenerics())
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy}))
+        $database.makeDirectory($path)
+  
+        $database.debug("    parse('HierarchyArranger');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyArrangerName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/HierarchyArranger.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchyRequest');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyRequestName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/HierarchyRequest.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchyRequestElement');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyRequestElementName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/HierarchyRequestElement.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchySourceColumn');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchySourceColumnName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/HierarchySourceColumn.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchySourceIterator');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchySourceIteratorName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/HierarchySourceIterator.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchySourceRow');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchySourceRowName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/HierarchySourceRow.${glTemplateFileExtension}",$path,"", "")
+
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic}))
+        $database.makeDirectory($path)
+
+        $database.debug("    parse('HierarchySourceEntityColumn');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceEntityColumnName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/basic/HierarchySourceEntityColumn.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchySourceEntityListIterator');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceEntityListIteratorName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/basic/HierarchySourceEntityListIterator.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchySourceEntityRow');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceEntityRowName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/basic/HierarchySourceEntityRow.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchySourceListIterator');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceListIteratorName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/basic/HierarchySourceListIterator.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchySourceRowSetupper');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceRowSetupperName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/basic/HierarchySourceRowSetupper.${glTemplateFileExtension}",$path,"", "")
+      #end
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo}))
+      $database.makeDirectory($path)
+
       $database.debug("    parse('ForeignInfo');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glForeignInfoName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/info/ForeignInfo.${glTemplateFileExtension}",$path,"", "")

@@ -1,0 +1,11 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
+
+#set ($myClassName = "${glHierarchySourceRowName}")
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${myClassName} {
+
+    public Object extractColumnValue(${glHierarchySourceColumnName} columnInfo);
+}

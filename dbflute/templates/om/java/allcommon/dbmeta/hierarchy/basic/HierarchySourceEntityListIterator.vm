@@ -1,0 +1,23 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchyBasic};
+
+#set ($myClassName = "${glHierarchySourceEntityListIteratorName}")
+
+/**
+ * @author ${database.ClassAuthor}
+ * @param <SOURCE_ROW> The type of source.
+ */
+public class ${myClassName}<SOURCE_ROW> extends ${glHierarchySourceListIteratorName}<SOURCE_ROW> {
+
+    /**
+     * Constructor.
+     * 
+     * @param sourceRowList The list of source row. (NotNull)
+     */
+    public ${myClassName}(java.util.List<SOURCE_ROW> sourceRowList) {
+        super(sourceRowList, new ${glHierarchySourceRowSetupperName}<SOURCE_ROW>() {
+            public ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchySourceRowName} setup(SOURCE_ROW source) {
+                return new ${glHierarchySourceEntityRowName}(source);
+            }
+        });
+    }
+}

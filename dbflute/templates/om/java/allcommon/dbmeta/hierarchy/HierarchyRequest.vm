@@ -1,0 +1,173 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
+
+#set ($myClassName = "${glHierarchyRequestName}")
+
+import java.util.ArrayList;
+import java.util.List;
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityColumnName};
+import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityListIteratorName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
+
+/**
+ * The request of hierarchy.
+ * 
+ * @author ${database.ClassAuthor}
+ * @param <LOCAL_ENTITY> The type of local entity.
+ */
+public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The dbmeta of desination. */
+    protected ${glDBMetaInterfaceName} destinationDBMeta;
+
+    /** The iterator of hierarychy source. */
+    protected ${glHierarchySourceIteratorName} sourceIterator;
+
+    /** The list of request element. */
+    protected List<${glHierarchyRequestElementName}> requestElementList = new ArrayList<${glHierarchyRequestElementName}>();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * 
+     * @param localEntityType The type of local entity. (NotNull)
+     */
+    public ${myClassName}(Class<LOCAL_ENTITY> localEntityType) {
+        LOCAL_ENTITY localEntity;
+        try {
+            localEntity = localEntityType.newInstance();
+        } catch (InstantiationException e) {
+            String msg = "localEntityType.newInstance() threw the InstantiationException:";
+            msg = msg + " localEntityType=" + localEntityType;
+            throw new IllegalStateException(msg, e);
+        } catch (IllegalAccessException e) {
+            String msg = "localEntityType.newInstance() threw the IllegalAccessException:";
+            msg = msg + " localEntityType=" + localEntityType;
+            throw new IllegalStateException(msg, e);
+        }
+        destinationDBMeta = localEntity.getDBMeta();
+    }
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    /**
+     * @param relationPropertyKey Relation Property key. (NotNull)
+     * @return The list of request element. (NotNull)
+     */
+    public List<${glHierarchyRequestElementName}> findPrimaryKeyElement(String relationPropertyKey) {
+        final List<${glHierarchyRequestElementName}> resultList = new ArrayList<${glHierarchyRequestElementName}>();
+        for (${glHierarchyRequestElementName} element : requestElementList) {
+            if (!relationPropertyKey.equals(element.getRelationPropertyKey())) {
+                continue;
+            }
+            final ${glColumnInfoName} destinationColumnInfo = element.getDestinationColumnInfo();
+            if (!destinationColumnInfo.isPrimary()) {
+                continue;
+            }
+            resultList.add(element);
+        }
+        if (resultList.isEmpty()) {
+            String msg = "Not found primary key element by relationPropertyKey in requestElementList: ";
+            msg = msg + " relationPropertyKey=" + relationPropertyKey + " requestElementList=" + requestElementList;
+            throw new IllegalStateException(msg);
+        }
+        return resultList;
+    }
+
+    /**
+     * @param sourceList The list of source. (NotNull)
+     * @param <SOURCE> The type of source. (NotNull)
+     */
+    public <SOURCE> void registerSourceList(java.util.List<SOURCE> sourceList) {
+        sourceIterator = createDefaultSourceIterator(sourceList);
+    }
+
+    /**
+     * @param sourceColumn The column of source. (NotNull)
+     * @param destinationColumnInfo The column info of destination. (NotNull)
+     */
+    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnInfo) {
+        final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
+        requestElementList.add(element);
+
+        element.mapping(sourceColumn, destinationColumnInfo);
+        element.setDestinationDBMeta(destinationColumnInfo.getDBMeta());
+    }
+
+    /**
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     * @param destinationColumnInfo The column info of destination. (NotNull)
+     */
+    public void mapping(${glColumnInfoName} sourceColumnInfo, ${glColumnInfoName} destinationColumnInfo) {
+        final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
+        requestElementList.add(element);
+
+        final ${glHierarchySourceColumnName} sourceColumn = createDefaultSourceColumn(sourceColumnInfo);
+        element.mapping(sourceColumn, destinationColumnInfo);
+        element.setDestinationDBMeta(destinationColumnInfo.getDBMeta());
+    }
+
+    /**
+     * @param relationInfoList The list of relation info. (NotNull)
+     */
+    public void relation(List<${glRelationInfoName}> relationInfoList) {
+        for (${glRelationInfoName} relationInfo : relationInfoList) {
+            final int lastIndex = requestElementList.size() - 1;
+            final ${glHierarchyRequestElementName} element = (${glHierarchyRequestElementName}) requestElementList.get(lastIndex);
+            element.relation(relationInfo);
+        }
+    }
+
+    /**
+     * @param sourceList The list of source. (NotNull)
+     * @param <SOURCE> The type of source. (NotNull)
+     * @return Default source iterator. (NotNull)
+     */
+    protected <SOURCE> ${glHierarchySourceIteratorName} createDefaultSourceIterator(java.util.List<SOURCE> sourceList) {
+        return new ${glHierarchySourceEntityListIteratorName}<SOURCE>(sourceList);
+    }
+
+    /**
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     * @return Default source column. (NotNull)
+     */
+    protected ${glHierarchySourceColumnName} createDefaultSourceColumn(${glColumnInfoName} sourceColumnInfo) {
+        return new ${glHierarchySourceEntityColumnName}(sourceColumnInfo);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ${glDBMetaInterfaceName} getDestinationDBMeta() {
+        return destinationDBMeta;
+    }
+
+    public void setDestinationDBMeta(${glDBMetaInterfaceName} destinationDBMeta) {
+        this.destinationDBMeta = destinationDBMeta;
+    }
+
+    public List<${glHierarchyRequestElementName}> getRequestElementList() {
+        return requestElementList;
+    }
+
+    public void addRequestElementList(${glHierarchyRequestElementName} element) {
+        this.requestElementList.add(element);
+    }
+
+    public ${glHierarchySourceIteratorName} getSourceIterator() {
+        return sourceIterator;
+    }
+
+    public void setSourceIterator(${glHierarchySourceIteratorName} sourceIterator) {
+        this.sourceIterator = sourceIterator;
+    }
+}
