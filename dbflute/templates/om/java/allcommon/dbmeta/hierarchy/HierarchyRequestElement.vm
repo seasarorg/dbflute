@@ -110,6 +110,10 @@ public class ${myClassName} {
         return destinationColumnInfo;
     }
 
+    public java.util.List<${glRelationInfoName}> getRelationInfoList() {
+        return relationInfoList;
+    }
+
     public List<String> getRelationPropertyNameList() {
         return relationPropertyNameList;
     }

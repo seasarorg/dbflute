@@ -32,6 +32,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     /** The list of request element. */
     protected List<${glHierarchyRequestElementName}> requestElementList = new ArrayList<${glHierarchyRequestElementName}>();
 
+    /** First source column info for check. */
+    protected ${glColumnInfoName} firstSourceColumnInfo4Check;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -80,9 +83,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
     public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnInfo) {
+        assertSameLocalDestinationDBMeta(destinationColumnInfo);
         final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
         requestElementList.add(element);
-
         element.mapping(sourceColumn, destinationColumnInfo);
         element.setDestinationDBMeta(destinationColumnInfo.getDBMeta());
     }
@@ -95,9 +98,10 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
     public void mapping(${glColumnInfoName} sourceColumnInfo, ${glColumnInfoName} destinationColumnInfo) {
+        assertSameSourceDBMeta(sourceColumnInfo);
+        assertSameLocalDestinationDBMeta(destinationColumnInfo);
         final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
         requestElementList.add(element);
-
         final ${glHierarchySourceColumnName} sourceColumn = createDefaultSourceColumn(sourceColumnInfo);
         element.mapping(sourceColumn, destinationColumnInfo);
         element.setDestinationDBMeta(destinationColumnInfo.getDBMeta());
@@ -109,10 +113,66 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      * @param relationInfoList The list of relation info. (NotNull)
      */
     public void relation(List<${glRelationInfoName}> relationInfoList) {
+        if (relationInfoList.isEmpty()) {
+            String msg = "You shuold invoke mapping() before invoking relation()!";
+            throw new IllegalStateException(msg);
+        }
         for (${glRelationInfoName} relationInfo : relationInfoList) {
             final int lastIndex = requestElementList.size() - 1;
             final ${glHierarchyRequestElementName} element = (${glHierarchyRequestElementName}) requestElementList.get(lastIndex);
             element.relation(relationInfo);
+        }
+    }
+
+    /**
+     * Assert same source dbmeta.
+     * 
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     */
+    protected void assertSameSourceDBMeta(${glColumnInfoName} sourceColumnInfo) {
+        if (firstSourceColumnInfo4Check == null) {
+            firstSourceColumnInfo4Check = sourceColumnInfo;
+            return;
+        }
+        final ${glDBMetaInterfaceName} expectedDBMeta = firstSourceColumnInfo4Check.getDBMeta();
+        final ${glDBMetaInterfaceName} actualDBMeta = sourceColumnInfo.getDBMeta();
+        if (!expectedDBMeta.equals(actualDBMeta)) {
+            String msg = "The wrong sourceColumnInfo!" + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The dbmeta of sourceColumnInfo is difference from";
+            msg = msg + " the one of Your First Source Column Info:" + getLineSeparator();
+            msg = msg + "- - - - -" + getLineSeparator();
+            msg = msg + "sourceColumnInfo=" + sourceColumnInfo + getLineSeparator();
+            msg = msg + "firstSourceColumnInfo4Check=" + firstSourceColumnInfo4Check + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    /**
+     * Assert same source dbmeta.
+     * 
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     */
+    protected void assertSameLocalDestinationDBMeta(${glColumnInfoName} destinationColumnInfo) {
+        if (!requestElementList.isEmpty()) {
+            final ${glHierarchyRequestElementName} currentElement = currentElement();
+            final List<${glRelationInfoName}> relationInfoList = currentElement.getRelationInfoList();
+            if (relationInfoList.isEmpty()) {
+                final ${glDBMetaInterfaceName} actualDBMeta = currentElement().getDestinationDBMeta();
+                final ${glDBMetaInterfaceName} expectedDBMeta = destinationDBMeta;
+                if (!expectedDBMeta.equals(actualDBMeta)) {
+                    String msg = "The wrong destinationColumnInfo!" + getLineSeparator();
+                    msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+                    msg = msg + "The dbmeta of destinationColumnInfo is difference from";
+                    msg = msg + " the one of Your Local Entity:" + getLineSeparator();
+                    msg = msg + "- - - - -" + getLineSeparator();
+                    msg = msg + "destinationColumnInfo=" + currentElement.getDestinationColumnInfo() + getLineSeparator();
+                    msg = msg + "localEntity=" + destinationDBMeta.getEntityTypeName() + getLineSeparator();
+                    msg = msg + "* * * * * * * * * */" + getLineSeparator();
+                    throw new IllegalStateException(msg);
+                }
+            }
         }
     }
 
@@ -131,6 +191,16 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      */
     protected ${glHierarchySourceColumnName} createDefaultSourceColumn(${glColumnInfoName} sourceColumnInfo) {
         return new ${glHierarchySourceEntityColumnName}(sourceColumnInfo);
+    }
+
+    /**
+     * Get current element.
+     * 
+     * @return Current element. (NotNull)
+     */
+    protected ${glHierarchyRequestElementName} currentElement() {
+        final int lastIndex = requestElementList.size() - 1;
+        return (${glHierarchyRequestElementName}) requestElementList.get(lastIndex);
     }
 
     // -----------------------------------------------------
@@ -185,5 +255,17 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
 
     public void setSourceIterator(${glHierarchySourceIteratorName} sourceIterator) {
         this.sourceIterator = sourceIterator;
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 }
