@@ -104,7 +104,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     }
 
     /**
-     * Make relatetion by the list of relation information object.
+     * Make relatetion by the list of relation info.
      * 
      * @param relationInfoList The list of relation info. (NotNull)
      */

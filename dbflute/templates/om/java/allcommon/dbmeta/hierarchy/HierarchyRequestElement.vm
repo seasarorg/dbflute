@@ -52,15 +52,15 @@ public class ${myClassName} {
      * @param sourceColumn The column of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnName) {
+    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnInfo) {
         this.sourceColumn = sourceColumn;
-        this.destinationColumnInfo = destinationColumnName;
+        this.destinationColumnInfo = destinationColumnInfo;
     }
 
     /**
-     * Make relatetion by relation information object.
+     * Make relatetion by relation info.
      * 
-     * @param relationInfoList Relation information object. (NotNull)
+     * @param relationInfo Relation info. (NotNull)
      */
     public void relation(${glRelationInfoName} relationInfo) {
         addRelationInfoList(relationInfo);

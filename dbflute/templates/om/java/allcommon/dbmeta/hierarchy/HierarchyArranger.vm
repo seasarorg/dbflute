@@ -129,7 +129,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  *     final HierarchyRequest&lt;Library&gt; request = new HierarchyRequest&lt;Library&gt;(Library.class);
  * 
  *     // Register the list of source iterator. (by calling creator for flat library list)
- *     request.registerSourceBeanList(flatLibraryList);
+ *     request.registerSourceList(flatLibraryList);
  *
  *     // Create relation trace.
  *     final LibraryRelationTrace trace = libraryDbm.createRelationTrace();

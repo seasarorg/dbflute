@@ -6,6 +6,8 @@ import ${glPackageBaseCommon}.*;
 #if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
+import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
+import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
 #end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
@@ -1333,6 +1335,34 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         delegateInsert(${myEntityVariableName});
     }
   #end
+#end
+
+#if ($database.isAvailableGenerics())
+    // ===================================================================================
+    //                                                                           Hierarchy
+    //                                                                           =========
+    /**
+     * Create hierarchy request of ${myExtendedObjectClassName}..
+     * 
+     * @param sourceList The list of source. (NotNull)
+     * @param <SOURCE> The type of source.
+     * @return Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
+     */
+    public <SOURCE> ${glHierarchyRequestName}<${myExtendedObjectClassName}> createHierarchyRequest(java.util.List<SOURCE> sourceList) {
+        final ${glHierarchyRequestName}<${myExtendedObjectClassName}> request = new ${glHierarchyRequestName}<${myExtendedObjectClassName}>(${myExtendedObjectClassName}.class);
+        request.registerSourceList(sourceList);
+        return request;
+    }
+
+    /**
+     * Arrange hierarchy.
+     * 
+     * @param request Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
+     * @return The list of ${myExtendedObjectClassName}. (NotNull)
+     */
+    public java.util.List<${myExtendedObjectClassName}> arrangeHierarchy(${glHierarchyRequestName}<${myExtendedObjectClassName}> request) {
+        return new ${glHierarchyArrangerName}<${myExtendedObjectClassName}>().arrangeHierarchy(request);
+    }
 #end
 
     // ===================================================================================
