@@ -764,7 +764,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     /**
-     * Relation trace.
+     * Relation trace of ${table.name}.
      */
     public static class ${table.javaName}RelationTrace implements RelationTrace {
         protected java.util.List${database.filterGenericsString($glRelationInfoName)} _relationList;
@@ -781,7 +781,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         public ${foreignKeys.foreignTableDBMetaClassName}.${foreignKeys.foreignTable.javaName}RelationTrace foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}());
-            return ${foreignKeys.foreignTableDBMetaClassName}.getInstance().createRelationTrace(this._relationList, this._relationTraceList);
+            return ${foreignKeys.foreignTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
 #end
 #foreach ($referer in $table.referrers)
@@ -789,7 +789,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         public ${referer.refererTableDBMetaClassName}.${referer.table.javaName}RelationTrace foreign${referer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().foreign${referer.refererJavaBeansRulePropertyNameAsOneInitCap}());
-            return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(this._relationList, this._relationTraceList);
+            return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
   #end
 #end
@@ -797,12 +797,12 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         public ${referer.refererTableDBMetaClassName}.${referer.table.javaName}RelationTrace referer${referer.refererJavaBeansRulePropertyNameInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().referer${referer.refererJavaBeansRulePropertyNameInitCap}());
-            return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(this._relationList, this._relationTraceList);
+            return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
 #end
 
         public java.util.List${database.filterGenericsString($glRelationInfoName)} end() {
-            final java.util.List<LdRelationInfo> resultList = this._relationList;
+            final java.util.List${database.filterGenericsString($glRelationInfoName)} resultList = _relationList;
             for (final java.util.Iterator ite = this._relationTraceList.iterator(); ite.hasNext(); ) {
                 final RelationTrace relationTrace = (RelationTrace)ite.next();
                 relationTrace.recycle();

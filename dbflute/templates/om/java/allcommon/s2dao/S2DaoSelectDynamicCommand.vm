@@ -60,13 +60,13 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     //                                                                           Attribute
     //                                                                           =========
     /** Root node. */
-    private Node rootNode;// Override!
+    protected Node rootNode;// Override!
 
     /** Result-set handler. */
-    private ResultSetHandler resultSetHandler;
+    protected ResultSetHandler resultSetHandler;
 
     /** Result-set factory. */
-    private ResultSetFactory resultSetFactory;
+    protected ResultSetFactory resultSetFactory;
 
     /** Cache of select clause command. */
     protected ${glSelectDynamicCommand} _selectClauseCommand;
@@ -184,18 +184,16 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     //                                               -------
     public Object execute(Object[] args) {
         if (!${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-
 #if ($database.isAvailableGenerics())
             if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
                 final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
                 if (!outsideSqlContext.isDynamicAnalysis() || args == null || args.length == 0 || args[0] == null) {
-                    return super.execute(args);
+                    return doDefaulExecute(args);
                 }
                 return executeOutsideSql(args, outsideSqlContext);
             }
 #end
-
-            return super.execute(args);
+            return doDefaulExecute(args);
         }
         assertSelectClauseCommand();
         final List${database.filterGenericsString('Object')} bindVariableList = new ArrayList${database.filterGenericsString('Object')}();
@@ -225,9 +223,13 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
 
         final BasicSelectHandler selectHandler = createBasicSelectHandler(finalClause);
-        selectHandler.setFetchSize(-1);
-
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
+    }
+
+    protected Object doDefaulExecute(Object args[]) {
+        final org.seasar.dao.CommandContext ctx = apply(args);
+        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql());
+        return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
     }
 
 #if ($database.isAvailableGenerics())
@@ -260,7 +262,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         final java.util.List<Class> bindVariableTypeList = new java.util.ArrayList<Class>();
         addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql());
-        selectHandler.setFetchSize(-1);
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
 #end
@@ -305,7 +306,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 
     protected BasicSelectHandler createBasicSelectHandler(String realSql) {
 #if ($database.isSelectQueryTimeoutValid())
-
         final StatementFactory statementFactoryReal = getStatementFactory();
         final StatementFactory statementFactoryWrapper = new StatementFactory() {
             public java.sql.PreparedStatement createPreparedStatement(java.sql.Connection arg0, String arg1) {
@@ -325,12 +325,16 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                 return statementFactoryReal.createCallableStatement(arg0, arg1);
             }
         };
-        return new BasicSelectHandler(getDataSource(), realSql, resultSetHandler, statementFactoryWrapper, resultSetFactory);
+        final BasicSelectHandler selectHandler = newBasicSelectHandler(realSql, resultSetHandler, statementFactoryWrapper, resultSetFactory);
 #else
-
-        return new BasicSelectHandler(getDataSource(), realSql, resultSetHandler, getStatementFactory(), resultSetFactory);
+        final BasicSelectHandler selectHandler = newBasicSelectHandler(realSql, resultSetHandler, getStatementFactory(), resultSetFactory);
 #end
+        selectHandler.setFetchSize(-1);
+        return selectHandler;
+    }
 
+    protected BasicSelectHandler newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory, ResultSetFactory resultSetFactory) {
+        return new BasicSelectHandler(getDataSource(), sql, resultSetHandler, statementFactory, resultSetFactory);
     }
 
     protected Class[] toClassArray(List${database.filterGenericsString('Class')} bindVariableTypeList) {
