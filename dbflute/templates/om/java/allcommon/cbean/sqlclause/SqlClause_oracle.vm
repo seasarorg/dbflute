@@ -81,7 +81,7 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
             final String primaryKeyColumnName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             _lockSqlSuffix = " for update of " + _tableName + "." + primaryKeyColumnName;
         } else {
-            final String randomColumnName = ((${glColumnInfoName})dbmeta.getColumnInfoList()).getColumnDbName();
+            final String randomColumnName = ((${glColumnInfoName})dbmeta.getColumnInfoList().get(0)).getColumnDbName();
             _lockSqlSuffix = " for update of " + _tableName + "." + randomColumnName;
         }
         return this;
