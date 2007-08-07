@@ -104,7 +104,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  * ex) Invoking Hierarchy Arranger
  * 
  * private List&lt;Library&gt; makeLibraryList() {
- *     final HierarchyRequest request = createHierarchyRequest(createFlatLibraryList());
+ *     final HierarchyRequest&lt;Library&gt; request = createHierarchyRequest(createFlatLibraryList());
  *     return new HierarchyArranger&lt;Library&gt;().arrangeHierarchy(request);
  * }
  * 
@@ -115,15 +115,6 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  * 
  *     // Define dbmeta.
  *     final HierarchyFlatLibraryDbm sourceDbm = HierarchyFlatLibraryDbm.getInstance();
- *     final LibraryDbm libraryDbm = LibraryDbm.getInstance();
- *     final NextLibraryDbm nextLibraryDbm = NextLibraryDbm.getInstance();
- *     final CollectionDbm collectionDbm = CollectionDbm.getInstance();
- *     final CollectionStatusDbm collectionStatusDbm = CollectionStatusDbm.getInstance();
- *     final CollectionStatusLookupDbm collectionStatusLookupDbm = CollectionStatusLookupDbm.getInstance();
- *     final BookDbm bookDbm = BookDbm.getInstance();
- *     final AuthorDbm authorDbm = AuthorDbm.getInstance();
- *     final LendingDbm lendingDbm = LendingDbm.getInstance();
- *     final LbUserDbm lbUserDbm = LbUserDbm.getInstance();
  *
  *     // Define hierarychy request as library.
  *     final HierarchyRequest&lt;Library&gt; request = new HierarchyRequest&lt;Library&gt;(Library.class);
@@ -132,108 +123,86 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  *     request.registerSourceList(flatLibraryList);
  *
  *     // Create relation trace.
- *     final LibraryRelationTrace trace = libraryDbm.createRelationTrace();
+ *     final LibraryRelationTrace trace = LibraryDbm.getInstance().createRelationTrace(null);
  *     
  *     // Register column [libraryId]
- *     request.mapping(sourceDbm.columnLibraryId(), libraryDbm.columnLibraryId());
- *     
+ *     request.mapping(sourceDbm.columnLibraryId(), trace.columnLibraryId());
+ *
  *     // Register column [libraryName]
- *     request.mapping(sourceDbm.columnLibraryName(), libraryDbm.columnLibraryName());
- *     
+ *     request.mapping(sourceDbm.columnLibraryName(), trace.columnLibraryName());
+ *
  *     // Register column [RUser]
- *     request.mapping(sourceDbm.columnRUser(), libraryDbm.columnRUser());
- *     
+ *     request.mapping(sourceDbm.columnRUser(), trace.columnRUser());
+ *
  *     // Register column [RTimestamp]
- *     request.mapping(sourceDbm.columnRTimestamp(), libraryDbm.columnRTimestamp());
- *     
+ *     request.mapping(sourceDbm.columnRTimestamp(), trace.columnRTimestamp());
+ *
  *     // Register column [baseLibraryId]
- *     request.mapping(sourceDbm.columnBaseLibraryId(), nextLibraryDbm.columnLibraryId());
- *     request.relation(trace.refererNextLibraryByBaseIdList().end());
- *     
+ *     request.mapping(sourceDbm.columnBaseLibraryId(), trace.refererNextLibraryByBaseIdList().columnLibraryId());
+ *
  *     // Register column [nextLibraryId]
- *     request.mapping(sourceDbm.columnNextLibraryId(), nextLibraryDbm.columnNextLibraryId());
- *     request.relation(trace.refererNextLibraryByBaseIdList().end());
- *     
+ *     request.mapping(sourceDbm.columnNextLibraryId(), trace.refererNextLibraryByBaseIdList().columnNextLibraryId());
+ *
  *     // Register column [nextLibraryNextLibraryId]
- *     request.mapping(sourceDbm.columnNextLibraryNextLibraryId(), libraryDbm.columnLibraryId());
- *     request.relation(trace.refererNextLibraryByBaseIdList().foreignLibraryByNextId().end());
- *     
+ *     request.mapping(sourceDbm.columnNextLibraryNextLibraryId(), trace.refererNextLibraryByBaseIdList().foreignLibraryByNextId().columnLibraryId());
+ *
  *     // Register column [nextLibraryNextLibraryName]
- *     request.mapping(sourceDbm.columnNextLibraryNextLibraryName(), libraryDbm.columnLibraryName());
- *     request.relation(trace.refererNextLibraryByBaseIdList().foreignLibraryByNextId().end());
- *     
+ *     request.mapping(sourceDbm.columnNextLibraryNextLibraryName(), trace.refererNextLibraryByBaseIdList().foreignLibraryByNextId().columnLibraryName());
+ *
  *     // Register column [collectionId]
- *     request.mapping(sourceDbm.columnCollectionId(), collectionDbm.columnCollectionId());
- *     request.relation(trace.refererCollectionList().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionId(), trace.refererCollectionList().columnCollectionId());
+ *
  *     // Register column [arrivalDate]
- *     request.mapping(sourceDbm.columnCollectionArrivalDate(), collectionDbm.columnArrivalDate());
- *     request.relation(trace.refererCollectionList().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionArrivalDate(), trace.refererCollectionList().columnArrivalDate());
+ *
  *     // Register column [collectionStatusId]
- *     request.mapping(sourceDbm.columnCollectionStatusId(), collectionStatusDbm.columnCollectionId());
- *     request.relation(trace.refererCollectionList().foreignCollectionStatusAsOne().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionStatusId(), trace.refererCollectionList().foreignCollectionStatusAsOne().columnCollectionId());
+ *
  *     // Register column [collectionStatusCode]
- *     request.mapping(sourceDbm.columnCollectionStatusCode(), collectionStatusLookupDbm.columnCollectionStatusCode());
- *     request.relation(trace.refererCollectionList().foreignCollectionStatusAsOne().foreignCollectionStatusLookup().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionStatusCode(), trace.refererCollectionList().foreignCollectionStatusAsOne().foreignCollectionStatusLookup().columnCollectionStatusCode());
+ *
  *     // Register column [collectionStatusName]
- *     request.mapping(sourceDbm.columnCollectionStatusName(), collectionStatusLookupDbm.columnCollectionStatusName());
- *     request.relation(trace.refererCollectionList().foreignCollectionStatusAsOne().foreignCollectionStatusLookup().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionStatusName(), trace.refererCollectionList().foreignCollectionStatusAsOne().foreignCollectionStatusLookup().columnCollectionStatusName());
+ *
  *     // Register column [collectionBookId]
- *     request.mapping(sourceDbm.columnCollectionBookId(), bookDbm.columnBookId());
- *     request.relation(trace.refererCollectionList().foreignBook().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionBookId(), trace.refererCollectionList().foreignBook().columnBookId());
+ *
  *     // Register column [collectionBookName]
- *     request.mapping(sourceDbm.columnCollectionBookName(), bookDbm.columnBookName());
- *     request.relation(trace.refererCollectionList().foreignBook().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionBookName(), trace.refererCollectionList().foreignBook().columnBookName());
+ *
  *     // Register column [collectionBookAuthorId]
- *     request.mapping(sourceDbm.columnCollectionBookAuthorId(), authorDbm.columnAuthorId());
- *     request.relation(trace.refererCollectionList().foreignBook().foreignAuthor().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionBookAuthorId(), trace.refererCollectionList().foreignBook().foreignAuthor().columnAuthorId());
+ *
  *     // Register column [collectionBookAuthorName]
- *     request.mapping(sourceDbm.columnCollectionBookAuthorName(), authorDbm.columnAuthorName());
- *     request.relation(trace.refererCollectionList().foreignBook().foreignAuthor().end());
- *     
+ *     request.mapping(sourceDbm.columnCollectionBookAuthorName(), trace.refererCollectionList().foreignBook().foreignAuthor().columnAuthorName());
+ *
  *     // Register column [libraryUserLibraryId]
- *     request.mapping(sourceDbm.columnLibraryUserLibraryId(), libraryUserDbm.columnLibraryId());
- *     request.relation(trace.refererLibraryUserList().end());
- *     
+ *     request.mapping(sourceDbm.columnLibraryUserLibraryId(), trace.refererLibraryUserList().columnLibraryId());
+ *
  *     // Register column [libraryUserLbUserId]
- *     request.mapping(sourceDbm.columnLibraryUserLbUserId(), libraryUserDbm.columnLbUserId());
- *     request.relation(trace.refererLibraryUserList().end());
- *     
+ *     request.mapping(sourceDbm.columnLibraryUserLbUserId(), trace.refererLibraryUserList().columnLbUserId());
+ *
  *     // Register column [lendingLibraryId]
- *     request.mapping(sourceDbm.columnLendingLibraryId(), lendingDbm.columnLibraryId());
- *     request.relation(trace.refererLibraryUserList().refererLendingList().end());
- *     
+ *     request.mapping(sourceDbm.columnLendingLibraryId(), trace.refererLibraryUserList().refererLendingList().columnLibraryId());
+ *
  *     // Register column [lendingLbUserId]
- *     request.mapping(sourceDbm.columnLendingLbUserId(), lendingDbm.columnLbUserId());
- *     request.relation(trace.refererLibraryUserList().refererLendingList().end());
- *     
+ *     request.mapping(sourceDbm.columnLendingLbUserId(), trace.refererLibraryUserList().refererLendingList().columnLbUserId());
+ *
  *     // Register column [lendingDate]
- *     request.mapping(sourceDbm.columnLendingDate(), lendingDbm.columnLendingDate());
- *     request.relation(trace.refererLibraryUserList().refererLendingList().end());
- *     
+ *     request.mapping(sourceDbm.columnLendingDate(), trace.refererLibraryUserList().refererLendingList().columnLendingDate());
+ *
  *     // Register column [lendingUUser]
- *     request.mapping(sourceDbm.columnLendingUUser(), lendingDbm.columnUUser());
- *     request.relation(trace.refererLibraryUserList().refererLendingList().end());
- *     
+ *     request.mapping(sourceDbm.columnLendingUUser(), trace.refererLibraryUserList().refererLendingList().columnUUser());
+ *
  *     // Register column [lendingUModule]
- *     request.mapping(sourceDbm.columnLendingUModule(), lendingDbm.columnUModule());
- *     request.relation(trace.refererLibraryUserList().refererLendingList().end());
- *     
+ *     request.mapping(sourceDbm.columnLendingUModule(), trace.refererLibraryUserList().refererLendingList().columnUModule());
+ *
  *     // Register column [lbUserId]
- *     request.mapping(sourceDbm.columnLbUserId(), lbUserDbm.columnLbUserId());
- *     request.relation(trace.refererLibraryUserList().foreignLbUser().end());
- *     
+ *     request.mapping(sourceDbm.columnLbUserId(), trace.refererLibraryUserList().foreignLbUser().columnLbUserId());
+ *
  *     // Register column [lbUserName]
- *     request.mapping(sourceDbm.columnLbUserName(), lbUserDbm.columnLbUserName());
- *     request.relation(trace.refererLibraryUserList().foreignLbUser().end());
- *     
+ *     request.mapping(sourceDbm.columnLbUserName(), trace.refererLibraryUserList().foreignLbUser().columnLbUserName());
+ *
  *     return request;
  * }
  * 

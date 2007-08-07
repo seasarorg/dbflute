@@ -790,10 +790,11 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * Create relation trace for first step.
      * 
+     * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
      * @return Relation trace. (NotNull)
      */
-    public ${table.relationTraceClassName}RelationTrace createRelationTrace() {
-        return new ${table.relationTraceClassName}RelationTrace();
+    public ${table.relationTraceClassName}RelationTrace createRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
+        return new ${table.relationTraceClassName}RelationTrace(relationTraceFixHandler);
     }
 
     /**
@@ -803,7 +804,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @param relationTraceList The list of relation trace. (NotNull)
      * @return Relation trace. (NotNull)
      */
-    public ${table.relationTraceClassName}RelationTrace createRelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('RelationTrace')} relationTraceList) {
+    public ${table.relationTraceClassName}RelationTrace createRelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('AbstractRelationTrace')} relationTraceList) {
         return new ${table.relationTraceClassName}RelationTrace(relationList, relationTraceList);
     }
 
@@ -814,9 +815,11 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
         /**
          * Constructor for first step.
+         * 
+         * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
          */
-        public ${table.relationTraceClassName}RelationTrace() {
-            super();
+        public ${table.relationTraceClassName}RelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
+            super(relationTraceFixHandler);
         }
 
         /**
@@ -825,7 +828,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
          * @param relationList The list of relation. (NotNull)
          * @param relationTraceList The list of relation trace. (NotNull)
          */
-        public ${table.relationTraceClassName}RelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('RelationTrace')} relationTraceList) {
+        public ${table.relationTraceClassName}RelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('AbstractRelationTrace')} relationTraceList) {
             super(relationList, relationTraceList);
         }
 #foreach ($foreignKeys in $table.foreignKeys)
@@ -850,6 +853,10 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
             _relationList.add(${myDBMetaClassName}.getInstance().referer${referer.refererJavaBeansRulePropertyNameInitCap}());
             return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
+#end
+
+#foreach ($col in $table.Columns)
+        public RelationTrace column${col.javaBeansRulePropertyNameInitCap}() { return fixTrace(_relationList, ${myDBMetaClassName}.getInstance().column${col.javaBeansRulePropertyNameInitCap}()); }
 #end
     }
 

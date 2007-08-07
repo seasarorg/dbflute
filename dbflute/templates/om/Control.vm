@@ -165,6 +165,7 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-DBMetaHierarchy]
     #set ($glHierarchyArrangerName = "${glProjectPrefix}HierarchyArranger")
+    #set ($glHierarchyBasicRequestName = "${glProjectPrefix}HierarchyBasicRequest")
     #set ($glHierarchyRequestName = "${glProjectPrefix}HierarchyRequest")
     #set ($glHierarchyRequestElementName = "${glProjectPrefix}HierarchyRequestElement")
     #set ($glHierarchySourceColumnName = "${glProjectPrefix}HierarchySourceColumn")
@@ -856,6 +857,10 @@ targetdatabase = $targetDatabase
         $database.debug("    parse('HierarchyArranger');")
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyArrangerName}.${glClassFileExtension}" )
         $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/HierarchyArranger.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parse('HierarchyBasicRequest');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyBasicRequestName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/dbmeta/hierarchy/HierarchyBasicRequest.${glTemplateFileExtension}",$path,"", "")
 
         $database.debug("    parse('HierarchyRequest');")
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyRequestName}.${glClassFileExtension}" )

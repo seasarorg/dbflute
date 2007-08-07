@@ -7,6 +7,7 @@ import ${glPackageBaseCommon}.*;
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
+import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequestName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
 #end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
@@ -1342,14 +1343,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                           Hierarchy
     //                                                                           =========
     /**
-     * Create hierarchy request of ${myExtendedObjectClassName}..
+     * Create the basic request of hierarchy of ${myExtendedObjectClassName}..
      * 
      * @param sourceList The list of source. (NotNull)
      * @param <SOURCE> The type of source.
      * @return Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
      */
-    public <SOURCE> ${glHierarchyRequestName}<${myExtendedObjectClassName}> createHierarchyRequest(java.util.List<SOURCE> sourceList) {
-        final ${glHierarchyRequestName}<${myExtendedObjectClassName}> request = new ${glHierarchyRequestName}<${myExtendedObjectClassName}>(${myExtendedObjectClassName}.class);
+    public <SOURCE> ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> createHierarchyBasicRequest(java.util.List<SOURCE> sourceList) {
+        final ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> request = new ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace>(${myExtendedObjectClassName}.class);
         request.registerSourceList(sourceList);
         return request;
     }

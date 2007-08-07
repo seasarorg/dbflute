@@ -77,12 +77,37 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     }
 
     /**
-     * Make mapping between the source column and the destination one.
+     * Set up mapping between the source column and the destination relation.
+     * 
+     * @param sourceColumn The column of source. (NotNull)
+     * @param relationTrace The relation trace of destination. (NotNull)
+     */
+    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glDBMetaInterfaceName}.RelationTrace relationTrace) {
+        setupElement(sourceColumn, relationTrace.getTraceColumn());
+        addRelationToLastElement(relationTrace.getTraceRelation());
+    }
+
+    /**
+     * Set up mapping between the source column and the destination relation.
+     * 
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     * @param relationTrace The relation trace of destination. (NotNull)
+     */
+    public void mapping(${glColumnInfoName} sourceColumnInfo, ${glDBMetaInterfaceName}.RelationTrace relationTrace) {
+        setupElement(sourceColumnInfo, relationTrace.getTraceColumn());
+        addRelationToLastElement(relationTrace.getTraceRelation());
+    }
+
+    // -----------------------------------------------------
+    //                                               internal
+    //                                               -------
+    /**
+     * Set up element.
      * 
      * @param sourceColumn The column of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnInfo) {
+    protected void setupElement(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnInfo) {
         assertSameLocalDestinationDBMeta(destinationColumnInfo);
         final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
         requestElementList.add(element);
@@ -91,13 +116,13 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     }
 
     /**
-     * Map the source column to the destination one. <br />
+     * Set up element. <br />
      * This method uses the default source column.
      * 
      * @param sourceColumnInfo The column info of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
-    public void mapping(${glColumnInfoName} sourceColumnInfo, ${glColumnInfoName} destinationColumnInfo) {
+    protected void setupElement(${glColumnInfoName} sourceColumnInfo, ${glColumnInfoName} destinationColumnInfo) {
         assertSameSourceDBMeta(sourceColumnInfo);
         assertSameLocalDestinationDBMeta(destinationColumnInfo);
         final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
@@ -112,8 +137,8 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      * 
      * @param relationInfoList The list of relation info. (NotNull)
      */
-    public void relation(List<${glRelationInfoName}> relationInfoList) {
-        if (relationInfoList.isEmpty()) {
+    protected void addRelationToLastElement(List<${glRelationInfoName}> relationInfoList) {
+        if (requestElementList.isEmpty()) {
             String msg = "You shuold invoke mapping() before invoking relation()!";
             throw new IllegalStateException(msg);
         }

@@ -501,16 +501,22 @@ public interface ${myClassName} {
     public static interface RelationTrace {
 
         /**
-         * End trace.
+         * Get the trace of relation.
          * 
-         * @return Final list. (NotNull)
+         * @return The trace of relation as the list of relation info. (NotNull)
          */
-        public java.util.List${database.filterGenericsString($glRelationInfoName)} end();
+        public java.util.List${database.filterGenericsString($glRelationInfoName)} getTraceRelation();
 
         /**
-         * Recycle instance.
+         * Get the trace of column.
+         * 
+         * @return The trace of column as column info. (Nullable)
          */
-        public void recycle();
+        public ${glColumnInfoName} getTraceColumn();
+    }
+
+    public static interface RelationTraceFixHandler {
+        public void handleFixedTrace(RelationTrace relationTrace);
     }
 
     // ===================================================================================
