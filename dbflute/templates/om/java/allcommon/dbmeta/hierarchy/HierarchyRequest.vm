@@ -59,31 +59,13 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
+    // -----------------------------------------------------
+    //                                                public
+    //                                                ------
     /**
-     * @param relationPropertyKey Relation Property key. (NotNull)
-     * @return The list of request element. (NotNull)
-     */
-    public List<${glHierarchyRequestElementName}> findPrimaryKeyElement(String relationPropertyKey) {
-        final List<${glHierarchyRequestElementName}> resultList = new ArrayList<${glHierarchyRequestElementName}>();
-        for (${glHierarchyRequestElementName} element : requestElementList) {
-            if (!relationPropertyKey.equals(element.getRelationPropertyKey())) {
-                continue;
-            }
-            final ${glColumnInfoName} destinationColumnInfo = element.getDestinationColumnInfo();
-            if (!destinationColumnInfo.isPrimary()) {
-                continue;
-            }
-            resultList.add(element);
-        }
-        if (resultList.isEmpty()) {
-            String msg = "Not found primary key element by relationPropertyKey in requestElementList: ";
-            msg = msg + " relationPropertyKey=" + relationPropertyKey + " requestElementList=" + requestElementList;
-            throw new IllegalStateException(msg);
-        }
-        return resultList;
-    }
-
-    /**
+     * Register the list of source. <br />
+     * This method uses the default source iterator.
+     * 
      * @param sourceList The list of source. (NotNull)
      * @param <SOURCE> The type of source. (NotNull)
      */
@@ -92,6 +74,8 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     }
 
     /**
+     * Make mapping between the source column and the destination one.
+     * 
      * @param sourceColumn The column of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
@@ -104,6 +88,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     }
 
     /**
+     * Map the source column to the destination one. <br />
+     * This method uses the default source column.
+     * 
      * @param sourceColumnInfo The column info of source. (NotNull)
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
@@ -117,6 +104,8 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     }
 
     /**
+     * Make relatetion by the list of relation information object.
+     * 
      * @param relationInfoList The list of relation info. (NotNull)
      */
     public void relation(List<${glRelationInfoName}> relationInfoList) {
@@ -142,6 +131,33 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      */
     protected ${glHierarchySourceColumnName} createDefaultSourceColumn(${glColumnInfoName} sourceColumnInfo) {
         return new ${glHierarchySourceEntityColumnName}(sourceColumnInfo);
+    }
+
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /**
+     * @param relationPropertyKey Relation Property key. (NotNull)
+     * @return The list of request element. (NotNull)
+     */
+    public List<${glHierarchyRequestElementName}> findPrimaryKeyElement(String relationPropertyKey) {
+        final List<${glHierarchyRequestElementName}> resultList = new ArrayList<${glHierarchyRequestElementName}>();
+        for (${glHierarchyRequestElementName} element : requestElementList) {
+            if (!relationPropertyKey.equals(element.getRelationPropertyKey())) {
+                continue;
+            }
+            final ${glColumnInfoName} destinationColumnInfo = element.getDestinationColumnInfo();
+            if (!destinationColumnInfo.isPrimary()) {
+                continue;
+            }
+            resultList.add(element);
+        }
+        if (resultList.isEmpty()) {
+            String msg = "Not found primary key element by relationPropertyKey in requestElementList: ";
+            msg = msg + " relationPropertyKey=" + relationPropertyKey + " requestElementList=" + requestElementList;
+            throw new IllegalStateException(msg);
+        }
+        return resultList;
     }
 
     // ===================================================================================

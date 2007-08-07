@@ -41,12 +41,12 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     /**
      * Get dao-readable.
      * 
-     * @param tableMultiName Table multi-name. (NotNull)
+     * @param tableFlexibleName Table flexible name. (NotNull)
      * @return Dao-readable. (NotNull)
      */
-    public ${glDaoReadableInterfaceName} byNameAsDaoReadable(String tableMultiName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
+    public ${glDaoReadableInterfaceName} byNameAsDaoReadable(String tableFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
         return getDao(getDaoType(dbmeta));
     }
 
@@ -64,12 +64,12 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     /**
      * Get behavior-readable.
      * 
-     * @param tableMultiName Table multi-name. (NotNull)
+     * @param tableFlexibleName Table flexible name. (NotNull)
      * @return Behavior-readable. (NotNull)
      */
-    public ${glBehaviorReadableInterfaceName} byNameAsBehaviorReadable(String tableMultiName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
+    public ${glBehaviorReadableInterfaceName} byNameAsBehaviorReadable(String tableFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
         return getBehavior(getBehaviorType(dbmeta));
     }
 #end
@@ -98,14 +98,14 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     }
 
     /**
-     * Get dao-readable by table multi-name.
+     * Get dao-readable by table flexible name.
      * 
-     * @param tableMultiName Table multi-name. (NotNull)
+     * @param tableFlexibleName Table flexible name. (NotNull)
      * @return Dao-readable. (NotNull)
      */
-    public ${glDaoReadableInterfaceName} getRDao(String tableMultiName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
+    public ${glDaoReadableInterfaceName} getRDao(String tableFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
         return getRDao(getDaoType(dbmeta));
     }
 
@@ -132,14 +132,14 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     }
 
     /**
-     * Get dao-writable by table multi-name.
+     * Get dao-writable by table flexible name.
      * 
-     * @param tableMultiName Table multi-name. (NotNull)
+     * @param tableFlexibleName Table flexible name. (NotNull)
      * @return Dao-writable. (NotNull)
      */
-    public ${glDaoWritableInterfaceName} getWDao(String tableMultiName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
-        return (${glDaoWritableInterfaceName})getRDao(tableMultiName);
+    public ${glDaoWritableInterfaceName} getWDao(String tableFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+        return (${glDaoWritableInterfaceName})getRDao(tableFlexibleName);
     }
 #if ($database.isAvailableBehaviorGeneration())
 
@@ -166,14 +166,14 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     }
 
     /**
-     * Get bhv-readable by table multi-name.
+     * Get bhv-readable by table flexible name.
      * 
-     * @param tableMultiName Table multi-name. (NotNull)
+     * @param tableFlexibleName Table flexible name. (NotNull)
      * @return Bhv-readable. (NotNull)
      */
-    public ${glBehaviorReadableInterfaceName} getRBhv(String tableMultiName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableMultiName(tableMultiName);
+    public ${glBehaviorReadableInterfaceName} getRBhv(String tableFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
         return getRBhv(getBehaviorType(dbmeta));
     }
 
@@ -200,14 +200,14 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     }
 
     /**
-     * Get bhv-writable by table multi-name.
+     * Get bhv-writable by table flexible name.
      * 
-     * @param tableMultiName Table multi-name. (NotNull)
+     * @param tableFlexibleName Table flexible name. (NotNull)
      * @return Bhv-writable. (NotNull)
      */
-    public ${glBehaviorWritableInterfaceName} getWBhv(String tableMultiName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
-        return (${glBehaviorWritableInterfaceName})getRBhv(tableMultiName);
+    public ${glBehaviorWritableInterfaceName} getWBhv(String tableFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+        return (${glBehaviorWritableInterfaceName})getRBhv(tableFlexibleName);
     }
 
     /**

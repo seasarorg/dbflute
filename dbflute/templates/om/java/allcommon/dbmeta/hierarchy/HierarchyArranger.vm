@@ -294,10 +294,21 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
         return localTableList;
     }
 
+    /**
+     * Build top already-registered key.
+     * 
+     * @param primaryKeyMap The map of primary key. (NotNull)
+     * @return Top already-registered key. (NotNull)
+     */
     protected String buildTopAlreadyRegisteredKey(Map<String, Object> primaryKeyMap) {
         return ${glHierarchyRequestElementName}.TOP_KEY + ":" + primaryKeyMap;
     }
 
+    /**
+     * Do column loop.
+     * 
+     * @param topInfo The information object of top that has generics of the type of local entity. (NotNull)
+     */
     protected void doColumnLoop(TopInfo<LOCAL_ENTITY> topInfo) {
         final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final ${glEntityInterfaceName} localEntity = topInfo.getLocalEntity();
@@ -326,8 +337,14 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
         }
     }
 
-    protected void doRelationLoop(TopInfo<LOCAL_ENTITY> topInfo, ${glHierarchyRequestElementName} requestElement,
-            List<String> relationPropNameList) {
+    /**
+     * Do relation loop.
+     * 
+     * @param topInfo The information object of top that has generics of local entity. (NotNull)
+     * @param requestElement The element of request. This is relation loop resource. (NotNull)
+     * @param relationPropNameList The list of relation property name that has generics of string. (NotNull)
+     */
+    protected void doRelationLoop(TopInfo<LOCAL_ENTITY> topInfo, ${glHierarchyRequestElementName} requestElement, java.util.List<String> relationPropNameList) {
         final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, ${glEntityInterfaceName}> alreadyRegisteredEntityMap = topInfo.getAlreadyRegisteredEntityMap();
 
@@ -347,7 +364,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
             }
             relationPropKeyStringBuilder.append(relationPropName);
             final String targetRelationPath = relationPropKeyStringBuilder.toString();
-            final ${glRelationInfoName} relationInfo = localDBMeta.getRelationInfo(relationPropName);
+            final ${glRelationInfoName} relationInfo = localDBMeta.findRelationInfo(relationPropName);
 
             final Map<String, Object> targetPrimaryKeyMap;
             final String alreadyRegisteredRefererKey;
@@ -355,7 +372,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 // =======
                 // Foreign
                 // =======
-                final ${glForeignInfoName} foreignInfo = localDBMeta.getForeignInfo(relationPropName);
+                final ${glForeignInfoName} foreignInfo = localDBMeta.findForeignInfo(relationPropName);
                 final String foreignPropName = foreignInfo.getForeignPropertyName();
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -393,7 +410,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 // =======
                 // Referer
                 // =======
-                final ${glRefererInfoName} refererInfo = localDBMeta.getRefererInfo(relationPropName);
+                final ${glRefererInfoName} refererInfo = localDBMeta.findRefererInfo(relationPropName);
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // Extract referer list from current local entity and initialize it if needs.
@@ -455,7 +472,14 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
         }
     }
 
-    private boolean isNotExistPrimaryKey(TopInfo<LOCAL_ENTITY> topInfo, String relationPath) {
+    /**
+     * Is not existing primary key at the relation path?.
+     * 
+     * @param topInfo The information object of top that has generics of local entity. (NotNull)
+     * @param relationPath The path of relation. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isNotExistPrimaryKey(TopInfo<LOCAL_ENTITY> topInfo, String relationPath) {
         final Map<String, Object> primaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, relationPath);
         final Set<String> keySet = primaryKeyMap.keySet();
         for (String key : keySet) {
@@ -467,8 +491,16 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
         return false;
     }
 
+    /**
+     * Do last loop injection.
+     * 
+     * @param topInfo The information object of top that has generics of local entity. (NotNull)
+     * @param requestElement The element of request. This is relation loop resource. (NotNull)
+     * @param localEntity The interface of local entity. (NotNull)
+     * @param primaryKeyMap The map of primary key. (NotNull)
+     */
     protected void doLastLoopInjection(TopInfo<LOCAL_ENTITY> topInfo, ${glHierarchyRequestElementName} requestElement,
-            ${glEntityInterfaceName} localEntity, Map<String, Object> primaryKeyMap) {
+                                       ${glEntityInterfaceName} localEntity, Map<String, Object> primaryKeyMap) {
         final ${glColumnInfoName} destinationColumnInfo = requestElement.getDestinationColumnInfo();
         if (!primaryKeyMap.containsKey(destinationColumnInfo.getColumnDbName())) {// The column is primary key!
             final ${glHierarchySourceRowName} sourceRow = topInfo.getSourceRow();
@@ -529,9 +561,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
             msg = msg + " table=" + entity.getTableDbName() + " column=" + columnDbName;
             throw new IllegalStateException(msg);
         }
-        final String capPropName = initCap(entity.getDBMeta().getPropertyNameByFlexibleName(columnDbName));
-        final Method method = findMethod(entity.getClass(), "set" + capPropName, new Class[] { columnValue.getClass() });
-        invoke(method, entity, new Object[] { columnValue });
+        invoke(entity.getDBMeta().findColumnInfo(columnDbName).findSetter(), entity, new Object[] { columnValue });
     }
 
     protected void injectColumnValueMapToDestination(${glEntityInterfaceName} entity, final Map<String, Object> columnValueMap) {

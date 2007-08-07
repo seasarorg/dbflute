@@ -357,10 +357,20 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                            Name Map
     //                                                                            ========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The key-to-lower map of db-name(lower) and property-name. (NotNull)
+     */
     public java.util.Map${database.filterGenericsString('String, String')} getDbNamePropertyNameKeyToLowerMap() {
         return createDbNamePropertyNameKeyToLowerMap();
     }
 
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The key-to-lower map of property-name(lower) and db-name. (NotNull)
+     */
     public java.util.Map${database.filterGenericsString('String, String')} getPropertyNameDbNameKeyToLowerMap() {
         return createPropertyNameDbNameKeyToLowerMap();
     }
@@ -591,6 +601,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return columnInfoList;
     }
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * ${database.ImplementComment}
      * 
@@ -606,7 +617,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return resultList;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
     /**
      * ${database.ImplementComment}
      * 
@@ -636,16 +646,17 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         }
         return resultList;
     }
-#end
 
     /**
      * ${database.ImplementComment}
      * 
      * @return Column-db-name comma-string. (NotNull and NotEmpty)
+     * @deprecated Please use getColumnInfoList()
      */
     public String getColumnDbNameCommaString() {
         return "${table.columnNameCommaString}";
     }
+#end
 
 #foreach ($col in $table.Columns)
     /**
@@ -659,6 +670,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
+    // -----------------------------------------------------
+    //                                       Primary Element
+    //                                       ---------------
     /**
      * ${database.ImplementComment}
      * 
@@ -672,6 +686,24 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
         uniqueInfo.setPrimary(true);
         return uniqueInfo;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean hasPrimaryKey() {
+        return ${table.hasPrimaryKey()};
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean hasTwoOrMorePrimaryKeys() {
+        return ${table.hasTwoOrMorePrimaryKeys()};
     }
 
     // ===================================================================================
@@ -755,31 +787,50 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // -----------------------------------------------------
     //                                        Relation Trace
     //                                        --------------
-    public ${table.javaName}RelationTrace createRelationTrace() {
-        return new ${table.javaName}RelationTrace();
+    /**
+     * Create relation trace for first step.
+     * 
+     * @return Relation trace. (NotNull)
+     */
+    public ${table.relationTraceClassName}RelationTrace createRelationTrace() {
+        return new ${table.relationTraceClassName}RelationTrace();
     }
 
-    public ${table.javaName}RelationTrace createRelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('RelationTrace')} relationTraceList) {
-        return new ${table.javaName}RelationTrace(relationList, relationTraceList);
+    /**
+     * Create relation trace for relation step.
+     * 
+     * @param relationList The list of relation. (NotNull)
+     * @param relationTraceList The list of relation trace. (NotNull)
+     * @return Relation trace. (NotNull)
+     */
+    public ${table.relationTraceClassName}RelationTrace createRelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('RelationTrace')} relationTraceList) {
+        return new ${table.relationTraceClassName}RelationTrace(relationList, relationTraceList);
     }
 
     /**
      * Relation trace of ${table.name}.
      */
-    public static class ${table.javaName}RelationTrace implements RelationTrace {
-        protected java.util.List${database.filterGenericsString($glRelationInfoName)} _relationList;
-        protected java.util.List${database.filterGenericsString('RelationTrace')} _relationTraceList;
-        public ${table.javaName}RelationTrace() {
-            this(new java.util.ArrayList${database.filterGenericsString($glRelationInfoName)}(), new java.util.ArrayList${database.filterGenericsString('RelationTrace')}());
+    public static class ${table.relationTraceClassName}RelationTrace extends AbstractRelationTrace {
+
+        /**
+         * Constructor for first step.
+         */
+        public ${table.relationTraceClassName}RelationTrace() {
+            super();
         }
-        public ${table.javaName}RelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('RelationTrace')} relationTraceList) {
-            this._relationList = relationList;
-            this._relationTraceList = relationTraceList;
-            this._relationTraceList.add(this);
+
+        /**
+         * Constructor for relation step.
+         * 
+         * @param relationList The list of relation. (NotNull)
+         * @param relationTraceList The list of relation trace. (NotNull)
+         */
+        public ${table.relationTraceClassName}RelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('RelationTrace')} relationTraceList) {
+            super(relationList, relationTraceList);
         }
 #foreach ($foreignKeys in $table.foreignKeys)
 
-        public ${foreignKeys.foreignTableDBMetaClassName}.${foreignKeys.foreignTable.javaName}RelationTrace foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+        public ${foreignKeys.foreignTableDBMetaClassName}.${foreignKeys.foreignTable.relationTraceClassName}RelationTrace foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}());
             return ${foreignKeys.foreignTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
@@ -787,7 +838,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #foreach ($referer in $table.referrers)
   #if (${referer.isOneToOne()})
 
-        public ${referer.refererTableDBMetaClassName}.${referer.table.javaName}RelationTrace foreign${referer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+        public ${referer.refererTableDBMetaClassName}.${referer.table.relationTraceClassName}RelationTrace foreign${referer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().foreign${referer.refererJavaBeansRulePropertyNameAsOneInitCap}());
             return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
@@ -795,49 +846,16 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
 #foreach ($referer in $table.referrers)
 
-        public ${referer.refererTableDBMetaClassName}.${referer.table.javaName}RelationTrace referer${referer.refererJavaBeansRulePropertyNameInitCap}() {
+        public ${referer.refererTableDBMetaClassName}.${referer.table.relationTraceClassName}RelationTrace referer${referer.refererJavaBeansRulePropertyNameInitCap}() {
             _relationList.add(${myDBMetaClassName}.getInstance().referer${referer.refererJavaBeansRulePropertyNameInitCap}());
             return ${referer.refererTableDBMetaClassName}.getInstance().createRelationTrace(_relationList, _relationTraceList);
         }
 #end
-
-        public java.util.List${database.filterGenericsString($glRelationInfoName)} end() {
-            final java.util.List${database.filterGenericsString($glRelationInfoName)} resultList = _relationList;
-            for (final java.util.Iterator ite = this._relationTraceList.iterator(); ite.hasNext(); ) {
-                final RelationTrace relationTrace = (RelationTrace)ite.next();
-                relationTrace.recycle();
-            }
-            return resultList;
-        }
-
-        public void recycle() {
-            this._relationList = new java.util.ArrayList${database.filterGenericsString($glRelationInfoName)}();
-            this._relationTraceList = new java.util.ArrayList${database.filterGenericsString('RelationTrace')}();
-            this._relationTraceList.add(this);
-        }
     }
 
     // ===================================================================================
-    //                                                                       Determination
+    //                                                                       Common Column
     //                                                                       =============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determination.
-     */
-    public boolean hasPrimaryKey() {
-        return ${table.hasPrimaryKey()};
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determination.
-     */
-    public boolean hasTwoOrMorePrimaryKeys() {
-        return ${table.hasTwoOrMorePrimaryKeys()};
-    }
-
     /**
      * ${database.ImplementComment}
      * 

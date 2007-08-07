@@ -13,38 +13,78 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  */
 public class ${myClassName} {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Top key. */
     public static final String TOP_KEY = "$top$";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Source column name. */
+    /** The column of source. */
     protected ${glHierarchySourceColumnName} sourceColumn;
 
-    /** Destination column name. */
+    /** The dbmeta of destination. */
     protected ${glDBMetaInterfaceName} destinationDBMeta;
 
-    /** Destination column name. */
+    /** The column info of destination. */
     protected ${glColumnInfoName} destinationColumnInfo;
 
+    /** The list of relation info. */
     protected java.util.List<${glRelationInfoName}> relationInfoList = new java.util.ArrayList<${glRelationInfoName}>();
 
+    /** the list of relation property name. */
     protected java.util.List<String> relationPropertyNameList = new java.util.ArrayList<String>();
 
+    /** Relation property key. Default value is TOP_KEY. */
     protected String relationPropertyKey = TOP_KEY;
 
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /**
+     * Make mapping between the source column and the destination one.
+     * 
+     * @param sourceColumn The column of source. (NotNull)
+     * @param destinationColumnInfo The column info of destination. (NotNull)
+     */
     public void mapping(${glHierarchySourceColumnName} sourceColumn, ${glColumnInfoName} destinationColumnName) {
         this.sourceColumn = sourceColumn;
         this.destinationColumnInfo = destinationColumnName;
     }
 
+    /**
+     * Make relatetion by relation information object.
+     * 
+     * @param relationInfoList Relation information object. (NotNull)
+     */
     public void relation(${glRelationInfoName} relationInfo) {
         addRelationInfoList(relationInfo);
     }
 
-    public void setupDestination(${glDBMetaInterfaceName} destinationDBMeta, ${glColumnInfoName} destinationColumnName) {
-        this.destinationDBMeta = destinationDBMeta;
-        this.destinationColumnInfo = destinationColumnName;
+    protected void addRelationInfoList(${glRelationInfoName} relationInfo) {
+        relationInfoList.add(relationInfo);
+        addRelationPropertyNameList(relationInfo.getRelationPropertyName());
+    }
+
+    protected void addRelationPropertyNameList(String relationPropertyName) {
+        relationPropertyNameList.add(relationPropertyName);
+        setupRelationPropertyKey();
+    }
+
+    protected void setupRelationPropertyKey() {
+        final StringBuilder sb = new StringBuilder();
+        for (String relationPropertyName : relationPropertyNameList) {
+            if (sb.length() > 0) {
+                sb.append("_");
+            }
+            sb.append(relationPropertyName);
+        }
+        this.relationPropertyKey = sb.toString();
     }
 
     // ===================================================================================
@@ -72,27 +112,6 @@ public class ${myClassName} {
 
     public List<String> getRelationPropertyNameList() {
         return relationPropertyNameList;
-    }
-
-    protected void addRelationInfoList(${glRelationInfoName} relationInfo) {
-        relationInfoList.add(relationInfo);
-        addRelationPropertyNameList(relationInfo.getRelationPropertyName());
-    }
-
-    protected void addRelationPropertyNameList(String relationPropertyName) {
-        relationPropertyNameList.add(relationPropertyName);
-        setupRelationPropertyKey();
-    }
-
-    protected void setupRelationPropertyKey() {
-        final StringBuilder sb = new StringBuilder();
-        for (String relationPropertyName : relationPropertyNameList) {
-            if (sb.length() > 0) {
-                sb.append("_");
-            }
-            sb.append(relationPropertyName);
-        }
-        this.relationPropertyKey = sb.toString();
     }
 
     public String getRelationPropertyKey() {

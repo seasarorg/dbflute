@@ -253,6 +253,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
+    public String outputOverrideAnnotationAfterNewLineOutput() {
+        return filterGenericsGeneralOutputAfterNewLineOutput("@Override()");
+    }
+
     public String outputSuppressWarningsAfterLineSeparator() {
         return filterGenericsGeneralOutputAfterNewLineOutput("@SuppressWarnings(\"unchecked\")");
     }

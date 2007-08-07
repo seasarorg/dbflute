@@ -57,14 +57,14 @@ public interface ${myClassName} {
     public String getTablePropertyName();
 
     /**
-     * Get table cap-prop-name.
+     * Get table cap-prop-name. (Not JavaBeansRule)
      * 
      * @return Table cap-prop-name. (NotNull)
      */
     public String getTableCapPropName();
 
     /**
-     * Get table uncap-prop-name.
+     * Get table uncap-prop-name. (Not JavaBeansRule)
      * 
      * @return Table uncap-prop-name. (NotNull)
      */
@@ -74,18 +74,18 @@ public interface ${myClassName} {
     //                                                                       Name Handling
     //                                                                       =============
     /**
-     * Is existing db-name? {Target objects are TABLE and COLUMN}
+     * Has object of flexible name? {Target objects are TABLE and COLUMN}
      * 
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
+     * @param flexibleName Flexible name. (NotNull and NotEmpty)
      * @return Determination.
      */
-    public boolean isExistByFlexibleName(String flexibleName);
+    public boolean hasFlexibleName(String flexibleName);
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
      * Is existing db-name? {Target objects are TABLE and COLUMN}
      * 
-     * @param dbName Db-name. (NotNull and NotEmpty)
+     * @param dbName Db name. (NotNull and NotEmpty)
      * @return Determination.
      * @deprecated Please use isExistByFlexibleName()
      */
@@ -94,7 +94,7 @@ public interface ${myClassName} {
     /**
      * Is existing cap-prop-name? {Target objects are TABLE and COLUMN}
      * 
-     * @param capPropName Cap-prop-name. (NotNull and NotEmpty)
+     * @param capPropName Cap prop name. (NotNull and NotEmpty)
      * @return Determination.
      * @deprecated Please use isExistByFlexibleName()
      */
@@ -103,7 +103,7 @@ public interface ${myClassName} {
     /**
      * Is existing uncap-prop-name? {Target objects are TABLE and COLUMN}
      * 
-     * @param uncapPropName Uncap-prop-name. (NotNull and NotEmpty)
+     * @param uncapPropName Uncap prop name. (NotNull and NotEmpty)
      * @return Determination.
      * @deprecated Please use isExistByFlexibleName()
      */
@@ -120,20 +120,20 @@ public interface ${myClassName} {
 #end
 
     /**
-     * Get db-name by flexible-name. {Target objects are TABLE and COLUMN}
+     * Find db name by flexible name. {Target objects are TABLE and COLUMN}
      * 
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return Db-name. (NotNull and NotEmpty)
+     * @param flexibleName Flexible ame. (NotNull and NotEmpty)
+     * @return Db name. (NotNull and NotEmpty)
      */
-    public String getDbNameByFlexibleName(String flexibleName);
+    public String findDbName(String flexibleName);
 
     /**
-     * Get prop-name(JavaBeansRule) by flexible-name. {Target objects are TABLE and COLUMN}
+     * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
      * 
-     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return Db-name. (NotNull and NotEmpty)
+     * @param flexibleName Flexible name. (NotNull and NotEmpty)
+     * @return Db name. (NotNull and NotEmpty)
      */
-    public String getPropertyNameByFlexibleName(String flexibleName);
+    public String findPropertyName(String flexibleName);
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
@@ -221,8 +221,18 @@ public interface ${myClassName} {
     // ===================================================================================
     //                                                                            Name Map
     //                                                                            ========
+    /**
+     * Get the key-to-lower map of db name(lower) and property name.
+     * 
+     * @return The key-to-lower map of db name(lower) and property name. (NotNull)
+     */
     public java.util.Map${database.filterGenericsString('String, String')} getDbNamePropertyNameKeyToLowerMap();
 
+    /**
+     * Get the key-to-lower map of property name(lower) and db name.
+     * 
+     * @return The key-to-lower map of property name(lower) and db name. (NotNull)
+     */
     public java.util.Map${database.filterGenericsString('String, String')} getPropertyNameDbNameKeyToLowerMap();
 
 #if ($database.isMakeRecentlyDeprecated())
@@ -336,14 +346,15 @@ public interface ${myClassName} {
      */
     public java.util.List${database.filterGenericsString(${glColumnInfoName})} getColumnInfoList();
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Get the list of column db-name.
      * 
      * @return The list of column db-name. (NotNull and NotEmpty)
+     * @deprecated Please use getColumnInfoList()
      */
     public java.util.List${database.filterGenericsString('String')} getColumnDbNameList();
 
-#if ($database.isMakeRecentlyDeprecated())
     /**
      * Get the list of column cap-prop-name.
      * 
@@ -359,95 +370,46 @@ public interface ${myClassName} {
      * @deprecated Please use getColumnInfoList()
      */
     public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList();
-#end
 
     /**
      * Get column-db-name comma-string.
      * 
      * @return Column-db-name comma-string. (NotNull and NotEmpty)
+     * @deprecated Please use getColumnInfoList()
      */
     public String getColumnDbNameCommaString();
+#end
+
+    /**
+     * Has column?
+     * 
+     * @param columnFlexibleName Column flexible name. (NotNull)
+     * @return Determination.
+     */
+    public boolean hasColumn(String columnFlexibleName);
+
+    /**
+     * Find column info by column flexible name.
+     * <pre>
+     * If the table name is 'BOOK_ID', you can find the dbmeta by ...(as follows)
+     *     'BOOK_ID', 'BOok_iD', 'book_id'
+     *     , 'BookId', 'bookid', 'bOoKiD'
+     * </pre>
+     * @param columnFlexibleName Column flexible name. (NotNull)
+     * @return Column info. (NotNull)
+     */ 
+    public ${glColumnInfoName} findColumnInfo(String columnFlexibleName);
 
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
     /**
-     * Get primary unique information.
+     * Get primary unique info.
      * 
-     * @return Primary unique information. (NotNull)
+     * @return Primary unique info. (NotNull)
      */
     public ${glUniqueInfoName} getPrimaryUniqueInfo();
 
-    // ===================================================================================
-    //                                                                       Relation Info
-    //                                                                       =============
-    /**
-     * Get relation information.
-     * 
-     * @param relationPropName Relation property name. (Both OK - InitCap or not). (NotNull)
-     * @return Foreign info. (NotNull)
-     */ 
-    public ${glRelationInfoName} getRelationInfo(String relationPropName);
-
-    /**
-     * Has foreign?
-     * 
-     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
-     * @return Determination. (NotNull)
-     */ 
-    public boolean hasForeign(String foreignPropName);
-
-    /**
-     * Get foreign dbmeta.
-     * 
-     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
-     * @return Foreign DBMeta. (NotNull)
-     */ 
-    public ${myClassName} getForeignDBMeta(String foreignPropName);
-
-    /**
-     * Get foreign information.
-     * 
-     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
-     * @return Foreign information. (NotNull)
-     */ 
-    public ${glForeignInfoName} getForeignInfo(String foreignPropName);
-
-    /**
-     * Get referer dbmeta.
-     * 
-     * @param refererPropName Referer property name. (Both OK - InitCap or not). (NotNull)
-     * @return Referer DBMeta. (NotNull)
-     */ 
-    public ${myClassName} getRefererDBMeta(String refererPropName);
-
-    /**
-     * Has referer?
-     * 
-     * @param refererPropName Referer property name. (Both OK - InitCap or not). (NotNull)
-     * @return Determination. (NotNull)
-     */ 
-    public boolean hasReferer(String refererPropName);
-
-    /**
-     * Get referer information.
-     * 
-     * @param refererPropName Referer property name. (Both OK - InitCap or not). (NotNull)
-     * @return Referer information. (NotNull)
-     */ 
-    public ${glRefererInfoName} getRefererInfo(String refererPropName);
-
-    /**
-     * Relation trace.
-     */
-    public static interface RelationTrace {
-        public java.util.List${database.filterGenericsString($glRelationInfoName)} end();
-        public void recycle();
-    }
-
-    // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
     /**
      * Has primary-key?
      * 
@@ -462,6 +424,98 @@ public interface ${myClassName} {
      */
     public boolean hasTwoOrMorePrimaryKeys();
 
+    // ===================================================================================
+    //                                                                       Relation Info
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                      Relation Element
+    //                                      ----------------
+    /**
+     * Find relation info.
+     * 
+     * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
+     * @return Relation info. (NotNull)
+     */ 
+    public ${glRelationInfoName} findRelationInfo(String relationPropertyName);
+
+    // -----------------------------------------------------
+    //                                       Foreign Element
+    //                                       ---------------
+    /**
+     * Has foreign?
+     * 
+     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
+     * @return Determination. (NotNull)
+     */ 
+    public boolean hasForeign(String foreignPropName);
+
+    /**
+     * Find foreign dbmeta.
+     * 
+     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
+     * @return Foreign DBMeta. (NotNull)
+     */ 
+    public ${myClassName} findForeignDBMeta(String foreignPropName);
+
+    /**
+     * Find foreign info.
+     * 
+     * @param foreignPropName Foreign property name. (Both OK - InitCap or not). (NotNull)
+     * @return Foreign info. (NotNull)
+     */ 
+    public ${glForeignInfoName} findForeignInfo(String foreignPropName);
+
+    // -----------------------------------------------------
+    //                                       Referer Element
+    //                                       ---------------
+    /**
+     * Has referer?
+     * 
+     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
+     * @return Determination. (NotNull)
+     */ 
+    public boolean hasReferer(String refererPropertyName);
+
+    /**
+     * Find referer dbmeta.
+     * 
+     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
+     * @return Referer DBMeta. (NotNull)
+     */ 
+    public ${myClassName} findRefererDBMeta(String refererPropertyName);
+
+    /**
+     * Find referer information.
+     * 
+     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
+     * @return Referer information. (NotNull)
+     */ 
+    public ${glRefererInfoName} findRefererInfo(String refererPropertyName);
+
+    // -----------------------------------------------------
+    //                                        Relation Trace
+    //                                        --------------
+    /**
+     * Relation trace.
+     */
+    public static interface RelationTrace {
+
+        /**
+         * End trace.
+         * 
+         * @return Final list. (NotNull)
+         */
+        public java.util.List${database.filterGenericsString($glRelationInfoName)} end();
+
+        /**
+         * Recycle instance.
+         */
+        public void recycle();
+    }
+
+    // ===================================================================================
+    //                                                                       Common Column
+    //                                                                       =============
     /**
      * Has common column?
      * 
@@ -692,14 +746,14 @@ public interface ${myClassName} {
     //                                                                          Map String
     //                                                                          ==========
     /**
-     * Create map list string that is prepared.
+     * Create map list string that is prepared. (for INTERNAL)
      * 
      * @return Map list string that is prepared. (NotNull)
      */
     public ${glMapListStringName} createMapListString();
 
     /**
-     * Create map string builder that is prepared.
+     * Create map string builder that is prepared. (for INTERNAL)
      * 
      * @return Map string builder that is prepared. (NotNull)
      */

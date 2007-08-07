@@ -559,6 +559,14 @@ public class Table implements IDMethod {
         }
     }
 
+    public String getRelationTraceClassName() {
+        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
+            return getSchemaPrefix() + getJavaName();
+        } else {
+            return getJavaName();
+        }
+    }
+
     public String getDBMetaClassName() {
         return getExtendedEntityClassName() + "Dbm";
     }

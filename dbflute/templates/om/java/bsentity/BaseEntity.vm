@@ -128,7 +128,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return DBMeta. (NotNull)
      */
     public ${glDBMetaInterfaceName} getDBMeta() {
-        return ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
+        return ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
     }
 #end
 

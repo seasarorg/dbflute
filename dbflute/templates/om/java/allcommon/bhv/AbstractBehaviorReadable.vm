@@ -16,6 +16,8 @@ import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
 
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
@@ -402,7 +404,12 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         final ${glFileMakingSimpleFacadeName} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImplName}();
         final ${glFileMakingOptionName} fileMakingOption = tokenFileOutputOption.getFileMakingOption();
         final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
-        fileMakingHeaderInfo.setColumnNameList(getDBMeta().getColumnDbNameList());
+        final java.util.List${database.filterGenericsString('String')} columnDbNameList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        for (final java.util.Iterator ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
+            final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+            columnDbNameList.add(columnInfo.getColumnDbName());
+        }
+        fileMakingHeaderInfo.setColumnNameList(columnDbNameList);
         fileMakingOption.setFileMakingHeaderInfo(fileMakingHeaderInfo);
         fileMakingSimpleFacade.makeFromRowList(filename, rowList, fileMakingOption);
         final ${glTokenFileOutputResultName} tokeFileOutputResult = new ${glTokenFileOutputResultName}();

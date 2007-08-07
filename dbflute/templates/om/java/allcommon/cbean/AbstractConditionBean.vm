@@ -356,7 +356,7 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         }
 
         final StringBuffer sb = new StringBuffer();
-        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.getInstanceByTableDbName(getTableDbName());
+        ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
         ${glConditionQueryInterfaceName} query = this.getConditionQueryAsInterface();
         for (final java.util.Iterator ite = orderBySlashList.iterator(); ite.hasNext(); ) {
             final String orderBySlashElement = (String)ite.next();
@@ -369,8 +369,8 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
 	        }
 
             if (orderByDotList.size() == 1) {
-                if (dbmeta.isExistByFlexibleName(orderBySlashElement)) {
-                    sb.append("/").append(query.getRealColumnName(dbmeta.getDbNameByFlexibleName(orderBySlashElement)));
+                if (dbmeta.hasFlexibleName(orderBySlashElement)) {
+                    sb.append("/").append(query.getRealColumnName(dbmeta.findDbName(orderBySlashElement)));
                 } else {
                     sb.append("/").append(orderBySlashElement);
                 }
@@ -383,16 +383,16 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
                     count++;
 
                     if (orderByDotList.size() == count) {// Last Loop!
-                        if (!foreignDBMeta.isExistByFlexibleName(orderByDotElement)) {
+                        if (!foreignDBMeta.hasFlexibleName(orderByDotElement)) {
                             String msg = "The name for order-by is not existing: name=" + orderByDotElement;
                             msg = msg + " orderBySlashElement=" + orderBySlashElement + " orderByProperty=" + orderByProperty;
                             throw new IllegalStateException(msg);
                         }
-                        sb.append("/").append(foreignQuery.getRealColumnName(foreignDBMeta.getDbNameByFlexibleName(orderByDotElement)));
+                        sb.append("/").append(foreignQuery.getRealColumnName(foreignDBMeta.findDbName(orderByDotElement)));
                         break;
                     }
 
-                    foreignDBMeta = foreignDBMeta.getForeignDBMeta(orderByDotElement);
+                    foreignDBMeta = foreignDBMeta.findForeignDBMeta(orderByDotElement);
                     foreignQuery = foreignQuery.getForeignConditionQuery(orderByDotElement);
                 }
             }
