@@ -82,17 +82,36 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
         return booleanProp("torque.isAvailableChildNoAnnotationGenerating", false);
     }
 
+    // ===============================================================================
+    //                                                                 S2Dao Component
+    //                                                                 ===============
     public String getExtendedDaoMetaDataFactoryImplClassName() {
         final DfBasicProperties basicProperties = getBasicProperties();
         final DfGeneratedClassPackageProperties generatedClassPackageProperties = getGeneratedClassPackageProperties();
         final String baseCommonPackage = generatedClassPackageProperties.getBaseCommonPackage();
         final String projectPrefix = basicProperties.getProjectPrefix();
         final String defaultClassName = baseCommonPackage + ".s2dao." + projectPrefix + "S2DaoMetaDataFactoryImpl";
-        final String value = stringProp("torque.extendedDaoMetaDataFactoryImplClassName", null);
-        if (value != null && value.trim().length() != 0) {
-            return value;
+        return stringPropNoEmpty("torque.extendedDaoMetaDataFactoryImplClassName", defaultClassName);
+    }
+
+    public String getExtendedAnnotationReaderFactoryClassName() {
+        final String defaultClassName = "org.seasar.dao.impl.AnnotationReaderFactoryImpl";
+        return stringPropNoEmpty("torque.extendedAnnotationReaderFactoryClassName", defaultClassName);
+    }
+    
+    // ===============================================================================
+    //                                                                  S2Dao Property
+    //                                                                  ==============
+    public boolean hasDaoSqlFileEncoding() {
+        final String daoSqlFileEncoding = getDaoSqlFileEncoding();
+        if (daoSqlFileEncoding != null && daoSqlFileEncoding.trim().length() != 0) {
+            return true;
         }
-        return defaultClassName;
+        return false;
+    }
+
+    public String getDaoSqlFileEncoding() {
+        return stringProp("torque.daoSqlFileEncoding", "");
     }
 
 }

@@ -16,10 +16,17 @@
 
 
     <!-- S2Dao component. -->
-    <component class="org.seasar.dao.impl.FieldAnnotationReaderFactory"/>
+    <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
     <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
-    <component class="${database.extendedDaoMetaDataFactoryImplClassName}"/>
+
+    <component class="${database.extendedDaoMetaDataFactoryImplClassName}">
+#if ($database.hasDaoSqlFileEncoding())
+        <property name="sqlFileEncoding">"${database.daoSqlFileEncoding}"</property>
+#end
+    </component>
+
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
+
 #if ($database.isVersionAfter1040())
 
     <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>

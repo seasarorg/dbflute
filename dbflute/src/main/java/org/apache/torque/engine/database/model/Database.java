@@ -711,19 +711,19 @@ public class Database {
     public String filterGenericsParamOutput(String variableName, String description) {
         return getBasicProperties().filterGenericsParamOutput(variableName, description);
     }
-    
+
     public String filterGenericsGeneralOutput(String genericsGeneralOutput) {// It is very important!
         return getBasicProperties().filterGenericsGeneralOutput(genericsGeneralOutput);
     }
-    
+
     public String outputOverrideAnnotationAfterNewLineOutput() {
         return getBasicProperties().outputOverrideAnnotationAfterNewLineOutput();
     }
-    
+
     public String outputSuppressWarningsAfterLineSeparator() {
         return getBasicProperties().outputSuppressWarningsAfterLineSeparator();
     }
-    
+
     // ===============================================================================
     //                                                             Properties - Prefix
     //                                                             ===================
@@ -1154,7 +1154,7 @@ public class Database {
     public boolean isVersionAfter1046() {
         return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1046();
     }
-    
+
     public boolean isVersionAfter1043() {
         return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1043();
     }
@@ -1162,7 +1162,7 @@ public class Database {
     public boolean isVersionAfter1040() {
         return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1040();
     }
-    
+
     public boolean isAvailableDaoMethodLazyInitializing() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodLazyInitializing();
     }
@@ -1170,15 +1170,27 @@ public class Database {
     public boolean isAvailableOtherConnectionDaoInitialization() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableOtherConnectionDaoInitialization();
     }
-    
+
     public boolean isAvailableChildNoAnnotationGenerating() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableChildNoAnnotationGenerating();
+    }
+
+    public String getExtendedAnnotationReaderFactoryClassName() {
+        return getProperties().getS2DaoAdjustmentProperties().getExtendedAnnotationReaderFactoryClassName();
     }
 
     public String getExtendedDaoMetaDataFactoryImplClassName() {
         return getProperties().getS2DaoAdjustmentProperties().getExtendedDaoMetaDataFactoryImplClassName();
     }
-    
+
+    public boolean hasDaoSqlFileEncoding() {
+        return getProperties().getS2DaoAdjustmentProperties().hasDaoSqlFileEncoding();
+    }
+
+    public String getDaoSqlFileEncoding() {
+        return getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding();
+    }
+
     // -----------------------------------------------------
     //                                                 Other
     //                                                 -----
@@ -1209,7 +1221,6 @@ public class Database {
     public String getExtractAcceptEqual() {
         return getProperties().getOtherProperties().getExtractAcceptEqual();
     }
-
 
     // ===============================================================================
     //                                        Properties - jdbcToJavaNative (Internal)

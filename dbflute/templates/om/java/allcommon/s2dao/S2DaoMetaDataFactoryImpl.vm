@@ -35,6 +35,9 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
  */
 public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log-instance. */
     private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
 
@@ -88,7 +91,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         }
         _log.info("[StatementFactory]: " + statementFactory);
         _log.info("[ResultSetFactory]: " + resultSetFactory);
+#if ($database.isVersionAfter1040())
         _log.info("[BeanEnhancer]: " + beanEnhancer);
+#end
     }
 
     // -----------------------------------------------------
@@ -128,6 +133,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     }
 
 #if ($database.isVersionAfter1046())
+    // ===================================================================================
+    //                                                                          Initialize
+    //                                                                          ==========
     public void initialize() {
         if (dtoMetaDataFactory == null) {
             final org.seasar.dao.impl.DtoMetaDataFactoryImpl factory = new org.seasar.dao.impl.DtoMetaDataFactoryImpl();
@@ -143,11 +151,18 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     }
 #end
 
+    // ===================================================================================
+    //                                                                   Sql File Encoding
+    //                                                                   =================
+    public String getSqlFileEncoding() {
+        return sqlFileEncoding;
+    }
+
 #if ($database.isVersionAfter1040())
 
     // ===================================================================================
-    //                                                      DataMetaData Creation Override
-    //                                                      ==============================
+    //                                                                       Bean Enhancer
+    //                                                                       =============
     protected BeanEnhancer beanEnhancer;
 
     public BeanEnhancer getBeanEnhancer() {
@@ -157,10 +172,14 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
         this.beanEnhancer = beanEnhancer;
     }
+
 #if ($database.isAvailableOtherConnectionDaoInitialization())
 
+    // ===================================================================================
+    //                                                      DataMetaData Creation Override
+    //                                                      ==============================
     protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
-        ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
+        final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
         dmdExtension.setBeanEnhancer(this.beanEnhancer);
         dmdExtension.setTransactionManager(this.transactionManager);
 #if ($database.isVersionAfter1046())
@@ -182,8 +201,11 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 #else
 
     protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
-        ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
+        final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
         dmdExtension.setBeanEnhancer(this.beanEnhancer);
+#if ($database.isVersionAfter1046())
+        dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
+#end
         return dmdExtension;
     }
 #end

@@ -73,6 +73,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     public ${glDaoMetaDataExtension}() {
     }
 
+    // ===================================================================================
+    //                                                                   Sql File Encoding
+    //                                                                   =================
+    public String getSqlFileEncoding() {
+        return sqlFileEncoding;
+    }
+
 #if ($database.isVersionAfter1046())
     // ===================================================================================
     //                                                           Annotation Reader Factory

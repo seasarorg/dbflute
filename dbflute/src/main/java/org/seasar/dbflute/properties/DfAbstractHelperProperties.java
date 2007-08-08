@@ -118,6 +118,32 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
+    /**
+     * Get property as string. {Delegate method}
+     * 
+     * @param key Property-key. (NotNull)
+     * @param defaultValue Default value. (Nullable)
+     * @return Property as string. (Nullable: If the default-value is null)
+     */
+    final protected String stringPropNoEmpty(String key, String defaultValue) {
+        try {
+            final String outsidePropString = getOutsidePropString(key);
+            if (outsidePropString != null && outsidePropString.trim().length() != 0) {
+                return outsidePropString;
+            }
+            final String value = DfPropertyUtil.stringProp(_buildProperties, key);
+            if (value != null && value.trim().length() != 0) {
+                return value;
+            }
+            return defaultValue;
+        } catch (PropertyNotFoundException e) {
+            return defaultValue;
+        } catch (RuntimeException e) {
+            _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
+            throw e;
+        }
+    }
+
     // -----------------------------------------------------
     //                                               Boolean
     //                                               -------
