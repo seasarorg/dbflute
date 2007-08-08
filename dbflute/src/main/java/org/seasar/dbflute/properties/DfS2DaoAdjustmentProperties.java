@@ -46,7 +46,11 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
     }
 
     protected boolean hasS2DaoVersion() {
-        return stringProp("torque.s2daoVersion", null) != null;
+        final String value = stringProp("torque.s2daoVersion", null);
+        if (value != null && value.trim().length() != 9) {
+            return true;
+        }
+        return false;
     }
 
     protected String getS2DaoVersion() {
@@ -84,7 +88,11 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
         final String baseCommonPackage = generatedClassPackageProperties.getBaseCommonPackage();
         final String projectPrefix = basicProperties.getProjectPrefix();
         final String defaultClassName = baseCommonPackage + ".s2dao." + projectPrefix + "S2DaoMetaDataFactoryImpl";
-        return stringProp("torque.extendedDaoMetaDataFactoryImplClassName", defaultClassName);
+        final String value = stringProp("torque.extendedDaoMetaDataFactoryImplClassName", null);
+        if (value != null && value.trim().length() != 0) {
+            return value;
+        }
+        return defaultClassName;
     }
 
 }

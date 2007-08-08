@@ -9,9 +9,9 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
  */
 public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implements ${glPagingBeanInterfaceName} {
 
-    // =====================================================================================
-    //                                                                             SqlClause
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
     /**
      * Get sql-clause.
      * 
@@ -21,9 +21,12 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
         return _sqlClause;
     }
 
-    // =====================================================================================
-    //                                                                        FetchNarrowing
-    //                                                                        ==============
+    /** Safety max result size. */
+    protected int _safetyMaxResultSize;
+
+    // ===================================================================================
+    //                                                                      FetchNarrowing
+    //                                                                      ==============
     /**
      * Get fetch-narrowing start-index.
      * 
@@ -69,9 +72,30 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
         return getSqlClause().isFetchNarrowingEffective();
     }
 
-    // =====================================================================================
-    //                                                                                Paging
-    //                                                                                ======
+    /**
+     * Get safety max result size.
+     * 
+     * @return Safety max result size.
+     */
+    public int getSafetyMaxResultSize() {
+        return _safetyMaxResultSize;
+    }
+
+    // ===================================================================================
+    //                                                                     Select Resource
+    //                                                                     ===============
+    /**
+     * Check safety result.
+     * 
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        this._safetyMaxResultSize = safetyMaxResultSize;
+    }
+
+    // ===================================================================================
+    //                                                                              Paging
+    //                                                                              ======
     /**
      * Fetch first.
      * <pre>
@@ -168,9 +192,9 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
         return getSqlClause().isFetchScopeEffective();
     }
 
-    // =====================================================================================
-    //                                                                        For SqlComment
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      For SqlComment
+    //                                                                      ==============
     /**
      * Get select-hint. {select [select-hint] * from table...}
      * 

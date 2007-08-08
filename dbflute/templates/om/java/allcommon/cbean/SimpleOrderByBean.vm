@@ -9,27 +9,27 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 /// </summary>
 public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName} {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** SQL clause instance. */
     protected final ${glSqlClauseName} _sqlClause;
     {
         _sqlClause = ${glConditionBeanContextName}.createSqlClause("Dummy");
     }
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
     public ${glSimpleOrderByBeanName}() {
     }
 
-    // =====================================================================================
-    //                                                                             SqlClause
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
     /**
      * Get sql-clause.
      * 
@@ -39,9 +39,21 @@ public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName}
         return _sqlClause;
     }
 
-    // =====================================================================================
-    //                                                                               OrderBy
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                     Select Resource
+    //                                                                     ===============
+    /**
+     * Check safety result.
+     * 
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    // ===================================================================================
+    //                                                                             OrderBy
+    //                                                                             =======
     /**
      * ${database.ImplementComment}
      * 

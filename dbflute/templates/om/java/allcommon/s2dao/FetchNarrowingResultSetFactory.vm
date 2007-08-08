@@ -3,9 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.framework.util.PreparedStatementUtil;
 
@@ -19,49 +16,43 @@ import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
  */
 public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
 
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${glFetchNarrowingResultSetFactory}.class);
-
-    /** Is internal-debug enabled? */
-    private boolean _isInternalDebugEnabled = false;
-
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
     public ${glFetchNarrowingResultSetFactory}() {
     }
 
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     /**
      * Create result set.
      * 
-     * @param ps Prepared statement.
+     * @param ps Prepared statement. (NotNull)
      * @return Result set. (NotNull)
      */
     public ResultSet createResultSet(PreparedStatement ps) {
-        if (_isInternalDebugEnabled) {
-            if (_log.isDebugEnabled()) {
-                _log.debug("executeQuery(ps) ps=" + ps);
-            }
-        }
         final ResultSet resultSet = PreparedStatementUtil.executeQuery(ps);
-
         if (!${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             return resultSet;
         }
-
-        final ${glFetchNarrowingBeanInterfaceName} ${glAttachedCBArgsVariableName} = ${glFetchNarrowingBeanContextName}.getFetchNarrowingBeanOnThread();
-        if (!${glAttachedCBArgsVariableName}.isFetchNarrowingEffective()) {
-            return resultSet;// It is not necessary to control.
-        }
-        if (!${glAttachedCBArgsVariableName}.isFetchNarrowingSkipStartIndexEffective() && !${glAttachedCBArgsVariableName}.isFetchNarrowingLoopCountEffective()) {
-            return resultSet;// It is not necessary to control. The sql already have been controlled.
-        }
-
-        if (_isInternalDebugEnabled) {
-            if (_log.isDebugEnabled()) {
-                _log.debug("Necessary to control fetch-narrowing! ${glAttachedCBArgsVariableName}=" + ${glAttachedCBArgsVariableName});
-            }
+        final ${glFetchNarrowingBeanInterfaceName} cb = ${glFetchNarrowingBeanContextName}.getFetchNarrowingBeanOnThread();
+        if (!isUseFetchNarrowingResultSetWrapper(cb)) {
+            return resultSet;
         }
         return new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName});
+    }
+
+    protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {
+        if (cb.getSafetyMaxResultSize() <= 0 && !cb.isFetchNarrowingEffective()) {
+            return false;// It is not necessary to control.
+        }
+        if (cb.getSafetyMaxResultSize() <= 0 && !cb.isFetchNarrowingSkipStartIndexEffective() && !cb.isFetchNarrowingLoopCountEffective()) {
+            return false;// It is not necessary to control. The sql already have been controlled.
+        }
+        return true;
     }
 }

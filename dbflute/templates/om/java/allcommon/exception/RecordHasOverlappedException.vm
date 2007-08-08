@@ -18,4 +18,14 @@ public class ${glRecordHasOverlappedException} extends RuntimeException {
     public ${glRecordHasOverlappedException}(String msg) {
         super(msg);
     }
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     * @param cause Throwable.
+     */
+    public ${glRecordHasOverlappedException}(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

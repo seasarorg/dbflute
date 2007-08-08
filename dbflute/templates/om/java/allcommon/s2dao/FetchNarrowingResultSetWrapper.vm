@@ -3,69 +3,59 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.seasar.extension.jdbc.impl.ResultSetWrapper;
 import org.seasar.framework.exception.SQLRuntimeException;
 
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 
 /**
- * Fetch-narrowing-result-set-wrapper.
+ * The wrapper of fetch-narrowing result-set.
  * 
  * @author ${database.ClassAuthor}
  */
 public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
 
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${glFetchNarrowingResultSetWrapper}.class);
-
-    /** Is internal-debug enabled? */
-    private boolean _isInternalDebugEnabled = false;
-
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Original result set. */
     private ResultSet _resultSet;
 
     /** FetchNarrowing-bean. */
-    private ${glFetchNarrowingBeanInterfaceName} _${glAttachedCBArgsVariableName};
+    private ${glFetchNarrowingBeanInterfaceName} _fetchNarrowingBean;
 
     /** Fetch counter. */
-    private long _counter;
+    private long _fetchCounter;
 
+    /** Request counter. */
+    private long _requestCounter;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
      * @param resultSet Original result set. (NotNull)
-     * @param ${glAttachedCBArgsVariableName} FetchNarrowing-bean. (NotNull)
+     * @param fetchNarrowingBean FetchNarrowing-bean. (NotNull)
      */
-    public ${glFetchNarrowingResultSetWrapper}(ResultSet resultSet, ${glFetchNarrowingBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+    public ${glFetchNarrowingResultSetWrapper}(ResultSet resultSet, ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean) {
         super(resultSet);
 
         _resultSet = resultSet;
-        _${glAttachedCBArgsVariableName} = ${glAttachedCBArgsVariableName};
-
-        if (_isInternalDebugEnabled) {
-            if (_log.isDebugEnabled()) {
-                String msg = "    isFetchNarrowingSkipStartIndexEffective()=" + getFetchNarrowingBean().isFetchNarrowingSkipStartIndexEffective();
-                _log.debug(msg);
-                msg = "    isFetchNarrowingLoopCountEffective()=" + getFetchNarrowingBean().isFetchNarrowingLoopCountEffective();
-                _log.debug(msg);
-                msg = "    getFetchNarrowingSkipStartIndex()=" + getFetchNarrowingSkipStartIndex();
-                _log.debug(msg);
-                msg = "    getFetchNarrowingLoopCount()=" + getFetchNarrowingLoopCount();
-                _log.debug(msg);
-            }
-        }
+        _fetchNarrowingBean = fetchNarrowingBean;
 
         skip();
     }
 
+    // ===================================================================================
+    //                                                                                Skip
+    //                                                                                ====
     /**
      * Skip to start-index.
      */
-    private void skip() {
-        if (!getFetchNarrowingBean().isFetchNarrowingSkipStartIndexEffective()) {
+    protected void skip() {
+        if (!isAvailableSkipRecord()) {
             return;
         }
         if (isCursorUsed()) {
@@ -75,14 +65,14 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
                 } else {
                     getResultSet().absolute(getFetchNarrowingSkipStartIndex());
                 }
-                _counter = getResultSet().getRow();
+                _fetchCounter = getResultSet().getRow();
             } catch (SQLException e) {
                 throw new SQLRuntimeException(e);
             }
         } else {
             try {
                 while (getResultSet().getRow() < getFetchNarrowingSkipStartIndex() && getResultSet().next()) {
-                    ++_counter;
+                    ++_fetchCounter;
                 }
             } catch (SQLException e) {
                 throw new SQLRuntimeException(e);
@@ -90,6 +80,16 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
         }
     }
 
+    protected boolean isAvailableSkipRecord() {
+        if (isFetchNarrowingEffective() && isFetchNarrowingSkipStartIndexEffective()) {
+            return true;
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                                Next
+    //                                                                                ====
     /**
      * Next.
      * 
@@ -98,25 +98,39 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
      */
     public boolean next() throws SQLException {
         final boolean hasNext = super.next();
-        if (!getFetchNarrowingBean().isFetchNarrowingLoopCountEffective()) {
+        ++_requestCounter;
+        if (!isAvailableLimitLoopCount()) {
+            checkSafetyResult(hasNext);
             return hasNext;
         }
-        if (hasNext && _counter < getFetchNarrowingSkipStartIndex() + getFetchNarrowingLoopCount()) {
-            ++_counter;
+
+        if (hasNext && _fetchCounter < getFetchNarrowingSkipStartIndex() + getFetchNarrowingLoopCount()) {
+            ++_fetchCounter;
+            checkSafetyResult(true);
             return true;
         } else {
-            if (_isInternalDebugEnabled) {
-                if (_log.isDebugEnabled()) {
-                    String msg = "    Finally the result of next() is false! Because counter is greater-equal";
-                    msg = msg + " than 'fetch-start-index + real-fetch-size'.";
-                    msg = msg + " " + _counter + " >= " + getFetchNarrowingSkipStartIndex() + " + " + getFetchNarrowingLoopCount();
-                    _log.debug(msg);
-                }
-            }
             return false;
         }
     }
 
+    protected boolean isAvailableLimitLoopCount() {
+        if (isFetchNarrowingEffective() && isFetchNarrowingLoopCountEffective()) {
+            return true;
+        }
+        return false;
+    }
+
+    protected void checkSafetyResult(boolean hasNext) {
+        if (hasNext && getSafetyMaxResultSize() > 0 && _requestCounter > (getSafetyMaxResultSize() + 1)) {
+            String msg = "You have already been in Danger Zone!";
+            msg = msg + " Please confirm your query or data of table: safetyMaxResultSize=" + getSafetyMaxResultSize();
+            throw new ${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName}(msg, getSafetyMaxResultSize());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     /**
      * Get result set.
      * 
@@ -132,25 +146,36 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
      * @return FetchNarrowing-bean.
      */
     protected ${glFetchNarrowingBeanInterfaceName} getFetchNarrowingBean() {
-        return _${glAttachedCBArgsVariableName};
+        return _fetchNarrowingBean;
     }
 
-    /**
-     * Get fetch-start-index from fetch-narrowing-bean.
-     * 
-     * @return Fetch-start-index.
-     */
+    protected boolean isFetchNarrowingEffective() {
+        return _fetchNarrowingBean.isFetchNarrowingEffective();
+    }
+
+    protected boolean isFetchNarrowingSkipStartIndexEffective() {
+        return _fetchNarrowingBean.isFetchNarrowingSkipStartIndexEffective();
+    }
+
+    protected boolean isFetchNarrowingLoopCountEffective() {
+        return _fetchNarrowingBean.isFetchNarrowingLoopCountEffective();
+    }
+
     protected int getFetchNarrowingSkipStartIndex() {
-        return _${glAttachedCBArgsVariableName}.getFetchNarrowingSkipStartIndex();
+        return _fetchNarrowingBean.getFetchNarrowingSkipStartIndex();
+    }
+
+    protected int getFetchNarrowingLoopCount() {
+        return _fetchNarrowingBean.getFetchNarrowingLoopCount();
     }
 
     /**
-     * Get fetch-size from fetch-narrowing-bean.
+     * Get safety max result size.
      * 
-     * @return Fetch-size.
+     * @return Safety max result size.
      */
-    protected int getFetchNarrowingLoopCount() {
-        return _${glAttachedCBArgsVariableName}.getFetchNarrowingLoopCount();
+    public int getSafetyMaxResultSize() {
+        return _fetchNarrowingBean.getSafetyMaxResultSize();
     }
 
     /**

@@ -26,6 +26,9 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         _sqlClause = ${glConditionBeanContextName}.createSqlClause(this);
     }
 
+    /** Safety max result size. */
+    protected int _safetyMaxResultSize;
+
     // =====================================================================================
     //                                                                            Sql-Clause
     //                                                                            ==========
@@ -158,6 +161,24 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     public boolean isFetchNarrowingEffective() {
         return getSqlClause().isFetchNarrowingEffective();
+    }
+
+    /**
+     * Get safety max result size.
+     * 
+     * @return Safety max result size.
+     */
+    public int getSafetyMaxResultSize() {
+        return _safetyMaxResultSize;
+    }
+
+    /**
+     * Check safety result.
+     * 
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        this._safetyMaxResultSize = safetyMaxResultSize;
     }
 
     // =====================================================================================

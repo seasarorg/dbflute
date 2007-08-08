@@ -287,12 +287,12 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that record has not been deleted.
      * 
      * @param ls Selected list.
-     * @param searchKey4log Search-key for Logging.
+     * @param searchKey4Log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      */
-    protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4log) {
+    protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
-            String msg = buildRecordHasBeenDeletedMessage(searchKey4log);
+            String msg = buildRecordHasBeenDeletedMessage(searchKey4Log);
             throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
         }
     }
@@ -301,23 +301,31 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Assert that record has been selected as one.
      * 
      * @param ls Selected list.
-     * @param searchKey4log Search-key for Logging.
+     * @param searchKey4Log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
      * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
      */
-    protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4log) {
+    protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
-            String msg = buildRecordHasBeenDeletedMessage(searchKey4log);
+            String msg = buildRecordHasBeenDeletedMessage(searchKey4Log);
             throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
         }
         if (ls.size() != 1) {
-            String msg = "This selected contents should be only one! But the resultCount=" + ls.size() + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "Please confirm your condition. Does it really select only one?" + getLineSeparator();
-            msg = msg + "And please confirm your database. Does it really exist only one?" + getLineSeparator();
-            msg = msg + "- - - - -" + getLineSeparator();
-            msg = msg + "The searchKey is as follows:" + getLineSeparator() + searchKey4log + getLineSeparator();
-            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throwRecordHasOverlappedException(ls.size() + "", searchKey4Log, null);
+        }
+    }
+
+    protected void throwRecordHasOverlappedException(String resultCountString, Object searchKey4Log, Throwable cause) {
+        String msg = "The selected records should be only one! But the resultCount=" + resultCountString + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Please confirm your condition. Does it really select only one?" + getLineSeparator();
+        msg = msg + "And please confirm your database. Does it really exist only one?" + getLineSeparator();
+        msg = msg + "- - - - -" + getLineSeparator();
+        msg = msg + "The searchKey is as follows:" + getLineSeparator() + searchKey4Log + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        if (cause != null) {
+            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg, cause);
+        } else {
             throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
         }
     }

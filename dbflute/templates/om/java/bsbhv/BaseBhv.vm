@@ -432,7 +432,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = selectList(cb);
+        cb.checkSafetyResult(1);
+        java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = null;
+        try {
+            ls = selectList(cb);
+        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
+            throwRecordHasOverlappedException("{Over safetyMaxResultSize '1'}", cb, e);
+        }
         if (ls.isEmpty()) {
             return null;
         }
@@ -450,7 +456,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        final java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = selectList(cb);
+        cb.checkSafetyResult(1);
+        java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = null;
+        try {
+            ls = selectList(cb);
+        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
+            throwRecordHasOverlappedException("{Over safetyMaxResultSize '1'}", cb, e);
+        }
         assertRecordHasNotBeenDeleted(ls, cb);
         assertRecordHasBeenSelectedAsOne(ls, cb);
         return (${myExtendedObjectClassName})ls.get(0);

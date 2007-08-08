@@ -41,4 +41,11 @@ public interface ${glFetchNarrowingBeanInterfaceName} {
      * @return Determiantion.
      */
     public boolean isFetchNarrowingEffective();
+
+    /**
+     * Get safety max result size.
+     * 
+     * @return Safety max result size.
+     */
+    public int getSafetyMaxResultSize();
 }

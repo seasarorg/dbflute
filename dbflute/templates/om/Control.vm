@@ -186,9 +186,8 @@ targetdatabase = $targetDatabase
     #set ($glUniqueInfoName = "${glProjectPrefix}UniqueInfo")
     #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
 
-
-
     ## [Allcommon-Exception]
+    #set ($glDangerousResultSizeExceptionName = "${glProjectPrefix}DangerousResultSizeException")
     #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
     #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
     #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
@@ -955,6 +954,10 @@ targetdatabase = $targetDatabase
 ##      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glDaoExceptionContextName}.${glClassFileExtension}" )
 ##      $generator.parse("om/${glTargetLanguage}/allcommon/exception/DaoExceptionContext.${glTemplateFileExtension}",$path,"", "")
 ##    #end
+
+    $database.debug("    parse('DangerousResultSizeException');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glDangerousResultSizeExceptionName}.${glClassFileExtension}" )
+    $generator.parse("om/${glTargetLanguage}/allcommon/exception/DangerousResultSizeException.${glTemplateFileExtension}",$path,"", "")
 
     $database.debug("    parseRecordHasAlreadyBeenDeletedException();")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glRecordHasAlreadyBeenDeletedException}.${glClassFileExtension}" )

@@ -6,4 +6,11 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
  * @author ${database.ClassAuthor}
  */
 public interface ${glSelectResourceInterfaceName} {
+
+    /**
+     * Check safety result.
+     * 
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     */
+    public void checkSafetyResult(int safetyMaxResultSize);
 }
