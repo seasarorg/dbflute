@@ -2263,6 +2263,10 @@ public class Table implements IDMethod {
         return getProperties().getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
     }
 
+    public boolean isAvailableEntityModifiedPropertiesAddLogicIfNeeds() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableEntityModifiedPropertiesAddLogicIfNeeds();
+    }
+
     // ===================================================================================
     //                                                                            toString
     //                                                                            ========

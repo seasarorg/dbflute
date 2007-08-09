@@ -911,10 +911,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Update.
+     * Update. {update: modified only}
      * <pre>
      * If it updates count zero, throws exception.
      * If concurrency control of this table is valid, this update have it.
+     * So then the entity of argument should have the value of concurrency column.
      * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
@@ -937,11 +938,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
 #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
     /**
-     * Update non stritct. <br />
-     * {update: modified only}
+     * Update non stritct. {update: modified only}
      * <pre>
      * This update ignores concurrency control.
-     * This method is faster than updateAfterSelect().
+     * So if the entity of argument have the value of concurrency column, it was ignored.
+     * 
+     * This method is faster than updateAfterSelect() because of non selecting before update().
+     * For example, batch application should use this better than updateAfterSelect().
      * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
@@ -968,8 +971,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Update after select. <br />
-     * {update: modified only}
+     * Update after select. {update: modified only}
      * <pre>
      * The merit of this method is only Deleted-Check before updating!
      * If you don't want the merit, please use update().
@@ -994,8 +996,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Insert or update. <br />
-     * {update: modified only}
+     * Insert or update. {update: modified only}
      * 
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
      */
@@ -1033,8 +1034,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
 #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
     /**
-     * Insert or update non strict. <br />
-     * {update: modified only} <br />
+     * Insert or update non strict. {update: modified only} <br />
      * This method is faster than insertOrUpdateAfterSelect().
      * 
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
@@ -1065,8 +1065,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Insert or update after select. <br />
-     * {update: modified only}
+     * Insert or update after select. {update: modified only}
      * <pre>
      * The merit of this method is only Deleted-Check before updating!
      * If you don't want the merit, please use update().
@@ -1123,8 +1122,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Insert or update after select-for-update.
-     * {update: modified only} <br />
+     * Insert or update after select-for-update. {update: modified only} <br />
      * 
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @deprecated This method is deprecated.

@@ -1,0 +1,24 @@
+# /---------------------------------------------------------------------------
+# [Classification]
+#   classificationDefinitionMap: (NotRequired - Default 'map:{}')
+#
+#     ex) map:{
+#             ; $$ALL$$                  = map:{suffix:_YN=YesNo}
+#             ; COLLECTION_STATUS        = map:{COLLECTION_STATUS_CODE=CollectionStatus}
+#             ; COLLECTION_STATUS_LOOKUP = map:{COLLECTION_STATUS_CODE=CollectionStatus}
+#         }
+#
+#     ex) From Database Example
+#      map:{
+#        CollectionStatus   =   list:{
+#               map:{table=COLLECTION_STATUS_LOOKUP;code=COLLECTION_STATUS_CODE;name=COLLECTION_STATUS_NAME}
+#           }
+#      }
+#
+map:{
+		; $$ALL$$					=	map:{suffix:_YN=YesNo}
+		; COLLECTION_STATUS			=	map:{COLLECTION_STATUS_CODE=CollectionStatus}
+		; COLLECTION_STATUS_LOOKUP	=	map:{COLLECTION_STATUS_CODE=CollectionStatus}
+	}
+# ----------------/
+

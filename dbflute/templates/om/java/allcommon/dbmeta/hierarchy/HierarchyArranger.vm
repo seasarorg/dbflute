@@ -211,6 +211,14 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  *     return flatLibraryList;
  * }
  * 
+ * 
+ * === Relation Trace Tips ===
+ * 
+ *   RelationTrace.f + [Code Assist] -- go to Foreign
+ *   RelationTrace.r + [Code Assist] -- go to Referer
+ *   RelationTrace.c + [Code Assist] -- end relation by Column
+ *
+ * 
  * <pre>
  * @author ${database.ClassAuthor}
  * @param <LOCAL_ENTITY> The type of local entity extends Entity

@@ -80,20 +80,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                           =========
     /** Entity modified properties. (for S2Dao) */
     protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
-
 #foreach ($col in $table.Columns)
-  #if ($database.isMakeDeprecated())
 
     /** The value of ${col.UncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
     protected ${col.JavaNative} _${col.UncapitalisedJavaName};
-
-    /** Has the setter of ${col.UncapitalisedJavaName} been invoked? */
-    protected boolean _isSetterInvoked${col.JavaName};
-  #else
-
-    /** The value of ${col.UncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
-    protected ${col.JavaNative} _${col.UncapitalisedJavaName};
-  #end
 #end
 
     // ===================================================================================
@@ -196,8 +186,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @param ${col.UncapitalisedJavaName} The value of ${col.UncapitalisedJavaName}. (Nullable)
      */
     public void set${col.JavaName}(${col.JavaNative} ${col.UncapitalisedJavaName}) {
+#if ($table.isAvailableEntityModifiedPropertiesAddLogicIfNeeds())
+        _modifiedProperties.addPropertyNameIfNeeds("${col.javaBeansRulePropertyName}", this._${col.UncapitalisedJavaName}, ${col.UncapitalisedJavaName});
+#else
         _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
-        _${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
+#end
+        this._${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
 #end
 

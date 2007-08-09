@@ -1,0 +1,31 @@
+# /---------------------------------------------------------------------------
+# [Additional ForeignKey]
+#   additionalForeignKeyMap: (NotRequired - Default 'map:{}')
+#
+#   If foreign key does not exist in your database,
+#   you can set up here as virtual foreign key for DBFlute.
+# 
+#    ex) torque.additionalForeignKeyMap = map:{ \
+#            ; FK_BOOK_AUTHOR = map:{ \
+#                ; localTableName  = BOOK      ; foreignTableName  = AUTHOR \
+#                ; localColumnName = AUTHOR_ID ; foreignColumnName = AUTHOR_ID \
+#            } \
+#            ; FK_BOOK_PUBLISHER = map:{ \
+#                ; localTableName  = BOOK         ; foreignTableName  = PUBLISHER \
+#                ; localColumnName = PUBLISHER_ID ; foreignColumnName = PUBLISHER_ID \
+#            } \
+#        }
+#
+map:{
+    ; FK_TEST_LENDING_COLLECTION  = map:{
+         ; localTableName  = LENDING_COLLECTION ; foreignTableName  = LIBRARY_USER
+         ; localColumnName = LIBRARY_ID/LB_USER_ID ; foreignColumnName = LIBRARY_ID/LB_USER_ID
+    }
+    ; FK_DEADLINK_TEST  = map:{
+        ; localTableName  = BOOK ; foreignTableName  = COLLECTION_STATUS_LOOKUP
+        ; localColumnName = GENRE_CODE ; foreignColumnName = COLLECTION_STATUS_CODE
+    }
+}
+# ----------------/
+
+

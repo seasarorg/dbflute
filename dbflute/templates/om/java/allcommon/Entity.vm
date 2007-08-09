@@ -213,6 +213,22 @@ public interface ${glEntityInterfaceName} {
         }
 
         /**
+         * Add property name. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (NotNull)
+         * @param before Before value. (Nullable)
+         * @param after After value. (Nullable)
+         */
+        public void addPropertyNameIfNeeds(String propertyName, Object before, Object after) {
+            if (_propertiesSet.contains(propertyName)) {
+                return;
+            }
+            if (before == null || !before.equals(after)) {
+                addPropertyName(propertyName);
+            }
+        }
+
+        /**
          * Get the set of properties.
          * 
          * @return The set of properties. (NotNull)

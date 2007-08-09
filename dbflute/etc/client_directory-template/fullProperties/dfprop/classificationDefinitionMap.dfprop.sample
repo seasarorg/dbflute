@@ -1,0 +1,37 @@
+# /---------------------------------------------------------------------------
+# [Classification]
+#   classificationDefinitionMap: (NotRequired - Default 'map:{}')
+#
+#     ex) map:{
+#             ; YesNo            = list:{
+#                                      ; map:{code=y;name=Yes;alias=はい}
+#                                      ; map:{code=n;name=No;alias=いいえ}
+#                                  }
+#             ; CollectionStatus = list:{
+#                                      ; map:{code=NOR; comment=通常状態を示す}
+#                                      ; map:{code=WAT; comment=待ち状態を示す}
+#                                      ; map:{code=OUT; comment=貸し出し中を示す}
+#                                  }
+#         }
+#
+#     ex) From Database Example
+#      map:{
+#        CollectionStatus   =   list:{
+#               map:{table=COLLECTION_STATUS_LOOKUP;code=COLLECTION_STATUS_CODE;name=COLLECTION_STATUS_NAME}
+#           }
+#      }
+#
+map:{
+	; YesNo				=	list:{
+								; map:{code=y;name=Yes;alias=はい}
+								; map:{code=n;name=No;alias=いいえ}
+							}
+	; CollectionStatus	=	list:{
+								; map:{code=NOR; comment=通常状態を示す}
+								; map:{code=WAT; comment=待ち状態を示す}
+								; map:{code=OUT; comment=貸し出し中を示す}
+							}
+}
+# ----------------/
+
+

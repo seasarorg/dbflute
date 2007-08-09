@@ -20,14 +20,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public DfLittleAdjustmentProperties(Properties prop) {
         super(prop);
     }
-    
+
     // ===============================================================================
     //                                                         Non PrimaryKey Writable
     //                                                         =======================
     public boolean isAvailableNonPrimaryKeyWritable() {
         return booleanProp("torque.isAvailableNonPrimaryKeyWritable", false);
     }
-    
+
     // ===============================================================================
     //                                                 Adding Schema to Table Sql-Name
     //                                                 ===============================
@@ -36,11 +36,19 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===============================================================================
+    //                                                 Adding Schema to Table Sql-Name
+    //                                                 ===============================
+    public boolean isAvailableEntityModifiedPropertiesAddLogicIfNeeds() {
+        return booleanProp("torque.isAvailableEntityModifiedPropertiesAddLogicIfNeeds", false);
+    }
+
+    // ===============================================================================
     //                                                             MultipleFK Property
     //                                                             ===================
     public static final String KEY_multipleFKPropertyMap = "multipleFKPropertyMap";
     protected Map<String, Map<String, Map<String, String>>> _multipleFKPropertyMap;
 
+    @SuppressWarnings("unchecked")
     public Map<String, Map<String, Map<String, String>>> getMultipleFKPropertyMap() {
         if (_multipleFKPropertyMap == null) {
             // TODO: @jflute - 真面目に展開すること。
