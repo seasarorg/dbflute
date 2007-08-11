@@ -205,7 +205,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                Select
     //                                                ------
     /**
-     * Get count as all. (Delegate-Method)
+     * Get count as all. {delegate method, internal for interceptor}
      * 
      * @return All count. (NotNull)
      */
@@ -214,7 +214,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Get list as all. (Delegate-Method)
+     * Get list as all. {delegate method, internal for interceptor}
      * 
      * @return All list. (NotNull)
      */
@@ -224,7 +224,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.hasPrimaryKey())
 
     //
-    // Get entity. (Delegate-Method)
+    // Get entity. {delegate method, internal for interceptor}
     // 
     // @param Primary-keys (NotNull)
     // @return Entity. (NotNull)
@@ -235,7 +235,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     /**
-     * Select count by condition-bean. (Delegate-Method)
+     * Select count by condition-bean. {delegate method, internal for interceptor}
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
@@ -246,7 +246,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Select entity by condition-bean. (Delegate-Method)
+     * Select entity by condition-bean. {delegate method, internal for interceptor}
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. If the select result is zero, it returns null. (Nullable)
@@ -257,7 +257,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Select list by condition-bean. (Delegate-Method)
+     * Select list by condition-bean. {delegate method, internal for interceptor}
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
@@ -270,7 +270,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.isUseSequence())
 
     /**
-     * Select next value as sequence. (Delegate-Method)
+     * Select next value as sequence. {delegate method, internal for interceptor}
      * 
      * @return Next value. (NotNull)
      */
@@ -284,7 +284,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                Update
     //                                                ------
     /**
-     * Insert one entity. (Delegate-Method)
+     * Insert one entity. {delegate method, internal for interceptor}
      * 
      * @param entity Entity. (NotNull)
      * @return Inserted count.
@@ -297,8 +297,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Update one entity. (Delegate-Method)
-     * {modified only}
+     * Update one entity. {modified only, delegate method}
      * 
      * @param entity Entity. (NotNull)
      * @return Updated count.
@@ -312,7 +311,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
 
     /**
-     * Update one entity. (Delegate-Method)
+     * Update one entity. {delegate method, internal for interceptor}
      * {non strict & modified only}
      * 
      * @param entity Entity. (NotNull)
@@ -327,7 +326,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 
     /**
-     * Delete one entity. (Delegate-Method)
+     * Delete one entity. {delegate method, internal for interceptor}
      * 
      * @param entity Entity. (NotNull)
      * @return Deleted count.
@@ -341,7 +340,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
 
     /**
-     * Delete one entity. (Delegate-Method)
+     * Delete one entity. {delegate method, internal for interceptor}
      * {non strict}
      * 
      * @param entity Entity. (NotNull)
@@ -356,7 +355,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 
     /**
-     * Insert several entities. (Delegate-Method)
+     * Insert several entities. {delegate method, internal for interceptor}
      * 
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return Inserted count.
@@ -367,7 +366,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Update several entities. (Delegate-Method)
+     * Update several entities. {delegate method, internal for interceptor}
      * 
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return Updated count.
@@ -378,7 +377,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Delete several entities. (Delegate-Method)
+     * Delete several entities. {delegate method, internal for interceptor}
      * 
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return Deleted count.
@@ -391,7 +390,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #if ($table.isAvailableNonPrimaryKeyWritable())
 
     /**
-     * Insert one entity. (Delegate-Method)
+     * Insert one entity. {delegate method, internal for interceptor}
      * 
      * @param entity Entity. (NotNull)
      * @return Inserted count.

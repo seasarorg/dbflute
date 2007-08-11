@@ -43,142 +43,167 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
-        if (_classificationDefinitionMap == null) {
-            _classificationDefinitionMap = new LinkedHashMap<String, List<Map<String, String>>>();
+        if (_classificationDefinitionMap != null) {
+            return _classificationDefinitionMap;
+        }
+        _classificationDefinitionMap = new LinkedHashMap<String, List<Map<String, String>>>();
 
-            final String key = "torque." + KEY_classificationDefinitionMap;
-            final Map<String, Object> tmpMap = mapProp(key, DEFAULT_EMPTY_MAP);
-            final Set<String> definitionKeySet = tmpMap.keySet();
+        final String key = "torque." + KEY_classificationDefinitionMap;
+        final Map<String, Object> plainMap = mapProp(key, DEFAULT_EMPTY_MAP);
+        final Set<String> definitionKeySet = plainMap.keySet();
 
-            for (String classificationName : definitionKeySet) {
-                final Object value = tmpMap.get(classificationName);
+        for (String classificationName : definitionKeySet) {
+            final Object value = plainMap.get(classificationName);
 
-                if (value instanceof List) {
-                    final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
-                    final List tmpList = (List) value;
-                    for (Object element : tmpList) {
-                        if (element instanceof Map) {
-                            final Map elementMap = (Map) element;
+            if (!(value instanceof List)) {
+                String msg = "The value of Map should be List but " + value.getClass();
+                msg = msg + " value = " + value;
+                throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+            }
 
-                            // ********
-                            // revising
-                            // ********
-                            final String table = (String) elementMap.get("table");
-                            if (table != null) {
-                                final String code = (String) elementMap.get("code");
-                                if (code == null) {
-                                    String msg = "The code of " + classificationName + " should not be null";
-                                    throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
-                                }
+            final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
+            final List plainList = (List) value;
+            for (Object element : plainList) {
+                if (!(element instanceof Map)) {
+                    String msg = "The element of List should be Map but " + element.getClass();
+                    msg = msg + " element = " + element;
+                    throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                }
+                final Map elementMap = (Map) element;
 
-                                String name = (String) elementMap.get("name");
-                                name = (name != null ? name : code);
-                                String alias = (String) elementMap.get("alias");
-                                alias = (alias != null ? alias : name);
-                                java.util.List exceptCodeList = new java.util.ArrayList();
-                                {
-                                    final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
-                                    if (exceptCodeObj != null) {
-                                        if (exceptCodeObj instanceof java.util.List) {
-                                            exceptCodeList = (java.util.List) exceptCodeObj;
-                                        } else {
-                                            String msg = "'exceptCodeList' should be java.util.List! But: "
-                                                    + exceptCodeObj.getClass();
-                                            msg = msg + " value=" + exceptCodeObj + " " + _classificationDefinitionMap;
-                                            throw new IllegalStateException(msg);
-                                        }
-                                    }
-                                }
+                // ********
+                // revising
+                // ********
+                final String table = (String) elementMap.get("table");
+                if (table != null) {
+                    final String code = (String) elementMap.get("code");
+                    if (code == null) {
+                        String msg = "The code of " + classificationName + " should not be null: table=" + table;
+                        throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                    }
 
-                                final String orderBy = (String) elementMap.get("orderBy");
-                                final StringBuffer sb = new StringBuffer();
-                                sb.append("select ").append(code).append(", ").append(name).append(", ").append(alias);
-                                sb.append(" from ").append(table);
-                                if (orderBy != null && orderBy.trim().length() != 0) {
-                                    sb.append(" order by ").append(orderBy);
-                                }
+                    // name
+                    String name = (String) elementMap.get("name");
+                    name = (name != null ? name : code);
 
-                                Connection conn = null;
-                                Statement stmt = null;
-                                ResultSet rs = null;
-                                try {
-                                    conn =  getBasicProperties().getConnection();
-                                    stmt = conn.createStatement();
-                                    _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-                                    _log.debug("The classification sql: " + sb.toString());
-                                    rs = stmt.executeQuery(sb.toString());
-                                    while (rs.next()) {
-                                        final String tmpCodeValue = rs.getString(code);
-                                        final String tmpNameValue = rs.getString(name);
-                                        final String tmpAliasValue = rs.getString(alias);
+                    // alias
+                    String alias = (String) elementMap.get("alias");
+                    alias = (alias != null ? alias : name);
 
-                                        if (exceptCodeList.contains(tmpCodeValue)) {
-                                            _log.debug("    exceptCode: " + tmpCodeValue);
-                                            continue;
-                                        }
+                    // comment
+                    final String comment = (String) elementMap.get("comment");
 
-                                        final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
-                                        selectedTmpMap.put("code", tmpCodeValue);
-                                        selectedTmpMap.put("name", tmpNameValue);
-                                        selectedTmpMap.put("alias", tmpAliasValue);
-                                        _log.debug("    code: " + tmpCodeValue);
-                                        _log.debug("    name: " + tmpNameValue);
-                                        _log.debug("    alias: " + tmpAliasValue);
-                                        elementList.add(selectedTmpMap);
-                                    }
-                                    _log.debug("- - - - - - - - /");
-                                } catch (SQLException e) {
-                                    throw new RuntimeException("The sql is " + sb.toString(), e);
-                                } finally {
-                                    try {
-                                        if (conn != null) {
-                                            conn.close();
-                                        }
-                                        if (stmt != null) {
-                                            stmt.close();
-                                        }
-                                        if (rs != null) {
-                                            rs.close();
-                                        }
-                                    } catch (SQLException ignored) {
-                                        _log.warn("The close() threw the exception: ", ignored);
-                                    }
-                                }
-                            } else {
-                                final String code = (String) elementMap.get("code");
-                                if (code == null) {
-                                    String msg = "The code of " + classificationName + " should not be null";
-                                    throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
-                                }
-
-                                final String name = (String) elementMap.get("name");
-                                if (name == null) {
-                                    elementMap.put("name", code);
-                                }
-
-                                final String alias = (String) elementMap.get("alias");
-                                if (alias == null) {
-                                    elementMap.put("alias", code);
-                                }
-
-                                elementList.add(elementMap);
+                    // exceptCodeList
+                    java.util.List exceptCodeList = new java.util.ArrayList();// Default Empty
+                    {
+                        final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
+                        if (exceptCodeObj != null) {
+                            if (!(exceptCodeObj instanceof java.util.List)) {
+                                String msg = "'exceptCodeList' should be java.util.List! But: "
+                                        + exceptCodeObj.getClass();
+                                msg = msg + " value=" + exceptCodeObj + " " + _classificationDefinitionMap;
+                                throw new IllegalStateException(msg);
                             }
-                        } else {
-                            String msg = "The element of List should be Map but " + element.getClass();
-                            msg = msg + " element = " + element;
-                            throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                            exceptCodeList = (java.util.List) exceptCodeObj;
                         }
                     }
 
-                    _classificationDefinitionMap.put(classificationName, elementList);
+                    // orderBy
+                    final String orderBy = (String) elementMap.get("orderBy");
+                    
+                    final StringBuffer sb = new StringBuffer();
+                    sb.append("select ").append(code).append(", ").append(name).append(", ").append(alias);
+                    if (comment != null && comment.trim().length() != 0) {
+                        sb.append(", ").append(comment);
+                    }
+                    sb.append(" from ").append(table);
+                    if (orderBy != null && orderBy.trim().length() != 0) {
+                        sb.append(" order by ").append(orderBy);
+                    }
+
+                    Connection conn = null;
+                    Statement stmt = null;
+                    ResultSet rs = null;
+                    try {
+                        conn = getBasicProperties().getConnection();
+                        stmt = conn.createStatement();
+                        _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+                        _log.debug("The classification sql: " + sb.toString());
+                        rs = stmt.executeQuery(sb.toString());
+                        while (rs.next()) {
+                            final String tmpCodeValue = rs.getString(code);
+                            final String tmpNameValue = rs.getString(name);
+                            final String tmpAliasValue = rs.getString(alias);
+                            String tmpCommentValue = null;
+                            if (comment != null && comment.trim().length() != 0) {
+                                tmpCommentValue = rs.getString(comment);
+                            }
+
+                            if (exceptCodeList.contains(tmpCodeValue)) {
+                                _log.debug("    exceptCode: " + tmpCodeValue);
+                                continue;
+                            }
+
+                            final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
+                            selectedTmpMap.put("code", tmpCodeValue);
+                            selectedTmpMap.put("name", tmpNameValue);
+                            selectedTmpMap.put("alias", tmpAliasValue);
+                            if (tmpCommentValue != null) {
+                                selectedTmpMap.put("comment", tmpCommentValue);
+                            }
+                            _log.debug("    code: " + tmpCodeValue);
+                            _log.debug("    name: " + tmpNameValue);
+                            _log.debug("    alias: " + tmpAliasValue);
+                            if (tmpCommentValue != null) {
+                                _log.debug("    comment: " + tmpCommentValue);
+                            }
+                            elementList.add(selectedTmpMap);
+                        }
+                        _log.debug("- - - - - - - - /");
+                    } catch (SQLException e) {
+                        throw new RuntimeException("The sql is " + sb.toString(), e);
+                    } finally {
+                        closeSqlResource(conn, stmt, rs);
+                    }
                 } else {
-                    String msg = "The value of Map should be List but " + value.getClass();
-                    msg = msg + " value = " + value;
-                    throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                    final String code = (String) elementMap.get("code");
+                    if (code == null) {
+                        String msg = "The code of " + classificationName + " should not be null";
+                        throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+                    }
+
+                    final String name = (String) elementMap.get("name");
+                    if (name == null) {
+                        elementMap.put("name", code);
+                    }
+
+                    final String alias = (String) elementMap.get("alias");
+                    if (alias == null) {
+                        elementMap.put("alias", code);
+                    }
+
+                    elementList.add(elementMap);
                 }
             }
+            _classificationDefinitionMap.put(classificationName, elementList);
         }
         return _classificationDefinitionMap;
+    }
+
+    protected void closeSqlResource(Connection conn, Statement stmt, ResultSet rs) {
+        try {
+            if (conn != null) {
+                conn.close();
+            }
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
+        } catch (SQLException ignored) {
+            _log.warn("The close() threw the exception: ", ignored);
+        }
     }
 
     public List<String> getClassificationNameList() {
@@ -239,7 +264,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected Map<String, Map<String, String>> _classificationDeploymentMap;
 
     // TODO: 列名の大文字小文字を区別しないようにする。CaseInsensitiveMapかな？
-    
+
     public Map<String, Map<String, String>> getClassificationDeploymentMap() {
         if (_classificationDeploymentMap == null) {
             final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
