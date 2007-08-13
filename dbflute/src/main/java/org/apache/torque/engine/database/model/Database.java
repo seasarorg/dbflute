@@ -1010,6 +1010,10 @@ public class Database {
         return getClassificationProperties().hasClassificationDefinitionMap();
     }
 
+    public Map<String, Map<String, String>> getClassificationTopDefinitionMap() {
+        return getClassificationProperties().getClassificationTopDefinitionMap();
+    }
+    
     public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
         return getClassificationProperties().getClassificationDefinitionMap();
     }
