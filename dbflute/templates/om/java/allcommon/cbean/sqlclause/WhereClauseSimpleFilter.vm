@@ -1,0 +1,126 @@
+${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
+
+#set ($myClassName = "${glWhereClauseSimpleFilterInterfaceName}")
+
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+
+/**
+ * The interface of simple filter for where clause.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${myClassName} {
+
+    public static final String BIND_COMMENT_BEGIN_PART = "/*dto";
+    public static final String BIND_COMMENT_END_PART = "*/null";
+
+    public static final String EMBEDDED_COMMENT_BEGIN_PART = "/*$dto";
+    public static final String EMBEDDED_COMMENT_END_PART = "*/null";
+
+    public static final String EMBEDDED_COMMENT_QUOTED_BEGIN_PART = "'/*$dto";
+    public static final String EMBEDDED_COMMENT_QUOTED_END_PART = "*/'dummy''";
+
+    /**
+     * Filter clause element.
+     * 
+     * @param clauseElement Clause element of where. (NotNull and NotEmpty)
+     * @return Filtered where clause. (NotNull and NotEmpty)
+     */
+    public String filterClauseElement(String clauseElement);
+
+    /**
+     * The simple filter for where clause to embedded. <br />
+     * *Attension -- Target column is not perfect. This class determines by column name only!
+     * So when the column name of base table is same as the column name of join table, both are target!
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public static class WhereClauseToEnbeddedSimpleFilter implements ${myClassName} {
+
+        protected java.util.Set${database.filterGenericsString(${glColumnInfoName})} _filterTargetColumnInfoSet;
+
+        public WhereClauseToEnbeddedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
+            this._filterTargetColumnInfoSet = new java.util.HashSet${database.filterGenericsString(${glColumnInfoName})}();
+            this._filterTargetColumnInfoSet.add(filterTargetColumnInfo);
+        }
+
+        public WhereClauseToEnbeddedSimpleFilter(java.util.Set${database.filterGenericsString(${glColumnInfoName})} filterTargetColumnInfoSet) {
+            this._filterTargetColumnInfoSet = filterTargetColumnInfoSet;
+        }
+
+        /**
+         * Filter clause element.
+         * 
+         * @param clauseElement Clause element of where. (NotNull and NotEmpty)
+         * @return Filtered where clause. (NotNull and NotEmpty)
+         */
+        public String filterClauseElement(String clauseElement) {
+            if (_filterTargetColumnInfoSet == null || _filterTargetColumnInfoSet.isEmpty()) {
+                return toEmbedded(clauseElement);
+            }
+            for (final java.util.Iterator ite = _filterTargetColumnInfoSet.iterator(); ite.hasNext(); ) {
+                final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+                if (clauseElement.contains("." + columnInfo.getColumnDbName() + " ")) {
+                    return toEmbedded(clauseElement);
+                }
+            }
+            return clauseElement;
+        }
+
+        protected String toEmbedded(String clauseElement) {
+            clauseElement = replace(clauseElement, BIND_COMMENT_BEGIN_PART, EMBEDDED_COMMENT_BEGIN_PART);
+            clauseElement = replace(clauseElement, BIND_COMMENT_END_PART, EMBEDDED_COMMENT_END_PART);
+            return clauseElement;
+        }
+
+        protected final String replace(String text, String fromText,
+                String toText) {
+
+            if (text == null || fromText == null || toText == null) {
+                return null;
+            }
+            StringBuffer buf = new StringBuffer(100);
+            int pos = 0;
+            int pos2 = 0;
+            while (true) {
+                pos = text.indexOf(fromText, pos2);
+                if (pos == 0) {
+                    buf.append(toText);
+                    pos2 = fromText.length();
+                } else if (pos > 0) {
+                    buf.append(text.substring(pos2, pos));
+                    buf.append(toText);
+                    pos2 = pos + fromText.length();
+                } else {
+                    buf.append(text.substring(pos2));
+                    break;
+                }
+            }
+            return buf.toString();
+        }
+    }
+
+    /**
+     * The simple filter for where clause to embedded and quoted. <br />
+     * *Attension -- Target column is not perfect. This class determines by column name only!
+     * So when the column name of base table is same as the column name of join table, both are target!
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public static class WhereClauseToEnbeddedQuotedSimpleFilter extends WhereClauseToEnbeddedSimpleFilter {
+
+        public WhereClauseToEnbeddedQuotedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
+            super(filterTargetColumnInfo);
+        }
+
+        public WhereClauseToEnbeddedQuotedSimpleFilter(java.util.Set${database.filterGenericsString(${glColumnInfoName})} filterTargetColumnInfoSet) {
+            super(filterTargetColumnInfoSet);
+        }
+
+        protected String toEmbedded(String clauseElement) {
+            clauseElement = replace(clauseElement, BIND_COMMENT_BEGIN_PART, EMBEDDED_COMMENT_QUOTED_BEGIN_PART);
+            clauseElement = replace(clauseElement, BIND_COMMENT_END_PART, EMBEDDED_COMMENT_QUOTED_END_PART);
+            return clauseElement;
+        }
+    }
+}

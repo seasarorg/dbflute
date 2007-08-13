@@ -157,6 +157,7 @@ targetdatabase = $targetDatabase
     #set ($glSqlClauseAbstractName = "${glProjectPrefix}AbstractSqlClause")
     #set ($glOrderByClauseName = "${glProjectPrefix}OrderByClause")
     #set ($glOrderByElementName = "${glProjectPrefix}OrderByElement")
+    #set ($glWhereClauseSimpleFilterInterfaceName = "${glProjectPrefix}WhereClauseSimpleFilter")
 
     ## [Allcommon-DBMeta]
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
@@ -774,6 +775,11 @@ targetdatabase = $targetDatabase
     $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/AbstractSqlClause.${glTemplateFileExtension}",$path ,"" ,"")
 
     #if ($database.isTargetLanguageJava())
+
+      $database.debug("    parse('WhereClauseSimpleFilter')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glWhereClauseSimpleFilterInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/WhereClauseSimpleFilter.${glTemplateFileExtension}",$path ,"" ,"")
+
       $database.debug("    parseSqlClause_derby")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClauseInterfaceName}Derby.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/cbean/sqlclause/SqlClause_derby.${glTemplateFileExtension}",$path ,"" ,"")

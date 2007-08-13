@@ -9,6 +9,7 @@ import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName};
 
 /**
  * The condition-bean as abstract.
@@ -39,6 +40,13 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     public ${glSqlClauseName} getSqlClause() {
         return _sqlClause;
+    }
+
+    // =====================================================================================
+    //                                                                   Where Clause Filter
+    //                                                                   ===================
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter) {
+        this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
     }
 
     // =====================================================================================

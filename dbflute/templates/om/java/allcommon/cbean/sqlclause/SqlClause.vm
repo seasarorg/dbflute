@@ -18,9 +18,14 @@ public interface ${myClassName} {
     public static final String INCLUDE_SELECT_CLAUSE_MARK = "/* df:includeSelectClause */";
 
     // =====================================================================================
-    //                                                                         Select Clause
-    //                                                                         =============
+    //                                                        Select Clause Column Alias Map
+    //                                                        ==============================
     public void setSelectClauseColumnAliasMap(java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap);
+
+    // =====================================================================================
+    //                                                            Where Clause Simple Filter
+    //                                                            ==========================
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
 
     // =====================================================================================
     //                                                                                Clause

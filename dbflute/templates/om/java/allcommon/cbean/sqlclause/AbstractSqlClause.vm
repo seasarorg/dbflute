@@ -34,8 +34,11 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /** Order-by clause. */
     protected final ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
 
-    /** Order-by clause. */
+    /** The map of select clause column alias. */
     protected java.util.Map${database.filterGenericsString('String, String')} _selectClauseColumnAliasMap;
+
+    /** The filter for where clause. */
+    protected java.util.List${database.filterGenericsString(${glWhereClauseSimpleFilterInterfaceName})} _whereClauseSimpleFilterList = new java.util.ArrayList${database.filterGenericsString(${glWhereClauseSimpleFilterInterfaceName})}();;
 
     /** Union clause list. */
     protected java.util.List${database.filterGenericsString('UnionQueryInfo')} _unionQueryInfoList = new java.util.ArrayList${database.filterGenericsString('UnionQueryInfo')}();
@@ -78,10 +81,32 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     // =====================================================================================
-    //                                                                         Select-Clause
-    //                                                                         =============
+    //                                                        Select Clause Column Alias Map
+    //                                                        ==============================
     public void setSelectClauseColumnAliasMap(java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap) {
-        _selectClauseColumnAliasMap = selectClauseColumnAliasMap;
+        this._selectClauseColumnAliasMap = selectClauseColumnAliasMap;
+    }
+
+    // =====================================================================================
+    //                                                            Where Clause Simple Filter
+    //                                                            ==========================
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter) {
+        this._whereClauseSimpleFilterList.add(whereClauseSimpleFilter);
+    }
+
+    protected String filterWhereClauseSimply(String clauseElement) {
+        if (_whereClauseSimpleFilterList == null || _whereClauseSimpleFilterList.isEmpty()) {
+            return clauseElement;
+        }
+        for (final java.util.Iterator ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext(); ) {
+            final ${glWhereClauseSimpleFilterInterfaceName} filter = (${glWhereClauseSimpleFilterInterfaceName})ite.next();
+            if (filter == null) {
+                String msg = "The list of filter should not have null: _whereClauseSimpleFilterList=" + _whereClauseSimpleFilterList;
+                throw new IllegalStateException(msg);
+            }
+            clauseElement = filter.filterClauseElement(clauseElement);
+        }
+        return clauseElement;
     }
 
     // =====================================================================================
@@ -225,11 +250,12 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         sb.append("(select * from ").append(joinTableName).append(" where ");
         int count = 0;
         for (final java.util.Iterator ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
-            final String whereClause = (String)ite.next();
+            String clauseElement = (String)ite.next();
+            clauseElement = filterWhereClauseSimply(clauseElement);
             if (count > 0) {
                 sb.append(" and ");
             }
-            sb.append(whereClause);
+            sb.append(clauseElement);
             ++count;
         }
         sb.append(")");
@@ -258,10 +284,12 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         final StringBuffer sb = new StringBuffer();
         int count = 0;
         for (final java.util.Iterator ite = _whereList.iterator(); ite.hasNext(); count++) {
+            String clauseElement = (String)ite.next();
+            clauseElement = filterWhereClauseSimply(clauseElement);
             if (count == 0) {
-                sb.append("where ").append((String)ite.next());
+                sb.append("where ").append(clauseElement);
             } else {
-                sb.append(" and ").append((String)ite.next());
+                sb.append(" and ").append(clauseElement);
             }
         }
         return sb.toString();

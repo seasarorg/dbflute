@@ -537,7 +537,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             if (s.startsWith("(") && s.endsWith(")")) {
                 peek().addChild(new ParenBindVariableNode(expr));
             } else if (expr.startsWith("$")) {
-                peek().addChild(new EmbeddedValueNode(expr.substring(1)));
+                peek().addChild(new InternalEmbeddedValueNode(expr.substring(1)));
             } else {
                 peek().addChild(new InternalBindVariableNode(expr));// Extension!
             }
@@ -631,6 +631,60 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                 }
             }
             ctx.addSql("?", value, clazz);
+        }
+    }
+
+    // --------------------------------------
+    //                      EmbeddedValueNode
+    //                      -----------------
+    protected static class InternalEmbeddedValueNode extends EmbeddedValueNode {
+        private String expression;
+
+        private String[] names;
+
+        public InternalEmbeddedValueNode(String expression) {
+            super(expression);
+
+            this.expression = expression;
+            names = StringUtil.split(expression, ".");
+            // this.baseName = array[0];
+            // if (array.length > 1) {
+            //     this.propertyName = array[1];
+            // }
+        }
+
+        public String getExpression() {
+            return expression;
+        }
+
+        /**
+         * @see org.seasar.dao.Node#accept(org.seasar.dao.QueryContext)
+         */
+        public void accept(CommandContext ctx) {
+            Object value = ctx.getArg(names[0]);
+            Class clazz = ctx.getArgType(names[0]);
+            for (int pos = 1; pos < names.length; pos++) {
+                if (value == null) {
+                    break;
+                }
+                if (java.util.Map.class.isInstance(value)) {// Extension!
+                    final java.util.Map map = (java.util.Map) value;
+                    value = map.get(names[pos]);
+                    if (value == null) {
+                        break;
+                    }
+                    clazz = value.getClass();
+                } else {
+                    BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
+                    PropertyDesc pd = beanDesc.getPropertyDesc(names[pos]);
+                    value = pd.getValue(value);
+                    clazz = pd.getPropertyType();
+                }
+            }
+            if (value != null && value.toString().indexOf("?") > -1) {
+                throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
+            }
+            ctx.addSql(value != null ? value.toString() : null);
         }
     }
 
