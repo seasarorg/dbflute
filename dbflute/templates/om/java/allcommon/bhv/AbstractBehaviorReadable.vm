@@ -223,6 +223,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return (${glEntityInterfaceName})ls.get(0);
     }
 
+
     // =====================================================================================
     //                                                                       Basic Read List
     //                                                                       ===============
@@ -383,6 +384,25 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return valueLabelList;
     }
 #end
+
+    // ===================================================================================
+    //                                                                            Sequence
+    //                                                                            ========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The value of sequence. (NotNull)
+     */
+    public ${database.sequenceReturnType} readNextVal() {
+        try {
+            final java.lang.reflect.Method method = getClass().getMethod("selectNextVal", new Class[] {});
+            return (${database.sequenceReturnType})method.invoke(getDaoReadable(), new Object[] {});
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("The table does not have sequence: " + getTableDbName(), e);
+        } catch (Exception e) {
+            throw new IllegalStateException("The selectNextVal() of the table threw the exception: " + getTableDbName(), e);
+        }
+    }
 
     // ===================================================================================
     //                                                                          Token File

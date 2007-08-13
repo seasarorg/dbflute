@@ -3,6 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 #set ($myClassName = "${glBehaviorWritableAbstractName}")
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
 
@@ -82,6 +83,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity-interface. (NotNull)
      */
     protected void filterEntityOfInsert(${glEntityInterfaceName} entity) {
+#if ($database.isAvailableBehaviorInsertSequenceInjection())
+        injectSequenceToPrimaryKeyIfNeeds(entity);
+#end
     }
 
     /**
@@ -362,6 +366,24 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callRemoveList(entityList);
+    }
+
+#set ($genericsPrimaryKeySequence = "String, ${database.sequenceReturnType}")
+    /**
+     * Inject sequence to primary key if it needs.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    protected void injectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
+        final ${glDBMetaInterfaceName} dbmeta = entity.getDBMeta();
+        if (!dbmeta.hasSequence() || dbmeta.hasTwoOrMorePrimaryKeys() || entity.hasPrimaryKeyValue()) {
+            return;
+        }
+        final ${database.sequenceReturnType} sequenceValue = readNextVal();
+        final String columnDbName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final java.util.Map${database.filterGenericsString($genericsPrimaryKeySequence)} map = new java.util.HashMap${database.filterGenericsString($genericsPrimaryKeySequence)}();
+        map.put(columnDbName, sequenceValue);
+        dbmeta.acceptPrimaryKeyMap(entity, map);
     }
 
     // =====================================================================================

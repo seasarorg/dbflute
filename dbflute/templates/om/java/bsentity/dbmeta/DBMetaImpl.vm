@@ -679,6 +679,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @return The primary unique info. (NotNull)
      */
     public ${glUniqueInfoName} getPrimaryUniqueInfo() {
+#if ($table.hasPrimaryKey())
         final ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
         uniqueInfo.setDBMeta(this);
 #foreach ($col in $table.primaryKey)
@@ -686,6 +687,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
         uniqueInfo.setPrimary(true);
         return uniqueInfo;
+#else
+        throw new UnsupportedOperationException("The table doen not have primary key: " + getTableDbName());
+#end
     }
 
     /**
@@ -858,6 +862,18 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #foreach ($col in $table.Columns)
         public RelationTrace column${col.javaBeansRulePropertyNameInitCap}() { return fixTrace(_relationList, ${myDBMetaClassName}.getInstance().column${col.javaBeansRulePropertyNameInitCap}()); }
 #end
+    }
+
+    // ===================================================================================
+    //                                                                       Sequence Info
+    //                                                                       =============
+    /**
+     * Has sequence?
+     * 
+     * @return Determination.
+     */
+    public boolean hasSequence() {
+        return ${table.isUseSequence()};
     }
 
     // ===================================================================================

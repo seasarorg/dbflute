@@ -217,6 +217,16 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker);
 
+    // ===================================================================================
+    //                                                                            Sequence
+    //                                                                            ========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The value of sequence. (NotNull)
+     */
+    public ${database.sequenceReturnType} readNextVal();
+
     // =====================================================================================
     //                                                                            Token File
     //                                                                            ==========

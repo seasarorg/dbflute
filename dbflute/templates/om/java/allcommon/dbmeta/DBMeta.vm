@@ -519,6 +519,17 @@ public interface ${myClassName} {
         public void handleFixedTrace(RelationTrace relationTrace);
     }
 
+
+    // ===================================================================================
+    //                                                                       Sequence Info
+    //                                                                       =============
+    /**
+     * Has sequence?
+     * 
+     * @return Determination.
+     */
+    public boolean hasSequence();
+
     // ===================================================================================
     //                                                                       Common Column
     //                                                                       =============

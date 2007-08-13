@@ -40,6 +40,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return (String) flmap.get(flexibleTableName);
     }
 
+    public boolean isAvailableBehaviorInsertSequenceInjection() {
+        return booleanProp("torque.isAvailableBehaviorInsertSequenceInjection", false);
+    }
+
     public String getSequenceReturnType() {
         return stringProp("torque.sequenceReturnType", "java.math.BigDecimal");
     }

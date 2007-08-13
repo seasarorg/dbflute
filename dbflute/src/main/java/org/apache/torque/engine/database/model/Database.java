@@ -882,6 +882,10 @@ public class Database {
     public String getSequenceDefinitionMapSequence(String flexibleTableName) {
         return getProperties().getSequenceIdentityProperties().getSequenceDefinitionMapSequence(flexibleTableName);
     }
+    
+    public boolean isAvailableBehaviorInsertSequenceInjection() {
+        return getProperties().getSequenceIdentityProperties().isAvailableBehaviorInsertSequenceInjection();
+    }
 
     public String getSequenceReturnType() {
         return getProperties().getSequenceIdentityProperties().getSequenceReturnType();

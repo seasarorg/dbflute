@@ -35,16 +35,16 @@ public interface ${myClassName} {
      * 
      * @author ${database.ClassAuthor}
      */
-    public static class WhereClauseToEnbeddedSimpleFilter implements ${myClassName} {
+    public static class WhereClauseToEmbeddedSimpleFilter implements ${myClassName} {
 
         protected java.util.Set${database.filterGenericsString(${glColumnInfoName})} _filterTargetColumnInfoSet;
 
-        public WhereClauseToEnbeddedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
+        public WhereClauseToEmbeddedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
             this._filterTargetColumnInfoSet = new java.util.HashSet${database.filterGenericsString(${glColumnInfoName})}();
             this._filterTargetColumnInfoSet.add(filterTargetColumnInfo);
         }
 
-        public WhereClauseToEnbeddedSimpleFilter(java.util.Set${database.filterGenericsString(${glColumnInfoName})} filterTargetColumnInfoSet) {
+        public WhereClauseToEmbeddedSimpleFilter(java.util.Set${database.filterGenericsString(${glColumnInfoName})} filterTargetColumnInfoSet) {
             this._filterTargetColumnInfoSet = filterTargetColumnInfoSet;
         }
 
@@ -107,13 +107,13 @@ public interface ${myClassName} {
      * 
      * @author ${database.ClassAuthor}
      */
-    public static class WhereClauseToEnbeddedQuotedSimpleFilter extends WhereClauseToEnbeddedSimpleFilter {
+    public static class WhereClauseToEmbeddedQuotedSimpleFilter extends WhereClauseToEmbeddedSimpleFilter {
 
-        public WhereClauseToEnbeddedQuotedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
+        public WhereClauseToEmbeddedQuotedSimpleFilter(${glColumnInfoName} filterTargetColumnInfo) {
             super(filterTargetColumnInfo);
         }
 
-        public WhereClauseToEnbeddedQuotedSimpleFilter(java.util.Set${database.filterGenericsString(${glColumnInfoName})} filterTargetColumnInfoSet) {
+        public WhereClauseToEmbeddedQuotedSimpleFilter(java.util.Set${database.filterGenericsString(${glColumnInfoName})} filterTargetColumnInfoSet) {
             super(filterTargetColumnInfoSet);
         }
 
