@@ -18,32 +18,61 @@ import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
- * Build properties for Torque.
+ * Classification properties for Torque.
  * 
- * @author mkubo
+ * @author jflute
  */
 public final class DfClassificationProperties extends DfAbstractHelperProperties {
 
     private static final Log _log = LogFactory.getLog(DfClassificationProperties.class);
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfClassificationProperties(Properties prop) {
         super(prop);
     }
 
-    // ===============================================================================
-    //                                                     Properties - Classification
-    //                                                     ===========================
-    // --------------------------------------
-    //              Classification Definition
-    //                             ----------
+    // ===================================================================================
+    //                                                         Properties - Classification
+    //                                                         ===========================
+    // -----------------------------------------------------
+    //                             Classification Definition
+    //                             -------------------------
     public static final String KEY_classificationDefinitionMap = "classificationDefinitionMap";
+
+    protected String _classificationTopCodeVariableNamePrefix;
+    protected String _classificationCodeVariableNamePrefix;
     protected Map<String, Map<String, String>> _classificationTopDefinitionMap;
     protected Map<String, List<Map<String, String>>> _classificationDefinitionMap;
 
-    public boolean hasClassificationDefinitionMap() {
-        return !getClassificationDefinitionMap().isEmpty();
+    public String getClassificationTopCodeVariableNamePrefix() {
+        if (_classificationTopCodeVariableNamePrefix != null) {
+            return _classificationTopCodeVariableNamePrefix;
+        }
+        getClassificationDefinitionMap();// Initialize!
+        if (_classificationTopCodeVariableNamePrefix == null) {
+            _classificationTopCodeVariableNamePrefix = "TOP_CODE_";
+        }
+        return _classificationTopCodeVariableNamePrefix;
     }
 
+    public String getClassificationCodeVariableNamePrefix() {
+        if (_classificationCodeVariableNamePrefix != null) {
+            return _classificationCodeVariableNamePrefix;
+        }
+        getClassificationDefinitionMap();// Initialize!
+        if (_classificationCodeVariableNamePrefix == null) {
+            _classificationCodeVariableNamePrefix = "CODE_";
+        }
+        return _classificationCodeVariableNamePrefix;
+    }
+
+    /**
+     * Get the map of classification TOP definition.
+     * 
+     * @return The map of classification TOP definition. (NotNull)
+     */
     public Map<String, Map<String, String>> getClassificationTopDefinitionMap() {
         if (_classificationTopDefinitionMap != null) {
             return _classificationTopDefinitionMap;
@@ -52,6 +81,20 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return _classificationTopDefinitionMap;
     }
 
+    /**
+     * Has the map of classification definition.
+     * 
+     * @return Determination.
+     */
+    public boolean hasClassificationDefinitionMap() {
+        return !getClassificationDefinitionMap().isEmpty();
+    }
+
+    /**
+     * Get the map of classification definition.
+     * 
+     * @return The map of classification definition. (NotNull)
+     */
     public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
         if (_classificationDefinitionMap != null) {
             return _classificationDefinitionMap;
@@ -60,20 +103,31 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         _classificationDefinitionMap = new LinkedHashMap<String, List<Map<String, String>>>();
 
         final String key = "torque." + KEY_classificationDefinitionMap;
-        final Map<String, Object> plainMap = mapProp(key, DEFAULT_EMPTY_MAP);
-        final Set<String> definitionKeySet = plainMap.keySet();
+        final Map<String, Object> plainClassificationDefinitionMap = mapProp(key, DEFAULT_EMPTY_MAP);
+        final Set<String> classificationNameSet = plainClassificationDefinitionMap.keySet();
 
-        for (String classificationName : definitionKeySet) {
+        for (String classificationName : classificationNameSet) {
+            if (_classificationDefinitionMap.containsKey(classificationName)) {
+                String msg = "Duplicate classification: " + classificationName;
+                throw new IllegalStateException(msg);
+            }
             if (classificationName.equals("$$SQL$$")) {
-                final String superSql = (String) plainMap.get(classificationName);
-
-                // TODO:
-                System.out.println("superSql: " + superSql);
-
+                final String topSql = (String) plainClassificationDefinitionMap.get(classificationName);
+                setupFromDatabaseByTopSql(topSql);
+                continue;
+            }
+            if (classificationName.equals("$$topCodeVariableNamePrefix$$")) {
+                final String prefix = (String) plainClassificationDefinitionMap.get(classificationName);
+                _classificationTopCodeVariableNamePrefix = prefix + "_";
+                continue;
+            }
+            if (classificationName.equals("$$codeVariableNamePrefix$$")) {
+                final String prefix = (String) plainClassificationDefinitionMap.get(classificationName);
+                _classificationCodeVariableNamePrefix = prefix + "_";
                 continue;
             }
 
-            final Object value = plainMap.get(classificationName);
+            final Object value = plainClassificationDefinitionMap.get(classificationName);
             if (!(value instanceof List)) {
                 String msg = "The value of Map should be List but " + value.getClass();
                 msg = msg + " value = " + value;
@@ -120,7 +174,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 if (classificationCode != null || classificationComment != null) {
                     setupClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
                 } else {
-                    setupClassificationFromLiteral(classificationName, elementMap, elementList);
+                    new ClassificationLiteralSetupper().setup(classificationName, elementMap, elementList);
                 }
             }
             _classificationDefinitionMap.put(classificationName, elementList);
@@ -128,77 +182,117 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return _classificationDefinitionMap;
     }
 
-    protected void setupClassificationFromLiteral(String classificationName, Map elementMap,
-            List<Map<String, String>> elementList) {
-        final String code = (String) elementMap.get("code");
-        if (code == null) {
-            String msg = "The code of " + classificationName + " should not be null";
-            throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
-        }
-        final String name = (String) elementMap.get("name");
-        if (name == null) {
-            elementMap.put("name", code);
-        }
-        final String alias = (String) elementMap.get("alias");
-        if (alias == null) {
-            elementMap.put("alias", name != null ? name : code);
-        }
-        elementList.add(elementMap);
-    }
-
-    public List<String> getClassificationNameList() {
-        return new ArrayList<String>(getClassificationDefinitionMap().keySet());
-    }
-
-    public List<String> getClassificationNameListValidNameOnly() {
-        final List<String> resultList = new ArrayList<String>();
-        final Set<String> keySet = getClassificationDefinitionMap().keySet();
-
-        classificationNameListLoop: for (String string : keySet) {
-            final List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
-            for (Map<String, String> map : list) {
-                final String code = map.get("code");
-                final String name = map.get("name");
-                if (!code.equals(name)) {
-                    resultList.add(string);
-                    continue classificationNameListLoop;
-                }
-            }
-        }
-        return resultList;
-    }
-
-    public List<String> getClassificationNameListValidAliasOnly() {
-        final List<String> resultList = new ArrayList<String>();
-        final Set<String> keySet = getClassificationDefinitionMap().keySet();
-
-        classificationNameListLoop: for (String string : keySet) {
-            final List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
-            for (Map<String, String> map : list) {
-                final String code = map.get("code");
-                final String name = map.get("name");
-                final String alias = map.get("alias");
-                if (!code.equals(alias) && !name.equals(alias)) {
-                    resultList.add(string);
-                    continue classificationNameListLoop;
-                }
-            }
-        }
-        return resultList;
-    }
-
-    public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        final String property = stringProp("torque." + KEY_classificationDefinitionMap, DEFAULT_EMPTY_MAP_STRING);
-        return filterDoubleQuotation(removeNewLine(property));
-    }
-
-    public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
-        return getClassificationDefinitionMap().get(classificationName);
-    }
-
     // -----------------------------------------------------
     //                                     Definition Helper
     //                                     -----------------
+    protected void setupFromDatabaseByTopSql(String sql) {
+        final DfBasicProperties basicProperties = getBasicProperties();
+        final ClassificationTopSqlExecutor executor = new ClassificationTopSqlExecutor();
+        final List<Map<String, String>> resultList = executor.executeTopSql(basicProperties.getConnection(), sql);
+
+        for (Map<String, String> map : resultList) {
+            final String classificationName = map.get("classificationName");
+
+            final String code = map.get(ClassificationInfo.KEY_CODE);
+            final String name = map.get("name");
+            final String alias = map.get("alias");
+            final String comment = map.get("comment");
+            final String topCode = map.get(ClassificationInfo.KEY_TOP_CODE);
+            final String topComment = map.get(ClassificationInfo.KEY_TOP_COMMENT);
+
+            List<Map<String, String>> elementList = _classificationDefinitionMap.get(classificationName);
+            if (elementList == null) {
+                elementList = new ArrayList<Map<String, String>>();
+                _classificationDefinitionMap.put(classificationName, elementList);
+            }
+
+            final Map<String, String> elementMap = new LinkedHashMap<String, String>();
+            elementMap.put(ClassificationInfo.KEY_CODE, code);
+            elementMap.put("name", name);
+            elementMap.put("alias", alias);
+            if (comment != null) {
+                elementMap.put("comment", comment);
+            }
+            elementList.add(elementMap);
+
+            if (!_classificationTopDefinitionMap.containsKey(classificationName)) {
+                final Map<String, String> topElementMap = new LinkedHashMap<String, String>();
+                topElementMap.put("classificationName", classificationName);
+                if (topCode != null) {
+                    topElementMap.put(ClassificationInfo.KEY_TOP_CODE, topCode);
+                }
+                if (topComment != null) {
+                    topElementMap.put(ClassificationInfo.KEY_TOP_COMMENT, topComment);
+                }
+                if (topCode != null || topComment != null) {
+                    _classificationTopDefinitionMap.put(classificationName, topElementMap);
+                }
+            }
+        }
+    }
+
+    protected static class ClassificationTopSqlExecutor {
+        public java.util.List<java.util.Map<String, String>> executeTopSql(Connection conn, String sql) {
+            Statement stmt = null;
+            ResultSet rs = null;
+            final java.util.List<java.util.Map<String, String>> elementList = new ArrayList<Map<String, String>>();
+            try {
+                stmt = conn.createStatement();
+                _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+                _log.debug("The classification sql: " + sql);
+                rs = stmt.executeQuery(sql);
+                final Set<String> classificationNameDuplicateCheckSet = new HashSet<String>();
+                while (rs.next()) {
+                    final String tmpClassificationNameValue = rs.getString("classificationName");
+                    final String tmpCodeValue = rs.getString(ClassificationInfo.KEY_CODE);
+                    if (tmpCodeValue == null) {
+                        String msg = "The sql should have 'code' column. But null: sql=" + sql;
+                        throw new IllegalStateException(msg);
+                    }
+                    String tmpNameValue = rs.getString("name");
+                    if (tmpNameValue == null) {
+                        tmpNameValue = tmpCodeValue;
+                    }
+                    String tmpAliasValue = rs.getString("alias");
+                    if (tmpAliasValue == null) {
+                        tmpAliasValue = tmpNameValue;
+                    }
+                    final String tmpCommentValue = rs.getString("comment");
+                    final String tmpTopCodeValue = rs.getString(ClassificationInfo.KEY_TOP_CODE);
+                    final String tmpTopCommentValue = rs.getString(ClassificationInfo.KEY_TOP_COMMENT);
+
+                    if (classificationNameDuplicateCheckSet.contains(tmpClassificationNameValue)) {
+                        _log.debug("    duplicate: " + tmpClassificationNameValue);
+                        continue;
+                    }
+
+                    final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
+                    selectedTmpMap.put(ClassificationInfo.KEY_CODE, tmpCodeValue);
+                    selectedTmpMap.put("name", tmpNameValue);
+                    selectedTmpMap.put("alias", tmpAliasValue);
+                    if (tmpCommentValue != null) {
+                        selectedTmpMap.put("comment", tmpCommentValue);
+                    }
+                    if (tmpTopCodeValue != null) {
+                        selectedTmpMap.put(ClassificationInfo.KEY_TOP_CODE, tmpTopCodeValue);
+                    }
+                    if (tmpTopCommentValue != null) {
+                        selectedTmpMap.put(ClassificationInfo.KEY_TOP_COMMENT, tmpTopCommentValue);
+                    }
+
+                    elementList.add(selectedTmpMap);
+                    classificationNameDuplicateCheckSet.add(tmpClassificationNameValue);
+                }
+                _log.debug("- - - - - - - - /");
+            } catch (SQLException e) {
+                throw new RuntimeException("The sql is " + sql, e);
+            } finally {
+                new ClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
+            }
+            return elementList;
+        }
+    }
+
     protected java.util.List extractExceptCodeList(final Map elementMap) {
         java.util.List exceptCodeList = new java.util.ArrayList();// Default Empty
         {
@@ -286,7 +380,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 }
 
                 final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
-                selectedTmpMap.put("code", tmpCodeValue);
+                selectedTmpMap.put(ClassificationInfo.KEY_CODE, tmpCodeValue);
                 selectedTmpMap.put("name", tmpNameValue);
                 selectedTmpMap.put("alias", tmpAliasValue);
                 if (tmpCommentValue != null) {
@@ -299,31 +393,15 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         } catch (SQLException e) {
             throw new RuntimeException("The sql is " + sql, e);
         } finally {
-            closeSqlResource(conn, stmt, rs);
+            new ClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
         }
     }
 
     protected String removeAliasPrefixIfNeeds(String name) {
-        if (name.lastIndexOf(".") >= 0) {
+        if (name != null && name.lastIndexOf(".") >= 0) {
             name = name.substring(name.lastIndexOf(".") + 1);
         }
         return name;
-    }
-
-    protected void closeSqlResource(Connection conn, Statement stmt, ResultSet rs) {
-        try {
-            if (conn != null) {
-                conn.close();
-            }
-            if (stmt != null) {
-                stmt.close();
-            }
-            if (rs != null) {
-                rs.close();
-            }
-        } catch (SQLException ignored) {
-            _log.warn("The close() threw the exception: ", ignored);
-        }
     }
 
     protected void setupClassificationTopFromLiteralIfNeeds(String classificationName, Map elementMap) {
@@ -345,8 +423,55 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
     }
 
+    protected static class ClassificationLiteralSetupper {
+
+        @SuppressWarnings("unchecked")
+        public void setup(String classificationName, Map elementMap, List<Map<String, String>> elementList) {
+            final String codeKey = ClassificationInfo.KEY_CODE;
+            final String nameKey = ClassificationInfo.KEY_NAME;
+            final String aliasKey = ClassificationInfo.KEY_ALIAS;
+
+            final String code = (String) elementMap.get(codeKey);
+            if (code == null) {
+                String msg = "The code of " + classificationName + " should not be null";
+                throw new IllegalStateException(msg + " at " + KEY_classificationDefinitionMap);
+            }
+            final String name = (String) elementMap.get(nameKey);
+            if (name == null) {
+                elementMap.put(nameKey, code);
+            }
+            final String alias = (String) elementMap.get(aliasKey);
+            if (alias == null) {
+                elementMap.put(aliasKey, name != null ? name : code);
+            }
+            elementList.add(elementMap);
+        }
+    }
+
+    public static class ClassificationSqlResourceCloser {
+        public void closeSqlResource(Connection conn, Statement stmt, ResultSet rs) {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException ignored) {
+                _log.warn("The close() threw the exception: ", ignored);
+            }
+        }
+    }
+
     protected static class ClassificationInfo {
 
+        public static final String KEY_CODE = "code";
+        public static final String KEY_NAME = "name";
+        public static final String KEY_ALIAS = "alias";
+        public static final String KEY_COMMENT = "comment";
         public static final String KEY_TOP_CODE = "topCode";
         public static final String KEY_TOP_COMMENT = "topComment";
 
@@ -357,7 +482,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         protected boolean group;
 
         public void acceptClassificationMap(Map elementMap) {
-            acceptMap(elementMap, "code", "name", "alias", "comment", false);
+            acceptMap(elementMap, ClassificationInfo.KEY_CODE, "name", "alias", "comment", false);
         }
 
         public void acceptClassificationMetaMap(Map elementMap) {
@@ -428,6 +553,66 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         public void setGroup(boolean group) {
             this.group = group;
         }
+    }
+
+    // -----------------------------------------------------
+    //                               Deriving Classification
+    //                               -----------------------
+    public List<String> getClassificationNameList() {
+        return new ArrayList<String>(getClassificationDefinitionMap().keySet());
+    }
+
+    public List<String> getClassificationNameListValidNameOnly() {
+        final String codeKey = ClassificationInfo.KEY_CODE;
+        final String nameKey = ClassificationInfo.KEY_NAME;
+
+        final List<String> resultList = new ArrayList<String>();
+        final Set<String> keySet = getClassificationDefinitionMap().keySet();
+
+        classificationNameListLoop: for (String string : keySet) {
+            final List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
+            for (Map<String, String> map : list) {
+                final String code = map.get(codeKey);
+                final String name = map.get(nameKey);
+                if (!code.equals(name)) {
+                    resultList.add(string);
+                    continue classificationNameListLoop;
+                }
+            }
+        }
+        return resultList;
+    }
+
+    public List<String> getClassificationNameListValidAliasOnly() {
+        final String codeKey = ClassificationInfo.KEY_CODE;
+        final String nameKey = ClassificationInfo.KEY_NAME;
+        final String aliasKey = ClassificationInfo.KEY_ALIAS;
+
+        final List<String> resultList = new ArrayList<String>();
+        final Set<String> keySet = getClassificationDefinitionMap().keySet();
+
+        classificationNameListLoop: for (String string : keySet) {
+            final List<Map<String, String>> list = getClassificationDefinitionMap().get(string);
+            for (Map<String, String> map : list) {
+                final String code = map.get(codeKey);
+                final String name = map.get(nameKey);
+                final String alias = map.get(aliasKey);
+                if (!code.equals(alias) && !name.equals(alias)) {
+                    resultList.add(string);
+                    continue classificationNameListLoop;
+                }
+            }
+        }
+        return resultList;
+    }
+
+    public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
+        final String property = stringProp("torque." + KEY_classificationDefinitionMap, DEFAULT_EMPTY_MAP_STRING);
+        return filterDoubleQuotation(removeNewLine(property));
+    }
+
+    public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
+        return getClassificationDefinitionMap().get(classificationName);
     }
 
     // --------------------------------------

@@ -882,7 +882,7 @@ public class Database {
     public String getSequenceDefinitionMapSequence(String flexibleTableName) {
         return getProperties().getSequenceIdentityProperties().getSequenceDefinitionMapSequence(flexibleTableName);
     }
-    
+
     public boolean isAvailableBehaviorInsertSequenceInjection() {
         return getProperties().getSequenceIdentityProperties().isAvailableBehaviorInsertSequenceInjection();
     }
@@ -1006,14 +1006,22 @@ public class Database {
     // --------------------------------------
     //                             Definition
     //                             ----------
-    public boolean hasClassificationDefinitionMap() {
-        return getClassificationProperties().hasClassificationDefinitionMap();
+    public String getClassificationTopCodeVariableNamePrefix() {
+        return getClassificationProperties().getClassificationTopCodeVariableNamePrefix();
+    }
+
+    public String getClassificationCodeVariableNamePrefix() {
+        return getClassificationProperties().getClassificationCodeVariableNamePrefix();
     }
 
     public Map<String, Map<String, String>> getClassificationTopDefinitionMap() {
         return getClassificationProperties().getClassificationTopDefinitionMap();
     }
-    
+
+    public boolean hasClassificationDefinitionMap() {
+        return getClassificationProperties().hasClassificationDefinitionMap();
+    }
+
     public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
         return getClassificationProperties().getClassificationDefinitionMap();
     }

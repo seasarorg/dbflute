@@ -97,7 +97,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * ${classificationMap.get('comment')} <br />
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
     }
         #end
       #end
@@ -313,7 +313,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * ${classificationMap.get('comment')} <br />
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        final String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        final String code = ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')};
         register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(code));
     }
         #end

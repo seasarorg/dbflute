@@ -237,7 +237,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * ${database.getMapValue($classificationMap, 'comment')} <br />
      */
     public void classify${col.JavaName}${classificationMap.get('name')}() {
-        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
+        String code = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')};
         set${col.JavaName}(new ${col.JavaNative}(code));
     }
     #end
@@ -262,7 +262,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determanation.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
-        return helpEqualingIgnoreCaseClassification(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')});
+        return helpEqualingIgnoreCaseClassification(_${col.UncapitalisedJavaName}, ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
     }
     #end
   #end
