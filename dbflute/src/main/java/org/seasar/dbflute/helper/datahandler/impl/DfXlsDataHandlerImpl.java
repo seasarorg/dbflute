@@ -67,6 +67,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 final DataTable dataTable = dataSet.getTable(i);
                 final String tableName = dataTable.getTableName();
 
+                if (dataTable.getRowSize() == 0) {
+                    _log.info("*Not found row at the table: " + tableName);
+                    continue;
+                }
+
                 final List<String> columnNameList = new ArrayList<String>();
                 for (int j = 0; j < dataTable.getColumnSize(); j++) {
                     final DataColumn dataColumn = dataTable.getColumn(j);
@@ -134,6 +139,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             bindCount++;
                         }
                         statement.addBatch();
+                    }
+                    if (statement == null) {
+                        String msg = "The statement should not be null:";
+                        msg = msg + " currentTable=" + dataTable.getTableName();
+                        msg = msg + " rowSize=" + dataTable.getRowSize();
+                        throw new IllegalStateException(msg);
                     }
                     statement.executeBatch();
                 } catch (SQLException e) {
