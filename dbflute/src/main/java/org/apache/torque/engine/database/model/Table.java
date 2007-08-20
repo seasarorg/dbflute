@@ -67,6 +67,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -109,7 +110,7 @@ public class Table implements IDMethod {
 
     private String _idMethod;
 
-    private String _javaNamingMethod;
+    protected String _javaNamingMethod;
 
     private Database _tableParent;
 
@@ -2133,9 +2134,17 @@ public class Table implements IDMethod {
         if (!isUseVersionNo()) {
             return "";
         }
-        final String fieldName = getDatabase().getVersionNoFieldName();
-        if (fieldName != null && fieldName.trim().length() != 0) {
-            return makeJavaName(fieldName);
+        return buildVersionNoJavaName(getDatabase().getVersionNoFieldName());
+    }
+
+    protected String buildVersionNoJavaName(String versionNoFieldName) {
+        if (versionNoFieldName != null && versionNoFieldName.trim().length() != 0) {
+            final DfBasicProperties basicProperties = getProperties().getBasicProperties();
+            if (basicProperties.isJavaNameOfColumnSameAsDbName()) {
+                return versionNoFieldName;
+            } else {
+                return makeJavaName(versionNoFieldName);
+            }
         } else {
             return "";
         }
@@ -2147,7 +2156,11 @@ public class Table implements IDMethod {
      * @return String.
      */
     public String getVersionNoUncapitalisedJavaName() {
-        return StringUtils.uncapitalise(getVersionNoJavaName());
+        return buildVersionNoUncapitalisedJavaName(getVersionNoJavaName());
+    }
+
+    protected String buildVersionNoUncapitalisedJavaName(String versionNoJavaName) {
+        return StringUtils.uncapitalise(versionNoJavaName);
     }
 
     // ===================================================================================

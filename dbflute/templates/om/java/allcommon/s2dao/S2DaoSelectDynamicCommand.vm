@@ -74,6 +74,11 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     /** Cache of select clause PK-only command. */
     protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
 
+#if ($database.isVersionAfter1046())
+    /** DBFlute does not use this class! */
+    protected org.seasar.dao.pager.PagingSqlRewriter pagingSqlRewriter;
+#end
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -88,12 +93,34 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     public ${glSelectDynamicCommand}(DataSource dataSource,
             StatementFactory statementFactory,
             ResultSetHandler resultSetHandler, ResultSetFactory resultSetFactory) {
-
+#if ($database.isVersionAfter1046())
+        this(dataSource, statementFactory, resultSetHandler, resultSetFactory, null);
+#else
         super(dataSource, statementFactory, resultSetHandler, resultSetFactory);
-
         this.resultSetHandler = resultSetHandler;
         this.resultSetFactory = resultSetFactory;
+#end
     }
+
+#if ($database.isVersionAfter1046())
+    /**
+     * Constructor.
+     * 
+     * @param dataSource Data source.
+     * @param statementFactory Statement factory.
+     * @param resultSetHandler Result-set handler.
+     * @param resultSetFactory Result-set factory.
+     * @param pagingSqlRewriter Paging sql rewriter.
+     */
+    public ${glSelectDynamicCommand}(DataSource dataSource,
+            StatementFactory statementFactory,
+            ResultSetHandler resultSetHandler, ResultSetFactory resultSetFactory, org.seasar.dao.pager.PagingSqlRewriter pagingSqlRewriter) {
+        super(dataSource, statementFactory, resultSetHandler, resultSetFactory, pagingSqlRewriter);
+        this.resultSetHandler = resultSetHandler;
+        this.resultSetFactory = resultSetFactory;
+        this.pagingSqlRewriter = pagingSqlRewriter;
+    }
+#end
 
     // ===================================================================================
     //                                                                                Main
