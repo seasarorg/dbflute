@@ -100,7 +100,7 @@ public class ${myClassName} {
             return clazz.getMethod(methodName, argTypes);
         } catch (NoSuchMethodException ex) {
             String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
-            throw new IllegalStateException(msg, ex);
+            throw new RuntimeException(msg, ex);
         }
     }
 

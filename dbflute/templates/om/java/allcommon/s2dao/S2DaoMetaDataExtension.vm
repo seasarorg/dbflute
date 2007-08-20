@@ -443,7 +443,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #if ($database.isAvailableOtherConnectionDaoInitialization())
 
     protected BeanMetaData createNonConcurrencyBeanMetaData(Method method) {
+#if ($database.isAvailableGenerics())
         if (method.getName().contains("Nonstrict")) {
+#else
+        if (method.getName().indexOf("Nonstrict") >= 0) {
+#end
             final TransactionSuspendEventInvoker transactionSuspendEventHandler = new TransactionSuspendEventInvoker();
             transactionSuspendEventHandler.setTransactionManager(transactionManager);
             final TransactionSuspendEventCallback callback = new TransactionSuspendEventCallback() {
@@ -459,7 +463,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #else
 
     protected BeanMetaData createNonConcurrencyBeanMetaData(Method method) {
+#if ($database.isAvailableGenerics())
         if (method.getName().contains("Nonstrict")) {
+#else
+        if (method.getName().indexOf("Nonstrict") >= 0) {
+#end
             return createNonConcurrencyBmdFactory().createBeanMetaData(getBeanClass());
         } else {
             return getBeanMetaData();

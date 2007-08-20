@@ -346,14 +346,14 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         } catch (NoSuchMethodException e) {
             String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new IllegalStateException(msg, e);
+            throw new RuntimeException(msg, e);
         }
         try {
             return (${glColumnInfoName})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new IllegalStateException(e.getCause());
+            throw new RuntimeException(e.getCause());
         }
     }
 
@@ -411,14 +411,14 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         } catch (NoSuchMethodException e) {
             String msg = "Not found foreign by foreignPropertyName: foreignPropertyName=" + foreignPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new IllegalStateException(msg, e);
+            throw new RuntimeException(msg, e);
         }
         try {
             return (${glForeignInfoName})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new IllegalStateException(e.getCause());
+            throw new RuntimeException(e.getCause());
         }
     }
 
@@ -463,14 +463,14 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         } catch (NoSuchMethodException e) {
             String msg = "Not found referer by refererPropertyName: refererPropertyName=" + refererPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new IllegalStateException(msg, e);
+            throw new RuntimeException(msg, e);
         }
         try {
             return (${glRefererInfoName})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new IllegalStateException(e.getCause());
+            throw new RuntimeException(e.getCause());
         }
     }
 
@@ -623,7 +623,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             return ps.executeUpdate();
         } catch (java.sql.SQLException e) {
             String msg = "The sql threw the exception: sql=" + sql;
-            throw new IllegalStateException(msg, e);
+            throw new RuntimeException(msg, e);
         } finally {
             if (ps != null) {
                 try {

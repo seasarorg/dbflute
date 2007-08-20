@@ -60,11 +60,15 @@ public interface ${myClassName} {
             }
             for (final java.util.Iterator ite = _filterTargetColumnInfoSet.iterator(); ite.hasNext(); ) {
                 final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
-                if (clauseElement.contains("." + columnInfo.getColumnDbName() + " ")) {
+                if (isTargetClause(clauseElement, columnInfo.getColumnDbName())) {
                     return toEmbedded(clauseElement);
                 }
             }
             return clauseElement;
+        }
+
+        protected boolean isTargetClause(String clauseElement, final String columnDbName) {
+            return clauseElement.indexOf("." + columnDbName + " ") >= 0;
         }
 
         protected String toEmbedded(String clauseElement) {

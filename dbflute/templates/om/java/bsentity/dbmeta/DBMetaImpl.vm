@@ -1370,7 +1370,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
             return (${myExtendedObjectClassName})entity;
         } catch (ClassCastException e) {
             String msg = "The entity should be ${myExtendedObjectClassName} but it was: " + entity.getClass();
-            throw new IllegalStateException(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 

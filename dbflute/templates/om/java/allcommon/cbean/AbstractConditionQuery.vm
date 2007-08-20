@@ -436,7 +436,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         String clause = subQuery.getSqlClause().getClauseWithoutIncludedOrderBySqlSuffix();
         clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
         final String parentCondition;
-        if (clause.contains("where")) {
+        if (clause.indexOf("where") >= 0) {
             parentCondition = " and " + relatedColumnName + " = " + realColumnName;
         } else {
             parentCondition = " where " + relatedColumnName + " = " + realColumnName;

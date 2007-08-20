@@ -196,7 +196,7 @@ public class ${glConditionBeanContextName} {
         final java.util.Set${database.filterGenericsString('String')} keySet = _driverHintDatabaseProductNameMap.keySet();
         for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
             final String driverHint = (String)ite.next();
-            if (driverClassName.contains(driverHint)) {
+            if (driverClassName.indexOf(driverHint) >= 0) {
                 final String databaseProductName = (String)_driverHintDatabaseProductNameMap.get(driverHint);
                 setDatabaseProductName(databaseProductName);
                 return true;
