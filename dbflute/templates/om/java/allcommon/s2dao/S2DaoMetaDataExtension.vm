@@ -161,7 +161,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 return callback.callback();
             } catch (Exception e) {
                 String msg = "The initialize() that is overrided threw the exception: tx=" + tx;
-                throw new IllegalStateException(msg, e);
+                throw new RuntimeException(msg, e);
             } finally {
                 if (tx != null) {
                     try {
