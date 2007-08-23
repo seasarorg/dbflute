@@ -46,6 +46,7 @@ import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.framework.util.StringUtil;
 
 /**
  * 
@@ -153,7 +154,18 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected List<File> collectSqlFileIntoList() {
         final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
-        return new DfSqlFileGetter().getSqlFileList(sqlDirectory);
+        final List<File> sqlFileList = new DfSqlFileGetter().getSqlFileList(sqlDirectory);
+        if (!sqlDirectory.contains("src/main/java/")) {
+            return sqlFileList;
+        }
+        final String srcMainResources = StringUtil.replace(sqlDirectory, "src/main/java/", "src/main/resources/");
+        try {
+            final List<File> resourcesSqlFileList = new DfSqlFileGetter().getSqlFileList(srcMainResources);
+            sqlFileList.addAll(resourcesSqlFileList);
+        } catch (Exception e) {
+            _log.debug("Not found sql directory on resources: " + srcMainResources);
+        }
+        return sqlFileList;
     }
 
     /**
@@ -164,7 +176,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
         final Log log4inner = _log;
-        final boolean sql2entityUseColumnNameNotLabel = getProperties().getOtherProperties().isSql2EntityUseColumnNameNotLabel();
+        final boolean sql2entityUseColumnNameNotLabel = getProperties().getOtherProperties()
+                .isSql2EntityUseColumnNameNotLabel();
 
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // Implementing SqlFileRunnerBase as inner class.
