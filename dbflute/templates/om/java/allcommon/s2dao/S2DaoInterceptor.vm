@@ -110,21 +110,138 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
+    // -----------------------------------------------------
+    //                                          Trace Method
+    //                                          ------------
     protected void traceMethod(MethodInvocation invocation) {
         if (_log.isDebugEnabled()) {
             final java.lang.reflect.Method method = invocation.getMethod();
-            final String invokeName = getShortClassName(method.getDeclaringClass()) + "." + method.getName();
-            final int length = invokeName.length();
-            final StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < length; i++) {
-                sb.append("=");
-            }
-            _log.debug("/=====================================================" + sb.toString() + "==");
-            _log.debug("                                                      " + invokeName + "()");
-            _log.debug("                                                      " + sb.toString() + "=/");
+            final String name = getShortClassName(method.getDeclaringClass());
+            final String invokeNameWithoutKakko = removeBasePrefixIfNeeds(name)  + "." + method.getName();
+            final String equalBorder = buildFitBorder("", "=", invokeNameWithoutKakko, false);
+            final String daoInvokeName = invokeNameWithoutKakko + "()";
+
+            _log.debug("/=====================================================" + equalBorder + "==");
+            _log.debug("                                                      " + daoInvokeName);
+            _log.debug("                                                      " + equalBorder + "=/");
+
+            tracePath();
         }
     }
 
+    protected void tracePath() {
+        final String clientInvokeName = extractClientInvokeName();
+        final String behaviorInvokeName = extractBehaviorInvokeName();
+        if (clientInvokeName.trim().length() == 0 && behaviorInvokeName.trim().length() == 0) {
+            return;
+        }
+        final String path = clientInvokeName + behaviorInvokeName + "...";
+        final String hyphenBorder = buildFitBorder("/", "-", path, true);
+        _log.debug(hyphenBorder);
+        _log.debug(path);
+        _log.debug("- - - - - - - - - -/");
+    }
+
+    protected String buildFitBorder(String prefix, String element, String lengthTargetString, boolean space) {
+        final int length = space ? lengthTargetString.length() / 2 : lengthTargetString.length();
+        final StringBuffer sb = new StringBuffer();
+        sb.append(prefix);
+        for (int i = 0; i < length; i++) {
+            sb.append(element);
+            if (space) {
+                sb.append(" ");
+            }
+        }
+        if (space) {
+            sb.append(element);
+        }
+        return sb.toString();
+    }
+
+    protected String extractClientInvokeName() {
+        final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
+            public boolean isTargetElement(String className, String methodName) {
+                return className.endsWith("Page") || className.endsWith("Action");
+            }
+            public String filterSimpleClassName(String simpleClassName) {
+                return simpleClassName;
+            }
+        };
+        return extractInvokeName(callback);
+    }
+
+    protected String extractBehaviorInvokeName() {
+        final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
+            public boolean isTargetElement(String className, String methodName) {
+                return className.endsWith("Bhv") || className.endsWith("BehaviorReadable") || className.endsWith("BehaviorWritable");
+            }
+            public String filterSimpleClassName(String simpleClassName) {
+                return removeBasePrefixIfNeeds(simpleClassName);
+            }
+        };
+        return extractInvokeName(callback);
+    }
+
+    protected String extractInvokeName(InvokeNameExtractingCallback callback) {
+        String targetSimpleClassName = null;
+        String targetMethodName = null;
+        final StackTraceElement[] stackTrace = new Exception().getStackTrace();
+        boolean onTarget = false;
+        int index = 0;
+        for (StackTraceElement element : stackTrace) {
+            if (index >= 20) {
+                break;
+            }
+            final String className = element.getClassName();
+            if (className.startsWith("sun.") || className.startsWith("java.")) {
+                if (onTarget) {
+                    break;
+                }
+                continue;
+            }
+            final String methodName = element.getMethodName();
+            if (callback.isTargetElement(className, methodName)) {
+                if (methodName.equals("invoke")) {
+                    continue;
+                }
+                targetSimpleClassName = className.substring(className.lastIndexOf(".") + 1);
+                targetMethodName = methodName;
+                onTarget = true;
+                continue;
+            }
+            if (onTarget) {
+                break;
+            }
+            ++index;
+        }
+        if (targetSimpleClassName == null) {
+            return "";
+        }
+        return callback.filterSimpleClassName(targetSimpleClassName) + "." + targetMethodName + "() --> ";
+    }
+
+    protected static interface InvokeNameExtractingCallback {
+        public boolean isTargetElement(String className, String methodName);
+        public String filterSimpleClassName(String simpleClassName);
+    }
+
+    protected String removeBasePrefixIfNeeds(String name) {
+        if (!name.startsWith("${glProjectPrefix}${glBasePrefix}")) {
+            return name;
+        }
+        final int prefixLength = "${glProjectPrefix}${glBasePrefix}".length();
+        if (!Character.isUpperCase(name.substring(prefixLength).charAt(0))) {
+            return name;
+        }
+        if (name.length() <= prefixLength) {
+            return name;
+        }
+        return "${glProjectPrefix}" + name.substring(prefixLength);
+    }
+
+    // -----------------------------------------------------
+    //                                      Trace SqlCommand
+    //                                      ----------------
     protected void traceSqlCommand(MethodInvocation invocation, org.seasar.dao.SqlCommand cmd, long beforeCmd, long afterCmd) {
         if (_log.isDebugEnabled()) {
             _log.debug("SqlCommand Initialization Cost: [" + getPerformanceView(afterCmd - beforeCmd) + "]");
@@ -147,6 +264,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
+    // -----------------------------------------------------
+    //                                          Trace Return
+    //                                          ------------
     protected void traceReturn(MethodInvocation invocation, Class retType, Object ret, long before, long after)
             throws Throwable {
         if (_log.isDebugEnabled()) {
