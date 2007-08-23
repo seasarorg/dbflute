@@ -211,7 +211,38 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
     //                                                                        Basic Override
     //                                                                        ==============
     /**
-     * This method overrides the method that is declared at super.
+     * ${database.OverrideComment}
+     * 
+     * @return Hash-code from primary-keys.
+     */
+    public int hashCode() {
+        if (_selectedList == null) {
+            return super.hashCode();
+        }
+        return _selectedList.hashCode();
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @param other Other entity. (Nullable)
+     * @return Comparing result. If other is null, returns false.
+     */
+    public boolean equals(Object other) {
+        if (_selectedList == null) {
+            return false;
+        }
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof java.util.List)) {
+            return false;
+        }
+        return _selectedList.equals(other);
+    }
+
+    /**
+     * ${database.OverrideComment}
      * 
      * @return View-string of all-columns value.
      */

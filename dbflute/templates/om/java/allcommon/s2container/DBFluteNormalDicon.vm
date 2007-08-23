@@ -34,10 +34,12 @@
     <component class="org.seasar.dao.impl.BeanEnhancerImpl"/>
 #end
 
+#if (!$database.isCommonColumnInterceptingOnBehaviorFilter())
     <!-- Common column setup interceptor. -->
     <component name="commonColumnSetupBeforeInsertInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeInsertInterceptor}"/>
     <component name="commonColumnSetupBeforeUpdateInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeUpdateInterceptor}"/>
     <component name="commonColumnSetupBeforeDeleteInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeDeleteInterceptor}"/>
+#end
 
     <!-- Dao selector. -->
     <component name="daoSelector" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">

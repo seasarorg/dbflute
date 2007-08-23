@@ -1208,6 +1208,24 @@ public class Database {
     }
 
     // -----------------------------------------------------
+    //                                     Little Adjustment
+    //                                     -----------------
+    public boolean isCommonColumnInterceptingOnBehaviorFilter() {
+        return getProperties().getLittleAdjustmentProperties().isCommonColumnInterceptingOnBehaviorFilter();
+    }
+
+    public String getBehaviorDelegateModifier() {
+        final String protectedString = "protected";
+        if (isCommonColumnInterceptingOnBehaviorFilter()) {
+            return protectedString;
+        }
+        return "public";
+
+        // TODO: @jflute -- 0.6.0で有効にする。
+        // return isAvailableCommonColumnSetupInterceptorToBehavior() ? "public" : protectedString;
+    }
+
+    // -----------------------------------------------------
     //                                                 Other
     //                                                 -----
     public boolean isStopGenerateExtendedBhv() {

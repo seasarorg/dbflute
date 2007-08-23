@@ -209,7 +209,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @return All count. (NotNull)
      */
-    public int delegateGetCountAll() {
+    ${database.behaviorDelegateModifier} int delegateGetCountAll() {
         return getMyDao().getCountAll();
     }
 
@@ -218,7 +218,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @return All list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateGetListAll() {
+    ${database.behaviorDelegateModifier} java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateGetListAll() {
         return getMyDao().getListAll();
     }
 #if ($table.hasPrimaryKey())
@@ -229,7 +229,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // @param Primary-keys (NotNull)
     // @return Entity. (NotNull)
     //
-    public ${myExtendedObjectClassName} delegateGetEntity(${table.PrimaryKeyArgsString}) {
+    ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateGetEntity(${table.PrimaryKeyArgsString}) {
         return getMyDao().getEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()});
     }
 #end
@@ -240,7 +240,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
      */
-    public int delegateSelectCount(${myConditionBeanClassName} cb) {
+    ${database.behaviorDelegateModifier} int delegateSelectCount(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
         return getMyDao().selectCount(cb);
     }
@@ -251,7 +251,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. If the select result is zero, it returns null. (Nullable)
      */
-    public ${myExtendedObjectClassName} delegateSelectEntity(${myConditionBeanClassName} cb) {
+    ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateSelectEntity(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
         return getMyDao().selectEntity(cb);
     }
@@ -262,7 +262,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateSelectList(${myConditionBeanClassName} cb) {
+    ${database.behaviorDelegateModifier} java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateSelectList(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
         return getMyDao().selectList(cb);
     }
@@ -274,7 +274,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @return Next value. (NotNull)
      */
-    public ${database.sequenceReturnType} delegateSelectNextVal() {
+    ${database.behaviorDelegateModifier} ${database.sequenceReturnType} delegateSelectNextVal() {
         return getMyDao().selectNextVal();
     }
 #end
@@ -289,7 +289,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      * @return Inserted count.
      */
-    public int delegateInsert(${myExtendedObjectClassName} entity) {
+    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         filterEntityOfInsert(entity);
         assertEntityOfInsert(entity);
@@ -302,7 +302,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      * @return Updated count.
      */
-    public int delegateUpdate(${myExtendedObjectClassName} entity) {
+    ${database.behaviorDelegateModifier} int delegateUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
@@ -317,7 +317,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      * @return Updated count.
      */
-    public int delegateUpdateNonstrict(${myExtendedObjectClassName} entity) {
+    ${database.behaviorDelegateModifier} int delegateUpdateNonstrict(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
@@ -331,7 +331,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      * @return Deleted count.
      */
-    public int delegateDelete(${myExtendedObjectClassName} entity) {
+    ${database.behaviorDelegateModifier} int delegateDelete(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfDelete(entity);
         assertEntityOfDelete(entity);
@@ -346,7 +346,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      * @return Deleted count.
      */
-    public int delegateDeleteNonstrict(${myExtendedObjectClassName} entity) {
+    ${database.behaviorDelegateModifier} int delegateDeleteNonstrict(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfDelete(entity);
         assertEntityOfDelete(entity);
@@ -360,7 +360,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return Inserted count.
      */
-    public int delegateInsertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+    ${database.behaviorDelegateModifier} int delegateInsertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return getMyDao().insertList(entityList);
     }
@@ -371,7 +371,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return Updated count.
      */
-    public int delegateUpdateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+    ${database.behaviorDelegateModifier} int delegateUpdateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return getMyDao().updateList(entityList);
     }
@@ -382,7 +382,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return Deleted count.
      */
-    public int delegateDeleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+    ${database.behaviorDelegateModifier} int delegateDeleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return getMyDao().deleteList(entityList);
     }
@@ -395,7 +395,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entity Entity. (NotNull)
      * @return Inserted count.
      */
-    public int delegateInsert(${myExtendedObjectClassName} entity) {
+    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         return getMyDao().insert(entity);
     }

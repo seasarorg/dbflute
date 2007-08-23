@@ -99,6 +99,12 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
+        final DfLittleAdjustmentProperties littleProp = getPropertiesHandler().getLittleAdjustmentProperties(
+                getProperties());
+        if (littleProp.isCommonColumnInterceptingOnBehaviorFilter()) {
+            return false;
+        }
+
         if (!isExistCommonColumnSetupElement()) {
             return false;
         }
@@ -106,6 +112,10 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         if (oldProp) {
             return true;
         }
+        return isCommonColumnSetupInterceptorAspectPointBehavior();
+    }
+
+    public boolean isCommonColumnSetupInterceptorAspectPointBehavior() {
         final String aspectPoint = getCommonColumnSetupInterceptorAspectPoint();
         if (aspectPoint.equalsIgnoreCase("behavior")) {
             return true;
@@ -115,6 +125,12 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isAvailableCommonColumnSetupInterceptorToDao() {
+        final DfLittleAdjustmentProperties littleProp = getPropertiesHandler().getLittleAdjustmentProperties(
+                getProperties());
+        if (littleProp.isCommonColumnInterceptingOnBehaviorFilter()) {
+            return false;
+        }
+
         if (!isExistCommonColumnSetupElement()) {
             return false;
         }
@@ -122,6 +138,10 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         if (oldProp) {
             return true;
         }
+        return isCommonColumnSetupInterceptorAspectPointDao();
+    }
+
+    public boolean isCommonColumnSetupInterceptorAspectPointDao() {
         final String aspectPoint = getCommonColumnSetupInterceptorAspectPoint();
         if (aspectPoint.equalsIgnoreCase("dao")) {
             return true;
@@ -130,7 +150,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected boolean isExistCommonColumnSetupElement() {
+    public boolean isExistCommonColumnSetupElement() {
         final Map<String, Object> insertElementMap = getCommonColumnSetupBeforeInsertInterceptorLogicMap();
         final Map<String, Object> updateElementMap = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
         final Map<String, Object> deleteElementMap = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
