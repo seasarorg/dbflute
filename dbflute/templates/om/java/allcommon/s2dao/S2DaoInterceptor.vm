@@ -187,9 +187,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         String targetMethodName = null;
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
         boolean onTarget = false;
-        int index = 0;
-        for (StackTraceElement element : stackTrace) {
-            if (index >= 20) {
+        for (int i=0; i < stackTrace.length; i++) {
+            final StackTraceElement element = stackTrace[i];
+            if (i >= 20) {
                 break;
             }
             final String className = element.getClassName();
@@ -212,7 +212,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             if (onTarget) {
                 break;
             }
-            ++index;
         }
         if (targetSimpleClassName == null) {
             return "";
