@@ -679,8 +679,41 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #end
 
     public static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
+
+        protected static final String DBFLUTE_INTERNAL_TOP_MARK_KEY = "_df:topmark";
+
+        protected static final String DBFLUTE_INTERNAL_KEY_PREFIX = "_df:_";
+
         public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues)
                 throws SQLException {
+            // - - - - - - - - - - - - 
+            // For performance tuning!
+            // - - - - - - - - - - - - 
+            if (!columnNames.contains(DBFLUTE_INTERNAL_TOP_MARK_KEY)) {
+                columnNames.add(DBFLUTE_INTERNAL_TOP_MARK_KEY);
+                final java.util.List<String> relNoMarkList = new java.util.ArrayList<String>();
+                for (Object object : columnNames) {
+                    if (!(object instanceof String)) {
+                        continue;
+                    }
+                    final String columnName = (String) object;
+                    final String[] split = columnName.split("_");
+
+                    // First element is out of target!
+                    for (int i = 1; i < split.length; i++) {
+                        try {
+                            Integer.parseInt(split[i]);
+                        } catch (NumberFormatException e) {
+                            continue;
+                        }
+                        relNoMarkList.add(DBFLUTE_INTERNAL_KEY_PREFIX + split[i]);
+                    }
+                }
+                for (final java.util.Iterator ite = relNoMarkList.iterator(); ite.hasNext();) {
+                    columnNames.add((String) ite.next());
+                }
+            }
+
             return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
         }
 
@@ -694,12 +727,30 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
         protected Object setupRelationAllValue(ResultSet rs, RelationPropertyType rpt, Set columnNames,
                 Map relKeyValues, String preRelationNoSuffix) throws SQLException {
+            // - - - - - - - - - - - - 
+            // For performance tuning!
+            // - - - - - - - - - - - - 
+            if (!columnNames.contains(DBFLUTE_INTERNAL_KEY_PREFIX + rpt.getRelationNo())) {
+                return null;
+            }
+
             Object row = null;
             final String relationNoSuffix = preRelationNoSuffix + "_" + rpt.getRelationNo();
             final BeanMetaData bmd = rpt.getBeanMetaData();
             int existColumn = 0;
             for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
                 final PropertyType pt = bmd.getPropertyType(i);
+
+                // Excludes non writable property for performance tuning!
+                if (!pt.getPropertyDesc().isWritable()) {
+                    continue;
+                }
+
+                // Excludes java.util.List property for pinpont performance tuning!
+                if (java.util.List.class.isAssignableFrom(pt.getPropertyDesc().getPropertyType())) {
+                    continue;
+                }
+
                 final String columnName = pt.getColumnName() + relationNoSuffix;
                 if (!columnNames.contains(columnName)) {
                     continue;
@@ -1267,6 +1318,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             int existColumn = 0;
             for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
                 PropertyType pt = bmd.getPropertyType(i);
+
+                // Excludes non writable property for performance tuning!
+                if (!pt.getPropertyDesc().isWritable()) {
+                    continue;
+                }
+
                 String columnName = pt.getColumnName() + relationNoSuffix;
                 if (!columnNames.contains(columnName)) {
                     continue;
