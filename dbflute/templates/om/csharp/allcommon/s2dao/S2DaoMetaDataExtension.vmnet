@@ -416,8 +416,6 @@ namespace ${glPackageBaseCommonS2Dao} {
                     continue;
                 }
 
-                // @jflute -- I want to exclude IList...But do nothing now.
-
                 string columnName = pt.ColumnName + relationNoSuffix;
                 if (!columnNames.Contains(columnName)) continue;
                 existColumn++;
