@@ -1167,6 +1167,10 @@ public class Database {
     // -----------------------------------------------------
     //                                      S2Dao Adjustment
     //                                      ----------------
+    public boolean isVersionAfter1047() {
+        return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1047();
+    }
+
     public boolean isVersionAfter1046() {
         return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1046();
     }

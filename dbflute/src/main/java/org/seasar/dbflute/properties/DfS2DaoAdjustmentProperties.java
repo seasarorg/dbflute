@@ -24,18 +24,16 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
     // ===============================================================================
     //                                                                   S2Dao Version
     //                                                                   =============
+    public boolean isVersionAfter1047() {
+        return hasS2DaoVersion() ? isS2DaoVersionGreaterEqual("1.0.47") : false;
+    }
+
     public boolean isVersionAfter1046() {
-        if (!hasS2DaoVersion()) {
-            return true;
-        }
-        return isS2DaoVersionGreaterEqual("1.0.46");
+        return hasS2DaoVersion() ? isS2DaoVersionGreaterEqual("1.0.46") : true;
     }
 
     public boolean isVersionAfter1043() {
-        if (!hasS2DaoVersion()) {
-            return true;
-        }
-        return isS2DaoVersionGreaterEqual("1.0.43");
+        return hasS2DaoVersion() ? isS2DaoVersionGreaterEqual("1.0.43") : true;
     }
 
     public boolean isVersionAfter1040() {
@@ -98,7 +96,7 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
         final String defaultClassName = "org.seasar.dao.impl.AnnotationReaderFactoryImpl";
         return stringPropNoEmpty("torque.extendedAnnotationReaderFactoryClassName", defaultClassName);
     }
-    
+
     // ===============================================================================
     //                                                                  S2Dao Property
     //                                                                  ==============
