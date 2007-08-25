@@ -9,42 +9,6 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  */
 public interface ${glEntityInterfaceName} {
 
-#if ($database.isMakeRecentlyDeprecated())
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /**
-     * @deprecated
-     */
-    public static final String MAP_STRING_MAP_MARK = "map:";
-
-    /**
-     * @deprecated
-     */
-    public static final String MAP_STRING_LIST_MARK = "list:";
-
-    /**
-     * @deprecated
-     */
-    public static final String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
-
-    /**
-     * @deprecated
-     */
-    public static final String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
-
-    /**
-     * @deprecated
-     */
-    public static final String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
-
-    /**
-     * @deprecated
-     */
-    public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
-#end
-
     // ===================================================================================
     //                                                                              DBMeta
     //                                                                              ======
@@ -78,94 +42,6 @@ public interface ${glEntityInterfaceName} {
      * @return Table uncap-prop-name. (NotNull)
      */
     public String getTableUncapPropName();
-
-#if ($database.isMakeDeprecated())
-
-    // ===================================================================================
-    //                                                                              Accept
-    //                                                                              ======
-    /**
-     * Accept primary-key map.
-     * 
-     * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
-     * @deprecated Please use ${glDBMetaInterfaceName}#acceptPrimaryKeyMap(entity, primaryKeyMap);
-     */
-    public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
-
-    /**
-     * Accept primary-key map-string.
-     * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull)
-     * @deprecated Please use ${glDBMetaInterfaceName}#acceptPrimaryKeyMapString(entity, primaryKeyMap);
-     */
-    public void acceptPrimaryKeyMapString(String primaryKeyMapString);
-
-    /**
-     * Accept column-value map.
-     * 
-     * @param columnValueMap Column-value map. (NotNull and NotEmpty)
-     * @deprecated Please use ${glDBMetaInterfaceName}#acceptColumnValueMap(entity, columnValueMap);
-     */
-    public void acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap);
-
-    /**
-     * Accept column-value map-string.
-     * 
-     * @param columnValueMapString Column-value map-string. (NotNull)
-     * @deprecated Please use ${glDBMetaInterfaceName}#acceptColumnValueMapString(entity, columnValueMapString);
-     */
-    public void acceptColumnValueMapString(String columnValueMapString);
-
-    // ===================================================================================
-    //                                                                             Extract
-    //                                                                             =======
-    /**
-     * Extract primary-key map-string. Delimiter is at-mark and semicolon.
-     * <p>
-     * <pre>
-     * ex) Uses that this method have.
-     *   final String primaryKeyMapString = entity.extractPrimaryKeyMapString();
-     *   final LdBook entity = dao.selectEntity(new LdBookCB().acceptPrimaryKeyMapString(primaryKeyMapString));
-     *   ... // as primary key for condition.
-     * </pre>
-     * 
-     * @return Primary-key map-string. (NotNull)
-     * @deprecated Please use ${glDBMetaInterfaceName}#extractPrimaryKeyMapString(entity);
-     */
-    public String extractPrimaryKeyMapString();
-
-    /**
-     * Extract primary-key map-string.
-     * 
-     * @param startBrace Start-brace. (NotNull)
-     * @param endBrace End-brace. (NotNull)
-     * @param delimiter Delimiter. (NotNull)
-     * @param equal Equal. (NotNull)
-     * @return Primary-key map-string. (NotNull)
-     * @deprecated Please use ${glDBMetaInterfaceName}#extractPrimaryKeyMapString(entity, startBrace, endBrace, delimiter, equal);
-     */
-    public String extractPrimaryKeyMapString(String startBrace, String endBrace, String delimiter, String equal);
-
-    /**
-     * Extract column-value map-string. Delimiter is at-mark and semicolon.
-     * 
-     * @return Column-value map-string. (NotNull)
-     * @deprecated Please use ${glDBMetaInterfaceName}#extractColumnValueMapString(entity);
-     */
-    public String extractColumnValueMapString();
-
-    /**
-     * Extract column-value map-string.
-     * 
-     * @param startBrace Start-brace. (NotNull)
-     * @param endBrace End-brace. (NotNull)
-     * @param delimiter Delimiter. (NotNull)
-     * @param equal Equal. (NotNull)
-     * @return Column-value map-string. (NotNull)
-     * @deprecated Please use ${glDBMetaInterfaceName}#extractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
-     */
-    public String extractColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal);
-#end
 
     // ===================================================================================
     //                                                                       Determination

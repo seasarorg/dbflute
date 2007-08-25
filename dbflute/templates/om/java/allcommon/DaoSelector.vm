@@ -48,7 +48,7 @@ public interface ${glDaoSelectorInterfaceName} {
     public ${glBehaviorReadableInterfaceName} byNameAsBehaviorReadable(String tableMultiName);
 #end
 #end
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * Get dao-readable by dao type.

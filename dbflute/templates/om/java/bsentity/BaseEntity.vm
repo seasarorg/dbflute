@@ -494,129 +494,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
   #end
 #end
-#if ($database.isMakeDeprecated())
-
-    // ===================================================================================
-    //                                                                              Accept
-    //                                                                              ======
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param primaryKeyMap Primary key map. (NotNull and NotEmpty)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().acceptPrimaryKeyMap(entity, primaryKeyMap);
-     */
-    public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
-        getDBMeta().acceptPrimaryKeyMap(this, primaryKeyMap);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param primaryKeyMapString Primary-key map-string. (NotNull and NotEmpty)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().acceptPrimaryKeyMapString(entity, primaryKeyMapString);
-     */
-    public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
-        getDBMeta().acceptPrimaryKeyMapString(this, primaryKeyMapString);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param columnValueMap Column-value map. (NotNull and NotEmpty)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().acceptColumnValueMap(entity, columnValueMap);
-     */
-    public void acceptColumnValueMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
-        getDBMeta().acceptColumnValueMap(this, columnValueMap);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param columnValueMapString Column-value map-string. (NotNull and NotEmpty)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().acceptColumnValueMap(entity, columnValueMapString);
-     */
-    public void acceptColumnValueMapString(String columnValueMapString) {
-        getDBMeta().acceptColumnValueMapString(this, columnValueMapString);
-    }
-
-    // ===================================================================================
-    //                                                                             Extract
-    //                                                                             =======
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Primary-key map-string. (NotNull)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractPrimaryKeyMapString(entity);
-     */
-    public String extractPrimaryKeyMapString() {
-        return getDBMeta().extractPrimaryKeyMapString(this);
-    }
-
-    /**
-     * Extract primary-key map-string.
-     * 
-     * @param startBrace Start-brace. (NotNull)
-     * @param endBrace End-brace. (NotNull)
-     * @param delimiter Delimiter. (NotNull)
-     * @param equal Equal. (NotNull)
-     * @return Primary-key map-string. (NotNull)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractPrimaryKeyMapString(entity, startBrace, endBrace, delimiter, equal);
-     */
-    public String extractPrimaryKeyMapString(String startBrace, String endBrace, String delimiter, String equal) {
-        return getDBMeta().extractPrimaryKeyMapString(this, startBrace, endBrace, delimiter, equal);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Column-value map-string. (NotNull)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractColumnValueMapString(entity);
-     */
-    public String extractColumnValueMapString() {
-        return getDBMeta().extractColumnValueMapString(this);
-    }
-
-    /**
-     * Extract column-value map-string.
-     * 
-     * @param startBrace Start-brace. (NotNull)
-     * @param endBrace End-brace. (NotNull)
-     * @param delimiter Delimiter. (NotNull)
-     * @param equal Equal. (NotNull)
-     * @return Column-value map-string. (NotNull)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
-     */
-    public String extractColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal) {
-        return getDBMeta().extractColumnValueMapString(this, startBrace, endBrace, delimiter, equal);
-    }
-
-#if (${table.hasAllCommonColumn()})
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Column-value map-string. (NotNull)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractCommonColumnValueMapString(entity);
-     */
-    public String extractCommonColumnValueMapString() {
-        return getDBMeta().extractCommonColumnValueMapString(this);
-    }
-
-    /**
-     * Extract common-column-value map-string.
-     * 
-     * @param startBrace Start-brace. (NotNull)
-     * @param endBrace End-brace. (NotNull)
-     * @param delimiter Delimiter. (NotNull)
-     * @param equal Equal. (NotNull)
-     * @return Common-column-value map-string. (NotNull)
-     * @deprecated Please use ${myDBMetaClassName}.getInstance().extractCommonColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
-     */
-    public String extractCommonColumnValueMapString(String startBrace, String endBrace, String delimiter, String equal) {
-        return getDBMeta().extractCommonColumnValueMapString(this, startBrace, endBrace, delimiter, equal);
-    }
-#end
-#end
 
     // ===================================================================================
     //                                                                       Determination
@@ -627,13 +504,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determination.
      */
     public boolean hasPrimaryKeyValue() {
-
 #foreach ($col in $table.PrimaryKey)
         if (_${col.UncapitalisedJavaName} == null) {
             return false;
         }
 #end
-
         return true;
     }
 

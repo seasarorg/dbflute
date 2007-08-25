@@ -136,7 +136,7 @@ public class ${myClassName} {
         return instance;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Get instance by table db-name.
      * 

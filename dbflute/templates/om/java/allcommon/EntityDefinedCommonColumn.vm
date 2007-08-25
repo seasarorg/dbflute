@@ -58,14 +58,4 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
   #end
 #end
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Extract common-column-value map-string.
-     * 
-     * @return Common-column-value map-string. (NotNull)
-     * @deprecated Please use ${glDBMetaInterfaceName}#extractCommonColumnValueMapString(entity);
-     */
-    public String extractCommonColumnValueMapString();
-#end
-
 }

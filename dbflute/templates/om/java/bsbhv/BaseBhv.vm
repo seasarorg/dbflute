@@ -1097,7 +1097,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity) {
         insertOrUpdateAfterSelect((${myExtendedObjectClassName})entity);
     }
-  #if ($database.isMakeBehaviorForUpdate() && $database.isMakeRecentlyDeprecated())
+  #if ($database.isMakeBehaviorForUpdate() && $database.isMakeDeprecated())
 
     /**
      * Update after select-for-update.

@@ -141,25 +141,6 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public void createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
-#if ($database.isMakeBehaviorForUpdate() && $database.isMakeRecentlyDeprecated())
-    /**
-     * Modify after select-for-update.
-     * 
-     * @param entity Entity.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated This method is deprecated.
-     */
-    public void modifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-
-    /**
-     * Create or modify after select-for-update.
-     * 
-     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @deprecated This method is deprecated.
-     */
-    public void createOrModifyAfterSelectForUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-#end
-
     /**
      * Remove.
      * 
@@ -218,54 +199,4 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @throws java.io.IOException
      */
     public ${glTokenFileReflectionResultName} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Reflect(insert or update) from separated-file.
-     * 
-     * @param filename Name of the file. (NotNull and NotEmpty)
-     * @param encoding Encoding of the file. (NotNull and NotEmpty)
-     * @param delimiter Delimiter of the file. (NotNull and NotEmpty)
-     * @param batchCount Batch-count for transaction.
-     * @param isErrorContinue If true, this method continue in spite of throwing the exception.   
-     * @return The list of InsertOrUpdateExceptionResult. (NotNull)
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     * @deprecated Please use reflectTokenFile()
-     */
-    public java.util.List${database.filterGenericsString('OneEntityExceptionResult')} reflectFromSeparatedFile(
-            String filename, String encoding,
-            String delimiter, int batchCount, boolean isErrorContinue
-            ) throws java.io.FileNotFoundException, java.io.IOException;
-
-    /**
-     * Exception result for one entity. 
-     * @deprecated Please use BatchTransactionFailureResult
-     */
-    public static class OneEntityExceptionResult {
-        protected String _primaryKeyMapString;
-        protected ${glEntityInterfaceName} _entity;
-        protected Exception _exception;
-        
-        public String getPrimaryKeyMapString() {
-            return _primaryKeyMapString;
-        }
-        public void setPrimaryKeyMapString(String value) {
-            _primaryKeyMapString = value;
-        }
-        public ${glEntityInterfaceName} getEntity() {
-            return _entity;
-        }
-        public void setEntity(${glEntityInterfaceName} value) {
-            _entity = value;
-        }
-        public Exception getException() {
-            return _exception;
-        }
-        public void setException(Exception value) {
-            _exception = value;
-        }
-    }
-#end
-
 }
