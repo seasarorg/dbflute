@@ -653,6 +653,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #end
 
 #if ($database.isVersionAfter1046())
+    // ===================================================================================
+    //                                               ResultSetHandlerFactoryImpl Extension
+    //                                               =====================================
     public static class ResultSetHandlerFactoryExtension extends org.seasar.dao.impl.ResultSetHandlerFactoryImpl {
         public ResultSetHandlerFactoryExtension() {
             super();
@@ -662,6 +665,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
     }
 #else
+    // ===================================================================================
+    //                                               ResultSetHandlerFactoryImpl Extension
+    //                                               =====================================
     public static class ResultSetHandlerFactoryExtension extends ResultSetHandlerFactoryImpl {
 #if ($database.isVersionAfter1043())
         public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData, org.seasar.dao.DaoAnnotationReader annotationReader, org.seasar.dao.DtoMetaDataFactory dtoMetaDataFactory) {
@@ -678,42 +684,142 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 #end
 
+#if ($database.isVersionAfter1047())
+    // ===================================================================================
+    //                                                    RelationRowCreatorImpl Extension
+    //                                                    ================================
     public static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
 
-        protected static final String DBFLUTE_INTERNAL_TOP_MARK_KEY = "_df:topmark";
+        /**
+         * @param rs Result set. (NotNull)
+         * @param rpt The type of relation property. (NotNull)
+         * @param columnNames The set of column name. (NotNull)
+         * @param relKeyValues The map of rel key values. (Nullable)
+         * @param relationPropertyCache The map of relation property cache. The key is String(relationNoSuffix) and the value is Set(PropertyType). (NotNull)
+         * @return Created relation row. (Nullable)
+         * @throws SQLException
+         */
+        public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues,
+                Map relationPropertyCache) throws SQLException {
+            // ========
+            // Override
+            // ========
+            return createRelationRow(rs, rpt, columnNames, relKeyValues, relationPropertyCache, "");
+        }
 
-        protected static final String DBFLUTE_INTERNAL_KEY_PREFIX = "_df:_";
+        public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues,
+                Map relationPropertyCache, String preRelationNoSuffix) throws SQLException {
+            // It must doesn't need to invoke this!
+            // final Object row = setupRelationKeyValue(rpt, columnNames, relKeyValues);
+
+            return setupRelationAllValue(rs, rpt, columnNames, relKeyValues, relationPropertyCache, preRelationNoSuffix);
+        }
+
+        protected Object setupRelationAllValue(ResultSet rs, RelationPropertyType rpt, Set columnNames,
+                Map relKeyValues, Map relationPropertyCache, String preRelationNoSuffix) throws SQLException {
+            final String relationNoSuffix = preRelationNoSuffix + buildRelationNoSuffix(rpt);
+            final org.seasar.dao.impl.RelationRowCreationResource resource = createRelationRowCreationResource(null, rs, rpt, columnNames,
+                    relKeyValues, relationPropertyCache, relationNoSuffix);
+            return setupRelationAllValue(resource);
+        }
+
+        protected boolean isTargetProperty(org.seasar.dao.impl.RelationRowCreationResource resource) throws SQLException {
+            // ========
+            // Override
+            // ========
+            final PropertyType pt = resource.getCurrentPropertyType();
+
+            // Excludes non writable property for performance tuning!
+            if (!pt.getPropertyDesc().hasWriteMethod()) {
+                return false;
+            }
+
+            // Excludes java.util.List property for pinpont performance tuning!
+            if (java.util.List.class.isAssignableFrom(pt.getPropertyDesc().getPropertyType())) {
+                return false;
+            }
+
+            final String columnName = resource.buildRelationColumnName();
+            if (!resource.containsColumnName(columnName)) {
+                return false;
+            }
+            return true;
+        }
+
+        protected boolean isValidRelation(org.seasar.dao.impl.RelationRowCreationResource resource) throws SQLException {
+            // ========
+            // Override
+            // ========
+            // Return null if the primary key of foreign table is invalid(The foreign key is deadlink).
+            if (resource.getCurrentPropertyType().isPrimaryKey()) {
+                final String columnName = resource.buildRelationColumnName();
+                if (!isValidValue(resource, columnName)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        protected Object getRowIfExistsColumn(org.seasar.dao.impl.RelationRowCreationResource resource) throws SQLException {
+            // ========
+            // Override
+            // ========
+            // Return null if setupSelect_Xxx() or withXxx() has not been invoked.
+            final Object row = resource.getRowIfExistsColumn();
+            if (row == null) {
+                return null;
+            }
+            final RelationPropertyType rpt = resource.getRelationPropertyType();
+            if (rpt.getBeanMetaData().getRelationPropertyTypeSize() != 0) {
+                createParentRelationRow(resource);
+            }
+            return row;
+        }
+
+        // Original
+        protected boolean isValidValue(org.seasar.dao.impl.RelationRowCreationResource resource, String columnName) throws SQLException {
+            Object value = null;
+            if (resource.existsRelKeyValues() && resource.containsRelKeyValue(columnName)) {
+                value = resource.extractRelKeyValue(columnName);
+            } else {
+                final org.seasar.extension.jdbc.ValueType valueType = resource.getCurrentPropertyType().getValueType();
+                value = valueType.getValue(resource.getResultSet(), columnName);
+            }
+            return value != null;
+        }
+
+        // Original
+        protected void createParentRelationRow(org.seasar.dao.impl.RelationRowCreationResource resource) throws SQLException {
+            final BeanMetaData parentBmd = resource.getRelationBeanMetaData();
+            final ResultSet rs = resource.getResultSet();
+            final Set columnNames = resource.getColumnNames();
+            final Map relKeyValues = null;
+            final Map relationPropertyCache = resource.getRelationPropertyCache();
+            final String relationNoSuffix = resource.getRelationNoSuffix();
+            final Object row = resource.getRow();
+            for (int i = 0; i < parentBmd.getRelationPropertyTypeSize(); ++i) {
+                RelationPropertyType parentParentRpt = parentBmd.getRelationPropertyType(i);
+                if (parentParentRpt == null) {
+                    continue;
+                }
+
+                Object relationRow = createRelationRow(rs, parentParentRpt, columnNames, relKeyValues,
+                        relationPropertyCache, relationNoSuffix);
+                if (relationRow != null) {
+                    PropertyDesc pd = parentParentRpt.getPropertyDesc();
+                    pd.setValue(row, relationRow);
+                }
+            }
+        }
+    }
+#else
+    // ===================================================================================
+    //                                                    RelationRowCreatorImpl Extension
+    //                                                    ================================
+    public static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
 
         public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues)
                 throws SQLException {
-            // - - - - - - - - - - - - 
-            // For performance tuning!
-            // - - - - - - - - - - - - 
-            if (!columnNames.contains(DBFLUTE_INTERNAL_TOP_MARK_KEY)) {
-                columnNames.add(DBFLUTE_INTERNAL_TOP_MARK_KEY);
-                final java.util.List<String> relNoMarkList = new java.util.ArrayList<String>();
-                for (Object object : columnNames) {
-                    if (!(object instanceof String)) {
-                        continue;
-                    }
-                    final String columnName = (String) object;
-                    final String[] split = columnName.split("_");
-
-                    // First element is out of target!
-                    for (int i = 1; i < split.length; i++) {
-                        try {
-                            Integer.parseInt(split[i]);
-                        } catch (NumberFormatException e) {
-                            continue;
-                        }
-                        relNoMarkList.add(DBFLUTE_INTERNAL_KEY_PREFIX + split[i]);
-                    }
-                }
-                for (final java.util.Iterator ite = relNoMarkList.iterator(); ite.hasNext();) {
-                    columnNames.add((String) ite.next());
-                }
-            }
-
             return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
         }
 
@@ -727,13 +833,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
         protected Object setupRelationAllValue(ResultSet rs, RelationPropertyType rpt, Set columnNames,
                 Map relKeyValues, String preRelationNoSuffix) throws SQLException {
-            // - - - - - - - - - - - - 
-            // For performance tuning!
-            // - - - - - - - - - - - - 
-            if (!columnNames.contains(DBFLUTE_INTERNAL_KEY_PREFIX + rpt.getRelationNo())) {
-                return null;
-            }
-
             Object row = null;
             final String relationNoSuffix = preRelationNoSuffix + "_" + rpt.getRelationNo();
             final BeanMetaData bmd = rpt.getBeanMetaData();
@@ -807,6 +906,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         }
     }
+#end
 }
 #else
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};

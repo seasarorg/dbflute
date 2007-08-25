@@ -141,6 +141,10 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             final org.seasar.dao.impl.DtoMetaDataFactoryImpl factory = new org.seasar.dao.impl.DtoMetaDataFactoryImpl();
             factory.setAnnotationReaderFactory(this.annotationReaderFactory);
             factory.setValueTypeFactory(valueTypeFactory);
+#if ($database.isVersionAfter1047())
+            factory.setPropertyTypeFactoryBuilder(propertyTypeFactoryBuilder);
+            factory.setColumnNaming(columnNaming);
+#end
             dtoMetaDataFactory = factory;
         }
         if (resultSetHandlerFactory == null) {
