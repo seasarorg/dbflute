@@ -9,11 +9,7 @@ import java.lang.reflect.Type;
 
 import java.lang.reflect.Method;
 import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 #if ($database.isAvailableOtherConnectionDaoInitialization())
 
@@ -48,7 +44,6 @@ import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
-import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -690,126 +685,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                    ================================
     public static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
 
-        /**
-         * @param rs Result set. (NotNull)
-         * @param rpt The type of relation property. (NotNull)
-         * @param columnNames The set of column name. (NotNull)
-         * @param relKeyValues The map of rel key values. (Nullable)
-         * @param relationPropertyCache The map of relation property cache. The key is String(relationNoSuffix) and the value is Set(PropertyType). (NotNull)
-         * @return Created relation row. (Nullable)
-         * @throws SQLException
-         */
-        public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues,
-                Map relationPropertyCache) throws SQLException {
-            // ========
-            // Override
-            // ========
-            return createRelationRow(rs, rpt, columnNames, relKeyValues, relationPropertyCache, "");
+        protected boolean isCreateDeadLink() {
+            return false;
         }
 
-        public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues,
-                Map relationPropertyCache, String preRelationNoSuffix) throws SQLException {
-            // It must doesn't need to invoke this!
-            // final Object row = setupRelationKeyValue(rpt, columnNames, relKeyValues);
-
-            return setupRelationAllValue(rs, rpt, columnNames, relKeyValues, relationPropertyCache, preRelationNoSuffix);
-        }
-
-        protected Object setupRelationAllValue(ResultSet rs, RelationPropertyType rpt, Set columnNames,
-                Map relKeyValues, Map relationPropertyCache, String preRelationNoSuffix) throws SQLException {
-            final String relationNoSuffix = preRelationNoSuffix + buildRelationNoSuffix(rpt);
-            final org.seasar.dao.impl.RelationRowCreationResource resource = createRelationRowCreationResource(null, rs, rpt, columnNames,
-                    relKeyValues, relationPropertyCache, relationNoSuffix);
-            return setupRelationAllValue(resource);
-        }
-
-        protected boolean isTargetProperty(org.seasar.dao.impl.RelationRowCreationResource resource) throws SQLException {
-            // ========
-            // Override
-            // ========
-            final PropertyType pt = resource.getCurrentPropertyType();
-
-            // Excludes non writable property for performance tuning!
-            if (!pt.getPropertyDesc().hasWriteMethod()) {
-                return false;
-            }
-
-            // Excludes java.util.List property for pinpont performance tuning!
-            if (java.util.List.class.isAssignableFrom(pt.getPropertyDesc().getPropertyType())) {
-                return false;
-            }
-
-            final String columnName = resource.buildRelationColumnName();
-            if (!resource.containsColumnName(columnName)) {
-                return false;
-            }
-            return true;
-        }
-
-        protected boolean isValidRelation(org.seasar.dao.impl.RelationRowCreationResource resource) throws SQLException {
-            // ========
-            // Override
-            // ========
-            // Return null if the primary key of foreign table is invalid(The foreign key is deadlink).
-            if (resource.getCurrentPropertyType().isPrimaryKey()) {
-                final String columnName = resource.buildRelationColumnName();
-                if (!isValidValue(resource, columnName)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        protected Object getRowIfExistsColumn(org.seasar.dao.impl.RelationRowCreationResource resource) throws SQLException {
-            // ========
-            // Override
-            // ========
-            // Return null if setupSelect_Xxx() or withXxx() has not been invoked.
-            final Object row = resource.getRowIfExistsColumn();
-            if (row == null) {
-                return null;
-            }
-            final RelationPropertyType rpt = resource.getRelationPropertyType();
-            if (rpt.getBeanMetaData().getRelationPropertyTypeSize() != 0) {
-                createParentRelationRow(resource);
-            }
-            return row;
-        }
-
-        // Original
-        protected boolean isValidValue(org.seasar.dao.impl.RelationRowCreationResource resource, String columnName) throws SQLException {
-            Object value = null;
-            if (resource.existsRelKeyValues() && resource.containsRelKeyValue(columnName)) {
-                value = resource.extractRelKeyValue(columnName);
-            } else {
-                final org.seasar.extension.jdbc.ValueType valueType = resource.getCurrentPropertyType().getValueType();
-                value = valueType.getValue(resource.getResultSet(), columnName);
-            }
-            return value != null;
-        }
-
-        // Original
-        protected void createParentRelationRow(org.seasar.dao.impl.RelationRowCreationResource resource) throws SQLException {
-            final BeanMetaData parentBmd = resource.getRelationBeanMetaData();
-            final ResultSet rs = resource.getResultSet();
-            final Set columnNames = resource.getColumnNames();
-            final Map relKeyValues = null;
-            final Map relationPropertyCache = resource.getRelationPropertyCache();
-            final String relationNoSuffix = resource.getRelationNoSuffix();
-            final Object row = resource.getRow();
-            for (int i = 0; i < parentBmd.getRelationPropertyTypeSize(); ++i) {
-                RelationPropertyType parentParentRpt = parentBmd.getRelationPropertyType(i);
-                if (parentParentRpt == null) {
-                    continue;
-                }
-
-                Object relationRow = createRelationRow(rs, parentParentRpt, columnNames, relKeyValues,
-                        relationPropertyCache, relationNoSuffix);
-                if (relationRow != null) {
-                    PropertyDesc pd = parentParentRpt.getPropertyDesc();
-                    pd.setValue(row, relationRow);
-                }
-            }
+        protected int getLimitRelationNestLevel() {
+            return 2;
         }
     }
 #else
@@ -818,21 +699,21 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                    ================================
     public static class RelationRowCreatorExtension extends RelationRowCreatorImpl {
 
-        public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues)
-                throws SQLException {
+        public Object createRelationRow(java.sql.ResultSet rs, RelationPropertyType rpt, java.util.Set columnNames, java.util.Map relKeyValues)
+                throws java.sql.SQLException {
             return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
         }
 
-        public Object createRelationRow(ResultSet rs, RelationPropertyType rpt, Set columnNames, Map relKeyValues,
-                String preRelationNoSuffix) throws SQLException {
+        public Object createRelationRow(java.sql.ResultSet rs, RelationPropertyType rpt, java.util.Set columnNames, java.util.Map relKeyValues,
+                String preRelationNoSuffix) throws java.sql.SQLException {
             // It must doesn't need to invoke this!
             // final Object row = setupRelationKeyValue(rpt, columnNames, relKeyValues);
 
             return setupRelationAllValue(rs, rpt, columnNames, relKeyValues, preRelationNoSuffix);
         }
 
-        protected Object setupRelationAllValue(ResultSet rs, RelationPropertyType rpt, Set columnNames,
-                Map relKeyValues, String preRelationNoSuffix) throws SQLException {
+        protected Object setupRelationAllValue(java.sql.ResultSet rs, RelationPropertyType rpt, java.util.Set columnNames,
+                java.util.Map relKeyValues, String preRelationNoSuffix) throws java.sql.SQLException {
             Object row = null;
             final String relationNoSuffix = preRelationNoSuffix + "_" + rpt.getRelationNo();
             final BeanMetaData bmd = rpt.getBeanMetaData();
@@ -880,7 +761,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return row;
         }
 
-        protected boolean isValidValue(ResultSet rs, PropertyType pt, String columnName, Map relKeyValues) throws SQLException {
+        protected boolean isValidValue(java.sql.ResultSet rs, PropertyType pt, String columnName, java.util.Map relKeyValues) throws java.sql.SQLException {
             Object value = null;
             if (relKeyValues != null && relKeyValues.containsKey(columnName)) {
                 value = relKeyValues.get(columnName);
@@ -891,8 +772,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return value != null;
         }
 
-        protected void createParentRelationRow(ResultSet rs, BeanMetaData parentBmd, Set columnNames,
-                String relationNoSuffix, Object row) throws SQLException {
+        protected void createParentRelationRow(java.sql.ResultSet rs, BeanMetaData parentBmd, java.util.Set columnNames,
+                String relationNoSuffix, Object row) throws java.sql.SQLException {
             for (int i = 0; i < parentBmd.getRelationPropertyTypeSize(); ++i) {
                 RelationPropertyType parentParentRpt = parentBmd.getRelationPropertyType(i);
                 if (parentParentRpt == null) {
@@ -900,7 +781,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 }
                 Object relationRow = createRelationRow(rs, parentParentRpt, columnNames, null, relationNoSuffix);
                 if (relationRow != null) {
-                    PropertyDesc pd = parentParentRpt.getPropertyDesc();
+                    org.seasar.framework.beans.PropertyDesc pd = parentParentRpt.getPropertyDesc();
                     pd.setValue(row, relationRow);
                 }
             }
