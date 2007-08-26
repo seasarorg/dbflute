@@ -72,8 +72,9 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
         return getBehavior(getBehaviorType(dbmeta));
     }
+
 #end
-#end
+#else
 
     /**
      * Get dao-readable by dao type.
@@ -209,7 +210,10 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
         return (${glBehaviorWritableInterfaceName})getRBhv(tableFlexibleName);
     }
+#end
+#end
 
+#if ($database.isAvailableBehaviorGeneration())
     /**
      * Get behavior-type by dbmeta.
      * 

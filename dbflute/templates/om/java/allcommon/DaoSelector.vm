@@ -47,15 +47,13 @@ public interface ${glDaoSelectorInterfaceName} {
      */
     public ${glBehaviorReadableInterfaceName} byNameAsBehaviorReadable(String tableMultiName);
 #end
-#end
-#if ($database.isMakeDeprecated())
+#else
 
     /**
      * Get dao-readable by dao type.
      * 
      * @param daoType Dao type. (NotNull)
      * @return Dao-readable. (NotNull)
-     * @deprecated
      */
     public ${glDaoReadableInterfaceName} getRDao(Class daoType);
 
@@ -64,7 +62,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param entity Entity. (NotNull)
      * @return Dao-readable. (NotNull)
-     * @deprecated
      */
     public ${glDaoReadableInterfaceName} getRDao(${glEntityInterfaceName} entity);
 
@@ -73,7 +70,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param tableMultiName Table multi-name. (NotNull)
      * @return Dao-readable. (NotNull)
-     * @deprecated
      */
     public ${glDaoReadableInterfaceName} getRDao(String tableMultiName);
 
@@ -82,7 +78,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param daoType Dao type. (NotNull)
      * @return Dao-writable. (NotNull)
-     * @deprecated
      */
     public ${glDaoWritableInterfaceName} getWDao(Class daoType);
 
@@ -91,7 +86,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param entity Entity. (NotNull)
      * @return Dao-writable. (NotNull)
-     * @deprecated
      */
     public ${glDaoWritableInterfaceName} getWDao(${glEntityInterfaceName} entity);
 
@@ -100,7 +94,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param tableMultiName Table multi-name. (NotNull)
      * @return Dao-writable. (NotNull)]
-     * @deprecated
      */
     public ${glDaoWritableInterfaceName} getWDao(String tableMultiName);
 #if ($database.isAvailableBehaviorGeneration())
@@ -110,7 +103,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param bhvType Bhv type. (NotNull)
      * @return Bhv-readable. (NotNull)
-     * @deprecated
      */
     public ${glBehaviorReadableInterfaceName} getRBhv(Class bhvType);
 
@@ -119,7 +111,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param entity Entity. (NotNull)
      * @return Bhv-readable. (NotNull)
-     * @deprecated
      */
     public ${glBehaviorReadableInterfaceName} getRBhv(${glEntityInterfaceName} entity);
 
@@ -128,7 +119,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param tableMultiName Table multi-name. (NotNull)
      * @return Bhv-readable. (NotNull)
-     * @deprecated
      */
     public ${glBehaviorReadableInterfaceName} getRBhv(String tableMultiName);
 
@@ -137,7 +127,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param bhvType Bhv type. (NotNull)
      * @return Bhv-writable. (NotNull)
-     * @deprecated
      */
     public ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName} getWBhv(Class bhvType);
 
@@ -146,7 +135,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param entity Entity. (NotNull)
      * @return Bhv-writable. (NotNull)
-     * @deprecated
      */
     public ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName} getWBhv(${glEntityInterfaceName} entity);
 
@@ -155,7 +143,6 @@ public interface ${glDaoSelectorInterfaceName} {
      * 
      * @param tableMultiName Table multi-name. (NotNull)
      * @return Bhv-writable. (NotNull)
-     * @deprecated
      */
     public ${glPackageBaseCommonBhv}.${glBehaviorWritableInterfaceName} getWBhv(String tableMultiName);
 #end
