@@ -39,7 +39,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return false;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * ${database.ImplementComment}
      * 
@@ -135,7 +135,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         throw new IllegalStateException(msg);
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * ${database.ImplementComment}
      * 

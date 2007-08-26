@@ -81,7 +81,7 @@ public interface ${myClassName} {
      */
     public boolean hasFlexibleName(String flexibleName);
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Is existing db-name? {Target objects are TABLE and COLUMN}
      * 
@@ -135,7 +135,7 @@ public interface ${myClassName} {
      */
     public String findPropertyName(String flexibleName);
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Get db-name by property-name. {Target objects are TABLE and COLUMN}
      * 
@@ -235,7 +235,7 @@ public interface ${myClassName} {
      */
     public java.util.Map${database.filterGenericsString('String, String')} getPropertyNameDbNameKeyToLowerMap();
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Get db-name cap-prop-name map. {Target objects are TABLE and COLUMN}
      * 
@@ -346,7 +346,7 @@ public interface ${myClassName} {
      */
     public java.util.List${database.filterGenericsString(${glColumnInfoName})} getColumnInfoList();
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Get the list of column db-name.
      * 

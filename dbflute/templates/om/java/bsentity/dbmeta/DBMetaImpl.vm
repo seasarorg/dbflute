@@ -99,7 +99,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String DB_NAME_${col.name} = "$col.name";
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 #foreach ($col in $table.Columns)
     /** @deprecated Deprecated! So use DB_NAME_${col.javaName}. */
     public static final String COLUMN_DB_NAME_OF_${col.javaName} = "$col.Name";
@@ -122,7 +122,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String CAP_PROP_NAME_${col.javaName} = "$col.javaName";
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 #foreach ($col in $table.Columns)
     /** @deprecated Deprecated! So use CAP_PROP_NAME_${col.javaName}. */
     public static final String COLUMN_CAP_PROP_NAME_OF_${col.JavaName} = "$col.JavaName";
@@ -137,7 +137,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String UNCAP_PROP_NAME_${col.uncapitalisedJavaName} = "$col.uncapitalisedJavaName";
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 #foreach ($col in $table.Columns)
     /** @deprecated Deprecated! So use UNCAP_PROP_NAME_${col.javaName}. */
     public static final String COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName} = "$col.uncapitalisedJavaName";
@@ -151,7 +151,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /** The foreign property name(JavaBeansRule) of ${foreignKeys.foreignJavaBeansRulePropertyName}. */
     public static final String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignJavaBeansRulePropertyName} = "$foreignKeys.foreignJavaBeansRulePropertyName";
 #end
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 #foreach ($foreignKeys in $table.foreignKeys)
     /** @deprecated Use FOREIGN_NAME_${foreignKeys.foreignPropertyName}. */
     public static final String FOREIGN_CAP_PROP_NAME_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.foreignPropertyNameInitCap";
@@ -181,7 +181,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /** The referer property name(JavaBeansRule) of ${children.refererJavaBeansRulePropertyName}. */
     public static final String REFERER_PROPERTY_NAME_${children.refererJavaBeansRulePropertyName} = "$children.refererJavaBeansRulePropertyName";
 #end
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 #foreach ($children in $table.referrers)
     /** @deprecated Use REFERER_NAME_${children.reffererPropertyName} */
     public static final String REFERER_CAP_PROP_NAME_${children.reffererPropertyNameInitCap} = "$children.reffererPropertyNameInitCap";
@@ -238,7 +238,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return _propertyNameDbNameKeyToLowerMap;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /** @deprecated */
     private static java.util.Map${database.filterGenericsString('String, String')} _dbNameCapPropNameMap;
 
@@ -375,7 +375,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return createPropertyNameDbNameKeyToLowerMap();
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * ${database.ImplementComment}
      * 
@@ -601,7 +601,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return columnInfoList;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * ${database.ImplementComment}
      * 
