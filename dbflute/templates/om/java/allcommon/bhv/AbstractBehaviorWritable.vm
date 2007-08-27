@@ -48,7 +48,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Inserted count.
      */
-    public int callCreate(${glEntityInterfaceName} entity) {
+    protected int callCreate(${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         filterEntityOfInsert(entity);
         assertEntityOfInsert(entity);
@@ -62,7 +62,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Updated count.
      */
-    public int callModify(${glEntityInterfaceName} entity) {
+    protected int callModify(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
@@ -75,7 +75,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Deleted count.
      */
-    public int callRemove(${glEntityInterfaceName} entity) {
+    protected int callRemove(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfDelete(entity);
         assertEntityOfDelete(entity);

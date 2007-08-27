@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 #set ($myClassName = "${glBehaviorReadableAbstractName}")
 
+import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 #if ($database.isAvailableGenerics())
@@ -33,6 +34,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** Behavior-selector instance. */
+    protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
+
     /** Dao-selector instance. */
     protected ${glDaoSelectorInterfaceName} _daoSelector;
 
@@ -46,8 +50,26 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     // ===================================================================================
-    //                                                                        Dao Accessor
-    //                                                                        ============
+    //                                                                            Selector
+    //                                                                            ========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Behavior-selector.
+     */
+    public ${glBehaviorSelectorInterfaceName} getBehaviorSelector() {
+        return _behaviorSelector;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param value Behavior-selector.
+     */
+    public void setBehaviorSelector(${glBehaviorSelectorInterfaceName} value) {
+        _behaviorSelector = value;
+    }
+
     /**
      * ${database.ImplementComment}
      * 
@@ -74,7 +96,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @return All count.
      */
-    public int callGetCountAll() {
+    protected int callGetCountAll() {
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getCountAll", new Class[]{});
         final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
         return ((Integer)result).intValue();
@@ -85,7 +107,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @return All list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callGetListAll() {
+    protected java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callGetListAll() {
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getListAll", new Class[]{});
         final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
         return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
@@ -97,7 +119,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      */
-    public int callReadCount(${glConditionBeanInterfaceName} cb) {
+    protected int callReadCount(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
         final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCount", types);
@@ -111,7 +133,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read entity. If the select result is zero, it returns null. (Nullable)
      */
-    public ${glEntityInterfaceName} callReadEntity(${glConditionBeanInterfaceName} cb) {
+    protected ${glEntityInterfaceName} callReadEntity(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
         final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectEntity", types);
@@ -125,7 +147,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callReadList(${glConditionBeanInterfaceName} cb) {
+    protected java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callReadList(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
         final Class[] types = new Class[]{cb.getClass()};
         final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectList", types);

@@ -709,7 +709,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             pkList.add(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}());
             pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()), ${myEntityVariableName});
         }
-        final ${reffererBhvClassName} refererBhv = getDaoSelector().getBehavior(${reffererBhvClassName}.class);
+        final ${reffererBhvClassName} refererBhv = getBehaviorSelector().select(${reffererBhvClassName}.class);
         final ${reffererCBClassName} cb = loadRefererOption.getRefererConditionBean() != null ? loadRefererOption.getRefererConditionBean() : refererBhv.newMyConditionBean();
         cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
         loadRefererOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
@@ -805,7 +805,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             pkList.add(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}());
             pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()), ${myEntityVariableName});
         }
-        final ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})getDaoSelector().getRBhv(${reffererBhvClassName}.class);
+        final ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})getBehaviorSelector().select(${reffererBhvClassName}.class);
         final ${reffererCBClassName} cb = reffererBhv.newMyConditionBean();
         cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
         cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();

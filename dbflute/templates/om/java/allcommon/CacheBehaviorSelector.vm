@@ -1,8 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
-#if ($database.isAvailableBehaviorGeneration())
 
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
-#end
 
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
@@ -10,15 +8,11 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import org.seasar.framework.container.S2Container;
 
 /**
- * The implementation of dao-selector.
- * <pre>
- * Long long ago this object have cache of dao and bhv.
- * But the cache cause wrong performance when this is initialized.
- * So now this object don't have cache.
- * </pre>
+ * The implementation of behavior-selector.
+ * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} {
+public class ${glCacheBehaviorSelectorName} implements ${glBehaviorSelectorInterfaceName} {
 
     protected S2Container _container;
 
@@ -27,109 +21,52 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
     }
 
 #if ($database.isAvailableGenerics())
-
     /**
-     * Select dao.
+     * Select behavior.
      * 
-     * ${database.filterGenericsParamOutput('<DAO_TYPE>', 'The type of behavior.')}
-     * @param daoType Dao type. (NotNull)
-     * @return Dao. (NotNull)
-     */
-    public <DAO_TYPE extends ${glDaoReadableInterfaceName}> DAO_TYPE select(Class<DAO_TYPE> daoType) {
-        return (DAO_TYPE)_container.getComponent(daoType);
-    }
-
-    /**
-     * Select dao-readable by name.
-     * 
-     * @param tableFlexibleName Table flexible name. (NotNull)
-     * @return Dao-readable. (NotNull)
-     */
-    public ${glDaoReadableInterfaceName} byName(String tableFlexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
-        return select(getDaoType(dbmeta));
-    }
-
-
-
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * Deprecated
-    /**
-     * Get dao.
-     * 
-     * @param daoType Dao type. (NotNull)
-     * @return Dao. (NotNull)
-     * @deprecated Please use this#select()
-     */
-    public <DAO_TYPE extends ${glDaoReadableInterfaceName}> DAO_TYPE getDao(Class<DAO_TYPE> daoType) {
-        return (DAO_TYPE)_container.getComponent(daoType);
-    }
-
-    /**
-     * Get dao-readable.
-     * 
-     * @param tableFlexibleName Table flexible name. (NotNull)
-     * @return Dao-readable. (NotNull)
-     * @deprecated Please use this#byName()
-     */
-    public ${glDaoReadableInterfaceName} byNameAsDaoReadable(String tableFlexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
-        return getDao(getDaoType(dbmeta));
-    }
-
-#if ($database.isAvailableBehaviorGeneration())
-    /**
-     * Get behavior.
-     * 
+     * ${database.filterGenericsParamOutput('<BEHAVIOR_TYPE>', 'The type of behavior.')}
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
-     * @deprecated Please use BehaviorSelector#select()
      */
-    public <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE getBehavior(Class<BEHAVIOR_TYPE> behaviorType) {
+    public <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE select(Class<BEHAVIOR_TYPE> behaviorType) {
         return (BEHAVIOR_TYPE)_container.getComponent(behaviorType);
     }
 
     /**
-     * Get behavior-readable.
+     * Select behavior-readable by name.
      * 
-     * @param tableFlexibleName Table flexible name. (NotNull)
+     * @param tableFlexibleName Table flexible-name. (NotNull)
      * @return Behavior-readable. (NotNull)
-     * @deprecated Please use BehaviorSelector#byName()
      */
-    public ${glBehaviorReadableInterfaceName} byNameAsBehaviorReadable(String tableFlexibleName) {
+    public ${glBehaviorReadableInterfaceName} byName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
-        return getBehavior(getBehaviorType(dbmeta));
+        return select(getBehaviorType(dbmeta));
     }
-
-#end
 #else
-
     /**
-     * Get dao.
+     * Select behavior.
      * 
-     * @param daoType Dao type. (NotNull)
-     * @return Dao. (NotNull)
+     * @param behaviorType Behavior type. (NotNull)
+     * @return Behavior. (NotNull)
      */
-    public ${glDaoReadableInterfaceName} select(Class daoType) {
-        return (${glDaoReadableInterfaceName})_container.getComponent(daoType);
+    public ${glBehaviorReadableInterfaceName} select(Class behaviorType) {
+        return (${glBehaviorReadableInterfaceName})_container.getComponent(behaviorType);
     }
 
     /**
-     * Select dao-readable by name.
+     * Select behavior-readable by name.
      * 
-     * @param tableFlexibleName Table flexible name. (NotNull)
-     * @return Dao-readable. (NotNull)
+     * @param tableFlexibleName Table flexible-name. (NotNull)
+     * @return Behavior-readable. (NotNull)
      */
-    public ${glDaoReadableInterfaceName} byName(String tableFlexibleName) {
+    public ${glBehaviorReadableInterfaceName} byName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
-        return select(getDaoType(dbmeta));
+        return select(getBehaviorType(dbmeta));
     }
 #end
 
-#if ($database.isAvailableBehaviorGeneration())
     /**
      * Get behavior-type by dbmeta.
      * 
@@ -149,22 +86,6 @@ public class ${glCacheDaoSelectorName} implements ${glDaoSelectorInterfaceName} 
             throw new RuntimeException("The class does not exist: " + behaviorTypeName, e);
         }
         return behaviorType;
-    }
-#end
-
-    protected Class getDaoType(${glDBMetaInterfaceName} dbmeta) {
-        final String daoTypeName = dbmeta.getDaoTypeName();
-        if (daoTypeName == null) {
-            String msg = "The dbmeta.getDaoTypeName() should not return null: dbmeta=" + dbmeta;
-            throw new IllegalStateException(msg);
-        }
-        final Class daoType;
-        try {
-            daoType = Class.forName(daoTypeName);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("The class does not exist: " + daoTypeName, e);
-        }
-        return daoType;
     }
 
     // =====================================================================================

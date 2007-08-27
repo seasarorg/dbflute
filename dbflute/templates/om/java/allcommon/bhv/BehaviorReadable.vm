@@ -103,48 +103,6 @@ public interface ${glBehaviorReadableInterfaceName} {
     public ${glConditionBeanInterfaceName} newConditionBean();
 
     // =====================================================================================
-    //                                                                       Delegate Method
-    //                                                                       ===============
-    /**
-     * Read count as all. (Delegate-Method)
-     * 
-     * @return All count. (NotNull)
-     */
-    public int callGetCountAll();
-
-    /**
-     * Read list as all. (Delegate-Method)
-     * 
-     * @return All list. (NotNull)
-     */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callGetListAll();
-
-    /**
-     * Read count by condition-bean. (Delegate-Method)
-     * If the condition-bean is invoked fetchFirst() and fetchScope() and fetchPage(), throw exception.
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Read count. (NotNull)
-     */
-    public int callReadCount(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-
-    /**
-     * Read entity by condition-bean. (Delegate-Method)
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Read entity. If the select result is zero, it returns null. (Nullable)
-     */
-    public ${glEntityInterfaceName} callReadEntity(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-
-    /**
-     * Read list by condition-bean. (Delegate-Method)
-     * 
-     * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
-     * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-     */
-    public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callReadList(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-
-    // =====================================================================================
     //                                                                         Basic Get All
     //                                                                         =============
     /**

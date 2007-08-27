@@ -73,6 +73,10 @@ targetdatabase = $targetDatabase
     #set ($glDaoSelectorInterfaceName = "${glProjectPrefix}DaoSelector")
     #set ($glCacheDaoSelectorName = "${glProjectPrefix}CacheDaoSelector")
 
+    ## [Allcommon-Base-BehaviorSelector]
+    #set ($glBehaviorSelectorInterfaceName = "${glProjectPrefix}BehaviorSelector")
+    #set ($glCacheBehaviorSelectorName = "${glProjectPrefix}CacheBehaviorSelector")
+
     ## [Allcommon-Base-GenMetaData]
     #set ($glGenMetaDataClassName = "${glProjectPrefix}GenMetaData")
 
@@ -1181,9 +1185,34 @@ targetdatabase = $targetDatabase
       #end
     #end
 
+
     ## -------------------------------------------------------
-    ##                                  allcommon dao-selector
-    ##                                  ----------------------
+    ##                                      allcommon selector
+    ##                                      ------------------
+    #if ($database.isTargetLanguageJava())
+      ## Setup java directory for daoSelector.
+      $database.setupJavaDir_for_daoSelector()
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
+      $database.makeDirectory($path)
+
+      $database.debug("public void parseBehaviorSelector() {")
+      $database.debug("    parse('BehaviorSelector');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glBehaviorSelectorInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/BehaviorSelector.${glTemplateFileExtension}",$path ,"", "")
+
+      ## Setup java directory for cacheDaoSelector.
+      $database.setupJavaDir_for_cacheDaoSelector()
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parse('CacheBehaviorSelector');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glCacheBehaviorSelectorName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/CacheBehaviorSelector.${glTemplateFileExtension}",$path ,"", "")
+      $database.debug("}")
+    #end
+
     ## Setup java directory for daoSelector.
     $database.setupJavaDir_for_daoSelector()
 
@@ -1191,13 +1220,10 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.debug("public void parseDaoSelector() {")
-    $database.debug("    parseDaoSelector();")
+    $database.debug("    parse('DaoSelector');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoSelectorInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/DaoSelector.${glTemplateFileExtension}",$path ,"", "")
 
-    ## -----------------------------------------------------------------------------------------------------
-    ##                                                                              Parse cache dao-selector
-    ##                                                                              ------------------------
     ## Setup java directory for cacheDaoSelector.
     $database.setupJavaDir_for_cacheDaoSelector()
 

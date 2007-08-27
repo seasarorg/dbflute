@@ -130,8 +130,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected void tracePath() {
-        final String clientInvokeName = extractClientInvokeName();
-        final String behaviorInvokeName = extractBehaviorInvokeName();
+        final StackTraceElement[] stackTrace = new Exception().getStackTrace();
+        final InvokeNameExtractingResult behaviorResult = extractBehaviorInvokeName(stackTrace);
+        final InvokeNameExtractingResult clientResult = extractClientInvokeName(stackTrace, behaviorResult.getNextStartIndex());
+        final String behaviorInvokeName = behaviorResult.getInvokeName();
+        final String clientInvokeName = clientResult.getInvokeName();
         if (clientInvokeName.trim().length() == 0 && behaviorInvokeName.trim().length() == 0) {
             return;
         }
@@ -158,7 +161,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         return sb.toString();
     }
 
-    protected String extractClientInvokeName() {
+    protected InvokeNameExtractingResult extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
                 return className.endsWith("Page") || className.endsWith("Action");
@@ -166,11 +169,17 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             public String filterSimpleClassName(String simpleClassName) {
                 return simpleClassName;
             }
+            public boolean isUseAdditionalInfo() {
+                return true;
+            }
+            public int getStartIndex() {
+                return startIndex;
+            }
         };
-        return extractInvokeName(callback);
+        return extractInvokeName(callback, stackTrace);
     }
 
-    protected String extractBehaviorInvokeName() {
+    protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
                 return className.endsWith("Bhv") || className.endsWith("BehaviorReadable") || className.endsWith("BehaviorWritable");
@@ -178,16 +187,23 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             public String filterSimpleClassName(String simpleClassName) {
                 return removeBasePrefixIfNeeds(simpleClassName);
             }
+            public boolean isUseAdditionalInfo() {
+                return false;
+            }
+            public int getStartIndex() {
+                return 0;
+            }
         };
-        return extractInvokeName(callback);
+        return extractInvokeName(callback, stackTrace);
     }
 
-    protected String extractInvokeName(InvokeNameExtractingCallback callback) {
+    protected InvokeNameExtractingResult extractInvokeName(InvokeNameExtractingCallback callback, StackTraceElement[] stackTrace) {
         String targetSimpleClassName = null;
         String targetMethodName = null;
-        final StackTraceElement[] stackTrace = new Exception().getStackTrace();
+        int lineNumber = 0;
+        int foundIndex = 0;
         boolean onTarget = false;
-        for (int i=0; i < stackTrace.length; i++) {
+        for (int i=callback.getStartIndex(); i < stackTrace.length; i++) {
             final StackTraceElement element = stackTrace[i];
             if (i >= 20) {
                 break;
@@ -206,6 +222,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 }
                 targetSimpleClassName = className.substring(className.lastIndexOf(".") + 1);
                 targetMethodName = methodName;
+                if (callback.isUseAdditionalInfo()) {
+                    lineNumber = element.getLineNumber();
+                }
+                foundIndex = i;
                 onTarget = true;
                 continue;
             }
@@ -213,15 +233,47 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 break;
             }
         }
+        final InvokeNameExtractingResult result = new InvokeNameExtractingResult();
         if (targetSimpleClassName == null) {
-            return "";
+            result.setInvokeName("");
+            return result;
         }
-        return callback.filterSimpleClassName(targetSimpleClassName) + "." + targetMethodName + "() --> ";
+        if (lineNumber > 0) {
+            result.setInvokeName(callback.filterSimpleClassName(targetSimpleClassName) + "." + targetMethodName + "():" + lineNumber + " --> ");
+        } else {
+            result.setInvokeName(callback.filterSimpleClassName(targetSimpleClassName) + "." + targetMethodName + "() --> ");
+        }
+        result.setFoundIndex(foundIndex);
+        return result;
     }
 
     protected static interface InvokeNameExtractingCallback {
         public boolean isTargetElement(String className, String methodName);
         public String filterSimpleClassName(String simpleClassName);
+        public boolean isUseAdditionalInfo();
+        public int getStartIndex();
+    }
+
+    protected static class InvokeNameExtractingResult {
+        protected String _invokeName;
+        protected int _foundIndex;
+
+        public int getNextStartIndex() {
+            return _foundIndex + 1;
+        }
+
+        public String getInvokeName() {
+            return _invokeName;
+        }
+        public void setInvokeName(String invokeName) {
+            this._invokeName = invokeName;
+        }
+        public int getFoundIndex() {
+            return _foundIndex;
+        }
+        public void setFoundIndex(int foundIndex) {
+            this._foundIndex = foundIndex;
+        }
     }
 
     protected String removeBasePrefixIfNeeds(String name) {

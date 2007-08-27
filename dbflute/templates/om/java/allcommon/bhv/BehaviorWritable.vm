@@ -19,55 +19,6 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public ${glDaoWritableInterfaceName} getDaoWritable();
 
-    /**
-     * Create entity. (Delegate-Method)
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Inserted count.
-     */
-    public int callCreate(${glEntityInterfaceName} entity);
-
-    /**
-     * Modify entity. (Delegate-Method)
-     * {modified only}
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Updated count.
-     */
-    public int callModify(${glEntityInterfaceName} entity);
-
-    /**
-     * Remove entity. (Delegate-Method)
-     * 
-     * @param entity Entity that the type is entity-interface. (NotNull)
-     * @return Deleted count.
-     */
-    public int callRemove(${glEntityInterfaceName} entity);
-
-    /**
-     * Create several entity-list. (Delegate-Method)
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Inserted count.
-     */
-    public int callCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
-
-    /**
-     * Modify several entity-list. (Delegate-Method)
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Updated count.
-     */
-    public int callModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
-
-    /**
-     * Remove several entity-list. (Delegate-Method)
-     * 
-     * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Deleted count.
-     */
-    public int callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
-
     // =====================================================================================
     //                                                                   Basic Entity Update
     //                                                                   ===================

@@ -41,6 +41,11 @@
     <component name="commonColumnSetupBeforeDeleteInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeDeleteInterceptor}"/>
 #end
 
+    <!-- Behavior selector. -->
+    <component name="behaviorSelector" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
+        <destroyMethod name="destroy"/>
+    </component>
+
     <!-- Dao selector. -->
     <component name="daoSelector" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
         <destroyMethod name="destroy"/>
