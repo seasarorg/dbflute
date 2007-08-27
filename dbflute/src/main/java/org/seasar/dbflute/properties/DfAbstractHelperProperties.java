@@ -35,6 +35,7 @@ public abstract class DfAbstractHelperProperties {
     //                                         -------------
     public static final String JAVA_targetLanguage = "java";
     public static final String CSHARP_targetLanguage = "csharp";
+    public static final String CSHARPOLD_targetLanguage = "csharpold";
     public static final String DEFAULT_targetLanguage = JAVA_targetLanguage;
 
     public static final String DEFAULT_templateFileEncoding = "UTF-8";

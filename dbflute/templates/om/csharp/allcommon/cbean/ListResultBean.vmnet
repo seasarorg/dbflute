@@ -12,7 +12,7 @@ namespace ${glPackageBaseCommonCBean} {
     /// Author: ${database.ClassAuthor}
     /// </summary>
     [System.Serializable]
-    public class ${myClassName} : System.Collections.IList {
+    public class ${myClassName}<ENTITY> : System.Collections.Generic.IList<ENTITY> {
 
         // =====================================================================================
         //                                                                             Attribute
@@ -26,7 +26,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected int _allRecordCount;
 
         /// <summary>Selected list. Default value is empty.</summary>
-        protected System.Collections.IList _selectedList = new System.Collections.ArrayList();
+        protected System.Collections.Generic.IList<ENTITY> _selectedList = new System.Collections.Generic.List<ENTITY>();
 
         /// <summary>The value of current page number.</summary>
         protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
@@ -73,7 +73,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>
         /// The property of all record count.
         /// </summary>
-        public System.Collections.IList SelectedList {
+        public System.Collections.Generic.IList<ENTITY> SelectedList {
             get { return _selectedList; }
             set { _isSetterInvokedSelectedList=true; _selectedList = value; }
         }
@@ -121,40 +121,33 @@ namespace ${glPackageBaseCommonCBean} {
         // =====================================================================================
         //                                                                         List Elements
         //                                                                         =============
-        public virtual int Add(Object value)
-        {
+        public virtual void Add(ENTITY value) {
             return _selectedList.Add(value);
         }
 
-        public virtual bool Contains(Object value)
+        public virtual bool Contains(ENTITY value)
         {
             return _selectedList.Contains(value);
         }
 
         public virtual void Clear()
         {
-            _selectedList.Clear();
-        }
+            _selectedList.Clear();        }
 
-        public virtual int IndexOf(Object value)
-        {
+        public virtual int IndexOf(ENTITY value) {
             return _selectedList.IndexOf(value);
         }
 
-        public virtual void Insert(int index, Object value)
-        {
+        public virtual void Insert(int index, ENTITY value) {
             _selectedList.Insert(index, value);
         }
 
-
-        public virtual void Remove(Object value)
-        {
+        public virtual bool Remove(ENTITY value) {
             _selectedList.Remove(value);
         }
 
 
-        public virtual void RemoveAt(int index)
-        {
+        public virtual void RemoveAt(int index) {
             _selectedList.RemoveAt(index);
         }
 
@@ -174,7 +167,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
         }
 
-        public virtual void CopyTo(System.Array array, int index)
+        public virtual void CopyTo(ENTITY[] array, int index)
         {
             _selectedList.CopyTo(array, index);
         }
@@ -187,35 +180,31 @@ namespace ${glPackageBaseCommonCBean} {
             }
         }
 
-        public virtual Object SyncRoot
-        {
-            get
-            {
+        public virtual Object SyncRoot {
+            get {
                 return _selectedList.SyncRoot;
             }
         }
 
-        public virtual bool IsSynchronized
-        {
-            get
-            {
+        public virtual bool IsSynchronized {
+            get {
                 return _selectedList.IsSynchronized;
             }
         }
 
-        public virtual System.Collections.IEnumerator GetEnumerator()
-        {
+        public virtual System.Collections.Generic.IEnumerator<ENTITY> GetEnumerator() {
             return _selectedList.GetEnumerator();
         }
 
-        public virtual Object this[int index]
-        {
-            get
-            {
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+            return _selectedList.GetEnumerator();
+        }
+
+        public virtual ENTITY this[int index] {
+            get {
                 return _selectedList[index];
             }
-            set
-            {
+            set {
                 _selectedList[index] = value;
             }
         }

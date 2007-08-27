@@ -12,7 +12,7 @@ namespace ${glPackageBaseCommonCBean} {
     /// Author: ${database.ClassAuthor}
     /// </summary>
     [System.Serializable]
-    public class ${myClassName} : ${glListResultBeanName} {
+    public class ${myClassName}<ENTITY> : ${glListResultBeanName}<ENTITY> {
 
         // =====================================================================================
         //                                                                             Attribute
@@ -203,7 +203,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageGroupSize and allPageCount.
         /// </summary>
         /// <returns>Current page-group page-number-list.</returns>
-        public System.Collections.IList GetCurrentPageGroupPageNumberList() {
+        public System.Collections.Generic.IList<int> GetCurrentPageGroupPageNumberList() {
             int allPageCount = this.AllPageCount;
             int currentPageGroupStartPageNumber = CalculateCurrentPageGroupStartPageNumber();
             if (!(currentPageGroupStartPageNumber > 0)) {
@@ -213,7 +213,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
             int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + _pageGroupSize;
 
-            System.Collections.IList resultList = new System.Collections.ArrayList();
+            System.Collections.Generic.IList<int> resultList = new System.Collections.Generic.List<int>();
             for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
                 resultList.Add(i);
             }
@@ -262,7 +262,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageRangeSize and allPageCount.
         /// </summary>
         /// <returns>Current page-range page-number-list.</returns>
-        public System.Collections.IList GetCurrentPageRangePageNumberList() {
+        public System.Collections.Generic.IList<int> GetCurrentPageRangePageNumberList() {
             int pageRangeSize = _pageRangeSize;
             if (pageRangeSize == 0) {
                 String msg = "The pageRangeSize should be greater than 1. But the value is zero.";
@@ -272,7 +272,7 @@ namespace ${glPackageBaseCommonCBean} {
             int allPageCount = this.AllPageCount;
             int currentPageNumber = _currentPageNumber;
 
-            System.Collections.IList resultList = new System.Collections.ArrayList();
+            System.Collections.Generic.IList<int> resultList = new System.Collections.Generic.List<int>();
 
             for (int i = currentPageNumber - pageRangeSize; i < currentPageNumber; i++) {
                 if (i < 1) {

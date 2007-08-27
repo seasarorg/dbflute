@@ -11,6 +11,7 @@
   <property name="dbflute.deploy.dir" value="/pj/java/dbflute-${version}"/>
   <property name="dbflute.example.dir" value="/pj/ws/dbflute-example"/>
   <property name="dbflute.postgresdemo.dir" value="/pj/ws/dbflute-postgresdemo"/>
+  <property name="dbflute.dfncsharp.dir" value="/pj/nws/dfncsharp"/>
 
   <target name="dist" description="==> generates distribution">
 
@@ -62,6 +63,9 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.postgresdemo.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.dfncsharp.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>

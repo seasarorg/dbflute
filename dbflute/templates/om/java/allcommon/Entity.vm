@@ -30,6 +30,13 @@ public interface ${glEntityInterfaceName} {
     public String getTableDbName();
 
     /**
+     * Get table property-name.
+     * 
+     * @return Table property-name. (NotNull)
+     */
+    public String getTablePropertyName();
+
+    /**
      * Get table cap-prop-name.
      * 
      * @return Table cap-prop-name. (NotNull)

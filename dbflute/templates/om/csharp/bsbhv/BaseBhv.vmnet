@@ -1,7 +1,7 @@
 #set ($myClassName = "${myExtendedBhvInterfaceName}")
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonCBean};
@@ -37,16 +37,6 @@ namespace ${glPackageExtendedBhv} {
         #endregion
 
         // =====================================================================================
-        //                                                                      Dao GetterSetter
-        //                                                                      ================
-        #region Dao GetterSetter
-        /// <summary>
-        /// Get my dao.
-        /// </summary>
-        ${myExtendedDaoClassName} Dao { get; set; }
-        #endregion
-
-        // =====================================================================================
         //                                                                          New Instance
         //                                                                          ============
         #region New Instance
@@ -61,103 +51,6 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <returns>My condition-bean. (NotNull)</returns>
         ${myConditionBeanClassName} NewMyConditionBean();
-        #endregion
-
-        // =====================================================================================
-        //                                                                       Delegate-Method
-        //                                                                       ===============
-        #region Delegate-Method
-        /// <summary>
-        /// Select all list. (Delegate-Method)
-        /// </summary> 
-        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        int DelegateGetCountAll();
-
-        /// <summary>
-        /// Select all list. (Delegate-Method)
-        /// </summary> 
-        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList DelegateGetListAll();
-
-        /// <summary>
-        /// Select all list. (Delegate-Method)
-        /// </summary> 
-        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList DelegateSelectListAll();// for saving compatible
-#if ($table.hasPrimaryKey())
-
-        //
-        // Get entity. (Delegate-Method)
-        // 
-        // @param Primary-keys (NotNull)
-        // @return Entity. (NotNull)
-        //
-        ${myExtendedObjectClassName} DelegateGetEntity(${table.PrimaryKeyArgsString});
-#end
-
-        /// <summary>
-        /// Select count by condition-bean. (Delegate-Method)
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>Selected count. (NotNull)</returns>
-        int DelegateSelectCount(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
-#if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// Select count by condition-bean. (Delegate-Method)
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>Selected count. (NotNull)</returns>
-        [Obsolete("This method is deprecated. Please use DelegateSelectCount()")]
-        int DelegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
-#end
-
-        /// <summary>
-        /// Select entity by condition-bean. (Delegate-Method)
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
-        ${myExtendedObjectClassName} DelegateSelectEntity(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
-
-        /// <summary>
-        /// Select list by condition-bean. (Delegate-Method)
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList DelegateSelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
-
-    #if ($table.isUseSequence())
-
-        /// <summary>
-        /// Select next value as sequence. (Delegate-Method)
-        /// </summary>
-        /// <returns>Next value. (NotNull)</returns>
-        int DelegateSelectNextVal();
-    #end
-    #if ($table.isWritable())
-
-        /// <summary>
-        /// Insert one entity. (Delegate-Method)
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Inserted count.</returns>
-        int DelegateInsert(${myExtendedObjectClassName} entity);
-
-        /// <summary>
-        /// Update one entity. (Delegate-Method)
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        int DelegateUpdate(${myExtendedObjectClassName} entity);
-
-        /// <summary>
-        /// Delete one entity. (Delegate-Method)
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Deleted count.</returns>
-        int DelegateDelete(${myExtendedObjectClassName} entity);
-
-    #end
         #endregion
 
         // =====================================================================================
@@ -191,17 +84,6 @@ namespace ${glPackageExtendedBhv} {
 
         ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
     #end
-    #if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
-
-        ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheckForUpdate(${table.PrimaryKeyArgsString});
-
-	  #if ($database.isMakeDeprecated())
-
-		//	K.Kotani Added.
-        [Obsolete("This method is deprecated. Please use SelectByPKValueWithDeletedCheck.")]
-        ${myExtendedObjectClassName} SelectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-      #end
-    #end
 
 
         /// <summary>
@@ -209,14 +91,14 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
-        ${glListResultBeanName} SelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+        ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
 
         /// <summary>
         /// Select page as result-bean.
         /// </summary>
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected page. (NotNull)</returns>
-        ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+        ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
 
         /// <summary>
         /// Select page as result-bean.
@@ -224,70 +106,15 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker invoker);
+        ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker<${myExtendedObjectClassName}> invoker);
 
         #endregion
-
-        // =====================================================================================
-        //                                                                        Various Select
-        //                                                                        ==============
-        #region Various Select
-    #if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// Select list after checking count(ignore fetch scope).
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <param name="maxCount">Max count.</param>
-        /// <returns>List-result-bean. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}"></exception>
-        [Obsolete("This method is deprecated.")]
-        ${glListResultBeanName} SelectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int maxCount);
-    #end
-
-        /// <summary>
-        /// Select page as first.
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <param name="fetchSize">Fetch-size.</param>
-        /// <returns>Selected page as first page. (NotNull)</returns>
-        ${glPagingResultBeanName} SelectPageAsFirst(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int fetchSize);
-
-        /// <summary>
-        /// Select page by page-number.
-        /// If result-page is 'rb.getAllRecordCount > 0 && rb.getSelectedList().size() == 0', re-select as max-page.
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <param name="fetchPageNumber">Fetch-page-number.</param>
-        /// <returns>Selected page as [fetchPageNumber] page. (NotNull)</returns>
-        ${glPagingResultBeanName} SelectPageByPageNumber(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, int fetchPageNumber);
-    #if ($table.hasPrimaryKey())
-      #if ($database.isMakeDeprecated())
-
-        [Obsolete("This method is deprecated. Please use SelectByPKMapStringWithDeletedCheck().")]
-        ${myExtendedObjectClassName} SelectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
-      #end
-    #end
-    #if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// Select for read only with deleted check.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        [Obsolete("This class is deprecated. Please use SelectByPKMapStringWithDeletedCheck().")]
-        ${myExtendedObjectClassName} SelectForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString);
-    #end
-
-        #endregion
-
 
 #if (${table.hasOnlyOnePrimaryKey()})
 
         // =====================================================================================
-        //                                                                         Load Refferer
-        //                                                                         =============
+        //                                                                          Load Referer
+        //                                                                          ============
         #region Load Refferer
   #foreach ($refferer in $table.Referrers)
     #set ($reffererTable = $refferer.Table)
@@ -300,28 +127,21 @@ namespace ${glPackageExtendedBhv} {
     #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List${database.filterGenericsString(${reffererEntityClassName})}")
 
         // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   ReffererTable    = [${refferer.Table.Name}]
-        //   ReffererProperty = [${refferer.ReffererPropertyName}]
+        //   RefererTable    = [${refferer.Table.Name}]
+        //   RefererProperty = [${refferer.ReffererPropertyName}]
         // * * * * * * * * */
-
-        /// <summary>
-        /// Load refferer of ${refferer.ReffererPropertyName}.
-        /// Default refferer condition is 'primary-key asc'.
-        /// </summary>
-        /// <param name="ls">Entity list of main table. (NotNull)</param>
-        void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.IList ls);
 
         /// <summary>
         /// Load refferer of ${refferer.ReffererPropertyName}.
         /// </summary>
         /// <param name="ls">Entity list of main table. (NotNull)</param>
         /// <param name="cbSetupper">Refferer condition-bean setupper instance for registering refferer condition. (NotNull)</param>
-        void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.IList ls, ${reffererTable.JavaName}CBSetupper cbSetupper);
+        void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, ${reffererTable.JavaName}CBSetupper cbSetupper);
   #end
 
         #endregion
 #end
-    #if ($table.isWritable())
+#if ($table.isWritable())
 
         // =====================================================================================
         //                                                                   Basic Entity Update
@@ -387,23 +207,10 @@ namespace ${glPackageExtendedBhv} {
 
         int CopyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString});
         #end
-
-		#if ($database.isMakeDeprecated())
-
-		//	K.Kotani added.
-        /// <summary>
-        /// Select for read only by primary-key map-string with deleted check.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is selected from database by select-for-read-only. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        [Obsolete("This class is deprecated. Please use CopyInsertByPKValueAfterSelect().")]
-        int CopyInsertByPKMapStringAfterSelect(String primaryKeyMapString);
-    	#end
       #end
 
         #endregion
-    #end
+#end
 
     }
 
@@ -430,22 +237,4 @@ namespace ${glPackageExtendedBhv} {
             ${glAttachedCBArgsVariableName}.AddOrderBy_PK_Asc();
         }
     }
-
-#if (${table.hasOnlyOnePrimaryKey()})
-  #foreach ($refferer in $table.Referrers)
-    #set ($reffererTable = $refferer.Table)
-    #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-    #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
-    #set ($reffererBhvClassName = "${reffererEntityClassName}Bhv")
-    #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
-    #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
-    #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List${database.filterGenericsString(${reffererEntityClassName})}")
-
-    [Obsolete("This class is deprecated. Please use ${reffererTable.JavaName}CBSetupper.")]
-    public interface ${table.JavaName}ReffererCondition${refferer.ReffererPropertyNameInitCap} : ${reffererTable.JavaName}CBSetupper {
-    }
-  #end
-#end
-
 }

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharpOld;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 
 /**
@@ -66,7 +67,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                             JavaDir
     //                                                                             =======
     public String getJavaDir() {
-        return stringProp("torque.java.dir", "../src/main/java");
+        final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
+        return stringProp("torque.java.dir", defaultSourceDirectory);
     }
 
     public String getJavaLocation_for_gen() {
@@ -137,6 +139,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isTargetLanguageCSharp() {
         return CSHARP_targetLanguage.equals(getTargetLanguage());
     }
+    
+    public boolean isTargetLanguageCSharpOld() {
+        return CSHARPOLD_targetLanguage.equals(getTargetLanguage());
+    }
 
     protected DfLanguageDependencyInfo _languageDependencyInfo;
 
@@ -146,6 +152,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
                 _languageDependencyInfo = new DfLanguageDependencyInfoJava();
             } else if (isTargetLanguageCSharp()) {
                 _languageDependencyInfo = new DfLanguageDependencyInfoCSharp();
+            } else if (isTargetLanguageCSharpOld()) {
+                _languageDependencyInfo = new DfLanguageDependencyInfoCSharpOld();
             } else {
                 String msg = "The language is supported: " + getTargetLanguage();
                 throw new IllegalStateException(msg);

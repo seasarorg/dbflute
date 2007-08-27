@@ -641,6 +641,10 @@ public class Database {
     public boolean isTargetLanguageCSharp() {
         return getBasicProperties().isTargetLanguageCSharp();
     }
+    
+    public boolean isTargetLanguageCSharpOld() {
+        return getBasicProperties().isTargetLanguageCSharpOld();
+    }
 
     public boolean isJavaVersionGreaterEqualMustang() {
         return getBasicProperties().isJavaVersionGreaterEqualMustang();

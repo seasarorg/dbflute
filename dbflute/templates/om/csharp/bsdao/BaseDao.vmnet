@@ -1,7 +1,7 @@
 #set ($myClassName = "${myExtendedDaoClassName}")
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using ${myExtendedEntityPackageName};
 #set ($InterfaceName = "")
 #if ($table.hasPrimaryKey())
@@ -58,7 +58,7 @@ namespace ${myExtendedDaoPackageName} {
         /// </summary>
         /// <returns>List of all records.</returns>
         [Seasar.Dao.Attrs.Sql("select ${table.columnNameCommaString} from ${table.Name}")]
-        System.Collections.IList GetListAll();
+        System.Collections.Generic.IList<${myExtendedObjectClassName}> GetListAll();
 #if ($table.hasPrimaryKey())
 
         [Seasar.Dao.Attrs.Sql("select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}")]
@@ -126,7 +126,7 @@ namespace ${myExtendedDaoPackageName} {
         /// </summary> 
         /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
         /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        System.Collections.IList SelectList(${myAttachedCBArgsString});
+        System.Collections.Generic.IList<${myExtendedObjectClassName}> SelectList(${myAttachedCBArgsString});
 
 #if ($table.hasPrimaryKey())
 
@@ -157,7 +157,7 @@ namespace ${myExtendedDaoPackageName} {
         /// <param name="entityList">Entity-list. (NotNull)</param>
         /// <returns>Inserted count.</returns>
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int InsertList(System.Collections.IList entityList);
+//        int InsertList(System.Collections.Generic.IList<${myExtendedObjectClassName}> entityList);
 
         /// <summary>
         /// Update several entities.
@@ -165,7 +165,7 @@ namespace ${myExtendedDaoPackageName} {
         /// <param name="entityList">Entity-list. (NotNull)</param>
         /// <returns>Updated count.</returns>
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int UpdateList(System.Collections.IList entityList);
+//        int UpdateList(System.Collections.Generic.IList<${myExtendedObjectClassName}> entityList);
 
         /// <summary>
         /// Delete several entities.
@@ -173,7 +173,7 @@ namespace ${myExtendedDaoPackageName} {
         /// <param name="entityList">Entity-list. (NotNull)</param>
         /// <returns>Deleted count.</returns>
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
-//        int DeleteList(System.Collections.IList entityList);
+//        int DeleteList(System.Collections.Generic.IList<${myExtendedObjectClassName}> entityList);
 
         /// <summary>
         /// Delete all entities.

@@ -1,7 +1,7 @@
 #set ($myClassName = "${myExtendedBhvClassName}")
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonCBean};
@@ -99,7 +99,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <returns>${glBehaviorReadableInterfaceName}</returns>
         protected override ${glBehaviorReadableInterfaceName} SelfReadable {
-            get { return this.Self; }
+            get { return this; }
         }
     #if ($table.isWritable())
 
@@ -108,7 +108,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <returns>${glBehaviorWritableInterfaceName}</returns>
         protected override ${glBehaviorWritableInterfaceName} SelfWritable {
-            get { return this.Self; }
+            get { return this; }
         }
     #end
 
@@ -192,7 +192,7 @@ namespace ${glPackageExtendedBhv} {
         /// Select all list. (Delegate-Method)
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateGetCountAll() {
+        protected int DelegateGetCountAll() {
             return this.Dao.GetCountAll();
         }
 
@@ -200,7 +200,7 @@ namespace ${glPackageExtendedBhv} {
         /// Select all list. (Delegate-Method)
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList ${myExtendedBhvInterfaceName}.DelegateGetListAll() {
+        protected System.Collections.Generic.IList<${myExtendedObjectClassName}> DelegateGetListAll() {
             return this.Dao.GetListAll();
         }
 
@@ -208,7 +208,7 @@ namespace ${glPackageExtendedBhv} {
         /// Select all list. (Delegate-Method)
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList ${myExtendedBhvInterfaceName}.DelegateSelectListAll() {// for saving compatible
+        protected System.Collections.Generic.IList<${myExtendedObjectClassName}> DelegateSelectListAll() {// for saving compatible
             return this.Dao.GetListAll();
         }
 #if ($table.hasPrimaryKey())
@@ -219,7 +219,7 @@ namespace ${glPackageExtendedBhv} {
         // @param Primary-keys (NotNull)
         // @return Entity. (NotNull)
         //
-        ${myExtendedObjectClassName} ${myExtendedBhvInterfaceName}.DelegateGetEntity(${table.PrimaryKeyArgsString}) {
+        protected ${myExtendedObjectClassName} DelegateGetEntity(${table.PrimaryKeyArgsString}) {
             return this.Dao.GetEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()});
         }
 #end
@@ -229,7 +229,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected count. (NotNull)</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateSelectCount(${myConditionBeanClassName} cb) {
+        protected int DelegateSelectCount(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.Dao.SelectCount(cb);
         }
@@ -240,39 +240,15 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected count. (NotNull)</returns>
         protected override int DoCallReadCount(${glConditionBeanInterfaceName} cb) {
-            return this.Self.DelegateSelectCount((${myConditionBeanClassName})cb);
+            return this.DelegateSelectCount((${myConditionBeanClassName})cb);
         }
-
-#if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// Select count by condition-bean. (Delegate-Method)
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Selected count. (NotNull)</returns>
-        [Obsolete("This method is deprecated. Please use DelegateSelectCount()")]
-        int ${myExtendedBhvInterfaceName}.DelegateSelectCountIgnoreFetchScope(${myConditionBeanClassName} cb) {
-            AssertConditionBeanNotNull(cb);
-            return this.Dao.SelectCountIgnoreFetchScope(cb);
-        }
-
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Selected count. (NotNull)</returns>
-        [Obsolete("This method is deprecated. Please don't use!")]
-        protected override int DoCallReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
-            return this.Self.DelegateSelectCountIgnoreFetchScope((${myConditionBeanClassName})cb);
-        }
-#end
 
         /// <summary>
         /// Select entity by condition-bean. (Delegate-Method)
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
-        ${myExtendedObjectClassName} ${myExtendedBhvInterfaceName}.DelegateSelectEntity(${myConditionBeanClassName} cb) {
+        protected ${myExtendedObjectClassName} DelegateSelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.Dao.SelectEntity(cb);
         }
@@ -282,7 +258,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary> 
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        IList ${myExtendedBhvInterfaceName}.DelegateSelectList(${myConditionBeanClassName} cb) {
+        protected System.Collections.Generic.IList<${myExtendedObjectClassName}> DelegateSelectList(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.Dao.SelectList(cb);
         }
@@ -292,15 +268,15 @@ namespace ${glPackageExtendedBhv} {
         /// </summary> 
         /// <returns>Selected all count. If the select result is zero, it returns empty list. (NotNull)</returns>
         protected override int DoCallGetCountAll() {
-            return this.Self.DelegateGetCountAll();
+            return this.DelegateGetCountAll();
         }
 
         /// <summary>
         /// ${database.OverrideComment}
         /// </summary> 
         /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        protected override IList DoCallGetListAll() {
-            return this.Self.DelegateGetListAll();
+        protected override System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallGetListAll() {
+            return (System.Collections.Generic.IList<${glEntityInterfaceName}>)this.DelegateGetListAll();
         }
 
         /// <summary>
@@ -309,7 +285,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
         protected override ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb) {
-            return this.Self.DelegateSelectEntity((${myConditionBeanClassName})cb);
+            return this.DelegateSelectEntity((${myConditionBeanClassName})cb);
         }
 
         /// <summary>
@@ -317,48 +293,9 @@ namespace ${glPackageExtendedBhv} {
         /// </summary> 
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        protected override IList DoCallReadList(${glConditionBeanInterfaceName} cb) {
-            return this.Self.DelegateSelectList((${myConditionBeanClassName})cb);
+        protected override System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb) {
+            return (System.Collections.Generic.IList<${glEntityInterfaceName}>)this.DelegateSelectList((${myConditionBeanClassName})cb);
         }
-
-#if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary> 
-        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        protected override IList DoDelegateReadAllList() {
-            return this.Self.DelegateGetListAll();
-        }
-
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Selected count. (NotNull)</returns>
-        [Obsolete("This method is deprecated. Please don't use!")]
-        protected override int DoDelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
-            return this.Self.DelegateSelectCountIgnoreFetchScope((${myConditionBeanClassName})cb);
-        }
-
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
-        protected override ${glEntityInterfaceName} DoDelegateReadEntity(${glConditionBeanInterfaceName} cb) {
-            return this.Self.DelegateSelectEntity((${myConditionBeanClassName})cb);
-        }
-
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary> 
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
-        protected override IList DoDelegateReadList(${glConditionBeanInterfaceName} cb) {
-            return this.Self.DelegateSelectList((${myConditionBeanClassName})cb);
-        }
-#end
 
     #if ($table.isUseSequence())
 
@@ -366,7 +303,7 @@ namespace ${glPackageExtendedBhv} {
         /// Select next value as sequence. (Delegate-Method)
         /// </summary>
         /// <returns>Next value. (NotNull)</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateSelectNextVal() {
+        protected int DelegateSelectNextVal() {
             return this.Dao.SelectNextVal();
         }
     #end
@@ -378,7 +315,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Inserted count.</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateInsert(${myExtendedObjectClassName} entity) {
+        protected int DelegateInsert(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
             FilterEntityOfInsert(entity);
             AssertEntityOfInsert(entity);
@@ -390,7 +327,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Updated count.</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateUpdate(${myExtendedObjectClassName} entity) {
+        protected int DelegateUpdate(${myExtendedObjectClassName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             FilterEntityOfUpdate(entity);
             AssertEntityOfUpdate(entity);
@@ -402,7 +339,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Deleted count.</returns>
-        int ${myExtendedBhvInterfaceName}.DelegateDelete(${myExtendedObjectClassName} entity) {
+        protected int DelegateDelete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             FilterEntityOfDelete(entity);
             AssertEntityOfDelete(entity);
@@ -415,7 +352,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Inserted count.</returns>
         protected override int DoCallCreate(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateInsert((${myExtendedObjectClassName})entity);
+            return this.DelegateInsert((${myExtendedObjectClassName})entity);
         }
 
         /// <summary>
@@ -424,7 +361,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Updated count.</returns>
         protected override int DoCallModify(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateUpdate((${myExtendedObjectClassName})entity);
+            return this.DelegateUpdate((${myExtendedObjectClassName})entity);
         }
 
         /// <summary>
@@ -433,38 +370,8 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Deleted count.</returns>
         protected override int DoCallRemove(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateDelete((${myExtendedObjectClassName})entity);
+            return this.DelegateDelete((${myExtendedObjectClassName})entity);
         }
-
-#if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Inserted count.</returns>
-        protected override int DoDelegateCreate(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateInsert((${myExtendedObjectClassName})entity);
-        }
-
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Updated count.</returns>
-        protected override int DoDelegateModify(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateUpdate((${myExtendedObjectClassName})entity);
-        }
-
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Deleted count.</returns>
-        protected override int DoDelegateRemove(${glEntityInterfaceName} entity) {
-            return this.Self.DelegateDelete((${myExtendedObjectClassName})entity);
-        }
-#end
 
     #end
 
@@ -482,7 +389,7 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>Selected count. (NotNull)</returns>
         public int SelectCount(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-	        return this.Self.DelegateSelectCount(cb);
+            return this.DelegateSelectCount(cb);
         }
 
         /// <summary>
@@ -494,11 +401,11 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
         public ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            System.Collections.IList ls = this.Self.DelegateSelectList(cb);
+            System.Collections.Generic.IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
             if (ls.Count == 0) {
                 return null;
             }
-            AssertRecordHasBeenSelectedAsOne(ls, cb);
+            AssertRecordHasBeenSelectedAsOne((System.Collections.Generic.IList<${glEntityInterfaceName}>)ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
 
@@ -511,9 +418,9 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
         public ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            System.Collections.IList ls = this.Self.DelegateSelectList(cb);
-            AssertRecordHasNotBeenDeleted(ls, cb);
-            AssertRecordHasBeenSelectedAsOne(ls, cb);
+            System.Collections.Generic.IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
+            AssertRecordHasNotBeenDeleted((System.Collections.Generic.IList<${glEntityInterfaceName}>)ls, cb);
+            AssertRecordHasBeenSelectedAsOne((System.Collections.Generic.IList<${glEntityInterfaceName}>)ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
 
@@ -524,33 +431,9 @@ namespace ${glPackageExtendedBhv} {
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
             ${myConditionBeanClassName} cb = NewMyConditionBean();
             cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-            return this.Self.SelectEntityWithDeletedCheck(cb);
+            return this.SelectEntityWithDeletedCheck(cb);
         }
     #end
-    #if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
-
-        public ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheckForUpdate(${table.PrimaryKeyArgsString}) {
-            ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-            ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            ${myConditionBeanClassName} cb = NewMyConditionBean();
-            cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-            cb.LockForUpdate();
-            return this.Self.SelectEntityWithDeletedCheck(cb);
-        }
-
-      #if ($database.isMakeDeprecated())
-
-		//	K.Kotani Added.
-        [Obsolete("This method is deprecated. Please use SelectByPKValueWithDeleteCheckForUpdate.")]
-        public ${myExtendedObjectClassName} SelectForUpdateByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-            ${myConditionBeanClassName} cb = NewMyConditionBean();
-            cb.AcceptPrimaryKeyMapString(primaryKeyMapString);
-            cb.LockForUpdate();
-            return this.Self.SelectEntityWithDeletedCheck(cb);
-        }
-      #end
-    #end
-
 
         /// <summary>
         /// Select list.
@@ -558,9 +441,9 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}"></exception>
-        public ${glListResultBeanName} SelectList(${myConditionBeanClassName} cb) {
+        public ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.Self.DelegateSelectList(cb));
+            return new ResultBeanBuilder<${myExtendedObjectClassName}>(this).BuildListResultBean(cb, this.DelegateSelectList(cb));
         }
 
         /// <summary>
@@ -568,9 +451,9 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected page. (NotNull)</returns>
-        public ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} cb) {
+        public ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            return this.Self.SelectPage(cb, new SelectPageSimpleInvoker(this));
+            return this.SelectPage(cb, new SelectPageSimpleInvoker<${myExtendedObjectClassName}>(this));
         }
 
         /// <summary>
@@ -579,99 +462,19 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        public ${glPagingResultBeanName} SelectPage(${myConditionBeanClassName} cb, SelectPageInvoker invoker) {
+        public ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb, SelectPageInvoker<${myExtendedObjectClassName}> invoker) {
             AssertConditionBeanNotNull(cb);
-            return invoker.InvokeSelectPage(new SelectPageSimpleCallback(cb, this));
+            return invoker.InvokeSelectPage(new SelectPageSimpleCallback<${myExtendedObjectClassName}>(cb, this));
         }
 
         #endregion
 
-        // =====================================================================================
-        //                                                                        Various Select
-        //                                                                        ==============
-        #region Various Select
-    #if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// Select list after checking count(ignore fetch scope).
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <param name="maxCount">Max count.</param>
-        /// <returns>List-result-bean. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}"></exception>
-        [Obsolete("This method is deprecated.")]
-        public ${glListResultBeanName} SelectListAfterCheckingCountIgnoreFetchScope(${myConditionBeanClassName} cb, int maxCount) {
-            AssertConditionBeanNotNull(cb);
-            int selectedCount = this.Self.DelegateSelectCountIgnoreFetchScope(cb);
-            AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb);
-            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.Self.DelegateSelectList(cb));
-        }
-    #end
-
-        /// <summary>
-        /// Select page as first.
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <param name="fetchSize">Fetch-size.</param>
-        /// <returns>Selected page as first page. (NotNull)</returns>
-        public ${glPagingResultBeanName} SelectPageAsFirst(${myConditionBeanClassName} cb, int fetchSize) {
-            AssertConditionBeanNotNull(cb);
-            cb.FetchFirst(fetchSize);
-            return this.Self.SelectPage(cb);
-        }
-
-        /// <summary>
-        /// Select page by page-number.
-        /// If result-page is 'rb.getAllRecordCount > 0 && rb.getSelectedList().size() == 0', re-select as max-page.
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <param name="fetchPageNumber">Fetch-page-number.</param>
-        /// <returns>Selected page as [fetchPageNumber] page. (NotNull)</returns>
-        public ${glPagingResultBeanName} SelectPageByPageNumber(${myConditionBeanClassName} cb, int fetchPageNumber) {
-            AssertConditionBeanNotNull(cb);
-            cb.FetchPage(fetchPageNumber);
-            return this.Self.SelectPage(cb);
-        }
-
-    #if ($table.hasPrimaryKey())
-      #if ($database.isMakeDeprecated())
-
-        [Obsolete("This class is deprecated. Please use SelectByPKMapStringWithDeletedCheck().")]
-        public ${myExtendedObjectClassName} SelectForReadOnlyByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
-            ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-            ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
-            ${myConditionBeanClassName} cb = NewMyConditionBean();
-            cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-            return SelectEntityWithDeletedCheck(cb);
-        }
-      #end
-    #end
-    #if ($database.isMakeDeprecated())
-
-        /// <summary>
-        /// Select for read only by primary-key map-string with deleted check.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is selected from database by select-for-read-only. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        [Obsolete("This class is deprecated. Please use SelectByPKMapStringWithDeletedCheck().")]
-        public ${myExtendedObjectClassName} SelectForReadOnlyByPKMapStringWithDeletedCheck(String primaryKeyMapString) {
-            AssertStringNotNullAndNotTrimmedEmpty("primaryKeyMapString", primaryKeyMapString);
-            ${myConditionBeanClassName} cb = NewMyConditionBean();
-            cb.AcceptPrimaryKeyMapString(primaryKeyMapString);
-            ${glPackageExtendedEntity}.${myExtendedObjectClassName} currentEntity = this.Self.DelegateSelectEntity(cb);
-            AssertRecordHasNotBeenDeleted(currentEntity, primaryKeyMapString);
-            return currentEntity;
-        }
-    #end
-
-        #endregion
 #if (${table.hasOnlyOnePrimaryKey()})
 
         // =====================================================================================
-        //                                                                         Load Refferer
-        //                                                                         =============
-        #region Load Refferer
+        //                                                                          Load Referer
+        //                                                                          ============
+        #region Load Referer
   #foreach ($refferer in $table.Referrers)
     #set ($reffererTable = $refferer.Table)
     #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
@@ -681,7 +484,8 @@ namespace ${glPackageExtendedBhv} {
     #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
     #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
     #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List${database.filterGenericsString(${reffererEntityClassName})}")
+    #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, System.Collections.Generic.IList<${reffererEntityClassName}>")
 
         // /* * * * * * * * * * * * * * * * * * * * * * *
         //   ReffererTable    = [${refferer.Table.Name}]
@@ -693,7 +497,7 @@ namespace ${glPackageExtendedBhv} {
         /// Default refferer condition is 'primary-key asc'.
         /// </summary>
         /// <param name="ls">Entity list of main table. (NotNull)</param>
-        public void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.IList ls) {
+        public void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls) {
             Load${refferer.ReffererPropertyNameInitCap}(ls, new ${reffererTable.JavaName}CBSetupperPKAsc());
         }
 
@@ -702,18 +506,18 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="ls">Entity list of main table. (NotNull)</param>
         /// <param name="cbSetupper">Refferer condition-bean setupper instance for registering refferer condition. (NotNull)</param>
-        public void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.IList ls, ${reffererTable.JavaName}CBSetupper cbSetupper) {
+        public void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, ${reffererTable.JavaName}CBSetupper cbSetupper) {
             AssertObjectNotNull("ls", ls);
             AssertObjectNotNull("cbSetupper", cbSetupper);
             if (ls.Count == 0) {
                 return;
             }
 
-            System.Collections.IDictionary pkMyEntityMap = new System.Collections.Hashtable();
-            System.Collections.IList pkList = new System.Collections.ArrayList();
+            System.Collections.Generic.IDictionary<${genericPKMyEntityMap}> pkMyEntityMap = new System.Collections.Generic.Dictionary<${genericPKMyEntityMap}>();
+            System.Collections.Generic.IList<${table.getPrimaryKeyJavaNativeAsOne()}> pkList = new System.Collections.Generic.List<${table.getPrimaryKeyJavaNativeAsOne()}>();
             foreach (${myExtendedObjectClassName} entity in ls) {
                 pkList.Add(entity.${table.getPrimaryKeyJavaNameAsOne()});
-                if (pkMyEntityMap.Contains(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
+                if (pkMyEntityMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
                     pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
                 }
             }
@@ -722,14 +526,14 @@ namespace ${glPackageExtendedBhv} {
             cb.Query().Set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
             cb.Query().AddOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
             cbSetupper.Setup(cb);
-            System.Collections.IList reffererList = reffererBhv.DelegateSelectList(cb);
+            System.Collections.Generic.IList<${reffererEntityClassName}> refererList = reffererBhv.SelectList(cb);
 
-            System.Collections.IDictionary pkReffererListMap = new System.Collections.Hashtable();
-            foreach (${reffererEntityClassName} reffererEntity in reffererList) {
-                if (!pkReffererListMap.Contains(reffererEntity.${refferer.getLocalColumnJavaNameAsOne()})) {
-                    pkReffererListMap.Add(reffererEntity.${refferer.getLocalColumnJavaNameAsOne()}, new System.Collections.ArrayList());
+            System.Collections.Generic.IDictionary<${genericPKChildListMap}> pkRefererListMap = new System.Collections.Generic.Dictionary<${genericPKChildListMap}>();
+            foreach (${reffererEntityClassName} reffererEntity in refererList) {
+                if (!pkRefererListMap.ContainsKey(reffererEntity.${refferer.getLocalColumnJavaNameAsOne()})) {
+                    pkRefererListMap.Add(reffererEntity.${refferer.getLocalColumnJavaNameAsOne()}, new System.Collections.Generic.List<${reffererEntityClassName}>());
                 }
-                ((System.Collections.IList)pkReffererListMap[reffererEntity.${refferer.getLocalColumnJavaNameAsOne()}]).Add(reffererEntity);
+                ((System.Collections.Generic.IList<${reffererEntityClassName}>)pkRefererListMap[reffererEntity.${refferer.getLocalColumnJavaNameAsOne()}]).Add(reffererEntity);
 
                 // for Reverse Reference.
                 ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap[reffererEntity.${refferer.getLocalColumnJavaNameAsOne()}];
@@ -737,25 +541,19 @@ namespace ${glPackageExtendedBhv} {
             }
 
             foreach (${myExtendedObjectClassName} entity in ls) {
-                if (pkReffererListMap.Contains(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
-                    entity.${refferer.ReffererPropertyNameInitCap} = (System.Collections.IList)pkReffererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
+                if (pkRefererListMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
+                    entity.${refferer.ReffererPropertyNameInitCap} = (System.Collections.Generic.IList<${reffererEntityClassName}>)pkRefererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
                 } else {
-                    entity.${refferer.ReffererPropertyNameInitCap} = new System.Collections.ArrayList();
+                    entity.${refferer.ReffererPropertyNameInitCap} = new System.Collections.Generic.List<${reffererEntityClassName}>();
                 }
             }
         }
 
-        [Obsolete("This class is deprecated. Please use ${reffererTable.JavaName}CBSetupperPKAsc.")]
-        public class ${table.JavaName}ReffererCondition${refferer.ReffererPropertyNameInitCap}PKAsc : ${reffererTable.JavaName}CBSetupper {
-            public void Setup(${reffererCBClassName} cb) {
-                cb.AddOrderBy_PK_Asc();
-            }
-        }
   #end
 
         #endregion
 #end
-    #if ($table.isWritable())
+#if ($table.isWritable())
 
         // =====================================================================================
         //                                                                   Basic Entity Update
@@ -767,7 +565,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity"> Entity. (NotNull)</param>
         public void Insert(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
-            this.Self.DelegateInsert(entity);
+            this.DelegateInsert(entity);
         }
 
         /// <summary>
@@ -776,7 +574,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity"> Entity. (NotNull)</param>
         public void Update(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
-            int updatedCount = this.Self.DelegateUpdate(entity);
+            int updatedCount = this.DelegateUpdate(entity);
             if (updatedCount != 1) {
                 throw new Seasar.Dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
             }
@@ -793,7 +591,7 @@ namespace ${glPackageExtendedBhv} {
             cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
             ${myExtendedObjectClassName} currentEntity = SelectEntityWithDeletedCheck(cb);
             MergeEntity(entity, currentEntity);
-            this.Self.Update(currentEntity);
+            this.Update(currentEntity);
         }
 
         /// <summary>
@@ -805,13 +603,13 @@ namespace ${glPackageExtendedBhv} {
 //        public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
 //            AssertEntityNotNull(entity);
 //            if (!entity.HasPrimaryKeyValue) {
-//                this.Self.Insert(entity);
+//                this.Insert(entity);
 //                return;
 //            }
 //            try {
-//                this.Self.Update(entity);
+//                this.Update(entity);
 //            } catch (Exception) {
-//                this.Self.Insert(entity);
+//                this.Insert(entity);
 //                return;
 //            }
 //        }
@@ -824,7 +622,7 @@ namespace ${glPackageExtendedBhv} {
         public void InsertOrUpdateAfterSelect(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
-                this.Self.Insert(entity);
+                this.Insert(entity);
                 return;
             }
             ${myExtendedObjectClassName} currentEntity = null;
@@ -833,56 +631,13 @@ namespace ${glPackageExtendedBhv} {
                 cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
                 currentEntity = SelectEntityWithDeletedCheck(cb);
             } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-                this.Self.Insert(entity);
+                this.Insert(entity);
                 return;
             }
             AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             MergeEntity(entity, currentEntity);
-            this.Self.Update(currentEntity);
+            this.Update(currentEntity);
         }
-      #if ($database.isMakeBehaviorForUpdate())
-
-        /// <summary>
-        /// Update after select-for-update.
-        /// </summary>
-        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public void UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
-            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            ${myConditionBeanClassName} cb = NewMyConditionBean();
-            cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-            cb.LockForUpdate();
-            ${myExtendedObjectClassName} currentEntity = SelectEntityWithDeletedCheck(cb);
-            MergeEntity(entity, currentEntity);
-            this.Self.Update(currentEntity);
-        }
-
-        /// <summary>
-        /// Insert or update after select-for-update.
-        /// </summary>
-        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public void InsertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity) {
-            AssertEntityNotNull(entity);
-            if (!entity.HasPrimaryKeyValue) {
-                this.Self.Insert(entity);
-                return;
-            }
-            ${myExtendedObjectClassName} currentEntity = null;
-            try {
-                ${myConditionBeanClassName} cb = NewMyConditionBean();
-                cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-                cb.LockForUpdate();
-                currentEntity = SelectEntityWithDeletedCheck(cb);
-            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-                this.Self.Insert(entity);
-                return;
-            }
-            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            MergeEntity(entity, currentEntity);
-            this.Self.Update(currentEntity);
-        }
-      #end
 
         /// <summary>
         /// ${database.ImplementComment}
@@ -894,11 +649,13 @@ namespace ${glPackageExtendedBhv} {
             AssertObjectNotNull("destinationEntity", destinationEntity);
             ${myExtendedObjectClassName} sourceMyEntity = (${myExtendedObjectClassName})sourceEntity;
             ${myExtendedObjectClassName} destinationMyEntity = (${myExtendedObjectClassName})destinationEntity;
+
+// TODO: @jflute -- ModifiedProperties
       #foreach ($col in $table.Columns)
 
-            if (sourceMyEntity.IsSetterInvoked${col.JavaName}()) {
-                destinationMyEntity.${col.JavaName} = sourceMyEntity.${col.JavaName};
-            }
+//            if (sourceMyEntity.IsSetterInvoked${col.JavaName}()) {
+//                destinationMyEntity.${col.JavaName} = sourceMyEntity.${col.JavaName};
+//            }
       #end
 
         }
@@ -909,7 +666,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity"> Entity. (NotNull)</param>
         public void Delete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
-            this.Self.DelegateDelete(entity);
+            this.DelegateDelete(entity);
         }
         #endregion
 
@@ -933,31 +690,13 @@ namespace ${glPackageExtendedBhv} {
             cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
             ${myExtendedObjectClassName} currentEntity = SelectEntityWithDeletedCheck(cb);
             FilterCopyInsertEntity(currentEntity);
-            return this.Self.DelegateInsert(currentEntity);
+            return this.DelegateInsert(currentEntity);
         }
-		  #if ($database.isMakeDeprecated())
-
-		//	K.Kotani added.
-        /// <summary>
-        /// Select for read only by primary-key map-string with deleted check.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        /// <returns>Entity that is selected from database by select-for-read-only. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        [Obsolete("This class is deprecated. Please use CopyInsertByPKValueAfterSelect().")]
-        public int CopyInsertByPKMapStringAfterSelect(String primaryKeyMapString) {
-            ${myConditionBeanClassName} cb = NewMyConditionBean();
-            cb.AcceptPrimaryKeyMapString(primaryKeyMapString);
-            ${myExtendedObjectClassName} currentEntity = SelectEntityWithDeletedCheck(cb);
-            FilterCopyInsertEntity(currentEntity);
-            return this.Self.DelegateInsert(currentEntity);
-        }
-    	  #end
         #end
       #end
 
         #endregion
-    #end
+#end
 
     }
 }

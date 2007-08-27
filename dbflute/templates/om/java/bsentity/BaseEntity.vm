@@ -137,11 +137,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     /**
      * ${database.ImplementComment}
      * 
+     * @return Table property name(JavaBeansRule) of ${table.basicInfoDispString}. (NotNull)
+     */
+    public String getTablePropertyName() {
+        return "${table.javaBeansRulePropertyName}";
+    }
+
+#if ($database.isMakeRecentlyDeprecated())
+    /**
+     * ${database.ImplementComment}
+     * 
      * @return Table prop-name(JavaBeansRule) of ${table.basicInfoDispString}. (NotNull)
+     * @deprecated Please use getTablePropertyName()
      */
     public String getTablePropName() {
         return "${table.javaBeansRulePropertyName}";
     }
+#end
 
     /**
      * ${database.ImplementComment}

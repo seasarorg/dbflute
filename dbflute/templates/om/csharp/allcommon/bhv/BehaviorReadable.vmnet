@@ -56,104 +56,6 @@ namespace ${glPackageBaseCommonBhv} {
         /// <returns>Condition-bean. (NotNull)</returns>
         ${glConditionBeanInterfaceName} NewConditionBean();
 
-        // =====================================================================================
-        //                                                                       Delegate-Method
-        //                                                                       ===============
-        /**
-         * Get count all. (Call-Method)
-         * 
-         * @return Count all. (NotNull)
-         */
-        int CallGetCountAll();
-
-        /**
-         * Read all list. (Call-Method)
-         * 
-         * @return Read all list. (NotNull)
-         */
-        IList CallGetListAll();
-
-        /**
-         * Read count by condition-bean. (Delegate-Method)
-         * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
-         * 
-         * @param cb Condition-bean. (NotNull)
-         * @return Read count. (NotNull)
-         */
-        int CallReadCount(${glConditionBeanInterfaceName} cb);
-#if ($database.isMakeDeprecated())
-
-        /**
-         * Read count by condition-bean. (Delegate-Method)
-         * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
-         * 
-         * @param cb Condition-bean. (NotNull)
-         * @return Read count. (NotNull)
-         */
-        [Obsolete("This method is deprecated. Please use CallReadCount()")]
-        int CallReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
-#end
-
-        /**
-         * Read entity by condition-bean. (Call-Method)
-         * 
-         * @param cb Condition-bean. (NotNull)
-         * @return Read entity. If the select result is zero, it returns null. (Nullable)
-         */
-        ${glEntityInterfaceName} CallReadEntity(${glConditionBeanInterfaceName} cb);
-
-        /**
-         * Read list by condition-bean. (Call-Method)
-         * 
-         * @param cb Condition-bean. (NotNull)
-         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-         */
-        IList CallReadList(${glConditionBeanInterfaceName} cb);
-
-
-
-#if ($database.isMakeDeprecated())
-
-        /**
-         * Read all list. (Delegate-Method)
-         * 
-         * @return Read all list. (NotNull)
-         */
-        [Obsolete("This method is deprecated. Please use CallReadAllList()")]
-        IList DelegateReadAllList();
-#if ($database.isMakeDeprecated())
-
-        /**
-         * Read count by condition-bean. (Delegate-Method)
-         * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
-         * 
-         * @param cb Condition-bean. (NotNull)
-         * @return Read count. (NotNull)
-         */
-        [Obsolete("This method is deprecated. Please don't use!")]
-        int DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
-#end
-
-        /**
-         * Read entity by condition-bean. (Delegate-Method)
-         * 
-         * @param cb Condition-bean. (NotNull)
-         * @return Read entity. If the select result is zero, it returns null. (Nullable)
-         */
-        [Obsolete("This method is deprecated. Please use CallReadEntity()")]
-        ${glEntityInterfaceName} DelegateReadEntity(${glConditionBeanInterfaceName} cb);
-
-        /**
-         * Read list by condition-bean. (Delegate-Method)
-         * 
-         * @param cb Condition-bean. (NotNull)
-         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-         */
-        [Obsolete("This method is deprecated. Please use CallReadList()")]
-        IList DelegateReadList(${glConditionBeanInterfaceName} cb);
-
-#end
-
 	    // =====================================================================================
 	    //                                                                         Basic Get All
 	    //                                                                         =============
@@ -197,14 +99,14 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
-        ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} cb);
+        ${glListResultBeanName}<${glEntityInterfaceName}> ReadList(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb);
+        ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
         /// ${database.ImplementComment}
@@ -212,44 +114,8 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker invoker);
+        ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker<${glEntityInterfaceName}> invoker);
 
-        #endregion
-
-        // =====================================================================================
-        //                                                                        Various Select
-        //                                                                        ==============
-        #region Various Select
-    #if ($database.isMakeDeprecated())
-
-        /**
-         * Read list after checking count.
-         * 
-         * @param cb Condition-bean.
-         * @param maxCount Max count.
-         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-         * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-         */
-        [Obsolete("This method is deprecated.")]
-        ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount);
-    #end
-
-        /// <summary>
-        /// Read page as first page.
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <param name="fetchSize">Fetch-size.</param>
-        /// <returns>Read page as first page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPageAsFirst(${glConditionBeanInterfaceName} cb, int fetchSize);
-
-        /// <summary>
-        /// Read page by page-number.
-        /// If result-page is 'rb.getAllRecordCount > 0 && rb.getSelectedList().size() == 0', re-select as max-page.
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <param name="fetchPageNumber">Fetch-page-number.</param>
-        /// <returns>Read page as [fetchPageNumber] page. (NotNull)</returns>
-        ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} cb, int fetchPageNumber);
         #endregion
     }
 
@@ -281,16 +147,16 @@ namespace ${glPackageBaseCommonBhv} {
     ///      }
     /// ]]>
     /// </summary>
-    public interface SelectPageCallback {
+    public interface SelectPageCallback<ENTITY> {
         ${glPagingBeanInterfaceName} PagingBean { get; }
         int SelectCountIgnoreFetchScope();
-        System.Collections.IList SelectList();
+        System.Collections.Generic.IList<ENTITY> SelectListWithFetchScope();
     }
 
     /// <summary>
     /// The simple-implementation of select-page-as-first callback.
     /// </summary>
-    public class SelectPageSimpleCallback : SelectPageCallback {
+    public class SelectPageSimpleCallback<ENTITY> : SelectPageCallback<ENTITY> {
         protected ${glPagingBeanInterfaceName} _pb;
         protected ${glBehaviorReadableInterfaceName} _bhv;
         public ${glPagingBeanInterfaceName} PagingBean { get { return _pb; } }
@@ -302,13 +168,13 @@ namespace ${glPackageBaseCommonBhv} {
             // This is default method of select-count-ignore-fetch-scope.
             return _bhv.ReadCount((${glConditionBeanInterfaceName})this.PagingBean);
         }
-        public virtual System.Collections.IList SelectList() {
+        public virtual System.Collections.Generic.IList<ENTITY> SelectListWithFetchScope() {
             // This is default method of select-list.
-            return _bhv.ReadList((${glConditionBeanInterfaceName})this.PagingBean);
+            return ((System.Collections.Generic.IList<ENTITY>))_bhv.ReadList((${glConditionBeanInterfaceName})this.PagingBean);
         }
     }
 
-    public class ResultBeanBuilder {
+    public class ResultBeanBuilder<ENTITY> {
 
         protected ${glBehaviorReadableInterfaceName} _bhv;
         public ResultBeanBuilder(${glBehaviorReadableInterfaceName} bhv) {
@@ -325,8 +191,8 @@ namespace ${glPackageBaseCommonBhv} {
          * @param selectedList Selected list. (NotNull)
          * @return List-result-bean. (NotNull)
          */
-        public ${glListResultBeanName} BuildListResultBean(${glOrderByBeanInterfaceName} ob, System.Collections.IList selectedList) {
-            ${glListResultBeanName} rb = new ${glListResultBeanName}();
+        public ${glListResultBeanName}<ENTITY> BuildListResultBean(${glOrderByBeanInterfaceName} ob, System.Collections.Generic.IList<ENTITY> selectedList) {
+            ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
             rb.TableDbName = this.Bhv.TableDbName;
             rb.AllRecordCount = selectedList.Count;
             rb.SelectedList = selectedList;
@@ -339,8 +205,8 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Paging result bean. (NotNull)</returns>
-        public ${glPagingResultBeanName} BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, System.Collections.IList selectedList) {
-            ${glPagingResultBeanName} rb = new ${glPagingResultBeanName}();
+        public ${glPagingResultBeanName}<ENTITY> BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, System.Collections.Generic.IList<ENTITY> selectedList) {
+            ${glPagingResultBeanName}<ENTITY> rb = new ${glPagingResultBeanName}<ENTITY>();
             rb.TableDbName = this.Bhv.TableDbName;
             rb.AllRecordCount = allRecordCount;
             rb.SelectedList = selectedList;
@@ -351,15 +217,15 @@ namespace ${glPackageBaseCommonBhv} {
         }
     }
 
-    public interface SelectPageInvoker {
+    public interface SelectPageInvoker<ENTITY> {
         /// <summary>
         /// Invoke select-page by callback.
         /// </summary>
         /// <param name="callback">Callback. (NotNull)</param>
-        ${glPagingResultBeanName} InvokeSelectPage(SelectPageCallback callback);
+        ${glPagingResultBeanName}<ENTITY> InvokeSelectPage(SelectPageCallback<ENTITY> callback);
     }
 
-    public class SelectPageSimpleInvoker : SelectPageInvoker {
+    public class SelectPageSimpleInvoker<ENTITY> : SelectPageInvoker<ENTITY> {
 
         protected ${glBehaviorReadableInterfaceName} _bhv;
         public SelectPageSimpleInvoker(${glBehaviorReadableInterfaceName} bhv) {
@@ -373,7 +239,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// Invoke select-page by callback.
         /// </summary>
         /// <param name="callback">Callback. (NotNull)</param>
-        public ${glPagingResultBeanName} InvokeSelectPage(SelectPageCallback callback) {
+        public ${glPagingResultBeanName}<ENTITY> InvokeSelectPage(SelectPageCallback<ENTITY> callback) {
             AssertObjectNotNull("callback", callback);
             AssertObjectNotNull("callback.PagingBean", callback.PagingBean);
             if (!callback.PagingBean.IsFetchScopeEffective) {
@@ -382,13 +248,13 @@ namespace ${glPackageBaseCommonBhv} {
                 throw new SystemException(msg);
             }
             int allRecordCount = callback.SelectCountIgnoreFetchScope();
-            System.Collections.IList selectedList = callback.SelectList();
-            ${glPagingResultBeanName} rb = new ResultBeanBuilder(this.Bhv).BuildPagingResultBean(callback.PagingBean, allRecordCount, selectedList);
+            System.Collections.Generic.IList<ENTITY> selectedList = callback.SelectListWithFetchScope();
+            ${glPagingResultBeanName}<ENTITY> rb = new ResultBeanBuilder<ENTITY>(this.Bhv).BuildPagingResultBean(callback.PagingBean, allRecordCount, selectedList);
             if (IsNecessaryToReadPageAgain(rb)) {
                 callback.PagingBean.FetchPage(rb.AllPageCount);
                 int reAllRecordCount = callback.SelectCountIgnoreFetchScope();
-                System.Collections.IList reSelectedList = callback.SelectList();
-                return new ResultBeanBuilder(this.Bhv).BuildPagingResultBean(callback.PagingBean, reAllRecordCount, reSelectedList);
+                System.Collections.Generic.IList<ENTITY> reSelectedList = callback.SelectListWithFetchScope();
+                return new ResultBeanBuilder<ENTITY>(this.Bhv).BuildPagingResultBean(callback.PagingBean, reAllRecordCount, reSelectedList);
             } else {
                 return rb;
             }
@@ -399,7 +265,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="rb">Paging-result-bean. (NotNull)<param>
         /// <returns>Determination.</return>
-        protected bool IsNecessaryToReadPageAgain(${glPagingResultBeanName} rb) {
+        protected bool IsNecessaryToReadPageAgain(${glPagingResultBeanName}<ENTITY> rb) {
             return rb.AllRecordCount > 0 && rb.SelectedList.Count == 0;
         }
 

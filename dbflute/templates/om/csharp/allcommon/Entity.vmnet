@@ -53,18 +53,6 @@ namespace ${glPackageBaseCommon} {
         /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
         void AcceptPrimaryKeyMapString(String primaryKeyMapString);
 
-        /// <summary>
-        /// Accept column-value map.
-        /// </summary>
-        /// <param name="columnValueMap">Column-value map. (NotNull and NotEmpty)</param>
-        void AcceptColumnValueMap(System.Collections.Generic.IDictionary<String, Object> columnValueMap);
-
-        /// <summary>
-        /// Accept column-value map-string.
-        /// </summary>
-        /// <param name="columnValueMapString">Column-value map-string. (NotNull)</param>
-        void AcceptColumnValueMapString(String columnValueMapString);
-
         // =====================================================================================
         //                                                                    Extract Map-String
         //                                                                    ==================
@@ -73,12 +61,6 @@ namespace ${glPackageBaseCommon} {
         /// </summary>
         /// <returns>Primary-key map-string.</returns>
         String ExtractPrimaryKeyMapString();
-
-        /// <summary>
-        /// Extract column-value map-string. Delimiter is atmark and semicolon {@;}.
-        /// </summary>
-        /// <returns>Column-value map-string.</returns>
-        String ExtractColumnValueMapString();
 
         // =====================================================================================
         //                                                                         Determination

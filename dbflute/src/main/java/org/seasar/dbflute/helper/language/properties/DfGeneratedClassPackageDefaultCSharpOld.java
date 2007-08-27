@@ -1,35 +1,35 @@
 package org.seasar.dbflute.helper.language.properties;
 
-public class DfGeneratedClassPackageDefaultCSharp implements DfGeneratedClassPackageDefault {
+public class DfGeneratedClassPackageDefaultCSharpOld implements DfGeneratedClassPackageDefault {
     public String getBaseCommonPackage() {
-        return "AllCommon";
+        return "allcommon";
     }
 
     public String getBaseBehaviorPackage() {
-        return "BsBhv";
+        return "bsbhv";
     }
 
     public String getBaseDaoPackage() {
-        return "BsDao";
+        return "bsdao";
     }
 
     public String getBaseEntityPackage() {
-        return "BsEntity";
+        return "bsentity";
     }
 
     public String getConditionBeanPackage() {
-        return "CBean";
+        return "cbean";
     }
 
     public String getExtendedBehaviorPackage() {
-        return "ExBhv";
+        return "exbhv";
     }
 
     public String getExtendedDaoPackage() {
-        return "ExDao";
+        return "exdao";
     }
 
     public String getExtendedEntityPackage() {
-        return "ExEntity";
+        return "exentity";
     }
 }

@@ -8,6 +8,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
 
 public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 
@@ -24,30 +25,33 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
     //                                               Properties - DaoDicon Information
     //                                               =================================
     public String getDBFluteDiconNamespace() {
+        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
         final String prop = stringProp("torque.dbfluteDiconNamespace", null);
         if (prop != null) {
             return prop;
         } else {
-            return stringProp("torque.daoDiconNamespace", "dbflute");
+            return stringProp("torque.daoDiconNamespace", diconDefault.getDBFluteDiconNamespace());
         }
     }
 
     public String getDBFluteDiconPackageName() {
+        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
         final String prop = stringProp("torque.dbfluteDiconPackageName", null);
         if (prop != null) {
             return prop;
         } else {
-            return stringProp("torque.daoDiconPackageName", "");
+            return stringProp("torque.daoDiconPackageName", diconDefault.getDBFluteDiconPackageName());
         }
     }
 
     public List<String> getDBFluteDiconPackageNameList() {
+        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
         final String diconSeparatedString;
         final String prop = stringProp("torque.dbfluteDiconPackageName", null);
         if (prop != null) {
             diconSeparatedString = prop;
         } else {
-            diconSeparatedString = stringProp("torque.daoDiconPackageName", "../resources");
+            diconSeparatedString = stringProp("torque.daoDiconPackageName", diconDefault.getDBFluteDiconPackageName());
         }
         final String[] array = diconSeparatedString.split(";");
         final List<String> ls = new ArrayList<String>();
@@ -58,44 +62,52 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
     }
 
     public String getDBFluteDiconFileName() {
+        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
         final String prop = stringProp("torque.dbfluteDiconFileName", null);
         if (prop != null) {
             return prop;
         } else {
-            return stringProp("torque.daoDiconFileName", "dbflute.dicon");
+            return stringProp("torque.daoDiconFileName", diconDefault.getDBFluteDiconFileName());
         }
     }
-    
+
     public String getDBFluteCreatorDiconFileName() {
         return stringProp("torque.dbfluteCreatorDiconFileName", "dbflute-creator.dicon");
     }
-    
+
     public String getDBFluteCustomizerDiconFileName() {
         return stringProp("torque.dbfluteCustomizerDiconFileName", "dbflute-customizer.dicon");
     }
 
     public String getJdbcDiconResourceName() {
+        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
         final String prop = stringProp("torque.j2eeDiconResourceName", null);
         if (prop != null) {
             return prop;
         } else {
-            String defaultValue = getLanguageDependencyInfo().getDBFluteDiconDefault().getJ2eeDiconResourceName();
+            String defaultValue = diconDefault.getJ2eeDiconResourceName();
             return stringProp("torque.jdbcDiconResourceName", defaultValue);
         }
     }
 
     public String getRequiredTxComponentName() {
-        String defaultValue = getLanguageDependencyInfo().getDBFluteDiconDefault().getRequiredTxComponentName();
+        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
+        final String defaultValue = diconDefault.getRequiredTxComponentName();
         return stringProp("torque.requiredTxComponentName", defaultValue);
     }
 
     public String getRequiresNewTxComponentName() {
-        String defaultValue = getLanguageDependencyInfo().getDBFluteDiconDefault().getRequiresNewTxComponentName();
+        final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
+        final String defaultValue = diconDefault.getRequiresNewTxComponentName();
         return stringProp("torque.requiresNewTxComponentName", defaultValue);
     }
 
     protected DfLanguageDependencyInfo getLanguageDependencyInfo() {
         return getBasicProperties().getLanguageDependencyInfo();
+    }
+
+    protected DfDefaultDBFluteDicon getDefaultDBFluteDicon() {
+        return getLanguageDependencyInfo().getDefaultDBFluteDicon();
     }
 
     // ===============================================================================

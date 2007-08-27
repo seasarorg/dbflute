@@ -1,42 +1,41 @@
 package org.seasar.dbflute.helper.language;
 
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoJava;
+import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoCSharp;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataJava;
+import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataCSharpOld;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
-import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDiconJava;
+import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDiconCSharp;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultJava;
+import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultCSharpOld;
 
 /**
- * The language depndency info of Java.
+ * The language depndency info of CSharpOld.
  * 
  * @author jflute
  */
-public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
-
+public class DfLanguageDependencyInfoCSharpOld implements DfLanguageDependencyInfo {
     public DfGrammarInfo getGrammarInfo() {
-        return new DfGrammarInfoJava();
+        return new DfGrammarInfoCSharp();
     }
 
     public String getTemplateFileExtension() {
-        return "vm";
+        return "vmnet";
     }
 
     public DfDefaultDBFluteDicon getDefaultDBFluteDicon() {
-        return new DfDefaultDBFluteDiconJava();
+        return new DfDefaultDBFluteDiconCSharp();
     }
 
     public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
-        return new DfGeneratedClassPackageDefaultJava();
+        return new DfGeneratedClassPackageDefaultCSharpOld();
     }
 
     public LanguageMetaData createLanguageMetaData() {
-        return new LanguageMetaDataJava();
+        return new LanguageMetaDataCSharpOld();
     }
 
     public String getDefaultSourceDirectory() {
-        return "../src/main/java";
+        return "../source";
     }
 }
