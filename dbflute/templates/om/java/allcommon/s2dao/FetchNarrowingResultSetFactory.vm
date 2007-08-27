@@ -9,6 +9,10 @@ import org.seasar.framework.util.PreparedStatementUtil;
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 
+#if ($database.isAvailableGenerics())
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
+#end
+
 /**
  * Fetch page result set factory.
  * 
@@ -43,7 +47,17 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
         if (!isUseFetchNarrowingResultSetWrapper(cb)) {
             return resultSet;
         }
+#if ($database.isAvailableGenerics())
+        final ${glFetchNarrowingResultSetWrapper} wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName});
+        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+            wrapper.setOffsetByCursorForcedly(outsideSqlContext.isOffsetByCursorForcedly());
+            wrapper.setLimitByCursorForcedly(outsideSqlContext.isLimitByCursorForcedly());
+        }
+        return wrapper;
+#else
         return new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName});
+#end
     }
 
     protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {

@@ -30,6 +30,12 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     /** Request counter. */
     private long _requestCounter;
 
+    /** Whether offsetting by cursor forcedly. */
+    private boolean _offsetByCursorForcedly;
+
+    /** Whether limiting by cursor forcedly. */
+    private boolean _limitByCursorForcedly;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -81,7 +87,13 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     }
 
     protected boolean isAvailableSkipRecord() {
-        if (isFetchNarrowingEffective() && isFetchNarrowingSkipStartIndexEffective()) {
+        if (!isFetchNarrowingEffective()) {
+            return false;
+        }
+        if (isOffsetByCursorForcedly()) {
+            return true;
+        }
+        if (isFetchNarrowingSkipStartIndexEffective()) {
             return true;
         }
         return false;
@@ -114,7 +126,13 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     }
 
     protected boolean isAvailableLimitLoopCount() {
-        if (isFetchNarrowingEffective() && isFetchNarrowingLoopCountEffective()) {
+        if (!isFetchNarrowingEffective()) {
+            return false;
+        }
+        if (isLimitByCursorForcedly()) {
+            return true;
+        }
+        if (isFetchNarrowingLoopCountEffective()) {
             return true;
         }
         return false;
@@ -129,26 +147,8 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    /**
-     * Get result set.
-     * 
-     * @return Result set.
-     */
-    protected ResultSet getResultSet() {
-        return _resultSet;
-    }
-
-    /**
-     * Get fetch-narrowing-bean.
-     * 
-     * @return FetchNarrowing-bean.
-     */
-    protected ${glFetchNarrowingBeanInterfaceName} getFetchNarrowingBean() {
-        return _fetchNarrowingBean;
-    }
-
+    //                                                                        Fetch Option
+    //                                                                        ============
     protected boolean isFetchNarrowingEffective() {
         return _fetchNarrowingBean.isFetchNarrowingEffective();
     }
@@ -199,5 +199,42 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get result set.
+     * 
+     * @return Result set.
+     */
+    protected ResultSet getResultSet() {
+        return _resultSet;
+    }
+
+    /**
+     * Get fetch-narrowing-bean.
+     * 
+     * @return FetchNarrowing-bean.
+     */
+    protected ${glFetchNarrowingBeanInterfaceName} getFetchNarrowingBean() {
+        return _fetchNarrowingBean;
+    }
+
+    public boolean isOffsetByCursorForcedly() {
+        return _offsetByCursorForcedly;
+    }
+
+    public void setOffsetByCursorForcedly(boolean offsetByCursorForcedly) {
+        this._offsetByCursorForcedly = offsetByCursorForcedly;
+    }
+
+    public boolean isLimitByCursorForcedly() {
+        return _limitByCursorForcedly;
+    }
+
+    public void setLimitByCursorForcedly(boolean limitByCursorForcedly) {
+        this._limitByCursorForcedly = limitByCursorForcedly;
     }
 }
