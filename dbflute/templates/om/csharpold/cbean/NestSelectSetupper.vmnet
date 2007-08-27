@@ -1,0 +1,75 @@
+#set ($myClassName = "${myNestSelectSetupperClassName}")
+
+using System;
+
+using ${glPackageCQ};
+
+
+namespace ${glPackageNss} {
+
+    public class ${myClassName} {
+
+        /** Base query. */
+        protected ${myConditionQueryClassName} _query;
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        public ${myClassName}(${myConditionQueryClassName} query) {
+            _query = query;
+        }
+
+        // =====================================================================================
+        //                                                                              Accessor
+        //                                                                              ========
+        public ${myConditionQueryClassName} Query() {
+            return _query;
+        }
+
+        public bool HasConditionQuery {
+            get { return _query != null; }
+        }
+
+        // =====================================================================================
+        //                                                                           SetupSelect
+        //                                                                           ===========
+    #foreach ($foreignKeys in $table.ForeignKeys)
+      #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
+
+        protected bool _isSelect${tmpPropertyNameInitCap};
+        public bool IsSelect${tmpPropertyNameInitCap} {
+            get { return _isSelect${tmpPropertyNameInitCap}; }
+        }
+        public void With${tmpPropertyNameInitCap}() {
+            AssertConditionQuery();
+            Query().Query${tmpPropertyNameInitCap}();
+            _isSelect${tmpPropertyNameInitCap} = true;
+        }
+    #end
+    #foreach ($refferer in $table.Referrers)
+      #if (${refferer.isOneToOne()})
+        #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
+
+        protected bool _isSelect${tmpPropertyNameInitCap};
+        public bool IsSelect${tmpPropertyNameInitCap} {
+            get { return _isSelect${tmpPropertyNameInitCap}; }
+        }
+        public void With${tmpPropertyNameInitCap}() {
+            AssertConditionQuery();
+            Query().Query${tmpPropertyNameInitCap}();
+            _isSelect${tmpPropertyNameInitCap} = true;
+        }
+      #end
+    #end
+
+        // =====================================================================================
+        //                                                                                Helper
+        //                                                                                ======
+        protected void AssertConditionQuery() {
+            if (!this.HasConditionQuery) {
+                String msg = "The query should not be null.";
+                throw new SystemException(msg);
+            }
+        }
+    }
+}

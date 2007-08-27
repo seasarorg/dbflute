@@ -1,0 +1,77 @@
+#set ($myClassName = "${glConditionKeyName}NotEqual")
+
+using System;
+using System.Collections;
+using System.Reflection;
+using ${glPackageBaseCommonCValue};
+
+namespace ${glPackageBaseCommonCKey} {
+
+    /// <summary>
+    /// The condition-key of equal.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public class ${myClassName} : ${glConditionKeyName} {
+
+        /** Log-instance. */
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        /**
+         * Constructor.
+         */
+        public ${myClassName}() {
+            _conditionKey = "notEqual";
+            _operand = "!=";
+        }
+
+        /**
+         * Is valid registration?
+         * 
+         * @param conditionValue Condition value. (NotNull)
+         * @param value Value. (NotNull)
+         * @param callerName Caller name. (NotNull)
+         * @return Determination.
+         */
+        public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
+            if (value == null || isNullableTypeNull(value)) {
+                return false;
+            }
+            Object valueObject = conditionValue.NotEqual;
+            if (valueObject != null && !isNullableTypeNull(valueObject) && valueObject.Equals(value)) {
+                _log.Warn("The value has already registered at " + callerName + ": " + valueObject + " = " + value);
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * This method implements super#doAddWhereClause().
+         * 
+         * @param conditionList Condition list. (NotNull)
+         * @param columnName Column name. (NotNull)
+         * @param value Condition value. (NotNull)
+         */
+        protected override void DoAddWhereClause(System.Collections.IList conditionList, String columnName, ${glConditionValueName} value) {
+            if (value.NotEqual == null) {
+                return;
+            }
+            Object valueObject = value.NotEqual;
+            if (isNullableTypeNull(valueObject)) {
+                return;
+            }
+            conditionList.Add(BuildBindClause(columnName, value.GetNotEqualLocation()));
+        }
+
+        /**
+         * This method implements super#doSetupConditionValue().
+         * 
+         * @param conditionValue Condition value. (NotNull)
+         * @param value Value. (NotNull)
+         * @param location Location. (NotNull)
+         */
+        protected override void DoSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+            conditionValue.NotEqual = value;
+            conditionValue.SetNotEqualLocation(location);
+        }
+    }
+}

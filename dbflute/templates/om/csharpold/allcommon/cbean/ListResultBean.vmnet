@@ -1,0 +1,223 @@
+#set ($myClassName = "${glListResultBeanName}")
+
+using System;
+using System.Text;
+
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The list-result-bean of ${myClassName}.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public class ${myClassName} : System.Collections.IList {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        #region Attribute
+
+        /// <summary>The value of table db-name.</summary>
+        protected String _tableDbName;
+
+        /// <summary>The value of all record count.</summary>
+        protected int _allRecordCount;
+
+        /// <summary>Selected list. Default value is empty.</summary>
+        protected System.Collections.IList _selectedList = new System.Collections.ArrayList();
+
+        /// <summary>The value of current page number.</summary>
+        protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
+
+        /// <summary>Has the setter of selected list invoked?</summary>
+        protected bool _isSetterInvokedSelectedList;
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        #region Constructor
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ${myClassName}() {
+        }
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                              Property
+        //                                                                              ========
+        #region Property
+
+        /// <summary>
+        /// The property of table db-name.
+        /// </summary>
+        public String TableDbName {
+            get { return _tableDbName; }
+            set { _tableDbName = value; }
+        }
+
+        /// <summary>
+        /// The property of all record count.
+        /// </summary>
+        public int AllRecordCount {
+            get { return _allRecordCount; }
+            set { _allRecordCount = value; }
+        }
+
+        /// <summary>
+        /// The property of all record count.
+        /// </summary>
+        public System.Collections.IList SelectedList {
+            get { return _selectedList; }
+            set { _isSetterInvokedSelectedList=true; _selectedList = value; }
+        }
+
+        /// <summary>
+        /// The property of order-by clause.
+        /// </summary>
+        public ${glOrderByClauseName} OrderByClause
+        {
+            get { return _orderByClause; }
+            set { _orderByClause = value; }
+        }
+        #endregion
+
+
+        // =====================================================================================
+        //                                                                         Determination
+        //                                                                         =============
+        #region Determination
+        /// <summary>
+        /// Has this result selected?
+        /// </summary>
+        /// <returns>Determination.</returns>
+        public bool IsSelectedResult { get { return _isSetterInvokedSelectedList; } }
+        #endregion
+
+        // =====================================================================================
+        //                                                                 Basic-Override Method
+        //                                                                 =====================
+        /// <summary>
+        /// This method overrides the method that is declared at super.
+        /// </summary>
+        /// <returns>View-string of all-columns value.</returns>
+        public override String ToString() {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(" tableDbName=").Append(_tableDbName);
+            sb.Append(" allRecordCount=").Append(_tableDbName);
+            sb.Append(" selectedList.Count=").Append(_selectedList.Count);
+            sb.Append(" orderByClause=").Append(_orderByClause);
+
+            return sb.ToString();
+        }
+
+        // =====================================================================================
+        //                                                                         List Elements
+        //                                                                         =============
+        public virtual int Add(Object value)
+        {
+            return _selectedList.Add(value);
+        }
+
+        public virtual bool Contains(Object value)
+        {
+            return _selectedList.Contains(value);
+        }
+
+        public virtual void Clear()
+        {
+            _selectedList.Clear();
+        }
+
+        public virtual int IndexOf(Object value)
+        {
+            return _selectedList.IndexOf(value);
+        }
+
+        public virtual void Insert(int index, Object value)
+        {
+            _selectedList.Insert(index, value);
+        }
+
+
+        public virtual void Remove(Object value)
+        {
+            _selectedList.Remove(value);
+        }
+
+
+        public virtual void RemoveAt(int index)
+        {
+            _selectedList.RemoveAt(index);
+        }
+
+
+        public virtual bool IsReadOnly
+        {
+            get
+            {
+                return _selectedList.IsReadOnly;
+            }
+        }
+        public virtual bool IsFixedSize
+        {
+            get
+            {
+                return _selectedList.IsFixedSize;
+            }
+        }
+
+        public virtual void CopyTo(System.Array array, int index)
+        {
+            _selectedList.CopyTo(array, index);
+        }
+
+        public virtual int Count
+        {
+            get
+            {
+                return _selectedList.Count;
+            }
+        }
+
+        public virtual Object SyncRoot
+        {
+            get
+            {
+                return _selectedList.SyncRoot;
+            }
+        }
+
+        public virtual bool IsSynchronized
+        {
+            get
+            {
+                return _selectedList.IsSynchronized;
+            }
+        }
+
+        public virtual System.Collections.IEnumerator GetEnumerator()
+        {
+            return _selectedList.GetEnumerator();
+        }
+
+        public virtual Object this[int index]
+        {
+            get
+            {
+                return _selectedList[index];
+            }
+            set
+            {
+                _selectedList[index] = value;
+            }
+        }
+    }
+}

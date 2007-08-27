@@ -1,0 +1,118 @@
+#set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
+
+using System;
+using System.Collections;
+using System.Text;
+
+namespace ${glPackageBaseCommonSqlClause} {
+
+    /// <summary>
+    /// SqlClause for Apache Derby.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public class ${myClassName} : ${glSqlClauseAbstractName} {
+
+        /** String of fetch-scope as select-hint. */
+        protected String _fetchScopeSelectHint = "";
+
+        /** String of fetch-scope as sql-suffix. */
+        protected String _fetchScopeSqlSuffix = "";
+
+        /** String of lock as sql-suffix. */
+        protected String _lockSqlSuffix = "";
+
+        /**
+         * Constructor.
+         * 
+         * @param tableName Table name. (NotNull)
+         **/
+        public ${myClassName}(String tableName)
+            : base(tableName) {}
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoFetchFirst() {
+            if (IsFetchSizeSupported) {
+                _fetchScopeSelectHint = " * from (select";
+                _fetchScopeSqlSuffix = ") where rownum <= " + this.FetchSize;
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoFetchPage() {
+            if (!IsFetchStartIndexSupported && !IsFetchSizeSupported) {
+                return;
+            }
+            _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (select";
+            _fetchScopeSqlSuffix = "";
+            if (IsFetchStartIndexSupported) {
+                _fetchScopeSqlSuffix = ") base ) where rn > " + this.PageStartIndex;
+            }
+            if (IsFetchSizeSupported) {
+                if (IsFetchStartIndexSupported) {
+                    _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + this.PageEndIndex;
+                } else {
+                    _fetchScopeSqlSuffix = ") base ) where rn <= " + this.PageEndIndex;
+                }
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoClearFetchPageClause() {
+            _fetchScopeSelectHint = "";
+            _fetchScopeSqlSuffix = "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public override ${glSqlClauseInterfaceName} LockForUpdate() {
+            _lockSqlSuffix = " for update";
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Select-hint. (NotNull)
+         */
+        protected override String CreateSelectHint() {
+            return _fetchScopeSelectHint;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+         */
+        protected override String CreateFromBaseTableHint() {
+            return "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return From-hint. (NotNull)
+         */
+        protected override String CreateFromHint() {
+            return "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Sql-suffix. (NotNull)
+         */
+        protected override String CreateSqlSuffix() {
+            return _fetchScopeSqlSuffix + _lockSqlSuffix;
+        }
+    }
+}

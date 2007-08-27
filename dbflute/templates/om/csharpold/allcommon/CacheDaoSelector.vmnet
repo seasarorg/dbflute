@@ -1,0 +1,257 @@
+
+using System;
+using System.Collections;
+
+#if ($database.isAvailableBehaviorGeneration())
+
+using ${glPackageBaseCommonBhv};
+#end
+
+using ${glPackageBaseCommonDBMeta};
+
+namespace ${glPackageBaseCommon} {
+
+    /**
+     * The implementation of dao-selector.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public class ${glCacheDaoSelectorName} : ${glDaoSelectorInterfaceName} {
+
+        protected Seasar.Framework.Container.IS2Container _container;
+        public Seasar.Framework.Container.IS2Container Container {
+            get { return _container; }
+            set { _container = value; }
+        }
+
+        /**
+         * Get dao-readable by dao type.
+         * 
+         * @param daoType Dao type. (NotNull)
+         * @return Dao-readable. (NotNull)
+         */
+        public ${glDaoReadableInterfaceName} GetRDao(Type daoType) {
+            AssertObjectNotNull("daoType", daoType);
+            return GetRDaoObject(daoType);
+        }
+
+        /**
+         * Get dao-readable by entity.
+         * 
+         * @param entity Entity. (NotNull)
+         * @return Dao-readable. (NotNull)
+         */
+        public ${glDaoReadableInterfaceName} GetRDao(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+            return GetRDao(entity.DBMeta.GetDaoType());
+        }
+
+        /**
+         * Get dao-readable by table multi-name.
+         * 
+         * @param tableMultiName Table multi-name. (NotNull)
+         * @return Dao-readable. (NotNull)
+         */
+        public ${glDaoReadableInterfaceName} GetRDao(String tableMultiName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableMultiName(tableMultiName);
+            return GetRDao(dbmeta.GetDaoType());
+        }
+
+        /**
+         * Get dao-writable by dao type.
+         * 
+         * @param daoType Dao type. (NotNull)
+         * @return Dao-writable. (NotNull)
+         */
+        public ${glDaoWritableInterfaceName} GetWDao(Type daoType) {
+            AssertObjectNotNull("daoType", daoType);
+            return (${glDaoWritableInterfaceName})GetRDao(daoType);
+        }
+
+        /**
+         * Get dao-writable by entity.
+         * 
+         * @param entity Entity. (NotNull)
+         * @return Dao-writable. (NotNull)
+         */
+        public ${glDaoWritableInterfaceName} GetWDao(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+            return (${glDaoWritableInterfaceName})GetRDao(entity);
+        }
+
+        /**
+         * Get dao-writable by table multi-name.
+         * 
+         * @param tableMultiName Table multi-name. (NotNull)
+         * @return Dao-writable. (NotNull)
+         */
+        public ${glDaoWritableInterfaceName} GetWDao(String tableMultiName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+            return (${glDaoWritableInterfaceName})GetRDao(tableMultiName);
+        }
+
+        protected System.Collections.Generic.IDictionary<Type, ${glDaoReadableInterfaceName}> _daoCacheMap;
+        protected ${glDaoReadableInterfaceName} GetRDaoObject(Type daoType) {
+            ${glDaoReadableInterfaceName} result = null;
+            if (_daoCacheMap == null) {
+                _daoCacheMap = new System.Collections.Generic.Dictionary<Type, ${glDaoReadableInterfaceName}>();
+            }
+            if (_daoCacheMap.ContainsKey(daoType)) {
+                result = _daoCacheMap[daoType];
+            }
+            if (result == null) {
+                result = (${glDaoReadableInterfaceName})_container.GetComponent(daoType);
+                _daoCacheMap.Add(daoType, result);
+            }
+            return result;
+        }
+#if ($database.isAvailableBehaviorGeneration())
+
+        /**
+         * Get bhv-readable by bhv type.
+         * 
+         * @param bhvType Bhv type. (NotNull)
+         * @return Bhv-readable. (NotNull)
+         */
+        public ${glBehaviorReadableInterfaceName} GetRBhv(Type bhvType) {
+            AssertObjectNotNull("bhvType", bhvType);
+            return GetRBhvObject(bhvType);
+        }
+
+        /**
+         * Get bhv-readable by entity.
+         * 
+         * @param entity Entity. (NotNull)
+         * @return Bhv-readable. (NotNull)
+         */
+        public ${glBehaviorReadableInterfaceName} GetRBhv(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+            return GetRBhv(GetBhvType(entity.DBMeta));
+        }
+
+        /**
+         * Get bhv-readable by table multi-name.
+         * 
+         * @param tableMultiName Table multi-name. (NotNull)
+         * @return Bhv-readable. (NotNull)
+         */
+        public ${glBehaviorReadableInterfaceName} GetRBhv(String tableMultiName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableMultiName(tableMultiName);
+            return GetRBhv(GetBhvType(dbmeta));
+        }
+
+        /**
+         * Get bhv-writable by bhv type.
+         * 
+         * @param bhvType Bhv type. (NotNull)
+         * @return Bhv-writable. (NotNull)
+         */
+        public ${glBehaviorWritableInterfaceName} GetWBhv(Type bhvType) {
+            AssertObjectNotNull("bhvType", bhvType);
+            return (${glBehaviorWritableInterfaceName})GetRBhv(bhvType);
+        }
+
+        /**
+         * Get bhv-writable by entity.
+         * 
+         * @param entity Entity. (NotNull)
+         * @return Bhv-writable. (NotNull)
+         */
+        public ${glBehaviorWritableInterfaceName} GetWBhv(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+            return (${glBehaviorWritableInterfaceName})GetRBhv(entity);
+        }
+
+        /**
+         * Get bhv-writable by table multi-name.
+         * 
+         * @param tableMultiName Table multi-name. (NotNull)
+         * @return Bhv-writable. (NotNull)
+         */
+        public ${glBehaviorWritableInterfaceName} GetWBhv(String tableMultiName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableMultiName", tableMultiName);
+            return (${glBehaviorWritableInterfaceName})GetRBhv(tableMultiName);
+        }
+
+        /**
+         * Get bhv-type by dbmeta.
+         * 
+         * @param dbmeta Dbmeta. (NotNull)
+         * @return Bhv-type. (NotNull)
+         */
+        protected Type GetBhvType(${glDBMetaInterfaceName} dbmeta) {
+            SetupDaoBhvMap();
+            return (Type)_daoBhvMap[dbmeta.GetDaoType()];
+        }
+
+        protected System.Collections.Generic.IDictionary<Type, ${glBehaviorReadableInterfaceName}> _bhvCacheMap;
+        protected ${glBehaviorReadableInterfaceName} GetRBhvObject(Type bhvType) {
+            ${glBehaviorReadableInterfaceName} result = null;
+            if (_bhvCacheMap == null) {
+                _bhvCacheMap = new System.Collections.Generic.Dictionary<Type, ${glBehaviorReadableInterfaceName}>();
+            }
+            if (_bhvCacheMap.ContainsKey(bhvType)) {
+                result = _bhvCacheMap[bhvType];
+            }
+            if (result == null) {
+                result = (${glBehaviorReadableInterfaceName})_container.GetComponent(bhvType);
+                _bhvCacheMap.Add(bhvType, result);
+            }
+            return result;
+        }
+
+        protected System.Collections.Generic.IDictionary<Type, Type> _daoBhvMap;
+        protected void SetupDaoBhvMap() {
+            if (_daoBhvMap == null) {
+                _daoBhvMap = new System.Collections.Generic.Dictionary<Type, Type>();
+  #foreach ($table in $database.Tables)
+
+                _daoBhvMap.Add(typeof(${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao), typeof(${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}Bhv));
+  #end
+
+            }
+        }
+#end
+
+        // ----------------------------------------------------------------
+        //                                                    Assert Object
+        //                                                    -------------
+        /**
+         * Assert that the object is not null.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param value Value. (NotNull)
+         * @exception IllegalArgumentException
+         */
+        protected void AssertObjectNotNull(String variableName, Object value) {
+            if (variableName == null) {
+                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+                throw new SystemException(msg);
+            }
+            if (value == null) {
+                String msg = "The value should not be null: variableName=" + variableName;
+                throw new SystemException(msg);
+            }
+        }
+
+        // ----------------------------------------------------------------
+        //                                                    Assert String
+        //                                                    -------------
+        /**
+         * Assert that the entity is not null and not trimmed empty.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param value Value. (NotNull)
+         */
+        protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+            AssertObjectNotNull("variableName", variableName);
+            AssertObjectNotNull(variableName, value);
+            if (value.Trim().Length ==0) {
+                String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+                throw new SystemException(msg);
+            }
+        }
+    }
+}

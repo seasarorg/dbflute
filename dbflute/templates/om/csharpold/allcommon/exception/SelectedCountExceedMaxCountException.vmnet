@@ -1,0 +1,49 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception when selected count exceeds max count.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public class ${glSelectedCountExceedMaxCountExceptionName} : ApplicationException {
+
+        /** Selected count. */
+        protected int _selectedCount;
+
+        /** Max count. */
+        protected int _maxCount;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param="msg">Exception message.</param>
+        /// <param="maxCount">Max count.</param>
+        /// <param="selectedCount">Selected count.</param>
+        public ${glSelectedCountExceedMaxCountExceptionName}(String msg, int selectedCount, int maxCount)
+        : base(msg) {
+            _selectedCount = selectedCount;
+            _maxCount = maxCount;
+        }
+
+        /**
+         * Get selected count.
+         * 
+         * @return Selected count. (Nullable)
+         */
+        public int GetSelectedCount() {
+            return _selectedCount;
+        }
+
+        /**
+         * Get max count.
+         * 
+         * @return Max count. (Nullable)
+         */
+        public int GetMaxCount() {
+            return _maxCount;
+        }
+    }
+}

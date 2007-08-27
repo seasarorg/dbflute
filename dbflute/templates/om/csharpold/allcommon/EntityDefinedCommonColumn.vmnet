@@ -1,0 +1,63 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommon} {
+
+    /// <summary>
+    /// The interface of entity defined common column.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public interface ${glEntityDefinedCommonColumnInterfaceName} : ${glEntityInterfaceName} {
+#foreach ($columnName in ${database.CommonColumnNameList})
+  #set ($commonColumnMap = ${database.CommonColumnMap})
+  #set ($columnType = ${commonColumnMap.get(${columnName})})
+  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
+  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+
+        /// <summary>
+        /// The property of ${uncapitalisedJavaName}.
+        /// </summary>
+        ${javaNative} ${javaName} { get; set; }
+
+        /// <summary>
+        /// Has the setter of ${javaName} been invoked?
+        /// </summary>
+        bool IsSetterInvoked${javaName}();
+  #if (${database.isAllClassificationColumn($columnName)})
+    #set ($classificationName = $database.getAllClassificationName($columnName))
+    #set ($classificationList = $database.getClassificationMapList($classificationName))
+    #foreach ($classificationMap in $classificationList)
+
+        /// <summary>
+        /// Classify the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}.
+        /// </summary>
+        void Classify${javaName}${classificationMap.get('name')}();
+
+        /// <summary>
+        /// Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// The difference of capital letters and small letters is NOT distinguished.
+        /// If the value is null, this method returns false!
+        /// </summary>
+        /// <returns>Determanation.</returns>
+        bool Is${javaName}${classificationMap.get('name')}();
+
+        /// <summary>
+        /// Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// The difference of capital letters and small letters is NOT distinguished.
+        /// If the value is null, this method throws exception!
+        /// </summary>
+        /// <returns>Determanation.</returns>
+        bool Is${javaName}${classificationMap.get('name')}IfNullException();
+    #end
+  #end
+#end
+
+        /// <summary>
+        /// Extract common-column-value map-string.
+        /// </summary>
+        /// <returns>Common-column-value map-string.</returns>
+        String ExtractCommonColumnValueMapString();
+    }
+}

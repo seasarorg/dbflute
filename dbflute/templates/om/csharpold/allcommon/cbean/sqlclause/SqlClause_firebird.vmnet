@@ -1,0 +1,107 @@
+#set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
+
+using System;
+using System.Collections;
+using System.Text;
+
+namespace ${glPackageBaseCommonSqlClause} {
+
+    /// <summary>
+    /// SqlClause for MSSQL.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public class ${myClassName} : ${glSqlClauseAbstractName} {
+
+        /** String of fetch-scope as select-hint. */
+        protected String _fetchScopeSelectHint = "";
+
+        /** String of lock as sql-suffix. */
+        protected String _lockSqlSuffix = "";
+
+        /**
+         * Constructor.
+         * 
+         * @param tableName Table name. (NotNull)
+         **/
+        public ${myClassName}(String tableName)
+            : base(tableName) {}
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoFetchFirst() {
+            if (this.IsFetchSizeSupported) {
+                _fetchScopeSelectHint = " first " + this.FetchSize;
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoFetchPage() {
+            if (this.IsFetchStartIndexSupported && this.IsFetchSizeSupported) {
+                _fetchScopeSelectHint = " first " + this.FetchSize + " skip " + this.PageStartIndex;
+            }
+            if (this.IsFetchStartIndexSupported && !this.IsFetchSizeSupported) {
+                _fetchScopeSelectHint = " skip " + this.PageStartIndex;
+            }
+            if (!this.IsFetchStartIndexSupported && this.IsFetchSizeSupported) {
+                _fetchScopeSelectHint = " first " + this.PageEndIndex;
+            }
+        }
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected override void DoClearFetchPageClause() {
+            _fetchScopeSelectHint = "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return this. (NotNull)
+         */
+        public override ${glSqlClauseInterfaceName} LockForUpdate() {
+            _lockSqlSuffix = " for update with lock";
+            return this;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Select-hint. (NotNull)
+         */
+        protected override String CreateSelectHint() {
+            return _fetchScopeSelectHint;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+         */
+        protected override String CreateFromBaseTableHint() {
+            return "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return From-hint. (NotNull)
+         */
+        protected override String CreateFromHint() {
+            return "";
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Sql-suffix. (NotNull)
+         */
+        protected override String CreateSqlSuffix() {
+            return _lockSqlSuffix;
+        }
+    }
+}

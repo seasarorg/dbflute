@@ -1,0 +1,58 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommon} {
+
+    /// <summary>
+    /// The interface of dao-writable.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public interface ${glDaoWritableInterfaceName} : ${glDaoReadableInterfaceName} {
+
+        /// <summary>
+        /// Insert one entity that the type is entity-interface.
+        /// </summary>
+        /// <param name="entity">Entity that the type is entity-interface. (NotNull)</returns>
+        /// <returns>Inserted count.</returns>
+        int Create(${glEntityInterfaceName} entity);
+
+        /// <summary>
+        /// Update one entity that the type is entity-interface.
+        /// </summary>
+        /// <param name="entity">Entity that the type is entity-interface. (NotNull)</returns>
+        /// <returns>Updated count.</returns>
+        int Modify(${glEntityInterfaceName} entity);
+
+        /// <summary>
+        /// Delete one entity that the type is entity-interface.
+        /// </summary>
+        /// <param name="entity">Entity that the type is entity-interface. (NotNull)</returns>
+        /// <returns>Deleted count.</returns>
+        int Remove(${glEntityInterfaceName} entity);
+
+        /// <summary>
+        /// Insert several entities that the type is entity-interface.
+        /// </summary>
+        /// <param name="entityList">Entity-list that the type is entity-interface. (NotNull)</returns>
+        /// <returns>Inserted count.</returns>
+/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
+//        int CreateList(System.Collections.IList entityList);
+
+        /// <summary>
+        /// Update several entities that the type is entity-interface.
+        /// </summary>
+        /// <param name="entityList">Entity-list that the type is entity-interface. (NotNull)</returns>
+        /// <returns>Updated count.</returns>
+/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
+//        int ModifyList(System.Collections.IList entityList);
+
+        /// <summary>
+        /// Delete several entities that the type is entity-interface.
+        /// </summary>
+        /// <param name="entityList">Entity-list that the type is entity-interface. (NotNull)</returns>
+        /// <returns>Deleted count.</returns>
+/// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
+//        int RemoveList(System.Collections.IList entityList);
+    }
+}

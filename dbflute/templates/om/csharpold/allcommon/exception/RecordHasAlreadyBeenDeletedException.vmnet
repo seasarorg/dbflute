@@ -1,0 +1,20 @@
+
+using System;
+using System.Collections;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception when the record has already been deleted (by other thread).
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public class ${glRecordHasAlreadyBeenDeletedException} : ApplicationException {
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param="msg">Exception message.</param>
+        public ${glRecordHasAlreadyBeenDeletedException}(String msg)
+        : base(msg) {}
+    }
+}

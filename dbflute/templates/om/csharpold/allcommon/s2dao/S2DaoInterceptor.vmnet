@@ -1,0 +1,334 @@
+
+using System;
+using System.Reflection;
+using System.Collections;
+using System.Text;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonException};
+
+namespace ${glPackageBaseCommonS2Dao} {
+
+    /**
+     * My-DaoInterceptor.
+     * Customises original class 'S2DaoInterceptor'.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public class ${glDaoInterceptor} : Seasar.Framework.Aop.Interceptors.AbstractInterceptor {
+
+        /** Log-instance. */
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        /** Dao meta data factory. */
+        private Seasar.Dao.IDaoMetaDataFactory daoMetaDataFactory_;
+
+        /**
+         * Constructor.
+         * 
+         * @param daoMetaDataFactory Dao meta data factory.
+         */
+        public ${glDaoInterceptor}(Seasar.Dao.IDaoMetaDataFactory daoMetaDataFactory) {
+            daoMetaDataFactory_ = daoMetaDataFactory;
+        }
+
+        /**
+         * Invoke.
+         * 
+         * @param invocation Method invocation.
+         * @return Result of the method.
+         * @throws Throwable
+         */
+        public override object Invoke(Seasar.Framework.Aop.IMethodInvocation invocation) {
+            System.Reflection.MethodBase method = invocation.Method;
+            if (!method.IsAbstract) {
+                return invocation.Proceed();
+            }
+            TraceMethod(invocation);
+            DateTime before = DateTime.Now;
+
+            Type targetType = GetComponentDef(invocation).ComponentType;
+            Seasar.Dao.ISqlCommand cmd = null;
+            {
+                DateTime beforeCmd = DateTime.Now;
+                Seasar.Dao.IDaoMetaData dmd = null;
+                try {
+                    dmd = daoMetaDataFactory_.GetDaoMetaData(targetType);
+                } catch (Exception e) {
+                    _log.Warn("IDaoMetaDataFactory#GetDaoMetaData() threw the exception: targetType=" + targetType, e);
+                    throw;
+                }
+                try {
+                    cmd = dmd.GetSqlCommand(method.Name);
+                } catch (Exception e) {
+                    _log.Warn("IDaoMetaData#GetSqlCommand() threw the exception: dmd=" + dmd + " methodName=" + method.Name, e);
+                    throw;
+                }
+                DateTime afterCmd = DateTime.Now;
+                TraceSqlCommand(invocation, cmd, beforeCmd, afterCmd);
+            }
+
+            ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = null;
+            try {
+                ${glAttachedCBArgsVariableName} = PreprocessConditionBean(invocation, cmd);
+            } catch (Exception e) {
+                _log.Warn("${glDaoInterceptor}#PreprocessConditionBean() threw the exception: ", e);
+                throw;
+            }
+
+            object ret = null;
+            try {
+                ret = cmd.Execute(invocation.Arguments);
+            } catch (Exception e) {
+                if (e is Seasar.Dao.NotSingleRowUpdatedRuntimeException) {
+                    if (_log.IsInfoEnabled) {
+                        _log.Info("Dao threw the exception: NotSingleRowUpdatedRuntimeException - " + e.Message);
+                    }
+                    throw;
+                }
+                _log.Info(" ");
+                _log.Info("/ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @");
+                _log.Info("Dao threw the exception: " + e.GetType() + " msg=" + e.Message);
+                _log.Info("    method   --> " + invocation.Method);
+                _log.Info("    argument --> " + GetObjectArrayString(invocation.Arguments));
+                if (e is Seasar.Framework.Exceptions.SQLRuntimeException) {
+                    String sql = ((Seasar.Framework.Exceptions.SQLRuntimeException)e).Sql;
+                    _log.Info("    sql      --> " + sql);
+                }
+                _log.Info("@ @ @ @ @ @ @ @ @ @ @ /");
+                _log.Info(" ");
+                throw;
+            }
+            PostprocessConditionBean(invocation, ${glAttachedCBArgsVariableName});
+            DateTime after = DateTime.Now;
+
+            Type retType = ((MethodInfo) method).ReturnType;
+            ret = Seasar.Framework.Util.ConversionUtil.ConvertTargetType(ret, retType);
+
+            TraceReturn(invocation, retType, ret, before, after);
+            return ret;
+        }
+
+        protected void TraceMethod(Seasar.Framework.Aop.IMethodInvocation invocation) {
+            if (_log.IsDebugEnabled) {
+                System.Reflection.MethodBase method = invocation.Method;
+                String invokeName = method.DeclaringType.Name + "." + method.Name;
+                int length = invokeName.Length;
+                StringBuilder sb = new StringBuilder();
+                for (int i=0; i < length; i++) {
+                    sb.Append("=");
+                }
+                _log.Debug("/=====================================================" + sb.ToString() + "==");
+                _log.Debug("                                                      " + invokeName + "()");
+                _log.Debug("                                                      " + sb.ToString() + "=/");
+            }
+        }
+
+        protected void TraceSqlCommand(Seasar.Framework.Aop.IMethodInvocation invocation, Seasar.Dao.ISqlCommand cmd, DateTime beforeCmd, DateTime afterCmd) {
+            if (_log.IsDebugEnabled) {
+                _log.Debug("SqlCommand Initialization Cost: [" + GetPerformanceView(beforeCmd, afterCmd) + "]");
+            }
+        }
+
+        protected void TraceReturn(Seasar.Framework.Aop.IMethodInvocation invocation, Type retType, Object ret, DateTime before, DateTime after) {
+            if (_log.IsDebugEnabled) {
+                System.Reflection.MethodBase method = invocation.Method;
+                try {
+                    String daoResultPrefix = "===========/ [" + GetPerformanceView(before, after) + " - ";
+                    if (typeof(System.Collections.IList).IsAssignableFrom(retType)) {
+                        if (ret == null) {
+                            _log.Debug(daoResultPrefix + "Selected count: null]");
+                        } else {
+                            System.Collections.IList ls = (System.Collections.IList)ret;
+                            if (ls.Count == 0) {
+                                _log.Debug(daoResultPrefix + "Selected count: 0]");
+                            } else {
+                                _log.Debug(daoResultPrefix + "Selected count: " + ls.Count + " first=" + ls[0] + "]");
+                            }
+                        }
+                    } else if (typeof(${glEntityInterfaceName}).IsAssignableFrom(retType)) {
+                        if (ret == null) {
+                            _log.Debug(daoResultPrefix + "Selected entity: null" + "]");
+                        } else {
+                            ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ret;
+                            _log.Debug(daoResultPrefix + "Selected entity: " + entity + "]");
+                        }
+                    } else {
+                        if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+                            _log.Debug(daoResultPrefix + "Selected count: " + ret + "]");
+                        } else {
+                            _log.Debug(daoResultPrefix + "Result: " + ret + "]");
+                        }
+                    }
+                    _log.Debug(" ");
+                } catch (Exception e) {
+                    String msg = "Result object debug threw the exception: methodName=" + method.Name + " retType=" + retType;
+                    msg = msg + " ret=" + ret;
+                    _log.Warn(msg, e);
+                    throw;
+                }
+            }
+        }
+
+        /**
+         * Preprocess condition-bean.
+         * <p>
+         * If this method is condition bean select target, make dynamic sql.
+         * Else nothing.
+         * 
+         * @param invocation Method invocation. (NotNull)
+         * @param cmd Sql command. (NotNull)
+         * @return Condition-bean. (Nullable)
+         */
+        protected ${glConditionBeanInterfaceName} PreprocessConditionBean(Seasar.Framework.Aop.IMethodInvocation invocation, Seasar.Dao.ISqlCommand cmd) {
+            ClearThreadLocal();
+
+            Object[] args = invocation.Arguments;
+            if (args == null || !(args.Length >= 1)) {
+                return null;
+            }
+            if (args[0] == null) {
+                return null;
+            }
+
+            if (!${glConditionBeanContextName}.IsTheArgumentConditionBean(args[0])) {// The argument is not condition-bean...
+                if (${glFetchNarrowingBeanContextName}.IsTheArgumentFetchNarrowingBean(args[0]) && !IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+                    // Fetch-narrowing-bean and Not select count!
+                    ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})args[0]);
+                }
+                return null;
+            }
+
+            ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = (${glConditionBeanInterfaceName})args[0];
+
+            if (!(cmd is ${glSelectDynamicCommand})) {// The argument is condition-bean, but this method using outer-file-sql...
+                ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})args[0]);
+                return null;
+            }
+
+	        if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+	            ${glAttachedCBArgsVariableName}.SetupSelectCountIgnoreFetchScope();
+	        } else {
+	            ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread(cb);
+	        }
+
+	        ${glConditionBeanContextName}.SetConditionBeanOnThread(cb);
+	        return ${glAttachedCBArgsVariableName};
+        }
+
+        /**
+         * Postprocess condition-bean.
+         * 
+         * @param invocation Method invocation. (NotNull)
+         * @param ${glAttachedCBArgsVariableName} Condition-bean. (Nullable)
+         */
+        public void PostprocessConditionBean(Seasar.Framework.Aop.IMethodInvocation invocation, ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+            ClearThreadLocal();
+
+            if (${glAttachedCBArgsVariableName} == null) {
+                return;
+            }
+            if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+                ${glAttachedCBArgsVariableName}.AfterCareSelectCountIgnoreFetchScope();
+            }
+        }
+
+        protected void ClearThreadLocal() {
+            if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
+                ${glFetchNarrowingBeanContextName}.ClearFetchNarrowingBeanOnThread();
+            }
+	        if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
+	            ${glConditionBeanContextName}.ClearConditionBeanOnThread();
+	        }
+        }
+
+        /**
+         * Is select-count-ignore-fetch-scope method?
+         * 
+         * @param invocation Method invocation. (NotNull)
+         * @return Determination.
+         */
+        protected bool IsSelectCountIgnoreFetchScopeMethod(Seasar.Framework.Aop.IMethodInvocation invocation) {
+            String name = invocation.Method.Name;
+            if (name.StartsWith("ReadCount")
+                    || name.StartsWith("SelectCount")
+                    || name.StartsWith("SelectCountIgnoreFetchScope")
+                    || name.StartsWith("SelectCountIgnoreFetchScope")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        protected String GetPerformanceView(DateTime before, DateTime after) {
+            long beforeMil = 0;
+            {
+                String hour = (before.Hour < 10 ? "0" + before.Hour : "" + before.Hour);
+                String minute = (before.Minute < 10 ? "0" + before.Minute : "" + before.Minute);
+                String secound = (before.Second < 10 ? "0" + before.Second : "" + before.Second);
+                String millisecond = (before.Millisecond < 10 ? "00" + before.Millisecond : (before.Millisecond < 100 ? "0" + before.Millisecond : "" + before.Millisecond));
+                beforeMil = long.Parse(hour + minute + secound + millisecond);
+            }
+            long afterMil = 0;
+            {
+                String hour = (after.Hour < 10 ? "0" + after.Hour : "" + after.Hour);
+                String minute = (after.Minute < 10 ? "0" + after.Minute : "" + after.Minute);
+                String secound = (after.Second < 10 ? "0" + after.Second : "" + after.Second);
+                String millisecond = (after.Millisecond < 10 ? "00" + after.Millisecond : (after.Millisecond < 100 ? "0" + after.Millisecond : "" + after.Millisecond));
+                afterMil = long.Parse(hour + minute + secound + millisecond);
+            }
+            long mil = afterMil - beforeMil;
+            if (mil < 0) {
+                return "minus mil: " + after + "-" + before;
+            }
+
+            long sec = mil / 1000;
+            long min = sec / 60;
+            sec = sec % 60;
+            mil = mil % 1000;
+
+            StringBuilder sb = new StringBuilder();
+            if (min >= 10) { // Minute
+                sb.Append(min).Append("m");
+            } else if (min < 10 && min >= 0) {
+                sb.Append("0").Append(min).Append("m");
+            }
+            if (sec >= 10) { // Secound
+                sb.Append(sec).Append("s");
+            } else if (sec < 10 && sec >= 0) {
+                sb.Append("0").Append(sec).Append("s");
+            }
+            if (mil >= 100) { // Millisecond
+                sb.Append(mil).Append("ms");
+            } else if (mil < 100 && mil >= 10) {
+                sb.Append("0").Append(mil).Append("ms");
+            } else if (mil < 10 && mil >= 0) {
+                sb.Append("00").Append(mil).Append("ms");
+            }
+
+            return sb.ToString();
+        }
+
+        /**
+         * Change object array to string divided with comma.
+         * 
+         * @param objArray Object array. (Nullable)
+         * @return String (NotNull: If the argument is null, returns empty string.)
+         */
+        protected String GetObjectArrayString(Object[] objArray) {
+            if (objArray == null) {
+                return "";
+            }
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < objArray.Length; i++) {
+                if (i == 0) {
+                    sb.Append(objArray[i]);
+                } else {
+                    sb.Append(", ").Append(objArray[i]);
+                }
+            }
+            return sb.ToString();
+        }
+    }
+}

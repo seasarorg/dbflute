@@ -1,0 +1,429 @@
+
+using System;
+using System.Collections;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMeta};
+
+namespace ${glPackageBaseCommonBhv} {
+
+    /**
+     * The interface of behavior-readable.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public interface ${glBehaviorReadableInterfaceName} {
+
+        // =====================================================================================
+        //                                                                             TableName
+        //                                                                             =========
+        /// <summary>
+        /// The property of table db-Name. (readonly)
+        /// </summary>
+        String TableDbName { get; }
+
+        // =====================================================================================
+        //                                                                                DBMeta
+        //                                                                                ======
+        /// <summary>
+        /// The property of DBMeta. (readonly)
+        /// </summary>
+        ${glDBMetaInterfaceName} DBMeta { get; }
+
+        // =====================================================================================
+        //                                                                          Dao Accessor
+        //                                                                          ============
+        /**
+         * Get dao-readable.
+         * 
+         * @return Dao-readable. (NotNull)
+         */
+        ${glDaoReadableInterfaceName} GetDaoReadable();
+
+        // =====================================================================================
+        //                                                                          New Instance
+        //                                                                          ============
+        /// <summary>
+        /// New entity.
+        /// </summary>
+        /// <returns>Entity. (NotNull)</returns>
+        ${glEntityInterfaceName} NewEntity();
+
+        /// <summary>
+        /// New condition-bean.
+        /// </summary>
+        /// <returns>Condition-bean. (NotNull)</returns>
+        ${glConditionBeanInterfaceName} NewConditionBean();
+
+        // =====================================================================================
+        //                                                                       Delegate-Method
+        //                                                                       ===============
+        /**
+         * Get count all. (Call-Method)
+         * 
+         * @return Count all. (NotNull)
+         */
+        int CallGetCountAll();
+
+        /**
+         * Read all list. (Call-Method)
+         * 
+         * @return Read all list. (NotNull)
+         */
+        IList CallGetListAll();
+
+        /**
+         * Read count by condition-bean. (Delegate-Method)
+         * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
+         * 
+         * @param cb Condition-bean. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        int CallReadCount(${glConditionBeanInterfaceName} cb);
+#if ($database.isMakeDeprecated())
+
+        /**
+         * Read count by condition-bean. (Delegate-Method)
+         * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
+         * 
+         * @param cb Condition-bean. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadCount()")]
+        int CallReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
+#end
+
+        /**
+         * Read entity by condition-bean. (Call-Method)
+         * 
+         * @param cb Condition-bean. (NotNull)
+         * @return Read entity. If the select result is zero, it returns null. (Nullable)
+         */
+        ${glEntityInterfaceName} CallReadEntity(${glConditionBeanInterfaceName} cb);
+
+        /**
+         * Read list by condition-bean. (Call-Method)
+         * 
+         * @param cb Condition-bean. (NotNull)
+         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+         */
+        IList CallReadList(${glConditionBeanInterfaceName} cb);
+
+
+
+#if ($database.isMakeDeprecated())
+
+        /**
+         * Read all list. (Delegate-Method)
+         * 
+         * @return Read all list. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadAllList()")]
+        IList DelegateReadAllList();
+#if ($database.isMakeDeprecated())
+
+        /**
+         * Read count by condition-bean. (Delegate-Method)
+         * Ignore fetchFirst() and fetchScope() and fetchPage(). But the fetch status of the condition-bean remains as it is.
+         * 
+         * @param cb Condition-bean. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please don't use!")]
+        int DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
+#end
+
+        /**
+         * Read entity by condition-bean. (Delegate-Method)
+         * 
+         * @param cb Condition-bean. (NotNull)
+         * @return Read entity. If the select result is zero, it returns null. (Nullable)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadEntity()")]
+        ${glEntityInterfaceName} DelegateReadEntity(${glConditionBeanInterfaceName} cb);
+
+        /**
+         * Read list by condition-bean. (Delegate-Method)
+         * 
+         * @param cb Condition-bean. (NotNull)
+         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadList()")]
+        IList DelegateReadList(${glConditionBeanInterfaceName} cb);
+
+#end
+
+	    // =====================================================================================
+	    //                                                                         Basic Get All
+	    //                                                                         =============
+	    /**
+	     * Get count all.
+	     * 
+	     * @return Count all.
+	     */
+	    int GetCountAll();
+
+        // =====================================================================================
+        //                                                                          Basic Select
+        //                                                                          ============
+        #region Basic Select
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read count.</returns>
+        int ReadCount(${glConditionBeanInterfaceName} cb);
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read entity. (Nullable)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        ${glEntityInterfaceName} ReadEntity(${glConditionBeanInterfaceName} cb);
+
+        /// <summary>
+        /// Read entity with deleted check.
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read entity. (NotNull)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}">If the result is nothing.</exception>
+        ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb);
+
+        /// <summary>
+        /// Read list.
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>List-result-bean. (NotNull)</returns>
+        ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} cb);
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read page. (NotNull)</returns>
+        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb);
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <param name="invoker">Select-page-invoker. (NotNull)</param>
+        /// <returns>Read page. (NotNull)</returns>
+        ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker invoker);
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                        Various Select
+        //                                                                        ==============
+        #region Various Select
+    #if ($database.isMakeDeprecated())
+
+        /**
+         * Read list after checking count.
+         * 
+         * @param cb Condition-bean.
+         * @param maxCount Max count.
+         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+         * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+         */
+        [Obsolete("This method is deprecated.")]
+        ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount);
+    #end
+
+        /// <summary>
+        /// Read page as first page.
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <param name="fetchSize">Fetch-size.</param>
+        /// <returns>Read page as first page. (NotNull)</returns>
+        ${glPagingResultBeanName} ReadPageAsFirst(${glConditionBeanInterfaceName} cb, int fetchSize);
+
+        /// <summary>
+        /// Read page by page-number.
+        /// If result-page is 'rb.getAllRecordCount > 0 && rb.getSelectedList().size() == 0', re-select as max-page.
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <param name="fetchPageNumber">Fetch-page-number.</param>
+        /// <returns>Read page as [fetchPageNumber] page. (NotNull)</returns>
+        ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} cb, int fetchPageNumber);
+        #endregion
+    }
+
+    /// <summary>
+    /// The interface of select-page callback.
+    /// 
+    /// <![CDATA[
+    ///   ex) If you select as original method, the way is as follows:
+    /// 
+    ///      // Original behavior method of select-page-as-first as BookInfo.
+    ///      public SelectPageAsFirstBookInfo(BookCB cb, BookInfoPmb pmb, int fetchSize) {
+    ///          SelectPageCallback callback = new SelectPageAsFirstSimpleCallback(cb, pmb, fetchSize);
+    ///          return InvokeSelectPage(callback);
+    ///      }
+    /// 
+    ///      // Original select-page callback.
+    ///      public class SelectPageBookInfoCallback : SelectPageSimpleCallback {
+    ///          protected BookInfoPmb _pmb;
+    ///          public ${glConditionBeanInterfaceName} PagingBeanAsBookInfoCB { get { return (BookInfoCB)this.PagingBean; } }
+    ///          public SelectPageAsFirstBookInfo(BookBhv bhv, BookCB pb, BookInfoPmb pmb) : base(bhv, pb) {
+    ///              _pmb = pmb;
+    ///          }
+    ///          override int SelectPageCallback.SelectCountIgnoreFetchScope() {
+    ///              return this.Behavior.Dao.SelectCountIgnoreFetchScopeBookInfo(this.PagingBeanAsBookInfoCB, _pmb); // Original Method Invoking
+    ///          }
+    ///          override int SelectPageCallback.SelectList() {
+    ///              return this.Behavior.Dao.SelectListBookInfo(this.PagingBeanAsBookInfoCB, _pmb); // Original Method Invoking
+    ///          }
+    ///      }
+    /// ]]>
+    /// </summary>
+    public interface SelectPageCallback {
+        ${glPagingBeanInterfaceName} PagingBean { get; }
+        int SelectCountIgnoreFetchScope();
+        System.Collections.IList SelectList();
+    }
+
+    /// <summary>
+    /// The simple-implementation of select-page-as-first callback.
+    /// </summary>
+    public class SelectPageSimpleCallback : SelectPageCallback {
+        protected ${glPagingBeanInterfaceName} _pb;
+        protected ${glBehaviorReadableInterfaceName} _bhv;
+        public ${glPagingBeanInterfaceName} PagingBean { get { return _pb; } }
+        public SelectPageSimpleCallback(${glPagingBeanInterfaceName} pb, ${glBehaviorReadableInterfaceName} bhv) {
+            _pb = pb;
+            _bhv = bhv;
+        }
+        public virtual int SelectCountIgnoreFetchScope() {
+            // This is default method of select-count-ignore-fetch-scope.
+            return _bhv.ReadCount((${glConditionBeanInterfaceName})this.PagingBean);
+        }
+        public virtual System.Collections.IList SelectList() {
+            // This is default method of select-list.
+            return _bhv.ReadList((${glConditionBeanInterfaceName})this.PagingBean);
+        }
+    }
+
+    public class ResultBeanBuilder {
+
+        protected ${glBehaviorReadableInterfaceName} _bhv;
+        public ResultBeanBuilder(${glBehaviorReadableInterfaceName} bhv) {
+            _bhv = bhv;
+        }
+        public ${glBehaviorReadableInterfaceName} Bhv {
+            get { return _bhv; }
+        }
+
+        /**
+         * Build list-reuslt-bean.
+         * 
+         * @param ob Order-by-bean. (NotNull)
+         * @param selectedList Selected list. (NotNull)
+         * @return List-result-bean. (NotNull)
+         */
+        public ${glListResultBeanName} BuildListResultBean(${glOrderByBeanInterfaceName} ob, System.Collections.IList selectedList) {
+            ${glListResultBeanName} rb = new ${glListResultBeanName}();
+            rb.TableDbName = this.Bhv.TableDbName;
+            rb.AllRecordCount = selectedList.Count;
+            rb.SelectedList = selectedList;
+            rb.OrderByClause = ob.SqlComponentOfOrderByClause;
+            return rb;
+        }
+
+        /// <summary>
+        /// Build paging-result-bean.
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Paging result bean. (NotNull)</returns>
+        public ${glPagingResultBeanName} BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, System.Collections.IList selectedList) {
+            ${glPagingResultBeanName} rb = new ${glPagingResultBeanName}();
+            rb.TableDbName = this.Bhv.TableDbName;
+            rb.AllRecordCount = allRecordCount;
+            rb.SelectedList = selectedList;
+            rb.PageSize = pb.FetchSize;
+            rb.CurrentPageNumber = pb.FetchPageNumber;
+            rb.OrderByClause = pb.SqlComponentOfOrderByClause;
+            return rb;
+        }
+    }
+
+    public interface SelectPageInvoker {
+        /// <summary>
+        /// Invoke select-page by callback.
+        /// </summary>
+        /// <param name="callback">Callback. (NotNull)</param>
+        ${glPagingResultBeanName} InvokeSelectPage(SelectPageCallback callback);
+    }
+
+    public class SelectPageSimpleInvoker : SelectPageInvoker {
+
+        protected ${glBehaviorReadableInterfaceName} _bhv;
+        public SelectPageSimpleInvoker(${glBehaviorReadableInterfaceName} bhv) {
+            _bhv = bhv;
+        }
+        public ${glBehaviorReadableInterfaceName} Bhv {
+            get { return _bhv; }
+        }
+
+        /// <summary>
+        /// Invoke select-page by callback.
+        /// </summary>
+        /// <param name="callback">Callback. (NotNull)</param>
+        public ${glPagingResultBeanName} InvokeSelectPage(SelectPageCallback callback) {
+            AssertObjectNotNull("callback", callback);
+            AssertObjectNotNull("callback.PagingBean", callback.PagingBean);
+            if (!callback.PagingBean.IsFetchScopeEffective) {
+                String msg = "When you invoke select page, you should set up fetch-scope of paging bean.";
+                msg = msg + " But the paging bean is not effective about fetch-scope: " + callback.PagingBean;
+                throw new SystemException(msg);
+            }
+            int allRecordCount = callback.SelectCountIgnoreFetchScope();
+            System.Collections.IList selectedList = callback.SelectList();
+            ${glPagingResultBeanName} rb = new ResultBeanBuilder(this.Bhv).BuildPagingResultBean(callback.PagingBean, allRecordCount, selectedList);
+            if (IsNecessaryToReadPageAgain(rb)) {
+                callback.PagingBean.FetchPage(rb.AllPageCount);
+                int reAllRecordCount = callback.SelectCountIgnoreFetchScope();
+                System.Collections.IList reSelectedList = callback.SelectList();
+                return new ResultBeanBuilder(this.Bhv).BuildPagingResultBean(callback.PagingBean, reAllRecordCount, reSelectedList);
+            } else {
+                return rb;
+            }
+        }
+
+        /// <summary>
+        /// Is it necessary to read page again?
+        /// </summary>
+        /// <param name="rb">Paging-result-bean. (NotNull)<param>
+        /// <returns>Determination.</return>
+        protected bool IsNecessaryToReadPageAgain(${glPagingResultBeanName} rb) {
+            return rb.AllRecordCount > 0 && rb.SelectedList.Count == 0;
+        }
+
+        /**
+         * Assert that the argument is not null.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param arg Argument. (NotNull)
+         */
+        protected void AssertObjectNotNull(String variableName, Object arg) {
+            if (variableName == null) {
+                String msg = "Argument[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (arg == null) {
+                String msg = "Argument[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The marker interface of simple condition-bean setupper.
+    /// </summary>
+    public interface SimpleCBSetupper {
+    }
+}

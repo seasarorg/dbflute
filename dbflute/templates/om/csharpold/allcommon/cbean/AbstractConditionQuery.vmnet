@@ -1,0 +1,515 @@
+#set ($myClassName = "${glConditionQueryAbstractName}")
+
+using System;
+using System.Collections;
+using System.Reflection;
+using System.Text;
+using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonSqlClause};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    /// <summary>
+    /// The abstract class of condition-query.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        /** Condition value for DUMMY. */
+        protected static readonly ${glConditionValueName} DUMMY_CONDITION_VALUE = new ${glConditionValueName}();
+
+        /** Object for DUMMY. */
+        protected static readonly Object DUMMY_OBJECT = new Object();
+
+        /** SQL clause. */
+        protected readonly ${glSqlClauseName} _sqlClause;
+
+        /** My alias name. */
+        protected readonly String _aliasName;
+
+        /** Nest level. */
+        protected readonly int _nestLevel;
+
+        /** Child query. */
+        protected readonly ${glConditionQueryInterfaceName} _childQuery;
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        /**
+         * Constructor.
+         * 
+         * @param childQuery Child query. (Nullable: If null, this is base instance.)
+         * @param sqlClause SQL clause instance. (NotNull)
+         * @param aliasName My alias name. (NotNull)
+         * @param nestLevel Nest level.
+         */
+        public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+            _childQuery = childQuery;
+            _sqlClause = sqlClause;
+            _aliasName = aliasName;
+            _nestLevel = nestLevel;
+        }
+
+        // =====================================================================================
+        //                                                                            Table Name
+        //                                                                            ==========
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        abstract public String GetTableDbName();
+
+        // =====================================================================================
+        //                                                                                Getter
+        //                                                                                ======
+        /**
+         * Get child query.
+         * 
+         * @return Child query. (Nullable)
+         */
+        public ${glConditionQueryInterfaceName} GetChildQuery() {
+            return _childQuery;
+        }
+
+        /**
+         * Get sql clause.
+         * 
+         * @return Sql clause. (NotNull)
+         */
+        public ${glSqlClauseName} GetSqlClause() {
+            return _sqlClause;
+        }
+
+        /**
+         * Get alias name.
+         * 
+         * @return Alias name. (NotNull)
+         */
+        public String GetAliasName() {
+            return _aliasName;
+        }
+
+        /**
+         * Get nest level.
+         * 
+         * @return Nest level.
+         */
+        public int GetNestLevel() {
+            return _nestLevel;
+        }
+
+        /**
+         * Get next nest level.
+         * 
+         * @return Next nest level.
+         */
+        public int GetNextNestLevel() {
+            return _nestLevel+1;
+        }
+
+        /**
+         * Is base query?
+         * 
+         * @param query Condition query. (NotNull)
+         * @return Determination.
+         */
+        public bool IsBaseQuery(${glConditionQueryInterfaceName} query) {
+            return (query.GetChildQuery() == null);
+        }
+
+        // =====================================================================================
+        //                                                                              RealName
+        //                                                                              ========
+        /// <summary>
+        ///    Get real alias name(that has nest level mark).
+        /// </summary>
+        /// <returns>Real alias name. (NotNull)</returns>
+        public String GetRealAliasName() {
+            if (GetNestLevel() > 1) {
+                return GetAliasName() + "_n" + GetNestLevel();
+            } else {
+                return GetAliasName();
+            }
+        }
+
+        /// <summary>
+        /// Get real column name(with real alias name).
+        /// </summary>
+        /// <param name="columnName">Column name without alias name. This should not contain comma.</param>
+        /// <returns>Real column name.</returns>
+        public String GetRealColumnName(String columnName) {
+            AssertColumnName(columnName);
+            return GetRealAliasName() + "." + columnName;
+        }
+
+        // =====================================================================================
+        //                                                                         IncludeAsMine
+        //                                                                         =============
+        /// <summary>
+        /// Register included-select-column.
+        /// </summary>
+        /// <param name="aliasName">Alias name. This should not contain comma. (NotNull)</param>
+        /// <param name="realColumnName">Real column name. This should not contain comma. (NotNull)</param>
+        protected void RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
+            AssertAliasName(aliasName);
+            AssertColumnName(realColumnName);
+            GetSqlClause().RegisterIncludedSelectColumn(aliasName, realColumnName);
+        }
+
+        // =====================================================================================
+        //                                                                                 Query
+        //                                                                                 =====
+        /// <summary>
+        /// Register condition of ${col.UncapitalisedJavaName}.
+        /// </summary>
+        /// <param name="key">Condition key. (NotNull)</param>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
+        protected virtual void RegisterQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+            if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
+                key.SetupConditionValue(cvalue, value, GetLocation(capPropName, key));// If C#, CapProp!
+                GetSqlClause().RegisterWhereClause(GetRealColumnName(colName), key, cvalue);
+            }
+        }
+
+        /// <summary>
+        /// Register inline condition of ${col.UncapitalisedJavaName}.
+        /// </summary>
+        /// <param name="key">Condition key. (NotNull)</param>
+        /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
+        protected virtual void RegisterInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+            if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
+                key.SetupConditionValue(cvalue, value, GetLocation(capPropName, key));// If C#, CapProp!
+                if (IsBaseQuery(this)) {
+                    GetSqlClause().RegisterBaseTableInlineWhereClause(colName, key, cvalue);
+                } else {
+                    GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), colName, key, cvalue);
+                }
+            }
+        }
+
+        // =====================================================================================
+        //                                                                              SubQuery
+        //                                                                              ========
+        protected void RegisterInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                     , String columnName, String relatedColumnName, String propertyName) {
+            String realColumnName = GetRealColumnName(columnName);
+            String subQueryClause = GetInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
+            GetSqlClause().RegisterWhereClause(realColumnName + " in (" + subQueryClause + ")");
+        }
+
+        protected void RegisterInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                     , String columnName, String relatedColumnName, String propertyName) {
+            String subQueryClause = GetInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
+            String finalClause = columnName + " in (" + subQueryClause + ")";
+            if (IsBaseQuery(this)) {
+                GetSqlClause().RegisterBaseTableInlineWhereClause(finalClause);
+            } else {
+                GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), finalClause);
+            }
+        }
+
+        protected String GetInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
+                                     , String relatedColumnName, String propertyName) {
+            String selectClause = "select " + subQuery.GetAliasName() + "." + relatedColumnName;
+            String fromClause = subQuery.GetSqlClause().GetFromClause();
+            String oldStr = ".ConditionQuery.";
+            String newStr = "." + GetLocationBase(propertyName) + ".";
+            String whereClause = subQuery.GetSqlClause().GetWhereClause().Replace(oldStr, newStr);
+            return selectClause + " " + fromClause + " " + whereClause;
+        }
+
+        protected void RegisterExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+                                     , String columnName, String relatedColumnName, String propertyName) {
+            String realColumnName = GetRealColumnName(columnName);
+            String subQueryClause = GetExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
+            GetSqlClause().RegisterWhereClause("exists (" + subQueryClause + ")");
+        }
+
+        // *Unsupport ExistsSubQuery as inline because it's so dangerous.
+
+        protected String GetExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
+                                 , String realColumnName, String relatedColumnName, String propertyName) {
+            String selectClause = "select " + subQuery.GetAliasName() + "." + relatedColumnName;
+            String fromClause = subQuery.GetSqlClause().GetFromClause();
+            String oldStr = ".ConditionQuery.";
+            String newStr = "." + GetLocationBase(propertyName) + ".";
+            String whereClause = subQuery.GetSqlClause().GetWhereClause().Replace(oldStr, newStr);
+
+            // String parentCondition = " and " + relatedColumnName + " = " + realColumnName;
+            String parentCondition = "";
+            if (whereClause.Contains("where")) {
+                parentCondition = " and " + relatedColumnName + " = " + realColumnName;
+            } else {
+                parentCondition = " where " + relatedColumnName + " = " + realColumnName;
+            }
+
+            return selectClause + " " + fromClause + " " + whereClause + parentCondition;
+        }
+
+        // =====================================================================================
+        //                                                                                Invoke
+        //                                                                                ======
+        public ${glConditionValueName} InvokeGetter(String columnMultiName) {
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableDbName(GetTableDbName());
+            String columnCapPropName = dbmeta.GetCapPropNameByMultiName(columnMultiName);
+
+            String methodName = columnCapPropName;
+            PropertyInfo propertyInfo = this.GetType().GetProperty(methodName);
+            if (propertyInfo == null) {
+                String msg = "The columnCapPropName is not existing in this table: columnCapPropName=" + columnCapPropName + " tableName=" + GetTableDbName();
+                msg = msg + " methodName=" + methodName;
+                throw new SystemException(msg);
+            }
+            Object result = propertyInfo.GetValue(this, null);
+            return (${glConditionValueName})result;
+        }
+
+        public void InvokeSetterEqual(String columnMultiName, Object value) {
+            InvokeSetter(columnMultiName, value, "equal");
+        }
+
+        public void InvokeSetterNotEqual(String columnMultiName, Object value) {
+            InvokeSetter(columnMultiName, value, "notEqual");
+        }
+
+        public void InvokeSetterGreaterThan(String columnMultiName, Object value) {
+            InvokeSetter(columnMultiName, value, "greaterThan");
+        }
+
+        public void InvokeSetterLessThan(String columnMultiName, Object value) {
+            InvokeSetter(columnMultiName, value, "lessThan");
+        }
+
+        public void InvokeSetterGreaterEqual(String columnMultiName, Object value) {
+            InvokeSetter(columnMultiName, value, "greaterEqual");
+        }
+
+        public void InvokeSetterLessEqual(String columnMultiName, Object value) {
+            InvokeSetter(columnMultiName, value, "lessEqual");
+        }
+
+        protected void InvokeSetter(String columnMultiName, Object value, String conditionKeyName) {
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableDbName(GetTableDbName());
+            String columnCapPropName = dbmeta.GetCapPropNameByMultiName(columnMultiName);
+
+            String methodName = "Set" + columnCapPropName + "_" + conditionKeyName.Substring(0, 1).ToUpper() + conditionKeyName.Substring(1);
+            MethodInfo methodInfo = this.GetType().GetMethod(methodName);
+            if (methodInfo == null) {
+                String msg = "The columnCapPropName is not existing in this table: columnCapPropName=" + columnCapPropName + " tableName=" + GetTableDbName();
+                msg = msg + " methodName=" + methodName;
+                throw new SystemException(msg);
+            }
+            methodInfo.Invoke(this, new Object[]{value});
+        }
+
+        public void InvokeAddOrderByAsc(String columnCapPropName) {
+            InvokeOrderBy(columnCapPropName, true);
+        }
+
+        public void InvokeAddOrderByDesc(String columnCapPropName) {
+            InvokeOrderBy(columnCapPropName, false);
+        }
+
+        protected void InvokeOrderBy(String columnMultiName, bool isAsc) {
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableDbName(GetTableDbName());
+            String columnCapPropName = dbmeta.GetCapPropNameByMultiName(columnMultiName);
+
+            String ascDesc = null;
+            if (isAsc) {
+                ascDesc = "Asc";
+            } else {
+                ascDesc = "Desc";
+            }
+            String methodName = "AddOrderBy_" + columnCapPropName + "_" + ascDesc;
+            MethodInfo methodInfo = this.GetType().GetMethod(methodName);
+            if (methodInfo == null) {
+                String msg = "The columnCapPropName is not existing in this table: columnCapPropName=" + columnCapPropName;
+                msg = msg + " tableName=" + GetTableDbName() + " methodName=" + methodName;
+                throw new SystemException(msg);
+            }
+            methodInfo.Invoke(this, null);
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
+        /// <returns>Foreign condition-query as interface.</returns>
+        public ${glConditionQueryInterfaceName} GetForeignConditionQuery(String foreignPropertyName) {
+            String methodName = "Query" + foreignPropertyName.Substring(0, 1).ToUpper() + foreignPropertyName.Substring(1);
+            MethodInfo methodInfo = this.GetType().GetMethod(methodName);
+            if (methodInfo == null) {
+                String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;
+                msg = msg + " tableName=" + GetTableDbName() + " methodName=" + methodName;
+                throw new SystemException(msg);
+            }
+            return (${glConditionQueryInterfaceName})methodInfo.Invoke(this, null);
+        }
+
+        /**
+         * Get location.
+         * 
+         * @param columnPropertyName Column property name.
+         * @param key Condition key.
+         * @return Next nest level.
+         */
+        protected String GetLocation(String columnPropertyName, ${glConditionKeyName} key) {
+            return GetLocationBase(columnPropertyName) + "." + key.GetConditionKey();
+        }
+
+        protected String GetLocationBase() {
+            StringBuilder sb = new StringBuilder();
+            ${glConditionQueryInterfaceName} query = this;
+            while (true) {
+                if (query.IsBaseQuery(query)) {
+                    sb.Insert(0, "ConditionQuery.");
+                    break;
+                } else {
+                    sb.Insert(0, "ConditionQuery" + query.GetAliasName() + ".");
+                }
+                query = query.GetChildQuery();
+            }
+            return sb.ToString();
+        }
+
+        protected String GetLocationBase(String columnPropertyName) {
+            return GetLocationBase() + columnPropertyName;
+        }
+
+
+        // =====================================================================================
+        //                                                                                Helper
+        //                                                                                ======
+        /// <summary>
+        /// Filter removing empty-string.
+        /// If the value is null or empty-string, returns null.
+        /// </summary>
+        /// <param name="value">Query-value-string. (Nullable)</param>
+        /// <returns>Filtered value. (Nullable)</returns>
+        protected String FilterRemoveEmptyString(String value) {
+            return ((value != null && value.Length != 0) ? value : null);
+        }
+
+        /// <summary>
+        /// Filter removing empty-string from the list.
+        /// If the list is null or empty-string, returns null.
+        /// </summary>
+        /// <param name="ls">List. (Nullable)</param>
+        /// <returns>Filtered list. (Nullable)</returns>
+        protected IList FilterRemoveEmptyStringFromList(IList ls) {
+            if (ls == null) {
+                return null;
+            }
+            IList newList = new ArrayList();
+            foreach (Object obj in ls) {
+                if ((obj is String) && "".Equals((String)obj)) {
+                    continue;
+                }
+                newList.Add(obj);
+            }
+            return newList;
+        }
+
+        // ----------------------------------------------------------------
+        //                                                    Assert Object
+        //                                                    -------------
+        #region Assert Object
+
+        /**
+         * Assert that the argument is not null.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param arg Argument. (NotNull)
+         */
+        protected void AssertObjectNotNull(String variableName, Object arg) {
+            if (variableName == null) {
+                String msg = "Argument[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (arg == null) {
+                String msg = "Argument[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+        }
+
+        /**
+         * Assert that the column-name is not null and is not emtpy and does not contain comma.
+         * 
+         * @param columnName Column-name. (NotNull)
+         * @exception IllegalArgumentException
+         */
+        protected void AssertColumnName(String columnName) {
+            if (columnName == null) {
+                String msg = "The columnName should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (columnName.Trim().Length == 0) {
+                String msg = "The columnName should not be empty-string.";
+                throw new ArgumentOutOfRangeException(msg);
+            }
+            if (columnName.Contains(",")) {
+                String msg = "The columnName should not contain comma ',': " + columnName;
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+
+        /**
+         * Assert that the alias-name is not null and is not emtpy and does not contain comma.
+         * 
+         * @param aliasName Alias-name. (NotNull)
+         * @exception IllegalArgumentException
+         */
+        protected void AssertAliasName(String aliasName) {
+            if (aliasName == null) {
+                String msg = "The aliasName should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (aliasName.Trim().Length == 0) {
+                String msg = "The aliasName should not be empty-string.";
+                throw new ArgumentOutOfRangeException(msg);
+            }
+            if (aliasName.Contains(",")) {
+                String msg = "The aliasName should not contain comma ',': " + aliasName;
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+
+        #endregion
+
+        // ----------------------------------------------------------------
+        //                                                    Assert String
+        //                                                    -------------
+        #region Assert String
+
+        /**
+         * Assert that the string is not null and not trimmed empty.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param arg Argument. (NotNull)
+         */
+        protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+            if (variableName == null) {
+                String msg = "Variable[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (value == null) {
+                String msg = "Variable[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (value.Trim().Length == 0) {
+                String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+
+        #endregion
+    }
+}

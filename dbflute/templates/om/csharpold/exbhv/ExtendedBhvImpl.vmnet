@@ -1,0 +1,14 @@
+#set ($myClassName = "${myExtendedBhvClassName}")
+
+using System;
+using System.Collections;
+
+namespace ${glPackageExtendedBhv} {
+
+    /// <summary>
+    /// The behavior of ${table.Name}. (partial class for customizing)
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    partial class $myClassName {
+    }
+}

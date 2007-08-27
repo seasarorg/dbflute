@@ -1,0 +1,600 @@
+#set ($myClassName = "${glBehaviorReadableAbstractName}")
+
+using System;
+using System.Collections;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMeta};
+
+namespace ${glPackageBaseCommonBhv} {
+
+    /**
+     * The abstract class of behavior-readable.
+     * 
+     * @author ${database.ClassAuthor}
+     */
+    public abstract class $myClassName : ${glBehaviorReadableInterfaceName} {
+
+        // =====================================================================================
+        //                                                                            Definition
+        //                                                                            ==========
+        /** Map-string map-mark. */
+        protected static readonly String MAP_STRING_MAP_MARK = "map:";
+
+        /** Map-string list-mark. */
+        protected static readonly String MAP_STRING_LIST_MARK = "list:";
+
+        /** Map-string start-brace. */
+        protected static readonly String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
+
+        /** Map-string end-brace. */
+        protected static readonly String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
+
+        /** Map-string delimiter. */
+        protected static readonly String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
+
+        /** Map-string equal. */
+        protected static readonly String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        #region Attribute
+        /// <summary>Dao-selector instance.</summary>
+        protected ${glDaoSelectorInterfaceName} _daoSelector;
+        #endregion
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        #region Constructor
+        /**
+         * Constructor.
+         */
+        public ${myClassName}() {
+        }
+        #endregion
+
+        // =====================================================================================
+        //                                                                             TableName
+        //                                                                             =========
+        /// <summary>
+        /// The property of table db-Name. (readonly)
+        /// </summary>
+        abstract public String TableDbName { get; }
+
+        // =====================================================================================
+        //                                                                                DBMeta
+        //                                                                                ======
+        /// <summary>
+        /// The property of DBMeta. (readonly)
+        /// </summary>
+        abstract public ${glDBMetaInterfaceName} DBMeta { get; }
+
+        // =====================================================================================
+        //                                                                       Self Dispatcher
+        //                                                                       ===============
+        #region Self Dispatcher
+        /// <summary>
+        /// Behavior's self dispatcher as readable
+        /// </summary>
+        /// <returns>${glBehaviorReadableInterfaceName}</returns>
+        abstract protected ${glBehaviorReadableInterfaceName} SelfReadable { get; }
+        #endregion
+
+        // =====================================================================================
+        //                                                                          Dao Accessor
+        //                                                                          ============
+        #region Dao Accessor
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return Dao-readable. (NotNull)
+         */
+        abstract public ${glDaoReadableInterfaceName} GetDaoReadable();
+        #endregion
+
+        // =====================================================================================
+        //                                                                          New Instance
+        //                                                                          ============
+        #region New Instance
+        /// <summary>
+        /// New entity.
+        /// </summary>
+        /// <returns>Entity. (NotNull)</returns>
+        abstract public ${glEntityInterfaceName} NewEntity();
+
+        /// <summary>
+        /// New condition-bean.
+        /// </summary>
+        /// <returns>Condition-bean. (NotNull)</returns>
+        abstract public ${glConditionBeanInterfaceName} NewConditionBean();
+        #endregion
+
+        // =====================================================================================
+        //                                                                          Dao Selector
+        //                                                                          ============
+        #region Dao Selector
+
+        /// <summary>
+        ///  The property of dao-selector.
+        /// </summary>
+        public ${glDaoSelectorInterfaceName} DaoSelector {
+            get { return _daoSelector; }
+            set { _daoSelector = value; }
+        }
+        #endregion
+
+        // =====================================================================================
+        //                                                                       Delegate Method
+        //                                                                       ===============
+        #region Delegate-Method
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        int ${glBehaviorReadableInterfaceName}.CallGetCountAll() {
+            return DoCallGetCountAll();
+        }
+        abstract protected int DoCallGetCountAll();
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        IList ${glBehaviorReadableInterfaceName}.CallGetListAll() {
+            return DoCallGetListAll();
+        }
+        abstract protected IList DoCallGetListAll();
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        int ${glBehaviorReadableInterfaceName}.CallReadCount(${glConditionBeanInterfaceName} cb) {
+            return DoCallReadCount(cb);
+        }
+        abstract protected int DoCallReadCount(${glConditionBeanInterfaceName} cb);
+#if ($database.isMakeDeprecated())
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadCount()")]
+        int ${glBehaviorReadableInterfaceName}.CallReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
+            return DoCallReadCountIgnoreFetchScope(cb);
+        }
+        abstract protected int DoCallReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
+#end
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read entity. If the select result is zero, it returns null. (Nullable)
+         */
+        ${glEntityInterfaceName} ${glBehaviorReadableInterfaceName}.CallReadEntity(${glConditionBeanInterfaceName} cb) {
+            return DoCallReadEntity(cb);
+        }
+        abstract protected ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb);
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+         */
+        IList ${glBehaviorReadableInterfaceName}.CallReadList(${glConditionBeanInterfaceName} cb) {
+            return DoCallReadList(cb);
+        }
+        abstract protected IList DoCallReadList(${glConditionBeanInterfaceName} cb);
+
+
+
+#if ($database.isMakeDeprecated())
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadAllList()")]
+        IList ${glBehaviorReadableInterfaceName}.DelegateReadAllList() {
+            return DoDelegateReadAllList();
+        }
+        abstract protected IList DoDelegateReadAllList();
+#if ($database.isMakeDeprecated())
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read count. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please don't use!")]
+        int ${glBehaviorReadableInterfaceName}.DelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb) {
+            return DoDelegateReadCountIgnoreFetchScope(cb);
+        }
+        abstract protected int DoDelegateReadCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb);
+#end
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read entity. If the select result is zero, it returns null. (Nullable)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadEntity()")]
+        ${glEntityInterfaceName} ${glBehaviorReadableInterfaceName}.DelegateReadEntity(${glConditionBeanInterfaceName} cb) {
+            return DoDelegateReadEntity(cb);
+        }
+        abstract protected ${glEntityInterfaceName} DoDelegateReadEntity(${glConditionBeanInterfaceName} cb);
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+         */
+        [Obsolete("This method is deprecated. Please use CallReadList()")]
+        IList ${glBehaviorReadableInterfaceName}.DelegateReadList(${glConditionBeanInterfaceName} cb) {
+            return DoDelegateReadList(cb);
+        }
+        abstract protected IList DoDelegateReadList(${glConditionBeanInterfaceName} cb);
+
+#end
+
+        #endregion
+
+	    // =====================================================================================
+	    //                                                                         Basic Get All
+	    //                                                                         =============
+	    /**
+	     * Get count all.
+	     * 
+	     * @return Count all.
+	     */
+	    public int GetCountAll() {
+	        return this.SelfReadable.CallGetCountAll();
+	    }
+
+        // =====================================================================================
+        //                                                                          Basic Select
+        //                                                                          ============
+        #region Basic Select
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read count.</returns>
+        public int ReadCount(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.SelfReadable.CallReadCount(cb);
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read entity. (Nullable)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        public ${glEntityInterfaceName} ReadEntity(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            System.Collections.IList ls = this.SelfReadable.CallReadList(cb);
+            if (ls.Count == 0) {
+                return null;
+            }
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
+            return (${glEntityInterfaceName})ls[0];
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read entity. (NotNull)</returns>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        public ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            System.Collections.IList ls = this.SelfReadable.CallReadList(cb);
+            AssertRecordHasNotBeenDeleted(ls, cb);
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
+            return (${glEntityInterfaceName})ls[0];
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>List-result-bean. (NotNull)</returns>
+        public ${glListResultBeanName} ReadList(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.CallReadList(cb));
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Read page. (NotNull)</returns>
+        public ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.SelfReadable.ReadPage(cb, new SelectPageSimpleInvoker(this));
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <param name="invoker">Select-page-invoker. (NotNull)</param>
+        /// <returns>Read page. (NotNull)</returns>
+        public ${glPagingResultBeanName} ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker invoker) {
+            AssertConditionBeanNotNull(cb);
+            return invoker.InvokeSelectPage(new SelectPageSimpleCallback(cb, this));
+        }
+
+
+        /**
+         * Assert that record has not been deleted.
+         * 
+         * @param entity Selected entity.
+         * @param searchKey Search-key for Logging.
+         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+         */
+        protected void AssertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
+            if (entity == null) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            }
+        }
+
+        /**
+         * Assert that record has not been deleted.
+         * 
+         * @param ls List.
+         * @param searchKey Search-key for Logging.
+         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+         */
+        protected void AssertRecordHasNotBeenDeleted(System.Collections.IList ls, Object searchKey4log) {
+            if (ls == null || ls.Count == 0) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            }
+        }
+
+        /**
+         * Assert that record has been selected as one.
+         * 
+         * @param ls List.
+         * @param searchKey Search-key for Logging.
+         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+         * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+         */
+        protected void AssertRecordHasBeenSelectedAsOne(System.Collections.IList ls, Object searchKey4log) {
+            if (ls == null || ls.Count == 0) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            }
+            if (ls.Count != 1) {
+                String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
+                msg = msg + " resultCount=" + ls.Count;
+                throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            }
+        }
+
+        /**
+         * Assert that selected count has not exceeded max count.
+         * 
+         * @param selectedCount Selected count.
+         * @param maxCount Max count.
+         * @param clauseObject Clause object for exception message.
+         * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+         */
+        protected void AssertSelectedCountHasNotExceededMaxCount(int selectedCount, int maxCount, Object clauseObject) {
+            AssertObjectNotNull("selectedCount", selectedCount);
+            AssertObjectNotNull("maxCount", maxCount);
+            if (selectedCount > maxCount) {
+                String msg = "Selected count[" + selectedCount + "] has exceeded max count[" + maxCount + "]: clauseObject=" + clauseObject;
+                throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
+            }
+        }
+        #endregion
+
+        // =====================================================================================
+        //                                                                        Various Select
+        //                                                                        ==============
+        #region Various Select
+    #if ($database.isMakeDeprecated())
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @param cb Condition-bean.
+         * @param maxCount Max count.
+         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+         * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
+         */
+        [Obsolete("This method is deprecated.")]
+        public ${glListResultBeanName} ReadListAfterCheckingCountIgnoreFetchScope(${glConditionBeanInterfaceName} cb, int maxCount) {
+            AssertConditionBeanNotNull(cb);
+            int selectedCount = this.SelfReadable.ReadCount(cb);
+            AssertSelectedCountHasNotExceededMaxCount(selectedCount, maxCount, cb);
+            return new ResultBeanBuilder(this).BuildListResultBean(cb, this.SelfReadable.CallReadList(cb));
+        }
+    #end
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <param name="fetchSize">Fetch-size.</param>
+        /// <returns>Read page as first page. (NotNull)</returns>
+        public ${glPagingResultBeanName} ReadPageAsFirst(${glConditionBeanInterfaceName} cb, int fetchSize) {
+            AssertConditionBeanNotNull(cb);
+            cb.FetchFirst(fetchSize);
+            return this.SelfReadable.ReadPage(cb);
+        }
+
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <param name="fetchPageNumber">Fetch-page-number.</param>
+        /// <returns>Read page as PageNumber page. (NotNull)</returns>
+        public ${glPagingResultBeanName} ReadPageByPageNumber(${glConditionBeanInterfaceName} cb, int fetchPageNumber) {
+            AssertConditionBeanNotNull(cb);
+            cb.FetchPage(fetchPageNumber);
+            return this.SelfReadable.ReadPage(cb);
+        }
+
+        #endregion
+
+        // =====================================================================================
+        //                                                                         Helper Method
+        //                                                                         =============
+        #region Helper Method
+
+        // ----------------------------------------------------------------
+        //                                                    Assert Object
+        //                                                    -------------
+        #region Assert Object
+
+        /**
+         * Assert that the argument is not null.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param arg Argument. (NotNull)
+         */
+        protected void AssertObjectNotNull(String variableName, Object arg) {
+            if (variableName == null) {
+                String msg = "Argument[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (arg == null) {
+                String msg = "Argument[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+        }
+
+        /**
+         * Assert that the entity is not null.
+         * 
+         * @param entity Entity. (NotNull)
+         */
+        protected void AssertEntityNotNull(${glEntityInterfaceName} entity) {
+            AssertObjectNotNull("entity", entity);
+        }
+
+        /**
+         * Assert that the condition-bean is not null.
+         * 
+         * @param cb Condition-bean. (NotNull)
+         */
+        protected void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
+            AssertObjectNotNull("cb", cb);
+        }
+
+        /**
+         * Assert that the entity has primary-key value.
+         * 
+         * @param entity Entity. (NotNull)
+         */
+        protected void AssertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            if (!entity.HasPrimaryKeyValue) {
+                String msg = "The entity must should primary-key: entity=" + entity;
+                throw new ArgumentOutOfRangeException(msg + entity);
+            }
+        }
+
+        #endregion
+
+        // ----------------------------------------------------------------
+        //                                                    Assert String
+        //                                                    -------------
+        #region Assert String
+
+        /**
+         * Assert that the string is not null and not trimmed empty.
+         * 
+         * @param variableName Variable name. (NotNull)
+         * @param arg Argument. (NotNull)
+         */
+        protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+            if (variableName == null) {
+                String msg = "Variable[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (value == null) {
+                String msg = "Variable[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (value.Trim().Length == 0) {
+                String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+
+        #endregion
+
+
+        // ----------------------------------------------------------------
+        //                                                      Assert List
+        //                                                      -----------
+        #region Assert List
+        /**
+         * Assert that the list is empty.
+         * 
+         * @param ls List. (NotNull)
+         */
+        protected void AssertListNotNullAndEmpty(String variableName, IList ls) {
+            AssertObjectNotNull(variableName, ls);
+            if (!(ls.Count == 0)) {
+                String msg = "The list[" + variableName + "] should be empty: ls=" + ls.ToString();
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+
+        /**
+         * Assert that the list is not empty.
+         * 
+         * @param ls List. (NotNull)
+         */
+        protected void AssertListNotNullAndNotEmpty(String variableName, IList ls) {
+            AssertObjectNotNull(variableName, ls);
+            if (ls.Count == 0) {
+                String msg = "The list[" + variableName + "] should not be empty: ls=" + ls.ToString();
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+
+        /**
+         * Assert that the list having only one.
+         * 
+         * @param ls List. (NotNull)
+         */
+        protected void AssertListNotNullAndHasOnlyOne(String variableName, IList ls) {
+            AssertObjectNotNull(variableName, ls);
+            if (ls.Count != 1) {
+                String msg = "The list[" + variableName + "] should contain only one object: ls=" + ls.ToString();
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+        #endregion
+        #endregion
+    }
+}

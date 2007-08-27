@@ -1,0 +1,157 @@
+#set ($myClassName = "${myConditionInlineQueryClassName}")
+#set ($myCQClassName = "")
+#if ($database.isJavaDirOnlyOne())
+  #set ($myCQClassName = "${myBaseConditionQueryClassName}")
+#else
+  #set ($myCQClassName = "${myConditionQueryClassName}")
+#end
+
+using System;
+using System.Collections;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCQ};
+using ${glPackageCQ};
+
+namespace ${glPackageCIQ} {
+
+    /// <summary>
+    /// The condition-query of {table.Name}.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    [System.Serializable]
+    public class ${myClassName} : ${myAbstractBaseConditionQueryClassName} {
+
+        // =====================================================================================
+        //                                                                             Attribute
+        //                                                                             =========
+        protected ${myCQClassName} _myCQ;
+
+        // =====================================================================================
+        //                                                                           Constructor
+        //                                                                           ===========
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="childQuery">Child query as interface. (Nullable: If null, this is base instance.)</param>
+        /// <param name="sqlClause">SQL clause instance. (NotNull)</param>
+        /// <param name="aliasName">My alias name. (NotNull)</param>
+        /// <param name="nestLevel">Nest level.</param>
+        /// <param name="myCQ">My condition-query. (NotNull)</param>
+        public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ)
+            : base(childQuery, sqlClause, aliasName, nestLevel) { _myCQ = myCQ; }
+
+        // =====================================================================================
+        //                                                                                 Query
+        //                                                                                 =====
+        protected override void RegisterQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                                 , String colName, String capPropName, String uncapPropName) {
+            RegisterInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
+        }
+
+  ## --------------------------------------------------------------------------------
+  ##                                                  Make getter and setter methods.
+  ##                                                  -------------------------------
+
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   MyTable = [$table.Name]
+    // * * * * * * * * */
+
+  #foreach ($col in $table.Columns)
+    #set ($tmpJavaName = "${col.JavaName}")
+    #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+
+	    protected override ${glConditionValueName} GetCValue${tmpJavaName}() {
+	        return _myCQ.${tmpJavaName};
+	    }
+
+    #if (${col.isJavaNativeStringObject()})
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+
+	    public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+	        _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+	    }
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+	    public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+	        _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+	    }
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+	    public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            throw new SystemException("ExistsSubQuery at inline() is unsupported! Sorry!");
+	        // _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+	    }
+          #end
+        #end
+      #end
+    #end
+    #if (${col.isJavaNativeNumberObject()})
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${glProjectPrefix}${col.foreignKey.foreignTable.javaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+
+	    public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+	        _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+	    }
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+	    public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+	        _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+	    }
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+
+	    public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            throw new SystemException("ExistsSubQuery at inline() is unsupported! Sorry!");
+	        // _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+	    }
+          #end
+        #end
+      #end
+    #end
+    #if (${col.isJavaNativeDateObject()})
+    #end
+    #if (${col.isJavaNativeBooleanObject()})
+    #end
+    #if (${col.isJavaNativeBinaryObject()})
+    #end
+    #if (!${col.isNotNull()})
+    #end
+    #if (!${col.isJavaNativeBinaryObject()})
+    #end
+  #end
+
+    }
+}

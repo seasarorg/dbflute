@@ -1,0 +1,92 @@
+
+using System;
+using System.Collections;
+
+using ${glPackageBaseCommonDBMeta};
+
+namespace ${glPackageBaseCommon} {
+
+    /// <summary>
+    /// The interface of entity.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public interface ${glEntityInterfaceName} {
+
+        // =====================================================================================
+        //                                                                             TableName
+        //                                                                             =========
+        /// <summary>
+        /// The property of table db-Name. (readonly)
+        /// </summary>
+        String TableDbName { get; }
+
+        /// <summary>
+        /// The property of table cap-prop-Name. (readonly)
+        /// </summary>
+        String TableCapPropName { get; }
+
+        /// <summary>
+        /// The property of table uncap-prop-Name. (readonly)
+        /// </summary>
+        String TableUncapPropName { get; }
+
+        // =====================================================================================
+        //                                                                                DBMeta
+        //                                                                                ======
+        /// <summary>
+        /// The property of DBMeta. (readonly)
+        /// </summary>
+        ${glDBMetaInterfaceName} DBMeta { get; }
+
+        // =====================================================================================
+        //                                                                     Accept Map-String
+        //                                                                     =================
+        /// <summary>
+        /// Accept primary-key map.
+        /// </summary>
+        /// <param name="primaryKeyMap">Primary-key map. (NotNull and NotEmpty)</param>
+        void AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
+
+        /// <summary>
+        /// Accept primary-key map-string.
+        /// </summary>
+        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
+        void AcceptPrimaryKeyMapString(String primaryKeyMapString);
+
+        /// <summary>
+        /// Accept column-value map.
+        /// </summary>
+        /// <param name="columnValueMap">Column-value map. (NotNull and NotEmpty)</param>
+        void AcceptColumnValueMap(System.Collections.Generic.IDictionary<String, Object> columnValueMap);
+
+        /// <summary>
+        /// Accept column-value map-string.
+        /// </summary>
+        /// <param name="columnValueMapString">Column-value map-string. (NotNull)</param>
+        void AcceptColumnValueMapString(String columnValueMapString);
+
+        // =====================================================================================
+        //                                                                    Extract Map-String
+        //                                                                    ==================
+        /// <summary>
+        /// Extract primary-key map-string. Delimiter is atmark and semicolon {@;}.
+        /// </summary>
+        /// <returns>Primary-key map-string.</returns>
+        String ExtractPrimaryKeyMapString();
+
+        /// <summary>
+        /// Extract column-value map-string. Delimiter is atmark and semicolon {@;}.
+        /// </summary>
+        /// <returns>Column-value map-string.</returns>
+        String ExtractColumnValueMapString();
+
+        // =====================================================================================
+        //                                                                         Determination
+        //                                                                         =============
+        /// <summary>
+        /// Has primary-key value?
+        /// </summary>
+        /// <returns>Determinationg.</returns>
+        bool HasPrimaryKeyValue { get; }
+    }
+}
