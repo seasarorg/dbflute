@@ -307,7 +307,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// Using values are currentPageNumber and pageRangeSize and allPageCount.
         /// </summary>
         /// <returns>Current page-range page-number-array.</returns>
-        protected int[] ConvertListToIntArray(System.Collections.IList ls) {
+        protected int[] ConvertListToIntArray(System.Collections.Generic.IList<int> ls) {
             int[] resultArray = new int[ls.Count];
             ls.CopyTo(resultArray, 0);
             return resultArray;

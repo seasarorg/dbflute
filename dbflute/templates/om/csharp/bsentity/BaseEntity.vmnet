@@ -89,9 +89,12 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                             =========
         #region Attribute
 
+        /** Entity modified properties. (for S2Dao) */
+        protected EntityModifiedProperties _modifiedProperties = new EntityModifiedProperties();
+
 #foreach ($col in $table.Columns)
 
-        /// <summary>The value of ${col.UncapitalisedJavaName}.</summary>
+        /// <summary>The value of ${col.UncapitalisedJavaName}. ${col.columnDefinitionLineDisp}</summary>
         protected ${col.JavaNative} _${col.UncapitalisedJavaName};
 #end
 
@@ -159,29 +162,27 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                              ========
         #region Property
 #foreach ($col in $table.Columns)
-  #if ($col.isIdentity())
 
-        /// <summary>
-        /// The property of ${col.UncapitalisedJavaName}. This is identity.
-        /// {${col.columnDefinitionLineDisp}}
-        /// </summary>
-        [Seasar.Dao.Attrs.ID("identity")]
-        [Seasar.Dao.Attrs.Column("${col.Name}")]
-        public ${col.JavaNative} ${col.JavaName} {
-            get { return _${col.UncapitalisedJavaName}; }
-            set { _${col.UncapitalisedJavaName} = value; }
-        }
-  #else
 
         /// <summary>
         /// The property of ${col.UncapitalisedJavaName}.
         /// {${col.columnDefinitionLineDisp}}
         /// </summary>
+#if ($col.isIdentity())
+        [Seasar.Dao.Attrs.ID("identity")]
+#end
+        [Seasar.Dao.Attrs.Column("${col.Name}")]
         public ${col.JavaNative} ${col.JavaName} {
             get { return _${col.UncapitalisedJavaName}; }
-            set { _${col.UncapitalisedJavaName} = value; }
+            set {
+#if ($table.isAvailableEntityModifiedPropertiesAddLogicIfNeeds())
+                _modifiedProperties.AddPropertyNameIfNeeds("${col.javaBeansRulePropertyNameInitCap}", this._${col.UncapitalisedJavaName}, value);
+#else
+                _modifiedProperties.AddPropertyName("${col.javaBeansRulePropertyNameInitCap}");
+#end
+                _${col.UncapitalisedJavaName} = value;
+            }
         }
-  #end
 #end
 
         #endregion
@@ -441,7 +442,6 @@ namespace ${myExtendedEntityPackageName} {
 
             if (!primaryKeyMap.ContainsKey("${col.Name}") || primaryKeyMap["${col.Name}"] == null) {
                 _${col.UncapitalisedJavaName} = null;
-                _isSetterInvoked${col.JavaName} = false;
             } else {
                 Object obj = primaryKeyMap["${col.Name}"];
                 if (obj == null) {
@@ -483,7 +483,6 @@ namespace ${myExtendedEntityPackageName} {
 
             if (!primaryKeyMap.ContainsKey("${col.Name}") || primaryKeyMap["${col.Name}"] == null) {
                 _${col.UncapitalisedJavaName} = null;
-                _isSetterInvoked${col.JavaName} = false;
             } else {
                 Object obj = primaryKeyMap["${col.Name}"];
                 if (obj == null) {
@@ -589,7 +588,7 @@ namespace ${myExtendedEntityPackageName} {
             return sb.ToString();
 #else
 
-            return ExtractColumnValueMapString();
+            return null; // TODO: -- @jflute
 #end
         }
 
@@ -617,33 +616,24 @@ namespace ${myExtendedEntityPackageName} {
             }
         }
 
-//        // ===================================================================================
-//        //                                                                 Modified Properties
-//        //                                                                 ===================
-//        /**
-//         * Get modified property names. (S2Dao uses this for updateModifiedProperties())
-//         * 
-//         * @return Modified property names. (NotNull)
-//         */
-//        public java.util.Set${database.filterGenericsString('String')} getModifiedPropertyNames() {
-//            return _modifiedProperties.getPropertyNames();
-//        }
-//
-//        /**
-//         * New entity modified properties. You can override this at the sub-class if you need it.
-//         * 
-//         * @return Entity modified properties. (NotNull)
-//         */
-//        protected EntityModifiedProperties newEntityModifiedProperties() {
-//            return new EntityModifiedProperties();
-//        }
-//
-//        /**
-//         * Clear modified property names.
-//         */
-//        public void clearModifiedPropertyNames() {
-//            _modifiedProperties.clear();
-//        }
+        // ===================================================================================
+        //                                                                 Modified Properties
+        //                                                                 ===================
+        /**
+         * Get modified property names. (S2Dao uses this for updateModifiedProperties())
+         * 
+         * @return Modified property names. (NotNull)
+         */
+        public System.Collections.Generic.IDictionary<String, Object> ModifiedPropertyNames {
+            get { return _modifiedProperties.PropertyNames; }
+        }
+
+        /**
+         * Clear modified property names.
+         */
+        public void ClearModifiedPropertyNames() {
+            _modifiedProperties.clear();
+        }
 
         // =====================================================================================
         //                                                                        Basic Override

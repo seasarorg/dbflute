@@ -649,15 +649,11 @@ namespace ${glPackageExtendedBhv} {
             AssertObjectNotNull("destinationEntity", destinationEntity);
             ${myExtendedObjectClassName} sourceMyEntity = (${myExtendedObjectClassName})sourceEntity;
             ${myExtendedObjectClassName} destinationMyEntity = (${myExtendedObjectClassName})destinationEntity;
-
-// TODO: @jflute -- ModifiedProperties
-      #foreach ($col in $table.Columns)
-
-//            if (sourceMyEntity.IsSetterInvoked${col.JavaName}()) {
-//                destinationMyEntity.${col.JavaName} = sourceMyEntity.${col.JavaName};
-//            }
-      #end
-
+#foreach ($col in $table.Columns)
+            if (sourceMyEntity.ModifiedPropertyNames.ContainsKey("${col.javaBeansRulePropertyNameInitCap}")) {
+                destinationMyEntity.${col.JavaName} = sourceMyEntity.${col.JavaName};
+            }
+#end
         }
 
         /// <summary>

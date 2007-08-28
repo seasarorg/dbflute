@@ -266,14 +266,14 @@ namespace ${glPackageBaseCommonCValue} {
         }
 
         /** Value of inScope. */
-        protected System.Collections.IList _inScope;
+        protected System.Collections.Generic.IList<Object> _inScope;
 
         /**
          * Get the value of inScope.
          * 
          * @return The value of inScope. (Nullable)
          */
-        public System.Collections.IList InScope {
+        public System.Collections.Generic.IList<Object> InScope {
             get { return _inScope; }
             set { _inScope = value; }
         }
@@ -302,14 +302,14 @@ namespace ${glPackageBaseCommonCValue} {
         }
 
         /** Value of notInScope. */
-        protected System.Collections.IList _notInScope;
+        protected System.Collections.Generic.IList<Object> _notInScope;
 
         /**
          * Get the value of notInScope.
          * 
          * @return The value of notInScope. (Nullable)
          */
-        public System.Collections.IList NotInScope {
+        public System.Collections.Generic.IList<Object> NotInScope {
             get { return _notInScope; }
             set { _notInScope = value; }
         }

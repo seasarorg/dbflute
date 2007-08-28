@@ -71,4 +71,62 @@ namespace ${glPackageBaseCommon} {
         /// <returns>Determinationg.</returns>
         bool HasPrimaryKeyValue { get; }
     }
+
+    public class EntityModifiedProperties {
+
+        protected System.Collections.Generic.IDictionary<String, Object> _propertiesSet = new System.Collections.Generic.Dictionary<String, Object>();
+
+        /**
+         * Add property name. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (Nullable)
+         */
+        public void AddPropertyName(String propertyName) {
+            if (_propertiesSet.ContainsKey(propertyName)) {
+                return;
+            }
+            _propertiesSet.Add(propertyName, null);
+        }
+
+        /**
+         * Add property name. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (NotNull)
+         * @param before Before value. (Nullable)
+         * @param after After value. (Nullable)
+         */
+        public void AddPropertyNameIfNeeds(String propertyName, Object before, Object after) {
+            if (_propertiesSet.ContainsKey(propertyName)) {
+                return;
+            }
+            if (before == null || !before.Equals(after)) {
+                AddPropertyName(propertyName);
+            }
+        }
+
+        /**
+         * Get the set of properties.
+         * 
+         * @return The set of properties. (NotNull)
+         */
+        public System.Collections.Generic.IDictionary<String, Object> PropertyNames {
+            get { return _propertiesSet; }
+        }
+
+        /**
+         * Clear the set of properties.
+         */
+        public void clear() {
+            _propertiesSet.Clear();
+        }
+
+        /**
+         * Remove property name from the set. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (Nullable)
+         */
+        public void remove(String propertyName) {
+            _propertiesSet.Remove(propertyName);
+        }
+    }
 }

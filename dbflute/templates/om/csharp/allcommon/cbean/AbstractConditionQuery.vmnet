@@ -404,16 +404,16 @@ namespace ${glPackageBaseCommonCBean} {
         /// </summary>
         /// <param name="ls">List. (Nullable)</param>
         /// <returns>Filtered list. (Nullable)</returns>
-        protected System.Collections.Generic.IList<Object> FilterRemoveEmptyStringFromList(System.Collections.Generic.IList<Object> ls) {
+        protected System.Collections.Generic.IList<String> FilterRemoveEmptyStringFromList(System.Collections.Generic.IList<String> ls) {
             if (ls == null) {
                 return null;
             }
-            System.Collections.Generic.IList<Object> newList = new System.Collections.Generic.List<Object>();
-            foreach (Object obj in ls) {
-                if ((obj is String) && "".Equals((String)obj)) {
+            System.Collections.Generic.IList<String> newList = new System.Collections.Generic.List<String>();
+            foreach (String str in ls) {
+                if (str == null || "".Equals(str)) {
                     continue;
                 }
-                newList.Add(obj);
+                newList.Add(str);
             }
             return newList;
         }

@@ -170,7 +170,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
         public virtual System.Collections.Generic.IList<ENTITY> SelectListWithFetchScope() {
             // This is default method of select-list.
-            return ((System.Collections.Generic.IList<ENTITY>))_bhv.ReadList((${glConditionBeanInterfaceName})this.PagingBean);
+            return (System.Collections.Generic.IList<ENTITY>)_bhv.ReadList((${glConditionBeanInterfaceName})this.PagingBean);
         }
     }
 

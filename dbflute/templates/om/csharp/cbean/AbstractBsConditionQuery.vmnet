@@ -334,7 +334,7 @@ namespace ${glPackageBaseCQ} {
         /// </summary>
         /// <param name="valueList">The value of ${col.UncapitalisedJavaName} as inScope.</param>
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            Register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, FilterRemoveEmptyStringFromList(valueList));
+            Register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, valueList);
         }
       #end
       #if (${col.isAvailableNumberNotInScope()})
@@ -345,7 +345,7 @@ namespace ${glPackageBaseCQ} {
         /// </summary>
         /// <param name="valueList">The value of ${col.UncapitalisedJavaName} as notInScope.</param>
         public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, FilterRemoveEmptyStringFromList(valueList));
+            Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, valueList);
         }
       #end
       #if (${col.isSingleKeyForeignKey()})

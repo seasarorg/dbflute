@@ -122,7 +122,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                         List Elements
         //                                                                         =============
         public virtual void Add(ENTITY value) {
-            return _selectedList.Add(value);
+            _selectedList.Add(value);
         }
 
         public virtual bool Contains(ENTITY value)
@@ -143,7 +143,7 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         public virtual bool Remove(ENTITY value) {
-            _selectedList.Remove(value);
+            return _selectedList.Remove(value);
         }
 
 
@@ -151,44 +151,19 @@ namespace ${glPackageBaseCommonCBean} {
             _selectedList.RemoveAt(index);
         }
 
-
-        public virtual bool IsReadOnly
-        {
-            get
-            {
+        public virtual bool IsReadOnly {
+            get {
                 return _selectedList.IsReadOnly;
             }
         }
-        public virtual bool IsFixedSize
-        {
-            get
-            {
-                return _selectedList.IsFixedSize;
-            }
-        }
 
-        public virtual void CopyTo(ENTITY[] array, int index)
-        {
+        public virtual void CopyTo(ENTITY[] array, int index) {
             _selectedList.CopyTo(array, index);
         }
 
-        public virtual int Count
-        {
-            get
-            {
+        public virtual int Count {
+            get {
                 return _selectedList.Count;
-            }
-        }
-
-        public virtual Object SyncRoot {
-            get {
-                return _selectedList.SyncRoot;
-            }
-        }
-
-        public virtual bool IsSynchronized {
-            get {
-                return _selectedList.IsSynchronized;
             }
         }
 

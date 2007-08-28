@@ -712,7 +712,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         java.util.List${database.filterGenericsString('String')} newList = new java.util.ArrayList${database.filterGenericsString('String')}();
         for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
             final String str = (String)ite.next();
-            if ("".equals(str)) {
+            if (str == null || "".equals(str)) {
                 continue;
             }
             newList.add(str);
