@@ -69,6 +69,9 @@ targetdatabase = $targetDatabase
     #set ($glEntityInterfaceName = "${glProjectPrefix}Entity")
     #set ($glEntityDefinedCommonColumnInterfaceName = "${glProjectPrefix}EntityDefinedCommonColumn")
 
+    ## [Allcommon-Base-BFinder]
+    #set ($glBFinderName = "${glProjectPrefix}BFinder")
+
     ## [Allcommon-Base-DaoSelector]
     #set ($glDaoSelectorInterfaceName = "${glProjectPrefix}DaoSelector")
     #set ($glCacheDaoSelectorName = "${glProjectPrefix}CacheDaoSelector")
@@ -1251,6 +1254,16 @@ targetdatabase = $targetDatabase
       #end
     #end
 
+    ## -------------------------------------------------------
+    ##                                         allcommon flute
+    ##                                         ---------------
+    #if ($database.isTargetLanguageJava())
+      $database.debug("public void parseBFinder() {")
+      $database.debug("    parse('BFinder');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glBFinderName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/BFinder.${glTemplateFileExtension}",$path ,"", "")
+      $database.debug("}")
+    #end
 
     ## -------------------------------------------------------
     ##                                      allcommon selector

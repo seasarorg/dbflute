@@ -5,8 +5,6 @@ import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
-import org.seasar.framework.container.S2Container;
-
 /**
  * The implementation of behavior-selector.
  * 
@@ -14,11 +12,18 @@ import org.seasar.framework.container.S2Container;
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glCacheBehaviorSelectorName} implements ${glBehaviorSelectorInterfaceName} {
 
-    protected S2Container _container;
+    /** The container of Seasar. */
+    protected org.seasar.framework.container.S2Container _container;
 
-    public void setContainer(S2Container container) {
+    public void setContainer(org.seasar.framework.container.S2Container container) {
         this._container = container;
     }
+
+#if ($database.isAvailableGenerics())
+    /** The cache of behavior. (It's the generics hell!) */
+    protected java.util.Map<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}> _behaviorCache = new java.util.LinkedHashMap<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}>();
+
+#end
 
 #if ($database.isAvailableGenerics())
     /**
@@ -29,7 +34,12 @@ public class ${glCacheBehaviorSelectorName} implements ${glBehaviorSelectorInter
      * @return Behavior. (NotNull)
      */
     public <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE select(Class<BEHAVIOR_TYPE> behaviorType) {
-        return (BEHAVIOR_TYPE)_container.getComponent(behaviorType);
+        if (_behaviorCache.containsKey(behaviorType)) {
+            return (BEHAVIOR_TYPE)_behaviorCache.get(behaviorType);
+        }
+        final BEHAVIOR_TYPE bhv = (BEHAVIOR_TYPE)_container.getComponent(behaviorType);
+        _behaviorCache.put(behaviorType, bhv);
+        return bhv;
     }
 
     /**
