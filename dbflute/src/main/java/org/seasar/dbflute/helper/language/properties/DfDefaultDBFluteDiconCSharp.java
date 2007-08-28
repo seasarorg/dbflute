@@ -17,7 +17,7 @@ public class DfDefaultDBFluteDiconCSharp implements DfDefaultDBFluteDicon {
     }
 
     public String getJ2eeDiconResourceName() {
-        return "Ado.dicon";
+        return "${topNamespace}/Resources/Ado.dicon";
     }
 
     public String getRequiredTxComponentName() {

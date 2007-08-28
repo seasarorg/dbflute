@@ -41,7 +41,7 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 
         // CSharpの場合のみ、TopのNamesapceをFilterする。
         if (getBasicProperties().isTargetLanguageCSharp()) {
-            realDiconDefault = filterDiconPackageAsTopNamespace(realDiconDefault);
+            realDiconDefault = filterDiconForTopNamespace(realDiconDefault);
         }
 
         final String prop = stringProp("torque.dbfluteDiconPackageName", null);
@@ -52,28 +52,13 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected String filterDiconPackageAsTopNamespace(String realDiconDefault) {
-        if (getBasicProperties().isTargetLanguageCSharp()) {
-            final DfGeneratedClassPackageProperties generatedClassPackageProperties = getGeneratedClassPackageProperties();
-            final String baseCommonPackage = generatedClassPackageProperties.getBaseCommonPackage();
-            final String topNamespace;
-            if (baseCommonPackage.indexOf(".") >= 0) {
-                topNamespace = baseCommonPackage.substring(0, baseCommonPackage.indexOf("."));
-            } else {
-                topNamespace = baseCommonPackage;
-            }
-            realDiconDefault = StringUtil.replace(realDiconDefault, "${topNamespace}", topNamespace);
-        }
-        return realDiconDefault;
-    }
-
     public List<String> getDBFluteDiconPackageNameList() {
         final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
         String realDiconDefault = diconDefault.getDBFluteDiconPackageName();
 
         // CSharpの場合のみ、TopのNamesapceをFilterする。
         if (getBasicProperties().isTargetLanguageCSharp()) {
-            realDiconDefault = filterDiconPackageAsTopNamespace(realDiconDefault);
+            realDiconDefault = filterDiconForTopNamespace(realDiconDefault);
         }
 
         final String diconSeparatedString;
@@ -111,12 +96,18 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 
     public String getJdbcDiconResourceName() {
         final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
+        String realDiconDefault = diconDefault.getJ2eeDiconResourceName();
+
+        // CSharpの場合のみ、TopのNamesapceをFilterする。
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            realDiconDefault = filterDiconForTopNamespace(realDiconDefault);
+        }
+
         final String prop = stringProp("torque.j2eeDiconResourceName", null);
         if (prop != null) {
             return prop;
         } else {
-            String defaultValue = diconDefault.getJ2eeDiconResourceName();
-            return stringProp("torque.jdbcDiconResourceName", defaultValue);
+            return stringProp("torque.jdbcDiconResourceName", realDiconDefault);
         }
     }
 
@@ -138,6 +129,21 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 
     protected DfDefaultDBFluteDicon getDefaultDBFluteDicon() {
         return getLanguageDependencyInfo().getDefaultDBFluteDicon();
+    }
+
+    protected String filterDiconForTopNamespace(String realDiconDefault) {
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            final DfGeneratedClassPackageProperties generatedClassPackageProperties = getGeneratedClassPackageProperties();
+            final String baseCommonPackage = generatedClassPackageProperties.getBaseCommonPackage();
+            final String topNamespace;
+            if (baseCommonPackage.indexOf(".") >= 0) {
+                topNamespace = baseCommonPackage.substring(0, baseCommonPackage.indexOf("."));
+            } else {
+                topNamespace = baseCommonPackage;
+            }
+            realDiconDefault = StringUtil.replace(realDiconDefault, "${topNamespace}", topNamespace);
+        }
+        return realDiconDefault;
     }
 
     // ===============================================================================
