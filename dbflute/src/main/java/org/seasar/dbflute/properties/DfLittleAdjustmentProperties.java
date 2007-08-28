@@ -53,7 +53,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         if (commonColumnProp.isCommonColumnSetupInterceptorAspectPointDao()) {
             return false;
         }
-        return booleanProp("torque.isCommonColumnInterceptingOnBehaviorFilter", false);
+        return booleanProp("torque.isCommonColumnInterceptingOnBehaviorFilter", true);
     }
 
     // ===============================================================================

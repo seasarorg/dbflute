@@ -16,6 +16,9 @@ namespace ${glPackageBaseCommonBhv} {
      */
     public abstract class $myClassName : ${glBehaviorReadableAbstractName}, ${glBehaviorWritableInterfaceName} {
 
+        /// <sumarry>Log-instance.</sumarry>
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         // =====================================================================================
         //                                                                           Constructor
         //                                                                           ===========
@@ -71,8 +74,43 @@ namespace ${glPackageBaseCommonBhv} {
         /// <summary>
         /// Filter the entity of insert.
         /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        protected virtual void FilterEntityOfInsert(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        /// <param name="targetEntity">Entity. (NotNull)</param>
+        protected virtual void FilterEntityOfInsert(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
+#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+            if (!IsEntityDefinedCommonColumn(targetEntity)) {
+                return;
+            }
+            ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            if (_log.IsDebugEnabled) {
+                _log.Debug("...Filtering entity of INSERT about the column columns of " + this.TableDbName);
+            }
+#foreach ($columnName in ${database.CommonColumnNameList})
+  #set ($entityCommonColumnMap = ${database.CommonColumnMap})
+  #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
+  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(${columnName})})
+    #set ($logic = ${database.getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(${columnName})})
+    #if ($database.isCommonColumnSetupInvokingLogic($logic))
+      #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+            ${filteredLogic}
+            if (_log.IsDebugEnabled) {
+                _log.Debug("  CommonColumnSetup - ${columnName} has been set up: invoking=${filteredLogic}");
+            }
+    #else
+
+            ${javaNative} ${uncapitalisedJavaName} = ${logic};
+            entity.${javaName} = ${uncapitalisedJavaName};
+            if (_log.IsDebugEnabled) {
+                _log.Debug("  CommonColumnSetup - ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
+            }
+    #end
+  #end
+#end
+#end
+
         }
 
         /// <summary>
@@ -100,8 +138,43 @@ namespace ${glPackageBaseCommonBhv} {
         /// <summary>
         /// Filter the entity of update.
         /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        protected virtual void FilterEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        /// <param name="targetEntity">Entity. (NotNull)</param>
+        protected virtual void FilterEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
+#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+            if (!IsEntityDefinedCommonColumn(targetEntity)) {
+                return;
+            }
+            ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            if (_log.IsDebugEnabled) {
+                _log.Debug("...Filtering entity of UPDATE about the column columns of " + this.TableDbName);
+            }
+#foreach ($columnName in ${database.CommonColumnNameList})
+  #set ($entityCommonColumnMap = ${database.CommonColumnMap})
+  #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
+  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(${columnName})})
+    #set ($logic = ${database.getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(${columnName})})
+    #if ($database.isCommonColumnSetupInvokingLogic($logic))
+      #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+            ${filteredLogic}
+            if (_log.IsDebugEnabled) {
+                _log.Debug("  CommonColumnSetup - ${columnName} has been set up: invoking=${filteredLogic}");
+            }
+    #else
+
+            ${javaNative} ${uncapitalisedJavaName} = ${logic};
+            entity.${javaName} = ${uncapitalisedJavaName};
+            if (_log.IsDebugEnabled) {
+                _log.Debug("  CommonColumnSetup - ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
+            }
+    #end
+  #end
+#end
+#end
+
         }
 
         /// <summary>
@@ -129,8 +202,43 @@ namespace ${glPackageBaseCommonBhv} {
         /// <summary>
         /// Filter the entity of delete.
         /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        protected virtual void FilterEntityOfDelete(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        /// <param name="targetEntity">Entity. (NotNull)</param>
+        protected virtual void FilterEntityOfDelete(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
+#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+            if (!IsEntityDefinedCommonColumn(targetEntity)) {
+                return;
+            }
+            ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
+            if (_log.IsDebugEnabled) {
+                _log.Debug("...Filtering entity of DELETE about the column columns of " + this.TableDbName);
+            }
+#foreach ($columnName in ${database.CommonColumnNameList})
+  #set ($entityCommonColumnMap = ${database.CommonColumnMap})
+  #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${columnName})})
+  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${columnName})})
+  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(${columnName})})
+    #set ($logic = ${database.getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(${columnName})})
+    #if ($database.isCommonColumnSetupInvokingLogic($logic))
+      #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+            ${filteredLogic}
+            if (_log.IsDebugEnabled) {
+                _log.Debug("    ${columnName} has been set up: invoking=${filteredLogic}");
+            }
+    #else
+
+            ${javaNative} ${uncapitalisedJavaName} = ${logic};
+            entity.${javaName} = ${uncapitalisedJavaName};
+            if (_log.IsDebugEnabled) {
+                _log.Debug("    ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
+            }
+    #end
+  #end
+#end
+#end
+
         }
 
         /// <summary>
@@ -141,6 +249,22 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         abstract protected int DoCallRemove(${glEntityInterfaceName} entity);
+
+        /// <sumarry>
+        /// Is the object entity defined common column?
+        /// </sumarry>
+        /// <param name="obj">Object. If the object is null, returns false. (Nullable)</param>
+        /// <returns>Determination.</returns>
+        protected bool IsEntityDefinedCommonColumn(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (obj is ${glEntityDefinedCommonColumnInterfaceName}) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         #endregion
 
         // =====================================================================================

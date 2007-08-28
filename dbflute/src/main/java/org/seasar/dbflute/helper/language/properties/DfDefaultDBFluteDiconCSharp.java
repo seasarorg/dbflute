@@ -13,7 +13,7 @@ public class DfDefaultDBFluteDiconCSharp implements DfDefaultDBFluteDicon {
     }
 
     public String getDBFluteDiconPackageName() {
-        return "../source";
+        return "../source/${topNamespace}/Resources";
     }
 
     public String getJ2eeDiconResourceName() {

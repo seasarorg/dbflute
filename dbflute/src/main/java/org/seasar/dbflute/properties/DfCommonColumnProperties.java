@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.framework.util.StringUtil;
 
 /**
@@ -32,7 +30,7 @@ import org.seasar.framework.util.StringUtil;
  */
 public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
 
-    private static final Log _log = LogFactory.getLog(DfCommonColumnProperties.class);
+    // private static final Log _log = LogFactory.getLog(DfCommonColumnProperties.class);
 
     public DfCommonColumnProperties(Properties prop) {
         super(prop);

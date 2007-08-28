@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
+import org.seasar.framework.util.StringUtil;
 
 public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 
@@ -36,22 +37,51 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 
     public String getDBFluteDiconPackageName() {
         final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
+        String realDiconDefault = diconDefault.getDBFluteDiconPackageName();
+
+        // CSharpの場合のみ、TopのNamesapceをFilterする。
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            realDiconDefault = filterDiconPackageAsTopNamespace(realDiconDefault);
+        }
+
         final String prop = stringProp("torque.dbfluteDiconPackageName", null);
         if (prop != null) {
             return prop;
         } else {
-            return stringProp("torque.daoDiconPackageName", diconDefault.getDBFluteDiconPackageName());
+            return stringProp("torque.daoDiconPackageName", realDiconDefault);
         }
+    }
+
+    protected String filterDiconPackageAsTopNamespace(String realDiconDefault) {
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            final DfGeneratedClassPackageProperties generatedClassPackageProperties = getGeneratedClassPackageProperties();
+            final String baseCommonPackage = generatedClassPackageProperties.getBaseCommonPackage();
+            final String topNamespace;
+            if (baseCommonPackage.indexOf(".") >= 0) {
+                topNamespace = baseCommonPackage.substring(0, baseCommonPackage.indexOf("."));
+            } else {
+                topNamespace = baseCommonPackage;
+            }
+            realDiconDefault = StringUtil.replace(realDiconDefault, "${topNamespace}", topNamespace);
+        }
+        return realDiconDefault;
     }
 
     public List<String> getDBFluteDiconPackageNameList() {
         final DfDefaultDBFluteDicon diconDefault = getDefaultDBFluteDicon();
+        String realDiconDefault = diconDefault.getDBFluteDiconPackageName();
+
+        // CSharpの場合のみ、TopのNamesapceをFilterする。
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            realDiconDefault = filterDiconPackageAsTopNamespace(realDiconDefault);
+        }
+
         final String diconSeparatedString;
         final String prop = stringProp("torque.dbfluteDiconPackageName", null);
         if (prop != null) {
             diconSeparatedString = prop;
         } else {
-            diconSeparatedString = stringProp("torque.daoDiconPackageName", diconDefault.getDBFluteDiconPackageName());
+            diconSeparatedString = stringProp("torque.daoDiconPackageName", realDiconDefault);
         }
         final String[] array = diconSeparatedString.split(";");
         final List<String> ls = new ArrayList<String>();
@@ -209,10 +239,10 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isAvailableBehaviorRequiresNewTx() {
-        return booleanProp("torque.isAvailableBehaviorRequiresNewTx", true);
+        return booleanProp("torque.isAvailableBehaviorRequiresNewTx", false);
     }
 
     public boolean isAvailableBehaviorRequiredTx() {
-        return booleanProp("torque.isAvailableBehaviorRequiredTx", true);
+        return booleanProp("torque.isAvailableBehaviorRequiredTx", false);
     }
 }
