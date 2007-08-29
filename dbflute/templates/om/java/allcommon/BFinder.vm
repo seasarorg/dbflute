@@ -9,7 +9,7 @@ import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glBFinderName} {
 
-    protected static String _dbfluteDiconName = "dbflute.dicon";
+    protected static String _dbfluteDiconName = "${database.DBFluteDiconFileName}";
 
     private ${glBFinderName}() {
     }

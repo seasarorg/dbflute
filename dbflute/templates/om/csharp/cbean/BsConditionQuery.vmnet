@@ -546,7 +546,6 @@ namespace ${glPackageCQ} {
     #end
     #if (!${col.isNotNull()})
     #end
-    #if (!${col.isJavaNativeBinaryObject()})
 
         /// <summary>
         /// Add order-by of ${col.UncapitalisedJavaName} as ASC. { ex) order by primaryKey asc }
@@ -564,22 +563,6 @@ namespace ${glPackageCQ} {
             GetSqlClause().RegisterOrderBy(GetRealColumnName(COL_${col.Name}), false);return this;
         }
 
-        /// <summary>
-        /// Reverse order-by (between 'asc' and 'desc') or override order-by of ${col.UncapitalisedJavaName} as ASC.
-        /// </summary>
-        /// <returns>this. (NotNull)</returns>
-        public ${myClassName} ReverseOrderBy_Or_OverrideOrderByAsc_${tmpJavaName}() {
-            GetSqlClause().ReverseOrderBy_Or_OverrideOrderBy(GetRealColumnName(COL_${col.Name}), true);return this;
-        }
-
-        /// <summary>
-        /// Reverse order-by  (between 'asc' and 'desc') or override order-by of ${col.UncapitalisedJavaName} as DESC.
-        /// </summary>
-        /// <returns>this. (NotNull)</returns>
-        public ${myClassName} ReverseOrderBy_Or_OverrideOrderByDesc_${tmpJavaName}() {
-            GetSqlClause().ReverseOrderBy_Or_OverrideOrderBy(GetRealColumnName(COL_${col.Name}), false);return this;
-        }
-    #end
   #end
 
         // =====================================================================================

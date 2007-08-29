@@ -28,13 +28,13 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         public override void Initialize()
         {
-            daoInterface = GetDaoInterface(daoType);
-            annotationReader = AnnotationReaderFactory.CreateDaoAnnotationReader(daoType);
-            beanType = annotationReader.GetBeanType();
-            dbms = DbmsManager.GetDbms(dataSource);
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanType, annotationReaderFactory, false);
-            bmdExt.Initialize(dbMetaData, dbms);
-            beanMetaData = bmdExt;
+            _daoInterface = GetDaoInterface(_daoType);
+            _annotationReader = AnnotationReaderFactory.CreateDaoAnnotationReader(_daoType);
+            _beanType = _annotationReader.GetBeanType();
+            _dbms = DbmsManager.GetDbms(_dataSource);
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(_beanType, _annotationReaderFactory, false);
+            bmdExt.Initialize(_dbMetaData, _dbms);
+            _beanMetaData = bmdExt;
             SetupSqlCommand();
         }
 
@@ -55,7 +55,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                ConditionBean Override
         //                                                                ======================
         protected override void SetupSelectMethodByAuto(MethodInfo methodInfo) {
-            String query = annotationReader.GetQuery(methodInfo.Name);
+            String query = _annotationReader.GetQuery(methodInfo.Name);
             IDataReaderHandler handler = CreateDataReaderHandler(methodInfo);
             SelectDynamicCommand cmd = null;
             String[] argNames = MethodUtil.GetParameterNames(methodInfo);
@@ -112,7 +112,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             cmd.ArgNames = argNames;
             cmd.ArgTypes = argTypes;
-            sqlCommands[methodInfo.Name] = cmd;
+            _sqlCommands[methodInfo.Name] = cmd;
         }
 
         protected String GetSelectClausePKOnly() {
@@ -120,13 +120,13 @@ namespace ${glPackageBaseCommonS2Dao} {
             sb.Append("select/*$dto.SelectHint*/ ");
 
             StringBuilder sbMySelectList = new StringBuilder(100);
-            for (int i = 0; i < beanMetaData.PropertyTypeSize; ++i) {
-                IPropertyType pt = beanMetaData.GetPropertyType(i);
+            for (int i = 0; i < _beanMetaData.PropertyTypeSize; ++i) {
+                IPropertyType pt = _beanMetaData.GetPropertyType(i);
                 if (pt.IsPersistent && pt.IsPrimaryKey) {
                     if (sbMySelectList.Length != 0) {
                         sbMySelectList.Append(", ");
                     }
-                    sbMySelectList.Append(beanMetaData.TableName);
+                    sbMySelectList.Append(_beanMetaData.TableName);
                     sbMySelectList.Append(".");
                     sbMySelectList.Append(pt.ColumnName);
                 }
@@ -141,20 +141,20 @@ namespace ${glPackageBaseCommonS2Dao} {
             sb.Append("select/*$dto.SelectHint*/ ");
 
             StringBuilder sbMySelectList = new StringBuilder(100);
-            for (int i = 0; i < beanMetaData.PropertyTypeSize; ++i) {
-                IPropertyType pt = beanMetaData.GetPropertyType(i);
+            for (int i = 0; i < _beanMetaData.PropertyTypeSize; ++i) {
+                IPropertyType pt = _beanMetaData.GetPropertyType(i);
                 if (pt.IsPersistent) {
                     if (sbMySelectList.Length != 0) {
                         sbMySelectList.Append(", ");
                     }
-                    sbMySelectList.Append(beanMetaData.TableName);
+                    sbMySelectList.Append(_beanMetaData.TableName);
                     sbMySelectList.Append(".");
                     sbMySelectList.Append(pt.ColumnName);
                 }
             }
             sb.Append(sbMySelectList);
 
-            SetupRelationSelectClause(sb, beanMetaData, "", "", 1);
+            SetupRelationSelectClause(sb, _beanMetaData, "", "", 1);
             return sb.ToString();
         }
 
@@ -195,34 +195,34 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected ${glSelectDynamicCommand} NewMySelectDynamicCommand(IDataReaderHandler handler) {// for condition-bean
-            return new ${glSelectDynamicCommand}(dataSource, commandFactory, handler, dataReaderFactory);
+            return new ${glSelectDynamicCommand}(_dataSource, _commandFactory, handler, _dataReaderFactory);
         }
 
         // =====================================================================================
         //                                                                      Command Override
         //                                                                      ================
         protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler drh) {// for all except condition-bean
-            return new SelectDynamicCommandExtension(dataSource, commandFactory, drh, dataReaderFactory);
+            return new SelectDynamicCommandExtension(_dataSource, _commandFactory, drh, _dataReaderFactory);
         }
 
         // =====================================================================================
         //                                                                     ByManual Override
         //                                                                     =================
         protected override void SetupSelectMethodByManual(MethodInfo mi, string sql) {
-            IBeanMetaData myMetaData = BuildBeanMetaData(mi, dbMetaData, dbms);
+            IBeanMetaData myMetaData = BuildBeanMetaData(mi, _dbMetaData, _dbms);
             SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler4SelectMethodByManual(mi, myMetaData));
             cmd.Sql = sql;
             cmd.ArgNames = MethodUtil.GetParameterNames(mi);
             cmd.ArgTypes = MethodUtil.GetParameterTypes(mi);
-            sqlCommands[mi.Name] = cmd;
+            _sqlCommands[mi.Name] = cmd;
         }
 
         protected IBeanMetaData BuildBeanMetaData(MethodInfo mi, IDatabaseMetaData databaseMetaData, Seasar.Dao.IDbms dbInfo) {
             Type beanClass4SelectMethodByManual = GetBeanClass4SelectMethodByManual(mi);
-            if (beanClass4SelectMethodByManual.Equals(beanType)) {
-                return beanMetaData;
+            if (beanClass4SelectMethodByManual.Equals(_beanType)) {
+                return _beanMetaData;
             }
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanClass4SelectMethodByManual, annotationReaderFactory, false);
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanClass4SelectMethodByManual, _annotationReaderFactory, false);
             bmdExt.Initialize(databaseMetaData, dbInfo);
             return bmdExt;
         }
@@ -232,11 +232,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
                 return retType.GetGenericArguments()[0];
             } else if (!retType.IsGenericType && typeof(System.Collections.IList).IsAssignableFrom(retType)) {
-                return beanType;
+                return _beanType;
             } else if (retType.IsArray) {
                 return retType.GetElementType();
             } else if (ValueTypes.GetValueType(retType) != ValueTypes.OBJECT) {
-                return beanType;
+                return _beanType;
             } else {
                 return retType;
             }
@@ -252,7 +252,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return CreateBeanListMetaDataDataReaderHandler(bmd);
             } else if (IsBeanTypeAssignable4SelectMethodByManual(retType, bmd)) {
                 return CreateBeanMetaDataDataReaderHandler(bmd);
-            } else if (Array.CreateInstance(beanType, 0).GetType().IsAssignableFrom(retType)) {
+            } else if (Array.CreateInstance(_beanType, 0).GetType().IsAssignableFrom(retType)) {
                 return CreateBeanArrayMetaDataDataReaderHandler(bmd);
             } else if(retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>))
                     || retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.List<>)))) {
@@ -264,29 +264,6 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected bool IsBeanTypeAssignable4SelectMethodByManual(Type type, IBeanMetaData bmd) {
             return bmd.BeanType.IsAssignableFrom(type) || type.IsAssignableFrom(bmd.BeanType);
-        }
-
-        // =====================================================================================
-        //                                                                ReaderHandler Override
-        //                                                                ======================
-        protected override BeanListMetaDataDataReaderHandler CreateBeanListMetaDataDataReaderHandler(IBeanMetaData bmd) {
-            return new BeanListMetaDataDataReaderHandlerExtension(bmd);
-        }
-
-        protected override BeanMetaDataDataReaderHandler CreateBeanMetaDataDataReaderHandler(IBeanMetaData bmd) {
-            return new BeanMetaDataDataReaderHandlerExtension(bmd);
-        }
-
-        protected override BeanArrayMetaDataDataReaderHandler CreateBeanArrayMetaDataDataReaderHandler(IBeanMetaData bmd) {
-            return new BeanArrayMetaDataDataReaderHandlerExtension(bmd);
-        }
-
-        protected override BeanGenericListMetaDataDataReaderHandler CreateBeanGenericListMetaDataDataReaderHandler(IBeanMetaData bmd) {
-            return new BeanGenericListMetaDataDataReaderHandlerExtension(bmd);
-        }
-
-        protected override ObjectDataReaderHandler CreateObjectDataReaderHandler() {
-            return new ObjectDataReaderHandler();
         }
     }
 
@@ -325,48 +302,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-    public class BeanListMetaDataDataReaderHandlerExtension : BeanListMetaDataDataReaderHandler {
-        public BeanListMetaDataDataReaderHandlerExtension(IBeanMetaData beanMetaData)
-            : base(beanMetaData) {
-        }
-        protected RelationRowCreator _creator = new RelationRowCreator();
-        protected override object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
-            return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
-        }
-    }
-    public class BeanMetaDataDataReaderHandlerExtension : BeanMetaDataDataReaderHandler {
-        public BeanMetaDataDataReaderHandlerExtension(IBeanMetaData beanMetaData)
-            : base(beanMetaData) {
-        }
-        protected RelationRowCreator _creator = new RelationRowCreator();
-        protected override object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
-            return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
-        }
-    }
-    public class BeanArrayMetaDataDataReaderHandlerExtension : BeanArrayMetaDataDataReaderHandler {
-        public BeanArrayMetaDataDataReaderHandlerExtension(IBeanMetaData beanMetaData)
-            : base(beanMetaData) {
-        }
-        protected RelationRowCreator _creator = new RelationRowCreator();
-        protected override object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
-            return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
-        }
-    }
-    public class BeanGenericListMetaDataDataReaderHandlerExtension : BeanGenericListMetaDataDataReaderHandler {
-        public BeanGenericListMetaDataDataReaderHandlerExtension(IBeanMetaData beanMetaData)
-            : base(beanMetaData) {
-        }
-        protected RelationRowCreator _creator = new RelationRowCreator();
-        protected override object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt, IList columnNames, Hashtable relKeyValues) {
-            return _creator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, "");
-        }
-    }
-
     public class BeanMetaDataExtension : BeanMetaDataImpl {
         public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {
             this.BeanType = beanType;
-            this.relation = relation;
+            this._relation = relation;
             this.AnnotationReaderFactory = annotationReaderFactory;
         }
         protected int _nestNo;
