@@ -682,6 +682,17 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                    RelationRowCreatorImpl Extension
     //                                                    ================================
     public static class RelationRowCreatorExtension extends org.seasar.dao.impl.RelationRowCreatorImpl {
+        protected boolean isTargetProperty(org.seasar.dao.impl.RelationRowCreationResource res) throws java.sql.SQLException {
+            final PropertyType pt = res.getCurrentPropertyType();
+            if (!pt.getPropertyDesc().hasWriteMethod()) {
+                return false;
+            }
+            if (java.util.List.class.isAssignableFrom(pt.getPropertyDesc().getPropertyType())) {
+                return false;
+            }
+            return true;
+        }
+
         protected boolean isCreateDeadLink() {
             return false;
         }

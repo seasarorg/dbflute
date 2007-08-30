@@ -199,13 +199,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         // =====================================================================================
-        //                                                                      Command Override
-        //                                                                      ================
-        protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler drh) {// for all except condition-bean
-            return new SelectDynamicCommandExtension(_dataSource, _commandFactory, drh, _dataReaderFactory);
-        }
-
-        // =====================================================================================
         //                                                                     ByManual Override
         //                                                                     =================
         protected override void SetupSelectMethodByManual(MethodInfo mi, string sql) {
@@ -264,6 +257,17 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected bool IsBeanTypeAssignable4SelectMethodByManual(Type type, IBeanMetaData bmd) {
             return bmd.BeanType.IsAssignableFrom(type) || type.IsAssignableFrom(bmd.BeanType);
+        }
+
+        // =====================================================================================
+        //                                                                             Extension
+        //                                                                             =========
+        protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler drh) {// for all except condition-bean
+            return new SelectDynamicCommandExtension(_dataSource, _commandFactory, drh, _dataReaderFactory);
+        }
+
+        protected override Seasar.Dao.IRelationRowCreator CreateRelationRowCreator() {
+            return new RelationRowCreatorExtension();
         }
     }
 
@@ -326,80 +330,24 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-    public class RelationRowCreator {
-        public virtual object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt,
-                              IList columnNames, Hashtable relKeyValues, String preNoSuffix) {
-            object row = null;
-            IBeanMetaData bmd = rpt.BeanMetaData;
-            for (int i = 0; i < rpt.KeySize; ++i) {
-                string columnName = rpt.GetMyKey(i);
-                if (columnNames.Contains(columnName))
-                {
-                    if (row == null) row = CreateRelationRow(rpt);
-                    if (relKeyValues != null && relKeyValues.ContainsKey(columnName))
-                    {
-                        object value = relKeyValues[columnName];
-                        IPropertyType pt = bmd.GetPropertyTypeByColumnName(rpt.GetYourKey(i));
-                        PropertyInfo pi = pt.PropertyInfo;
-                        if (value != null) pi.SetValue(row, value, null);
-                    }
-                }
-                continue;
+    public class RelationRowCreatorExtension : Seasar.Dao.Impl.RelationRowCreatorImpl {
+        protected override bool IsTargetProperty(RelationRowCreationResource res) {
+            IPropertyType pt = res.CurrentPropertyType;
+            if (!pt.PropertyInfo.CanWrite) {
+                return false;
             }
-            String relationNoSuffix = BuildRelationNoSuffix(preNoSuffix, rpt.RelationNo);
-            int existColumn = 0;
-            for (int i = 0; i < bmd.PropertyTypeSize; ++i) {
-                IPropertyType pt = bmd.GetPropertyType(i);
-
-                // Excludes non writable property!
-                if (!pt.PropertyInfo.CanWrite) {
-                    continue;
-                }
-
-                string columnName = pt.ColumnName + relationNoSuffix;
-                if (!columnNames.Contains(columnName)) continue;
-                existColumn++;
-                if (row == null) row = CreateRelationRow(rpt);
-                object value = null;
-                PropertyInfo pi = pt.PropertyInfo;
-                if (relKeyValues != null && relKeyValues.ContainsKey(columnName)) {
-                    value = relKeyValues[columnName];
-                } else {
-                    IValueType valueType = pt.ValueType;
-                    value = valueType.GetValue(reader, columnName);
-                }
-                if (value != null) pi.SetValue(row, value, null);
+            if (typeof(System.Collections.Generic.IList<>).IsAssignableFrom(pt.PropertyInfo.GetType())) {
+                return false;
             }
-            if (existColumn == 0) {
-                return null;
-            }
-            if (rpt.BeanMetaData.RelationPropertyTypeSize > 0) {
-                CreateParentRelationRow(reader, rpt.BeanMetaData, columnNames, relationNoSuffix, row);
-            }
-            return row;
+            return true;
         }
 
-        protected virtual void CreateParentRelationRow(IDataReader reader, IBeanMetaData parentBmd, IList columnNames, String relationNoSuffix, Object row) {
-            for (int i = 0; i < parentBmd.RelationPropertyTypeSize; ++i) {
-                IRelationPropertyType parentParentRpt = parentBmd.GetRelationPropertyType(i);
-                if (parentParentRpt == null) {
-                    continue;
-                }
-                Object relationRow = CreateRelationRow(reader, parentParentRpt, columnNames, null, relationNoSuffix);
-                if (relationRow != null) {
-                    IPropertyType pt = parentBmd.GetRelationPropertyType(i);
-                    PropertyInfo pi = pt.PropertyInfo;
-                    pi.SetValue(row, relationRow, null);
-                }
-            }
+        protected override bool IsCreateDeadLink() {
+            return false;
         }
 
-        protected virtual object CreateRelationRow(IRelationPropertyType rpt) {
-            return ClassUtil.NewInstance(rpt.PropertyInfo.PropertyType);
-        }
-
-        protected virtual String BuildRelationNoSuffix(String preNoSuffix, int relationNo) {
-            return preNoSuffix + "_" + relationNo;
+        protected override int GetLimitRelationNestLevel() {
+            return 2;
         }
     }
 }
