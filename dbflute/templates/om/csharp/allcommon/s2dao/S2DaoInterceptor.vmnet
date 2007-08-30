@@ -136,16 +136,14 @@ namespace ${glPackageBaseCommonS2Dao} {
                 System.Reflection.MethodBase method = invocation.Method;
                 try {
                     String daoResultPrefix = "===========/ [" + GetPerformanceView(before, after) + " - ";
-                    if (typeof(System.Collections.IList).IsAssignableFrom(retType)) {
+                    if (typeof(System.Collections.Generic.IList<>).Name.Equals(retType.Name)) {
                         if (ret == null) {
-                            _log.Debug(daoResultPrefix + "Selected count: null]");
+                            _log.Debug(daoResultPrefix + "Selected count of list: null]");
                         } else {
-                            System.Collections.IList ls = (System.Collections.IList)ret;
-                            if (ls.Count == 0) {
-                                _log.Debug(daoResultPrefix + "Selected count: 0]");
-                            } else {
-                                _log.Debug(daoResultPrefix + "Selected count: " + ls.Count + " first=" + ls[0] + "]");
-                            }
+                            PropertyInfo pi = ret.GetType().GetProperty("Count");
+                            int count = (int)pi.GetValue(ret, null);
+                            // TODO: @jflute -- I want to get First Element!
+                            _log.Debug(daoResultPrefix + "Selected count of list: " + count + "]");
                         }
                     } else if (typeof(${glEntityInterfaceName}).IsAssignableFrom(retType)) {
                         if (ret == null) {

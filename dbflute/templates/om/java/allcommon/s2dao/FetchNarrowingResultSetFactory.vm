@@ -36,15 +36,15 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
      * @param statement Statement. (NotNull)
      * @return Result set for procedure executing of s2dao. (NotNull)
      */
-    public ResultSet getResultSet(java.sql.Statement statement) {
+    public java.sql.ResultSet getResultSet(java.sql.Statement statement) {
         // return org.seasar.framework.util.StatementUtil.getResultSet(statement);
         return doGetResultSet(statement);// This behavior is same as StatementUtil.getResultSet().
     }
 
-    protected ResultSet doGetResultSet(Statement statement) throws org.seasar.framework.exception.SQLRuntimeException {
+    protected java.sql.ResultSet doGetResultSet(java.sql.Statement statement) throws org.seasar.framework.exception.SQLRuntimeException {
         try {
             return statement.getResultSet();
-        } catch (SQLException ex) {
+        } catch (java.sql.SQLException ex) {
             throw new org.seasar.framework.exception.SQLRuntimeException(ex);
         }
     }

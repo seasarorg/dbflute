@@ -44,26 +44,12 @@ namespace ${glPackageBaseCQ} {
         // =====================================================================================
         //                                                                                 Query
         //                                                                                 =====
-  ## --------------------------------------------------------------------------------
-  ##                                                  Make getter and setter methods.
-  ##                                                  -------------------------------
-
         // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   MyTable = [$table.Name]
+        //   MyTable = [$table.name]
         // * * * * * * * * */
-
   #foreach ($col in $table.Columns)
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
-    
-        /// <summary> Column db name of ${col.UncapitalisedJavaName}. </summary>
-        protected static readonly String COL_${col.Name} = "${col.Name}";
-
-        /// <summary> Column java name of ${col.UncapitalisedJavaName}. </summary>
-        protected static readonly String J_${col.JavaName} = "${col.JavaName}";
-
-        /// <summary> Column uncapitalised java name of ${col.UncapitalisedJavaName}. </summary>
-        protected static readonly String UJ_${col.UncapitalisedJavaName} = "${col.UncapitalisedJavaName}";
     #if (${col.isJavaNativeStringObject()})
 
         /// <summary>
@@ -170,7 +156,7 @@ namespace ${glPackageBaseCQ} {
         /// </summary>
         /// <param name="valueList">The value of ${col.UncapitalisedJavaName} as inScope.</param>
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            Register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, FilterRemoveEmptyStringFromList(valueList));
+            Register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, FilterGenericListWithRemovingEmptyString(valueList));
         }
       #end
       #if (${col.isAvailableStringNotInScope()})
@@ -181,7 +167,7 @@ namespace ${glPackageBaseCQ} {
         /// </summary>
         /// <param name="valueList">The value of ${col.UncapitalisedJavaName} as notInScope.</param>
         public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, FilterRemoveEmptyStringFromList(valueList));
+            Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, FilterGenericListWithRemovingEmptyString(valueList));
         }
       #end
       #if (${col.isSingleKeyForeignKey()})
@@ -200,7 +186,7 @@ namespace ${glPackageBaseCQ} {
 	    public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
 	        AssertObjectNotNull("subQuery", subQuery);
 	        Keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-	        RegisterInScopeSubQuery(subQuery, COL_${col.Name}, "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
+	        RegisterInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
 	    }
 
         abstract public void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -222,7 +208,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             Keep${subQueryPropertyNameInitCap}(subQuery);
-            RegisterInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            RegisterInScopeSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
         }
 
         abstract public void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -246,7 +232,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             Keep${subQueryPropertyNameInitCap}(subQuery);
-            RegisterExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            RegisterExistsSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
         }
 
         abstract public void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -334,7 +320,7 @@ namespace ${glPackageBaseCQ} {
         /// </summary>
         /// <param name="valueList">The value of ${col.UncapitalisedJavaName} as inScope.</param>
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            Register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, valueList);
+            Register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, FilterGenericList<${col.JavaNative}>(valueList));
         }
       #end
       #if (${col.isAvailableNumberNotInScope()})
@@ -345,7 +331,7 @@ namespace ${glPackageBaseCQ} {
         /// </summary>
         /// <param name="valueList">The value of ${col.UncapitalisedJavaName} as notInScope.</param>
         public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) {
-            Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, valueList);
+            Register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, FilterGenericList<${col.JavaNative}>(valueList));
         }
       #end
       #if (${col.isSingleKeyForeignKey()})
@@ -364,7 +350,7 @@ namespace ${glPackageBaseCQ} {
 	    public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
 	        AssertObjectNotNull("subQuery", subQuery);
 	        Keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-	        RegisterInScopeSubQuery(subQuery, COL_${col.Name}, "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
+	        RegisterInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyNameInitCap}");
 	    }
 
         abstract public void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -386,7 +372,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             Keep${subQueryPropertyNameInitCap}(subQuery);
-            RegisterInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            RegisterInScopeSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
         }
 
         abstract public void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -410,7 +396,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             Keep${subQueryPropertyNameInitCap}(subQuery);
-            RegisterExistsSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
+            RegisterExistsSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}");
         }
 
         abstract public void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
@@ -513,7 +499,7 @@ namespace ${glPackageBaseCQ} {
         /// <param name="key">Condition key. (NotNull)</param>
         /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
         protected void Register${tmpJavaName}(${glConditionKeyName} key, Object value) {
-            RegisterQuery(key, value, GetCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName});
+            RegisterQuery(key, value, GetCValue${tmpJavaName}(), "${col.Name}", "${col.JavaName}", "${col.UncapitalisedJavaName}");
         }
 
         /// <summary>
@@ -523,7 +509,7 @@ namespace ${glPackageBaseCQ} {
         /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
         /// <returns>this. (NotNull)</returns>
         protected void RegisterInline${tmpJavaName}(${glConditionKeyName} key, Object value) {
-            RegisterInlineQuery(key, value, GetCValue${tmpJavaName}(), COL_${col.Name}, J_${col.JavaName}, UJ_${col.UncapitalisedJavaName});
+            RegisterInlineQuery(key, value, GetCValue${tmpJavaName}(), "${col.Name}", "${col.JavaName}", "${col.UncapitalisedJavaName}");
         }
 
         abstract protected ${glConditionValueName} GetCValue${tmpJavaName}();

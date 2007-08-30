@@ -33,7 +33,7 @@ namespace ${glPackageBaseCommonCKey} {
             if (value == null || isNullableTypeNull(value)) {
                 return false;
             }
-            if (value is System.Collections.Generic.IList<Object> && ((System.Collections.Generic.IList<Object>)value).Count == 0) {
+            if (value is System.Collections.IList && ((System.Collections.IList)value).Count == 0) {
                 return false;
             }
             return true;
@@ -50,8 +50,8 @@ namespace ${glPackageBaseCommonCKey} {
             if (value.InScope == null) {
                 return;
             }
-            System.Collections.Generic.IList<Object> valueList = value.InScope;
-            System.Collections.Generic.IList<Object> checkedValueList = new System.Collections.Generic.List<Object>();
+            System.Collections.IList valueList = value.InScope;
+            System.Collections.IList checkedValueList = new System.Collections.Generic.List<Object>();
             foreach (Object checkTargetValue in valueList) {
                 if (checkTargetValue == null) {
                     continue;
@@ -75,7 +75,7 @@ namespace ${glPackageBaseCommonCKey} {
          * @param location Location. (NotNull)
          */
         protected override void DoSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
-            conditionValue.InScope = (System.Collections.Generic.IList<Object>)value;
+            conditionValue.InScope = (System.Collections.IList)value;
             conditionValue.SetInScopeLocation(location);
         }
     }

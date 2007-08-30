@@ -96,7 +96,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
     // /- - - - - - - - - - - - - - - - - - - - - - -
-    //   Column = [$col.Name]
+    //   Column = [$col.name]
     // - - - - - - - - -/
 
     /** The attribute of ${col.UncapitalisedJavaName}. */
@@ -275,7 +275,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} addOrderBy_${tmpJavaName}_Asc() {
-        getSqlClause().registerOrderBy(getRealColumnName(COL_${col.Name}), null, true);return this;
+        getSqlClause().registerOrderBy(getRealColumnName("${col.Name}"), null, true);return this;
     }
 
     /**
@@ -284,7 +284,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} addOrderBy_${tmpJavaName}_Desc() {
-        getSqlClause().registerOrderBy(getRealColumnName(COL_${col.Name}), null, false);return this;
+        getSqlClause().registerOrderBy(getRealColumnName("${col.Name}"), null, false);return this;
     }
   #end
 

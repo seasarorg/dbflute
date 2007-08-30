@@ -22,10 +22,6 @@ namespace ${glPackageNss} {
         // =====================================================================================
         //                                                                              Accessor
         //                                                                              ========
-        public ${myConditionQueryClassName} Query() {
-            return _query;
-        }
-
         public bool HasConditionQuery {
             get { return _query != null; }
         }
@@ -42,7 +38,7 @@ namespace ${glPackageNss} {
         }
         public void With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
-            Query().Query${tmpPropertyNameInitCap}();
+            _query.Query${tmpPropertyNameInitCap}();
             _isSelect${tmpPropertyNameInitCap} = true;
         }
     #end
@@ -56,7 +52,7 @@ namespace ${glPackageNss} {
         }
         public void With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
-            Query().Query${tmpPropertyNameInitCap}();
+            _query.Query${tmpPropertyNameInitCap}();
             _isSelect${tmpPropertyNameInitCap} = true;
         }
       #end

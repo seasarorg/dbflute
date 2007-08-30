@@ -362,6 +362,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateInsertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
+        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            filterEntityOfInsert(entity);
+            assertEntityOfInsert(entity);
+        }
         return getMyDao().insertList(entityList);
     }
 
@@ -373,6 +379,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateUpdateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
+        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            filterEntityOfUpdate(entity);
+            assertEntityOfUpdate(entity);
+        }
         return getMyDao().updateList(entityList);
     }
 
@@ -384,6 +396,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateDeleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
+        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
+            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
+            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            filterEntityOfDelete(entity);
+            assertEntityOfDelete(entity);
+        }
         return getMyDao().deleteList(entityList);
     }
 #else

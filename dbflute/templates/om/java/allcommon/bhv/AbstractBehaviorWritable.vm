@@ -269,6 +269,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
             filterEntityOfInsert(entity);
             assertEntityOfInsert(entity);
         }
@@ -285,6 +286,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
             filterEntityOfUpdate(entity);
             assertEntityOfUpdate(entity);
         }
@@ -301,6 +303,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
             filterEntityOfDelete(entity);
             assertEntityOfDelete(entity);
         }

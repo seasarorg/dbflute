@@ -279,7 +279,7 @@ namespace ${glPackageCQ} {
         public void Set${subQueryPropertyNameInitCap}_AsInline(${relatedCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
-            RegisterInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
+            RegisterInlineInScopeSubQuery(subQuery, "${col.name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
         }
             #end
           #end
@@ -446,7 +446,7 @@ namespace ${glPackageCQ} {
         public void Set${subQueryPropertyNameInitCap}_AsInline(${relatedCQClassName} subQuery) {
             AssertObjectNotNull("subQuery", subQuery);
             _${subQueryPropertyName}_AsInline = subQuery;// for saving query-value.
-            RegisterInlineInScopeSubQuery(subQuery, COL_${col.Name}, "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
+            RegisterInlineInScopeSubQuery(subQuery, "${col.name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyNameInitCap}_AsInline");
         }
             #end
           #end
@@ -552,7 +552,7 @@ namespace ${glPackageCQ} {
         /// </summary>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} AddOrderBy_${tmpJavaName}_Asc() {
-            GetSqlClause().RegisterOrderBy(GetRealColumnName(COL_${col.Name}), true);return this;
+            GetSqlClause().RegisterOrderBy(GetRealColumnName("${col.name}"), true);return this;
         }
 
         /// <summary>
@@ -560,7 +560,7 @@ namespace ${glPackageCQ} {
         /// </summary>
         /// <returns>this. (NotNull)</returns>
         public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() {
-            GetSqlClause().RegisterOrderBy(GetRealColumnName(COL_${col.Name}), false);return this;
+            GetSqlClause().RegisterOrderBy(GetRealColumnName("${col.name}"), false);return this;
         }
 
   #end

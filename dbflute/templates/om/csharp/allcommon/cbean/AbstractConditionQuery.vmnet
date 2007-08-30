@@ -404,11 +404,28 @@ namespace ${glPackageBaseCommonCBean} {
         /// </summary>
         /// <param name="ls">List. (Nullable)</param>
         /// <returns>Filtered list. (Nullable)</returns>
-        protected System.Collections.Generic.IList<String> FilterRemoveEmptyStringFromList(System.Collections.Generic.IList<String> ls) {
+        protected System.Collections.IList FilterGenericList<ELEMENT_TYPE>(System.Collections.Generic.IList<ELEMENT_TYPE> ls) {
             if (ls == null) {
                 return null;
             }
-            System.Collections.Generic.IList<String> newList = new System.Collections.Generic.List<String>();
+            System.Collections.IList newList = new System.Collections.ArrayList();
+            foreach (ELEMENT_TYPE str in ls) {
+                newList.Add(str);
+            }
+            return newList;
+        }
+
+        /// <summary>
+        /// Filter removing empty-string from the list.
+        /// If the list is null or empty-string, returns null.
+        /// </summary>
+        /// <param name="ls">List. (Nullable)</param>
+        /// <returns>Filtered list. (Nullable)</returns>
+        protected System.Collections.IList FilterGenericListWithRemovingEmptyString(System.Collections.Generic.IList<String> ls) {
+            if (ls == null) {
+                return null;
+            }
+            System.Collections.IList newList = new System.Collections.ArrayList();
             foreach (String str in ls) {
                 if (str == null || "".Equals(str)) {
                     continue;

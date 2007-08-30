@@ -33,16 +33,6 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#if ($database.isMakeDeprecated())
-    /**
-     * @return Condition-query.
-     * @deprecated This method is INTERNAL! Please use cb.query().queryXxx().setXxx_Equal()...
-     */
-    public ${myConditionQueryClassName} query() {
-        return _query;
-    }
-#end
-
     /**
      * Has condition query?
      * 
