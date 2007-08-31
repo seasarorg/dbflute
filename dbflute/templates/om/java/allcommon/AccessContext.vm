@@ -96,6 +96,28 @@ public class ${glAccessContextName} {
     }
 
     /**
+     * Get access date on thread.
+     * <pre>
+     * If it can't get access date from access-context, 
+     * returns application current time as default value!
+     * </pre>
+     * @return Access date. (NotNull)
+     */
+    public static java.util.Date getAccessDateOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final java.util.Date accessDate = userContextOnThread.getAccessDate();
+            if (accessDate != null) {
+                return accessDate;
+            }
+            if (userContextOnThread.getAccessDateProvider() != null) {
+                return userContextOnThread.getAccessDateProvider().getAccessDate();
+            }
+        }
+        return new java.util.Date();// as Default
+    }
+
+    /**
      * Get access timestamp on thread.
      * <pre>
      * If it can't get access timestamp from access-context, 
@@ -110,6 +132,9 @@ public class ${glAccessContextName} {
             if (accessTimestamp != null) {
                 return accessTimestamp;
             }
+            if (userContextOnThread.getAccessTimestampProvider() != null) {
+                return userContextOnThread.getAccessTimestampProvider().getAccessTimestamp();
+            }
         }
         return new java.sql.Timestamp(System.currentTimeMillis());// as Default
     }
@@ -121,7 +146,13 @@ public class ${glAccessContextName} {
 
     protected String accessModule;
 
+    protected java.util.Date accessDate;
+
+    protected AccessDateProvider accessDateProvider;
+
     protected java.sql.Timestamp accessTimestamp;
+
+    protected AccessTimestampProvider accessTimestampProvider;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -142,11 +173,64 @@ public class ${glAccessContextName} {
         this.accessModule = accessModule;
     }
 
+    public java.util.Date getAccessDate() {
+        return accessDate;
+    }
+
+    public void setAccessDate(java.util.Date accessDate) {
+        this.accessDate = accessDate;
+    }
+
+    public AccessDateProvider getAccessDateProvider() {
+        return accessDateProvider;
+    }
+
+    public void setAccessDateProvider(AccessDateProvider accessDateProvider) {
+        this.accessDateProvider = accessDateProvider;
+    }
+
     public java.sql.Timestamp getAccessTimestamp() {
         return accessTimestamp;
     }
 
     public void setAccessTimestamp(java.sql.Timestamp accessTimestamp) {
         this.accessTimestamp = accessTimestamp;
+    }
+
+    public AccessTimestampProvider getAccessTimestampProvider() {
+        return accessTimestampProvider;
+    }
+
+    public void setAccessTimestampProvider(AccessTimestampProvider accessTimestampProvider) {
+        this.accessTimestampProvider = accessTimestampProvider;
+    }
+
+    // ===================================================================================
+    //                                                                  Provider Interface
+    //                                                                  ==================
+    /**
+     * The provider interface of access date.
+     */
+    public static interface AccessDateProvider {
+
+        /**
+         * Get access date.
+         * 
+         * @return Access date. (NotNull)
+         */
+        public java.util.Date getAccessDate();
+    }
+
+    /**
+     * The provider interface of access date.
+     */
+    public static interface AccessTimestampProvider {
+
+        /**
+         * Get access timestamp.
+         * 
+         * @return Access timestamp. (NotNull)
+         */
+        public java.sql.Timestamp getAccessTimestamp();
     }
 }

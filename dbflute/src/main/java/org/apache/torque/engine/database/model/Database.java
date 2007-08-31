@@ -77,6 +77,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
+import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -941,12 +942,24 @@ public class Database {
         return !getProperties().getCommonColumnProperties().getCommonColumnNameList().isEmpty();
     }
 
+    /**
+     * @deprecated
+     * @return Determination.
+     */
     public boolean isAvailableCommonColumnSetupInterceptorToBehavior() {
         return getProperties().getCommonColumnProperties().isAvailableCommonColumnSetupInterceptorToBehavior();
     }
 
+    /**
+     * @deprecated
+     * @return Determination.
+     */
     public boolean isAvailableCommonColumnSetupInterceptorToDao() {
         return getProperties().getCommonColumnProperties().isAvailableCommonColumnSetupInterceptorToDao();
+    }
+
+    public boolean hasCommonColumnConvertion(String commonColumnName) {
+        return getProperties().getCommonColumnProperties().isCommonColumnConvertion(commonColumnName);
     }
 
     // --------------------------------------
@@ -1000,6 +1013,18 @@ public class Database {
                 .getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(columnName);
     }
 
+    // --------------------------------------
+    //                               resource
+    //                               --------
+    public boolean hasCommonColumnSetupResource() {
+        return getProperties().getCommonColumnProperties().hasCommonColumnSetupResource();
+    }
+    
+    public List<CommonColumnSetupResource> getCommonColumnSetupResourceList() {
+        return getProperties().getCommonColumnProperties().getCommonColumnSetupResourceList();
+    }
+
+    
     // ===============================================================================
     //                                                     Properties - Classification
     //                                                     ===========================

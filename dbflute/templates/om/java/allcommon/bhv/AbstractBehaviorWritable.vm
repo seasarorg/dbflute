@@ -26,10 +26,34 @@ import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImplName};
 public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} implements ${glBehaviorWritableInterfaceName} {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
 
-    /** Log-instance. */
+    /** Log instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
 #end
 
+#if ($database.hasCommonColumnSetupResource())
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+#foreach ($resource in ${database.commonColumnSetupResourceList})
+    /** The property of ${resource.propertyName}. */
+    protected ${resource.className} ${resource.propertyVariableName};
+
+    /**
+     * @return The value of ${resource.propertyName}.
+     */
+    public ${resource.className} get${resource.propertyNameInitCap}() {
+        return ${resource.propertyVariableName};
+    }
+
+    /**
+     * @param ${resource.propertyName} The value of ${resource.propertyName}.
+     */
+    public void set${resource.propertyNameInitCap}(${resource.className} ${resource.propertyName}) {
+        this.${resource.propertyVariableName} = ${resource.propertyName};
+    }
+
+#end
+#end
     // =====================================================================================
     //                                                                           Constructor
     //                                                                           ===========
@@ -102,9 +126,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             _log.debug(msg);
             _log.debug("  before setup : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
         }
-#foreach ($columnName in ${database.CommonColumnNameList})
+#foreach ($columnName in ${database.commonColumnNameList})
   #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
-  #set ($entityCommonColumnMap = ${database.CommonColumnMap})
+  #set ($entityCommonColumnMap = ${database.commonColumnMap})
   #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
   #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
   #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})

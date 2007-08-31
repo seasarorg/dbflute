@@ -1257,7 +1257,7 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                         allcommon flute
     ##                                         ---------------
-    #if ($database.isTargetLanguageJava())
+    #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
       $database.debug("public void parseBFinder() {")
       $database.debug("    parse('BFinder');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glBFinderName}.${glClassFileExtension}" )

@@ -16,11 +16,13 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.framework.util.StringUtil;
 
 /**
@@ -37,8 +39,8 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                          Properties - Common-Column
-    //                                                          ==========================
+    //                                                                       Common Column
+    //                                                                       =============
     public static final String KEY_commonColumnMap = "commonColumnMap";
     protected Map<String, Object> _commonColumnMap;
 
@@ -89,9 +91,13 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         }
     }
 
-    // -----------------------------------------------------
-    //                                          aspect point
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        Aspect Point
+    //                                                                        ============
+    /**
+     * @deprecated
+     * @return Aspect Point.
+     */
     public String getCommonColumnSetupInterceptorAspectPoint() {
         return stringProp("torque.commonColumnSetupInterceptorAspectPoint", "behavior");
     }
@@ -158,9 +164,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return true;
     }
 
-    // -----------------------------------------------------
-    //                                                insert
-    //                                                ------
+    // ===================================================================================
+    //                                                                    Intercept Insert
+    //                                                                    ================
     public static final String KEY_commonColumnSetupBeforeInsertInterceptorLogicMap = "commonColumnSetupBeforeInsertInterceptorLogicMap";
     protected Map<String, Object> _commonColumnSetupBeforeInsertInterceptorLogicMap;
 
@@ -171,24 +177,6 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             filterCommonColumnSetupValue(_commonColumnSetupBeforeInsertInterceptorLogicMap);
         }
         return _commonColumnSetupBeforeInsertInterceptorLogicMap;
-    }
-
-    protected void filterCommonColumnSetupValue(Map<String, Object> map) {
-        final String baseCommonPackage = getGeneratedClassPackageProperties().getBaseCommonPackage();
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            final String value = (String) map.get(key);
-            if (value != null && value.contains("$$allcommon$$")) {
-                final String replaced = StringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
-                map.put(key, replaced);
-            }
-            if (value != null && value.contains("$$AccessContext$$")) {
-                final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
-                final String replaced = StringUtil.replace(value, "$$AccessContext$$", accessContext);
-                map.put(key, replaced);
-            }
-        }
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
@@ -206,9 +194,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return (String) map.get(columnName);
     }
 
-    // -----------------------------------------------------
-    //                                                update
-    //                                                ------
+    // ===================================================================================
+    //                                                                    Intercept Update
+    //                                                                    ================
     public static final String KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap = "commonColumnSetupBeforeUpdateInterceptorLogicMap";
     protected Map<String, Object> _commonColumnSetupBeforeUpdateInterceptorLogicMap;
 
@@ -236,9 +224,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return (String) map.get(columnName);
     }
 
-    // -----------------------------------------------------
-    //                                                delete
-    //                                                ------
+    // ===================================================================================
+    //                                                                    Intercept Delete
+    //                                                                    ================
     public static final String KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap = "commonColumnSetupBeforeDeleteInterceptorLogicMap";
     protected Map<String, Object> _commonColumnSetupBeforeDeleteInterceptorLogicMap;
 
@@ -264,5 +252,131 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     public String getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(String columnName) {
         final Map map = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
         return (String) map.get(columnName);
+    }
+
+    // ===================================================================================
+    //                                                                    Intercept Common
+    //                                                                    ================
+    // -----------------------------------------------------
+    //                                                filter
+    //                                                ------
+    protected void filterCommonColumnSetupValue(Map<String, Object> map) {
+        final String baseCommonPackage = getGeneratedClassPackageProperties().getBaseCommonPackage();
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            String value = (String) map.get(key);
+            if (value != null && value.contains("$$allcommon$$")) {
+                value = StringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
+            }
+            if (value != null && value.contains("$$AccessContext$$")) {
+                final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
+                value = StringUtil.replace(value, "$$AccessContext$$", accessContext);
+            }
+            final String prefixMark = COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK;
+            final String secondMark = COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK;
+            final String variablePrefix = COMMON_COLUMN_SETUP_RESOURCE_VARIABLE_PREFIX;
+            if (value != null && value.startsWith(prefixMark)) {
+                final boolean valid = setupCommonColumnSetupResource(value);
+                if (valid) {
+                    final String tmp = value.substring(prefixMark.length());
+                    value = variablePrefix + tmp.substring(tmp.indexOf(secondMark) + secondMark.length());
+                }
+            }
+            map.put(key, value);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                              resource
+    //                                              --------
+    protected static final String COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK = "@";
+    protected static final String COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK = "@";
+    protected static final String COMMON_COLUMN_SETUP_RESOURCE_VARIABLE_PREFIX = "_";
+
+    // 
+    // @org.seasar.dbflute.DateProvider@dateProvider.getDate()
+    // 
+
+    protected Map<String, CommonColumnSetupResource> _commonColumnSetupResourceMap = new LinkedHashMap<String, CommonColumnSetupResource>();
+
+    public boolean hasCommonColumnSetupResource() {
+        final Map<String, CommonColumnSetupResource> map = getCommonColumnSetupResourceMap();
+        return map != null && !map.isEmpty();
+    }
+
+    public List<CommonColumnSetupResource> getCommonColumnSetupResourceList() {
+        return new ArrayList<CommonColumnSetupResource>(getCommonColumnSetupResourceMap().values());
+    }
+
+    protected Map<String, CommonColumnSetupResource> getCommonColumnSetupResourceMap() {
+        return _commonColumnSetupResourceMap;
+    }
+
+    protected boolean setupCommonColumnSetupResource(String value) {
+        final String prefixMark = COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK;
+        final String secondMark = COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK;
+        if (!value.startsWith(prefixMark)) {
+            return false;
+        }
+        String remainderString = value.substring(prefixMark.length());
+        if (!remainderString.contains(secondMark)) {
+            String msg = "The common column setup may be wrong format.";
+            msg = msg + " Not found second mark[" + secondMark + "]" + ": " + value;
+            throw new IllegalStateException(msg);
+        }
+        final int secondMarkIndex = remainderString.indexOf(prefixMark);
+        final String className = remainderString.substring(0, secondMarkIndex);
+        remainderString = remainderString.substring(secondMarkIndex + 1);
+        final String propertyName = remainderString.substring(0, remainderString.indexOf("."));
+
+        final CommonColumnSetupResource resource = createCommonColumnSetupResource(className, propertyName);
+        _commonColumnSetupResourceMap.put(propertyName, resource);
+        return true;
+    }
+
+    protected CommonColumnSetupResource createCommonColumnSetupResource(String className, String propertyName) {
+        final CommonColumnSetupResource resource = newCommonColumnSetupResource();
+        resource.setClassName(className);
+        resource.setPropertyName(propertyName);
+        return resource;
+    }
+
+    protected CommonColumnSetupResource newCommonColumnSetupResource() {
+        return new CommonColumnSetupResource(COMMON_COLUMN_SETUP_RESOURCE_VARIABLE_PREFIX);
+    }
+
+    public static class CommonColumnSetupResource {
+        protected String className;
+        protected String propertyName;
+        protected String variablePrefix;
+
+        public CommonColumnSetupResource(String variablePrefix) {
+            this.variablePrefix = variablePrefix;
+        }
+
+        public String getClassName() {
+            return className;
+        }
+
+        public void setClassName(String className) {
+            this.className = className;
+        }
+
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        public String getPropertyNameInitCap() {
+            return DfStringUtil.initCapAfterTrimming(propertyName);
+        }
+
+        public String getPropertyVariableName() {
+            return variablePrefix + propertyName;
+        }
+
+        public void setPropertyName(String propertyName) {
+            this.propertyName = propertyName;
+        }
     }
 }
