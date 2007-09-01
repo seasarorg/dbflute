@@ -1,8 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.framework.util.PreparedStatementUtil;
 
@@ -19,6 +16,15 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
  * @author ${database.ClassAuthor}
  */
 public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The determination of internal debug. */
+    private static final boolean _internalDebug = false;
+
+    /** Log instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glFetchNarrowingResultSetFactory}.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -55,8 +61,17 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
      * @param ps Prepared statement. (NotNull)
      * @return Result set. (NotNull)
      */
-    public ResultSet createResultSet(PreparedStatement ps) {
-        final ResultSet resultSet = PreparedStatementUtil.executeQuery(ps);
+    public java.sql.ResultSet createResultSet(java.sql.PreparedStatement ps) {
+        long before = 0;
+        if (_internalDebug && _log.isDebugEnabled()) {
+            before = System.currentTimeMillis();
+        }
+        final java.sql.ResultSet resultSet = PreparedStatementUtil.executeQuery(ps);
+        if (_internalDebug && _log.isDebugEnabled()) {
+            final long after = System.currentTimeMillis();
+            _log.debug("Pure Query Cost: [" + getPerformanceView(after - before) + "]");
+        }
+
         if (!${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             return resultSet;
         }
@@ -85,5 +100,43 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
             return false;// It is not necessary to control. The sql already have been controlled.
         }
         return true;
+    }
+
+    /**
+     * Get performance view.
+     * 
+     * @param mil The value of millisecound.
+     * @return Performance view. (ex. 1m23s456ms) (NotNull)
+     */
+    protected String getPerformanceView(long mil) {
+        if (mil < 0) {
+            return String.valueOf(mil);
+        }
+
+        long sec = mil / 1000;
+        long min = sec / 60;
+        sec = sec % 60;
+        mil = mil % 1000;
+
+        StringBuffer sb = new StringBuffer();
+        if (min >= 10) { // Minute
+            sb.append(min).append("m");
+        } else if (min < 10 && min >= 0) {
+            sb.append("0").append(min).append("m");
+        }
+        if (sec >= 10) { // Second
+            sb.append(sec).append("s");
+        } else if (sec < 10 && sec >= 0) {
+            sb.append("0").append(sec).append("s");
+        }
+        if (mil >= 100) { // Millisecond
+            sb.append(mil).append("ms");
+        } else if (mil < 100 && mil >= 10) {
+            sb.append("0").append(mil).append("ms");
+        } else if (mil < 10 && mil >= 0) {
+            sb.append("00").append(mil).append("ms");
+        }
+
+        return sb.toString();
     }
 }

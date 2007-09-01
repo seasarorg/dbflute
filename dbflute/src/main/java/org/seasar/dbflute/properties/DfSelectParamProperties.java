@@ -30,11 +30,19 @@ public final class DfSelectParamProperties extends DfAbstractHelperProperties {
     }
 
     public String getStatementResultSetType() {
-        return stringProp("torque.statementResultSetType", "");
+        final String value = stringProp("torque.statementResultSetType", "ResultSet.TYPE_SCROLL_INSENSITIVE");
+        if (value.startsWith("ResultSet.")) {
+            return "java.sql." + value;
+        }
+        return value;
     }
 
     public String getStatementResultSetConcurrency() {
-        return stringProp("torque.statementResultSetConcurrency", "");
+        final String value = stringProp("torque.statementResultSetConcurrency", "ResultSet.CONCUR_READ_ONLY");
+        if (value.startsWith("ResultSet.")) {
+            return "java.sql." + value;
+        }
+        return value;
     }
 
     public boolean isStatementResultSetTypeValid() {

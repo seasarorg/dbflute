@@ -39,9 +39,6 @@ import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-#if ($database.isAvailableGenerics())
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-#end
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
 
 /**
@@ -50,11 +47,6 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
-#if ($database.isSelectQueryTimeoutValid())
-
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
-#end
 
     // ===================================================================================
     //                                                                           Attribute
@@ -238,8 +230,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     public Object execute(Object[] args) {
         if (!${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
 #if ($database.isAvailableGenerics())
-            if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+            if (${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+                final ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName} outsideSqlContext = ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
                 if (!outsideSqlContext.isDynamicAnalysis() || args == null || args.length == 0 || args[0] == null) {
                     return doDefaulExecute(args);
                 }
@@ -289,7 +281,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     // -----------------------------------------------------
     //                                           Outside-Sql
     //                                           -----------
-    protected Object executeOutsideSql(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+    protected Object executeOutsideSql(Object[] args, ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName} outsideSqlContext) {
         final Object firstArg = args[0];
         final org.seasar.framework.beans.BeanDesc beanDesc = org.seasar.framework.beans.factory.BeanDescFactory.getBeanDesc(firstArg.getClass());
         String filteredSql = getSql();
@@ -338,7 +330,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return realSelectClause;
     }
 
-    protected String setupRealFromWhereClause(Object[] args, List${database.filterGenericsString('Object')} bindVariableList, List${database.filterGenericsString('Class')} bindVariableTypeList) {
+    protected String setupRealFromWhereClause(Object[] args, java.util.List${database.filterGenericsString('Object')} bindVariableList, List${database.filterGenericsString('Class')} bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realFromWhereClause;
         {
@@ -350,7 +342,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             cb.getSqlClause().setSelectClauseColumnAliasMap(${glConditionBeanContextName}.getSelectClauseColumnAliasMap(cb.getClass()));
 
             fromWhereCommand.setSql(cb.getSqlClause().getClause());
-            CommandContext ctx = fromWhereCommand.doApply(args);
+            final CommandContext ctx = fromWhereCommand.doApply(args);
             realFromWhereClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         }
@@ -358,30 +350,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     }
 
     protected BasicSelectHandler createBasicSelectHandler(String realSql) {
-#if ($database.isSelectQueryTimeoutValid())
-        final StatementFactory statementFactoryReal = getStatementFactory();
-        final StatementFactory statementFactoryWrapper = new StatementFactory() {
-            public java.sql.PreparedStatement createPreparedStatement(java.sql.Connection arg0, String arg1) {
-                final java.sql.PreparedStatement ps = statementFactoryReal.createPreparedStatement(arg0, arg1);
-                try {
-                    final int timeout = ${database.SelectQueryTimeout};
-                    if (_log.isDebugEnabled()) {
-                        _log.debug("@SelectDynamicCommand: ps.setQueryTimeout(" + timeout + ");// from ${database.SelectQueryTimeout}");
-                    }
-                    ps.setQueryTimeout(timeout);
-                } catch (java.sql.SQLException e) {
-                    throw new org.seasar.framework.exception.SQLRuntimeException(e);
-                }
-                return ps;
-            }
-            public java.sql.CallableStatement createCallableStatement(java.sql.Connection arg0, String arg1) {
-                return statementFactoryReal.createCallableStatement(arg0, arg1);
-            }
-        };
-        final BasicSelectHandler selectHandler = newBasicSelectHandler(realSql, resultSetHandler, statementFactoryWrapper, resultSetFactory);
-#else
         final BasicSelectHandler selectHandler = newBasicSelectHandler(realSql, resultSetHandler, getStatementFactory(), resultSetFactory);
-#end
         selectHandler.setFetchSize(-1);
         return selectHandler;
     }
@@ -729,9 +698,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             return text == null || text.length() == 0;
         }
 
-        public static final String replace(String text, String fromText,
-                String toText) {
-
+        public static final String replace(String text, String fromText,  String toText) {
             if (text == null || fromText == null || toText == null) {
                 return null;
             }

@@ -1,19 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import org.aopalliance.intercept.MethodInvocation;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
-#if ($database.isAvailableGenerics())
-import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
-#end
-
 
 /**
  * My-DaoInterceptor.
@@ -26,8 +17,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(${glDaoInterceptor}.class);
+    /** Log instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoInterceptor}.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -57,22 +48,38 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @return Result of the method.
      * @throws Throwable
      */
-    public Object invoke(MethodInvocation invocation) throws Throwable {
+    public Object invoke(org.aopalliance.intercept.MethodInvocation invocation) throws Throwable {
         final java.lang.reflect.Method method = invocation.getMethod();
         if (!org.seasar.framework.util.MethodUtil.isAbstract(method)) {
             return invocation.proceed();
         }
-        traceMethod(invocation);
-        final long before = System.currentTimeMillis();
+
+        if (_log.isDebugEnabled()) {
+            traceMethod(invocation);
+        }
+
+        long before = 0;
+        if (_log.isDebugEnabled()) {
+            before = System.currentTimeMillis();
+        }
 
         final org.seasar.dao.SqlCommand cmd;
         {
-            final long beforeCmd = System.currentTimeMillis();
+            long beforeCmd = 0;
+            if (_log.isDebugEnabled()) {
+                beforeCmd = System.currentTimeMillis();
+            }
+
             final Class targetClass = getTargetClass(invocation);
             final org.seasar.dao.DaoMetaData dmd = daoMetaDataFactory_.getDaoMetaData(targetClass);
             cmd = dmd.getSqlCommand(method.getName());
-            final long afterCmd = System.currentTimeMillis();
-            traceSqlCommand(invocation, cmd, beforeCmd, afterCmd);
+
+            if (_log.isDebugEnabled()) {
+                final long afterCmd = System.currentTimeMillis();
+                if (beforeCmd != afterCmd) {
+                    traceSqlCommand(invocation, cmd, beforeCmd, afterCmd);
+                }
+            }
         }
 
         final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = preprocessConditionBean(invocation, cmd);
@@ -95,11 +102,13 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         } finally {
             postprocessConditionBean(invocation, ${glAttachedCBArgsVariableName});
         }
-        final long after = System.currentTimeMillis();
-
         final Class retType = method.getReturnType();
         assertRetType(retType, ret);
-        traceReturn(invocation, retType, ret, before, after);
+
+        if (_log.isDebugEnabled()) {
+            final long after = System.currentTimeMillis();
+            traceReturn(invocation, retType, ret, before, after);
+        }
 
         if (retType.isPrimitive()) {
             return org.seasar.framework.util.NumberConversionUtil.convertPrimitiveWrapper(retType, ret);
@@ -113,20 +122,18 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // -----------------------------------------------------
     //                                          Trace Method
     //                                          ------------
-    protected void traceMethod(MethodInvocation invocation) {
-        if (_log.isDebugEnabled()) {
-            final java.lang.reflect.Method method = invocation.getMethod();
-            final String name = getShortClassName(method.getDeclaringClass());
-            final String invokeNameWithoutKakko = removeBasePrefixIfNeeds(name)  + "." + method.getName();
-            final String equalBorder = buildFitBorder("", "=", invokeNameWithoutKakko, false);
-            final String daoInvokeName = invokeNameWithoutKakko + "()";
+    protected void traceMethod(org.aopalliance.intercept.MethodInvocation invocation) {
+        final java.lang.reflect.Method method = invocation.getMethod();
+        final String name = getShortClassName(method.getDeclaringClass());
+        final String invokeNameWithoutKakko = removeBasePrefixIfNeeds(name)  + "." + method.getName();
+        final String equalBorder = buildFitBorder("", "=", invokeNameWithoutKakko, false);
+        final String daoInvokeName = invokeNameWithoutKakko + "()";
 
-            _log.debug("/=====================================================" + equalBorder + "==");
-            _log.debug("                                                      " + daoInvokeName);
-            _log.debug("                                                      " + equalBorder + "=/");
+        _log.debug("/=====================================================" + equalBorder + "==");
+        _log.debug("                                                      " + daoInvokeName);
+        _log.debug("                                                      " + equalBorder + "=/");
 
-            tracePath();
-        }
+        tracePath();
     }
 
     protected void tracePath() {
@@ -293,10 +300,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // -----------------------------------------------------
     //                                      Trace SqlCommand
     //                                      ----------------
-    protected void traceSqlCommand(MethodInvocation invocation, org.seasar.dao.SqlCommand cmd, long beforeCmd, long afterCmd) {
-        if (_log.isDebugEnabled()) {
-            _log.debug("SqlCommand Initialization Cost: [" + getPerformanceView(afterCmd - beforeCmd) + "]");
-        }
+    protected void traceSqlCommand(org.aopalliance.intercept.MethodInvocation invocation, org.seasar.dao.SqlCommand cmd, long beforeCmd, long afterCmd) {
+        _log.debug("SqlCommand Initialization Cost: [" + getPerformanceView(afterCmd - beforeCmd) + "]");
     }
 
     protected void assertRetType(Class retType, Object ret) {
@@ -318,44 +323,41 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // -----------------------------------------------------
     //                                          Trace Return
     //                                          ------------
-    protected void traceReturn(MethodInvocation invocation, Class retType, Object ret, long before, long after)
-            throws Throwable {
-        if (_log.isDebugEnabled()) {
-            try {
-                final String daoResultPrefix = "===========/ [" + getPerformanceView(after - before) + " - ";
-                if (java.util.List.class.isAssignableFrom(retType)) {
-                    if (ret == null) {
-                        _log.debug(daoResultPrefix + "Selected count: null]");
-                    } else {
-                        final java.util.List ls = (java.util.List) ret;
-                        if (ls.isEmpty()) {
-                            _log.debug(daoResultPrefix + "Selected count: 0]");
-                        } else {
-                            _log.debug(daoResultPrefix + "Selected count: " + ls.size() + " first=" + ls.get(0) + "]");
-                        }
-                    }
-                } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
-                    if (ret == null) {
-                        _log.debug(daoResultPrefix + "Selected entity: null" + "]");
-                    } else {
-                        final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) ret;
-                        _log.debug(daoResultPrefix + "Selected entity: " + entity + "]");
-                    }
+    protected void traceReturn(org.aopalliance.intercept.MethodInvocation invocation, Class retType, Object ret, long before, long after) throws Throwable {
+        try {
+            final String daoResultPrefix = "===========/ [" + getPerformanceView(after - before) + " - ";
+            if (java.util.List.class.isAssignableFrom(retType)) {
+                if (ret == null) {
+                    _log.debug(daoResultPrefix + "Selected count: null]");
                 } else {
-                    if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
-                        _log.debug(daoResultPrefix + "Selected count: " + ret + "]");
+                    final java.util.List ls = (java.util.List) ret;
+                    if (ls.isEmpty()) {
+                        _log.debug(daoResultPrefix + "Selected count: 0]");
                     } else {
-                        _log.debug(daoResultPrefix + "Result: " + ret + "]");
+                        _log.debug(daoResultPrefix + "Selected count: " + ls.size() + " first=" + ls.get(0) + "]");
                     }
                 }
-                _log.debug(" ");
-            } catch (Exception e) {
-                String msg = "Result object debug threw the exception: methodName=";
-                msg = msg + invocation.getMethod().getName() + " retType=" + retType;
-                msg = msg + " ret=" + ret;
-                _log.warn(msg, e);
-                throw e;
+            } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
+                if (ret == null) {
+                    _log.debug(daoResultPrefix + "Selected entity: null" + "]");
+                } else {
+                    final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) ret;
+                    _log.debug(daoResultPrefix + "Selected entity: " + entity + "]");
+                }
+            } else {
+                if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
+                    _log.debug(daoResultPrefix + "Selected count: " + ret + "]");
+                } else {
+                    _log.debug(daoResultPrefix + "Result: " + ret + "]");
+                }
             }
+            _log.debug(" ");
+        } catch (Exception e) {
+            String msg = "Result object debug threw the exception: methodName=";
+            msg = msg + invocation.getMethod().getName() + " retType=" + retType;
+            msg = msg + " ret=" + ret;
+            _log.warn(msg, e);
+            throw e;
         }
     }
 
@@ -372,15 +374,16 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @param cmd Sql command. (NotNull)
      * @return Condition-bean. (Nullable)
      */
-    protected ${glConditionBeanInterfaceName} preprocessConditionBean(MethodInvocation invocation, org.seasar.dao.SqlCommand cmd) {
+    protected ${glConditionBeanInterfaceName} preprocessConditionBean(org.aopalliance.intercept.MethodInvocation invocation, org.seasar.dao.SqlCommand cmd) {
         clearThreadLocal();
 
 #if ($database.isAvailableGenerics())
-        final OutsideSql outsideSql = invocation.getMethod().getAnnotation(OutsideSql.class);
+        final Class<${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}> outsideSqlType = ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}.class;
+        final ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation} outsideSql = invocation.getMethod().getAnnotation(outsideSqlType);
         if (outsideSql != null && outsideSql.dynamicAnalysis()) {
-            final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+            final ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName} outsideSqlContext = new ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}();
             outsideSqlContext.setDynamicAnalysis(true);
-            ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+            ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
         }
 #end
 
@@ -428,7 +431,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @param invocation Method invocation. (NotNull)
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (Nullable)
      */
-    public void postprocessConditionBean(MethodInvocation invocation, ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
+    public void postprocessConditionBean(org.aopalliance.intercept.MethodInvocation invocation, ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
         clearThreadLocal();
 
         if (${glAttachedCBArgsVariableName} != null && isSelectCountIgnoreFetchScopeMethod(invocation)) {
@@ -438,8 +441,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
 
     protected void clearThreadLocal() {
 #if ($database.isAvailableGenerics())
-        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            ${glOutsideSqlContextName}.clearOutsideSqlContextOnThread();
+        if (${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.clearOutsideSqlContextOnThread();
         }
 #end
         if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
@@ -459,7 +462,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @param invocation Method invocation. (NotNull)
      * @return Determination.
      */
-    protected boolean isSelectCountIgnoreFetchScopeMethod(MethodInvocation invocation) {
+    protected boolean isSelectCountIgnoreFetchScopeMethod(org.aopalliance.intercept.MethodInvocation invocation) {
         final String name = invocation.getMethod().getName();
         if (name.startsWith("readCount")
                 || name.startsWith("selectCount")

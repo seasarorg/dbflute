@@ -58,6 +58,17 @@ import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
 public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The determination of internal debug. */
+    private static final boolean _internalDebug = false;
+#if ($database.isSelectQueryTimeoutValid() || ${database.isStatementResultSetTypeValid()})
+
+    /** Log instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoMetaDataExtension}.class);
+#end
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
@@ -258,16 +269,72 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #end
 
     // ===================================================================================
-    //                                                    My SelectDynamicCommand Creation
-    //                                                    ================================
+    //                                             Customize SelectDynamicCommand Creation
+    //                                             =======================================
     /**
-     * New my select dynamic command.
+     * Create customize select dynamic command.
      * 
-     * @param handler ResultSetHandler
-     * @return My select dynamic command. (NotNull)
+     * @param handler The handler of result set. (NotNull)
+     * @return Customize select dynamic command. (NotNull)
      */
-    protected ${glSelectDynamicCommand} newMySelectDynamicCommand(ResultSetHandler handler) {
-        return new ${glSelectDynamicCommand}(dataSource, statementFactory, handler, resultSetFactory);
+    protected ${glSelectDynamicCommand} createCustomizeSelectDynamicCommand(org.seasar.extension.jdbc.ResultSetHandler handler) {
+        final org.seasar.extension.jdbc.ResultSetFactory customizeResultSetFactory = new ${glPackageBaseCommonS2Dao}.${glFetchNarrowingResultSetFactory}();
+#if ($database.isSelectQueryTimeoutValid() || ${database.isStatementResultSetTypeValid()})
+        final org.seasar.extension.jdbc.impl.ConfigurableStatementFactory confSf;
+        if (statementFactory instanceof org.seasar.extension.jdbc.impl.ConfigurableStatementFactory) {
+            confSf = (org.seasar.extension.jdbc.impl.ConfigurableStatementFactory)statementFactory;
+        } else {
+            confSf = null;
+        }
+        final org.seasar.extension.jdbc.StatementFactory customizeStatementFactory = new org.seasar.extension.jdbc.StatementFactory() {
+            public java.sql.PreparedStatement createPreparedStatement(java.sql.Connection con, String sql) {
+                try {
+#if ($database.isStatementResultSetTypeValid())
+                    if (_internalDebug && _log.isDebugEnabled()) {
+                        _log.debug("...Invoking ps.prepareStatement(sql, ${database.statementResultSetType}, ${database.statementResultSetConcurrency})");
+                    }
+                    final java.sql.PreparedStatement ps = con.prepareStatement(sql, ${database.statementResultSetType}, ${database.statementResultSetConcurrency});
+#else
+                    final java.sql.PreparedStatement ps = con.prepareStatement(sql);
+#end
+#if ($database.isSelectQueryTimeoutValid())
+                    final int timeout = ${database.SelectQueryTimeout};
+                    if (_internalDebug && _log.isDebugEnabled()) {
+                        _log.debug("...Invoking ps.setQueryTimeout(" + timeout + ")");
+                    }
+                    ps.setQueryTimeout(timeout);
+#end
+                    if (confSf == null) {
+                        return ps;
+                    }
+                    final Class confSfType = org.seasar.extension.jdbc.impl.ConfigurableStatementFactory.class;
+                    final String confMethodName = "configurePreparedStatement";
+                    final Class[] confMethodParameterType = new Class[]{java.sql.PreparedStatement.class};
+                    try {
+                        final Method confMethod = confSfType.getDeclaredMethod(confMethodName, confMethodParameterType);
+                        confMethod.setAccessible(true);// Because the method is protected!
+                        if (_internalDebug && _log.isDebugEnabled()) {
+                            _log.debug("...Invoking configurableStatementFactory." + confMethodName + "(ps)");
+                        }
+                        confMethod.invoke(confSf, new Object[]{ps});
+                        return ps;
+                    } catch (Exception e) {
+                        String msg = "The configuration of statement factory threw exception:";
+                        msg = msg + " class=" + confSfType + " method=" + confMethodName + " parameter=java.sql.PreparedStatement";
+                        throw new RuntimeException(msg, e);
+                    }
+                } catch (java.sql.SQLException e) {
+                    throw new org.seasar.framework.exception.SQLRuntimeException(e);
+                }
+            }
+            public java.sql.CallableStatement createCallableStatement(java.sql.Connection con, String sql) {
+                return org.seasar.extension.jdbc.util.ConnectionUtil.prepareCall(con, sql);
+            }
+        };
+#else
+        final StatementFactory customizeStatementFactory = statementFactory;
+#end
+        return new ${glSelectDynamicCommand}(dataSource, customizeStatementFactory, handler, customizeResultSetFactory);
     }
 
     // ===================================================================================
@@ -284,7 +351,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         argNames = new String[] { "dto" };
         final String sqlNormal = getSelectClause(getBeanMetaData(), clazz);
         final String sqlPKOnly = getSelectClausePKOnly(getBeanMetaData());
-        final ${glSelectDynamicCommand} dynamicCommand = newMySelectDynamicCommand(handler);
+        final ${glSelectDynamicCommand} dynamicCommand = createCustomizeSelectDynamicCommand(handler);
         String sql = sqlNormal;
         final SelectDynamicCommand cmd = dynamicCommand;
         dynamicCommand.setSelectClause(sqlNormal);
@@ -511,7 +578,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected void setupSelectMethodByManual(Method method, String sql) {
         final BeanMetaData myBeanMetaData = getOutsideSqlBeanMetaData(method);
 #if ($database.isVersionAfter1046())
-        final SelectDynamicCommand cmd = newMySelectDynamicCommand(createResultSetHandler(myBeanMetaData, method));
+        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(createResultSetHandler(myBeanMetaData, method));
         cmd.setSql(sql);
         cmd.setArgNames(this.daoAnnotationReader.getArgNames(method));
         cmd.setArgTypes(method.getParameterTypes());
@@ -523,7 +590,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData);
 #end
 
-        final SelectDynamicCommand cmd = newMySelectDynamicCommand(factory.createResultSetHandler(method));
+        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(factory.createResultSetHandler(method));
         cmd.setSql(sql);
         cmd.setArgNames(this.annotationReader.getArgNames(method));
         cmd.setArgTypes(method.getParameterTypes());

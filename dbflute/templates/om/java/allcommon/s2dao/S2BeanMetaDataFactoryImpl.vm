@@ -1,14 +1,18 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
-
 /**
  * BeanMetaDataFactoryImpl for DBFlute.
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
+public class ${glBeanMetaDataFactoryImpl} extends org.seasar.dao.impl.BeanMetaDataFactoryImpl {
+
+    /**
+     * Get the limit nest level of relation.
+     * 
+     * @return The limit nest level of relation.
+     */
     protected int getLimitRelationNestLevel() {
-        return 2;
+        return 2;// Extension for DBFlute
     }
 }

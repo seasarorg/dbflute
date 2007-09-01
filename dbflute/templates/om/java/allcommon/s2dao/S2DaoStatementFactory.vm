@@ -4,7 +4,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.seasar.extension.jdbc.impl.BasicStatementFactory;
@@ -29,7 +28,7 @@ public class ${glDaoStatementFactory} extends BasicStatementFactory {
 
     public PreparedStatement createPreparedStatement(Connection con, String sql) {
         try {
-            return con.prepareStatement(sql, ${database.StatementResultSetType}, ${database.StatementResultSetConcurrency});
+            return con.prepareStatement(sql, ${database.statementResultSetType}, ${database.statementResultSetConcurrency});
         } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         }
