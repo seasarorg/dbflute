@@ -1018,7 +1018,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         }
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(baseTableName);
         final ${glForeignInfoName} foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
-        return resolveNestLevelExpression("rel" + foreignInfo.getRelationNo(), cqNestNo);
+        return resolveNestLevelExpression("dbfluteRelno" + foreignInfo.getRelationNo(), cqNestNo);
     }
 
     /**
@@ -1033,7 +1033,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         if (isValidJoinAliasName(aliasName)) {
             return aliasName;
         }
-        return resolveNestLevelExpression("rel" + relationNo, cqNestNo);
+        return resolveNestLevelExpression("dbfluteRelno" + relationNo, cqNestNo);
     }
 
     /**
