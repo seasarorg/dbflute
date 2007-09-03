@@ -23,6 +23,11 @@
     <!-- Dao selector. -->
     <component name="daoSelector" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}"/>
 
+    <!-- Original behavior aspect. -->
+#foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
+#set ($className = ${database.getOriginalBehaviorAspectClassName($componentName)})
+    <component name="${componentName}" class="${className}"/>
+#end
 
     <!-- Original dao component. -->
 #foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
