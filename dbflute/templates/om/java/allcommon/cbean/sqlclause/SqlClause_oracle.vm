@@ -126,7 +126,13 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
     // ===================================================================================
     //                                                                       Name Resolver
     //                                                                       =============
+    /**
+     * The override.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @return Determination.
+     */
     protected boolean isValidJoinAliasName(String aliasName) {
-        return aliasName.length() <= 30;
+        return aliasName.length() <= 30;// The length of alias name should be less (equal) than 30 in Oracle.
     }
 }
