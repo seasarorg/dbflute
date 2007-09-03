@@ -46,7 +46,12 @@
         <aspect>${glDaoDiconNamespace}.interceptor</aspect>
     </component>
 #if (${database.isAvailableBehaviorGeneration()})
-    <component class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}BhvImpl" />
+    <component class="${glPackageExtendedBhv}.${glProjectPrefix}${table.JavaName}BhvImpl">
+#foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
+#set ($pointcut = ${database.getOriginalBehaviorAspectPointcut($componentName)})
+        <aspect pointcut="${pointcut}">${glDaoDiconNamespace}.${componentName}</aspect>
+#end
+    </component>
 #end
 #end
 
