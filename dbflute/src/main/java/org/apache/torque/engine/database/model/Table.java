@@ -1213,14 +1213,19 @@ public class Table implements IDMethod {
     }
 
     protected int doResolveRelationIndex(ForeignKey foreignKey, boolean referer, boolean oneToOne) {
-        final String relationIndexKey = buildRefererIndexKey(foreignKey, referer, oneToOne);
-        final Integer realIndex = _relationIndexMap.get(relationIndexKey);
-        if (realIndex != null) {
-            return realIndex;
+        try {
+            final String relationIndexKey = buildRefererIndexKey(foreignKey, referer, oneToOne);
+            final Integer realIndex = _relationIndexMap.get(relationIndexKey);
+            if (realIndex != null) {
+                return realIndex;
+            }
+            final int minimumRelationIndex = extractMinimumRelationIndex(_relationIndexMap);
+            _relationIndexMap.put(relationIndexKey, minimumRelationIndex);
+            return minimumRelationIndex;
+        } catch (RuntimeException e) {
+            _log.warn("doResolveRelationIndex() threw the exception: " + foreignKey, e);
+            throw e;
         }
-        final int minimumRelationIndex = extractMinimumRelationIndex(_relationIndexMap);
-        _relationIndexMap.put(relationIndexKey, minimumRelationIndex);
-        return minimumRelationIndex;
     }
 
     protected String buildRefererIndexKey(ForeignKey foreignKey, boolean referer, boolean oneToOne) {

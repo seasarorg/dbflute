@@ -624,6 +624,13 @@ public class Database {
     }
 
     // -----------------------------------------------------
+    //                                              Database
+    //                                              --------
+    public boolean isDatabaseOracle() {
+        return getBasicProperties().isDatabaseOracle();
+    }
+
+    // -----------------------------------------------------
     //                                              Language
     //                                              --------
     public String getTargetLanguage() {
@@ -642,7 +649,7 @@ public class Database {
     public boolean isTargetLanguageCSharp() {
         return getBasicProperties().isTargetLanguageCSharp();
     }
-    
+
     public boolean isTargetLanguageCSharpOld() {
         return getBasicProperties().isTargetLanguageCSharpOld();
     }
@@ -1019,12 +1026,11 @@ public class Database {
     public boolean hasCommonColumnSetupResource() {
         return getProperties().getCommonColumnProperties().hasCommonColumnSetupResource();
     }
-    
+
     public List<CommonColumnSetupResource> getCommonColumnSetupResourceList() {
         return getProperties().getCommonColumnProperties().getCommonColumnSetupResourceList();
     }
 
-    
     // ===============================================================================
     //                                                     Properties - Classification
     //                                                     ===========================

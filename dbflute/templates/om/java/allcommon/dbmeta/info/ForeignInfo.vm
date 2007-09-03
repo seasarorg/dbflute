@@ -20,6 +20,7 @@ public class ${myClassName} implements ${glRelationInfoName} {
     protected ${glDBMetaInterfaceName} foreignDBMeta;
     protected java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} localForeignColumnInfoMap;
     protected java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} foreignLocalColumnInfoMap;
+    protected int relationNo;
     protected boolean oneToOne;
 
     // ===================================================================================
@@ -117,6 +118,14 @@ public class ${myClassName} implements ${glRelationInfoName} {
 
     public java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} getForeignLocalColumnInfoMap() {
         return foreignLocalColumnInfoMap;
+    }
+
+    public int getRelationNo() {
+        return relationNo;
+    }
+
+    public void setRelationNo(int relationNo) {
+        this.relationNo = relationNo;
     }
 
     public boolean isOneToOne() {

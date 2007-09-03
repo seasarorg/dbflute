@@ -733,6 +733,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #end
         foreignInfo.setLocalForeignColumnInfoMap(map);
+        foreignInfo.setRelationNo(${table.resolveForeignIndex($foreignKeys)});
         foreignInfo.setOneToOne(${foreignKeys.isOneToOne()});
         return foreignInfo;
     }
@@ -756,6 +757,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referer.refererTableDBMetaClassName}.getInstance().column${referer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #end
         foreignInfo.setLocalForeignColumnInfoMap(map);
+        foreignInfo.setRelationNo(${table.resolveRefererIndexAsOne($referer)});
         foreignInfo.setOneToOne(${referer.isOneToOne()});
         return foreignInfo;
     }

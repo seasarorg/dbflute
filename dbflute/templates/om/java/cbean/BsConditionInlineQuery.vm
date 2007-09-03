@@ -44,6 +44,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
         super(childQuery, sqlClause, aliasName, nestLevel);
         _myCQ = myCQ;
+        _resolvedJoinAliasName = _myCQ.getResolvedJoinAliasName();// Accept resolved join alias name.
     }
 
     // ===================================================================================

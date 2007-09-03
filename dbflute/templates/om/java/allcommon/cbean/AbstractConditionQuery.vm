@@ -40,6 +40,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     /** Child query. */
     protected final ${glConditionQueryInterfaceName} _childQuery;
 
+    /** Resolved join alias name. (Internal) */
+    protected String _resolvedJoinAliasName;
+
     // =====================================================================================
     //                                                                           Constructor
     //                                                                           ===========
@@ -116,6 +119,24 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return (query.getChildQuery() == null);
     }
 
+    /**
+     * Get resolved join alias name. (Non-Interface Method)
+     * 
+     * @return Resolved join alias name. (Nullable)
+     */
+    public String getResolvedJoinAliasName() {
+        return this._resolvedJoinAliasName;
+    }
+
+    /**
+     * Set resolved join alias name. (Non-Interface Method)
+     * 
+     * @param resolvedJoinAliasName Resolved join alias name. (Nullable)
+     */
+    public void setResolvedJoinAliasName(String resolvedJoinAliasName) {
+        this._resolvedJoinAliasName = resolvedJoinAliasName;
+    }
+
     // =====================================================================================
     //                                                                             Real Name
     //                                                                             =========
@@ -125,11 +146,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @return Real alias name.
      */
     public String getRealAliasName() {
-        if (getNestLevel() > 1) {
-            return getAliasName() + "_n" + getNestLevel();
-        } else {
-            return getAliasName();
+        if (this._resolvedJoinAliasName != null) {
+            return this._resolvedJoinAliasName;
         }
+        return resolveNestLevelExpression(getAliasName());
     }
 
     /**
@@ -140,7 +160,11 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      */
     public String getRealColumnName(String columnName) {
         assertColumnName(columnName);
-        return getRealAliasName() + "." + columnName;
+        return buildRealColumnName(getRealAliasName(), columnName);
+    }
+
+    protected String buildRealColumnName(String aliasName, String columnName) {
+        return aliasName + "." + columnName;
     }
 
     // =====================================================================================
@@ -178,7 +202,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 #set ($unionQueryGenericsString = "String, ${glConditionQueryInterfaceName}")
 
     // =====================================================================================
-    //                                                                           Union-Query
+    //                                                                           Union Query
     //                                                                           ===========
     protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
 
@@ -491,6 +515,17 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String newStr = ".conditionQuery." + unionQueryPropertyName + ".";
         final String replacedClause = replaceString(queryClause, oldStr, newStr);// Very Important!
         return selectClause + " " + replacedClause;
+    }
+
+    // ===================================================================================
+    //                                                                       Name Resolver
+    //                                                                       =============
+    protected String resolveJoinAliasName(String aliasName, String foreignPropertyName, int nestLevel) {
+        return getSqlClause().resolveJoinAliasName(aliasName, getTableDbName(), foreignPropertyName, nestLevel);
+    }
+
+    protected String resolveNestLevelExpression(String name) {
+        return getSqlClause().resolveNestLevelExpression(name, getNestLevel());
     }
 
     // ===================================================================================

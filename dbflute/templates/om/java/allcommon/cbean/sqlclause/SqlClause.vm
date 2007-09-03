@@ -347,6 +347,9 @@ public interface ${myClassName} {
      */
     public boolean isFetchSizeSupported();
 
+    // ===================================================================================
+    //                                                                     Fetch Narrowing
+    //                                                                     ===============
     /**
      * Is fetch-narrowing effective?
      * 
@@ -368,6 +371,9 @@ public interface ${myClassName} {
      */
     public int getFetchNarrowingLoopCount();
 
+    // ===================================================================================
+    //                                                                                Lock
+    //                                                                                ====
     /**
      * Lock for update.
      * <p>
@@ -377,4 +383,37 @@ public interface ${myClassName} {
      * @return this. (NotNull)
      */
     public ${myClassName} lockForUpdate();
+
+    // ===================================================================================
+    //                                                                       Name Resolver
+    //                                                                       =============
+    /**
+     * Resolved join alias name.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @param baseTableName Base table name. (NotNull)
+     * @param foreignPropertyName Foreign property name. (NotNull)
+     * @param cqNestNo The nest no of condition query.
+     * @return Resolved join alias name. (NotNull)
+     */
+    public String resolveJoinAliasName(String aliasName, String baseTableName, String foreignPropertyName, int cqNestNo);
+
+    /**
+     * Resolve join alias name.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @param relationNo Relation no.
+     * @param cqNestNo The nest no of condition query.
+     * @return Resolved join alias name. (NotNull)
+     */
+    public String resolveJoinAliasName(String aliasName, int relationNo, int cqNestNo);
+
+    /**
+     * Resolve nest level expression.
+     * 
+     * @param name Name. (NotNull)
+     * @param cqNestNo The nest no of condition query.
+     * @return Resolved name about nest level. (NotNull)
+     */
+    public String resolveNestLevelExpression(String name, int cqNestNo);
 }

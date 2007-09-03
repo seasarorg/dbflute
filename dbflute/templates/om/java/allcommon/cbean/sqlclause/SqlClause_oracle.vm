@@ -122,4 +122,11 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
+
+    // ===================================================================================
+    //                                                                       Name Resolver
+    //                                                                       =============
+    protected boolean isValidJoinAliasName(String aliasName) {
+        return aliasName.length() <= 30;
+    }
 }

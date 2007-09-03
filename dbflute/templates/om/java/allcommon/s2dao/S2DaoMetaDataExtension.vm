@@ -44,11 +44,11 @@ import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.util.StringUtil;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 #if ($database.isAvailableGenerics())
-
 import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
 #end
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
 
 /**
  * DaoMetaDataImpl for DBFlute.
@@ -401,10 +401,15 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             final StringBuffer sbYourSelectList = new StringBuffer(100);
             final RelationPropertyType rpt = baseBmd.getRelationPropertyType(i);
             if (rpt == null) {
-                String msg = "The baseBmd.GetRelationPropertyType(" + i + ") returned null";
-                msg = msg + ": baseBmd.getTableName()=" + baseBmd.getTableName();
-                msg = msg + ": baseBmd.getRelationPropertyTypeSize()=" + baseBmd.getRelationPropertyTypeSize();
-                throw new IllegalStateException(msg);
+                continue;
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // Comment out because it is possible that s2dao make relation property type as null.
+                //   Ref: org.seasar.dao.impl.BeanMetaDataImpl#addRelationPropertyType();
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // String msg = "The baseBmd.getRelationPropertyType(" + i + ") returned null";
+                // msg = msg + ": baseBmd.getTableName()=" + baseBmd.getTableName();
+                // msg = msg + ": baseBmd.getRelationPropertyTypeSize()=" + baseBmd.getRelationPropertyTypeSize();
+                // throw new IllegalStateException(msg);
             }
 
             final BeanMetaData relationBmd = rpt.getBeanMetaData();
@@ -413,7 +418,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             final String endComment = "/*END*/";
             for (int j = 0; j < relationBmd.getPropertyTypeSize(); ++j) {
                 final PropertyType pt = relationBmd.getPropertyType(j);
-                final String tableAliasName = StringUtil.capitalize(rpt.getPropertyName()) + (cqNestNo > 1 ? "_n" + cqNestNo : "");
+                final String tableAliasNameCandidate = resolveNestLevelExpression(StringUtil.capitalize(rpt.getPropertyName()), cqNestNo);
+                final String tableAliasName = resolveJoinAliasName(tableAliasNameCandidate, rpt.getRelationNo(), cqNestNo);
                 if (pt.isPersistent()) {
                     final String columnName = pt.getColumnName();
                     final String columnFullName = tableAliasName + "." + columnName;
@@ -432,6 +438,16 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
             sb.append(ifComment).append(sbYourSelectList).append(endComment);
         }
+    }
+
+    protected String resolveJoinAliasName(String aliasName, int relationNo, int cqNestNo) {
+        final ${glSqlClauseInterfaceName} sqlClause = ${glConditionBeanContextName}.createSqlClause("dummy");
+        return sqlClause.resolveJoinAliasName(aliasName, relationNo, cqNestNo);
+    }
+
+    protected String resolveNestLevelExpression(String name, int cqNestNo) {
+        final ${glSqlClauseInterfaceName} sqlClause = ${glConditionBeanContextName}.createSqlClause("dummy");
+        return sqlClause.resolveNestLevelExpression(name, cqNestNo);
     }
 
     /**

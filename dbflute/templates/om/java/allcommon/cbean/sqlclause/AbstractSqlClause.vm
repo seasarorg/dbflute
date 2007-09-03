@@ -5,6 +5,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
 
 /**
  * The abstract class of SqlClause.
@@ -963,9 +966,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      */
     abstract protected String createSqlSuffix();
 
-    // =====================================================================================
-    //                                                                        FetchNarrowing
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                     Fetch Narrowing
+    //                                                                     ===============
     /**
      * ${database.ImplementComment}
      * 
@@ -998,8 +1001,69 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     // ===================================================================================
-    //                                                                       Helper Method
+    //                                                                       Name Resolver
     //                                                                       =============
+    /**
+     * Get resolved join alias name.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @param baseTableName Base table name. (NotNull)
+     * @param foreignPropertyName Foreign property name. (NotNull)
+     * @param cqNestNo The nest no of condition query.
+     * @return Resolved join alias name. (NotNull)
+     */
+    public String resolveJoinAliasName(String aliasName, String baseTableName, String foreignPropertyName, int cqNestNo) {
+        if (isValidJoinAliasName(aliasName)) {
+            return aliasName;
+        }
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(baseTableName);
+        final ${glForeignInfoName} foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
+        return resolveNestLevelExpression("rel" + foreignInfo.getRelationNo(), cqNestNo);
+    }
+
+    /**
+     * Resolve join alias name.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @param relationNo Relation no.
+     * @param cqNestNo The nest no of condition query.
+     * @return Resolved join alias name. (NotNull)
+     */
+    public String resolveJoinAliasName(String aliasName, int relationNo, int cqNestNo) {
+        if (isValidJoinAliasName(aliasName)) {
+            return aliasName;
+        }
+        return resolveNestLevelExpression("rel" + relationNo, cqNestNo);
+    }
+
+    /**
+     * Resolve nest level expression.
+     * 
+     * @param name Name. (NotNull)
+     * @param cqNestNo The nest no of condition query.
+     * @return Resolved name about nest level. (NotNull)
+     */
+    public String resolveNestLevelExpression(String name, int cqNestNo) {
+        if (cqNestNo > 1) {
+            return name + "_n" + cqNestNo;
+        } else {
+            return name;
+        }
+    }
+
+    /**
+     * Is valid join alias name? {The method for Override}
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isValidJoinAliasName(String aliasName) {
+        return true;// as Default
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
     /**
      * Get the value of line separator.
      * 
