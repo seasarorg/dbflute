@@ -328,13 +328,13 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             final String daoResultPrefix = "===========/ [" + getPerformanceView(after - before) + " - ";
             if (java.util.List.class.isAssignableFrom(retType)) {
                 if (ret == null) {
-                    _log.debug(daoResultPrefix + "Selected count: null]");
+                    _log.debug(daoResultPrefix + "Selected list: null]");
                 } else {
                     final java.util.List ls = (java.util.List) ret;
                     if (ls.isEmpty()) {
-                        _log.debug(daoResultPrefix + "Selected count: 0]");
+                        _log.debug(daoResultPrefix + "Selected list: 0]");
                     } else {
-                        _log.debug(daoResultPrefix + "Selected count: " + ls.size() + " first=" + ls.get(0) + "]");
+                        _log.debug(daoResultPrefix + "Selected list: " + ls.size() + " first=" + ls.get(0) + "]");
                     }
                 }
             } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
@@ -380,9 +380,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
 #if ($database.isAvailableGenerics())
         final Class<${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}> outsideSqlType = ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}.class;
         final ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation} outsideSql = invocation.getMethod().getAnnotation(outsideSqlType);
-        if (outsideSql != null && outsideSql.dynamicAnalysis()) {
+        if (outsideSql != null && (outsideSql.dynamicAnalysis() || outsideSql.offsetByCursor() || outsideSql.offsetByCursor() || outsideSql.limitByCursor())) {
             final ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName} outsideSqlContext = new ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}();
-            outsideSqlContext.setDynamicAnalysis(true);
+            outsideSqlContext.setDynamicAnalysis(outsideSql.dynamicAnalysis());
+            outsideSqlContext.setOffsetByCursorForcedly(outsideSql.offsetByCursor());
+            outsideSqlContext.setLimitByCursorForcedly(outsideSql.limitByCursor());
             ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
         }
 #end

@@ -19,6 +19,7 @@ public class ${myClassName} {
     protected String propertyName;
     protected Class propertyType;
     protected boolean primary;
+    protected Integer columnSize;
 
     // ===================================================================================
     //                                                                         Easy-to-Use
@@ -28,11 +29,12 @@ public class ${myClassName} {
         this.columnDbName = columnDbName;
     }
 
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Class propertyType, boolean primary) {
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Class propertyType, boolean primary, Integer columnSize) {
         this(dbmeta, columnDbName);
         this.propertyName = propertyName;
         this.propertyType = propertyType;
         this.primary = primary;
+        this.columnSize = columnSize;
     }
 
     // ===================================================================================
@@ -86,6 +88,14 @@ public class ${myClassName} {
 
     public void setPrimary(boolean primary) {
         this.primary = primary;
+    }
+
+    public Integer getColumnSize() {
+        return this.columnSize;
+    }
+
+    public void setColumnSize(Integer columnSize) {
+        this.columnSize = columnSize;
     }
 
     // ===================================================================================

@@ -1,7 +1,7 @@
 #set ($myClassName = "${myDBMetaClassName}")
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
@@ -161,6 +161,9 @@ namespace ${myDBMetaPackageName} {
         /// <summary>{uncap-prop-name : cap-prop-name} map.</summary>
         protected static readonly System.Collections.Generic.IDictionary<String, String> _uncapPropNameCapPropNameMap;
 
+        /// <summary>The map of entity property setupper.</summary>
+        protected static readonly IDictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap;
+
         /// <summary>
         /// Constractor
         /// </summary>
@@ -168,62 +171,59 @@ namespace ${myDBMetaPackageName} {
             {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
                 map.Add(TABLE_UNCAP_PROP_NAME, TABLE_DB_NAME);
-    #foreach ($col in $table.Columns)
-
+#foreach ($col in $table.Columns)
                 map.Add(COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName}, COLUMN_DB_NAME_OF_${col.JavaName});
-    #end
-
+#end
                 _uncapPropNameDbNameMap = map;
             }
             {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
                 map.Add(TABLE_DB_NAME, TABLE_UNCAP_PROP_NAME);
-    #foreach ($col in $table.Columns)
-
+#foreach ($col in $table.Columns)
                 map.Add(COLUMN_DB_NAME_OF_${col.JavaName}, COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName});
-    #end
-
+#end
                 _dbNameUncapPropNameMap = map;
             }
             {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
                 map.Add(TABLE_CAP_PROP_NAME, TABLE_DB_NAME);
-    #foreach ($col in $table.Columns)
-
+#foreach ($col in $table.Columns)
                 map.Add(COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, COLUMN_DB_NAME_OF_${col.JavaName});
-    #end
-
+#end
                 _capPropNameDbNameMap = map;
             }
             {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
                 map.Add(TABLE_DB_NAME, TABLE_CAP_PROP_NAME);
-    #foreach ($col in $table.Columns)
-
+#foreach ($col in $table.Columns)
                 map.Add(COLUMN_DB_NAME_OF_${col.JavaName}, COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
-    #end
-
+#end
                 _dbNameCapPropNameMap = map;
             }
             {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
                 map.Add(TABLE_CAP_PROP_NAME, TABLE_UNCAP_PROP_NAME);
-    #foreach ($col in $table.Columns)
-
+#foreach ($col in $table.Columns)
                 map.Add(COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName});
-    #end
-
+#end
                 _capPropNameUncapPropNameMap = map;
             }
             {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
                 map.Add(TABLE_UNCAP_PROP_NAME, TABLE_CAP_PROP_NAME);
-    #foreach ($col in $table.Columns)
-
+#foreach ($col in $table.Columns)
                 map.Add(COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName}, COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
-    #end
-
+#end
                 _uncapPropNameCapPropNameMap = map;
+            }
+
+            // Entity Property Setupper
+            {
+                IDictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>> map = new Dictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
+#foreach ($col in $table.Columns)
+                map.Add("${col.javaName}", new ${myClassName}.EntityProperty${col.javaName}Setupper());
+#end
+                _entityPropertySetupperMap = map;
             }
         }
 
@@ -514,5 +514,23 @@ namespace ${myDBMetaPackageName} {
         public override bool HasCommonColumn {
             get { return ${table.hasAllCommonColumn()}; }
         }
+
+        // =====================================================================================
+        //                                                                 Entity Property Setup
+        //                                                                 =====================
+        public override bool SetupEntityProperty(String propertyName, Object entity, Object value) {
+            if (!_entityPropertySetupperMap.ContainsKey(propertyName)) {
+                return false;
+            }
+            EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap[propertyName];
+            callback.setup((${myExtendedObjectClassName})entity, value);
+            return true;
+        }
+
+#foreach ($col in $table.columns)
+        public class EntityProperty${col.javaName}Setupper : EntityPropertySetupper<${myExtendedObjectClassName}> {
+            public void setup(${myExtendedObjectClassName} entity, Object value) { entity.${col.javaName} = (${col.javaNative})value; }
+        }
+#end
     }
 }

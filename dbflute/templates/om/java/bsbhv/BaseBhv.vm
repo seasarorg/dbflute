@@ -268,13 +268,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
 #if ($table.isUseSequence())
-
     /**
      * Select next value as sequence. {delegate method, internal for interceptor}
      * 
      * @return Next value. (NotNull)
      */
-    ${database.behaviorDelegateModifier} ${database.sequenceReturnType} delegateSelectNextVal() {
+    ${database.behaviorDelegateModifier} ${table.sequenceReturnType} delegateSelectNextVal() {
         return getMyDao().selectNextVal();
     }
 #end
@@ -594,7 +593,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @return Next value. (NotNull)
      */
-    public ${database.sequenceReturnType} selectNextVal() {
+    public ${table.sequenceReturnType} selectNextVal() {
         return delegateSelectNextVal();
     }
 #end

@@ -69,6 +69,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
+import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -1996,6 +1997,22 @@ public class Table implements IDMethod {
         String result = getDatabase().getSequenceNextSql();
         result = DfPropertyUtil.convertAll(result, "$$sequenceName$$", sequenceName);
         return result;
+    }
+
+    public String getSequenceReturnType() {
+        final DfSequenceIdentityProperties sequenceIdentityProperties = getProperties().getSequenceIdentityProperties();
+        if (sequenceIdentityProperties.hasSequenceReturnType()) {
+            return sequenceIdentityProperties.getSequenceReturnType();
+        }
+        final String sequenceReturnType = sequenceIdentityProperties.getSequenceReturnType();
+        if (hasTwoOrMorePrimaryKeys()) {
+            return sequenceReturnType;
+        }
+        final Column primaryKeyAsOne = getPrimaryKeyAsOne();
+        if (primaryKeyAsOne.isJavaNativeNumberObject()) {
+            return primaryKeyAsOne.getJavaNative();
+        }
+        return sequenceReturnType;
     }
 
     // ===================================================================================

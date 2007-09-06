@@ -83,6 +83,9 @@ targetdatabase = $targetDatabase
     ## [Allcommon-Base-GenMetaData]
     #set ($glGenMetaDataClassName = "${glProjectPrefix}GenMetaData")
 
+    ## [Allcommon-Base-InternalMapContext]
+    #set ($glInternalMapContextName = "${glProjectPrefix}InternalMapContext")
+
     ## [Allcommon-Base-ClassificationDefinition]
     #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
 
@@ -1326,6 +1329,21 @@ targetdatabase = $targetDatabase
     $database.debug("parseGenMetaData();")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glGenMetaDataClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/GenMetaData.${glTemplateFileExtension}",$path ,"" ,"")
+
+    ## -----------------------------------------------------------------------------------------------------
+    ##                                                                            Parse internal map context
+    ##                                                                            --------------------------
+    ## Setup java directory for genMetaData.
+    $database.setupJavaDir_for_genMetaData()
+
+    #if ($database.isTargetLanguageCSharp())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
+      $database.makeDirectory($path)
+
+      $database.debug("parseInternalMapContext();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glInternalMapContextName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/InternalMapContext.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                               Parse interceptor class

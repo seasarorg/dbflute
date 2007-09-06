@@ -238,6 +238,6 @@ public interface ${myClassName} extends ${InterfaceName} {
      * 
      * @return Next value. (NotNull)
      */
-    public ${database.sequenceReturnType} selectNextVal();
+    public ${table.sequenceReturnType} selectNextVal();
 #end
 }

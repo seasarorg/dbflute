@@ -372,6 +372,11 @@ namespace ${glPackageBaseCommonDBMeta} {
          */
         abstract public bool HasCommonColumn { get; }
 
+        // =====================================================================================
+        //                                                                 Entity Property Setup
+        //                                                                 =====================
+        abstract public bool SetupEntityProperty(String propertyName, Object entity, Object value);
+
         // ----------------------------------------------------------------
         //                                                    Assert Object
         //                                                    -------------

@@ -417,13 +417,36 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${database.sequenceReturnType} readNextVal() {
         try {
-            final java.lang.reflect.Method method = getClass().getMethod("selectNextVal", new Class[] {});
-            return (${database.sequenceReturnType})method.invoke(getDaoReadable(), new Object[] {});
+            final java.lang.reflect.Method method = getClass().getMethod("selectNextVal", new Class[]{});
+            Object sequenceObject = method.invoke(getDaoReadable(), new Object[] {});
+            if (sequenceObject instanceof ${database.sequenceReturnType}) {
+                return (${database.sequenceReturnType})sequenceObject;
+            }
+            return (${database.sequenceReturnType})newInstanceSequence(${database.sequenceReturnType}.class, sequenceObject);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("The table does not have sequence: " + getTableDbName(), e);
         } catch (Exception e) {
             throw new RuntimeException("The selectNextVal() of the table threw the exception: " + getTableDbName(), e);
         }
+    }
+
+    private Object newInstanceSequence(Class resultClass, Object sequenceObject) {
+        try {
+            final java.lang.reflect.Method method = resultClass.getMethod("valueOf", new Class[]{String.class});
+            return method.invoke(null, new Object[]{sequenceObject.toString()});
+        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
+            throw new RuntimeException("The readNextVal() of the table threw the exception: " + getTableDbName(), e);
+        }
+        try {
+            final java.lang.reflect.Method method = resultClass.getMethod("valueOf", new Class[]{Long.class});
+            return method.invoke(null, new Object[]{Long.valueOf(sequenceObject.toString())});
+        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
+            throw new RuntimeException("The readNextVal() of the table threw the exception: " + getTableDbName(), e);
+        }
+        String msg = "The result type of selectNextVal() is unsupported: type=" + resultClass;
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================

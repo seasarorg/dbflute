@@ -405,7 +405,7 @@ namespace ${glPackageExtendedBhv} {
             if (ls.Count == 0) {
                 return null;
             }
-            AssertRecordHasBeenSelectedAsOne((System.Collections.Generic.IList<${glEntityInterfaceName}>)ls, cb);
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
 
@@ -419,8 +419,8 @@ namespace ${glPackageExtendedBhv} {
         public ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             System.Collections.Generic.IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
-            AssertRecordHasNotBeenDeleted((System.Collections.Generic.IList<${glEntityInterfaceName}>)ls, cb);
-            AssertRecordHasBeenSelectedAsOne((System.Collections.Generic.IList<${glEntityInterfaceName}>)ls, cb);
+            AssertRecordHasNotBeenDeleted(ls, cb);
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
 
@@ -694,5 +694,38 @@ namespace ${glPackageExtendedBhv} {
         #endregion
 #end
 
+        /**
+         * Assert that record has not been deleted.
+         * 
+         * @param ls List.
+         * @param searchKey Search-key for Logging.
+         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+         */
+        protected void AssertRecordHasNotBeenDeleted(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, Object searchKey4log) {
+            if (ls == null || ls.Count == 0) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            }
+        }
+
+        /**
+         * Assert that record has been selected as one.
+         * 
+         * @param ls List.
+         * @param searchKey Search-key for Logging.
+         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+         * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+         */
+        protected void AssertRecordHasBeenSelectedAsOne(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, Object searchKey4log) {
+            if (ls == null || ls.Count == 0) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            }
+            if (ls.Count != 1) {
+                String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
+                msg = msg + " resultCount=" + ls.Count;
+                throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            }
+        }
     }
 }

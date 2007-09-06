@@ -82,10 +82,10 @@ public class Column {
     //                                                                      Attribute
     //                                                                      =========
     private Table _parentTable;
-    
+
     // ------------------------------------
-    //                    Column Definition
-    //                    -----------------
+    //                                Basic
+    //                                -----
     private String _name;
 
     private String _description;
@@ -96,9 +96,9 @@ public class Column {
 
     private String _defaultValue;
 
-    // ........................
-    //                     Type
-    //                     ^^^^
+    // ------------------------------------
+    //                                 Type
+    //                                 ----
     private String _torqueType;
 
     private String _dbType;
@@ -295,7 +295,7 @@ public class Column {
         final Database db = getTable().getDatabase();
         return db.decapitalizePropertyName(db.convertJavaNameByJdbcNameAsTable(getName()));
     }
-    
+
     public String getJavaBeansRulePropertyNameInitCap() {
         final Database db = getTable().getDatabase();
         return initCap(db.decapitalizePropertyName(db.convertJavaNameByJdbcNameAsTable(getName())));
@@ -304,7 +304,7 @@ public class Column {
     protected String initCap(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
-    
+
     /**
      * Set name to use in Java sources
      */
@@ -561,6 +561,18 @@ public class Column {
      */
     public String printSize() {
         return (_size == null ? "" : '(' + _size + ')');
+    }
+
+    public String getColumnSizeSettingExpression() {
+        if (_size == null) {
+            return "null";
+        }
+        try {
+            Integer.parseInt(_size);
+            return "Integer.valueOf(\"" + _size + "\")";
+        } catch (NumberFormatException e) {
+            return "null";
+        }
     }
 
     // -------------------------------------------

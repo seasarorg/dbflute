@@ -595,7 +595,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */
     public java.util.List${database.filterGenericsString(${glColumnInfoName})} getColumnInfoList() {
         final java.util.List${database.filterGenericsString(${glColumnInfoName})} columnInfoList = new java.util.ArrayList${database.filterGenericsString(${glColumnInfoName})}();
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
         columnInfoList.add(column${col.javaBeansRulePropertyNameInitCap}());
 #end
         return columnInfoList;
@@ -658,12 +658,12 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 #end
 
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
     /**
      * @return Column information of ${col.uncapitalisedJavaName}. (NotNull)
      */
     public ${glColumnInfoName} column${col.javaBeansRulePropertyNameInitCap}() {
-        return new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()});
+        return new ${glColumnInfoName}(this, "${col.name}", "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression});
     }
 #end
 
@@ -683,7 +683,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         final ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
         uniqueInfo.setDBMeta(this);
 #foreach ($col in $table.primaryKey)
-        uniqueInfo.addUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", ${col.javaNative}.class, true));
+        uniqueInfo.addUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", ${col.javaNative}.class, true, ${col.columnSizeSettingExpression}));
 #end
         uniqueInfo.setPrimary(true);
         return uniqueInfo;

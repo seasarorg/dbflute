@@ -99,8 +99,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 _log.Info("@ @ @ @ @ @ @ @ @ @ @ /");
                 _log.Info(" ");
                 throw;
+            } finally {
+                PostprocessConditionBean(invocation, ${glAttachedCBArgsVariableName});
             }
-            PostprocessConditionBean(invocation, ${glAttachedCBArgsVariableName});
             DateTime after = DateTime.Now;
 
             Type retType = ((MethodInfo) method).ReturnType;
@@ -138,12 +139,12 @@ namespace ${glPackageBaseCommonS2Dao} {
                     String daoResultPrefix = "===========/ [" + GetPerformanceView(before, after) + " - ";
                     if (typeof(System.Collections.Generic.IList<>).Name.Equals(retType.Name)) {
                         if (ret == null) {
-                            _log.Debug(daoResultPrefix + "Selected count of list: null]");
+                            _log.Debug(daoResultPrefix + "Selected list: null]");
                         } else {
                             PropertyInfo pi = ret.GetType().GetProperty("Count");
                             int count = (int)pi.GetValue(ret, null);
                             // TODO: @jflute -- I want to get First Element!
-                            _log.Debug(daoResultPrefix + "Selected count of list: " + count + "]");
+                            _log.Debug(daoResultPrefix + "Selected list: " + count + "]");
                         }
                     } else if (typeof(${glEntityInterfaceName}).IsAssignableFrom(retType)) {
                         if (ret == null) {
@@ -236,9 +237,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
                 ${glFetchNarrowingBeanContextName}.ClearFetchNarrowingBeanOnThread();
             }
-	        if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
-	            ${glConditionBeanContextName}.ClearConditionBeanOnThread();
-	        }
+            if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
+                ${glConditionBeanContextName}.ClearConditionBeanOnThread();
+            }
+            if (${glInternalMapContextName}.IsExistInternalMapOnThread()) {
+                ${glInternalMapContextName}.ClearInternalMapOnThread();
+            }
         }
 
         /**

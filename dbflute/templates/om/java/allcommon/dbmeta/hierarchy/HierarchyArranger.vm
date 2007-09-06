@@ -344,7 +344,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
             final ${glRelationInfoName} relationInfo = localDBMeta.findRelationInfo(relationPropName);
 
             final Map<String, Object> targetPrimaryKeyMap;
-            final String alreadyRegisteredRefererKey;
+            final String alreadyRegisteredEntityKey;
             if (!relationInfo.isReferer()) {
                 // =======
                 // Foreign
@@ -360,10 +360,10 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 }
 
                 targetPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, targetRelationPath);
-                alreadyRegisteredRefererKey = targetRelationPath + ":" + targetPrimaryKeyMap.toString();
-                if (!alreadyRegisteredEntityMap.containsKey(alreadyRegisteredRefererKey)) {
+                alreadyRegisteredEntityKey = targetRelationPath + ":" + targetPrimaryKeyMap.toString();
+                if (!alreadyRegisteredEntityMap.containsKey(alreadyRegisteredEntityKey)) {
                     // - - - - - - - - - - - - - - - - - - - - - - -
-                    // Initialize the list of referer and inject it.
+                    // Initialize the foreign entity and inject it.
                     // - - - - - - - - - - - - - - - - - - - - - - -
                     final ${glEntityInterfaceName} foreignEntity = foreignInfo.getForeignDBMeta().newEntity();
                     injectForeignEntity(localEntity, foreignPropName, foreignEntity);
@@ -381,7 +381,13 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     // Put foreign entity to the map of already-registered-entity.
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    alreadyRegisteredEntityMap.put(alreadyRegisteredRefererKey.toString(), foreignEntity);
+                    alreadyRegisteredEntityMap.put(alreadyRegisteredEntityKey.toString(), foreignEntity);
+                } else {
+                    // - - - - - - - - - - - - - -
+                    // Inject the foreign entity.
+                    // - - - - - - - - - - - - - -
+                    final ${glEntityInterfaceName} foreignEntity = alreadyRegisteredEntityMap.get(alreadyRegisteredEntityKey);
+                    injectForeignEntity(localEntity, foreignPropName, foreignEntity);
                 }
             } else {
                 // =======
@@ -407,8 +413,8 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 }
 
                 targetPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, targetRelationPath);
-                alreadyRegisteredRefererKey = targetRelationPath + ":" + targetPrimaryKeyMap.toString();
-                if (!alreadyRegisteredEntityMap.containsKey(alreadyRegisteredRefererKey)) {
+                alreadyRegisteredEntityKey = targetRelationPath + ":" + targetPrimaryKeyMap.toString();
+                if (!alreadyRegisteredEntityMap.containsKey(alreadyRegisteredEntityKey)) {
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     // Initialize referer entity and register it to the list of referer with primary key value.
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -428,14 +434,14 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     // Put referer entity to the map of already-registered-entity.
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    alreadyRegisteredEntityMap.put(alreadyRegisteredRefererKey.toString(), refererEntity);
+                    alreadyRegisteredEntityMap.put(alreadyRegisteredEntityKey.toString(), refererEntity);
                 }
             }
 
             // - - - - - - - - - - - - - - - - - -
             // Set next value to current element.
             // - - - - - - - - - - - - - - - - - -
-            localEntity = alreadyRegisteredEntityMap.get(alreadyRegisteredRefererKey);
+            localEntity = alreadyRegisteredEntityMap.get(alreadyRegisteredEntityKey);
             localDBMeta = localEntity.getDBMeta();
             localRelationPath = targetRelationPath;
 
@@ -551,8 +557,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
 
     protected void injectForeignEntity(${glEntityInterfaceName} entity, String foreignPropName, ${glEntityInterfaceName} foreignEntity) {
         final String capPropRefererName = initCap(foreignPropName);
-        final Method method = findMethod(entity.getClass(), "set" + capPropRefererName, new Class[] { foreignEntity
-                .getDBMeta().getEntityType() });
+        final Method method = findMethod(entity.getClass(), "set" + capPropRefererName, new Class[] { foreignEntity.getDBMeta().getEntityType() });
         invoke(method, entity, new Object[] { foreignEntity });
     }
 
@@ -568,12 +573,10 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
         injectColumnValueMapToDestination(refererEntity, refererPrimaryKeyMap);
     }
 
-    protected void injectLocalForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntityInterfaceName} localEntity,
-            ${glForeignInfoName} foreignInfo, String foreignRelationPath) {
+    protected void injectLocalForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntityInterfaceName} localEntity, ${glForeignInfoName} foreignInfo, String foreignRelationPath) {
         final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Object> foreignPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, foreignRelationPath);
-        final List<${glHierarchyRequestElementName}> primaryKeyElementList = request
-                .findPrimaryKeyElement(foreignRelationPath);
+        final List<${glHierarchyRequestElementName}> primaryKeyElementList = request.findPrimaryKeyElement(foreignRelationPath);
         final Map<String, Object> localForeignKeyMap = new HashMap<String, Object>();
         for (${glHierarchyRequestElementName} foreignElement : primaryKeyElementList) {
             final String foreignPrimaryKeyColumnName = foreignElement.getDestinationColumnInfo().getColumnDbName();

@@ -11,4 +11,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface ${glOutsideSqlAnnotation} {
     boolean dynamicAnalysis() default false;
+    boolean offsetByCursor() default false;
+    boolean limitByCursor() default false;
 }

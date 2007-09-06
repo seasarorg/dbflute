@@ -44,6 +44,11 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return booleanProp("torque.isAvailableBehaviorInsertSequenceInjection", false);
     }
 
+    public boolean hasSequenceReturnType() {
+        final String value = stringProp("torque.sequenceReturnType", "");
+        return value != null && value.trim().length() != 0;
+    }
+
     public String getSequenceReturnType() {
         return stringProp("torque.sequenceReturnType", "java.math.BigDecimal");
     }

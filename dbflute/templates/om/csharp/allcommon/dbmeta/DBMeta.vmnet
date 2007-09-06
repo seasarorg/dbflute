@@ -249,5 +249,14 @@ namespace ${glPackageBaseCommonDBMeta} {
          * @return Determination.
          */
         bool HasCommonColumn { get; }
+
+        // =====================================================================================
+        //                                                                 Entity Property Setup
+        //                                                                 =====================
+        bool SetupEntityProperty(String propertyName, Object entity, Object value);
+    }
+
+    public interface EntityPropertySetupper<ENTITY_TYPE> {
+        void setup(ENTITY_TYPE entity, Object value);
     }
 }

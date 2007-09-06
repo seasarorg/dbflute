@@ -250,7 +250,7 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
         final StringBuffer sb = new StringBuffer();
 
         sb.append(" tableDbName=").append(_tableDbName);
-        sb.append(" allRecordCount=").append(_tableDbName);
+        sb.append(" allRecordCount=").append(_allRecordCount);
         sb.append(" selectedList.size()=").append(_selectedList.size());
         sb.append(" orderByClause=").append(_orderByClause);
 

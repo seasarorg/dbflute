@@ -495,7 +495,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return callRemoveList(entityList);
     }
 
-#set ($genericsPrimaryKeySequence = "String, ${database.sequenceReturnType}")
     /**
      * Inject sequence to primary key if it needs.
      * 
@@ -508,8 +507,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
         final ${database.sequenceReturnType} sequenceValue = readNextVal();
         final String columnDbName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
-        final java.util.Map${database.filterGenericsString($genericsPrimaryKeySequence)} map = new java.util.HashMap${database.filterGenericsString($genericsPrimaryKeySequence)}();
-        map.put(columnDbName, sequenceValue);
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.HashMap${database.filterGenericsString('String, String')}();
+        map.put(columnDbName, sequenceValue.toString());
         dbmeta.acceptPrimaryKeyMap(entity, map);
     }
 

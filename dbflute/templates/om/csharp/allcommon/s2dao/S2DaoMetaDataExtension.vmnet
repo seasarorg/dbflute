@@ -266,6 +266,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new SelectDynamicCommandExtension(_dataSource, _commandFactory, drh, _dataReaderFactory);
         }
 
+        protected override Seasar.Dao.IRowCreator CreateRowCreator() {
+            return new RowCreatorExtension();
+        }
+
         protected override Seasar.Dao.IRelationRowCreator CreateRelationRowCreator() {
             return new RelationRowCreatorExtension();
         }
@@ -327,6 +331,42 @@ namespace ${glPackageBaseCommonS2Dao} {
             bmdExt.NestNo = this.NestNo + 1;
             bmdExt.Initialize(dbMetaData, dbms);
             return bmdExt;
+        }
+    }
+
+    public class RowCreatorExtension : Seasar.Dao.Impl.RowCreatorImpl {
+
+        public override object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
+            object row = NewBean(beanType);
+            ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} dbmeta = findDBMeta(row);
+            foreach (IColumnMetaData column in columns) {
+                object value = column.ValueType.GetValue(reader, column.ColumnName);
+                if (dbmeta != null && dbmeta.SetupEntityProperty(column.PropertyInfo.Name, row, value)) {
+                    continue;
+                }
+                column.PropertyInfo.SetValue(row, value, null);
+            }
+            return row;
+        }
+
+        protected ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} findDBMeta(Object row) {
+            ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} dbmeta = (${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName})InternalMapContext.GetObject("CreateRow-DBMeta");
+            if (dbmeta != null) {
+                return dbmeta;
+            }
+            if (InternalMapContext.GetObject("CreateRow-NotFound") != null) {
+                return null;
+            }
+            PropertyInfo propertyOfDBMeta = row.GetType().GetProperty("DBMeta");
+            if (propertyOfDBMeta != null) {
+                dbmeta = (${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName})propertyOfDBMeta.GetValue(row, null);
+                if (dbmeta != null) {
+                    InternalMapContext.SetObject("CreateRow-DBMeta", dbmeta);
+                    return dbmeta;
+                }
+            }
+            InternalMapContext.SetObject("CreateRow-NotFound", "dummy");
+            return null;
         }
     }
 
