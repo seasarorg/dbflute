@@ -619,14 +619,43 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                         break;
                     }
                     clazz = value.getClass();
-                } else {
-                    BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
-                    PropertyDesc pd = beanDesc.getPropertyDesc(names[pos]);
+                    continue;
+                }
+                final org.seasar.framework.beans.BeanDesc beanDesc = org.seasar.framework.beans.factory.BeanDescFactory.getBeanDesc(clazz);
+                final String currentName = names[pos];
+                if (beanDesc.hasPropertyDesc(currentName)) {
+                    PropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                     value = pd.getValue(value);
                     clazz = pd.getPropertyType();
+                    continue;
                 }
+                final String methodName = "get" + initCap(currentName);
+                if (beanDesc.hasMethod(methodName)) {
+                    final java.lang.reflect.Method method = beanDesc.getMethod(methodName);
+                    value = invokeGetter(method, value);
+                    clazz = method.getReturnType();
+                    continue;
+                }
+                String msg = "Not found property: currentName=" + currentName + " class=" + clazz;
+                throw new IllegalStateException(msg);
             }
             ctx.addSql("?", value, clazz);
+        }
+
+        protected String initCap(String name) {
+            return name.substring(0, 1).toUpperCase() + name.substring(1);
+        }
+
+        protected Object invokeGetter(java.lang.reflect.Method method, Object target) {
+            try {
+                return method.invoke(target, (Object[]) null);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

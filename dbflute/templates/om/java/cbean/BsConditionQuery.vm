@@ -123,21 +123,25 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
-    protected ${relatedCQClassName} _${subQueryPropertyName};
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
-    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
-        return _${subQueryPropertyName};
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        _${subQueryPropertyName} = subQuery;
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
     }
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -145,21 +149,25 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
           #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
-    protected ${relatedCQClassName} _${subQueryPropertyName};
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
-    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
-        return _${subQueryPropertyName};
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        _${subQueryPropertyName} = subQuery;
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
     }
         #end
       #end
@@ -169,21 +177,25 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
             #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
             #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
             #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
-    protected ${relatedCQClassName} _${subQueryPropertyName};
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
-    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
-        return _${subQueryPropertyName};
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        _${subQueryPropertyName} = subQuery;
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
     }
           #end
         #end
@@ -194,21 +206,25 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
-    protected ${relatedCQClassName} _${subQueryPropertyName};
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
-    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
-        return _${subQueryPropertyName};
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        _${subQueryPropertyName} = subQuery;
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
     }
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -216,21 +232,25 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
           #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
-    protected ${relatedCQClassName} _${subQueryPropertyName};
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
      */
-    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
-        return _${subQueryPropertyName};
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        _${subQueryPropertyName} = subQuery;
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
     }
         #end
       #end
@@ -240,21 +260,25 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
             #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
             #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
             #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
 
     /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
-    protected ${relatedCQClassName} _${subQueryPropertyName};
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
 
     /**
      * Get the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
      * 
      * @return The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (Nullable)
      */
-    public ${relatedCQClassName} get${subQueryPropertyNameInitCap}() {
-        return _${subQueryPropertyName};
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
     }
 
-    public void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        _${subQueryPropertyName} = subQuery;
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
     }
           #end
         #end

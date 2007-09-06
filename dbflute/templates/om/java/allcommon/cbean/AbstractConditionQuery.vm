@@ -459,13 +459,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         final String selectClause = "select " + subQuery.getAliasName() + "." + relatedColumnName;
         String clause = subQuery.getSqlClause().getClauseWithoutIncludedOrderBySqlSuffix();
         clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
-        final String parentCondition;
-        if (clause.indexOf("where") >= 0) {
-            parentCondition = " and " + relatedColumnName + " = " + realColumnName;
+        final String joinCondition = relatedColumnName + " = " + realColumnName;
+        final String finalClause;
+        final int whereIndex = clause.indexOf(" where ");
+        final int whereEndIndex = whereIndex + " where ".length();
+        if (whereIndex >= 0) {
+            finalClause = clause.substring(0, whereEndIndex) + joinCondition + " and " + clause.substring(whereEndIndex);
         } else {
-            parentCondition = " where " + relatedColumnName + " = " + realColumnName;
+            finalClause = clause + " where " + joinCondition;
         }
-        return replaceString(clause + parentCondition, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
+        return replaceString(finalClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
     }
 
     protected void registerWhereClause(String whereClause) {

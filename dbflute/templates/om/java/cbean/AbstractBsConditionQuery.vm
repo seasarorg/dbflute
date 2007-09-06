@@ -98,6 +98,18 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, filterRemoveEmptyString(${tmpUncapitalisedJavaName}));
     }
+        #if (${col.hasClassification()})
+          #foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as notEqual. { != } <br />
+     * ${classificationMap.get('comment')} <br />
+     */
+    public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
+        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')});
+    }
+          #end
+        #end
       #end
       #if (${col.isAvailableStringGreaterThan()})
 
@@ -224,11 +236,11 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
-        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-        registerInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyName}");
+        final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
@@ -247,11 +259,11 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
-        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-        registerInScopeSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerInScopeSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", subQueryPropertyName);
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -272,11 +284,11 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
-        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-        registerExistsSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerExistsSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", subQueryPropertyName);
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
           #end
         #end
       #end
@@ -314,6 +326,19 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_NotEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
         register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, ${tmpUncapitalisedJavaName});
     }
+        #if (${col.hasClassification()})
+          #foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * Set the value of ${classificationMap.get('name')} of ${col.UncapitalisedJavaName} as notEqual. { != } <br />
+     * ${classificationMap.get('comment')} <br />
+     */
+    public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
+        final String code = ${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.ClassificationName}_${classificationMap.get('name')};
+        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, new ${col.JavaNative}(code));
+    }
+          #end
+        #end
       #end
       #if (${col.isAvailableNumberGreaterThan()})
 
@@ -465,11 +490,11 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
-        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-        registerInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", "${subQueryPropertyName}");
+        final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerInScopeSubQuery(subQuery, "${col.Name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
@@ -488,11 +513,11 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
-        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-        registerInScopeSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerInScopeSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", subQueryPropertyName);
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -513,11 +538,11 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      */
     public void set${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery) {
         assertObjectNotNull("subQuery", subQuery);
-        keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
-        registerExistsSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", "${subQueryPropertyName}");
+        final String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(subQuery);// for saving query-value.
+        registerExistsSubQuery(subQuery, "${col.Name}", "${refferer.FirstLocalColumnName}", subQueryPropertyName);
     }
 
-    abstract public void keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
           #end
         #end
       #end
