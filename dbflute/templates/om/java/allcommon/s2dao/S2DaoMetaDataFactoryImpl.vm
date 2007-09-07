@@ -209,10 +209,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         return sqlFileEncoding;
     }
 
-#if ($database.isVersionAfter1047())
     // ===================================================================================
-    //                                                                Version After 1.0.47
-    //                                                                ====================
+    //                                                                       Bean Enhancer
+    //                                                                       =============
     public BeanEnhancer getBeanEnhancer() {
         return beanEnhancer;
     }
@@ -221,6 +220,10 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         this.beanEnhancer = beanEnhancer;
     }
 
+#if ($database.isVersionAfter1047())
+    // ===================================================================================
+    //                                                                Version After 1.0.47
+    //                                                                ====================
     public PropertyTypeFactoryBuilder getPropertyTypeFactoryBuilder() {
         return propertyTypeFactoryBuilder;
     }
