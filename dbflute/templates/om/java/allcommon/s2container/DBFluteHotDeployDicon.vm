@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//SEASAR2.1//DTD S2Container//EN"
-	"http://www.seasar.org/dtd/components21.dtd">
+    "http://www.seasar.org/dtd/components21.dtd">
 
 <components namespace="${glDBFluteDiconNamespace}">
 #foreach ($includePath in $database.DBFluteDiconBeforeJ2eeIncludePathList)
@@ -27,6 +27,15 @@
     <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
     <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
     <component class="org.seasar.dao.impl.BeanEnhancerImpl"/>
+#end
+#if ($database.isVersionAfter1047())
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>
+    <component class="org.seasar.dao.impl.DtoMetaDataFactoryImpl"/>
+    <component class="org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl"/>
+    <component class="org.seasar.dao.impl.RelationPropertyTypeFactoryBuilderImpl"/>
+    <component class="org.seasar.dao.impl.DefaultTableNaming"/>
+    <component class="org.seasar.dao.impl.DefaultColumnNaming"/>
+    <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
 #end
 
     <!-- Common column setup interceptor. -->

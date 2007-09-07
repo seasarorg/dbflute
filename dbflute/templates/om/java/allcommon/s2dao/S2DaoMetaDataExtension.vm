@@ -38,6 +38,13 @@ import org.seasar.dao.impl.UpdateBatchAutoStaticCommand;
 import org.seasar.dao.impl.UpdateModifiedOnlyCommand;
 import org.seasar.dao.impl.DeleteAutoStaticCommand;
 import org.seasar.dao.impl.DeleteBatchAutoStaticCommand;
+
+#if ($database.isVersionAfter1047())
+import org.seasar.dao.PropertyTypeFactoryBuilder;
+import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
+import org.seasar.dao.TableNaming;
+#end
+
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.types.ValueTypes;
@@ -69,6 +76,32 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #end
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Bean enhancer. */
+    protected BeanEnhancer beanEnhancer;
+
+#if ($database.isVersionAfter1046())
+    /** The factory of annotation reader. */
+    protected org.seasar.dao.AnnotationReaderFactory annotationReaderFactory;
+#end
+
+#if ($database.isVersionAfter1047())
+    /** The builder of property type factory. {After S2Dao-1.0.47} */
+    protected PropertyTypeFactoryBuilder propertyTypeFactoryBuilder;
+
+    /** The builder of relation property type factory. {After S2Dao-1.0.47} */
+    protected RelationPropertyTypeFactoryBuilder relationPropertyTypeFactoryBuilder;
+
+    /** The builder of table naming. {After S2Dao-1.0.47} */
+    protected TableNaming tableNaming;
+#end
+
+#if ($database.isAvailableOtherConnectionDaoInitialization())
+    protected TransactionManager transactionManager;
+#end
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
@@ -77,31 +110,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     public ${glDaoMetaDataExtension}() {
     }
 
-    // ===================================================================================
-    //                                                                   Sql File Encoding
-    //                                                                   =================
-    public String getSqlFileEncoding() {
-        return sqlFileEncoding;
-    }
-
-#if ($database.isVersionAfter1046())
-    // ===================================================================================
-    //                                                           Annotation Reader Factory
-    //                                                           =========================
-    protected org.seasar.dao.AnnotationReaderFactory annotationReaderFactory;
-
-    public void setAnnotationReaderFactory(org.seasar.dao.AnnotationReaderFactory annotationReaderFactory) {
-        this.annotationReaderFactory = annotationReaderFactory;
-    }
-#end
-
 #if ($database.isAvailableOtherConnectionDaoInitialization())
 
     // ===================================================================================
     //                                        Other Connection Dao Initialization Override
     //                                        ============================================
-    protected TransactionManager transactionManager;
-
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
@@ -180,20 +193,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 #end
 
-    // ===================================================================================
-    //                                                                       Bean Enhancer
-    //                                                                       =============
-    protected BeanEnhancer beanEnhancer;
-
-    public BeanEnhancer getBeanEnhancer() {
-        return beanEnhancer;
-    }
-
-    public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
-        this.beanEnhancer = beanEnhancer;
-    }
 #if ($database.isAvailableGenerics())
-
     // ===================================================================================
     //                                                           OutsideSql Check Override
     //                                                           =========================
@@ -566,7 +566,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         };
         nonConcurrencyBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
+#if ($database.isVersionAfter1047())
+        nonConcurrencyBmdFactory.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
+        nonConcurrencyBmdFactory.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
+        nonConcurrencyBmdFactory.setTableNaming(this.tableNaming);
+#else
         nonConcurrencyBmdFactory.setValueTypeFactory(this.valueTypeFactory);
+#end
         nonConcurrencyBmdFactory.setDataSource(this.dataSource);
         nonConcurrencyBmdFactory.setDaoNamingConvention(this.daoNamingConvention);
         nonConcurrencyBmdFactory.setBeanEnhancer(this.beanEnhancer);
@@ -637,7 +643,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         };
         originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
+#if ($database.isVersionAfter1047())
+        originalBmdFactory.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
+        originalBmdFactory.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
+        originalBmdFactory.setTableNaming(this.tableNaming);
+#else
         originalBmdFactory.setValueTypeFactory(this.valueTypeFactory);
+#end
         originalBmdFactory.setDataSource(this.dataSource);
         originalBmdFactory.setDaoNamingConvention(this.daoNamingConvention);
         originalBmdFactory.setBeanEnhancer(this.beanEnhancer);
@@ -879,4 +891,61 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
     }
 #end
+
+    // ===================================================================================
+    //                                                                   Sql File Encoding
+    //                                                                   =================
+    public String getSqlFileEncoding() {
+        return sqlFileEncoding;
+    }
+
+    // ===================================================================================
+    //                                                                       Bean Enhancer
+    //                                                                       =============
+    public BeanEnhancer getBeanEnhancer() {
+        return beanEnhancer;
+    }
+
+    public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
+        this.beanEnhancer = beanEnhancer;
+    }
+
+#if ($database.isVersionAfter1046())
+    // ===================================================================================
+    //                                                           Annotation Reader Factory
+    //                                                           =========================
+    public void setAnnotationReaderFactory(org.seasar.dao.AnnotationReaderFactory annotationReaderFactory) {
+        this.annotationReaderFactory = annotationReaderFactory;
+    }
+#end
+
+#if ($database.isVersionAfter1047())
+    // ===================================================================================
+    //                                                                Version After 1.0.47
+    //                                                                ====================
+    public PropertyTypeFactoryBuilder getPropertyTypeFactoryBuilder() {
+        return propertyTypeFactoryBuilder;
+    }
+
+    public void setPropertyTypeFactoryBuilder(final PropertyTypeFactoryBuilder propertyTypeFactoryBuilder) {
+        this.propertyTypeFactoryBuilder = propertyTypeFactoryBuilder;
+    }
+
+    public RelationPropertyTypeFactoryBuilder getRelationPropertyTypeFactoryBuilder() {
+        return relationPropertyTypeFactoryBuilder;
+    }
+
+    public void setRelationPropertyTypeFactoryBuilder(final RelationPropertyTypeFactoryBuilder relationPropertyTypeFactoryBuilder) {
+        this.relationPropertyTypeFactoryBuilder = relationPropertyTypeFactoryBuilder;
+    }
+
+    public TableNaming getTableNaming() {
+        return tableNaming;
+    }
+
+    public void setTableNaming(final TableNaming tableNaming) {
+        this.tableNaming = tableNaming;
+    }
+#end
+
 }

@@ -221,6 +221,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ ");
         _log.info("$ *************************************/");
 
+        if (tableList.isEmpty()) {
+            String msg = "Not found tables: url=" + _url + " schema=" + _schema;
+            throw new IllegalStateException(msg);
+        }
+        
         _databaseNode = _doc.createElement("database");
         _databaseNode.setAttribute("name", _schema);
 
