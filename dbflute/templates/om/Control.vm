@@ -262,6 +262,9 @@ targetdatabase = $targetDatabase
     #set ($glFetchNarrowingResultSetFactory = "${glProjectPrefix}FetchNarrowingResultSetFactory")
     #set ($glFetchNarrowingResultSetWrapper = "${glProjectPrefix}FetchNarrowingResultSetWrapper")
 
+    ## [Allcommon-Util]
+    #set ($glValueLabelUtilName = "${glProjectPrefix}ValueLabelUtil")
+
     ## ===================================================================================
     ##                                                                            Variable
     ##                                                                            ========
@@ -311,6 +314,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.jdbc.history")
     #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
     #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
+    #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.util")
 
     #if ($database.isTargetLanguageCSharp())
       ## [Common]
@@ -350,6 +354,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
       #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
       #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
+      #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
     #end
 
     ## [Main]
@@ -1440,6 +1445,19 @@ targetdatabase = $targetDatabase
 
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetWrapper}.${glClassFileExtension}" )
     $generator.parse("om/${glTargetLanguage}/allcommon/s2dao/FetchNarrowingResultSetWrapper.${glTemplateFileExtension}",$path,"", "")
+
+    ## -----------------------------------------------------------------------------------------------------
+    ##                                                                                            Parse util
+    ##                                                                                            ----------
+    #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
+      $database.setupJavaDir_for_allcommon()
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonUtil}))
+      $database.makeDirectory($path)
+
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtilName}.${glClassFileExtension}" )
+    $generator.parse("om/${glTargetLanguage}/allcommon/util/ValueLabelUtil.${glTemplateFileExtension}",$path,"", "")
+    #end
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                    Parse table object
