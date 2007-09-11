@@ -35,12 +35,12 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
   #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
     /**
-     * Get the value of ${propertyName}.
+     * Get the value of ${propertyName}. (Converted empty to null)
      * 
-     * @return The value of ${propertyName}.
+     * @return The value of ${propertyName}. (NotEmptyString: if the value is empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
-        return _${propertyName};
+        return ($propertyType)convertEmptyToNullIfString(_${propertyName});
     }
 
     /**
@@ -52,6 +52,22 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
         _${propertyName} = ${propertyName};
     }
 #end
+
+    /**
+     * @param value Query value. (Nullable)
+     * @return Converted value. (Nullable)
+     */
+    protected Object convertEmptyToNullIfString(Object value) {
+        if (value instanceof String) { return filterRemoveEmptyString((String)value); } else { return value; }
+    }
+
+    /**
+     * @param value Query value string. (Nullable)
+     * @return Removed-empty value. (Nullable)
+     */
+    protected String filterRemoveEmptyString(String value) {
+        return ((value != null && !"".equals(value)) ? value : null);
+    }
 
     // ===================================================================================
     //                                                                      Basic Override

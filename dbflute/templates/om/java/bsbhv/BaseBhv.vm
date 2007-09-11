@@ -1422,4 +1422,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         public void setup(${myConditionBeanClassName} cb);
     }
 #end
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    protected ${myExtendedObjectClassName} downcast(${glEntityInterfaceName} entity) {
+        assertObjectNotNull("entity", entity);
+        try {
+            return (${myExtendedObjectClassName})entity;
+        } catch (ClassCastException e) {
+            String msg = "The entity should be ${myExtendedObjectClassName} but it was: " + entity.getClass();
+            throw new RuntimeException(msg, e);
+        }
+    }
 }
