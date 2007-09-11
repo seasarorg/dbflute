@@ -1388,14 +1388,12 @@ targetdatabase = $targetDatabase
     ##                                                                                      ----------------
     $database.setupJavaDir_for_allcommon()
     $database.debug("public void parseInterceptorClass() {")
-    #if ($database.isTargetLanguageJava())
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbc}))
-      $database.makeDirectory($path)
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbc}))
+    $database.makeDirectory($path)
 
-      $database.debug("    parse('CursorHandler');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glCursorHandlerName}.${glClassFileExtension}" )
-      $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/CursorHandler.${glTemplateFileExtension}",$path,"", "")
-    #end
+    $database.debug("    parse('CursorHandler');")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glCursorHandlerName}.${glClassFileExtension}" )
+    $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/CursorHandler.${glTemplateFileExtension}",$path,"", "")
 
     #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
       #if ($database.isMakeTraceablePreparedStatement())

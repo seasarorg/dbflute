@@ -109,7 +109,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         public override object Execute(object[] args) {
             if (!${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
-                return base.Execute(args);
+                return doDefaultExecute(args);
             }
             AssertSelectClauseCommand();
             IList<Object> bindVariableList = new List<Object>();
@@ -121,16 +121,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             sb.Append(" ");
             sb.Append(SetupRealFromWhereClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
 
-            BasicSelectHandler selectHandler = CreateBasicSelectHandler(sb.ToString());
-#if ($database.isSelectQueryTimeoutValid())
-
-            int timeout = ${database.SelectQueryTimeout};
-            if (_log.IsDebugEnabled) {
-                _log.Debug("@SelectDynamicCommand: selectHandler.CommandTimeout = " + timeout + ";// from ${database.SelectQueryTimeout}");
-            }
-            selectHandler.CommandTimeout = timeout;
-#end
-
+            BasicSelectHandler selectHandler = CreateBasicSelectHandler(sb.ToString(), this.dataReaderHandler);
             Object[] bindVariableArray = new Object[bindVariableList.Count];
             bindVariableList.CopyTo(bindVariableArray, 0);
             Type[] bindVariableTypeArray = new Type[bindVariableTypeList.Count];
@@ -140,7 +131,56 @@ namespace ${glPackageBaseCommonS2Dao} {
             return selectHandler.Execute(bindVariableArray, bindVariableTypeArray, bindVariableNameArray);
         }
 
-        protected String SetupRealSelectClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
+        protected virtual object doDefaultExecute(object[] args) {
+            ICommandContext ctx = Apply(args);
+            IDataReaderHandler specifiedDataReaderHandler = FindSpecifiedResultSetHandler(args);
+            BasicSelectHandler selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
+            return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
+        }
+
+        protected virtual object[] FilterArgumentsForResultSetHandler(object[] args) {
+            if (args == null || args.Length == 0) {
+                return args;
+            }
+            object[] filteredArgs;
+            if (args[args.Length - 1] is ${glPackageBaseCommonJdbc}.${glCursorHandlerName}) {
+                filteredArgs = new object[args.Length - 1];
+                for (int i=0; i < args.Length - 1; i++) {
+                    filteredArgs[i] = args[i];
+                }
+            } else {
+                filteredArgs = args;
+            }
+            return filteredArgs;
+        }
+
+        protected IDataReaderHandler FindSpecifiedResultSetHandler(object[] args) {
+            if (args == null || args.Length == 0) {
+                return this.dataReaderHandler;
+            }
+            if (args[args.Length-1] is ${glPackageBaseCommonJdbc}.${glCursorHandlerName}) {
+                ${glPackageBaseCommonJdbc}.${glCursorHandlerName} cursorHandler = (${glPackageBaseCommonJdbc}.${glCursorHandlerName})args[args.Length-1];
+                return new DataReaderCursol(cursorHandler);
+            }
+            if (ArgTypes.Length+1 == args.Length && args[args.Length-1] == null) {
+                String lineSeparator = "";
+                String msg = "System Level Exception!" + lineSeparator;
+                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
+                msg = msg + "The size of arg types have not been same as the size of arg objects:";
+                msg = msg + " argTypes=" + ArgTypes.Length + " args=" + args.Length + lineSeparator;
+                msg = msg + "If the arguments contain ResultSetHandler, the argument value should not be null!" + lineSeparator;
+                int index = 0;
+                for (int i=0; i < args.Length - 1; i++) {
+                    msg = msg + "  args[" + index + "] -- " + args[i] + lineSeparator;
+                    ++index;
+                }
+                msg = msg + "* * * * * * * * * */" + lineSeparator;
+                throw new SystemException(msg);
+            }
+            return this.dataReaderHandler;
+        }
+
+        protected virtual String SetupRealSelectClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
             ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             if (cb.IsSelectCountIgnoreFetchScope()) {
                 return "select count(*)";
@@ -159,7 +199,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return realSelectClause;
         }
 
-        protected String SetupRealFromWhereClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
+        protected virtual String SetupRealFromWhereClause(Object[] args, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
             ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
             String realFromWhereClause;
             {
@@ -174,8 +214,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             return realFromWhereClause;
         }
 
-        protected BasicSelectHandler CreateBasicSelectHandler(String realSql) {
-            return new BasicSelectHandler(DataSource, realSql, dataReaderHandler, CommandFactory, dataReaderFactory);
+        protected BasicSelectHandler CreateBasicSelectHandler(String realSql, IDataReaderHandler specifiedDataReaderHandler) {
+            return new BasicSelectHandler(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
         }
 
         protected void AddBindVariableInfo(ICommandContext ctx, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
@@ -209,6 +249,16 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (_selectClauseCommand == null) {
                 String msg = "Select clause command should not be null.";
                 throw new SystemException(msg);
+            }
+        }
+
+        protected class DataReaderCursol : IDataReaderHandler {
+            protected ${glPackageBaseCommonJdbc}.${glCursorHandlerName} _cursorHandler;
+            public DataReaderCursol(${glPackageBaseCommonJdbc}.${glCursorHandlerName} cursorHandler) {
+                this._cursorHandler = cursorHandler;
+            }
+            public object Handle(System.Data.IDataReader dr) {
+                return _cursorHandler.Handle(dr);
             }
         }
     }

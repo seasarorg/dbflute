@@ -17,6 +17,7 @@ using Seasar.Framework.Util;
 
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonAnnotation};
+using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -199,14 +200,30 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         // =====================================================================================
-        //                                                                     ByManual Override
-        //                                                                     =================
+        //                                                                   OutsideSql Override
+        //                                                                   ===================
         protected override void SetupSelectMethodByManual(MethodInfo mi, string sql) {
+            string[] parameterNames = MethodUtil.GetParameterNames(mi);
+            Type[] parameterTypes = MethodUtil.GetParameterTypes(mi);
+            string[] filteredParameterNames = null;
+            Type[] filteredParameterTypes = null;
+            if (parameterTypes != null && parameterTypes.Length > 0
+                    && typeof(${glCursorHandlerName}).IsAssignableFrom(parameterTypes[parameterTypes.Length - 1])) {
+                filteredParameterNames = new string[parameterTypes.Length - 1];
+                filteredParameterTypes = new Type[parameterTypes.Length - 1];
+                for (int i = 0; i < parameterTypes.Length - 1; i++) {
+                    filteredParameterNames[i] = parameterNames[i];
+                    filteredParameterTypes[i] = parameterTypes[i];
+                }
+            } else {
+                filteredParameterNames = parameterNames;
+                filteredParameterTypes = parameterTypes;
+            }
             IBeanMetaData myMetaData = BuildBeanMetaData(mi, _dbMetaData, _dbms);
             SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler4SelectMethodByManual(mi, myMetaData));
             cmd.Sql = sql;
-            cmd.ArgNames = MethodUtil.GetParameterNames(mi);
-            cmd.ArgTypes = MethodUtil.GetParameterTypes(mi);
+            cmd.ArgNames = filteredParameterNames;
+            cmd.ArgTypes = filteredParameterTypes;
             _sqlCommands[mi.Name] = cmd;
         }
 

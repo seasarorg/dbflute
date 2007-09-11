@@ -344,15 +344,15 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             final ${glPackageBaseCommonJdbc}.${glCursorHandlerName} cursorHandler = (${glPackageBaseCommonJdbc}.${glCursorHandlerName})args[args.length-1];
             return new ResultSetHandler() { public Object handle(java.sql.ResultSet rs) throws java.sql.SQLException { return cursorHandler.handle(rs); } };
         }
-        if (getArgTypes().length != args.length) {
+        if (getArgTypes().length+1 == args.length && args[args.length-1] == null) {
             String msg = "System Level Exception!" + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The size of arg types have not been same as the size of arg objects:" + getLineSeparator();
-            msg = msg + "  getArgTypes().length=" + getArgTypes().length + " args.length=" + args.length + getLineSeparator() + getLineSeparator();
+            msg = msg + "The size of arg types have not been same as the size of arg objects:";
+            msg = msg + " argTypes=" + getArgTypes().length + " args=" + args.length + getLineSeparator();
             msg = msg + "If the arguments contain ResultSetHandler, the argument value should not be null!" + getLineSeparator();
             int index = 0;
             for (int i=0; i < args.length - 1; i++) {
-                msg = msg + "  args[" + index + "] = " + args[i];
+                msg = msg + "  args[" + index + "] -- " + args[i] + getLineSeparator();
                 ++index;
             }
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
