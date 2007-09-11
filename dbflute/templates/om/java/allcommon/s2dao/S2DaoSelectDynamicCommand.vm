@@ -267,13 +267,17 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
         }
 
-        final BasicSelectHandler selectHandler = createBasicSelectHandler(finalClause);
+        final BasicSelectHandler selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
 
     protected Object doDefaulExecute(Object args[]) {
-        final org.seasar.dao.CommandContext ctx = apply(args);
-        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql());
+        // Supports SpecifiedResultSetHandler
+        final ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
+        final Object[] filteredArgs = filterArgumentsForResultSetHandler(args);
+
+        final org.seasar.dao.CommandContext ctx = apply(filteredArgs);
+        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
         return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
     }
 
@@ -302,14 +306,60 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         outsideSqlCommand.setArgNames(getArgNames());
         outsideSqlCommand.setArgTypes(getArgTypes());
         outsideSqlCommand.setSql(filteredSql);
-        final org.seasar.dao.CommandContext ctx = outsideSqlCommand.doApply(args);
+
+        // Supports SpecifiedResultSetHandler
+        final ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
+        final Object[] filteredArgs = filterArgumentsForResultSetHandler(args);
+
+        final org.seasar.dao.CommandContext ctx = outsideSqlCommand.doApply(filteredArgs);
         final java.util.List<Object> bindVariableList = new java.util.ArrayList<Object>();
         final java.util.List<Class> bindVariableTypeList = new java.util.ArrayList<Class>();
         addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
-        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql());
+        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
 #end
+
+    protected Object[] filterArgumentsForResultSetHandler(Object[] args) {
+        if (args == null || args.length == 0) {
+            return args;
+        }
+        final Object[] filteredArgs;
+        if (args[args.length - 1] instanceof ${glPackageBaseCommonJdbc}.${glCursorHandlerName}) {
+            filteredArgs = new Object[args.length - 1];
+            for (int i=0; i < args.length - 1; i++) {
+                filteredArgs[i] = args[i];
+            }
+        } else {
+            filteredArgs = args;
+        }
+        return filteredArgs;
+    }
+
+    protected ResultSetHandler findSpecifiedResultSetHandler(Object[] args) {
+        if (args == null || args.length == 0) {
+            return this.resultSetHandler;
+        }
+        if (args[args.length-1] instanceof ${glPackageBaseCommonJdbc}.${glCursorHandlerName}) {
+            final ${glPackageBaseCommonJdbc}.${glCursorHandlerName} cursorHandler = (${glPackageBaseCommonJdbc}.${glCursorHandlerName})args[args.length-1];
+            return new ResultSetHandler() { public Object handle(java.sql.ResultSet rs) throws java.sql.SQLException { return cursorHandler.handle(rs); } };
+        }
+        if (getArgTypes().length != args.length) {
+            String msg = "System Level Exception!" + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The size of arg types have not been same as the size of arg objects:" + getLineSeparator();
+            msg = msg + "  getArgTypes().length=" + getArgTypes().length + " args.length=" + args.length + getLineSeparator() + getLineSeparator();
+            msg = msg + "If the arguments contain ResultSetHandler, the argument value should not be null!" + getLineSeparator();
+            int index = 0;
+            for (int i=0; i < args.length - 1; i++) {
+                msg = msg + "  args[" + index + "] = " + args[i];
+                ++index;
+            }
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+        return this.resultSetHandler;
+    }
 
     // -----------------------------------------------------
     //                                          Setup Clause
@@ -349,8 +399,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return realFromWhereClause;
     }
 
-    protected BasicSelectHandler createBasicSelectHandler(String realSql) {
-        final BasicSelectHandler selectHandler = newBasicSelectHandler(realSql, resultSetHandler, getStatementFactory(), resultSetFactory);
+    protected BasicSelectHandler createBasicSelectHandler(String realSql, ResultSetHandler specifiedResultSetHandler) {
+        final BasicSelectHandler selectHandler = newBasicSelectHandler(realSql, specifiedResultSetHandler, getStatementFactory(), resultSetFactory);
         selectHandler.setFetchSize(-1);
         return selectHandler;
     }
@@ -392,6 +442,15 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             String msg = "Select clause command should not be null.";
             throw new IllegalStateException(msg);
         }
+    }
+
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 
     // =====================================================================================

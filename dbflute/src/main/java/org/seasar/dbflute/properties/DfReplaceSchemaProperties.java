@@ -67,18 +67,21 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (propString == null) {
             return "ut";
         }
-        if (propString.trim().equalsIgnoreCase("ut")) {
-            return "ut";
-        } else if (propString.trim().equalsIgnoreCase("it")) {
-            return "it";
-        } else if (propString.trim().equalsIgnoreCase("pt")) {
-            return "pt";
-        } else if (propString.trim().equalsIgnoreCase("real")) {
-            return "real";
-        } else {
-            String msg = "The environmentType[" + propString + "] is unsupported. Options are {test/it/pt/real}";
-            throw new IllegalStateException(msg);
-        }
+        return propString;
+
+        // For All OK!
+        //        if (propString.trim().equalsIgnoreCase("ut")) {
+        //            return "ut";
+        //        } else if (propString.trim().equalsIgnoreCase("it")) {
+        //            return "it";
+        //        } else if (propString.trim().equalsIgnoreCase("pt")) {
+        //            return "pt";
+        //        } else if (propString.trim().equalsIgnoreCase("real")) {
+        //            return "real";
+        //        } else {
+        //            String msg = "The environmentType[" + propString + "] is unsupported. Options are {test/it/pt/real}";
+        //            throw new IllegalStateException(msg);
+        //        }
     }
 
     public boolean isReplaceSchemaAutoCommit() {

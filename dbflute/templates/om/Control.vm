@@ -242,6 +242,9 @@ targetdatabase = $targetDatabase
     #set ($glCommonColumnSetupBeforeUpdateInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeUpdateInterceptor")
     #set ($glCommonColumnSetupBeforeDeleteInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeDeleteInterceptor")
 
+    ## [Allcommon-JDBC]
+    #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
+
     ## [Allcommon-JDBC-History]
     #set ($glPreparedExecutionBeanName = "${glProjectPrefix}PreparedExecutionBean")
     #set ($glPreparedParameterElementName = "${glProjectPrefix}PreparedParameterElement")
@@ -311,6 +314,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.helper.token.file")
     #set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.helper.token.file.impl")
     #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
+    #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
     #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.jdbc.history")
     #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
     #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
@@ -351,6 +355,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.Helper.Token.File")
       #set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.Helper.Token.File.Impl")
       #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.Interceptor")
+      #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
       #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
       #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
       #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
@@ -1381,8 +1386,18 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                      Parse jdbc class
     ##                                                                                      ----------------
+    $database.setupJavaDir_for_allcommon()
+    $database.debug("public void parseInterceptorClass() {")
+    #if ($database.isTargetLanguageJava())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbc}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parse('CursorHandler');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glCursorHandlerName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/CursorHandler.${glTemplateFileExtension}",$path,"", "")
+    #end
+
     #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
-      $database.setupJavaDir_for_allcommon()
       #if ($database.isMakeTraceablePreparedStatement())
         #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory}))
         $database.makeDirectory($path)
@@ -1408,6 +1423,7 @@ targetdatabase = $targetDatabase
         $generator.parse("om/${glTargetLanguage}/allcommon/jdbc/history/TraceablePreparedStatement.${glTemplateFileExtension}",$path,"", "")
       #end
     #end
+    $database.debug("}")
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                            Parse extended s2dao class

@@ -251,8 +251,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         try {
             changer = (DelimiterChanger) ClassUtil.newInstance(className);
         } catch (RuntimeException ignore) {
-            String msg = "The database has no delimiter changer: databaseName=";
-            _log.debug(msg + databaseName + " className=" + className + " ignore=" + ignore);
             changer = new DelimiterChanger_null();
         }
         return changer;
