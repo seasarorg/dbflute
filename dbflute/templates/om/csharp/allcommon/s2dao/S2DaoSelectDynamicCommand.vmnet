@@ -163,16 +163,14 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return new DataReaderCursol(cursorHandler);
             }
             if (ArgTypes.Length+1 == args.Length && args[args.Length-1] == null) {
-                String lineSeparator = "";
+                String lineSeparator = Environment.NewLine;
                 String msg = "System Level Exception!" + lineSeparator;
                 msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
                 msg = msg + "The size of arg types have not been same as the size of arg objects:";
                 msg = msg + " argTypes=" + ArgTypes.Length + " args=" + args.Length + lineSeparator;
                 msg = msg + "If the arguments contain ResultSetHandler, the argument value should not be null!" + lineSeparator;
-                int index = 0;
                 for (int i=0; i < args.Length - 1; i++) {
-                    msg = msg + "  args[" + index + "] -- " + args[i] + lineSeparator;
-                    ++index;
+                    msg = msg + "  args[" + i + "] -- " + args[i] + lineSeparator;
                 }
                 msg = msg + "* * * * * * * * * */" + lineSeparator;
                 throw new SystemException(msg);

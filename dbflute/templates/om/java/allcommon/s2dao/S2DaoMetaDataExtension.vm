@@ -845,7 +845,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 final PropertyType pt = bmd.getPropertyType(i);
 
                 // Excludes non writable property for performance tuning!
-                if (!pt.getPropertyDesc().isWritable()) {
+                if (!pt.getPropertyDesc().hasWriteMethod()) {
                     continue;
                 }
 

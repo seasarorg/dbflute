@@ -15,12 +15,41 @@
  */
 package org.seasar.dbflute.task;
 
+import java.io.File;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
+import org.seasar.framework.util.StringUtil;
 
 public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
 
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
+
+    @Override
+    protected List<File> getSqlFileList() {
+        final String sqlDirectory = getSqlDirectory();
+        final DfSqlFileGetter getter = new DfSqlFileGetter();
+        final List<File> sqlFileList = getter.getSqlFileList(sqlDirectory);
+        if (!sqlDirectory.contains("src/main/java/")) {
+            return sqlFileList;
+        }
+        final String srcMainResources = StringUtil.replace(sqlDirectory, "src/main/java/", "src/main/resources/");
+        try {
+            final List<File> resourcesSqlFileList = new DfSqlFileGetter().getSqlFileList(srcMainResources);
+            sqlFileList.addAll(resourcesSqlFileList);
+        } catch (Exception e) {
+            _log.debug("Not found sql directory on resources: " + srcMainResources);
+        }
+        return sqlFileList;
+    }
+
+    @Override
     protected String getSqlDirectory() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         final DfBasicProperties basicProp = prop.getBasicProperties();
