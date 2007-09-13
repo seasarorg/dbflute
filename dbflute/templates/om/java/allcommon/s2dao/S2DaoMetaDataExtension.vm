@@ -415,12 +415,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             final String endComment = "/*END*/";
             for (int j = 0; j < relationBmd.getPropertyTypeSize(); ++j) {
                 final PropertyType pt = relationBmd.getPropertyType(j);
-                final String tableAliasNameCandidate = resolveNestLevelExpression(StringUtil.capitalize(rpt.getPropertyName()), cqNestNo);
-                final String tableAliasName = resolveJoinAliasName(tableAliasNameCandidate, rpt.getRelationNo(), cqNestNo);
+                final String relationPath = preNoSuffix + "_" + rpt.getRelationNo();
+                final String tableAliasName = resolveJoinAliasName(relationPath, cqNestNo);
                 if (pt.isPersistent()) {
                     final String columnName = pt.getColumnName();
                     final String columnFullName = tableAliasName + "." + columnName;
-                    final String columnAliasName = pt.getColumnName() + preNoSuffix + "_" + rpt.getRelationNo();
+                    final String columnAliasName = pt.getColumnName() + relationPath;
                     sbYourSelectList.append(", ");
                     sbYourSelectList.append(columnFullName).append(" AS ").append(columnAliasName);
 
@@ -437,14 +437,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
     }
 
-    protected String resolveJoinAliasName(String aliasName, int relationNo, int cqNestNo) {
+    protected String resolveJoinAliasName(String relationPath, int cqNestNo) {
         final ${glSqlClauseInterfaceName} sqlClause = ${glConditionBeanContextName}.createSqlClause("dummy");
-        return sqlClause.resolveJoinAliasName(aliasName, relationNo, cqNestNo);
-    }
-
-    protected String resolveNestLevelExpression(String name, int cqNestNo) {
-        final ${glSqlClauseInterfaceName} sqlClause = ${glConditionBeanContextName}.createSqlClause("dummy");
-        return sqlClause.resolveNestLevelExpression(name, cqNestNo);
+        return sqlClause.resolveJoinAliasName(relationPath, cqNestNo);
     }
 
     /**
