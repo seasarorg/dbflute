@@ -9,7 +9,7 @@ import ${glPackageCQ}.${myConditionQueryClassName};
  * The nest select setupper of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
 
     // ===================================================================================

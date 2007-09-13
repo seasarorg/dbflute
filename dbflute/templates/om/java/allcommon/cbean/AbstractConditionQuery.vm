@@ -37,11 +37,17 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     /** Nest level. */
     protected final int _nestLevel;
 
+    // -----------------------------------------------------
+    //                                          Foreign Info
+    //                                          ------------
+    /** Foreign property name. */
+    protected String _foreignPropertyName;
+
+    /** Relation Path. */
+    protected String _relationPath;
+
     /** Child query. */
     protected final ${glConditionQueryInterfaceName} _childQuery;
-
-    /** Resolved join alias name. (Internal) */
-    protected String _resolvedJoinAliasName;
 
     // =====================================================================================
     //                                                                           Constructor
@@ -119,22 +125,23 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return (query.getChildQuery() == null);
     }
 
-    /**
-     * Get resolved join alias name. (Non-Interface Method)
-     * 
-     * @return Resolved join alias name. (Nullable)
-     */
-    public String getResolvedJoinAliasName() {
-        return this._resolvedJoinAliasName;
+    // -----------------------------------------------------
+    //                                          Foreign Info
+    //                                          ------------
+    public String getForeignPropertyName() {
+        return _foreignPropertyName;
     }
 
-    /**
-     * Set resolved join alias name. (Non-Interface Method)
-     * 
-     * @param resolvedJoinAliasName Resolved join alias name. (Nullable)
-     */
-    public void setResolvedJoinAliasName(String resolvedJoinAliasName) {
-        this._resolvedJoinAliasName = resolvedJoinAliasName;
+    public void setForeignPropertyName(String foreignPropertyName) {
+        this._foreignPropertyName = foreignPropertyName;
+    }
+
+    public String getRelationPath() {
+        return _relationPath;
+    }
+
+    public void setRelationPath(String relationPath) {
+        this._relationPath = relationPath;
     }
 
     // =====================================================================================
@@ -146,10 +153,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @return Real alias name.
      */
     public String getRealAliasName() {
-        if (this._resolvedJoinAliasName != null) {
-            return this._resolvedJoinAliasName;
-        }
-        return resolveNestLevelExpression(getAliasName());
+        return getAliasName();
     }
 
     /**
@@ -189,7 +193,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                 sb.insert(0, "conditionQuery.");
                 break;
             } else {
-                sb.insert(0, "conditionQuery" + query.getAliasName() + ".");
+                sb.insert(0, "conditionQuery" + initCap(query.getForeignPropertyName()) + ".");
             }
             query = query.getChildQuery();
         }
@@ -430,7 +434,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
-        final String selectClause = "select " + subQuery.getAliasName() + "." + relatedColumnName;
+        final String selectClause = "select " + subQuery.getTableDbName() + "." + relatedColumnName;
         String clause = subQuery.getSqlClause().getClauseWithoutIncludedOrderBySqlSuffix();
         clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
         return replaceString(clause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
@@ -456,7 +460,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
-        final String selectClause = "select " + subQuery.getAliasName() + "." + relatedColumnName;
+        final String selectClause = "select " + subQuery.getTableDbName() + "." + relatedColumnName;
         String clause = subQuery.getSqlClause().getClauseWithoutIncludedOrderBySqlSuffix();
         clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
         final String joinCondition = relatedColumnName + " = " + realColumnName;
@@ -523,8 +527,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // ===================================================================================
     //                                                                       Name Resolver
     //                                                                       =============
-    protected String resolveJoinAliasName(String aliasName, String foreignPropertyName, int nestLevel) {
-        return getSqlClause().resolveJoinAliasName(aliasName, getTableDbName(), foreignPropertyName, nestLevel);
+    protected String resolveJoinAliasName(String relationPath, int nestLevel) {
+        return getSqlClause().resolveJoinAliasName(relationPath, nestLevel);
     }
 
     protected String resolveNestLevelExpression(String name) {

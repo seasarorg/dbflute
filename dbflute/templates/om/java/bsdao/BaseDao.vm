@@ -41,7 +41,7 @@ import ${glPackageExtendedEntity}.${myExtendedObjectClassName};
  * </pre>
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public interface ${myClassName} extends ${InterfaceName} {
 
     /** BEAN-Annotation. */

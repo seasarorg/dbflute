@@ -6,6 +6,6 @@ ${database.allClassCopyright}package ${myExtendedDaoPackageName};
  * The dao interface of ${table.Name}.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public interface ${myClassName} extends ${myBaseDaoPackageName}.${myBaseDaoClassName} {
 }

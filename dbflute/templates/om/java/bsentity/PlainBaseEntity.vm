@@ -6,7 +6,7 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
  * The entity of ${table.Name}.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} implements java.io.Serializable {
 
     /** Serial version UID. (Default) */

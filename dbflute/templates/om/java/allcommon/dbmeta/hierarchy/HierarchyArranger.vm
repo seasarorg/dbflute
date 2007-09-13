@@ -222,7 +222,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  * <pre>
  * @author ${database.ClassAuthor}
  * @param <LOCAL_ENTITY> The type of local entity extends Entity
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
 
     // ===================================================================================
@@ -235,7 +235,6 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      * @return The list of local entity. (NotNull)
      */
     public List<LOCAL_ENTITY> arrangeHierarchy(${glHierarchyRequestName}<LOCAL_ENTITY> request) {
-        //        final List<? extends Object> sourceList = request.getSourceEntityList();
         final List<LOCAL_ENTITY> localTableList = new ArrayList<LOCAL_ENTITY>();
         final Map<String, ${glEntityInterfaceName}> alreadyRegisteredEntityMap = new HashMap<String, ${glEntityInterfaceName}>();
 
@@ -268,6 +267,14 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
             // ============
             doColumnLoop(topInfo);
         }
+
+        // Clear modified properties.
+        final java.util.Set<String> alreadyRegisteredEntityKeySet = alreadyRegisteredEntityMap.keySet();
+        for (String key : alreadyRegisteredEntityKeySet) {
+            final ${glEntityInterfaceName} currentRegisteredEntity = alreadyRegisteredEntityMap.get(key);
+            currentRegisteredEntity.clearModifiedPropertyNames();
+        }
+
         return localTableList;
     }
 
@@ -638,6 +645,22 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     private Object invoke(java.lang.reflect.Method method, Object target, Object[] args) {
         try {
             return method.invoke(target, args);
+        } catch (RuntimeException e) {
+            final String lineSeparator = System.getProperty("line.separator");
+            final Class<?>[] parameterTypes = method.getParameterTypes();
+            String msg = "Invoking method threw the exception:" + lineSeparator;
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
+            msg = msg + "[" + method.getDeclaringClass().getSimpleName() + "." + method.getName() + "()]" + lineSeparator;
+            msg = msg + " methodArgTypes     = {" + createTypeViewFromTypeArray(parameterTypes) + "}" + lineSeparator;
+            msg = msg + " specifiedArgValues = {" + createValueViewFromValueArray(args) + "}" + lineSeparator;
+            msg = msg + " specifiedArgTypes  = {" + createTypeViewFromValueArray(args) + "}" + lineSeparator;
+            if (parameterTypes.length > 0 && args.length > 0 && args[0] != null && !parameterTypes[0].equals(args[0].getClass())) {
+                msg = msg + " " + lineSeparator;
+                final String compareString = "{" + parameterTypes[0] + " -- " + args[0].getClass() + "}";
+                msg = msg + " *Warning! The argType is ummatched: " + compareString + lineSeparator;    
+            }
+            msg = msg + "* * * * * * * * * */" + lineSeparator;
+            throw new RuntimeException(msg, e);
         } catch (java.lang.reflect.InvocationTargetException ex) {
             Throwable t = ex.getCause();
             if (t instanceof RuntimeException) {
@@ -652,6 +675,46 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
             String msg = "target=" + target + " method=" + method + "-" + java.util.Arrays.asList(args);
             throw new RuntimeException(msg, ex);
         }
+    }
+
+    private String createValueViewFromValueArray(Object[] array) {
+        final StringBuffer sb = new StringBuffer();
+        for (int i=0; i < array.length; i++) {
+            final Object value = array[i];
+            if (sb.length() == 0) {
+                sb.append(value);
+            } else {
+                sb.append(", ").append(value);
+            }
+        }
+        return sb.toString();
+    }
+    
+    private String createTypeViewFromValueArray(Object[] array) {
+        final StringBuffer sb = new StringBuffer();
+        for (int i=0; i < array.length; i++) {
+            final Object value = array[i];
+            final String typeName = value != null ? value.getClass().getSimpleName() : "null";
+            if (sb.length() == 0) {
+                sb.append(typeName);
+            } else {
+                sb.append(", ").append(typeName);
+            }
+        }
+        return sb.toString();
+    }
+    
+    private String createTypeViewFromTypeArray(Class[] array) {
+        final StringBuffer sb = new StringBuffer();
+        for (int i=0; i < array.length; i++) {
+            final Class type = array[i];
+            if (sb.length() == 0) {
+                sb.append(type.getSimpleName());
+            } else {
+                sb.append(", ").append(type.getSimpleName());
+            }
+        }
+        return sb.toString();
     }
 
     // ===================================================================================

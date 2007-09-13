@@ -8,7 +8,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  * The class of column info.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
 
     // ===================================================================================

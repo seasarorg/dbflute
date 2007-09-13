@@ -8,7 +8,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  * The class of referer information.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public interface ${myClassName} {
 
     public String getRelationPropertyName();

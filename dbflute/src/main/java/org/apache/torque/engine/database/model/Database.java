@@ -923,7 +923,7 @@ public class Database {
     }
 
     // ===============================================================================
-    //                                                      Properties - Common-Column
+    //                                                      Properties - Common Column
     //                                                      ==========================
     public Map<String, Object> getCommonColumnMap() {
         return getProperties().getCommonColumnProperties().getCommonColumnMap();

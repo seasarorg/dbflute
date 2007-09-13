@@ -10,7 +10,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 
 /**
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
 
     // ===================================================================================

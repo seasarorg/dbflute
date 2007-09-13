@@ -388,25 +388,13 @@ public interface ${myClassName} {
     //                                                                       Name Resolver
     //                                                                       =============
     /**
-     * Resolved join alias name.
-     * 
-     * @param aliasName Alias name. (NotNull)
-     * @param baseTableName Base table name. (NotNull)
-     * @param foreignPropertyName Foreign property name. (NotNull)
-     * @param cqNestNo The nest no of condition query.
-     * @return Resolved join alias name. (NotNull)
-     */
-    public String resolveJoinAliasName(String aliasName, String baseTableName, String foreignPropertyName, int cqNestNo);
-
-    /**
      * Resolve join alias name.
      * 
-     * @param aliasName Alias name. (NotNull)
-     * @param relationNo Relation no.
+     * @param relationPath Relation path. (NotNull)
      * @param cqNestNo The nest no of condition query.
      * @return Resolved join alias name. (NotNull)
      */
-    public String resolveJoinAliasName(String aliasName, int relationNo, int cqNestNo);
+    public String resolveJoinAliasName(String relationPath, int cqNestNo);
 
     /**
      * Resolve nest level expression.
@@ -416,4 +404,16 @@ public interface ${myClassName} {
      * @return Resolved name about nest level. (NotNull)
      */
     public String resolveNestLevelExpression(String name, int cqNestNo);
+
+    // ===================================================================================
+    //                                                                              Facade
+    //                                                                              ======
+    /**
+     * Resolve relation no.
+     * 
+     * @param baseTableName The table name of base. (NotNull)
+     * @param foreignPropertyName The property name of foreign. (NotNull)
+     * @return Resolved relation no.
+     */
+    public int resolveRelationNo(String baseTableName, String foreignPropertyName);
 }

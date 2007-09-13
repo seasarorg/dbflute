@@ -13,7 +13,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
  * The abstract class of SqlClause.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     // =====================================================================================
@@ -1004,36 +1004,14 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                       Name Resolver
     //                                                                       =============
     /**
-     * Get resolved join alias name.
-     * 
-     * @param aliasName Alias name. (NotNull)
-     * @param baseTableName Base table name. (NotNull)
-     * @param foreignPropertyName Foreign property name. (NotNull)
-     * @param cqNestNo The nest no of condition query.
-     * @return Resolved join alias name. (NotNull)
-     */
-    public String resolveJoinAliasName(String aliasName, String baseTableName, String foreignPropertyName, int cqNestNo) {
-        if (isValidJoinAliasName(aliasName)) {
-            return aliasName;
-        }
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(baseTableName);
-        final ${glForeignInfoName} foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
-        return resolveNestLevelExpression("dbfluteRelno" + foreignInfo.getRelationNo(), cqNestNo);
-    }
-
-    /**
      * Resolve join alias name.
      * 
-     * @param aliasName Alias name. (NotNull)
      * @param relationNo Relation no.
      * @param cqNestNo The nest no of condition query.
      * @return Resolved join alias name. (NotNull)
      */
-    public String resolveJoinAliasName(String aliasName, int relationNo, int cqNestNo) {
-        if (isValidJoinAliasName(aliasName)) {
-            return aliasName;
-        }
-        return resolveNestLevelExpression("dbfluteRelno" + relationNo, cqNestNo);
+    public String resolveJoinAliasName(String relationPath, int cqNestNo) {
+        return resolveNestLevelExpression("dbfluteRelno" + relationPath, cqNestNo);
     }
 
     /**
@@ -1051,14 +1029,20 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         }
     }
 
+    // ===================================================================================
+    //                                                                              Facade
+    //                                                                              ======
     /**
-     * Is valid join alias name? {The method for Override}
+     * Resolve relation no.
      * 
-     * @param aliasName Alias name. (NotNull)
-     * @return Determination.
+     * @param baseTableName The table name of base. (NotNull)
+     * @param foreignPropertyName The property name of foreign. (NotNull)
+     * @return Resolved relation no.
      */
-    protected boolean isValidJoinAliasName(String aliasName) {
-        return true;// as Default
+    public int resolveRelationNo(String baseTableName, String foreignPropertyName) {
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(baseTableName);
+        final ${glForeignInfoName} foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
+        return foreignInfo.getRelationNo();
     }
 
     // ===================================================================================

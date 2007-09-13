@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
  * DBMeta instance handler.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
 
     /** The key-to-lower map of db-name and property-name for table. */

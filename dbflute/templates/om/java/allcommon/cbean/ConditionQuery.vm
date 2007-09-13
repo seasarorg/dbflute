@@ -7,7 +7,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
  * The condition-query as interface.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public interface ${glConditionQueryInterfaceName} {
 
     // ===================================================================================
@@ -77,6 +77,8 @@ public interface ${glConditionQueryInterfaceName} {
      * @return Determination.
      */
     public boolean isBaseQuery(${glConditionQueryInterfaceName} query);
+
+    public String getForeignPropertyName();
 
     // ===================================================================================
     //                                                                              Invoke

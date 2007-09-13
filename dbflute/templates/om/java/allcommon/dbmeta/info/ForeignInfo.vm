@@ -8,7 +8,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  * The class of foreign information.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} implements ${glRelationInfoName} {
 
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")

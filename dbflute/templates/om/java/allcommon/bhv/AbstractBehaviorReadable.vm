@@ -418,7 +418,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     public ${database.sequenceReturnType} readNextVal() {
         try {
             final java.lang.reflect.Method method = getClass().getMethod("selectNextVal", new Class[]{});
-            Object sequenceObject = method.invoke(getDaoReadable(), new Object[] {});
+            Object sequenceObject = method.invoke(this, new Object[] {});
             if (sequenceObject instanceof ${database.sequenceReturnType}) {
                 return (${database.sequenceReturnType})sequenceObject;
             }

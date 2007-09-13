@@ -20,7 +20,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
  * The condition-inline-query of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     // ===================================================================================
@@ -44,7 +44,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
         super(childQuery, sqlClause, aliasName, nestLevel);
         _myCQ = myCQ;
-        _resolvedJoinAliasName = _myCQ.getResolvedJoinAliasName();// Accept resolved join alias name.
+        _foreignPropertyName = _myCQ.getForeignPropertyName();// Accept foreign property name.
+        _relationPath = _myCQ.getRelationPath();// Accept relation path.
     }
 
     // ===================================================================================

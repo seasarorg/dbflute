@@ -16,7 +16,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
  * The condition-query of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     // ===================================================================================

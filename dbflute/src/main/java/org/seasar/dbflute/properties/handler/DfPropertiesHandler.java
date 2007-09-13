@@ -142,7 +142,7 @@ public final class DfPropertiesHandler {
         }
         return _littleAdjustmentPropertiess;
     }
-    
+
     // -----------------------------------------------------
     //                                      Other Adjustment
     //                                      ----------------

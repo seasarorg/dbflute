@@ -6,6 +6,6 @@ ${database.allClassCopyright}package ${glPackageCB};
  * The condition-bean of ${table.Name}.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} extends ${glPackageBaseCB}.${myBaseConditionBeanClassName} {
 }

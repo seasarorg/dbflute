@@ -6,6 +6,6 @@ ${database.allClassCopyright}package ${glPackageExtendedParameterBean};
  * The parameter-bean of ${pmbClassName}.
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} extends ${glPackageBaseParameterBean}.${myBaseParameterBeanClassName} {
 }
