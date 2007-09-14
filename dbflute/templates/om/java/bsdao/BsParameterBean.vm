@@ -6,7 +6,7 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
  * The parametaer-bean of ${pmbClassName}.
  * 
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
 
     // ===================================================================================
@@ -32,7 +32,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                            Accessor
     //                                                                            ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-  #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
     /**
      * Get the value of ${propertyName}. (Converted empty to null)
@@ -40,7 +40,11 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
      * @return The value of ${propertyName}. (NotEmptyString: if the value is empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
+#if ($propertyType == "String")
         return ($propertyType)convertEmptyToNullIfString(_${propertyName});
+#else
+        return _${propertyName};
+#end
     }
 
     /**
@@ -57,8 +61,8 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
      * @param value Query value. (Nullable)
      * @return Converted value. (Nullable)
      */
-    protected Object convertEmptyToNullIfString(Object value) {
-        if (value instanceof String) { return filterRemoveEmptyString((String)value); } else { return value; }
+    protected String convertEmptyToNullIfString(String value) {
+        return filterRemoveEmptyString(value);
     }
 
     /**

@@ -26,7 +26,7 @@
 #if ($database.isVersionAfter1040())
     <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
     <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
-    <component class="org.seasar.dao.impl.BeanEnhancerImpl"/>
+    <component class="org.seasar.dao.impl.NullBeanEnhancer"/>
 #end
 #if ($database.isVersionAfter1047())
     <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>

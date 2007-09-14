@@ -108,6 +108,12 @@ public class ${glConditionBeanContextName} {
             _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
         }
 #end
+#if ($database.isVersionAfter1047())
+        {
+            final Class clazz = ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class;
+            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+        }
+#end
         _log.debug("----------/");
     }
 
