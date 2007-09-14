@@ -40,7 +40,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
      * @return The value of ${propertyName}. (NotEmptyString: if the value is empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
-#if ($propertyType == "String")
+#if ($propertyType.endsWith("String"))
         return ($propertyType)convertEmptyToNullIfString(_${propertyName});
 #else
         return _${propertyName};
