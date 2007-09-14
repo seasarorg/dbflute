@@ -34,10 +34,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          * ${database.ImplementComment}
          */
         protected override void DoFetchFirst() {
-            if (IsFetchSizeSupported) {
-                _fetchScopeSelectHint = " * from (select";
-                _fetchScopeSqlSuffix = ") where rownum <= " + this.FetchSize;
-            }
+            DoFetchPage();
         }
 
         /**

@@ -35,10 +35,7 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
      * ${database.ImplementComment}
      */
     protected void doFetchFirst() {
-        if (isFetchSizeSupported()) {
-            _fetchScopeSelectHint = " * from (select";
-            _fetchScopeSqlSuffix = ") where rownum <= " + getFetchSize();
-        }
+        doFetchPage();
     }
 
     /**

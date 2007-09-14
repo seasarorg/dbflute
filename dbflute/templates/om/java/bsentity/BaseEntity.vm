@@ -516,12 +516,38 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Determination.
      */
     public boolean hasPrimaryKeyValue() {
-#foreach ($col in $table.PrimaryKey)
-        if (_${col.UncapitalisedJavaName} == null) {
+#foreach ($col in $table.primaryKey)
+        if (_${col.uncapitalisedJavaName} == null) {
             return false;
         }
 #end
         return true;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean hasVersionNoValue() {
+#if ($table.isUseVersionNo())
+        return !(get${table.versionNoJavaName}() + "").equals("null");// For primitive type
+#else
+        return false;
+#end
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean hasUpdateDateValue() {
+#if ($table.isUseUpdateDate())
+        return get${table.updateDateJavaName}() != null;
+#else
+        return false;
+#end
     }
 
     // ===================================================================================

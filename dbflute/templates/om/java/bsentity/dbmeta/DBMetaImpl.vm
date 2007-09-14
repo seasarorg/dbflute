@@ -879,6 +879,27 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     // ===================================================================================
+    //                                                                Optimistic Lock Info
+    //                                                                ====================
+    /**
+     * Has version no?
+     * 
+     * @return Determination.
+     */
+    public boolean hasVersionNo() {
+        return ${table.isUseVersionNo()};
+    }
+
+    /**
+     * Has update date?
+     * 
+     * @return Determination.
+     */
+    public boolean hasUpdateDate() {
+        return ${table.isUseUpdateDate()};
+    }
+
+    // ===================================================================================
     //                                                                       Common Column
     //                                                                       =============
     /**

@@ -531,6 +531,23 @@ public interface ${myClassName} {
     public boolean hasSequence();
 
     // ===================================================================================
+    //                                                                Optimistic Lock Info
+    //                                                                ====================
+    /**
+     * Has version no?
+     * 
+     * @return Determination.
+     */
+    public boolean hasVersionNo();
+
+    /**
+     * Has update date?
+     * 
+     * @return Determination.
+     */
+    public boolean hasUpdateDate();
+
+    // ===================================================================================
     //                                                                       Common Column
     //                                                                       =============
     /**

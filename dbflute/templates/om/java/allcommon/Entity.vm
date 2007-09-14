@@ -60,6 +60,20 @@ public interface ${glEntityInterfaceName} {
      */
     public boolean hasPrimaryKeyValue();
 
+    /**
+     * Has version no value?
+     * 
+     * @return Determination.
+     */
+    public boolean hasVersionNoValue();
+
+    /**
+     * Has update date value?
+     * 
+     * @return Determination.
+     */
+    public boolean hasUpdateDateValue();
+
     // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================

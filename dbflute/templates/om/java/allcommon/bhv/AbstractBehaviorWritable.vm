@@ -334,6 +334,28 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return getDaoWritable().removeList(entityList);
     }
 
+    protected void assertEntityHasVersionNoValue(${glEntityInterfaceName} entity) {
+        if (!getDBMeta().hasVersionNo()) {
+            return;
+        }
+        if (entity.hasVersionNoValue()) {
+            return;
+        }
+        String msg = "Not found the value of version no: " + entity;
+        throw new IllegalStateException(msg);
+    }
+
+    protected void assertEntityHasUpdateDateValue(${glEntityInterfaceName} entity) {
+        if (!getDBMeta().hasUpdateDate()) {
+            return;
+        }
+        if (entity.hasUpdateDateValue()) {
+            return;
+        }
+        String msg = "Not found the value of update date: " + entity;
+        throw new IllegalStateException(msg);
+    }
+
     // =====================================================================================
     //                                                                   Basic Entity Update
     //                                                                   ===================

@@ -5,6 +5,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 
 /**
  * My-DaoInterceptor.
@@ -90,7 +91,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         } catch (Exception e) {
             _log.info("Dao threw the exception: " + e.getClass() + " msg=" + e.getMessage());
             _log.info("    method   --> " + invocation.getMethod());
-            _log.info("    argument --> " + getObjectArrayString(invocation.getArguments()));
+            _log.info("    argument --> " + ${glTraceViewUtilName}.convertObjectArrayToStringView(invocation.getArguments()));
             if (e instanceof org.seasar.framework.exception.SQLRuntimeException) {
                 final Throwable causeException = ((org.seasar.framework.exception.SQLRuntimeException)e).getCause();
                 if (causeException instanceof org.seasar.framework.exception.SSQLException) {
@@ -124,7 +125,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                          ------------
     protected void traceMethod(org.aopalliance.intercept.MethodInvocation invocation) {
         final java.lang.reflect.Method method = invocation.getMethod();
+#if ($database.isAvailableGenerics())
+        final String name = method.getDeclaringClass().getSimpleName();
+#else
         final String name = getShortClassName(method.getDeclaringClass());
+#end
         final String invokeNameWithoutKakko = removeBasePrefixIfNeeds(name)  + "." + method.getName();
         final String equalBorder = buildFitBorder("", "=", invokeNameWithoutKakko, false);
         final String daoInvokeName = invokeNameWithoutKakko + "()";
@@ -301,7 +306,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                      Trace SqlCommand
     //                                      ----------------
     protected void traceSqlCommand(org.aopalliance.intercept.MethodInvocation invocation, org.seasar.dao.SqlCommand cmd, long beforeCmd, long afterCmd) {
-        _log.debug("SqlCommand Initialization Cost: [" + getPerformanceView(afterCmd - beforeCmd) + "]");
+        _log.debug("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
 
     protected void assertRetType(Class retType, Object ret) {
@@ -325,7 +330,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                          ------------
     protected void traceReturn(org.aopalliance.intercept.MethodInvocation invocation, Class retType, Object ret, long before, long after) throws Throwable {
         try {
-            final String daoResultPrefix = "===========/ [" + getPerformanceView(after - before) + " - ";
+            final String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + " - ";
             if (java.util.List.class.isAssignableFrom(retType)) {
                 if (ret == null) {
                     _log.debug(daoResultPrefix + "Selected list: null]");
@@ -476,6 +481,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
+#if (!$database.isAvailableGenerics())
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
@@ -493,63 +499,5 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
         return s;
     }
-
-    /**
-     * Change object array to string divided with comma.
-     * 
-     * @param objArray Object array. (Nullable)
-     * @return String (NotNull: If the argument is null, returns empty string.)
-     */
-    protected String getObjectArrayString(Object[] objArray) {
-        if (objArray == null) {
-            return "";
-        }
-        final StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < objArray.length; i++) {
-            if (i == 0) {
-                sb.append(objArray[i]);
-            } else {
-                sb.append(", ").append(objArray[i]);
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Get performance view.
-     * 
-     * @param mil The value of millisecound.
-     * @return Performance view. (ex. 1m23s456ms) (NotNull)
-     */
-    protected String getPerformanceView(long mil) {
-        if (mil < 0) {
-            return String.valueOf(mil);
-        }
-
-        long sec = mil / 1000;
-        long min = sec / 60;
-        sec = sec % 60;
-        mil = mil % 1000;
-
-        StringBuffer sb = new StringBuffer();
-        if (min >= 10) { // Minute
-            sb.append(min).append("m");
-        } else if (min < 10 && min >= 0) {
-            sb.append("0").append(min).append("m");
-        }
-        if (sec >= 10) { // Second
-            sb.append(sec).append("s");
-        } else if (sec < 10 && sec >= 0) {
-            sb.append("0").append(sec).append("s");
-        }
-        if (mil >= 100) { // Millisecond
-            sb.append(mil).append("ms");
-        } else if (mil < 100 && mil >= 10) {
-            sb.append("0").append(mil).append("ms");
-        } else if (mil < 10 && mil >= 0) {
-            sb.append("00").append(mil).append("ms");
-        }
-
-        return sb.toString();
-    }
+#end
 }

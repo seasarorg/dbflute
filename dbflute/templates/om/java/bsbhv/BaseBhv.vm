@@ -939,6 +939,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public void update(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
+        assertEntityHasVersionNoValue(${myEntityVariableName});
+        assertEntityHasUpdateDateValue(${myEntityVariableName});
         final int updatedCount = delegateUpdate(${myEntityVariableName});
         if (updatedCount == 0) {
             throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(${myEntityVariableName}.toString());

@@ -267,6 +267,7 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Util]
     #set ($glValueLabelUtilName = "${glProjectPrefix}ValueLabelUtil")
+    #set ($glTraceViewUtilName = "${glProjectPrefix}TraceViewUtil")
 
     ## ===================================================================================
     ##                                                                            Variable
@@ -1463,14 +1464,19 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                            Parse util
     ##                                                                                            ----------
-    #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
+    #if ($database.isTargetLanguageJava())
       $database.setupJavaDir_for_allcommon()
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonUtil}))
       $database.makeDirectory($path)
 
-    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtilName}.${glClassFileExtension}" )
-    $generator.parse("om/${glTargetLanguage}/allcommon/util/ValueLabelUtil.${glTemplateFileExtension}",$path,"", "")
+      #if ($database.isAvailableGenerics())
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtilName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/allcommon/util/ValueLabelUtil.${glTemplateFileExtension}",$path,"", "")
+      #end
+
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glTraceViewUtilName}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/util/TraceViewUtil.${glTemplateFileExtension}",$path,"", "")
     #end
 
     ## -----------------------------------------------------------------------------------------------------
