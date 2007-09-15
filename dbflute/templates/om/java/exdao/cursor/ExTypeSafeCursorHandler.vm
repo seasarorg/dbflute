@@ -7,5 +7,5 @@ ${database.allClassCopyright}package ${myExtendedDaoCursorPackageName};
  * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public abstract class ${myClassName} extends ${myBaseTypeSafeCursorHandlerClassName} {
+public abstract class ${myClassName} extends ${myBaseDaoCursorPackageName}.${myBaseTypeSafeCursorHandlerClassName} {
 }

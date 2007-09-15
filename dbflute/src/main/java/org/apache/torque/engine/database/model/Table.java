@@ -145,7 +145,7 @@ public class Table implements IDMethod {
 
     private boolean _existSameNameTable;
 
-    private boolean _sql2entityTypeSafeCursol;
+    private boolean _sql2entityTypeSafeCursor;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -2379,12 +2379,12 @@ public class Table implements IDMethod {
         return result.toString();
     }
 
-    public boolean isSql2EntityTypeSafeCursol() {
-        return _sql2entityTypeSafeCursol;
+    public boolean isSql2EntityTypeSafeCursor() {
+        return _sql2entityTypeSafeCursor;
     }
 
-    public void setSql2EntityTypeSafeCursol(boolean sql2entityTypeSafeCursol) {
-        this._sql2entityTypeSafeCursol = sql2entityTypeSafeCursol;
+    public void setSql2EntityTypeSafeCursor(boolean sql2entityTypeSafeCursor) {
+        this._sql2entityTypeSafeCursor = sql2entityTypeSafeCursor;
     }
 
 }

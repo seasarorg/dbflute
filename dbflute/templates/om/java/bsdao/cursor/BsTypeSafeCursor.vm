@@ -9,18 +9,27 @@ ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Wrapped result set. */
     protected java.sql.ResultSet _rs;
 
+    // ===================================================================================
+    //                                                                             Prepare
+    //                                                                             =======
     /**
-     * Constructor.
+     * Accept.
      * 
-     * @param rs Wrapped result set. (NotNull)
+     * @param rs Result set. (NotNull)
      */
-    public ${myClassName}(java.sql.ResultSet rs) {
+    public void accept(java.sql.ResultSet rs) {
         this._rs = rs;
     }
 
+    // ===================================================================================
+    //                                                                              Direct
+    //                                                                              ======
     /**
      * Get wrapped result set.
      * 
@@ -30,23 +39,81 @@ public class ${myClassName} {
         return _rs;
     }
 
-#foreach ($col in $table.columns)
-    public ${col.javaNative} get${col.javaName}() {
-        return (${col.javaNative})extractValueAsObject("${col.name}");
+    // ===================================================================================
+    //                                                                            Delegate
+    //                                                                            ========
+    /**
+     * Next result.
+     * 
+     * @return Is exist next result.
+     * @throws java.sql.SQLException
+     */
+    public boolean next() throws java.sql.SQLException {
+        return _rs.next();
     }
-#end
 
-    protected Object extractValueAsObject(String name) {
-        try {
-            return _rs.getObject(name);
-        } catch (java.sql.SQLException e) {
-            String msg = "java.sql.ResultSet#getObject() threw the SQLException; columnName=${col.name}";
-            throw new RuntimeException(msg);
+    // ===================================================================================
+    //                                                                  Type Safe Accessor
+    //                                                                  ==================
+#foreach ($col in $table.columns)
+    /**
+     * Get the value of ${col.uncapitalisedJavaName}.
+     * 
+     * @return The value of ${col.uncapitalisedJavaName}. (Nullable)
+     * @throws java.sql.SQLException
+     */
+    public ${col.javaNative} get${col.javaName}() throws java.sql.SQLException {
+#if ($col.isJavaNativeStringObject())
+        return extractValueAsString("${col.name}");
+#end
+#if ($col.isJavaNativeBooleanObject())
+        return extractValueAsBoolean("${col.name}");
+#end
+#if ($col.isJavaNativeNumberObject())
+        return (${col.javaNative})extractValueAsNumber(${col.javaNative}.class, "${col.name}");
+#end
+#if ($col.isJavaNativeDateObject())
+        return (${col.javaNative})extractValueAsDate(${col.javaNative}.class, "${col.name}");
+#end
+#if ($col.isJavaNativeBinaryObject())
+        return (${col.javaNative})extractValueAsObject("${col.name}");
+#end
+    }
+
+#end
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+
+    protected String extractValueAsString(String name) throws java.sql.SQLException {
+        return _rs.getString(name);
+    }
+
+    protected Boolean extractValueAsBoolean(String name) throws java.sql.SQLException {
+        return _rs.getBoolean(name);
+    }
+
+    protected Object extractValueAsNumber(Class type, String name) throws java.sql.SQLException {
+        return org.seasar.framework.util.NumberConversionUtil.convertNumber(type, extractValueAsObject(name));
+    }
+
+    protected Object extractValueAsDate(Class type, String name) throws java.sql.SQLException {
+        if (type.isAssignableFrom(java.sql.Timestamp.class)) {
+            return _rs.getTimestamp(name);
+        } else if (type.isAssignableFrom(java.sql.Date.class)) {
+            return _rs.getDate(name);
+        } else if (type.isAssignableFrom(java.util.Date.class)) {
+            return toDate(_rs.getTimestamp(name));
+        } else {
+            return toDate(extractValueAsObject(name));
         }
     }
 
-    protected void handleSQLException(java.sql.SQLException e) {
-        String msg = "java.sql.ResultSet#getObject() threw the SQLException; columnName=${col.name}";
-        throw new RuntimeException(msg);
+    protected java.util.Date toDate(Object object) {
+        return org.seasar.framework.util.DateConversionUtil.toDate(object);
+    }
+
+    protected Object extractValueAsObject(String name) throws java.sql.SQLException {
+        return _rs.getObject(name);
     }
 }

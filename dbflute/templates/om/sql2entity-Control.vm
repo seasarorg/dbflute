@@ -55,6 +55,9 @@ targetdatabase = $targetDatabase
     #set ($glMapStringBuilderName = "${glProjectPrefix}MapStringBuilder")
     #set ($glMapStringBuilderImplName = "${glProjectPrefix}MapStringBuilderImpl")
 
+    ## [Allcommon-JDBC]
+    #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
+
     ## [ClassificationDefinition]
     #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
 
@@ -64,10 +67,12 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
     #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.dbmeta.info")
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
+    #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
     #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
-    #set ($glPackageBaseDaoCursol = "${database.baseDaoPackage}.cursol" )
+    #set ($glPackageBaseDaoCursor = "${database.baseDaoPackage}.cursor" )
     #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
     #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
+    #set ($glPackageExtendedDaoCursor = "${database.extendedDaoPackage}.cursor")
     #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
     #if ($database.isTargetLanguageCSharp())
       #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
@@ -76,9 +81,10 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.Dbm.Info")
       #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
       #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
-      #set ($glPackageBaseDaoCursol = "${database.baseDaoPackage}.Cursol" )
+      #set ($glPackageBaseDaoCursor = "${database.baseDaoPackage}.Cursor" )
       #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
       #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
+      #set ($glPackageExtendedDaoCursor = "${database.extendedDaoPackage}.Cursor")
       #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
     #end
 
@@ -128,24 +134,42 @@ targetdatabase = $targetDatabase
       #set ($myEntityListVariableName = "${table.uncapitalisedJavaName}List")
       #set ($myCBVariableName = "${table.uncapitalisedJavaName}")
 
-      #set ($myBaseDaoCursolPackageName = "${glPackageBaseDaoCursol}")
-      #set ($myTypeSafeCursolClassName = "${glProjectPrefix}${table.javaName}Cursol")
-      #set ($myTypeSafeCursolHandlerClassName = "${glProjectPrefix}${table.javaName}CursolHandler")
+      #set ($myBaseDaoCursorPackageName = "${glPackageBaseDaoCursor}")
+      #set ($myExtendedDaoCursorPackageName = "${glPackageExtendedDaoCursor}")
+      #set ($myBaseTypeSafeCursorClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}Cursor")
+      #set ($myBaseTypeSafeCursorHandlerClassName = "${glProjectPrefix}${glBasePrefix}${table.javaName}CursorHandler")
+      #set ($myExtendedTypeSafeCursorClassName = "${glProjectPrefix}${table.javaName}Cursor")
+      #set ($myExtendedTypeSafeCursorHandlerClassName = "${glProjectPrefix}${table.javaName}CursorHandler")
 
       #set ($isExistDao = false)
       #set ($isExistConditionBean = false)
 
-      #if ($table.isSql2EntityTypeSafeCursol())
-        #set ($path = $strings.getPackageAsPath(${glPackageBaseDaoCursol}))
+      #if ($table.isSql2EntityTypeSafeCursor())
+        #set ($path = $strings.getPackageAsPath(${myBaseDaoCursorPackageName}))
         $database.makeDirectory($path)
 
-        $database.debug("        parse('${myTypeSafeCursolClassName}')")
-        #set ( $path = "${strings.getPackageAsPath(${myBaseDaoCursolPackageName})}${myTypeSafeCursolClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glTargetLanguage}/bsdao/cursol/TypeSafeCursol.${glTemplateFileExtension}",$path ,"" ,"")
+        $database.debug("        parse('BaseTypeSafeCursor')")
+        #set ( $path = "${strings.getPackageAsPath(${myBaseDaoCursorPackageName})}${myBaseTypeSafeCursorClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/bsdao/cursor/BsTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
 
-        $database.debug("        parse('${myTypeSafeCursolClassName}')")
-        #set ( $path = "${strings.getPackageAsPath(${myBaseDaoCursolPackageName})}${myTypeSafeCursolHandlerClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glTargetLanguage}/bsdao/cursol/TypeSafeCursolHandler.${glTemplateFileExtension}",$path ,"" ,"")
+        $database.debug("        parse('BaseTypeSafeCursorHandler')")
+        #set ( $path = "${strings.getPackageAsPath(${myBaseDaoCursorPackageName})}${myBaseTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glTargetLanguage}/bsdao/cursor/BsTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
+
+        #set ($path = $strings.getPackageAsPath(${myExtendedDaoCursorPackageName}))
+        $database.makeDirectory($path)
+
+        $database.debug("        parse('ExtendedTypeSafeCursor')")
+        #set ( $path = "${strings.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorClassName}.${glClassFileExtension}" )
+        #if (!$files.file(${generator.OutputPath},$path).exists())
+          $generator.parse("om/${glTargetLanguage}/exdao/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
+        #end
+
+        $database.debug("        parse('ExtendedTypeSafeCursorHandler')")
+        #set ( $path = "${strings.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
+        #if (!$files.file(${generator.OutputPath},$path).exists())
+          $generator.parse("om/${glTargetLanguage}/exdao/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
+        #end
       #else
         #if ($database.isSql2EntityPlainEntity())
           $database.debug("        parseBaseCustomizeEntity(tableName);     // ${myBaseObjectClassName}")
