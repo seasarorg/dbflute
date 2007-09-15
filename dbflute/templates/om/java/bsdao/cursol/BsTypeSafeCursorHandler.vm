@@ -34,8 +34,8 @@ public abstract class ${myClassName} implements ${glCursorHandlerName} {
     /**
      * Fetch cursor.
      * 
-     * @param rs Type safe cursor. (NotNull)
+     * @param cursor Type safe cursor. (NotNull)
      * @return Result. (Nullable)
      */
-    abstract protected Object fetchCursor(${myTypeSafeResultSetClassName} rs);
+    abstract protected Object fetchCursor(${myExtendedTypeSafeCursorClassName} cursor);
 }

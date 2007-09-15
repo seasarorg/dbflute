@@ -1,9 +1,9 @@
-${database.allClassCopyright}package ${myBaseDaoCursolPackageName};
+${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
 
-#set ($myClassName = "${myTypeSafeCursolClassName}")
+#set ($myClassName = "${myBaseTypeSafeCursorClassName}")
 
 /**
- * The cursol of ${table.name}.
+ * The cursor of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
@@ -22,12 +22,12 @@ public class ${myClassName} {
     }
 
     /**
-     * Get Wrapped result set.
+     * Get wrapped result set.
      * 
      * @return Wrapped result set. (NotNull)
      */
-    public java.sql.ResultSet cursol() {
-        return rs;
+    public java.sql.ResultSet cursor() {
+        return _rs;
     }
 
 #foreach ($col in $table.columns)
@@ -45,7 +45,7 @@ public class ${myClassName} {
         }
     }
 
-    protected handleSQLException(java.sql.SQLException e) {
+    protected void handleSQLException(java.sql.SQLException e) {
         String msg = "java.sql.ResultSet#getObject() threw the SQLException; columnName=${col.name}";
         throw new RuntimeException(msg);
     }
