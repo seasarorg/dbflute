@@ -217,7 +217,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (Nullalble)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public ${glEntityInterfaceName} readEntity(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
@@ -234,8 +234,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
@@ -297,12 +297,12 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @param entity Selected entity.
      * @param searchKey4log Search-key for Logging.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      */
     protected void assertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
         if (entity == null) {
             String msg = buildRecordHasBeenDeletedMessage(searchKey4log);
-            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         }
     }
 
@@ -311,12 +311,12 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @param ls Selected list.
      * @param searchKey4Log Search-key for Logging.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      */
     protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
             String msg = buildRecordHasBeenDeletedMessage(searchKey4Log);
-            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         }
     }
 
@@ -325,13 +325,13 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @param ls Selected list.
      * @param searchKey4Log Search-key for Logging.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
             String msg = buildRecordHasBeenDeletedMessage(searchKey4Log);
-            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         }
         if (ls.size() != 1) {
             throwRecordHasOverlappedException(ls.size() + "", searchKey4Log, null);
@@ -347,9 +347,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         msg = msg + "The searchKey is as follows:" + getLineSeparator() + searchKey4Log + getLineSeparator();
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         if (cause != null) {
-            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg, cause);
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg, cause);
         } else {
-            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
 

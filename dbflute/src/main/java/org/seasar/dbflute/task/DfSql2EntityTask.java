@@ -61,6 +61,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                           Meta Info
     //                                                                           =========
     protected final Map<String, Map<String, Integer>> _entityInfoMap = new LinkedHashMap<String, Map<String, Integer>>();
+    protected final Map<String, Object> _cursolInfoMap = new LinkedHashMap<String, Object>();
     protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = new LinkedHashMap<String, DfParameterBeanMetaData>();
     protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
     protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
@@ -237,6 +238,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         final String entityName = getEntityName(sql);
                         if (entityName != null) {
                             _entityInfoMap.put(entityName, columnJdbcTypeMap);
+                            if (isCursol(sql)) {
+                                _cursolInfoMap.put(entityName, new Object());
+                            }
                             _entitySqlFileMap.put(entityName, _srcFile);
                             _primaryKeyMap.put(entityName, getPrimaryKeyColumnNameList(sql));
                         }
@@ -379,6 +383,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return getTargetString(sql, "#");
     }
 
+    protected boolean isCursol(final String sql) {
+        final String targetString = getTargetString(sql, "+");
+        
+        return targetString != null && targetString.contains("cursol");
+    }
+
     protected String getParameterBeanClassDefinition(final String sql) {
         return getTargetString(sql, "!");
     }
@@ -491,6 +501,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final Table tbl = new Table();
             tbl.setName(entityName);
             tbl.setupNeedsJavaNameConvertFalse();
+            tbl.setSql2EntityTypeSafeCursol(_cursolInfoMap.get(entityName) != null);
             db.addTable(tbl);
             _log.info(entityName + " --> " + tbl.getName() + " : " + tbl.getJavaName() + " : "
                     + tbl.getUncapitalisedJavaName());

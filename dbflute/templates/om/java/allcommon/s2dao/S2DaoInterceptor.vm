@@ -87,16 +87,20 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         Object ret = null;
 
         try {
-            ret = cmd.execute(invocation.getArguments());
+            try {
+                ret = cmd.execute(invocation.getArguments());
+            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException notSingleRow) {
+                throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(notSingleRow);
+            }
         } catch (Exception e) {
-            _log.info("Dao threw the exception: " + e.getClass() + " msg=" + e.getMessage());
-            _log.info("    method   --> " + invocation.getMethod());
-            _log.info("    argument --> " + ${glTraceViewUtilName}.convertObjectArrayToStringView(invocation.getArguments()));
+            _log.debug("SqlCommand threw the exception: " + e.getClass() + " msg=" + e.getMessage());
+            _log.debug("    method   --> " + invocation.getMethod());
+            _log.debug("    argument --> " + ${glTraceViewUtilName}.convertObjectArrayToStringView(invocation.getArguments()));
             if (e instanceof org.seasar.framework.exception.SQLRuntimeException) {
                 final Throwable causeException = ((org.seasar.framework.exception.SQLRuntimeException)e).getCause();
                 if (causeException instanceof org.seasar.framework.exception.SSQLException) {
                     final String sql = ((org.seasar.framework.exception.SSQLException)causeException).getSql();
-                    _log.info("    sql      --> " + sql);
+                    _log.debug("    sql      --> " + sql);
                 }
             }
             throw e;

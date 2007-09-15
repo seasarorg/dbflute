@@ -1,0 +1,21 @@
+${database.allClassCopyright}package ${glPackageBaseCommonException};
+
+/**
+ * The exception when the entity has been deleted (by other thread).
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glEntityAlreadyDeletedException} extends ${glRecordHasAlreadyBeenDeletedException} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     */
+    public ${glEntityAlreadyDeletedException}(String msg) {
+        super(msg);
+    }
+}

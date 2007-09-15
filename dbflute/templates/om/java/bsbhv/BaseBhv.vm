@@ -444,7 +444,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. (Nullalble)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
@@ -467,8 +467,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
@@ -490,8 +490,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param primaryKey
      * @return Selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -508,8 +508,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param primaryKey
      * @return Selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      * @deprecated This method is deprecated.
      */
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheckForUpdate(${table.PrimaryKeyArgsString}) {
@@ -934,8 +934,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * So then the entity of argument should have the value of concurrency column.
      * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void update(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
@@ -943,10 +944,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityHasUpdateDateValue(${myEntityVariableName});
         final int updatedCount = delegateUpdate(${myEntityVariableName});
         if (updatedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(${myEntityVariableName}.toString());
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
         } else if (updatedCount > 1) {
             String msg = "updatedCount=" + updatedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
 
@@ -965,17 +966,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * For example, batch application should use this better than updateAfterSelect().
      * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void updateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
         final int updatedCount = delegateUpdateNonstrict(${myEntityVariableName});
         if (updatedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(${myEntityVariableName}.toString());
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
         } else if (updatedCount > 1) {
             String msg = "updatedCount=" + updatedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
 #end
@@ -998,7 +999,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   : it does not throw optimistic lock exception. It can updates.
      * </pre>
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void updateAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
@@ -1017,6 +1020,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Insert or update. {update: modified only}
      * 
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void insertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
@@ -1026,12 +1031,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             RuntimeException exception = null;
             try {
                 update(${myEntityVariableName});
-            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
                 if (e.getRows() > 1) {
                     throw e;
                 }
                 exception = e;
-            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
                 exception = e;
             }
             if (exception != null) {
@@ -1056,7 +1061,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method is faster than insertOrUpdateAfterSelect().
      * 
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void insertOrUpdateNonStrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
@@ -1065,9 +1070,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         } else {
             try {
                 updateNonstrict(${myEntityVariableName});
-            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException e) {
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
                 insert(${myEntityVariableName});
-            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
                 insert(${myEntityVariableName});
             }
         }
@@ -1092,6 +1097,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   : it does not throw optimistic lock exception. It can updates.
      * </pre>
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
      */
     public void insertOrUpdateAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
@@ -1104,7 +1110,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             final ${myConditionBeanClassName} cb = newMyConditionBean();
             cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
             currentEntity = selectEntityWithDeletedCheck(cb);
-        } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+        } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
             insert(${myEntityVariableName});
             return;
         }
@@ -1122,7 +1128,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Update after select-for-update.
      * 
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @deprecated This method is deprecated.
      */
     public void updateAfterSelectForUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -1157,7 +1163,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
             cb.lockForUpdate();
             currentEntity = selectEntityWithDeletedCheck(cb);
-        } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException} e) {
+        } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
             insert(${myEntityVariableName});
             return;
         }
@@ -1195,17 +1201,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Delete.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
         final int deletedCount = delegateDelete(${myEntityVariableName});
         if (deletedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(${myEntityVariableName}.toString());
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
         } else if (deletedCount > 1) {
             String msg = "deletedCount=" + deletedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
 
@@ -1223,7 +1230,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   : it does not throw optimistic lock exception. It can updates.
      * </pre>
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void deleteAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
@@ -1245,17 +1253,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method is faster than deleteAfterSelect().
      * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
         final int deletedCount = delegateDeleteNonstrict(${myEntityVariableName});
         if (deletedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(${myEntityVariableName}.toString());
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
         } else if (deletedCount > 1) {
             String msg = "deletedCount=" + deletedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
 
@@ -1266,17 +1274,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This method is faster than deleteAfterSelect().
      * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
         final int deletedCount = delegateDeleteNonstrict(${myEntityVariableName});
         if (deletedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(${myEntityVariableName}.toString());
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
         } else if (deletedCount > 1) {
             String msg = "deletedCount=" + deletedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
   #end
@@ -1328,7 +1336,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param primaryKey Primary-keys. (NotNull)
      * @return Inserted count.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      */
     public int copyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();

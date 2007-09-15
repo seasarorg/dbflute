@@ -176,7 +176,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
 
     /** Column Annotation for S2Dao. ${col.columnDefinitionLineDisp} */
     public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.Name}";

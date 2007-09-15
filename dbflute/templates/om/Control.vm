@@ -199,6 +199,9 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Exception]
     #set ($glDangerousResultSizeExceptionName = "${glProjectPrefix}DangerousResultSizeException")
+    #set ($glEntityAlreadyUpdatedException = "${glProjectPrefix}EntityAlreadyUpdatedException")
+    #set ($glEntityAlreadyDeletedException = "${glProjectPrefix}EntityAlreadyDeletedException")
+    #set ($glEntityDuplicatedException = "${glProjectPrefix}EntityDuplicatedException")
     #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
     #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
     #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
@@ -1050,6 +1053,18 @@ targetdatabase = $targetDatabase
       $database.debug("    parse('DangerousResultSizeException');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glDangerousResultSizeExceptionName}.${glClassFileExtension}" )
       $generator.parse("om/${glTargetLanguage}/allcommon/exception/DangerousResultSizeException.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('EntityAlreadyUpdatedException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEntityAlreadyUpdatedException}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/exception/EntityAlreadyUpdatedException.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('EntityAlreadyDeletedException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEntityAlreadyDeletedException}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/exception/EntityAlreadyDeletedException.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('EntityDuplicatedException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEntityDuplicatedException}.${glClassFileExtension}" )
+      $generator.parse("om/${glTargetLanguage}/allcommon/exception/EntityDuplicatedException.${glTemplateFileExtension}",$path,"", "")
     #end
 
     $database.debug("    parseRecordHasAlreadyBeenDeletedException();")

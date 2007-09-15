@@ -374,8 +374,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Modify.
      * 
      * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void modify(${glEntityInterfaceName} entity) {
         doModify(entity);
@@ -387,8 +387,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Modify non strict.
      * 
      * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void modifyNonstrict(${glEntityInterfaceName} entity) {
         doModifyNonstrict(entity);
@@ -400,7 +400,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * ${database.ImplementComment}
      * 
      * @param entity Entity having primary-key value. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      */
     public void modifyAfterSelect(${glEntityInterfaceName} entity) {
         doModifyAfterSelect(entity);
@@ -458,8 +458,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Remove.
      * 
      * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
@@ -472,7 +472,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Remove after select.
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      */
     public void removeAfterSelect(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);

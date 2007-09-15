@@ -728,6 +728,10 @@ public class Database {
         return getBasicProperties().filterGenericsGeneralOutput(genericsGeneralOutput);
     }
 
+    public String outputOverrideAnnotation() {
+        return getBasicProperties().outputOverrideAnnotation();
+    }
+    
     public String outputOverrideAnnotationAfterNewLineOutput() {
         return getBasicProperties().outputOverrideAnnotationAfterNewLineOutput();
     }

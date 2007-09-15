@@ -87,6 +87,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromSeparatedFileAsAdditionalData("tsv", "\t");
         writeDbFromSeparatedFileAsAdditionalData("csv", ",");
         writeDbFromXlsAsAdditionalData();
+        undercurrent(runInfo);
     }
 
     // --------------------------------------------
@@ -162,6 +163,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
     }
 
+    protected void undercurrent(DfRunnerInformation runInfo) {
+        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
+        fireMan.execute(getSqlFileRunner(runInfo), getUndercurrentSqlFileList());
+    }
+
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource());
     }
@@ -229,6 +235,63 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected DfReplaceSchemaProperties getMyProperties() {
         return DfBuildProperties.getInstance().getInvokeReplaceSchemaProperties();
+    }
+
+    // --------------------------------------------
+    //                           after all sql file
+    //                           ------------------
+    protected List<File> getUndercurrentSqlFileList() {
+        final List<File> fileList = new ArrayList<File>();
+        fileList.addAll(getUndercurrentNextSqlFileList());
+        return fileList;
+    }
+
+    protected List<File> getUndercurrentNextSqlFileList() {
+        final String replaceSchemaSqlFileDirectoryName = getUndercurrentSqlFileDirectoryName();
+        final File baseDir = new File(replaceSchemaSqlFileDirectoryName);
+        final FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                if (name.startsWith(getUndercurrentSqlFileNameWithoutExt())) {
+                    if (name.endsWith("." + getUndercurrentSqlFileExt())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+        // Order by FileName Asc
+        final Comparator<File> fileNameAscComparator = new Comparator<File>() {
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        };
+        final TreeSet<File> treeSet = new TreeSet<File>(fileNameAscComparator);
+
+        final String[] targetList = baseDir.list(filter);
+        if (targetList == null) {
+            return new ArrayList<File>();
+        }
+        for (String targetFileName : targetList) {
+            final String targetFilePath = replaceSchemaSqlFileDirectoryName + "/" + targetFileName;
+            treeSet.add(new File(targetFilePath));
+        }
+        return new ArrayList<File>(treeSet);
+    }
+
+    protected String getUndercurrentSqlFileDirectoryName() {
+        final String sqlFileName = getMyProperties().getUndercurrentSqlFile();
+        return sqlFileName.substring(0, sqlFileName.lastIndexOf("/"));
+    }
+
+    protected String getUndercurrentSqlFileNameWithoutExt() {
+        final String sqlFileName = getMyProperties().getUndercurrentSqlFile();
+        final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
+        return tmp.substring(0, tmp.lastIndexOf("."));
+    }
+
+    protected String getUndercurrentSqlFileExt() {
+        final String sqlFileName = getMyProperties().getUndercurrentSqlFile();
+        return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
     }
 
     // --------------------------------------------

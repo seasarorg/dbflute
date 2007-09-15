@@ -145,6 +145,8 @@ public class Table implements IDMethod {
 
     private boolean _existSameNameTable;
 
+    private boolean _sql2entityTypeSafeCursol;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -2130,6 +2132,12 @@ public class Table implements IDMethod {
     // ===================================================================================
     //                                                                           VersionNo
     //                                                                           =========
+    protected static final String DEF_VERSION_NO = "version_no";
+
+    protected boolean hasDefaultVersionNoColumn() {
+        return getColumnByFlexibleName(DEF_VERSION_NO) != null;
+    }
+
     /**
      * Determine whether this table uses a version-no column.
      * 
@@ -2138,7 +2146,7 @@ public class Table implements IDMethod {
     public boolean isUseVersionNo() {
         final String versionNoColumnName = getDatabase().getVersionNoFieldName();
         if ("".equals(versionNoColumnName)) {
-            return false;
+            return hasDefaultVersionNoColumn();
         }
         final Column column = getColumn(versionNoColumnName);
         if (column == null) {
@@ -2156,7 +2164,13 @@ public class Table implements IDMethod {
         if (!isUseVersionNo()) {
             return "";
         }
-        return buildVersionNoJavaName(getDatabase().getVersionNoFieldName());
+        final String versionNoFieldName = getDatabase().getVersionNoFieldName();
+        if ("".equals(versionNoFieldName) && hasDefaultVersionNoColumn()) {
+            final Column column = getColumnByFlexibleName(DEF_VERSION_NO);
+            return buildVersionNoJavaName(column.getName());
+        } else {
+            return buildVersionNoJavaName(versionNoFieldName);
+        }
     }
 
     protected String buildVersionNoJavaName(String versionNoFieldName) {
@@ -2363,6 +2377,14 @@ public class Table implements IDMethod {
         result.append("</table>\n");
 
         return result.toString();
+    }
+
+    public boolean isSql2EntityTypeSafeCursol() {
+        return _sql2entityTypeSafeCursol;
+    }
+
+    public void setSql2EntityTypeSafeCursol(boolean sql2entityTypeSafeCursol) {
+        this._sql2entityTypeSafeCursol = sql2entityTypeSafeCursol;
     }
 
 }

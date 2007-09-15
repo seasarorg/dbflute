@@ -329,7 +329,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         };
 #else
-        final StatementFactory customizeStatementFactory = statementFactory;
+        final org.seasar.extension.jdbc.StatementFactory customizeStatementFactory = statementFactory;
 #end
         return new ${glSelectDynamicCommand}(dataSource, customizeStatementFactory, handler, customizeResultSetFactory);
     }
@@ -473,6 +473,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                  Update and Delete By Auto Override
     //                                                  ==================================
 #if (!$database.isVersionAfter1047())
+    ${database.outputOverrideAnnotation()}
     protected void setupUpdateMethodByAuto(Method method) {
         checkAutoUpdateMethod(method);
         String[] propertyNames = getPersistentPropertyNames(method);
@@ -491,9 +492,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         sqlCommands.put(method.getName(), cmd);
     }
 #end
+#if ($database.isVersionAfter1047())
+    ${database.outputOverrideAnnotation()}
+#end
     protected AbstractSqlCommand createUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
         AbstractSqlCommand cmd;
-        UpdateAutoDynamicCommand uac = new UpdateAutoDynamicCommand(dataSource, statementFactory);
+        final UpdateAutoDynamicCommand uac = newUpdateAutoDynamicCommand(dataSource, statementFactory);
         uac.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         uac.setPropertyNames(propertyNames);
         uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
@@ -501,23 +505,37 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return cmd;
     }
 
+    protected UpdateAutoDynamicCommand newUpdateAutoDynamicCommand(javax.sql.DataSource ds, org.seasar.extension.jdbc.StatementFactory sf) {
+        return new UpdateAutoDynamicCommand(ds, sf);
+    }
+
+#if ($database.isVersionAfter1047())
+    ${database.outputOverrideAnnotation()}
+#end
     protected AbstractSqlCommand createUpdateModifiedOnlyCommand(final Method method, final String[] propertyNames) {
-        UpdateModifiedOnlyCommand uac = new UpdateModifiedOnlyCommand(dataSource, statementFactory);
+        UpdateModifiedOnlyCommand uac = newUpdateModifiedOnlyCommand(dataSource, statementFactory);
         uac.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         uac.setPropertyNames(propertyNames);
         uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
         return uac;
     }
 
+    protected UpdateModifiedOnlyCommand newUpdateModifiedOnlyCommand(javax.sql.DataSource ds, org.seasar.extension.jdbc.StatementFactory sf) {
+        return new UpdateModifiedOnlyCommand(ds, sf);
+    }
+
 #if ($database.isVersionAfter1047())
+    ${database.outputOverrideAnnotation()}
     protected DeleteAutoStaticCommand createDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
         return new DeleteAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
     }
 
+    ${database.outputOverrideAnnotation()}
     protected DeleteBatchAutoStaticCommand createDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
         return new DeleteBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
     }
 #else
+    ${database.outputOverrideAnnotation()}
     protected void setupDeleteMethodByAuto(Method method) {
         checkAutoUpdateMethod(method);
         String[] propertyNames = getPersistentPropertyNames(method);

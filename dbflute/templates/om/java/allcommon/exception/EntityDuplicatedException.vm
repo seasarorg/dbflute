@@ -1,0 +1,31 @@
+${database.allClassCopyright}package ${glPackageBaseCommonException};
+
+/**
+ * The exception when the entity has been duplicated.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glEntityDuplicatedException} extends ${glRecordHasOverlappedException} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     */
+    public ${glEntityDuplicatedException}(String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     * @param cause Throwable.
+     */
+    public ${glEntityDuplicatedException}(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+}

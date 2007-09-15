@@ -261,6 +261,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
+    public String outputOverrideAnnotation() {
+        return filterGenericsGeneralOutput("@Override()");
+    }
+    
     public String outputOverrideAnnotationAfterNewLineOutput() {
         return filterGenericsGeneralOutputAfterNewLineOutput("    @Override()");
     }
