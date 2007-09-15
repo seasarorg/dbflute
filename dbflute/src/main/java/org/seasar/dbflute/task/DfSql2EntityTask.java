@@ -386,7 +386,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected boolean isCursor(final String sql) {
         final String targetString = getTargetString(sql, "+");
         
-        return targetString != null && targetString.contains("cursol");
+        return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
     }
 
     protected String getParameterBeanClassDefinition(final String sql) {
