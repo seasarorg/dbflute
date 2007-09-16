@@ -87,7 +87,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromSeparatedFileAsAdditionalData("tsv", "\t");
         writeDbFromSeparatedFileAsAdditionalData("csv", ",");
         writeDbFromXlsAsAdditionalData();
-        undercurrent(runInfo);
+        takeFinally(runInfo);
     }
 
     // --------------------------------------------
@@ -163,9 +163,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
     }
 
-    protected void undercurrent(DfRunnerInformation runInfo) {
+    protected void takeFinally(DfRunnerInformation runInfo) {
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        fireMan.execute(getSqlFileRunner(runInfo), getUndercurrentSqlFileList());
+        fireMan.execute(getSqlFileRunner(runInfo), getTakeFinallySqlFileList());
     }
 
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
@@ -240,19 +240,19 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     // --------------------------------------------
     //                           after all sql file
     //                           ------------------
-    protected List<File> getUndercurrentSqlFileList() {
+    protected List<File> getTakeFinallySqlFileList() {
         final List<File> fileList = new ArrayList<File>();
-        fileList.addAll(getUndercurrentNextSqlFileList());
+        fileList.addAll(getTakeFinallyNextSqlFileList());
         return fileList;
     }
 
-    protected List<File> getUndercurrentNextSqlFileList() {
-        final String replaceSchemaSqlFileDirectoryName = getUndercurrentSqlFileDirectoryName();
+    protected List<File> getTakeFinallyNextSqlFileList() {
+        final String replaceSchemaSqlFileDirectoryName = getTakeFinallySqlFileDirectoryName();
         final File baseDir = new File(replaceSchemaSqlFileDirectoryName);
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                if (name.startsWith(getUndercurrentSqlFileNameWithoutExt())) {
-                    if (name.endsWith("." + getUndercurrentSqlFileExt())) {
+                if (name.startsWith(getTakeFinallySqlFileNameWithoutExt())) {
+                    if (name.endsWith("." + getTakeFinallySqlFileExt())) {
                         return true;
                     }
                 }
@@ -278,19 +278,19 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return new ArrayList<File>(treeSet);
     }
 
-    protected String getUndercurrentSqlFileDirectoryName() {
-        final String sqlFileName = getMyProperties().getUndercurrentSqlFile();
+    protected String getTakeFinallySqlFileDirectoryName() {
+        final String sqlFileName = getMyProperties().getTakeFinallySqlFile();
         return sqlFileName.substring(0, sqlFileName.lastIndexOf("/"));
     }
 
-    protected String getUndercurrentSqlFileNameWithoutExt() {
-        final String sqlFileName = getMyProperties().getUndercurrentSqlFile();
+    protected String getTakeFinallySqlFileNameWithoutExt() {
+        final String sqlFileName = getMyProperties().getTakeFinallySqlFile();
         final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
         return tmp.substring(0, tmp.lastIndexOf("."));
     }
 
-    protected String getUndercurrentSqlFileExt() {
-        final String sqlFileName = getMyProperties().getUndercurrentSqlFile();
+    protected String getTakeFinallySqlFileExt() {
+        final String sqlFileName = getMyProperties().getTakeFinallySqlFile();
         return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
     }
 

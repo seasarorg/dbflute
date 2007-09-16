@@ -42,8 +42,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
     }
 
-    public String getUndercurrentSqlFile() {
-        return "./playsql/undercurrent.sql";
+    public String getTakeFinallySqlFile() {
+        return "./playsql/take-finally.sql";
     }
 
     public boolean isEnvironmentTypeTest() {
