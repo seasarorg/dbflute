@@ -361,12 +361,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateInsertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
-            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-            filterEntityOfInsert(entity);
-            assertEntityOfInsert(entity);
-        }
+        helpFilterBeforeInsertInternally(entityList);
         return getMyDao().insertList(entityList);
     }
 
@@ -378,12 +373,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateUpdateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
-            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-            filterEntityOfUpdate(entity);
-            assertEntityOfUpdate(entity);
-        }
+        helpFilterBeforeUpdateInternally(entityList);
         return getMyDao().updateList(entityList);
     }
 
@@ -395,12 +385,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateDeleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
-            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-            filterEntityOfDelete(entity);
-            assertEntityOfDelete(entity);
-        }
+        helpFilterBeforeDeleteInternally(entityList);
         return getMyDao().deleteList(entityList);
     }
 #else
@@ -446,20 +431,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @return Selected entity. (Nullalble)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        cb.checkSafetyResult(1);
-        java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = null;
-        try {
-            ls = selectList(cb);
-        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
-            throwRecordHasOverlappedException("{Over safetyMaxResultSize '1'}", cb, e);
-        }
-        if (ls.isEmpty()) {
-            return null;
-        }
-        assertRecordHasBeenSelectedAsOne(ls, cb);
-        return (${myExtendedObjectClassName})ls.get(0);
+    public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
+        return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
+            public java.util.List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
     }
 
     /**
@@ -470,21 +444,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        cb.checkSafetyResult(1);
-        java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls = null;
-        try {
-            ls = selectList(cb);
-        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
-            throwRecordHasOverlappedException("{Over safetyMaxResultSize '1'}", cb, e);
-        }
-        assertRecordHasNotBeenDeleted(ls, cb);
-        assertRecordHasBeenSelectedAsOne(ls, cb);
-        return (${myExtendedObjectClassName})ls.get(0);
+    public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb) {
+        return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
+            public java.util.List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
     }
-#if ($table.hasPrimaryKey())
 
+#if ($table.hasPrimaryKey())
     /*
      * Select entity with deleted check. {by primary-key}
      * 
@@ -501,8 +466,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return selectEntityWithDeletedCheck(cb);
     }
 #end
-#if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
 
+#if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
+#if ($database.isMakeDeprecated())
     /*
      * Select entity for update with deleted check. {by primary-key}
      * 
@@ -520,6 +486,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         cb.lockForUpdate();
         return selectEntityWithDeletedCheck(cb);
     }
+#end
 #end
 
     // ===================================================================================
@@ -558,12 +525,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertConditionBeanNotNull(cb);
         final SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})}() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
-            public int selectCountIgnoreFetchScope() {
-                return selectCount(cb);
-            }
-            public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectListWithFetchScope() {
-                return selectList(cb);
-            }
+            public int selectCountIgnoreFetchScope() { return selectCount(cb); }
+            public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectListWithFetchScope() { return selectList(cb); }
         };
         return invoker.invokeSelectPage(pageCallback);
     }
@@ -633,8 +596,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         final ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper = new ${glConditionBeanSetupperName}<${reffererCBClassName}>() {
-            public void setup(${reffererCBClassName} cb) {
-            }
+            public void setup(${reffererCBClassName} cb) {}
         };
         load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
     }
@@ -673,9 +635,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("conditionBeanSetupper<${reffererCBClassName}>", conditionBeanSetupper);
-        if (${myEntityListVariableName}.isEmpty()) {
-            return;
-        }
+        if (${myEntityListVariableName}.isEmpty()) { return; }
         load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
     }
 
@@ -770,18 +730,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
      * @return The list of foreign table. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${foreignEntityClassName})} pullout${foreignKeys.foreignPropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        final java.util.Set${database.filterGenericsString(${foreignEntityClassName})} foreignSet = new java.util.LinkedHashSet${database.filterGenericsString(${foreignEntityClassName})}();
-        for (java.util.Iterator ite = ${myEntityListVariableName}.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} ${myEntityVariableName} = (${myExtendedObjectClassName})ite.next();
-            final ${foreignEntityClassName} foreignEntity = ${myEntityVariableName}.get${foreignKeys.foreignPropertyNameInitCap}();
-            if (foreignEntity == null || foreignSet.contains(foreignEntity)) {
-                continue;
-            }
-            foreignSet.add(foreignEntity);
-        }
-        return new java.util.ArrayList${database.filterGenericsString(${foreignEntityClassName})}(foreignSet);
+    public java.util.List<${foreignEntityClassName}> pullout${foreignKeys.foreignPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
+            public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${foreignKeys.foreignPropertyNameInitCap}(); } });
     }
 #end
 #foreach ($refferer in $table.Referrers)
@@ -790,22 +741,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #if (${refferer.isOneToOne()})
 
     /**
-     * Pull out the list of referer-as-one table '${foreignEntityClassName}'.
+     * Pull out the list of referer-as-one table '${reffererEntityClassName}'.
      * 
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
      * @return The list of referer-as-one table. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${reffererEntityClassName})} pullout${refferer.reffererPropertyNameInitCapAsOne}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
-        final java.util.Set${database.filterGenericsString(${reffererEntityClassName})} reffererAsOneSet = new java.util.LinkedHashSet${database.filterGenericsString(${reffererEntityClassName})}();
-        for (java.util.Iterator ite = ${myEntityListVariableName}.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} ${myEntityVariableName} = (${myExtendedObjectClassName})ite.next();
-            final ${reffererEntityClassName} refererEntity = ${myEntityVariableName}.get${refferer.reffererPropertyNameInitCapAsOne}();
-            if (refererEntity == null || reffererAsOneSet.contains(refererEntity)) {
-                continue;
-            }
-            reffererAsOneSet.add(refererEntity);
-        }
-        return new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}(reffererAsOneSet);
+    public java.util.List<${reffererEntityClassName}> pullout${refferer.reffererPropertyNameInitCapAsOne}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${reffererEntityClassName}>() {
+            public ${reffererEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${refferer.reffererPropertyNameInitCapAsOne}(); } });
     }
   #end
 #end

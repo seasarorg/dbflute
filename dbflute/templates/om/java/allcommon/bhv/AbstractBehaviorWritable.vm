@@ -292,12 +292,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public int callCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-            filterEntityOfInsert(entity);
-            assertEntityOfInsert(entity);
-        }
+        helpFilterBeforeInsertInternally(entityList);
         return getDaoWritable().createList(entityList);
     }
 
@@ -309,12 +304,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public int callModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-            filterEntityOfUpdate(entity);
-            assertEntityOfUpdate(entity);
-        }
+        helpFilterBeforeUpdateInternally(entityList);
         return getDaoWritable().modifyList(entityList);
     }
 
@@ -326,12 +316,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     public int callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-            filterEntityOfDelete(entity);
-            assertEntityOfDelete(entity);
-        }
+        helpFilterBeforeDeleteInternally(entityList);
         return getDaoWritable().removeList(entityList);
     }
 
@@ -355,6 +340,36 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
         String msg = "Not found the value of update date: " + entity;
         throw new IllegalStateException(msg);
+    }
+
+    // ===================================================================================
+    //                                                     Delegate Method Internal Helper
+    //                                                     ===============================
+    protected void helpFilterBeforeInsertInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
+        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
+            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            filterEntityOfInsert(entity);
+            assertEntityOfInsert(entity);
+        }
+    }
+
+    protected void helpFilterBeforeUpdateInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
+        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
+            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+            assertEntityNotNullAndHasPrimaryKeyValue(entity);
+            filterEntityOfUpdate(entity);
+            assertEntityOfUpdate(entity);
+        }
+    }
+
+    protected void helpFilterBeforeDeleteInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
+        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
+            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+            assertEntityNotNullAndHasPrimaryKeyValue(entity);
+            filterEntityOfDelete(entity);
+            assertEntityOfDelete(entity);
+        }
     }
 
     // =====================================================================================

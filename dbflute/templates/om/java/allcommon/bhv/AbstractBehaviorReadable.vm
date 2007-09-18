@@ -245,6 +245,49 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return (${glEntityInterfaceName})ls.get(0);
     }
 
+    // =====================================================================================
+    //                                                     Basic Read Entity Internal Helper
+    //                                                     =================================
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
+            ENTITY_TYPE helpSelectEntityInternally(CB_TYPE cb, InternalSelectEntityCallback<ENTITY_TYPE, CB_TYPE> callback) {
+        assertConditionBeanNotNull(cb);
+        cb.checkSafetyResult(1);
+        java.util.List<ENTITY_TYPE> ls = null;
+        try {
+            ls = callback.callbackSelectList(cb);
+        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
+            throwRecordHasOverlappedException("{Over safetyMaxResultSize '1'}", cb, e);
+        }
+        if (ls.isEmpty()) {
+            return null;
+        }
+        assertRecordHasBeenSelectedAsOne(ls, cb);
+        return (ENTITY_TYPE)ls.get(0);
+    }
+
+    protected static interface InternalSelectEntityCallback<ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
+        public java.util.List<ENTITY_TYPE> callbackSelectList(CB_TYPE cb);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
+            ENTITY_TYPE helpSelectEntityWithDeletedCheckInternally(CB_TYPE cb, InternalSelectEntityWithDeletedCheckCallback<ENTITY_TYPE, CB_TYPE> callback) {
+        assertConditionBeanNotNull(cb);
+        cb.checkSafetyResult(1);
+        java.util.List<ENTITY_TYPE> ls = null;
+        try {
+            ls = callback.callbackSelectList(cb);
+        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
+            throwRecordHasOverlappedException("{Over safetyMaxResultSize '1'}", cb, e);
+        }
+        assertRecordHasNotBeenDeleted(ls, cb);
+        assertRecordHasBeenSelectedAsOne(ls, cb);
+        return (ENTITY_TYPE)ls.get(0);
+    }
+
+    protected static interface InternalSelectEntityWithDeletedCheckCallback<ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
+        public java.util.List<ENTITY_TYPE> callbackSelectList(CB_TYPE cb);
+    }
+
 
     // =====================================================================================
     //                                                                       Basic Read List
@@ -447,6 +490,27 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
         String msg = "The result type of selectNextVal() is unsupported: type=" + resultClass;
         throw new IllegalStateException(msg);
+    }
+
+    // ===================================================================================
+    //                                                             Pullout Internal Helper
+    //                                                             =======================
+    protected <BASE_ENTITY_TYPE extends ${glEntityInterfaceName}, FOREIGN_ENTITY_TYPE extends ${glEntityInterfaceName}>
+            java.util.List<FOREIGN_ENTITY_TYPE> helpPulloutInternally(java.util.List<BASE_ENTITY_TYPE> baseEntityList, InternalPulloutCallback<BASE_ENTITY_TYPE, FOREIGN_ENTITY_TYPE> callback) {
+        assertObjectNotNull("baseEntityList", baseEntityList);
+        final java.util.Set<FOREIGN_ENTITY_TYPE> foreignSet = new java.util.LinkedHashSet<FOREIGN_ENTITY_TYPE>();
+        for (BASE_ENTITY_TYPE entity : baseEntityList) {
+            final FOREIGN_ENTITY_TYPE foreignEntity = callback.callbackGetForeignEntity(entity);
+            if (foreignEntity == null || foreignSet.contains(foreignEntity)) {
+                continue;
+            }
+            foreignSet.add(foreignEntity);
+        }
+        return new java.util.ArrayList<FOREIGN_ENTITY_TYPE>(foreignSet);
+    }
+
+    protected static interface InternalPulloutCallback<BASE_ENTITY_TYPE extends ${glEntityInterfaceName}, FOREIGN_ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public FOREIGN_ENTITY_TYPE callbackGetForeignEntity(BASE_ENTITY_TYPE entity);
     }
 
     // ===================================================================================
