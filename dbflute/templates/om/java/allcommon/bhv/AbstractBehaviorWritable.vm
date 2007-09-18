@@ -3,6 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 #set ($myClassName = "${glBehaviorWritableAbstractName}")
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
@@ -396,17 +397,24 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     abstract protected void doModifyNonstrict(${glEntityInterfaceName} entity);
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * ${database.ImplementComment}
      * 
      * @param entity Entity having primary-key value. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @deprecated Thie method is old style and has wrong performance. Please use modify().
      */
     public void modifyAfterSelect(${glEntityInterfaceName} entity) {
         doModifyAfterSelect(entity);
     }
 
+    /**
+     * @param entity Entity having primary-key value. (NotNull)
+     * @deprecated Thie method is old style and has wrong performance. Please use modify().
+     */
     abstract protected void doModifyAfterSelect(${glEntityInterfaceName} entity);
+#end
 
     /**
      * ${database.ImplementComment}
@@ -432,17 +440,23 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     abstract protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity);
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Create or modify after select. <br />
      * {modify: modified only}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @deprecated Thie method is old style and has wrong performance. Please use createOrModify().
      */
     public void createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
         doCreateOrModifyAfterSelect(entity);
     }
 
+    /**
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @deprecated Thie method is old style and has wrong performance. Please use createOrModify().
+     */
     abstract protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity);
 
     /**
@@ -451,8 +465,10 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * 
      * @param sourceEntity Source entity. (NotNull)
      * @param destinationEntity Destination entity. (NotNull)
+     * @deprecated Thie method is old style and has wrong performance.
      */
     abstract protected void mergeEntity(${glEntityInterfaceName} sourceEntity, ${glEntityInterfaceName} destinationEntity);
+#end
 
     /**
      * Remove.
@@ -468,18 +484,115 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     abstract protected void doRemove(${glEntityInterfaceName} entity);
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Remove after select.
      * 
      * @param entity Entity. This must contain primary-key value at least. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @deprecated Thie method is old style and has wrong performance. Please use remove().
      */
     public void removeAfterSelect(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         doRemoveAfterSelect(entity);
     }
 
+    /**
+     * @param entity Entity. This must contain primary-key value at least. (NotNull)
+     * @deprecated Thie method is old style and has wrong performance. Please use remove().
+     */
     abstract protected void doRemoveAfterSelect(${glEntityInterfaceName} entity);
+#end
+
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateInternally(ENTITY_TYPE entity, InternalUpdateCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        assertEntityHasVersionNoValue(entity);
+        assertEntityHasUpdateDateValue(entity);
+        final int updatedCount = callback.callbackDelegateUpdate(entity);
+        if (updatedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(entity.toString());
+        } else if (updatedCount > 1) {
+            String msg = "updatedCount=" + updatedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+        }
+    }
+
+    protected static interface InternalUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateUpdate(ENTITY_TYPE entity);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateNonstrictInternally(ENTITY_TYPE entity, InternalUpdateNonstrictCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
+        if (updatedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(entity.toString());
+        } else if (updatedCount > 1) {
+            String msg = "updatedCount=" + updatedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+        }
+    }
+
+    protected static interface InternalUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateUpdateNonstrict(ENTITY_TYPE entity);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
+            void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback) {
+        assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            callback.callbackInsert(entity);
+        } else {
+            RuntimeException exception = null;
+            try {
+                callback.callbackUpdate(entity);
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
+                if (e.getRows() == 0) {
+                    exception = e;
+                }
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
+                exception = e;
+            }
+            if (exception != null) {
+                final CB_TYPE cb = callback.callbackNewMyConditionBean();
+                cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
+                if (callback.callbackSelectCount(cb) == 0) {
+                    callback.callbackInsert(entity);
+                } else {
+                    throw exception;
+                }
+            }
+        }
+    }
+
+    protected static interface InternalInsertOrUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
+        public void callbackInsert(ENTITY_TYPE entity);
+        public void callbackUpdate(ENTITY_TYPE entity);
+        public CB_TYPE callbackNewMyConditionBean();
+        public int callbackSelectCount(CB_TYPE cb);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            callback.callbackInsert(entity);
+        } else {
+            try {
+                callback.callbackUpdateNonstrict(entity);
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
+                callback.callbackInsert(entity);
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
+                callback.callbackInsert(entity);
+            }
+        }
+    }
+
+    protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public void callbackInsert(ENTITY_TYPE entity);
+        public void callbackUpdateNonstrict(ENTITY_TYPE entity);
+    }
 
     // =====================================================================================
     //                                                                    Basic Batch Update

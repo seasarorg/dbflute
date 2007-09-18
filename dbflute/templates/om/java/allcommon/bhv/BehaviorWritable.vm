@@ -37,7 +37,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
     public void modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
-     * Modify non strict.
+     * Modify non-strict.
      * 
      * @param entity Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
@@ -45,6 +45,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public void modifyNonstrict(${glEntityInterfaceName} entity);
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Modify after select. <br />
      * {modify: modified only}
@@ -57,8 +58,10 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * </pre>
      * @param entity Entity.
      * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @deprecated Thie method is old style and has wrong performance. Please use modify().
      */
     public void modifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+#end
 
     /**
      * Create or modify. <br />
@@ -70,7 +73,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
     public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
     /**
-     * Create or modify non strict. <br />
+     * Create or modify non-strict. <br />
      * {modify: modified only} <br />
      * This method is faster than createOrModifyAfterSelect().
      * 
@@ -78,6 +81,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Create or modify after select. <br />
      * {modify: modified only}
@@ -89,8 +93,10 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      *   : it does not throw optimistic lock exception. It can updates.
      * </pre>
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @deprecated Thie method is old style and has wrong performance. Please use createOrModify().
      */
     public void createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+#end
 
     /**
      * Remove.

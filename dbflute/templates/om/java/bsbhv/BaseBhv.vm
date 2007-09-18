@@ -311,7 +311,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Update one entity. {delegate method, internal for interceptor}
-     * {non strict & modified only}
+     * {non-strict & modified only}
      * 
      * @param entity Entity. (NotNull)
      * @return Updated count.
@@ -340,7 +340,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Delete one entity. {delegate method, internal for interceptor}
-     * {non strict}
+     * {non-strict}
      * 
      * @param entity Entity. (NotNull)
      * @return Deleted count.
@@ -568,7 +568,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return invoker.invokeSelectPage(pageCallback);
     }
 
-#if ($database.isAvailableGenerics())
     // ===================================================================================
     //                                                                      Various Select
     //                                                                      ==============
@@ -582,7 +581,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public java.util.List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
     }
-#end
 #if ($table.isUseSequence())
 
     // ===================================================================================
@@ -616,7 +614,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //   RefererTable    = [${refferer.table.name}]
     //   RefererProperty = [${refferer.reffererPropertyName}]
     // * * * * * * * * */
-    #if ($database.isAvailableGenerics())
 
     /**
      * Load referer of ${refferer.ReffererPropertyName}.
@@ -758,101 +755,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             }
         }
     }
-    #else
-
-    /**
-     * Load refferer of ${refferer.refererJavaBeansRulePropertyName}.
-     * <pre>
-     *   Default refferer order-by is 'primary-key asc'.
-     * 
-     *   ex) {Client Example}
-     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *     cb.query().setXxx_Equal("xxx");
-     *     final List<${myExtendedObjectClassName}> ls = ${myBehaviorVariableName}.selectList(cb);
-     *     ${myBehaviorVariableName}.load${refferer.refererJavaBeansRulePropertyNameInitCap}(ls);
-     * 
-     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * </pre>
-     * 
-     * @param ls Entity list of main table. (NotNull)
-     */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls) {
-        final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
-            public void setup(${reffererCBClassName} cb) {
-                cb.addOrderBy_PK_Asc();// Default OrderBy for Refferer.
-            }
-        };
-        load${refferer.refererJavaBeansRulePropertyNameInitCap}(ls, cbSetupper);
-    }
-
-    /**
-     * Load refferer of ${refferer.refererJavaBeansRulePropertyName}.
-     * <pre>
-     *   You can load refferer with your original condition.
-     * 
-     *   ex) {Client Example}: Refferer conditions are 'Xxx' is not null and order-by 'Yyy' desc
-     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *     cb.query().setXxx_Equal("xxx");
-     *     final List<${myExtendedObjectClassName}> ls = ${myBehaviorVariableName}.selectList(cb);
-     *     final ${reffererBhvClassName}.CBSetupper cbSetupper = new ${reffererBhvClassName}.CBSetupper() {
-     *         public void setup(${reffererCBClassName} cb) {
-     *             cb.query().setXxx_IsNotNull();
-     *             cb.query().addOrderBy_Yyy_Desc();
-     *         }
-     *     };
-     *     ${myBehaviorVariableName}.load${refferer.refererJavaBeansRulePropertyNameInitCap}(ls, cbSetupper);
-     * 
-     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * </pre>
-     * 
-     * @param ls Entity list of main table. (NotNull)
-     * @param cbSetupper Refferer condition setupper instance for registering refferer condition. (NotNull)
-     */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ls, ${reffererBhvClassName}.CBSetupper cbSetupper) {
-        assertObjectNotNull("ls", ls);
-        assertObjectNotNull("cbSetupper", cbSetupper);
-        if (ls.isEmpty()) {
-            return;
-        }
-
-        final java.util.Map${database.filterGenericsString(${genericPKMyEntityMap})} pkMyEntityMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKMyEntityMap})}();
-        final java.util.List${database.filterGenericsString(${table.getPrimaryKeyJavaNativeAsOne()})} pkList = new java.util.ArrayList${database.filterGenericsString(${table.getPrimaryKeyJavaNativeAsOne()})}();
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} ${myEntityVariableName} = (${myExtendedObjectClassName})ite.next();
-            pkList.add(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}());
-            pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()), ${myEntityVariableName});
-        }
-        final ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})getBehaviorSelector().select(${reffererBhvClassName}.class);
-        final ${reffererCBClassName} cb = reffererBhv.newMyConditionBean();
-        cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-        cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-        cbSetupper.setup(cb);
-        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = reffererBhv.selectList(cb);
-
-        final java.util.Map${database.filterGenericsString(${genericPKChildListMap})} pkReffererListMap;
-        pkReffererListMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericPKChildListMap})}();
-        for (final java.util.Iterator ite = reffererList.iterator(); ite.hasNext(); ) {
-            final ${reffererEntityClassName} reffererEntity = (${reffererEntityClassName})ite.next();
-            if (!pkReffererListMap.containsKey(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))) {
-                pkReffererListMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()), new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
-            }
-            ((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))).add(reffererEntity);
-
-            // for Reverse Reference.
-            final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()));
-            reffererEntity.set${refferer.ForeignPropertyNameInitCap}(myEntity);
-        }
-
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
-            final ${myExtendedObjectClassName} ${myEntityVariableName} = (${myExtendedObjectClassName})ite.next();
-            if (pkReffererListMap.containsKey(toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()))) {
-                ${myEntityVariableName}.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}())));
-            } else {
-                ${myEntityVariableName}.set${refferer.ReffererPropertyNameInitCap}(new java.util.ArrayList${database.filterGenericsString(${reffererEntityClassName})}());
-            }
-        }
-    }
-    #end
   #end
 #end
 
@@ -927,57 +829,38 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Update. {update: modified only}
-     * <pre>
-     * If it updates count zero, throws exception.
-     * If concurrency control of this table is valid, this update have it.
+     * Update. {update: modified only} <br />
+     * If it updates count zero, throws exception. <br />
+     * If concurrency control of this table is valid, this update have it. <br />
      * So then the entity of argument should have the value of concurrency column.
-     * </pre>
+     * 
      * @param ${myEntityVariableName} Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    public void update(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        assertEntityHasVersionNoValue(${myEntityVariableName});
-        assertEntityHasUpdateDateValue(${myEntityVariableName});
-        final int updatedCount = delegateUpdate(${myEntityVariableName});
-        if (updatedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
-        } else if (updatedCount > 1) {
-            String msg = "updatedCount=" + updatedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
-        }
+    public void update(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateUpdate(${myExtendedObjectClassName} entity) { return delegateUpdate(entity); } });
     }
 
     protected void doModify(${glEntityInterfaceName} entity) {
         update((${myExtendedObjectClassName})entity);
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
-     * Update non stritct. {update: modified only}
-     * <pre>
-     * This update ignores concurrency control.
+     * Update non stritct. {update: modified only} <br />
+     * This update ignores concurrency control. <br />
      * So if the entity of argument have the value of concurrency column, it was ignored.
      * 
-     * This method is faster than updateAfterSelect() because of non selecting before update().
-     * For example, batch application should use this better than updateAfterSelect().
-     * </pre>
      * @param ${myEntityVariableName} Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    public void updateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        final int updatedCount = delegateUpdateNonstrict(${myEntityVariableName});
-        if (updatedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
-        } else if (updatedCount > 1) {
-            String msg = "updatedCount=" + updatedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
-        }
+    public void updateNonstrict(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { return delegateUpdateNonstrict(entity); } });
     }
 #end
 
@@ -989,6 +872,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
     }
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Update after select. {update: modified only}
      * <pre>
@@ -1002,6 +886,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @deprecated Thie method is old style and has wrong performance. Please use update().
      */
     public void updateAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
@@ -1015,6 +900,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doModifyAfterSelect(${glEntityInterfaceName} entity) {
         updateAfterSelect((${myExtendedObjectClassName})entity);
     }
+#end
 
     /**
      * Insert or update. {update: modified only}
@@ -1023,70 +909,56 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    public void insertOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        if (!${myEntityVariableName}.hasPrimaryKeyValue()) {
-            insert(${myEntityVariableName});
-        } else {
-            RuntimeException exception = null;
-            try {
-                update(${myEntityVariableName});
-            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
-                if (e.getRows() > 1) {
-                    throw e;
-                }
-                exception = e;
-            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
-                exception = e;
-            }
-            if (exception != null) {
-                final ${myConditionBeanClassName} cb = newMyConditionBean();
-                cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
-                if (selectCount(cb) == 0) {
-                    insert(${myEntityVariableName});
-                } else {
-                    throw exception;
-                }
-            }
-        }
+    public void insertOrUpdate(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
+            public void callbackInsert(${myExtendedObjectClassName} entity) { insert(entity); }
+            public void callbackUpdate(${myExtendedObjectClassName} entity) { update(entity); }
+            public ${myConditionBeanClassName} callbackNewMyConditionBean() { return newMyConditionBean(); }
+            public int callbackSelectCount(${myConditionBeanClassName} cb) { return selectCount(cb); }
+        });
     }
 
     protected void doCreateOrUpdate(${glEntityInterfaceName} ${myEntityVariableName}) {
         insertOrUpdate((${myExtendedObjectClassName})${myEntityVariableName});
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+#if ($database.isMakeRecentlyDeprecated())
     /**
-     * Insert or update non strict. {update: modified only} <br />
-     * This method is faster than insertOrUpdateAfterSelect().
+     * Insert or update non-strict. {update: modified only}
+     * 
+     * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @deprecated Sorry! Please use insertOrUpdateNonstrict(). This method name is wrong name.
+     */
+    public void insertOrUpdateNonStrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        insertOrUpdateNonstrict(${myEntityVariableName});
+    }
+#end
+
+    /**
+     * Insert or update non-strict. {update: modified only}
      * 
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    public void insertOrUpdateNonStrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        if (!${myEntityVariableName}.hasPrimaryKeyValue()) {
-            insert(${myEntityVariableName});
-        } else {
-            try {
-                updateNonstrict(${myEntityVariableName});
-            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
-                insert(${myEntityVariableName});
-            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
-                insert(${myEntityVariableName});
-            }
-        }
+    public void insertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
+            public void callbackInsert(${myExtendedObjectClassName} entity) { insert(entity); }
+            public void callbackUpdateNonstrict(${myExtendedObjectClassName} entity) { updateNonstrict(entity); }
+        });
     }
 #end
 
     protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity) {
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
-        insertOrUpdateNonStrict((${myExtendedObjectClassName})entity);
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+        insertOrUpdateNonstrict((${myExtendedObjectClassName})entity);
 #else
         insertOrUpdate((${myExtendedObjectClassName})entity);
 #end
     }
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Insert or update after select. {update: modified only}
      * <pre>
@@ -1098,6 +970,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * </pre>
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
+     * @deprecated Thie method is old style and has wrong performance. Please use insertOrUpdate().
      */
     public void insertOrUpdateAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
@@ -1122,8 +995,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity) {
         insertOrUpdateAfterSelect((${myExtendedObjectClassName})entity);
     }
-  #if ($database.isMakeBehaviorForUpdate() && $database.isMakeDeprecated())
+#end
 
+#if ($database.isMakeBehaviorForUpdate() && $database.isMakeDeprecated())
     /**
      * Update after select-for-update.
      * 
@@ -1141,6 +1015,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         update(currentEntity);
     }
 
+    /**
+     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
+     * @deprecated This method is deprecated.
+     */
     protected void doModifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
         updateAfterSelectForUpdate((${myExtendedObjectClassName})entity);
     }
@@ -1172,16 +1050,22 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         update(${myEntityVariableName});
     }
 
+    /**
+     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @deprecated This method is deprecated.
+     */
     protected void doCreateOrModifyAfterSelectForUpdate(${glEntityInterfaceName} ${myEntityVariableName}) {
         insertOrUpdateAfterSelectForUpdate((${myExtendedObjectClassName})${myEntityVariableName});
     }
-  #end
+#end
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * ${database.ImplementComment}
      * 
      * @param sourceEntity Source entity. (NotNull)
      * @param destinationEntity Destination entity. (NotNull)
+     * @deprecated Thie method is old style and has wrong performance.
      */
     protected void mergeEntity(${glEntityInterfaceName} sourceEntity, ${glEntityInterfaceName} destinationEntity) {
         assertEntityNotNull(sourceEntity);
@@ -1196,6 +1080,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     }
+#end
 
     /**
      * Delete.
@@ -1220,6 +1105,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         delete((${myExtendedObjectClassName})${myEntityVariableName});
     }
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Delete after select.
      * <pre>
@@ -1232,6 +1118,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @deprecated Thie method is old style and has wrong performance. Please use remove().
      */
     public void deleteAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
@@ -1241,17 +1128,20 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         delete(${myEntityVariableName});
     }
 
+    /**
+     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
+     * @deprecated Thie method is old style and has wrong performance. Please use remove().
+     */
     protected void doRemoveAfterSelect(${glEntityInterfaceName} entity) {
         deleteAfterSelect((${myExtendedObjectClassName})entity);
     }
-  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#end
 
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
-     * Delete non stritct.
-     * <pre>
+     * Delete non stritct. <br />
      * This delete ignores concurrency control.
-     * This method is faster than deleteAfterSelect().
-     * </pre>
+     * 
      * @param ${myEntityVariableName} Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
@@ -1268,11 +1158,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Delete non stritct ignoring deleted.
-     * <pre>
+     * Delete non stritct ignoring deleted. <br />
      * This delete ignores concurrency control.
-     * This method is faster than deleteAfterSelect().
-     * </pre>
+     * 
      * @param ${myEntityVariableName} Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
@@ -1287,7 +1175,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
-  #end
+#end
 
     // ===================================================================================
     //                                                                  Basic Batch Update

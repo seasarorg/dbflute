@@ -637,6 +637,10 @@ public class Database {
         return getBasicProperties().getTargetLanguage();
     }
 
+    public String getResourceDirectory() {
+        return getBasicProperties().getResourceDirectory();
+    }
+    
     public String getTargetLanguageInitCap() {
         final String targetLanguage = getBasicProperties().getTargetLanguage();
         return targetLanguage.substring(0, 1).toUpperCase() + targetLanguage.substring(1);

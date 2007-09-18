@@ -132,6 +132,14 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return stringProp("torque.targetLanguage", DEFAULT_targetLanguage);
     }
 
+    public String getResourceDirectory() {
+        final String targetLanguage = getTargetLanguage();
+        if (isTargetLanguageJava() && getTargetLanguageVersion().startsWith("1.4")) {
+            return targetLanguage + "j14";
+        }
+        return targetLanguage;
+    }
+
     public boolean isTargetLanguageJava() {
         return JAVA_targetLanguage.equals(getTargetLanguage());
     }
@@ -139,7 +147,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isTargetLanguageCSharp() {
         return CSHARP_targetLanguage.equals(getTargetLanguage());
     }
-    
+
     public boolean isTargetLanguageCSharpOld() {
         return CSHARPOLD_targetLanguage.equals(getTargetLanguage());
     }
@@ -163,7 +171,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getTargetLanguageVersion() {
-        return stringProp("torque.targetLanguageVersion", "5.0");
+        return stringProp("torque.targetLanguageVersion", isAvailableGenerics() ? "5.0" : "1.4");
     }
 
     public boolean isJavaVersionGreaterEqualMustang() {
@@ -264,7 +272,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String outputOverrideAnnotation() {
         return filterGenericsGeneralOutput("@Override()");
     }
-    
+
     public String outputOverrideAnnotationAfterNewLineOutput() {
         return filterGenericsGeneralOutputAfterNewLineOutput("    @Override()");
     }
