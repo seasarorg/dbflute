@@ -1047,7 +1047,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
 #if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
-     * Delete non stritct. <br />
+     * Delete non-stritct. <br />
      * This delete ignores concurrency control.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
@@ -1060,7 +1060,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Delete non stritct ignoring deleted. <br />
+     * Delete non-stritct ignoring deleted. <br />
      * This delete ignores concurrency control.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
