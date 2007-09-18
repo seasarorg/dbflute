@@ -493,6 +493,139 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     // ===================================================================================
+    //                                                        Load Referer Internal Helper
+    //                                                        ============================
+    /**
+     * Help load referer internally. <br />
+     * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     * 
+     * @param <BASE_ENTITY_TYPE> The type of base entity.
+     * @param <PK_TYPE> The type of primary key.
+     * @param <REFERER_CB_TYPE> The type of referer condition-bean.
+     * @param <REFERER_ENTITY_TYPE> The type of referer entity.
+     * @param baseEntityList The list of base entity. (NotNull)
+     * @param loadRefererOption The option of load referer. (NotNull)
+     * @param callback The internal callback of load referer. (NotNull) 
+     */
+    protected <BASE_ENTITY_TYPE extends ${glEntityInterfaceName}, PK_TYPE, REFERER_CB_TYPE extends ${glConditionBeanInterfaceName}, REFERER_ENTITY_TYPE extends ${glEntityInterfaceName}>
+            void helpLoadRefererInternally(java.util.List<BASE_ENTITY_TYPE> baseEntityList
+                                         , ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<REFERER_CB_TYPE, REFERER_ENTITY_TYPE> loadRefererOption
+                                         , InternalLoadRefererCallback<BASE_ENTITY_TYPE, PK_TYPE, REFERER_CB_TYPE, REFERER_ENTITY_TYPE> callback) {
+
+        // - - - - - - - - - - -
+        // Assert pre-condition
+        // - - - - - - - - - - -
+        assertObjectNotNull("baseEntityList", baseEntityList);
+        assertObjectNotNull("loadRefererOption", loadRefererOption);
+        if (baseEntityList.isEmpty()) {
+            return;
+        }
+
+        // - - - - - - - - - - - - - -
+        // Prepare temporary container
+        // - - - - - - - - - - - - - -
+        final java.util.Map<PK_TYPE, BASE_ENTITY_TYPE> pkBaseEntityMap = new java.util.LinkedHashMap<PK_TYPE, BASE_ENTITY_TYPE>();
+        final java.util.List<PK_TYPE> pkList = new java.util.ArrayList<PK_TYPE>();
+        for (BASE_ENTITY_TYPE baseEntity : baseEntityList) {
+            final PK_TYPE primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(baseEntity);
+            pkList.add(callback.callbackBase_getPrimaryKeyValue(baseEntity));
+            pkBaseEntityMap.put(toLowerCasePrimaryKeyIfString(primaryKeyValue), baseEntity);
+        }
+
+        // - - - - - - - - - - - - - - - -
+        // Prepare referer condition bean
+        // - - - - - - - - - - - - - - - -
+        final REFERER_CB_TYPE cb;
+        if (loadRefererOption.getRefererConditionBean() != null) {
+            cb = loadRefererOption.getRefererConditionBean();
+        } else {
+            cb = callback.callbackReferer_newMyConditionBean();
+        }
+
+        // - - - - - - - - - - - - - -
+        // Select the list of referer
+        // - - - - - - - - - - - - - -
+        callback.callbackReferer_queryForeignKeyInScope(cb, pkList);
+        loadRefererOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
+        if (!loadRefererOption.isStopOrderByKey()) {
+            callback.callbackReferer_queryAddOrderByForeignKeyAsc(cb);
+            cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
+        }
+        loadRefererOption.delegateConditionBeanSettingUp(cb);
+        final java.util.List<REFERER_ENTITY_TYPE> refererList = callback.callbackReferer_selectList(cb);
+        loadRefererOption.delegateEntitySettingUp(refererList);
+
+        // - - - - - - - - - - - - - - - - - - - - - - - -
+        // Create the map of {primary key / referer list}
+        // - - - - - - - - - - - - - - - - - - - - - - - -
+        final java.util.Map<PK_TYPE, java.util.List<REFERER_ENTITY_TYPE>> pkReffererListMap = new java.util.LinkedHashMap<PK_TYPE, java.util.List<REFERER_ENTITY_TYPE>>();
+        for (REFERER_ENTITY_TYPE refererEntity : refererList) {
+            final PK_TYPE refererListKey;
+            {
+                final PK_TYPE foreignKeyValue = callback.callbackReferer_getForeignKeyValue(refererEntity);
+                refererListKey = toLowerCasePrimaryKeyIfString(foreignKeyValue);
+            }
+            if (!pkReffererListMap.containsKey(refererListKey)) {
+                pkReffererListMap.put(refererListKey, new java.util.ArrayList<REFERER_ENTITY_TYPE>());
+            }
+            (pkReffererListMap.get(refererListKey)).add(refererEntity);
+
+            // for Reverse Reference.
+            final BASE_ENTITY_TYPE baseEntity = pkBaseEntityMap.get(refererListKey);
+            callback.callbackReferer_setForeignEntity(refererEntity, baseEntity);
+        }
+
+        // - - - - - - - - - - - - - - - - - -
+        // Relate referer list to base entity
+        // - - - - - - - - - - - - - - - - - -
+        for (BASE_ENTITY_TYPE baseEntity : baseEntityList) {
+            final PK_TYPE refererListKey;
+            {
+                final PK_TYPE primaryKey = callback.callbackBase_getPrimaryKeyValue(baseEntity);
+                refererListKey = toLowerCasePrimaryKeyIfString(primaryKey);
+            }
+            if (pkReffererListMap.containsKey(refererListKey)) {
+                callback.callbackBase_setRefererList(baseEntity, pkReffererListMap.get(refererListKey));
+            } else {
+                callback.callbackBase_setRefererList(baseEntity, new java.util.ArrayList<REFERER_ENTITY_TYPE>());
+            }
+        }
+    }
+
+    /**
+     * To lower case for primary key if the value is string.
+     * 
+     * @param <PK_TYPE> The type of primary key.
+     * @param value The value of primary key. (Nullable)
+     * @return The value of primary key. (Nullable)
+     */
+    protected <PK_TYPE> PK_TYPE toLowerCasePrimaryKeyIfString(PK_TYPE value) {
+        return (PK_TYPE)toLowerCaseIfString(value);
+    }
+
+    /**
+     * @param <BASE_ENTITY_TYPE> The type of base entity.
+     * @param <PK_TYPE> The type of primary key.
+     * @param <REFERER_CB_TYPE> The type of referer condition-bean.
+     * @param <REFERER_ENTITY_TYPE> The type of referer entity.
+     */
+    protected static interface InternalLoadRefererCallback<BASE_ENTITY_TYPE extends ${glEntityInterfaceName}
+                                                         , PK_TYPE, REFERER_CB_TYPE extends ${glConditionBeanInterfaceName}
+                                                         , REFERER_ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        // For Base
+        public PK_TYPE callbackBase_getPrimaryKeyValue(BASE_ENTITY_TYPE entity);
+        public void callbackBase_setRefererList(BASE_ENTITY_TYPE entity, java.util.List<REFERER_ENTITY_TYPE> refererList);
+
+        // For Referer
+        public REFERER_CB_TYPE callbackReferer_newMyConditionBean();
+        public void callbackReferer_queryForeignKeyInScope(REFERER_CB_TYPE cb, java.util.List<PK_TYPE> pkList);
+        public void callbackReferer_queryAddOrderByForeignKeyAsc(REFERER_CB_TYPE cb);
+        public java.util.List<REFERER_ENTITY_TYPE> callbackReferer_selectList(REFERER_CB_TYPE cb);
+        public PK_TYPE callbackReferer_getForeignKeyValue(REFERER_ENTITY_TYPE entity);
+        public void callbackReferer_setForeignEntity(REFERER_ENTITY_TYPE refererEntity, BASE_ENTITY_TYPE baseEntity);
+    }
+
+    // ===================================================================================
     //                                                             Pullout Internal Helper
     //                                                             =======================
     protected <BASE_ENTITY_TYPE extends ${glEntityInterfaceName}, FOREIGN_ENTITY_TYPE extends ${glEntityInterfaceName}>
@@ -577,6 +710,17 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected String getLineSeparator() {
         return System.getProperty("line.separator");
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> ENTITY_TYPE helpDowncastInternally(${glEntityInterfaceName} entity, Class<ENTITY_TYPE> clazz) {
+        assertObjectNotNull("entity", entity);
+        assertObjectNotNull("clazz", clazz);
+        try {
+            return (ENTITY_TYPE)entity;
+        } catch (ClassCastException e) {
+            String msg = "The entity should be " + clazz.getSimpleName() + " but it was: " + entity.getClass();
+            throw new RuntimeException(msg, e);
+        }
     }
 
     // ----------------------------------------------------------------

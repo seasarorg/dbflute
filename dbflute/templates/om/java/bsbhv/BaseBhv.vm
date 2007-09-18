@@ -673,47 +673,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("loadRefererOption<${reffererEntityClassName}, ${reffererCBClassName}>", loadRefererOption);
-        if (${myEntityListVariableName}.isEmpty()) {
-            return;
-        }
-
-        final java.util.Map<${genericPKMyEntityMap}> pkMyEntityMap = new java.util.LinkedHashMap<${genericPKMyEntityMap}>();
-        final java.util.List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList = new java.util.ArrayList<${table.getPrimaryKeyJavaNativeAsOne()}>();
-        for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
-            pkList.add(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}());
-            pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()), ${myEntityVariableName});
-        }
+        if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${reffererBhvClassName} refererBhv = getBehaviorSelector().select(${reffererBhvClassName}.class);
-        final ${reffererCBClassName} cb = loadRefererOption.getRefererConditionBean() != null ? loadRefererOption.getRefererConditionBean() : refererBhv.newMyConditionBean();
-        cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-        loadRefererOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
-        if (!loadRefererOption.isStopOrderByKey()) {
-            cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-            cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
-        }
-        loadRefererOption.delegateConditionBeanSettingUp(cb);
-        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = refererBhv.selectList(cb);
-        loadRefererOption.delegateEntitySettingUp(reffererList);
-
-        final java.util.Map<${genericPKChildListMap}> pkReffererListMap = new java.util.LinkedHashMap<${genericPKChildListMap}>();
-        for (${reffererEntityClassName} reffererEntity : reffererList) {
-            if (!pkReffererListMap.containsKey(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))) {
-                pkReffererListMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()), new java.util.ArrayList<${reffererEntityClassName}>());
-            }
-            (pkReffererListMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))).add(reffererEntity);
-
-            // for Reverse Reference.
-            final ${myExtendedObjectClassName} myEntity = pkMyEntityMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()));
-            reffererEntity.set${refferer.ForeignPropertyNameInitCap}(myEntity);
-        }
-
-        for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
-            if (pkReffererListMap.containsKey(toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()))) {
-                ${myEntityVariableName}.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}())));
-            } else {
-                ${myEntityVariableName}.set${refferer.ReffererPropertyNameInitCap}(new java.util.ArrayList<${reffererEntityClassName}>());
-            }
-        }
+        helpLoadRefererInternally(${myEntityListVariableName}, loadRefererOption, new InternalLoadRefererCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${reffererCBClassName}, ${reffererEntityClassName}>() {
+            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity) { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
+            public void callbackBase_setRefererList(${myExtendedObjectClassName} entity, java.util.List<${reffererEntityClassName}> refererList) { entity.set${refferer.ReffererPropertyNameInitCap}(refererList); }
+            public ${reffererCBClassName} callbackReferer_newMyConditionBean() { return refererBhv.newMyConditionBean(); }
+            public void callbackReferer_queryForeignKeyInScope(${reffererCBClassName} cb, java.util.List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
+            public void callbackReferer_queryAddOrderByForeignKeyAsc(${reffererCBClassName} cb) { cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc(); }
+            public java.util.List<${reffererEntityClassName}> callbackReferer_selectList(${reffererCBClassName} cb) { return refererBhv.selectList(cb); }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferer_getForeignKeyValue(${reffererEntityClassName} entity) { return entity.get${refferer.getLocalColumnJavaNameAsOne()}(); }
+            public void callbackReferer_setForeignEntity(${reffererEntityClassName} refererEntity, ${myExtendedObjectClassName} baseEntity) { refererEntity.set${refferer.foreignPropertyNameInitCap}(baseEntity); }
+        } );
     }
   #end
 #end
@@ -1187,7 +1158,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #end
 #end
 
-#if ($database.isAvailableGenerics())
     // ===================================================================================
     //                                                                           Hierarchy
     //                                                                           =========
@@ -1213,12 +1183,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public java.util.List<${myExtendedObjectClassName}> arrangeHierarchy(${glHierarchyRequestName}<${myExtendedObjectClassName}> request) {
         return new ${glHierarchyArrangerName}<${myExtendedObjectClassName}>().arrangeHierarchy(request);
     }
-#end
 
     // ===================================================================================
     //                                                                          CBSetupper
     //                                                                          ==========
-#if ($database.isAvailableGenerics())
     /**
      * The interface of condition-bean setupper.
      */
@@ -1231,31 +1199,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
          */
         public void setup(${myConditionBeanClassName} cb);
     }
-#else
-    /**
-     * The interface of condition-bean setupper.
-     */
-    public static interface CBSetupper extends SimpleCBSetupper {
-
-        /**
-         * Set up condition.
-         * 
-         * @param cb Condition-bean. (NotNull)
-         */
-        public void setup(${myConditionBeanClassName} cb);
-    }
-#end
 
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
     protected ${myExtendedObjectClassName} downcast(${glEntityInterfaceName} entity) {
-        assertObjectNotNull("entity", entity);
-        try {
-            return (${myExtendedObjectClassName})entity;
-        } catch (ClassCastException e) {
-            String msg = "The entity should be ${myExtendedObjectClassName} but it was: " + entity.getClass();
-            throw new RuntimeException(msg, e);
-        }
+        return helpDowncastInternally(entity, ${myExtendedObjectClassName}.class);
     }
 }
