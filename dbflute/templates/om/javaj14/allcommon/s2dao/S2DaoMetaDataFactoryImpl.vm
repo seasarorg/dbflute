@@ -1,0 +1,251 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
+
+import org.seasar.dao.AnnotationReaderFactory;
+import org.seasar.dao.BeanEnhancer;
+import org.seasar.dao.impl.DaoMetaDataFactoryImpl;
+import org.seasar.dao.impl.DaoMetaDataImpl;
+import org.seasar.extension.jdbc.ResultSetFactory;
+import org.seasar.extension.jdbc.StatementFactory;
+
+#if ($database.isVersionAfter1047())
+import org.seasar.dao.PropertyTypeFactoryBuilder;
+import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
+import org.seasar.dao.TableNaming;
+#end
+
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+
+/**
+ * DaoMetaDataFactoryImpl for DBFlute.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log-instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoInterceptor}.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Bean enhancer. */
+    protected BeanEnhancer beanEnhancer;
+
+#if ($database.isVersionAfter1047())
+    /** The builder of property type factory. {After S2Dao-1.0.47} */
+    protected PropertyTypeFactoryBuilder propertyTypeFactoryBuilder;
+
+    /** The builder of relation property type factory. {After S2Dao-1.0.47} */
+    protected RelationPropertyTypeFactoryBuilder relationPropertyTypeFactoryBuilder;
+
+    /** The builder of table naming. {After S2Dao-1.0.47} */
+    protected TableNaming tableNaming;
+#end
+
+#if ($database.isAvailableOtherConnectionDaoInitialization())
+    /** The transaction manager for other connection dao initialization. */
+    protected javax.transaction.TransactionManager transactionManager;
+#end
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * 
+     * @param dataSource Data source.
+     * @param statementFactory Statement factory.
+     * @param resultSetFactory Result set factory.
+     * @param readerFactory Annotation reader factory.
+     * @param xaDataSource XA data source.
+     */
+    public ${glDaoMetaDataFactoryImpl}(javax.sql.DataSource dataSource,
+            StatementFactory statementFactory,
+            ResultSetFactory resultSetFactory,
+            AnnotationReaderFactory readerFactory,
+            javax.sql.XADataSource xaDataSource) {
+        super(dataSource, statementFactory, resultSetFactory, readerFactory);
+
+        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
+        showInformation(dataSource, xaDataSource);
+
+        // Stop the LinkageError!
+        ${glConditionBeanContextName}.initialize();
+
+        initializeDatabaseProductNameOfContext(xaDataSource);
+
+        _log.info("* * * * */");
+    }
+
+    protected void showInformation(javax.sql.DataSource dataSource, javax.sql.XADataSource xaDataSource) {
+        if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
+            final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
+            final String driverClassName = xaDataSourceImpl.getDriverClassName();
+            final String url = xaDataSourceImpl.getURL();
+            final String user = xaDataSourceImpl.getUser();
+            _log.info("[XADataSource]: " + xaDataSourceImpl);
+            _log.info("    driver = " + driverClassName);
+            _log.info("    url    = " + url);
+            _log.info("    user   = " + user);
+        }
+        _log.info("[StatementFactory]: " + statementFactory);
+        _log.info("[ResultSetFactory]: " + resultSetFactory);
+    }
+
+    // -----------------------------------------------------
+    //                                 Database Product Name
+    //                                 ---------------------
+    protected void initializeDatabaseProductNameOfContext(javax.sql.XADataSource xaDataSource) {
+        if (getDatabaseProductNameFromContext() != null) {
+            return;
+        }
+
+        // From JDBC Driver!
+        if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
+            final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
+            final String driverClassName = xaDataSourceImpl.getDriverClassName();
+            if (driverClassName != null) {
+                if (setupDatabaseProductNameByDriverClassName(driverClassName)) {
+                    _log.info("...Initializing database product name from driverClassName: " + getDatabaseProductNameFromContext());
+                    return;
+                }
+            }
+        }
+
+        _log.info("...Initializing database product name as default: ${database.daoGenDbName}");
+        setDatabaseProductNameToContext("${database.daoGenDbName}");
+    }
+
+    protected String getDatabaseProductNameFromContext() {
+        return ${glConditionBeanContextName}.getDatabaseProductName();
+    }
+
+    protected void setDatabaseProductNameToContext(String name) {
+        ${glConditionBeanContextName}.setDatabaseProductName(name);
+    }
+
+    protected boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
+        return ${glConditionBeanContextName}.setupDatabaseProductNameByDriverClassName(driverClassName);
+    }
+
+#if ($database.isVersionAfter1046() && !$database.isVersionAfter1047())
+    // ===================================================================================
+    //                                                                          Initialize
+    //                                                                          ==========
+    public void initialize() {
+        if (dtoMetaDataFactory == null) {
+            final org.seasar.dao.impl.DtoMetaDataFactoryImpl factory = new org.seasar.dao.impl.DtoMetaDataFactoryImpl();
+            factory.setAnnotationReaderFactory(this.annotationReaderFactory);
+            factory.setValueTypeFactory(valueTypeFactory);
+            dtoMetaDataFactory = factory;
+        }
+        if (resultSetHandlerFactory == null) {
+            final org.seasar.dao.impl.ResultSetHandlerFactoryImpl factory = new ${glDaoMetaDataExtension}.ResultSetHandlerFactoryExtension();
+            factory.setDtoMetaDataFactory(dtoMetaDataFactory);
+            resultSetHandlerFactory = factory;
+        }
+    }
+#end
+
+#if ($database.isAvailableOtherConnectionDaoInitialization())
+    // ===================================================================================
+    //                                                      DataMetaData Creation Override
+    //                                                      ==============================
+    protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
+        final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
+        dmdExtension.setBeanEnhancer(beanEnhancer);
+        dmdExtension.setTransactionManager(this.transactionManager);
+#if ($database.isVersionAfter1046())
+        dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
+#end
+#if ($database.isVersionAfter1047())
+        dmdExtension.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
+        dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
+        dmdExtension.setTableNaming(tableNaming);
+#end
+        return dmdExtension;
+    }
+
+    // ===================================================================================
+    //                                                                 Transaction Manager
+    //                                                                 ===================
+    public javax.transaction.TransactionManager getTransactionManager() {
+        return transactionManager;
+    }
+
+    public void setTransactionManager(javax.transaction.TransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+#else
+    // ===================================================================================
+    //                                                      DataMetaData Creation Override
+    //                                                      ==============================
+    protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
+        final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
+        dmdExtension.setBeanEnhancer(beanEnhancer);
+#if ($database.isVersionAfter1046())
+        dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
+#end
+#if ($database.isVersionAfter1047())
+        dmdExtension.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
+        dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
+        dmdExtension.setTableNaming(tableNaming);
+#end
+        return dmdExtension;
+    }
+#end
+
+    protected ${glDaoMetaDataExtension} newDaoMetaDataExtension() {
+        return new ${glDaoMetaDataExtension}();
+    }
+
+    // ===================================================================================
+    //                                                                   Sql File Encoding
+    //                                                                   =================
+    public String getSqlFileEncoding() {
+        return sqlFileEncoding;
+    }
+
+    // ===================================================================================
+    //                                                                       Bean Enhancer
+    //                                                                       =============
+    public BeanEnhancer getBeanEnhancer() {
+        return beanEnhancer;
+    }
+
+    public void setBeanEnhancer(final BeanEnhancer beanEnhancer) {
+        this.beanEnhancer = beanEnhancer;
+    }
+
+#if ($database.isVersionAfter1047())
+    // ===================================================================================
+    //                                                                Version After 1.0.47
+    //                                                                ====================
+    public PropertyTypeFactoryBuilder getPropertyTypeFactoryBuilder() {
+        return propertyTypeFactoryBuilder;
+    }
+
+    public void setPropertyTypeFactoryBuilder(final PropertyTypeFactoryBuilder propertyTypeFactoryBuilder) {
+        this.propertyTypeFactoryBuilder = propertyTypeFactoryBuilder;
+    }
+
+    public RelationPropertyTypeFactoryBuilder getRelationPropertyTypeFactoryBuilder() {
+        return relationPropertyTypeFactoryBuilder;
+    }
+
+    public void setRelationPropertyTypeFactoryBuilder(final RelationPropertyTypeFactoryBuilder relationPropertyTypeFactoryBuilder) {
+        this.relationPropertyTypeFactoryBuilder = relationPropertyTypeFactoryBuilder;
+    }
+
+    public TableNaming getTableNaming() {
+        return tableNaming;
+    }
+
+    public void setTableNaming(final TableNaming tableNaming) {
+        this.tableNaming = tableNaming;
+    }
+#end
+}

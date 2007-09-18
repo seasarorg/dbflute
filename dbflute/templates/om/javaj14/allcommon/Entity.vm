@@ -1,0 +1,153 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+
+/**
+ * The interface of entity.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glEntityInterfaceName} {
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    /**
+     * Get dbmeta.
+     * 
+     * @return DBMeta. (NotNull)
+     */
+    public ${glDBMetaInterfaceName} getDBMeta();
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    /**
+     * Get table db-name.
+     * 
+     * @return Table db-name. (NotNull)
+     */
+    public String getTableDbName();
+
+    /**
+     * Get table property-name.
+     * 
+     * @return Table property-name. (NotNull)
+     */
+    public String getTablePropertyName();
+
+    /**
+     * Get table cap-prop-name.
+     * 
+     * @return Table cap-prop-name. (NotNull)
+     */
+    public String getTableCapPropName();
+
+    /**
+     * Get table uncap-prop-name.
+     * 
+     * @return Table uncap-prop-name. (NotNull)
+     */
+    public String getTableUncapPropName();
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    /**
+     * Has primary-key value?
+     * 
+     * @return Determination.
+     */
+    public boolean hasPrimaryKeyValue();
+
+    /**
+     * Has version no value?
+     * 
+     * @return Determination.
+     */
+    public boolean hasVersionNoValue();
+
+    /**
+     * Has update date value?
+     * 
+     * @return Determination.
+     */
+    public boolean hasUpdateDateValue();
+
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    /**
+     * Get modified property names. (JavaBeansRule)
+     * 
+     * @return Modified property names. (NotNull)
+     */
+    public java.util.Set${database.filterGenericsString('String')} getModifiedPropertyNames();
+
+    /**
+     * Clear modified property names.
+     */
+    public void clearModifiedPropertyNames();
+
+    /**
+     * Entity modified properties.
+     */
+    public static class EntityModifiedProperties implements java.io.Serializable {
+
+        /** Serial version UID. (Default) */
+        private static final long serialVersionUID = 1L;
+
+        /** Set of properties. */
+        protected java.util.Set${database.filterGenericsString('String')} _propertiesSet = new java.util.LinkedHashSet${database.filterGenericsString('String')}();
+
+        /**
+         * Add property name. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (Nullable)
+         */
+        public void addPropertyName(String propertyName) {
+            _propertiesSet.add(propertyName);
+        }
+
+        /**
+         * Add property name. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (NotNull)
+         * @param before Before value. (Nullable)
+         * @param after After value. (Nullable)
+         */
+        public void addPropertyNameIfNeeds(String propertyName, Object before, Object after) {
+            if (_propertiesSet.contains(propertyName)) {
+                return;
+            }
+            if (before == null || !before.equals(after)) {
+                addPropertyName(propertyName);
+            }
+        }
+
+        /**
+         * Get the set of properties.
+         * 
+         * @return The set of properties. (NotNull)
+         */
+        public java.util.Set${database.filterGenericsString('String')} getPropertyNames() {
+            return _propertiesSet;
+        }
+
+        /**
+         * Clear the set of properties.
+         */
+        public void clear() {
+            _propertiesSet.clear();
+        }
+
+        /**
+         * Remove property name from the set. (JavaBeansRule)
+         * 
+         * @param propertyName Property name. (Nullable)
+         */
+        public void remove(String propertyName) {
+            _propertiesSet.remove(propertyName);
+        }
+    }
+}

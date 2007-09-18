@@ -1,0 +1,153 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhv};
+
+import ${glPackageBaseCommon}.${glDaoWritableInterfaceName};
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionOptionName};
+import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionResultName};
+
+/**
+ * The interface of behavior-writable.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadableInterfaceName} {
+
+    /**
+     * Get dao-writable.
+     * 
+     * @return Dao-writable. (NotNull)
+     */
+    public ${glDaoWritableInterfaceName} getDaoWritable();
+
+    // =====================================================================================
+    //                                                                   Basic Entity Update
+    //                                                                   ===================
+    /**
+     * Create.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    public void create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Modify.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    public void modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Modify non strict.
+     * 
+     * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     */
+    public void modifyNonstrict(${glEntityInterfaceName} entity);
+
+    /**
+     * Modify after select. <br />
+     * {modify: modified only}
+     * <pre>
+     * The merit of this method is only Deleted-Check before updating!
+     * If you don't want the merit, please use update().
+     * And the demerit of this method is as follows:
+     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
+     *   : it does not throw optimistic lock exception. It can updates.
+     * </pre>
+     * @param entity Entity.
+     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     */
+    public void modifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Create or modify. <br />
+     * {modify: modified only} <br />
+     * This method is faster than createOrModifyAfterSelect().
+     * 
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     */
+    public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Create or modify non strict. <br />
+     * {modify: modified only} <br />
+     * This method is faster than createOrModifyAfterSelect().
+     * 
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     */
+    public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Create or modify after select. <br />
+     * {modify: modified only}
+     * <pre>
+     * The merit of this method is only Deleted-Check before updating!
+     * If you don't want the merit, please use update().
+     * And the demerit of this method is as follows:
+     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
+     *   : it does not throw optimistic lock exception. It can updates.
+     * </pre>
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     */
+    public void createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    /**
+     * Remove.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+
+    // =====================================================================================
+    //                                                                    Basic Batch Update
+    //                                                                    ==================
+    /**
+     * Create list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Created count.
+     */
+    public int createList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Modify list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Modified count.
+     */
+    public int modifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    /**
+     * Remove list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Removed count.
+     */
+    public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+
+    // =====================================================================================
+    //                                                                            Token File
+    //                                                                            ==========
+    /**
+     * Reflect(insert or update) token-file to this table.
+     * 
+     * @param filename Name of the file. (NotNull and NotEmpty)
+     * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
+     * @return Token-file-reflection-result. (NotNull)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public ${glTokenFileReflectionResultName} reflectTokenFile(String filename, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
+
+    /**
+     * Reflect(insert or update) token-file to this table.
+     * 
+     * @param inputStream Input stream. (NotNull and NotClosed)
+     * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
+     * @return Token-file-reflection-result. (NotNull)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public ${glTokenFileReflectionResultName} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
+}

@@ -1,0 +1,14 @@
+${database.allClassCopyright}package ${myExtendedEntityPackageName};
+
+#set ($myClassName = "${myExtendedObjectClassName}")
+
+/**
+ * The entity of ${table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+public class $myClassName extends ${myBaseEntityPackageName}.${myBaseObjectClassName} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+}

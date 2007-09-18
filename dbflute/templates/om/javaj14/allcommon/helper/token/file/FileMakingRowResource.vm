@@ -1,0 +1,23 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFile};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glFileMakingRowResourceName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected java.util.List${database.filterGenericsString('String')} _valueList;
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public java.util.List${database.filterGenericsString('String')} getValueList() {
+        return _valueList;
+    }
+
+    public void setValueList(java.util.List${database.filterGenericsString('String')} valueList) {
+        this._valueList = valueList;
+    }
+}

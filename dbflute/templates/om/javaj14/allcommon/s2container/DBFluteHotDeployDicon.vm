@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR2.1//DTD S2Container//EN"
+    "http://www.seasar.org/dtd/components21.dtd">
+
+<components namespace="${glDBFluteDiconNamespace}">
+#foreach ($includePath in $database.DBFluteDiconBeforeJ2eeIncludePathList)
+    <include path="${includePath}"/>
+#end
+
+    <include path="${glJdbcDiconResourceName}"/>
+#foreach ($includePath in $database.DBFluteDiconOtherIncludePathList)
+    <include path="${includePath}"/>
+#end
+
+    <!-- S2Dao component. -->
+    <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
+    <component class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
+
+    <component class="${database.extendedDaoMetaDataFactoryImplClassName}">
+#if ($database.hasDaoSqlFileEncoding())
+        <property name="sqlFileEncoding">"${database.daoSqlFileEncoding}"</property>
+#end
+    </component>
+
+    <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
+#if ($database.isVersionAfter1040())
+    <component class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}"/>
+    <component class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
+    <component class="org.seasar.dao.impl.NullBeanEnhancer"/>
+#end
+#if ($database.isVersionAfter1047())
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>
+    <component class="org.seasar.dao.impl.DtoMetaDataFactoryImpl"/>
+    <component class="org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl"/>
+    <component class="org.seasar.dao.impl.RelationPropertyTypeFactoryBuilderImpl"/>
+    <component class="org.seasar.dao.impl.DefaultTableNaming"/>
+    <component class="org.seasar.dao.impl.DefaultColumnNaming"/>
+    <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
+#end
+
+    <!-- Common column setup interceptor. -->
+    <component name="commonColumnSetupBeforeInsertInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeInsertInterceptor}"/>
+    <component name="commonColumnSetupBeforeUpdateInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeUpdateInterceptor}"/>
+    <component name="commonColumnSetupBeforeDeleteInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeDeleteInterceptor}"/>
+
+    <!-- Behavior selector. -->
+    <component name="behaviorSelector" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
+        <destroyMethod name="destroy"/>
+    </component>
+
+    <!-- Dao selector. -->
+    <component name="daoSelector" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
+        <destroyMethod name="destroy"/>
+    </component>
+
+</components>

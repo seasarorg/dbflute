@@ -1,0 +1,110 @@
+${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
+
+#set ($myClassName = "${glSqlClauseInterfaceName}Db2")
+
+/**
+ * SqlClause for DB2.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glSqlClauseAbstractName} {
+
+    /** String of fetch-first as sql-suffix. */
+    protected String _fetchFirstSqlSuffix = "";
+
+    /** String of lock as from-hint. */
+    protected String _lockSqlSuffix = "";
+
+    /**
+     * Constructor.
+     * 
+     * @param tableName Table name. (NotNull)
+     **/
+    public ${myClassName}(String tableName) {
+        super(tableName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchFirst() {
+        if (isFetchSizeSupported()) {
+            _fetchFirstSqlSuffix = " fetch first " + getFetchSize() + " rows only";
+        }
+    }
+
+    /**
+     * ${database.ImplementComment} {Unsupported!}
+     */
+    protected void doFetchPage() {
+        if (isFetchSizeSupported()) {
+            if (isFetchStartIndexSupported()) {
+                _fetchFirstSqlSuffix = " fetch first " + getFetchSize() + " rows only";
+            } else {
+                _fetchFirstSqlSuffix = " fetch first " + getPageEndIndex() + " rows only";
+            }
+        }
+    }
+
+    /**
+     * ${database.ImplementComment} {Unsupported!}
+     */
+    protected void doClearFetchPageClause() {
+        _fetchFirstSqlSuffix = "";
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchStartIndexSupported() {
+        return false;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glSqlClauseInterfaceName} lockForUpdate() {
+        _lockSqlSuffix = " for update with RS";
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Select-hint. (NotNull)
+     */
+    protected String createSelectHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+     */
+    protected String createFromBaseTableHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return From-hint. (NotNull)
+     */
+    protected String createFromHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql-suffix. (NotNull)
+     */
+    protected String createSqlSuffix() {
+        return _fetchFirstSqlSuffix + _lockSqlSuffix;
+    }
+}

@@ -1,0 +1,89 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
+
+/**
+ * The context of outside-sql.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glOutsideSqlContextName} {
+
+    // ===================================================================================
+    //                                                                        Thread Local
+    //                                                                        ============
+    /** The thread-local for this. */
+    private static final ThreadLocal<${glOutsideSqlContextName}> _threadLocal = new ThreadLocal<${glOutsideSqlContextName}>();
+
+    /**
+     * Get outside-sql context on thread.
+     * 
+     * @return Outside-sql context. (Nullable)
+     */
+    public static ${glOutsideSqlContextName} getOutsideSqlContextOnThread() {
+        return (${glOutsideSqlContextName})_threadLocal.get();
+    }
+
+    /**
+     * Set outside-sql context on thread.
+     * 
+     * @param outsideSqlContext Outside-sql context. (NotNull)
+     */
+    public static void setOutsideSqlContextOnThread(${glOutsideSqlContextName} outsideSqlContext) {
+        if (outsideSqlContext == null) {
+            String msg = "The argument[outsideSqlContext] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        _threadLocal.set(outsideSqlContext);
+    }
+
+    /**
+     * Is existing outside-sql context on thread?
+     * 
+     * @return Determination.
+     */
+    public static boolean isExistOutsideSqlContextOnThread() {
+        return (_threadLocal.get() != null);
+    }
+
+    /**
+     * Clear outside-sql context on thread.
+     */
+    public static void clearOutsideSqlContextOnThread() {
+        _threadLocal.set(null);
+    }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private boolean _dynamicAnalysis;
+
+    private boolean _offsetByCursorForcedly;
+
+    private boolean _limitByCursorForcedly;
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isDynamicAnalysis() {
+        return _dynamicAnalysis;
+    }
+
+    public void setDynamicAnalysis(boolean dynamicAnalysis) {
+        this._dynamicAnalysis = dynamicAnalysis;
+    }
+
+    public boolean isOffsetByCursorForcedly() {
+        return _offsetByCursorForcedly;
+    }
+
+    public void setOffsetByCursorForcedly(boolean offsetByCursorForcedly) {
+        this._offsetByCursorForcedly = offsetByCursorForcedly;
+    }
+    
+    public boolean isLimitByCursorForcedly() {
+        return _limitByCursorForcedly;
+    }
+
+    public void setLimitByCursorForcedly(boolean limitByCursorForcedly) {
+        this._limitByCursorForcedly = limitByCursorForcedly;
+    }
+}

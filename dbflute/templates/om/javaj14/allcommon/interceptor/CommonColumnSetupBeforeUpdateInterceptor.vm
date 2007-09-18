@@ -1,0 +1,64 @@
+${database.allClassCopyright}package ${glPackageBaseCommonInterceptor};
+
+import ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName};
+
+/**
+ * CommonColumn-Setup-before-Update Interceptor.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glCommonColumnSetupBeforeUpdateInterceptor} extends ${glCommonColumnSetupAbstractInterceptor} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+#if (!$database.isCommonColumnInterceptingOnBehaviorFilter())
+    /** Log-instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glCommonColumnSetupBeforeUpdateInterceptor}.class);
+#end
+
+    /**
+     * Set up the entity.
+     * 
+     * @param entity Entity. (Nullable)
+     */
+    protected void setupEntity(${glEntityDefinedCommonColumnInterfaceName} entity) {
+#if ($database.isCommonColumnInterceptingOnBehaviorFilter())
+        throw new UnsupportedOperationException("Common column intercepting is supported on behavior filter! Not here!");
+#else
+        if (_log.isDebugEnabled()) {
+            _log.debug("  before setup : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
+        }
+#foreach ($columnName in ${database.CommonColumnNameList})
+  #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+  #set ($entityCommonColumnMap = ${database.CommonColumnMap})
+  #set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+  #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+  #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+  #set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+  #if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(${columnName})})
+    #set ($logic = ${database.getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(${columnName})})
+    #if ($database.isCommonColumnSetupInvokingLogic($logic))
+      #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+        ${filteredLogic}
+        if (_log.isDebugEnabled()) {
+            _log.debug("    ${filteredColumnName} has been set up: invoking=${filteredLogic}");
+        }
+    #else
+
+        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
+        entity.set${javaName}(${uncapitalisedJavaName});
+        if (_log.isDebugEnabled()) {
+            _log.debug("    ${filteredColumnName} has been set up: value=" + ${uncapitalisedJavaName});
+        }
+    #end
+  #end
+#end
+
+        if (_log.isDebugEnabled()) {
+            _log.debug("  after setup  : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
+        }
+#end
+    }
+}

@@ -1,0 +1,1012 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
+
+#set ($myClassName = "${glDBMetaAbstractName}")
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonHelper}.${glMapListStringName};
+import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
+import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
+
+/**
+ * The abstract class of dbmeta.
+ * 
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
+
+    // =====================================================================================
+    //                                                                         Name Handling
+    //                                                                         =============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
+     * @return Determination.
+     */
+    public boolean hasFlexibleName(String flexibleName) {
+        final String key = flexibleName.toLowerCase();
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
+            return true;
+        }
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
+            return true;
+        }
+        return false;
+    }
+
+#if ($database.isMakeDeprecated())
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param dbName Db-name. (NotNull)
+     * @return Determination.
+     * @deprecated Please use isExistByFlexibleName()
+     */
+    public boolean isExistDbName(String dbName) {
+        return getDbNameCapPropNameMap().containsKey(dbName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param capPropName Cap-prop-name. (NotNull)
+     * @return Determination.
+     * @deprecated Please use isExistByFlexibleName()
+     */
+    public boolean isExistCapPropName(String capPropName) {
+        return getCapPropNameDbNameMap().containsKey(capPropName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param uncapPropName Uncap-prop-name. (NotNull)
+     * @return Determination.
+     * @deprecated Please use isExistByFlexibleName()
+     */
+    public boolean isExistUncapPropName(String uncapPropName) {
+        return getUncapPropNameDbNameMap().containsKey(uncapPropName);
+    }
+
+    /**
+     * 
+     * @param multiName Mult-name. (NotNull)
+     * @return Determination.
+     * @deprecated Please use isExistByFlexibleName()
+     */
+    public boolean isExistMultiName(String multiName) {
+        if (isExistDbName(multiName)) {
+            return true;
+        }
+        if (isExistCapPropName(multiName)) {
+            return true;
+        }
+        if (isExistUncapPropName(multiName)) {
+            return true;
+        }
+        return false;
+    }
+#end
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
+     * @return Db-name. (NotNull and NotEmpty)
+     */
+    public String findDbName(String flexibleName) {
+        final String key = flexibleName.toLowerCase();
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
+            return (String)getPropertyNameDbNameKeyToLowerMap().get(key);
+        }
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
+            final String dbNameKeyToLower = ((String)getDbNamePropertyNameKeyToLowerMap().get(key)).toLowerCase();
+            if (getPropertyNameDbNameKeyToLowerMap().containsKey(dbNameKeyToLower)) {
+                return (String)getPropertyNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
+            }
+        }
+        String msg = "Nof found object by the flexible name: flexibleName=" + flexibleName;
+        throw new IllegalStateException(msg);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
+     * @return Db-name. (NotNull and NotEmpty)
+     */
+    public String findPropertyName(String flexibleName) {
+        final String key = flexibleName.toLowerCase();
+        if (getDbNamePropertyNameKeyToLowerMap().containsKey(key)) {
+            return (String)getDbNamePropertyNameKeyToLowerMap().get(key);
+        }
+        if (getPropertyNameDbNameKeyToLowerMap().containsKey(key)) {
+            final String dbNameToLower = ((String)getPropertyNameDbNameKeyToLowerMap().get(key)).toLowerCase();
+            if (getDbNamePropertyNameKeyToLowerMap().containsKey(dbNameToLower)) {
+                return (String)getDbNamePropertyNameKeyToLowerMap().get(dbNameToLower);
+            }
+        }
+        String msg = "Nof found object by the flexible name: flexibleName=" + flexibleName;
+        throw new IllegalStateException(msg);
+    }
+
+#if ($database.isMakeDeprecated())
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param capPropName Cap-prop-name. (NotNull and NotEmpty)
+     * @return Db-name. (NotNull and NotEmpty)
+     * @deprecated Please use getDbNameByFlexibleName()
+     */
+    public String getDbNameByCapPropName(String capPropName) {
+        assertStringNotNullAndNotTrimmedEmpty("capPropName", capPropName);
+        final String dbName = (String)getCapPropNameDbNameMap().get(capPropName);
+        if (dbName == null) {
+            String msg = "The capPropNameDbNameMap didn't contain the key of '" + capPropName + "': ";
+            throw new IllegalStateException(msg + getCapPropNameDbNameMap());
+        }
+        return dbName;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param uncapPropName Uncap-prop-name. (NotNull)
+     * @return {db-name : java-name} map. (NotNull)
+     * @deprecated Please use getDbNameByFlexibleName()
+     */
+    public String getDbNameByUncapPropName(String uncapPropName) {
+        assertStringNotNullAndNotTrimmedEmpty("uncapPropName", uncapPropName);
+        final String dbName = (String)getUncapPropNameDbNameMap().get(uncapPropName);
+        if (dbName == null) {
+            String msg = "The uncapPropNameDbNameMap didn't contain the key of '" + uncapPropName + "': ";
+            throw new IllegalStateException(msg + getUncapPropNameDbNameMap());
+        }
+        return dbName;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param dbName Db-name. (NotNull)
+     * @return Cap-prop-name. (NotNull)
+     * @deprecated Please use getPropNameByFlexibleName()
+     */
+    public String getCapPropNameByDbName(String dbName) {
+        assertStringNotNullAndNotTrimmedEmpty("dbName", dbName);
+        final String capPropName = (String)getDbNameCapPropNameMap().get(dbName);
+        if (capPropName == null) {
+            String msg = "The dbNameCapPropNameMap didn't contain the key of '" + dbName + "': ";
+            throw new IllegalStateException(msg + getDbNameCapPropNameMap());
+        }
+        return capPropName;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param uncapPropName Uncap-prop-name. (NotNull)
+     * @return Cap-prop-name. (NotNull)
+     * @deprecated Please use getDbNameByFlexibleName()
+     * @deprecated Please use getPropNameByFlexibleName()
+     */
+    public String getCapPropNameByUncapPropName(String uncapPropName) {
+        assertStringNotNullAndNotTrimmedEmpty("uncapPropName", uncapPropName);
+        final String dbName = getDbNameByMultiName(uncapPropName);
+        final String capPropName = (String)getDbNameCapPropNameMap().get(dbName);
+        if (capPropName == null) {
+            String msg = "The dbNameCapPropNameMap didn't contain the key of '" + dbName + "': ";
+            throw new IllegalStateException(msg + getDbNameCapPropNameMap());
+        }
+        return capPropName;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param dbName Db-name. (NotNull)
+     * @return Uncap-prop-name. (NotNull)
+     * @deprecated Please use getPropNameByFlexibleName()
+     */
+    public String getUncapPropNameByDbName(String dbName) {
+        assertStringNotNullAndNotTrimmedEmpty("dbName", dbName);
+        final String uncapPropName = (String)getDbNameUncapPropNameMap().get(dbName);
+        if (uncapPropName == null) {
+            String msg = "The dbNameUncapPropNameMap didn't contain the key of '" + dbName + "': ";
+            throw new IllegalStateException(msg + getDbNameUncapPropNameMap());
+        }
+        return uncapPropName;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param capPropName Cap-prop-name. (NotNull)
+     * @return Uncap-prop-name. (NotNull)
+     * @deprecated Please use getPropNameByFlexibleName()
+     */
+    public String getUncapPropNameByCapPropName(String capPropName) {
+        assertStringNotNullAndNotTrimmedEmpty("capPropName", capPropName);
+        final String dbName = getDbNameByMultiName(capPropName);
+        final String uncapPropName = (String)getDbNameUncapPropNameMap().get(dbName);
+        if (uncapPropName == null) {
+            String msg = "The dbNameUncapPropNameMap didn't contain the key of '" + capPropName + "': ";
+            throw new IllegalStateException(msg + getDbNameUncapPropNameMap());
+        }
+        return uncapPropName;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param multiName Multi-name. (NotNull)
+     * @return Db-name. (NotNull)
+     * @deprecated Please use getPropNameByFlexibleName()
+     */
+    public String getDbNameByMultiName(String multiName) {
+        assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
+        if (isExistDbName(multiName)) {
+            return multiName;
+        }
+        if (isExistCapPropName(multiName)) {
+            return getDbNameByCapPropName(multiName);
+        }
+        if (isExistUncapPropName(multiName)) {
+            return getDbNameByUncapPropName(multiName);
+        }
+        String msg = "The multi-name is invalid: multiName=" + multiName;
+        throw new IllegalStateException(msg);
+    }
+
+    /**
+     * Get java-name by multi-name.
+     * 
+     * @param multiName Multi-name.
+     * @return Cap-prop-name.
+     * @deprecated Please use getPropNameByFlexibleName()
+     */
+    public String getCapPropNameByMultiName(String multiName) {
+        assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
+        if (isExistDbName(multiName)) {
+            return getCapPropNameByDbName(multiName);
+        }
+        if (isExistCapPropName(multiName)) {
+            return multiName;
+        }
+        if (isExistUncapPropName(multiName)) {
+            return getCapPropNameByUncapPropName(multiName);
+        }
+        String msg = "The multi-name is invalid: multiName=" + multiName;
+        throw new IllegalStateException(msg);
+    }
+
+    /**
+     * Get property-name by multi-name.
+     * 
+     * @param multiName Multi-name.
+     * @return Uncap-prop-name.
+     * @deprecated Please use getPropNameByFlexibleName()
+     */
+    public String getUncapPropNameByMultiName(String multiName) {
+        assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
+        if (isExistDbName(multiName)) {
+            return getUncapPropNameByDbName(multiName);
+        }
+        if (isExistCapPropName(multiName)) {
+            return getUncapPropNameByCapPropName(multiName);
+        }
+        if (isExistUncapPropName(multiName)) {
+            return multiName;
+        }
+        String msg = "The multi-name is invalid: multiName=" + multiName;
+        throw new IllegalStateException(msg);
+    }
+#end
+
+    // ===================================================================================
+    //                                                                         Column Info
+    //                                                                         ===========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param columnFlexibleName Column flexible name. (NotNull)
+     * @return Determination.
+     */
+    public boolean hasColumn(String columnFlexibleName) {
+        if (!hasFlexibleName(columnFlexibleName)) {
+            return false;
+        }
+        final String propertyName = findPropertyName(columnFlexibleName);
+        return hasMethod("column" + initCap(propertyName));
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param columnFlexibleName Column flexible name. (NotNull and NotEmpty)
+     * @return Column info. (NotNull)
+     */ 
+    public ${glColumnInfoName} findColumnInfo(String columnFlexibleName) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+        if (!hasColumn(columnFlexibleName)) {
+            String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
+            msg = msg + " tableName=" + getTableDbName();
+            throw new IllegalArgumentException(msg);
+        }
+        final String propertyName = findPropertyName(columnFlexibleName);
+        final String methodName = "column" + initCap(propertyName);
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glColumnInfoName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Relation Info
+    //                                                                       =============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
+     * @return Relation information. (NotNull)
+     */ 
+    public ${glRelationInfoName} findRelationInfo(String relationPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
+        return hasForeign(relationPropertyName) ? (${glRelationInfoName})findForeignInfo(relationPropertyName) : (${glRelationInfoName})findRefererInfo(relationPropertyName);
+    }
+
+    // -----------------------------------------------------
+    //                                       Foreign Element
+    //                                       ---------------
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * @return Determination. (NotNull)
+     */ 
+    public boolean hasForeign(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
+        return hasMethod(methodName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * @return Foreign DBMeta. (NotNull)
+     */ 
+    public ${glDBMetaInterfaceName} findForeignDBMeta(String foreignPropertyName) {
+        return findForeignInfo(foreignPropertyName).getForeignDBMeta();
+    }
+
+    /**
+     * Get foreign information.
+     * 
+     * @param foreignPropertyName The property name of foreign. (Both OK - InitCap or not). (NotNull)
+     * @return Foreign information. (NotNull)
+     */ 
+    public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} findForeignInfo(String foreignPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "Not found foreign by foreignPropertyName: foreignPropertyName=" + foreignPropertyName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glForeignInfoName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                       Referer Element
+    //                                       ---------------
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
+     * @return Determination. (NotNull)
+     */ 
+    public boolean hasReferer(String refererPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("referer", refererPropertyName);
+        return hasMethod(methodName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
+     * @return Referer DBMeta. (NotNull)
+     */ 
+    public ${glDBMetaInterfaceName} findRefererDBMeta(String refererPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+        return findRefererInfo(refererPropertyName).getRefererDBMeta();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
+     * @return Referer information. (NotNull)
+     */ 
+    public ${glRefererInfoName} findRefererInfo(String refererPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("referer", refererPropertyName);
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "Not found referer by refererPropertyName: refererPropertyName=" + refererPropertyName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glRefererInfoName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    protected String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
+        return  targetName + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
+    }
+
+    // -----------------------------------------------------
+    //                                        Relation Trace
+    //                                        --------------
+    /**
+     * Relation trace.
+     */
+    protected static abstract class AbstractRelationTrace implements RelationTrace {
+
+        /** The list of relation. */
+        protected java.util.List${database.filterGenericsString($glRelationInfoName)} _relationList;
+
+        /** The list of relation trace. */
+        protected java.util.List${database.filterGenericsString('AbstractRelationTrace')} _relationTraceList;
+
+        /** The list of relation info as trace. */
+        protected java.util.List${database.filterGenericsString($glRelationInfoName)} _traceRelationInfoList;
+
+        /** The column info as trace. */
+        protected ${glColumnInfoName} _traceColumnInfo;
+
+        /** The handler of fixed relation trace. */
+        protected RelationTraceFixHandler _relationTraceFixHandler;
+
+        /**
+         * Constructor for first step.
+         * 
+         * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
+         */
+        public AbstractRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
+            this(new java.util.ArrayList${database.filterGenericsString($glRelationInfoName)}(), new java.util.ArrayList${database.filterGenericsString('AbstractRelationTrace')}());
+            this._relationTraceFixHandler = relationTraceFixHandler;
+        }
+
+        /**
+         * Constructor for relation step.
+         * 
+         * @param relationList The list of relation. (NotNull)
+         * @param relationTraceList The list of relation trace. (NotNull)
+         */
+        public AbstractRelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('AbstractRelationTrace')} relationTraceList) {
+            this._relationList = relationList;
+            this._relationTraceList = relationTraceList;
+            this._relationTraceList.add(this);
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return The trace of relation as the list of relation info. (NotNull)
+         */
+        public java.util.List${database.filterGenericsString($glRelationInfoName)} getTraceRelation() {
+            return _traceRelationInfoList;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         * 
+         * @return The trace of column as column info. (Nullable)
+         */
+        public ${glColumnInfoName} getTraceColumn() {
+            return _traceColumnInfo;
+        }
+
+        /**
+         * Fix trace.
+         * 
+         * @param traceRelationInfoList The trace of relation as the list of relation info. (NotNull)
+         * @param traceColumnInfo The trace of column as column info. (Nullable)
+         * @return Relation trace(result). (NotNull)
+         */
+        protected RelationTrace fixTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} traceRelationInfoList, ${glColumnInfoName} traceColumnInfo) {
+            final AbstractRelationTrace localRelationTrace = (AbstractRelationTrace)_relationTraceList.get(0);
+            localRelationTrace.setTraceRelation(traceRelationInfoList);
+            localRelationTrace.setTraceColumn(traceColumnInfo);
+            localRelationTrace.recycle();
+            localRelationTrace.handleFixedRelationTrace();
+            return localRelationTrace;
+        }
+
+        protected void setTraceRelation(java.util.List${database.filterGenericsString($glRelationInfoName)} traceRelationInfoList) {
+            this._traceRelationInfoList = traceRelationInfoList;
+        }
+
+        protected void setTraceColumn(${glColumnInfoName} traceColumn) {
+            this._traceColumnInfo = traceColumn;
+        }
+
+        /**
+         * ${database.ImplementComment}
+         */
+        protected void recycle() {
+            this._relationList = new java.util.ArrayList${database.filterGenericsString($glRelationInfoName)}();
+            this._relationTraceList = new java.util.ArrayList${database.filterGenericsString('AbstractRelationTrace')}();
+            this._relationTraceList.add(this);
+        }
+
+        protected void handleFixedRelationTrace() {
+            if (_relationTraceFixHandler != null) {
+                _relationTraceFixHandler.handleFixedTrace(this);
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        JDBC Support
+    //                                                                        ============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param conn Connection. (NotNull)
+     * @param entity Entity. (NotNull)
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity) {
+        return insertEntity(conn, entity, new PreparedInsertClauseOption());
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param conn Connection. (NotNull)
+     * @param entity Entity. (NotNull)
+     * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
+     * @return Prepared insert clause. (NotNull and NotEmpty)
+     */
+    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, PreparedInsertClauseOption preparedInsertClauseOption) {
+        checkDowncast(entity);
+        final String sql = getPreparedInsertClause(preparedInsertClauseOption);
+        java.sql.PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(sql);
+            final java.util.List${database.filterGenericsString('Object')} valueList = convertToColumnValueList(entity);
+            int settingIndex = 1;
+            for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
+                Object value = ite.next();
+                if (value == null) {
+                    ps.setNull(settingIndex, java.sql.Types.VARCHAR);// Giving a clear-cut attitude!
+                } else {
+                    ps.setObject(settingIndex, value);
+                }
+                ++settingIndex;
+            }
+            return ps.executeUpdate();
+        } catch (java.sql.SQLException e) {
+            String msg = "The sql threw the exception: sql=" + sql;
+            throw new RuntimeException(msg, e);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (java.sql.SQLException ignored) {
+                }
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                          Map String
+    //                                                                          ==========
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Map list string that is prepared. (NotNull)
+     */
+    public ${glMapListStringName} createMapListString() {
+        return MapStringUtil.createMapListString();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Map string builder that is prepared. (NotNull)
+     */
+    public ${glMapStringBuilderName} createMapStringBuilder() {
+        final java.util.List${database.filterGenericsString('String')} columnDbNameList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        for (final java.util.Iterator ite = getColumnInfoList().iterator(); ite.hasNext(); ) {
+            final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+            columnDbNameList.add(columnInfo.getColumnDbName());
+        }
+        return MapStringUtil.createMapStringBuilder(columnDbNameList);
+    }
+
+    // ===================================================================================
+    //                                                                          Util Class
+    //                                                                          ==========
+    /**
+     * This class is for Internal. Don't use this!
+     */
+    protected static class MapStringUtil {
+        public static void acceptPrimaryKeyMapString(String primaryKeyMapString, ${glEntityInterfaceName} entity) {
+            if (primaryKeyMapString == null) {
+                String msg = "The argument[primaryKeyMapString] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+            final String suffix = MAP_STRING_END_BRACE;
+            if (!primaryKeyMapString.trim().startsWith(prefix)) {
+                primaryKeyMapString = prefix + primaryKeyMapString;
+            }
+            if (!primaryKeyMapString.trim().endsWith(suffix)) {
+                primaryKeyMapString = primaryKeyMapString + suffix;
+            }
+            ${glMapListStringName} mapListString = createMapListString();
+            entity.getDBMeta().acceptPrimaryKeyMap(entity, mapListString.generateMap(primaryKeyMapString));
+        }
+
+        public static void acceptColumnValueMapString(String columnValueMapString, ${glEntityInterfaceName} entity) {
+            if (columnValueMapString == null) {
+                String msg = "The argument[columnValueMapString] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
+            final String suffix = MAP_STRING_END_BRACE;
+            if (!columnValueMapString.trim().startsWith(prefix)) {
+                columnValueMapString = prefix + columnValueMapString;
+            }
+            if (!columnValueMapString.trim().endsWith(suffix)) {
+                columnValueMapString = columnValueMapString + suffix;
+            }
+            ${glMapListStringName} mapListString = createMapListString();
+            entity.getDBMeta().acceptColumnValueMap(entity, mapListString.generateMap(columnValueMapString));
+        }
+
+        public static String extractPrimaryKeyMapString(${glEntityInterfaceName} entity) {
+            final String startBrace = MAP_STRING_START_BRACE;
+            final String endBrace = MAP_STRING_END_BRACE;
+            final String delimiter = MAP_STRING_DELIMITER;
+            final String equal = MAP_STRING_EQUAL;
+            return entity.getDBMeta().extractPrimaryKeyMapString(entity, startBrace, endBrace, delimiter, equal);
+        }
+
+        public static String extractColumnValueMapString(${glEntityInterfaceName} entity) {
+            final String startBrace = MAP_STRING_START_BRACE;
+            final String endBrace = MAP_STRING_END_BRACE;
+            final String delimiter = MAP_STRING_DELIMITER;
+            final String equal = MAP_STRING_EQUAL;
+            return entity.getDBMeta().extractColumnValueMapString(entity, startBrace, endBrace, delimiter, equal);
+        }
+
+        public static void checkTypeString(Object value, String propertyName, String typeName) {
+            if (value == null) {
+                throw new IllegalArgumentException("The value should not be null: " + propertyName);
+            }
+            if (!(value instanceof String)) {
+                String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
+                msg = msg + "valueType=" + value.getClass() + " value=" + value;
+                throw new IllegalArgumentException(msg);
+            }
+        }
+
+        public static long parseDateStringAsMillis(Object value, String propertyName, String typeName) {
+            checkTypeString(value, propertyName, typeName);
+            try {
+                final String valueString = filterTimestampValue(((String)value).trim());
+                return java.sql.Timestamp.valueOf(valueString).getTime();
+            } catch (RuntimeException e) {
+                String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
+                throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+            }
+        }
+
+        public static String filterTimestampValue(String value) {
+            value = value.trim();
+            if (value.indexOf("/") == 4 && value.lastIndexOf("/") == 7) {
+                value = value.replaceAll("/", "-");
+            }
+            if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
+                if (value.length() == "2007-07-09".length()) {
+                    value = value + " 00:00:00";
+                }
+            }
+            return value;
+        }
+
+        public static String formatDate(java.util.Date value) {
+            return getFormatDateFormat().format(value);
+        }
+
+        public static String formatTimestamp(java.sql.Timestamp value) {
+            return getFormatDateFormat().format(value);
+        }
+
+        public static java.text.DateFormat getParseDateFormat() {
+            return java.text.DateFormat.getDateInstance();
+        }
+
+        public static java.text.DateFormat getFormatDateFormat() {
+            return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        }
+
+        public static ${glMapListStringName} createMapListString() {
+            final ${glMapListStringName} mapListString = new ${glMapListStringImplName}();
+            mapListString.setMapMark(MAP_STRING_MAP_MARK);
+            mapListString.setListMark(MAP_STRING_LIST_MARK);
+            mapListString.setStartBrace(MAP_STRING_START_BRACE);
+            mapListString.setEndBrace(MAP_STRING_END_BRACE);
+            mapListString.setEqual(MAP_STRING_EQUAL);
+            mapListString.setDelimiter(MAP_STRING_DELIMITER);
+            return mapListString;
+        }
+
+        public static ${glMapStringBuilderName} createMapStringBuilder(java.util.List${database.filterGenericsString('String')} columnNameList) {
+            ${glMapStringBuilderName} mapStringBuilder = new ${glMapStringBuilderImplName}();
+            mapStringBuilder.setMsMapMark(MAP_STRING_MAP_MARK);
+            mapStringBuilder.setMsStartBrace(MAP_STRING_START_BRACE);
+            mapStringBuilder.setMsEndBrace(MAP_STRING_END_BRACE);
+            mapStringBuilder.setMsEqual(MAP_STRING_EQUAL);
+            mapStringBuilder.setMsDelimiter(MAP_STRING_DELIMITER);
+            mapStringBuilder.setColumnNameList(columnNameList);
+            return mapStringBuilder;
+        }
+    }
+
+    /**
+     * This class is for Internal. Don't use this!
+     */
+    protected static class MapAssertUtil {
+        public static void assertPrimaryKeyMapNotNullAndNotEmpty(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
+            if (primaryKeyMap == null) {
+                String msg = "The argument[primaryKeyMap] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            if (primaryKeyMap.isEmpty()) {
+                String msg = "The argument[primaryKeyMap] should not be empty.";
+                throw new IllegalArgumentException(msg);
+            }
+        }
+        public static void assertColumnExistingInPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap, String columnName) {
+            if (!primaryKeyMap.containsKey(columnName)) {
+                String msg = "The primaryKeyMap must have the value of " + columnName;
+                throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
+            }
+        }
+        public static void assertColumnValueMapNotNullAndNotEmpty(java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
+            if (columnValueMap == null) {
+                String msg = "The argument[columnValueMap] should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+            if (columnValueMap.isEmpty()) {
+                String msg = "The argument[columnValueMap] should not be empty.";
+                throw new IllegalArgumentException(msg);
+            }
+        }
+    }
+
+#if ($database.isAvailableGenerics())
+
+    /**
+     * This class is for Internal. Don't use this!
+     */
+    protected static class MapStringValueAnalyzer {
+        protected java.util.Map<String, ? extends Object> _valueMap;
+        protected java.util.Set<String> _modifiedPropertyNames;
+        protected String _columnName;
+        protected String _uncapPropName;
+        protected String _propertyName;
+
+        public MapStringValueAnalyzer(java.util.Map<String, ? extends Object> valueMap, java.util.Set<String> modifiedPropertyNames) {
+            this._valueMap = valueMap;
+            this._modifiedPropertyNames = modifiedPropertyNames;
+        }
+
+        public boolean init(String columnName, String uncapPropName, String propertyName) {
+            this._columnName = columnName;
+            this._uncapPropName = uncapPropName;
+            this._propertyName = propertyName;
+            return _valueMap.containsKey(_columnName);
+        }
+
+        public <COLUMN_TYPE> COLUMN_TYPE analyzeString(Class<COLUMN_TYPE> javaType) {
+            final Object obj = _valueMap.get(_columnName);
+            if (obj == null) {
+                _modifiedPropertyNames.remove(_propertyName);
+                return null;
+            }
+            helpCheckingTypeString(obj, _uncapPropName, javaType.getName());
+            return (COLUMN_TYPE)obj;
+        }
+
+        public <COLUMN_TYPE> COLUMN_TYPE analyzeNumber(Class<COLUMN_TYPE> javaType) {
+            final Object obj = _valueMap.get(_columnName);
+            if (obj == null) {
+                _modifiedPropertyNames.remove(_propertyName);
+                return null;
+            }
+            if (javaType.isAssignableFrom(obj.getClass())) {
+                return (COLUMN_TYPE)obj;
+            }
+            return (COLUMN_TYPE)newInstanceByConstructor(javaType, String.class, obj.toString());
+        }
+
+        public <COLUMN_TYPE> COLUMN_TYPE analyzeDate(Class<COLUMN_TYPE> javaType) {
+            final Object obj = _valueMap.get(_columnName);
+            if (obj == null) {
+                _modifiedPropertyNames.remove(_propertyName);
+                return null;
+            }
+            if (javaType.isAssignableFrom(obj.getClass())) {
+                return (COLUMN_TYPE)obj;
+            }
+            return (COLUMN_TYPE)newInstanceByConstructor(javaType, long.class, helpParsingDateString(obj, _uncapPropName, javaType.getName()));
+        }
+
+        public <COLUMN_TYPE> COLUMN_TYPE analyzeOther(Class<COLUMN_TYPE> javaType) {
+            final Object obj = _valueMap.get(_columnName);
+            if (obj == null) {
+                _modifiedPropertyNames.remove(_propertyName);
+                return null;
+            }
+            return (COLUMN_TYPE)obj;
+        }
+
+	    private void helpCheckingTypeString(Object value, String uncapPropName, String typeName) {
+	        MapStringUtil.checkTypeString(value, uncapPropName, typeName);
+	    }
+
+	    private long helpParsingDateString(Object value, String uncapPropName, String typeName) {
+	        return MapStringUtil.parseDateStringAsMillis(value, uncapPropName, typeName);
+	    }
+
+        protected Object newInstanceByConstructor(Class targetType, Class argType, Object arg) {
+            java.lang.reflect.Constructor constructor;
+            try {
+                constructor = targetType.getConstructor(new Class[]{argType});
+            } catch (SecurityException e) {
+                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
+                throw new RuntimeException(msg, e);
+            } catch (NoSuchMethodException e) {
+                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
+                throw new RuntimeException(msg, e);
+            }
+            try {
+                return constructor.newInstance(new Object[]{arg});
+            } catch (IllegalArgumentException e) {
+                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
+                throw new RuntimeException(msg, e);
+            } catch (InstantiationException e) {
+                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
+                throw new RuntimeException(msg, e);
+            } catch (IllegalAccessException e) {
+                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
+                throw new RuntimeException(msg, e);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
+                throw new RuntimeException(msg, e);
+            }
+        }
+    }
+
+#end
+
+    // =====================================================================================
+    //                                                                                Helper
+    //                                                                                ======
+    abstract protected void checkDowncast(${glEntityInterfaceName} entity);
+
+    protected String helpGettingColumnStringValue(Object value) {
+        if (value instanceof java.sql.Timestamp) {
+            return (value != null ? helpFormatingTimestamp((java.sql.Timestamp)value) : "");
+        } else if (value instanceof java.util.Date) {
+            return (value != null ? helpFormatingDate((java.util.Date)value) : "");
+        } else {
+            return (value != null ? value.toString() : "");
+        }
+    }
+
+    protected String helpFormatingDate(java.util.Date date) {
+        return MapStringUtil.formatDate(date);
+    }
+
+    protected String helpFormatingTimestamp(java.sql.Timestamp timestamp) {
+        return MapStringUtil.formatTimestamp(timestamp);
+    }
+
+    protected String initCap(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    protected boolean hasMethod(String methodName) {
+        assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
+        try {
+            this.getClass().getMethod(methodName, new Class[]{});
+            return true;
+        } catch (NoSuchMethodException ignored) {
+            return false;
+        }
+    }
+
+    // ----------------------------------------------------------------
+    //                                                    Assert Object
+    //                                                    -------------
+    /**
+     * Assert that the argument is not null.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param arg Argument. (NotNull)
+     */
+    protected void assertObjectNotNull(String variableName, Object arg) {
+        if (variableName == null) {
+            String msg = "Argument[variableName] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (arg == null) {
+            String msg = "Argument[" + variableName + "] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    // ----------------------------------------------------------------
+    //                                                    Assert String
+    //                                                    -------------
+    /**
+     * Assert that the string is not null and not trimmed empty.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     */
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        if (variableName == null) {
+            String msg = "Variable[variableName] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "Variable[" + variableName + "] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (value.trim().length() == 0) {
+            String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+}

@@ -1,0 +1,48 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvBatch};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glTokenFileReflectionResultName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected java.util.List${database.filterGenericsString('String')} _columnNameList;
+    protected int _successCount;
+    protected java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} _failureList;
+
+    // =====================================================================================
+    //                                                                           Easy-to-Use
+    //                                                                           ===========
+    public void incrementSuccessCount() {
+        ++_successCount;
+    }
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public java.util.List${database.filterGenericsString('String')} getColumnNameList() {
+        return _columnNameList;
+    }
+
+    public void setColumnNameList(java.util.List${database.filterGenericsString('String')} columnNameList) {
+        this._columnNameList = columnNameList;
+    }
+
+    public int getSuccessCount() {
+        return _successCount;
+    }
+
+    public void setSuccessCount(int successCount) {
+        _successCount = successCount;
+    }
+
+    public java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} getFailureList() {
+        return _failureList;
+    }
+
+    public void setFailureList(java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList) {
+        this._failureList = failureList;
+    }
+}

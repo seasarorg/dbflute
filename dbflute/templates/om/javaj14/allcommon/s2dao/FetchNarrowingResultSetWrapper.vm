@@ -1,0 +1,240 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.seasar.extension.jdbc.impl.ResultSetWrapper;
+import org.seasar.framework.exception.SQLRuntimeException;
+
+import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanInterfaceName};
+
+/**
+ * The wrapper of fetch-narrowing result-set.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Original result set. */
+    private ResultSet _resultSet;
+
+    /** FetchNarrowing-bean. */
+    private ${glFetchNarrowingBeanInterfaceName} _fetchNarrowingBean;
+
+    /** Fetch counter. */
+    private long _fetchCounter;
+
+    /** Request counter. */
+    private long _requestCounter;
+
+    /** Whether offsetting by cursor forcedly. */
+    private boolean _offsetByCursorForcedly;
+
+    /** Whether limiting by cursor forcedly. */
+    private boolean _limitByCursorForcedly;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * 
+     * @param resultSet Original result set. (NotNull)
+     * @param fetchNarrowingBean FetchNarrowing-bean. (NotNull)
+     */
+    public ${glFetchNarrowingResultSetWrapper}(ResultSet resultSet, ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean) {
+        super(resultSet);
+
+        _resultSet = resultSet;
+        _fetchNarrowingBean = fetchNarrowingBean;
+
+        skip();
+    }
+
+    // ===================================================================================
+    //                                                                                Skip
+    //                                                                                ====
+    /**
+     * Skip to start-index.
+     */
+    protected void skip() {
+        if (!isAvailableSkipRecord()) {
+            return;
+        }
+        if (isCursorUsed()) {
+            try {
+                if (0 == getFetchNarrowingSkipStartIndex()) {
+                    getResultSet().beforeFirst();
+                } else {
+                    getResultSet().absolute(getFetchNarrowingSkipStartIndex());
+                }
+                _fetchCounter = getResultSet().getRow();
+            } catch (SQLException e) {
+                throw new SQLRuntimeException(e);
+            }
+        } else {
+            try {
+                while (getResultSet().getRow() < getFetchNarrowingSkipStartIndex() && getResultSet().next()) {
+                    ++_fetchCounter;
+                }
+            } catch (SQLException e) {
+                throw new SQLRuntimeException(e);
+            }
+        }
+    }
+
+    protected boolean isAvailableSkipRecord() {
+        if (!isFetchNarrowingEffective()) {
+            return false;
+        }
+        if (isOffsetByCursorForcedly()) {
+            return true;
+        }
+        if (isFetchNarrowingSkipStartIndexEffective()) {
+            return true;
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                                Next
+    //                                                                                ====
+    /**
+     * Next.
+     * 
+     * @return Does the result set have next record?
+     * @throws SQLException
+     */
+    public boolean next() throws SQLException {
+        final boolean hasNext = super.next();
+        ++_requestCounter;
+        if (!isAvailableLimitLoopCount()) {
+            checkSafetyResult(hasNext);
+            return hasNext;
+        }
+
+        if (hasNext && _fetchCounter < getFetchNarrowingSkipStartIndex() + getFetchNarrowingLoopCount()) {
+            ++_fetchCounter;
+            checkSafetyResult(true);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected boolean isAvailableLimitLoopCount() {
+        if (!isFetchNarrowingEffective()) {
+            return false;
+        }
+        if (isLimitByCursorForcedly()) {
+            return true;
+        }
+        if (isFetchNarrowingLoopCountEffective()) {
+            return true;
+        }
+        return false;
+    }
+
+    protected void checkSafetyResult(boolean hasNext) {
+        if (hasNext && getSafetyMaxResultSize() > 0 && _requestCounter > (getSafetyMaxResultSize() + 1)) {
+            String msg = "You have already been in Danger Zone!";
+            msg = msg + " Please confirm your query or data of table: safetyMaxResultSize=" + getSafetyMaxResultSize();
+            throw new ${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName}(msg, getSafetyMaxResultSize());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        Fetch Option
+    //                                                                        ============
+    protected boolean isFetchNarrowingEffective() {
+        return _fetchNarrowingBean.isFetchNarrowingEffective();
+    }
+
+    protected boolean isFetchNarrowingSkipStartIndexEffective() {
+        return _fetchNarrowingBean.isFetchNarrowingSkipStartIndexEffective();
+    }
+
+    protected boolean isFetchNarrowingLoopCountEffective() {
+        return _fetchNarrowingBean.isFetchNarrowingLoopCountEffective();
+    }
+
+    protected int getFetchNarrowingSkipStartIndex() {
+        return _fetchNarrowingBean.getFetchNarrowingSkipStartIndex();
+    }
+
+    protected int getFetchNarrowingLoopCount() {
+        return _fetchNarrowingBean.getFetchNarrowingLoopCount();
+    }
+
+    /**
+     * Get safety max result size.
+     * 
+     * @return Safety max result size.
+     */
+    public int getSafetyMaxResultSize() {
+        return _fetchNarrowingBean.getSafetyMaxResultSize();
+    }
+
+    /**
+     * Is cursor used?
+     * 
+     * @return Determination.
+     */
+    protected boolean isCursorUsed() {
+        return isCursorSupported(getResultSet());
+    }
+
+    /**
+     * Is cursor supported?
+     * 
+     * @param resultSet ResultSet
+     * @return Determation.
+     */
+    public static boolean isCursorSupported(ResultSet resultSet) {
+        try {
+            return !(resultSet.getType() == ResultSet.TYPE_FORWARD_ONLY);
+        } catch (SQLException e) {
+            throw new SQLRuntimeException(e);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get result set.
+     * 
+     * @return Result set.
+     */
+    protected ResultSet getResultSet() {
+        return _resultSet;
+    }
+
+    /**
+     * Get fetch-narrowing-bean.
+     * 
+     * @return FetchNarrowing-bean.
+     */
+    protected ${glFetchNarrowingBeanInterfaceName} getFetchNarrowingBean() {
+        return _fetchNarrowingBean;
+    }
+
+    public boolean isOffsetByCursorForcedly() {
+        return _offsetByCursorForcedly;
+    }
+
+    public void setOffsetByCursorForcedly(boolean offsetByCursorForcedly) {
+        this._offsetByCursorForcedly = offsetByCursorForcedly;
+    }
+
+    public boolean isLimitByCursorForcedly() {
+        return _limitByCursorForcedly;
+    }
+
+    public void setLimitByCursorForcedly(boolean limitByCursorForcedly) {
+        this._limitByCursorForcedly = limitByCursorForcedly;
+    }
+}

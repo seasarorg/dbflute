@@ -1,0 +1,74 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFileImpl};
+
+import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenName};
+
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingCallbackName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingOptionName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingRowResourceName};
+import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glFileMakingSimpleFacadeImplName} implements ${glFileMakingSimpleFacadeName} {
+
+    protected ${glFileTokenName} _fileToken = new ${glFileTokenImplName}();
+
+    public void setFileToken(${glFileTokenName} fileToken) {
+        this._fileToken = fileToken;
+    }
+
+    /**
+     * Make token-file from row-list.
+     * 
+     * @param filename Output target file name. (NotNull)
+     * @param rowList Row-list composed of value-list. (NotNull)
+     * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public void makeFromRowList(final String filename, final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+        final ${glFileMakingCallbackName} fileMakingCallback = new ${glFileMakingCallbackName}() {
+            protected int rowCount = 0;
+            public ${glFileMakingRowResourceName} getRowResource() {
+                ++rowCount;
+                if (rowList.size() < rowCount) {
+                    return null;// The End!
+                }
+                final java.util.List${database.filterGenericsString('String')} valueList = (java.util.List${database.filterGenericsString('String')})rowList.get(rowCount - 1);
+                final ${glFileMakingRowResourceName} fileMakingRowResource = new ${glFileMakingRowResourceName}();
+                fileMakingRowResource.setValueList(valueList);
+                return fileMakingRowResource;
+            }
+        };
+        _fileToken.make(filename, fileMakingCallback, fileMakingOption);
+    }
+
+    /**
+     * Make bytes from row-list.
+     * 
+     * @param rowList Row-list composed of value-list. (NotNull)
+     * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
+     * @return Result byte array. (NotNull)
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public byte[] makeFromRowList(final java.util.List${database.filterGenericsString('java.util.List<String>')} rowList, final ${glFileMakingOptionName} fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+        final ${glFileMakingCallbackName} fileMakingCallback = new ${glFileMakingCallbackName}() {
+            protected int rowCount = 0;
+            public ${glFileMakingRowResourceName} getRowResource() {
+                ++rowCount;
+                if (rowList.size() < rowCount) {
+                    return null;// The End!
+                }
+                final java.util.List${database.filterGenericsString('String')} valueList = (java.util.List${database.filterGenericsString('String')})rowList.get(rowCount - 1);
+                final ${glFileMakingRowResourceName} fileMakingRowResource = new ${glFileMakingRowResourceName}();
+                fileMakingRowResource.setValueList(valueList);
+                return fileMakingRowResource;
+            }
+        };
+        final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        _fileToken.make(baos, fileMakingCallback, fileMakingOption);
+        return baos.toByteArray();
+    }
+}

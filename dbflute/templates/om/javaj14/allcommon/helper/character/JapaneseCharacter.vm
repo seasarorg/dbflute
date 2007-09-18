@@ -1,0 +1,11 @@
+${database.allClassCopyright}package ${glPackageBaseCommonHelperCharacter};
+
+/**
+ * The interface of Japanese character.
+ *
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glJapaneseCharacterName} {
+
+    public String toDoubleByteKatakana(String target);
+}

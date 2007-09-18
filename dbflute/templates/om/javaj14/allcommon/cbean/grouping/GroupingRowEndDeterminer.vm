@@ -1,0 +1,12 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanGrouping};
+
+/**
+ * The interface of grouping switch point determiner.
+ * 
+ * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glGroupingRowEndDeterminerName}<ENTITY> {
+
+    public boolean determine(int columnIndex, int columnCount, ${glGroupingRowResourceName}<ENTITY> rowResource, ENTITY nextEntity);
+}

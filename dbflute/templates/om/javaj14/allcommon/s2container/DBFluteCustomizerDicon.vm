@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR2.1//DTD S2Container//EN"
+	"http://www.seasar.org/dtd/components21.dtd">
+
+<components>
+    <component name="s2DaoCustomizer" class="org.seasar.framework.container.customizer.AspectCustomizer">
+        <property name="interceptorName">"${glDBFluteDiconNamespace}.interceptor"</property>
+    </component>
+
+    <component name="requiresNewTransactionAspectCustomizer" class="org.seasar.framework.container.customizer.AspectCustomizer">
+        <property name="interceptorName">"${database.RequiresNewTxComponentName}"</property>
+        <property name="pointcut">"${database.requiredTransactionToBehaviorPointcut}"</property>
+    </component>
+
+    <component name="requiredTransactionAspectCustomizer" class="org.seasar.framework.container.customizer.AspectCustomizer">
+        <property name="interceptorName">"${database.RequiredTxComponentName}"</property>
+        <property name="pointcut">"${database.requiresNewTransactionToBehaviorPointcut}"</property>
+    </component>
+
+    <component name="commonColumnSetupBeforeInsertAspectCustomizer" class="org.seasar.framework.container.customizer.AspectCustomizer">
+        <property name="interceptorName">"${glDBFluteDiconNamespace}.commonColumnSetupBeforeInsertInterceptor"</property>
+        <property name="pointcut">"${database.columnSetupBeforeInsertInterceptorPointcut}"</property>
+    </component>
+
+    <component name="commonColumnSetupBeforeUpdateAspectCustomizer" class="org.seasar.framework.container.customizer.AspectCustomizer">
+        <property name="interceptorName">"${glDBFluteDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor"</property>
+        <property name="pointcut">"${database.columnSetupBeforeUpdateInterceptorPointcut}"</property>
+    </component>
+
+    <component name="commonColumnSetupBeforeDeleteAspectCustomizer" class="org.seasar.framework.container.customizer.AspectCustomizer">
+        <property name="interceptorName">"${glDBFluteDiconNamespace}.commonColumnSetupBeforeDeleteInterceptor"</property>
+        <property name="pointcut">"${database.columnSetupBeforeDeleteInterceptorPointcut}"</property>
+    </component>
+
+#if (${database.isAvailableCommonColumnSetupInterceptorToDao()})
+    <component name="daoCustomizer" class="org.seasar.framework.container.customizer.CustomizerChain">
+        <initMethod name="addCustomizer">
+            <arg>commonColumnSetupBeforeInsertAspectCustomizer</arg>
+        </initMethod>
+        <initMethod name="addCustomizer">
+            <arg>commonColumnSetupBeforeUpdateAspectCustomizer</arg>
+        </initMethod>
+        <initMethod name="addCustomizer">
+            <arg>commonColumnSetupBeforeDeleteAspectCustomizer</arg>
+        </initMethod>
+        <initMethod name="addCustomizer">
+            <arg>s2DaoCustomizer</arg>
+        </initMethod>
+    </component>
+#else
+    <component name="daoCustomizer" class="org.seasar.framework.container.customizer.CustomizerChain">
+        <initMethod name="addCustomizer">
+            <arg>s2DaoCustomizer</arg>
+        </initMethod>
+    </component>
+#end
+#if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
+    <component name="behaviorCustomizer" class="org.seasar.framework.container.customizer.CustomizerChain">
+#if (${database.isAvailableBehaviorRequiresNewTx()})
+        <initMethod name="addCustomizer">
+            <arg>requiresNewTransactionAspectCustomizer</arg>
+        </initMethod>
+#end
+#if (${database.isAvailableBehaviorRequiredTx()})
+        <initMethod name="addCustomizer">
+            <arg>requiredTransactionAspectCustomizer</arg>
+        </initMethod>
+#end
+        <initMethod name="addCustomizer">
+            <arg>commonColumnSetupBeforeInsertAspectCustomizer</arg>
+        </initMethod>
+        <initMethod name="addCustomizer">
+            <arg>commonColumnSetupBeforeUpdateAspectCustomizer</arg>
+        </initMethod>
+        <initMethod name="addCustomizer">
+            <arg>commonColumnSetupBeforeDeleteAspectCustomizer</arg>
+        </initMethod>
+    </component>
+#else
+    <component name="behaviorCustomizer" class="org.seasar.framework.container.customizer.CustomizerChain">
+#if (${database.isAvailableBehaviorRequiresNewTx()})
+        <initMethod name="addCustomizer">
+            <arg>requiredTransactionAspectCustomizer</arg>
+        </initMethod>
+#end
+#if (${database.isAvailableBehaviorRequiredTx()})
+        <initMethod name="addCustomizer">
+            <arg>requiresNewTransactionAspectCustomizer</arg>
+        </initMethod>
+#end
+    </component>
+#end
+
+</components>

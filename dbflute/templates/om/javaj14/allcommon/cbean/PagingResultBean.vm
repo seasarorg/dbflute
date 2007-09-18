@@ -1,0 +1,463 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
+
+#set ($myClassName = "${glPagingResultBeanName}")
+#if ($database.isAvailableGenerics())
+import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
+#end
+import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupBeanName};
+import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupOptionName};
+import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeBeanName};
+import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName};
+
+/**
+ * The paging-result-bean for ${myClassName}.
+ * 
+ * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity for the element of selectedList()')}
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${glListResultBeanName}${database.filterGenericsString('ENTITY')} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The value of current page number. */
+    protected int _pageSize;
+
+    /** The value of current page number. */
+    protected int _currentPageNumber;
+
+    // -----------------------------------------------------
+    //                                            Page Group
+    //                                            ----------
+    /** The value of page-group bean. */
+    protected ${glPageGroupBeanName} _pageGroupBean;
+
+    /** The value of page-group option. */
+    protected ${glPageGroupOptionName} _pageGroupOption;
+
+    // -----------------------------------------------------
+    //                                            Page Range
+    //                                            ----------
+    /** The value of page-range bean. */
+    protected ${glPageRangeBeanName} _pageRangeBean;
+
+    /** The value of page-range option. */
+    protected ${glPageRangeOptionName} _pageRangeOption;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     */
+    public ${myClassName}() {
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get the value of pageSize.
+     * 
+     * @return The value of pageSize.
+     */
+    public int getPageSize() {
+        return _pageSize;
+    }
+
+    /**
+     * Set the value of pageSize.
+     * 
+     * @param pageSize The value of pageSize.
+     */
+    public void setPageSize(int pageSize) {
+        _pageSize = pageSize;
+    }
+
+    /**
+     * Get the value of currentPageNumber.
+     * 
+     * @return The value of currentPageNumber.
+     */
+    public int getCurrentPageNumber() {
+        return _currentPageNumber;
+    }
+
+    /**
+     * Set the value of currentPageNumber.
+     * 
+     * @param currentPageNumber The value of currentPageNumber.
+     */
+    public void setCurrentPageNumber(int currentPageNumber) {
+        _currentPageNumber = currentPageNumber;
+    }
+
+    /**
+     * Get the value of allPageCount.
+     * 
+     * @return The value of allPageCount.
+     */
+    public int getAllPageCount() {
+        return calculateAllPageCount(_allRecordCount, _pageSize);
+    }
+
+    /**
+     * Get the value of currentStartRecordNumber.
+     * 
+     * @return The value of currentStartRecordNumber.
+     */
+    public int getCurrentStartRecordNumber() {
+        return calculateCurrentStartRecordNumber(_currentPageNumber, _pageSize);
+    }
+
+    /**
+     * Get the value of currentEndRecordNumber.
+     * 
+     * @return The value of currentEndRecordNumber.
+     */
+    public int getCurrentEndRecordNumber() {
+        return calculateCurrentEndRecordNumber(_currentPageNumber, _pageSize);
+    }
+
+    // -----------------------------------------------------
+    //                                            Page Group
+    //                                            ----------
+    /**
+     * Get the value of pageGroupSize.
+     * 
+     * @return The value of pageGroupSize.
+     */
+    public int getPageGroupSize() {
+        return _pageGroupOption != null ? _pageGroupOption.getPageGroupSize() : 0;
+    }
+
+    /**
+     * Set the value of pageGroupSize.
+     * 
+     * @param pageGroupSize The value of pageGroupSize.
+     */
+    public void setPageGroupSize(int pageGroupSize) {
+        final ${glPageGroupOptionName} option = new ${glPageGroupOptionName}();
+        option.setPageGroupSize(pageGroupSize);
+        setPageGroupOption(option);
+    }
+
+    /**
+     * Set the value of pageGroupOption.
+     * 
+     * @param pageGroupOption The value of pageGroupOption.
+     */
+    public void setPageGroupOption(${glPageGroupOptionName} pageGroupOption) {
+        _pageGroupOption = pageGroupOption;
+    }
+
+    /**
+     * Get the value of pageGroupBean.
+     * 
+     * @return The value of pageGroupBean.
+     */
+    public ${glPageGroupBeanName} pageGroup() {
+        assertPageGroupValid();
+        if (_pageGroupBean == null) {
+            _pageGroupBean = new ${glPageGroupBeanName}();
+        }
+        _pageGroupBean.setPageGroupOption(_pageGroupOption);
+        _pageGroupBean.setCurrentPageNumber(getCurrentPageNumber());
+        _pageGroupBean.setAllPageCount(getAllPageCount());
+        return _pageGroupBean;
+    }
+
+    protected void assertPageGroupValid() {
+        if (_pageGroupOption == null) {
+            String msg = "The pageGroupOption should not be null. Please invoke setPageGroupOption().";
+            throw new IllegalStateException(msg);
+        }
+        if (_pageGroupOption.getPageGroupSize() == 0) {
+            String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
+            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+            throw new IllegalStateException(msg);
+        }
+        if (_pageGroupOption.getPageGroupSize() == 1) {
+            String msg = "The pageGroupSize should be greater than 1. But the value is one.";
+            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            Page Range
+    //                                            ----------
+    /**
+     * Get the value of pageRangeSize.
+     * 
+     * @return The value of pageRangeSize.
+     */
+    public int getPageRangeSize() {
+        return _pageRangeOption != null ? _pageRangeOption.getPageRangeSize() : 0;
+    }
+
+    /**
+     * Set the value of pageRangeSize.
+     * 
+     * @param pageRangeSize The value of pageRangeSize.
+     */
+    public void setPageRangeSize(int pageRangeSize) {
+        final ${glPageRangeOptionName} option = new ${glPageRangeOptionName}();
+        option.setPageRangeSize(pageRangeSize);
+        setPageRangeOption(option);
+    }
+
+    /**
+     * Set the value of pageRangeOption.
+     * 
+     * @param pageRangeOption The value of pageRangeOption.
+     */
+    public void setPageRangeOption(${glPageRangeOptionName} pageRangeOption) {
+        this._pageRangeOption = pageRangeOption;
+    }
+
+    /**
+     * Get the value of pageRangeBean.
+     * 
+     * @return The value of pageRangeBean.
+     */
+    public ${glPageRangeBeanName} pageRange() {
+        assertPageRangeValid();
+        if (_pageRangeBean == null) {
+            _pageRangeBean = new ${glPageRangeBeanName}();
+        }
+        _pageRangeBean.setPageRangeOption(_pageRangeOption);
+        _pageRangeBean.setCurrentPageNumber(getCurrentPageNumber());
+        _pageRangeBean.setAllPageCount(getAllPageCount());
+        return _pageRangeBean;
+    }
+
+    protected void assertPageRangeValid() {
+        if (_pageRangeOption == null) {
+            String msg = "The pageRangeOption should not be null. Please invoke setPageRangeOption().";
+            throw new IllegalStateException(msg);
+        }
+        final int pageRangeSize = _pageRangeOption.getPageRangeSize();
+        if (pageRangeSize == 0) {
+            String msg = "The pageRangeSize should be greater than 1. But the value is zero.";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+#if ($database.isAvailableGenerics())
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
+    public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
+        final ${glListResultBeanName}<DTO> ls = super.mappingList(entityDtoMapper);
+        final ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
+        mappingList.setSelectedList(ls.getSelectedList());
+        mappingList.setTableDbName(getTableDbName());
+        mappingList.setAllRecordCount(getAllRecordCount());
+        mappingList.setOrderByClause(getOrderByClause());
+        mappingList.setPageSize(getPageSize());
+        mappingList.setCurrentPageNumber(getCurrentPageNumber());
+        mappingList.setPageRangeOption(_pageRangeOption);
+        mappingList.setPageGroupOption(_pageGroupOption);
+        return mappingList;
+    }
+#end
+
+    // ===================================================================================
+    //                                                                           Calculate
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                                  Page
+    //                                                  ----
+    /**
+     * Calculate all page count.
+     * 
+     * @param allRecordCount All record count.
+     * @param pageSize Fetch-size.
+     * @return All page count.
+     */
+    protected int calculateAllPageCount(int allRecordCount, int pageSize) {
+        if (allRecordCount == 0) {
+            return 1;
+        }
+        int pageCountBase = (allRecordCount / pageSize);
+        if (allRecordCount % pageSize > 0) {
+            pageCountBase++;
+        }
+        return pageCountBase;
+    }
+
+    protected int calculateCurrentStartRecordNumber(int currentPageNumber, int pageSize) {
+        return ((currentPageNumber - 1) * pageSize) + 1;
+    }
+
+    protected int calculateCurrentEndRecordNumber(int currentPageNumber, int pageSize) {
+        return calculateCurrentStartRecordNumber(currentPageNumber, pageSize) + _selectedList.size() - 1;
+    }
+
+    /**
+     * Is existing previous page?
+     * Using values are currentPageNumber.
+     * 
+     * @return Determination.
+     */
+    public boolean isExistPrePage() {
+        return (_allRecordCount > 0 && _currentPageNumber > 1);
+    }
+
+    /**
+     * Is existing next page?
+     * Using values are currentPageNumber and allPageCount.
+     * 
+     * @return Determination.
+     */
+    public boolean isExistNextPage() {
+        return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
+    }
+
+#if ($database.isMakeRecentlyDeprecated())
+    // -----------------------------------------------------
+    //                                            Page Range
+    //                                            ----------
+    /**
+     * Get current page-range page-number-list.
+     * Using values are pageRangeOption and currentPageNumber and allPageCount.
+     * 
+     * @return Current page-range page-number-list. (NotNull)
+     * @deprecated Please use PagingResultBean#pageRange().getCurrentPageRangePageNumberList();
+     */
+    public java.util.List${database.filterGenericsString('Integer')} getCurrentPageRangePageNumberList() {
+        return pageRange().createPageNumberList();
+    }
+
+    /**
+     * Get current page-range page-number-array.
+     * Using values are pageRangeOption and currentPageNumber and allPageCount.
+     * 
+     * @return Current page-range page-number-array.
+     * @deprecated Please use PagingResultBean#pageRange().getCurrentPageRangePageNumberArray();
+     */
+    public int[] getCurrentPageRangePageNumberArray() {
+        return pageRange().createPageNumberArray();
+    }
+
+    /**
+     * Is existing previous page-range?
+     * Using values are pageRangeOption and currentPageNumber and allPageCount.
+     * 
+     * @return Determination.
+     * @deprecated Please use PagingResultBean#pageRange().isExistPrePageRange();
+     */
+    public boolean isExistPrePageRange() {
+        return pageRange().isExistPrePageRange();
+    }
+
+    /**
+     * Is existing next page-range?
+     * Using values are pageRangeOption and currentPageNumber and allPageCount.
+     * 
+     * @return Determination.
+     * @deprecated Please use PagingResultBean#pageRange().isExistNextPageRange();
+     */
+    public boolean isExistNextPageRange() {
+        return pageRange().isExistNextPageRange();
+    }
+
+    // -----------------------------------------------------
+    //                                            Page Group
+    //                                            ----------
+    /**
+     * Calculate current page-group start-page-number.
+     * Using values are currentPageNumber and pageGroupSize.
+     * 
+     * @return Current page-group start-page-number.
+     * @deprecated Please use PagingResultBean#pageGroup().calculateCurrentPageGroupStartPageNumber();
+     */
+    public int calculateCurrentPageGroupStartPageNumber() {
+        return pageGroup().calculateStartPageNumber();
+    }
+
+    /**
+     * Get current page-group page-number-list.
+     * Using values are currentPageNumber and pageGroupSize and allPageCount.
+     * 
+     * @return Current page-group page-number-list.
+     * @deprecated Please use PagingResultBean#pageGroup().getCurrentPageGroupPageNumberList();
+     */
+    public java.util.List${database.filterGenericsString('Integer')} getCurrentPageGroupPageNumberList() {
+        return pageGroup().createPageNumberList();
+    }
+
+    /**
+     * Get current page-group page-number-array.
+     * Using values are currentPageNumber and pageGroupSize and allPageCount.
+     * 
+     * @return Current page-group page-number-array.
+     * @deprecated Please use PagingResultBean#pageGroup().getCurrentPageGroupPageNumberArray();
+     */
+    public int[] getCurrentPageGroupPageNumberArray() {
+        return pageGroup().createPageNumberArray();
+    }
+
+    /**
+     * Is existing previous page-group?
+     * Using values are currentPageNumber and pageGroupSize.
+     * 
+     * @return Determination.
+     * @deprecated Please use PagingResultBean#pageGroup().isExistPrePageGroup();
+     */
+    public boolean isExistPrePageGroup() {
+        return pageGroup().isExistPrePageGroup();
+    }
+
+    /**
+     * Is existing next page-group?
+     * Using values are currentPageNumber and pageGroupSize and allPageCount.
+     * 
+     * @return Determination.
+     * @deprecated Please use PagingResultBean#pageGroup().isExistNextPageGroup();
+     */
+    public boolean isExistNextPageGroup() {
+        return pageGroup().isExistNextPageGroup();
+    }
+
+    /**
+     * @deprecated Please use ${glPackageBaseCommonCBeanPagenavi}.${glPageRangeOptionName}
+     */
+    public static class PageRangeOption extends ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName} {
+        private static final long serialVersionUID = 1L;
+    }
+
+    /**
+     * @deprecated Please use ${glPackageBaseCommonCBeanPagenavi}.${glPageGroupOptionName}
+     */
+    public static class PageGroupOption extends ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupOptionName} {
+        private static final long serialVersionUID = 1L;
+    }
+#end
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * This method overrides the method that is declared at super.
+     * 
+     * @return View-string of all-columns value.
+     */
+    public String toString() {
+        final StringBuffer sb = new StringBuffer();
+
+        sb.append(getCurrentPageNumber()).append("/").append(getAllPageCount());
+        sb.append(" of ").append(getAllRecordCount());
+        sb.append(" listSize=").append(getSelectedList() != null ? new Integer(getSelectedList().size()) : null);
+        sb.append(" pageSize=").append(getPageSize());
+        sb.append(" page:{").append(isExistPrePage()).append("/").append(isExistNextPage()).append("}");
+        sb.append(" groupSize=").append(getPageGroupSize());
+        sb.append(" rangeSize=").append(getPageRangeSize());
+
+        return sb.toString();
+    }
+}

@@ -1,0 +1,148 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
+
+import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+
+/// <summary>
+/// The order-by-bean as simple implemetation.
+/// Author: ${database.ClassAuthor}
+/// </summary>
+public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** SQL clause instance. */
+    protected final ${glSqlClauseName} _sqlClause;
+    {
+        _sqlClause = ${glConditionBeanContextName}.createSqlClause("Dummy");
+    }
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     */
+    public ${glSimpleOrderByBeanName}() {
+    }
+
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
+    /**
+     * Get sql-clause.
+     * 
+     * @return Sql clause. (NotNull)
+     */
+    protected ${glSqlClauseName} getSqlClause() {
+        return _sqlClause;
+    }
+
+    // ===================================================================================
+    //                                                                     Select Resource
+    //                                                                     ===============
+    /**
+     * Check safety result.
+     * 
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    // ===================================================================================
+    //                                                                             OrderBy
+    //                                                                             =======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql component of order-by clause. (NotNull)
+     */
+    public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
+        return getSqlClause().getSqlComponentOfOrderByClause();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Order-by clause. (NotNull)
+     */
+    public String getOrderByClause() {
+        return getSqlClause().getOrderByClause();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} clearOrderBy() {
+        getSqlClause().clearOrderBy();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} ignoreOrderBy() {
+        getSqlClause().ignoreOrderBy();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} makeOrderByEffective() {
+        getSqlClause().makeOrderByEffective();
+        return this;
+    }
+
+    /**
+     * Register order-by-asc.
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} registerOrderByAsc(String orderByProperty) {
+        getSqlClause().registerOrderBy(orderByProperty, orderByProperty, true);
+        return this;
+    }
+
+    /**
+     * Register order-by-desc.
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} registerOrderByDesc(String orderByProperty) {
+        getSqlClause().registerOrderBy(orderByProperty, orderByProperty, false);
+        return this;
+    }
+
+    /**
+     * Reverse order-by or Override order-by asc.
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByAsc(String orderByProperty) {
+        getSqlClause().reverseOrderBy_Or_OverrideOrderBy(orderByProperty, orderByProperty, true);
+        return this;
+    }
+
+    /**
+     * Reverse order-by or Override order-by desc.
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByDesc(String orderByProperty) {
+        getSqlClause().reverseOrderBy_Or_OverrideOrderBy(orderByProperty, orderByProperty, false);
+        return this;
+    }
+}

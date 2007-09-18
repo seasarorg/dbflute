@@ -1,0 +1,11 @@
+${database.allClassCopyright}package ${glPackageExtendedBhv};
+
+#set ($myClassName = "${myExtendedBhvClassName}")
+
+/**
+ * The behavior of ${table.Name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+public class $myClassName extends ${glPackageBaseBhv}.${myBaseBhvClassName} {
+}

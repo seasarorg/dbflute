@@ -1,0 +1,11 @@
+${database.allClassCopyright}package ${glPackageExtendedSqlParameterBean};
+
+#set ($myClassName = "${myExtendedSqlParameterClassName}")
+
+/**
+ * The sql-parameter-bean of ${mySqlParameterBeanName}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glPackageBaseSqlParameterBean}.${myBaseSqlParameterClassName} {
+}

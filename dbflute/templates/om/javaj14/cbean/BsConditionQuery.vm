@@ -1,0 +1,491 @@
+#set ($myClassName = "")
+#if ($database.isJavaDirOnlyOne())
+${database.allClassCopyright}package ${glPackageBaseCQ};
+
+#if ($table.hasForeignKeyOrReferer())
+import ${glPackageCQ}.*;
+#end
+#set ($myClassName = "${myBaseConditionQueryClassName}")
+#else
+${database.allClassCopyright}package ${glPackageCQ};
+
+import ${glPackageBaseCQ}.*;
+#set ($myClassName = "${myConditionQueryClassName}")
+#end
+
+import ${glPackageBaseCommonCBean}.*;
+import ${glPackageBaseCommonCValue}.${glConditionValueName};
+import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageCIQ}.*;
+
+/**
+ * The condition-query of ${table.name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Corresponding inline query. */
+    protected ${myConditionInlineQueryClassName} _inlineQuery;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * 
+     * @param childQuery Child query as abstract class. (Nullable: If null, this is base instance.)
+     * @param sqlClause SQL clause instance. (NotNull)
+     * @param aliasName My alias name. (NotNull)
+     * @param nestLevel Nest level.
+     */
+    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+        super(childQuery, sqlClause, aliasName, nestLevel);
+    }
+
+    // ===================================================================================
+    //                                                                              Inline
+    //                                                                              ======
+    /**
+     * Get inline query.
+     * 
+     * @return Inline query. (NotNull)
+     */
+    public ${myConditionInlineQueryClassName} inline() {
+        if (_inlineQuery == null) {
+            _inlineQuery = new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
+        }
+        return _inlineQuery;
+    }
+
+    // ===================================================================================
+    //                                                                     Include-as-Mine
+    //                                                                     ===============
+  #foreach ($col in $table.Columns)
+
+    /**
+     * Include select-column of ${col.UncapitalisedJavaName} as mine.
+     * Alias name is java-name of this column.
+     * Be careful to whether your table have the same column.
+     */
+    public void includeAsMine_${col.JavaName}() {
+        registerIncludedSelectColumn("${col.JavaName}", getRealColumnName("${col.Name}"));
+    }
+
+    /**
+     * Include select-column of ${col.UncapitalisedJavaName} as mine.
+     * 
+     * @param aliasName Alias name. {select columnName as aliasName from ...} This should not contain comma. (NotNull)
+     */
+    public void includeAsMine_${col.JavaName}(String aliasName) {
+        registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}"));
+    }
+  #end
+
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   MyTable = [$table.Name]
+    // * * * * * * * * */
+  #foreach ($col in $table.Columns)
+    #set ($tmpJavaName = "${col.JavaName}")
+    #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
+
+    // /- - - - - - - - - - - - - - - - - - - - - - -
+    //   Column = [$col.name]
+    // - - - - - - - - -/
+
+    /** The attribute of ${col.UncapitalisedJavaName}. */
+    protected ${glConditionValueName} _${tmpUncapitalisedJavaName};
+
+    /**
+     * Get the value of ${col.UncapitalisedJavaName}.
+     * 
+     * @return The value of ${col.UncapitalisedJavaName}.
+     */
+    public ${glConditionValueName} get${tmpJavaName}() {
+        if (_${tmpUncapitalisedJavaName} == null) {
+            _${tmpUncapitalisedJavaName} = new ${glConditionValueName}();
+        }
+        return _${tmpUncapitalisedJavaName};
+    }
+
+    protected ${glConditionValueName} getCValue${tmpJavaName}() {
+        return get${tmpJavaName}();
+    }
+
+    #if (${col.isJavaNativeStringObject()})
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
+    }
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
+    }
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
+    }
+          #end
+        #end
+      #end
+    #end
+    #if (${col.isJavaNativeNumberObject()})
+      #if (${col.isSingleKeyForeignKey()})
+        #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+        #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
+    }
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. */
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using inScopeSubQuery. (Nullable)
+     */
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
+    }
+        #end
+      #end
+      #if (${col.hasSingleKeyReferrer()})
+        #foreach ($refferer in $col.SingleKeyReferrers)
+          #if (!$refferer.isSelfReference())
+            #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
+            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+            #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+
+    /** The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. */
+    protected java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} _${subQueryPropertyName}Map;
+
+    /**
+     * Get the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
+     * 
+     * @return The sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery. (Nullable)
+     */
+    public java.util.Map${database.filterGenericsString(${subQueryKeepMapGeneric})} get${subQueryPropertyNameInitCap}() {
+        return _${subQueryPropertyName}Map;
+    }
+
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = new java.util.LinkedHashMap${database.filterGenericsString(${subQueryKeepMapGeneric})}(); }
+        final String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(key, subQuery);
+        return "${subQueryPropertyName}." + key;
+    }
+          #end
+        #end
+      #end
+    #end
+    #if (${col.isJavaNativeDateObject()})
+    #end
+    #if (${col.isJavaNativeBooleanObject()})
+    #end
+    #if (${col.isJavaNativeBinaryObject()})
+    #end
+    #if (!${col.isNotNull()})
+    #end
+
+    /**
+     * Add order-by of ${col.UncapitalisedJavaName} as ASC.
+     * 
+     * @return this. (NotNull)
+     */
+    public ${myClassName} addOrderBy_${tmpJavaName}_Asc() {
+        getSqlClause().registerOrderBy(getRealColumnName("${col.Name}"), null, true);return this;
+    }
+
+    /**
+     * Add order-by of ${col.UncapitalisedJavaName} as DESC.
+     * 
+     * @return this. (NotNull)
+     */
+    public ${myClassName} addOrderBy_${tmpJavaName}_Desc() {
+        getSqlClause().registerOrderBy(getRealColumnName("${col.Name}"), null, false);return this;
+    }
+  #end
+
+    // ===================================================================================
+    //                                                                         Union Query
+    //                                                                         ===========
+    protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+#if ($table.hasForeignKeyOrRefererAsOne())
+        final ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
+        final ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;
+#end
+#foreach ($foreignKeys in $table.ForeignKeys)
+        if (baseQuery.hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
+            unionQuery.query${foreignKeys.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(baseQuery.query${foreignKeys.foreignPropertyNameInitCap}(), unionQuery.query${foreignKeys.foreignPropertyNameInitCap}());
+        }
+#end
+#foreach ($refferer in $table.Referrers)
+#if (${refferer.isOneToOne()})
+        if (baseQuery.hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
+            unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.query${refferer.reffererPropertyNameInitCapAsOne}(), unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}());
+        }
+#end
+#end
+
+    }
+
+    // ===================================================================================
+    //                                                                       Foreign Query
+    //                                                                       =============
+#foreach ($foreignKeys in $table.ForeignKeys)
+#set ($foreignCQClassName = "${foreignKeys.foreignTableExtendedConditionQueryClassName}")
+    
+    // /* * * * * * * * * * * * * * * * * * * * * * *
+    //   ForeignTable    = [${foreignKeys.foreignTable.basicInfoDispString}]
+    //   ForeignProperty = [${foreignKeys.foreignJavaBeansRulePropertyName}]
+    // * * * * * * * * */
+
+    /**
+     * Query for ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * 
+     * @return Instance of ${foreignCQClassName} as ${foreignKeys.ForeignPropertyName}. (NotNull)
+     */
+    public ${foreignCQClassName} query${foreignKeys.ForeignPropertyNameInitCap}() {
+        return getConditionQuery${foreignKeys.ForeignPropertyNameInitCap}();
+    }
+
+    /** Condition-query for ${foreignKeys.foreignJavaBeansRulePropertyName}. */
+    protected ${foreignCQClassName} _conditionQuery${foreignKeys.ForeignPropertyNameInitCap};
+
+    /**
+     * Get condition-query for ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * 
+     * @return Instance of ${foreignCQClassName} as ${foreignKeys.ForeignPropertyName}. (NotNull)
+     */
+    public ${foreignCQClassName} getConditionQuery${foreignKeys.ForeignPropertyNameInitCap}() {
+        if (_conditionQuery${foreignKeys.foreignPropertyNameInitCap} == null) {
+            _conditionQuery${foreignKeys.foreignPropertyNameInitCap} = createQuery${foreignKeys.ForeignPropertyNameInitCap}();
+            setupOuterJoin_${foreignKeys.foreignPropertyNameInitCap}();
+        }
+        return _conditionQuery${foreignKeys.foreignPropertyNameInitCap};
+    }
+
+    /**
+     * Setup outer join for ${foreignJavaBeansRulePropertyName}.
+     */
+    protected void setupOuterJoin_${foreignKeys.foreignPropertyNameInitCap}() {
+        final java.util.Map${database.filterGenericsString('String, String')} joinOnMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+#foreach ($columnName in $foreignKeys.LocalColumns)
+#set ($localColumn = $table.getColumn($columnName))
+#set ($foreignColumnName = $foreignKeys.getLocalForeignMapping().get($columnName))
+        joinOnMap.put(getRealColumnName("${localColumn.Name}"), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealColumnName("${foreignColumnName}"));
+#end
+        getSqlClause().registerOuterJoin("${foreignKeys.foreignTable.name}", getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName(), joinOnMap);
+    }
+
+    /**
+     * Create query for ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * 
+     * @return Query for ${foreignKeys.foreignJavaBeansRulePropertyName}. (NotNull)
+     */
+    protected ${foreignCQClassName} createQuery${foreignKeys.ForeignPropertyNameInitCap}() {
+        final int relationNo = getSqlClause().resolveRelationNo("${table.name}", "${foreignKeys.foreignPropertyName}");
+        String nextRelationPath = "_" + relationNo;
+        if (_relationPath != null) {
+            nextRelationPath = _relationPath + nextRelationPath;
+        }
+        final String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
+        final ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
+        cq.setForeignPropertyName("${foreignKeys.foreignPropertyName}");
+        cq.setRelationPath(nextRelationPath);
+        return cq;
+    }
+
+    /**
+     * Has condition query?
+     * 
+     * @return Determination.
+     */
+    public boolean hasConditionQuery${foreignKeys.ForeignPropertyNameInitCap}() {
+        return _conditionQuery${foreignKeys.ForeignPropertyNameInitCap} != null;
+    }
+#end
+
+#foreach ($refferer in $table.Referrers)
+#set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
+#if (${refferer.isOneToOne()})
+
+    // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
+    //   RefererTable    = [${refferer.table.basicInfoDispString}]
+    //   RefererProperty = [${refferer.refererJavaBeansRulePropertyNameAsOne}]
+    // * * * * * * * * */
+
+    /**
+     * Query for ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     * 
+     * @return Instance of ${relatedCQClassName} as ${refferer.ReffererPropertyNameAsOne}. (NotNull)
+     */
+    public ${relatedCQClassName} query${refferer.ReffererPropertyNameInitCapAsOne}() {
+        return getConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}();
+    }
+
+    /** Condition-query for ${refferer.refererJavaBeansRulePropertyNameAsOne}. */
+    protected ${relatedCQClassName} _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
+
+    /**
+     * Get condition-query for ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     * 
+     * @return Instance of ${relatedCQClassName} as ${refferer.refererJavaBeansRulePropertyNameAsOne}. (NotNull)
+     */
+    public ${relatedCQClassName} getConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
+        if (_conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} == null) {
+            _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} = createQuery${refferer.ReffererPropertyNameInitCapAsOne}();
+            setupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}();
+        }
+        return _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
+    }
+
+    /**
+     * Setup outer join for ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     */
+    protected void setupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}() {
+        final java.util.Map${database.filterGenericsString('String, String')} joinOnMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+#foreach ($columnName in $refferer.ForeignColumns)
+#set ($foreignColumn = $table.getColumn($columnName))
+#set ($reffererColumnName = $refferer.getLocalForeignMapping().get($columnName))
+        joinOnMap.put(getRealColumnName("${foreignColumn.name}"), getConditionQuery${refferer.reffererPropertyNameInitCapAsOne}().getRealColumnName("${reffererColumnName}"));
+#end
+        getSqlClause().registerOuterJoin("${refferer.table.name}", getConditionQuery${refferer.reffererPropertyNameInitCapAsOne}().getRealAliasName(), joinOnMap);
+    }
+
+    /**
+     * Create query for ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     * 
+     * @return Query for ${refferer.refererJavaBeansRulePropertyNameAsOne}. (NotNull)
+     */
+    protected ${relatedCQClassName} createQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
+        final int relationNo = getSqlClause().resolveRelationNo("${table.name}", "${refferer.reffererPropertyNameAsOne}");
+        String nextRelationPath = "_" + relationNo;
+        if (_relationPath != null) {
+            nextRelationPath = _relationPath + nextRelationPath;
+        }
+        final String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
+        final ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
+        cq.setForeignPropertyName("${refferer.reffererPropertyNameAsOne}");
+        cq.setRelationPath(nextRelationPath);
+        return cq;
+    }
+
+    /**
+     * Has condition query?
+     * 
+     * @return Determination.
+     */
+    public boolean hasConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
+        return _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} != null;
+    }
+#end
+#end
+
+}

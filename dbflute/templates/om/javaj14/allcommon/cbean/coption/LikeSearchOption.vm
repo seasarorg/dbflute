@@ -1,0 +1,210 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCOption};
+
+#set ($myClassName = "${glConditionOptionLikeSearchName}")
+
+import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
+
+/**
+ * The class of like-search-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
+
+    protected static final String LIKE_PREFIX = "prefix";
+    protected static final String LIKE_SUFFIX = "suffix";
+    protected static final String LIKE_CONTAIN = "contain";
+
+    protected String _like;
+    protected String _escape;
+
+    protected java.util.List${database.filterGenericsString('LikeAsOrCallback')} _likeAsOrCallbackList = new java.util.ArrayList${database.filterGenericsString('LikeAsOrCallback')}();
+
+    // =====================================================================================
+    //                                                                           Rear Option
+    //                                                                           ===========
+    public String getRearOption() {
+        if (_escape == null || _escape.trim().length() == 0) {
+            return "";
+        }
+        return " escape '" + _escape + "'";
+    }
+
+    // =====================================================================================
+    //                                                                                  AsOr
+    //                                                                                  ====
+    public static interface LikeAsOrCallback {
+        public String getAdditionalTargetPropertyName();
+        public String filterValue(String currentValue);
+        public ${myClassName} filterOption(${myClassName} optionDeepCopyWithoutCallback);
+    }
+
+    public static abstract class DefaultLikeAsOrCallback implements LikeAsOrCallback {
+        public String filterValue(String currentValue) {
+            return currentValue;
+        }
+        public ${myClassName} filterOption(${myClassName} optionDeepCopyWithoutCallback) {
+            return optionDeepCopyWithoutCallback;
+        }
+    }
+
+    public java.util.List${database.filterGenericsString('LikeAsOrCallback')} getLikeAsOrCallbackList() {
+        return _likeAsOrCallbackList;
+    }
+
+    public void addLikeAsOrCallback(LikeAsOrCallback likeAsOrCallback) {
+        _likeAsOrCallbackList.add(likeAsOrCallback);
+    }
+
+    public void clearLikeAsOrCallback() {
+        _likeAsOrCallbackList.clear();
+    }
+
+    // =====================================================================================
+    //                                                                                  Like
+    //                                                                                  ====
+    public ${myClassName} likePrefix() {
+        _like = LIKE_PREFIX;
+        return this;
+    }
+    public ${myClassName} likeSuffix() {
+        _like = LIKE_SUFFIX;
+        return this;
+    }
+    public ${myClassName} likeContain() {
+        _like = LIKE_CONTAIN;
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                                Escape
+    //                                                                                ======
+    public ${myClassName} escapeByPipeLine() {
+        _escape = "|";
+        return this;
+    }
+
+    public ${myClassName} escapeByAtMark() {
+        _escape = "@";
+        return this;
+    }
+
+    public ${myClassName} escapeBySlash() {
+        _escape = "/";
+        return this;
+    }
+
+    public ${myClassName} escapeByBackSlash() {
+        _escape = "\\";
+        return this;
+    }
+
+    // =====================================================================================
+    //                                                                                 Split
+    //                                                                                 =====
+    public ${myClassName} splitBySpace() {
+        return (${myClassName})doSplitBySpace();
+    }
+
+    public ${myClassName} splitBySpace(int splitLimitCount) {
+        return (${myClassName})doSplitBySpace(splitLimitCount);
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte() {
+        return (${myClassName})doSplitBySpaceContainsDoubleByte();
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte(int splitLimitCount) {
+        return (${myClassName})doSplitBySpaceContainsDoubleByte(splitLimitCount);
+    }
+
+    public ${myClassName} splitByPipeLine() {
+        return (${myClassName})doSplitByPipeLine();
+    }
+
+    public ${myClassName} splitByPipeLine(int splitLimitCount) {
+        return (${myClassName})doSplitByPipeLine(splitLimitCount);
+    }
+
+    // =====================================================================================
+    //                                                                   To Upper/Lower Case
+    //                                                                   ===================
+    public ${myClassName} toUpperCase() {
+        return (${myClassName})doToUpperCase();
+    }
+
+    public ${myClassName} toLowerCase() {
+        return (${myClassName})doToLowerCase();
+    }
+
+    // =====================================================================================
+    //                                                                        To Single Byte
+    //                                                                        ==============
+    public ${myClassName} toSingleByteSpace() {
+        return (${myClassName})doToSingleByteSpace();
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumber() {
+        return (${myClassName})doToSingleByteAlphabetNumber();
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumberMark() {
+        return (${myClassName})doToSingleByteAlphabetNumberMark();
+    }
+
+    // =====================================================================================
+    //                                                                        To Double Byte
+    //                                                                        ==============
+
+    // =====================================================================================
+    //                                                                              Japanese
+    //                                                                              ========
+    public ${glConditionOptionPartsAgentJapaneseName} localJapanese() {
+        return doLocalJapanese();
+    }
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public String generateRealValue(String value) {
+        value = super.generateRealValue(value);
+
+        // Escape
+        if (_escape != null && _escape.trim().length() != 0) {
+            String tmp = replace(value, _escape, _escape + _escape);
+            tmp = replace(tmp, "%", _escape + "%");
+            tmp = replace(tmp, "_", _escape + "_");
+            value = tmp;
+        }
+        final String wildCard = "${database.wildCard}";
+        if (_like == null || _like.trim().length() == 0) {
+            return value;
+        } else if (_like.equals(LIKE_PREFIX)) {
+            return value + wildCard;
+        } else if (_like.equals(LIKE_SUFFIX)) {
+            return wildCard + value;
+        } else if (_like.equals(LIKE_CONTAIN)) {
+            return wildCard + value + wildCard;
+        } else {
+            String msg = "The like was wrong string: " + _like;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // =====================================================================================
+    //                                                                              DeepCopy
+    //                                                                              ========
+    public Object createDeepCopy() {
+        final ${myClassName} deepCopy = (${myClassName})super.createDeepCopy();
+        deepCopy._like = _like;
+        deepCopy._escape = _escape;
+        for (java.util.Iterator ite = _likeAsOrCallbackList.iterator(); ite.hasNext(); ) {
+            deepCopy.addLikeAsOrCallback((LikeAsOrCallback)ite.next());
+        }
+        return deepCopy;
+    }
+
+    protected ${glConditionOptionSimpleStringName} newDeepCopyInstance() {
+        return new ${myClassName}();
+    }
+}

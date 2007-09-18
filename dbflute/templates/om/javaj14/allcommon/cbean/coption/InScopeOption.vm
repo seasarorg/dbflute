@@ -1,0 +1,89 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCOption};
+
+#set ($myClassName = "${glConditionOptionInScopeName}")
+
+import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
+
+/**
+ * The class of in-scope-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
+
+    // =====================================================================================
+    //                                                                                 Split
+    //                                                                                 =====
+    public ${myClassName} splitBySpace() {
+        return (${myClassName})doSplitBySpace();
+    }
+
+    public ${myClassName} splitBySpace(int splitLimitCount) {
+        return (${myClassName})doSplitBySpace(splitLimitCount);
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte() {
+        return (${myClassName})doSplitBySpaceContainsDoubleByte();
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte(int splitLimitCount) {
+        return (${myClassName})doSplitBySpaceContainsDoubleByte(splitLimitCount);
+    }
+
+    public ${myClassName} splitByPipeLine() {
+        return (${myClassName})doSplitByPipeLine();
+    }
+
+    public ${myClassName} splitByPipeLine(int splitLimitCount) {
+        return (${myClassName})doSplitByPipeLine(splitLimitCount);
+    }
+
+    // =====================================================================================
+    //                                                                   To Upper/Lower Case
+    //                                                                   ===================
+    public ${myClassName} toUpperCase() {
+        return (${myClassName})doToUpperCase();
+    }
+
+    public ${myClassName} toLowerCase() {
+        return (${myClassName})doToLowerCase();
+    }
+
+    // =====================================================================================
+    //                                                                        To Single Byte
+    //                                                                        ==============
+    public ${myClassName} toSingleByteSpace() {
+        return (${myClassName})doToSingleByteSpace();
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumber() {
+        return (${myClassName})doToSingleByteAlphabetNumber();
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumberMark() {
+        return (${myClassName})doToSingleByteAlphabetNumberMark();
+    }
+
+    // =====================================================================================
+    //                                                                        To Double Byte
+    //                                                                        ==============
+
+    // =====================================================================================
+    //                                                                              Japanese
+    //                                                                              ========
+    public ${glConditionOptionPartsAgentJapaneseName} localJapanese() {
+        return doLocalJapanese();
+    }
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public java.util.List generateRealValueList(java.util.List valueList) {
+        final java.util.List${database.filterGenericsString('String')} resultList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
+            final String value = (String)ite.next();
+            resultList.add(generateRealValue(value));
+        }
+        return resultList;
+    }
+}

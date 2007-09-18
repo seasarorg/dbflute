@@ -1,0 +1,102 @@
+${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
+
+#set ($myClassName = "${glSqlClauseInterfaceName}Default")
+
+/**
+ * SqlClause for Default.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glSqlClauseAbstractName} {
+
+    /**
+     * Constructor.
+     * <p>
+     * @param tableName Table name. (NotNull)
+     **/
+    public ${myClassName}(String tableName) {
+        super(tableName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchFirst() {
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchPage() {
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doClearFetchPageClause() {
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchStartIndexSupported() {
+        return false; // Default
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchSizeSupported() {
+        return false; // Default
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glSqlClauseInterfaceName} lockForUpdate() {
+        String msg = "LockForUpdate-SQL is unsupported in the database. Sorry...: " + toString();
+        throw new UnsupportedOperationException(msg);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Select-hint. (NotNull)
+     */
+    protected String createSelectHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+     */
+    protected String createFromBaseTableHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return From-hint. (NotNull)
+     */
+    protected String createFromHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql-suffix. (NotNull)
+     */
+    protected String createSqlSuffix() {
+        return "";
+    }
+}

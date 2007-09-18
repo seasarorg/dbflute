@@ -1,0 +1,110 @@
+${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
+
+#set ($myClassName = "${glSqlClauseInterfaceName}SqlServer")
+
+/**
+ * SqlClause for MSSQL.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glSqlClauseAbstractName} {
+
+    /** String of fetch-first as select-hint. */
+    protected String _fetchFirstSelectHint = "";
+
+    /** String of lock as from-hint. */
+    protected String _lockFromHint = "";
+
+    /**
+     * Constructor.
+     * 
+     * @param tableName Table name. (NotNull)
+     **/
+    public ${myClassName}(String tableName) {
+        super(tableName);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchFirst() {
+        if (isFetchSizeSupported()) {
+            _fetchFirstSelectHint = " top " + getFetchSize();
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchPage() {
+        if (isFetchSizeSupported()) {
+            if (isFetchStartIndexSupported()) {
+                _fetchFirstSelectHint = " top " + getFetchSize();
+            } else {
+                _fetchFirstSelectHint = " top " + getPageEndIndex();
+            }
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doClearFetchPageClause() {
+        _fetchFirstSelectHint = "";
+    }
+
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchStartIndexSupported() {
+        return false;
+    }
+
+    /**
+     * ${database.ImplementComment} {Implement}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glSqlClauseInterfaceName} lockForUpdate() {
+        _lockFromHint = " with (updlock)";
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Select-hint. (NotNull)
+     */
+    protected String createSelectHint() {
+        return _fetchFirstSelectHint;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+     */
+    protected String createFromBaseTableHint() {
+        return _lockFromHint;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return From-hint. (NotNull)
+     */
+    protected String createFromHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql-suffix. (NotNull)
+     */
+    protected String createSqlSuffix() {
+        return "";
+    }
+}

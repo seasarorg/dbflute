@@ -1,0 +1,46 @@
+${database.allClassCopyright}package ${glPackageBaseCommonJdbcHistory};
+
+/**
+ * The element of prepared parameters.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glPreparedParameterElementName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected int settingIndex;
+
+    /** JDBC type. (java.sql.Types) */
+    protected int jdbcType;
+
+    protected Object parameterValue;
+
+    // =====================================================================================
+    //                                                                              Accessor
+    //                                                                              ========
+    public int getSettingIndex() {
+        return settingIndex;
+    }
+
+    public void setSettingIndex(int settingIndex) {
+        this.settingIndex = settingIndex;
+    }
+
+    public int getJdbcType() {
+        return jdbcType;
+    }
+
+    public void setJdbcType(int jdbcType) {
+        this.jdbcType = jdbcType;
+    }
+
+    public Object getParameterValue() {
+        return parameterValue;
+    }
+
+    public void setParameterValue(Object parameterValue) {
+        this.parameterValue = parameterValue;
+    }
+}

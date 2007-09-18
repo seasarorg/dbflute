@@ -1,0 +1,72 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
+
+#set ($myClassName = "${glUniqueInfoName}")
+
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+
+/**
+ * The class of unique info.
+ * 
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glDBMetaInterfaceName} dbmeta;
+    protected java.util.List${database.filterGenericsString(${glColumnInfoName})} uniqueColumnList = new java.util.ArrayList${database.filterGenericsString(${glColumnInfoName})}();
+    protected boolean primary;
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    public boolean containsColumn(String columnName) {
+        for (final java.util.Iterator ite = uniqueColumnList.iterator(); ite.hasNext(); ) {
+            final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+            if (columnInfo.getColumnDbName().equals(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean containsColumn(${glColumnInfoName} column) {
+        return containsColumn(column.getColumnDbName());
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ${glDBMetaInterfaceName} getDBMeta() {
+        return dbmeta;
+    }
+
+    public void setDBMeta(${glDBMetaInterfaceName} dbmeta) {
+        this.dbmeta = dbmeta;
+    }
+
+    public java.util.List${database.filterGenericsString(${glColumnInfoName})} getUniqueColumnList() {
+        return uniqueColumnList;
+    }
+
+    public void addUniqueColumnList(${glColumnInfoName} uniqueColumn) {
+        this.uniqueColumnList.add(uniqueColumn);
+    }
+
+    public ${glColumnInfoName} getFirstColumn() {
+        return (${glColumnInfoName})this.uniqueColumnList.get(0);
+    }
+
+    public boolean isTwoOrMore() {
+        return this.uniqueColumnList.size() > 1;
+    }
+
+    public boolean isPrimary() {
+        return this.primary;
+    }
+
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
+    }
+}

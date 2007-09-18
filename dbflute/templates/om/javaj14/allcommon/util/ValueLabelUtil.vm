@@ -1,0 +1,37 @@
+${database.allClassCopyright}package ${glPackageBaseCommonUtil};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glValueLabelUtilName} {
+
+    /**
+     * Find the label by the value from the list of value label.
+     * 
+     * @param valueLabelList The list of value label. (NotNull and NotEmpty)
+     * @param value Value. (NotNull)
+     * @return Label. (NotNull)
+     */
+    public static String findLabel(java.util.List<java.util.Map<String, Object>> valueLabelList, Object value) {
+        if (valueLabelList == null) {
+            String msg = "The arguement[valueLabelList] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (valueLabelList.isEmpty()) {
+            String msg = "The arguement[valueLabelList] should not be empty.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The arguement[value] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        for (java.util.Map<String, Object> map : valueLabelList) {
+            final Object currentValue = map.get("value");
+            if (value.equals(currentValue)) {
+                return (String) map.get("label");
+            }
+        }
+        String msg = "Not found label by the value: value=" + value + " valueLabelList=" + valueLabelList;
+        throw new IllegalStateException(msg);
+    }
+}

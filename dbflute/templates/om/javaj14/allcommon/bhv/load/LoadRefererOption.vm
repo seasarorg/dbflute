@@ -1,0 +1,138 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvLoad};
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
+import ${glPackageBaseCommonBhvSetup}.${glEntityListSetupperName};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+
+/**
+ * The class of load referer option.
+ * 
+ * ${database.filterGenericsParamOutput('<REFERER_CONDITION_BEAN>', 'The type of referer condition-bean.')}
+ * ${database.filterGenericsParamOutput('<REFERER_ENTITY>', 'The type of referer entity.')}
+ * @author ${database.ClassAuthor}
+ */
+public class ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN extends ${glConditionBeanInterfaceName}, REFERER_ENTITY extends ${glEntityInterfaceName}> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${glConditionBeanSetupperName}<REFERER_CONDITION_BEAN> _conditionBeanSetupper;
+
+    protected ${glEntityListSetupperName}<REFERER_ENTITY> _entityListSetupper;
+
+    protected REFERER_CONDITION_BEAN _refererConditionBean;
+
+    protected boolean _toLastKeyCondtion;
+
+    protected boolean _stopOrderByKey;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glLoadRefererOptionName}() {
+    }
+
+    public ${glLoadRefererOptionName}(${glConditionBeanSetupperName}<REFERER_CONDITION_BEAN> conditionBeanSetupper) {
+        this._conditionBeanSetupper = conditionBeanSetupper;
+    }
+
+    public ${glLoadRefererOptionName}(${glConditionBeanSetupperName}<REFERER_CONDITION_BEAN> conditionBeanSetupper, ${glEntityListSetupperName}<REFERER_ENTITY> entityListSetupper) {
+        this._conditionBeanSetupper = conditionBeanSetupper;
+        this._entityListSetupper = entityListSetupper;
+    }
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    /**
+     * Specify that the key condition is added as last condition. <br />
+     * This method is valid only after you use reffererConditionBean and add your original condition to it. <br />
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN, REFERER_ENTITY> toLastKeyCondtion() {
+        _toLastKeyCondtion = true;
+        return this;
+    }
+
+    /**
+     * Specify that it stops adding order-by of the key. <br />
+     * This method is valid only after you use reffererConditionBean and add your original order-by to it. <br />
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glLoadRefererOptionName}<REFERER_CONDITION_BEAN, REFERER_ENTITY> stopOrderByKey() {
+        _stopOrderByKey = true;
+        return this;
+    }
+
+    public void delegateKeyConditionExchangingFirstWhereClauseForLastOne(REFERER_CONDITION_BEAN cb) {// Internal
+        if (!_toLastKeyCondtion) {
+            cb.getSqlClause().exchangeFirstWhereClauseForLastOne();
+        }
+    }
+
+    public void delegateConditionBeanSettingUp(REFERER_CONDITION_BEAN cb) {// Internal
+        if (_conditionBeanSetupper != null) {
+            _conditionBeanSetupper.setup(cb);
+        }
+    }
+
+    public void delegateEntitySettingUp(java.util.List<REFERER_ENTITY> entityList) {// Internal
+        if (_entityListSetupper != null) {
+            _entityListSetupper.setup(entityList);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ${glConditionBeanSetupperName}<REFERER_CONDITION_BEAN> getConditionBeanSetupper() {
+        return _conditionBeanSetupper;
+    }
+
+    public void setConditionBeanSetupper(${glConditionBeanSetupperName}<REFERER_CONDITION_BEAN> conditionBeanSetupper) {
+        this._conditionBeanSetupper = conditionBeanSetupper;
+    }
+
+    public ${glEntityListSetupperName}<REFERER_ENTITY> getEntityListSetupper() {
+        return _entityListSetupper;
+    }
+
+    public void setEntityListSetupper(${glEntityListSetupperName}<REFERER_ENTITY> entityListSetupper) {
+        this._entityListSetupper = entityListSetupper;
+    }
+
+    /**
+     * @return The condition-bean of referer.
+     * @deprecated Sorry! This methid have typo! Please use getRefererConditionBean().
+     */
+    public REFERER_CONDITION_BEAN getReffererConditionBean() {
+        return _refererConditionBean;
+    }
+
+    /**
+     * @param refererConditionBean The condition-bean of referer.
+     * @deprecated Sorry! This methid have typo! Please use setRefererConditionBean().
+     */
+    public void setReffererConditionBean(REFERER_CONDITION_BEAN refererConditionBean) {
+        this._refererConditionBean = refererConditionBean;
+    }
+
+    public REFERER_CONDITION_BEAN getRefererConditionBean() {
+        return _refererConditionBean;
+    }
+
+    public void setRefererConditionBean(REFERER_CONDITION_BEAN refererConditionBean) {
+        this._refererConditionBean = refererConditionBean;
+    }
+
+    public boolean isToLastKeyCondtion() {
+        return _toLastKeyCondtion;
+    }
+
+    public boolean isStopOrderByKey() {
+        return _stopOrderByKey;
+    }
+}
