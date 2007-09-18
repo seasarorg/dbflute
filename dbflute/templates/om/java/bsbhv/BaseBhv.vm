@@ -1091,14 +1091,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        final int deletedCount = delegateDelete(${myEntityVariableName});
-        if (deletedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
-        } else if (deletedCount > 1) {
-            String msg = "deletedCount=" + deletedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
-        }
+        helpDeleteInternally(${myEntityVariableName}, new InternalDeleteCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateDelete(${myExtendedObjectClassName} entity) { return delegateDelete(entity); } });
     }
 
     protected void doRemove(${glEntityInterfaceName} ${myEntityVariableName}) {
@@ -1118,7 +1112,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
-     * @deprecated Thie method is old style and has wrong performance. Please use remove().
+     * @deprecated Thie method is old style and has wrong performance. Please use delete().
      */
     public void deleteAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
@@ -1130,7 +1124,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
-     * @deprecated Thie method is old style and has wrong performance. Please use remove().
+     * @deprecated Thie method is old style and has wrong performance. Please use delete().
      */
     protected void doRemoveAfterSelect(${glEntityInterfaceName} entity) {
         deleteAfterSelect((${myExtendedObjectClassName})entity);
@@ -1147,14 +1141,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        final int deletedCount = delegateDeleteNonstrict(${myEntityVariableName});
-        if (deletedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
-        } else if (deletedCount > 1) {
-            String msg = "deletedCount=" + deletedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
-        }
+        helpDeleteNonstrictInternally(${myEntityVariableName}, new InternalDeleteNonstrictCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity); } });
     }
 
     /**
@@ -1166,14 +1154,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        final int deletedCount = delegateDeleteNonstrict(${myEntityVariableName});
-        if (deletedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(${myEntityVariableName}.toString());
-        } else if (deletedCount > 1) {
-            String msg = "deletedCount=" + deletedCount + ": " + ${myEntityVariableName}.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
-        }
+        helpDeleteNonstrictIgnoreDeletedInternally(${myEntityVariableName}, new InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity); } });
     }
 #end
 

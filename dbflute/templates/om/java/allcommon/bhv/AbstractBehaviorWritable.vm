@@ -504,9 +504,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     abstract protected void doRemoveAfterSelect(${glEntityInterfaceName} entity);
 #end
 
+    // =====================================================================================
+    //                                                   Basic Entity Update Internal Helper
+    //                                                   ===================================
     // -----------------------------------------------------
-    //                                       Internal Helper
-    //                                       ---------------
+    //                                                Update
+    //                                                ------
     protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateInternally(ENTITY_TYPE entity, InternalUpdateCallback<ENTITY_TYPE> callback) {
         assertEntityNotNull(entity);
         assertEntityHasVersionNoValue(entity);
@@ -539,6 +542,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         public int callbackDelegateUpdateNonstrict(ENTITY_TYPE entity);
     }
 
+    // -----------------------------------------------------
+    //                                        InsertOrUpdate
+    //                                        --------------
     protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
             void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback) {
         assertEntityNotNull(entity);
@@ -592,6 +598,56 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
         public void callbackInsert(ENTITY_TYPE entity);
         public void callbackUpdateNonstrict(ENTITY_TYPE entity);
+    }
+
+    // -----------------------------------------------------
+    //                                                Delete
+    //                                                ------
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteInternally(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        assertEntityHasVersionNoValue(entity);
+        assertEntityHasUpdateDateValue(entity);
+        final int deletedCount = callback.callbackDelegateDelete(entity);
+        if (deletedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(entity.toString());
+        } else if (deletedCount > 1) {
+            String msg = "deletedCount=" + deletedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+        }
+    }
+
+    protected static interface InternalDeleteCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDelete(ENTITY_TYPE entity);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteNonstrictInternally(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
+        if (deletedCount == 0) {
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(entity.toString());
+        } else if (deletedCount > 1) {
+            String msg = "deletedCount=" + deletedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+        }
+    }
+
+    protected static interface InternalDeleteNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
+        if (deletedCount == 0) {
+            return;
+        } else if (deletedCount > 1) {
+            String msg = "deletedCount=" + deletedCount + ": " + entity.toString();
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+        }
+    }
+
+    protected static interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
     }
 
     // =====================================================================================
