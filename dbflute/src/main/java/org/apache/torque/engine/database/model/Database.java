@@ -640,7 +640,7 @@ public class Database {
     public String getResourceDirectory() {
         return getBasicProperties().getResourceDirectory();
     }
-    
+
     public String getTargetLanguageInitCap() {
         final String targetLanguage = getBasicProperties().getTargetLanguage();
         return targetLanguage.substring(0, 1).toUpperCase() + targetLanguage.substring(1);
@@ -735,7 +735,7 @@ public class Database {
     public String outputOverrideAnnotation() {
         return getBasicProperties().outputOverrideAnnotation();
     }
-    
+
     public String outputOverrideAnnotationAfterNewLineOutput() {
         return getBasicProperties().outputOverrideAnnotationAfterNewLineOutput();
     }
@@ -1259,6 +1259,10 @@ public class Database {
     //                                     -----------------
     public boolean isCommonColumnInterceptingOnBehaviorFilter() {
         return getProperties().getLittleAdjustmentProperties().isCommonColumnInterceptingOnBehaviorFilter();
+    }
+
+    public boolean isOneToManyReturnNullIfNonSelect() {
+        return getProperties().getLittleAdjustmentProperties().isOneToManyReturnNullIfNonSelect();
     }
 
     public String getBehaviorDelegateModifier() {

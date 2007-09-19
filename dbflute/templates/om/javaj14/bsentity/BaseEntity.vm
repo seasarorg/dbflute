@@ -369,12 +369,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Has relation object of ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * Has foreign object of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * 
      * @return Determination.
      */
-    public boolean hasRelation${foreignKeys.foreignPropertyNameInitCap}() {
+    public boolean hasForeign${foreignKeys.foreignPropertyNameInitCap}() {
         return ${foreignVariableName} != null && ${foreignVariableName}.hasPrimaryKeyValue();
+    }
+
+    /**
+     * @return Determination.
+     * @deprecated Sorry! Please use hasForeign${foreignKeys.foreignPropertyNameInitCap}().
+     */
+    public boolean hasRelation${foreignKeys.foreignPropertyNameInitCap}() {
+        return hasForeign${foreignKeys.foreignPropertyNameInitCap}();
     }
 
     /**
@@ -439,7 +447,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The list of referer table. (Nullable)
      */
     public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.refererJavaBeansRulePropertyNameInitCap}() {
+#if ($database.isOneToManyReturnNullIfNonSelect())
         return ${reffererVariableName};
+#else
+        return ${reffererVariableName} != null ? ${reffererVariableName} : new java.util.ArrayList();
+#end
     }
 
     /**
@@ -450,8 +462,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public void set${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ${refferer.reffererPropertyName}) {
         this.${reffererVariableName} = ${refferer.reffererPropertyName};
     }
-  #if (${refferer.isOneToOne()})
 
+    /**
+     * Has relation of ${refferer.refererJavaBeansRulePropertyNameInitCap}.
+     * 
+     * @return Determination.
+     */
+    public boolean hasReferer${refferer.refererJavaBeansRulePropertyNameInitCap}() {
+        return ${reffererVariableName} != null;
+    }
+
+#if (${refferer.isOneToOne()})
     /**
      * Get the entity of referer-as-one table of ${refferer.reffererPropertyNameAsOne}. {without lazyload}
      * If it's not loaded yet, returns null.
@@ -482,18 +503,26 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
             ${reffererVariableName} = null;
             return;
         }
-        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = new java.util.ArrayList${database.filterGenericsString(${reffererEntityLongClassName})}();
+        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = new java.util.ArrayList();
         ls.add(entity);
         ${reffererVariableName} = ls;
     }
 
     /**
-     * Has relation of ${refferer.reffererPropertyNameAsOne}.
+     * Has foreign of ${refferer.reffererPropertyNameAsOne}.
      * 
      * @return Determination.
      */
-    public boolean hasRelation${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+    public boolean hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
         return get${refferer.reffererPropertyNameInitCapAsOne}() != null && get${refferer.reffererPropertyNameInitCapAsOne}().hasPrimaryKeyValue();
+    }
+
+    /**
+     * @return Determination.
+     * @deprecated Sorry! Please use hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}().
+     */
+    public boolean hasRelation${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+        return hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}();
     }
 
     /**
@@ -504,7 +533,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public ${reffererEntityLongClassName} trace${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
         return get${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() != null ? get${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() : new ${reffererEntityLongClassName}();
     }
-  #end
+#end
 #end
 
     // ===================================================================================

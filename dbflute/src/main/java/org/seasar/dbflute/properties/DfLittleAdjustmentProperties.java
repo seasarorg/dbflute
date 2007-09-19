@@ -41,12 +41,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isAvailableEntityModifiedPropertiesAddLogicIfNeeds() {
         return booleanProp("torque.isAvailableEntityModifiedPropertiesAddLogicIfNeeds", false);
     }
-    
+
     // ===============================================================================
     //                                   Common Column Intercepting On Behavior Filter
     //                                   =============================================
     public boolean isCommonColumnInterceptingOnBehaviorFilter() {
-        final DfCommonColumnProperties commonColumnProp = getPropertiesHandler().getCommonColumnProperties(getProperties());
+        final DfCommonColumnProperties commonColumnProp = getPropertiesHandler().getCommonColumnProperties(
+                getProperties());
         if (!commonColumnProp.isExistCommonColumnSetupElement()) {
             return false;
         }
@@ -54,6 +55,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
             return false;
         }
         return booleanProp("torque.isCommonColumnInterceptingOnBehaviorFilter", true);
+    }
+
+    // ===============================================================================
+    //                                        Is one to many return null If non select
+    //                                        ========================================
+    public boolean isOneToManyReturnNullIfNonSelect() {
+        return booleanProp("torque.isOneToManyReturnNullIfNonSelect", false);
     }
 
     // ===============================================================================

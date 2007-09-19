@@ -19,9 +19,9 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
  */
 public abstract class ${myClassName} implements ${glConditionQueryInterfaceName} {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Condition value for DUMMY. */
     protected static final ${glConditionValueName} DUMMY_CONDITION_VALUE = new ${glConditionValueName}();
 
@@ -49,9 +49,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     /** Child query. */
     protected final ${glConditionQueryInterfaceName} _childQuery;
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * 
@@ -67,113 +67,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         _nestLevel = nestLevel;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
-    /**
-     * Get child query.
-     * 
-     * @return Child query. (Nullable)
-     */
-    public ${glConditionQueryInterfaceName} getChildQuery() {
-        return _childQuery;
-    }
-
-    /**
-     * Get sql clause.
-     * 
-     * @return Sql clause. (NotNull)
-     */
-    public ${glSqlClauseName} getSqlClause() {
-        return _sqlClause;
-    }
-
-    /**
-     * Get alias name.
-     * 
-     * @return Alias name. (NotNull)
-     */
-    public String getAliasName() {
-        return _aliasName;
-    }
-
-    /**
-     * Get nest level.
-     * 
-     * @return Nest level.
-     */
-    public int getNestLevel() {
-        return _nestLevel;
-    }
-
-    /**
-     * Get next nest level.
-     * 
-     * @return Next nest level.
-     */
-    public int getNextNestLevel() {
-        return _nestLevel+1;
-    }
-
-    /**
-     * Is base query?
-     * 
-     * @param query Condition query. (NotNull)
-     * @return Determination.
-     */
-    public boolean isBaseQuery(${glConditionQueryInterfaceName} query) {
-        return (query.getChildQuery() == null);
-    }
-
-    // -----------------------------------------------------
-    //                                          Foreign Info
-    //                                          ------------
-    public String getForeignPropertyName() {
-        return _foreignPropertyName;
-    }
-
-    public void setForeignPropertyName(String foreignPropertyName) {
-        this._foreignPropertyName = foreignPropertyName;
-    }
-
-    public String getRelationPath() {
-        return _relationPath;
-    }
-
-    public void setRelationPath(String relationPath) {
-        this._relationPath = relationPath;
-    }
-
-    // =====================================================================================
-    //                                                                             Real Name
-    //                                                                             =========
-    /**
-     * Get real alias name(that has nest level mark).
-     * 
-     * @return Real alias name.
-     */
-    public String getRealAliasName() {
-        return getAliasName();
-    }
-
-    /**
-     * Get real column name(with real alias name).
-     * 
-     * @param columnName Column name without alias name. This should not contain comma. (NotNull)
-     * @return Real column name.
-     */
-    public String getRealColumnName(String columnName) {
-        assertColumnName(columnName);
-        return buildRealColumnName(getRealAliasName(), columnName);
-    }
-
-    protected String buildRealColumnName(String aliasName, String columnName) {
-        return aliasName + "." + columnName;
-    }
-
-    // =====================================================================================
-    //                                                                              Location
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Location
+    //                                                                            ========
     /**
      * Get location.
      * 
@@ -203,14 +99,19 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected String getLocationBase(String columnPropertyName) {
         return getLocationBase() + columnPropertyName;
     }
-#set ($unionQueryGenericsString = "String, ${glConditionQueryInterfaceName}")
 
-    // =====================================================================================
-    //                                                                           Union Query
-    //                                                                           ===========
-    protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
+    // ===================================================================================
+    //                                                                         Union Query
+    //                                                                         ===========
+    /** The map of union query. */
+    protected java.util.Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap = new java.util.LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
 
-    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionQueryMap() {// for Internal
+    /**
+     * Get the map of union query.
+     * 
+     * @return The map of union query. (NotNull)
+     */
+    public java.util.Map<String, ${glConditionQueryInterfaceName}> getUnionQueryMap() {// for Internal
         return _unionQueryMap;
     }
 
@@ -225,9 +126,15 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         xsetupUnion(unionQuery, false, _unionQueryMap);
     }
 
-    protected java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} _unionAllQueryMap = new java.util.LinkedHashMap${database.filterGenericsString(${unionQueryGenericsString})}();
+    /** The map of union all query. */
+    protected java.util.Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap = new java.util.LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
 
-    public java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} getUnionAllQueryMap() {// for Internal
+    /**
+     * Get the map of union all query.
+     * 
+     * @return The map of union all query. (NotNull)
+     */
+    public java.util.Map<String, ${glConditionQueryInterfaceName}> getUnionAllQueryMap() {// for Internal
         return _unionAllQueryMap;
     }
 
@@ -242,7 +149,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         xsetupUnion(unionAllQuery, true, _unionAllQueryMap);
     }
 
-    protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, java.util.Map${database.filterGenericsString(${unionQueryGenericsString})} unionQueryMap) {
+    protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, java.util.Map<String, ${glConditionQueryInterfaceName}> unionQueryMap) {
         if (unionQuery == null) {
             String msg = "The argument[unionQuery] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -254,23 +161,47 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
     }
 
+    /**
+     * Reflect relation on union query.
+     * 
+     * @param baseQueryAsSuper Base query as super. (NotNull)
+     * @param unionQueryAsSuper Union query as super. (NotNull)
+     */
     abstract protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper);
 
+    /**
+     * Has union query or union all query?
+     * 
+     * @return Determination.
+     */
     public boolean hasUnionQueryOrUnionAllQuery() {
         return !_unionQueryMap.isEmpty() || !_unionAllQueryMap.isEmpty();
     }
 
-    public java.util.List${database.filterGenericsString(${glConditionQueryInterfaceName})} getUnionQueryList() {
-        return new java.util.ArrayList${database.filterGenericsString(${glConditionQueryInterfaceName})}(_unionQueryMap.values());
+    /**
+     * Get the list of union query.
+     * 
+     * @return The list of union query. (NotNull)
+     */
+    public java.util.List<${glConditionQueryInterfaceName}> getUnionQueryList() {
+        return new java.util.ArrayList<${glConditionQueryInterfaceName}>(_unionQueryMap.values());
     }
 
-    public java.util.List${database.filterGenericsString(${glConditionQueryInterfaceName})} getUnionAllQueryList() {
-        return new java.util.ArrayList${database.filterGenericsString(${glConditionQueryInterfaceName})}(_unionAllQueryMap.values());
+    /**
+     * Get the list of union all query.
+     * 
+     * @return The list of union all query. (NotNull)
+     */
+    public java.util.List<${glConditionQueryInterfaceName}> getUnionAllQueryList() {
+        return new java.util.ArrayList<${glConditionQueryInterfaceName}>(_unionAllQueryMap.values());
     }
 
-    // =====================================================================================
-    //                                                                       Include-As-Mine
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                            Register
+    //                                                                            ========
+    // ----------------------------------------
+    //                          Include-As-Mine
+    //                          ---------------
     /**
      * Register included-select-column.
      * 
@@ -283,9 +214,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         getSqlClause().registerIncludedSelectColumn(aliasName, realColumnName);
     }
 
-    // =====================================================================================
-    //                                                                              Register
-    //                                                                              ========
     // ----------------------------------------
     //                                   Normal
     //                                   ------
@@ -323,7 +251,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             }
         }
     }
-#set ($likeAsOrCallbackFullClassName = "${glConditionOptionLikeSearchName}.LikeAsOrCallback")
 
     // ----------------------------------------
     //                               LikeSearch
@@ -338,11 +265,11 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                     setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
 
                     // Callback for LikeAsOr!
-                    final java.util.List${database.filterGenericsString(${likeAsOrCallbackFullClassName})} callbackList = option.getLikeAsOrCallbackList();
+                    final java.util.List<${glConditionOptionLikeSearchName}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
                     if (!callbackList.isEmpty()) {
                         getSqlClause().makeAdditionalConditionAsOrEffective();
                         for (java.util.Iterator ite = callbackList.iterator(); ite.hasNext(); ) {
-                            final ${likeAsOrCallbackFullClassName} likeAsOrCallback = (${likeAsOrCallbackFullClassName})ite.next();
+                            final ${glConditionOptionLikeSearchName}.LikeAsOrCallback likeAsOrCallback = (${glConditionOptionLikeSearchName}.LikeAsOrCallback)ite.next();
                             final String additionalTargetPropertyName = likeAsOrCallback.getAdditionalTargetPropertyName();
                             final String filteredValue = likeAsOrCallback.filterValue(currentValue);
                             final ${glConditionOptionLikeSearchName} optionDeepCopy = (${glConditionOptionLikeSearchName})option.createDeepCopy();
@@ -486,8 +413,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause);
         }
     }
-#if ($database.isMakeDeprecated())
 
+#if ($database.isMakeDeprecated())
     /**
      * @param subQuery Sub query. (NotNull)
      * @param columName Column name. (NotNull)
@@ -527,6 +454,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // ===================================================================================
     //                                                                       Name Resolver
     //                                                                       =============
+    /**
+     * Resolve join alias name.
+     * 
+     * @param relationPath Relation path. (NotNull)
+     * @param nestLevel Nest level.
+     * @return Resolved join alias name. (NotNull)
+     */
     protected String resolveJoinAliasName(String relationPath, int nestLevel) {
         return getSqlClause().resolveJoinAliasName(relationPath, nestLevel);
     }
@@ -730,6 +664,23 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     /**
+     * Initcap string.
+     * 
+     * @param col Target collection. (Nullable)
+     * @param <PROPERTY_TYPE> The type of property.
+     * @return List. (Nullable: If the argument is null, returns null.)
+     */
+    protected <PROPERTY_TYPE> java.util.List<PROPERTY_TYPE> convertToList(java.util.Collection<PROPERTY_TYPE> col) {
+        if (col == null) {
+            return null;
+        }
+        if (col instanceof java.util.List) {
+            return (java.util.List<PROPERTY_TYPE>)col;
+        }
+        return new java.util.ArrayList<PROPERTY_TYPE>(col);
+    }
+
+    /**
      * Filter removing empty-string.
      * If the value is null or empty-string, returns null.
      * 
@@ -747,11 +698,11 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param ls List. (Nullable)
      * @return Filtered list. (Nullable)
      */
-    protected java.util.List${database.filterGenericsString('String')} filterRemoveEmptyStringFromList(java.util.List${database.filterGenericsString('String')} ls) {
+    protected java.util.List<String> filterRemoveEmptyStringFromList(java.util.List<String> ls) {
         if (ls == null) {
             return null;
         }
-        java.util.List${database.filterGenericsString('String')} newList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        java.util.List<String> newList = new java.util.ArrayList<String>();
         for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
             final String str = (String)ite.next();
             if (str == null || "".equals(str)) {
@@ -762,6 +713,12 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return newList;
     }
 
+    /**
+     * Initcap string.
+     * 
+     * @param str Target string. (NotNull)
+     * @return Initcaped string. (NotNull)
+     */
     protected String initCap(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
@@ -846,5 +803,117 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
+    }
+
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get child query.
+     * 
+     * @return Child query. (Nullable)
+     */
+    public ${glConditionQueryInterfaceName} getChildQuery() {
+        return _childQuery;
+    }
+
+    /**
+     * Get sql clause.
+     * 
+     * @return Sql clause. (NotNull)
+     */
+    public ${glSqlClauseName} getSqlClause() {
+        return _sqlClause;
+    }
+
+    /**
+     * Get alias name.
+     * 
+     * @return Alias name. (NotNull)
+     */
+    public String getAliasName() {
+        return _aliasName;
+    }
+
+    /**
+     * Get nest level.
+     * 
+     * @return Nest level.
+     */
+    public int getNestLevel() {
+        return _nestLevel;
+    }
+
+    /**
+     * Get next nest level.
+     * 
+     * @return Next nest level.
+     */
+    public int getNextNestLevel() {
+        return _nestLevel+1;
+    }
+
+    /**
+     * Is base query?
+     * 
+     * @param query Condition query. (NotNull)
+     * @return Determination.
+     */
+    public boolean isBaseQuery(${glConditionQueryInterfaceName} query) {
+        return (query.getChildQuery() == null);
+    }
+
+    // -----------------------------------------------------
+    //                                             Real Name
+    //                                             ---------
+    /**
+     * Get real alias name(that has nest level mark).
+     * 
+     * @return Real alias name.
+     */
+    public String getRealAliasName() {
+        return getAliasName();
+    }
+
+    /**
+     * Get real column name(with real alias name).
+     * 
+     * @param columnName Column name without alias name. This should not contain comma. (NotNull)
+     * @return Real column name.
+     */
+    public String getRealColumnName(String columnName) {
+        assertColumnName(columnName);
+        return buildRealColumnName(getRealAliasName(), columnName);
+    }
+
+    /**
+     * Build real column name.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @param columnName Column name. (NotNull)
+     * @return Real column name. (NotNull)
+     */
+    protected String buildRealColumnName(String aliasName, String columnName) {
+        return aliasName + "." + columnName;
+    }
+
+    // -----------------------------------------------------
+    //                                          Foreign Info
+    //                                          ------------
+    public String getForeignPropertyName() {
+        return _foreignPropertyName;
+    }
+
+    public void setForeignPropertyName(String foreignPropertyName) {
+        this._foreignPropertyName = foreignPropertyName;
+    }
+
+    public String getRelationPath() {
+        return _relationPath;
+    }
+
+    public void setRelationPath(String relationPath) {
+        this._relationPath = relationPath;
     }
 }

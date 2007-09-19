@@ -189,17 +189,17 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using inScope. { in ('a', 'b') }
-     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * If the element in the collection is null or empty-string, the condition-element is ignored.
      * 
      * @param ${tmpUncapitalisedJavaName}List The value of ${col.UncapitalisedJavaName} as inScope.
      */
-    public void set${tmpJavaName}_InScope(java.util.List${database.filterGenericsString(${col.JavaNative})} ${tmpUncapitalisedJavaName}List) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyStringFromList(${tmpUncapitalisedJavaName}List));
+    public void set${tmpJavaName}_InScope(java.util.Collection<${col.JavaNative}> ${tmpUncapitalisedJavaName}List) {
+        register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyStringFromList(convertToList(${tmpUncapitalisedJavaName}List)));
     }
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using inScope. { in ('a', 'b') }
-     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * If the element in the collection is null or empty-string, the condition-element is ignored.
      * 
      * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as inScope.
      * @param inScopeOption The option of in-scope. (NotNull)
@@ -212,12 +212,12 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notInScope. { not in ('a', 'b') }
-     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * If the element in the collection is null or empty-string, the condition-element is ignored.
      * 
      * @param ${tmpUncapitalisedJavaName}List The value of ${col.UncapitalisedJavaName} as notInScope.
      */
-    public void set${tmpJavaName}_NotInScope(java.util.List${database.filterGenericsString(${col.JavaNative})} ${tmpUncapitalisedJavaName}List) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(${tmpUncapitalisedJavaName}List));
+    public void set${tmpJavaName}_NotInScope(java.util.Collection<${col.JavaNative}> ${tmpUncapitalisedJavaName}List) {
+        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(convertToList(${tmpUncapitalisedJavaName}List)));
     }
       #end
       #if (${col.isSingleKeyForeignKey()})
@@ -454,24 +454,24 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using inScope. { in (a, b) }
-     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * If the element in the collection is null or empty-string, the condition-element is ignored.
      * 
      * @param ${tmpUncapitalisedJavaName}List The value of ${col.UncapitalisedJavaName} as inScope.
      */
-    public void set${tmpJavaName}_InScope(java.util.List${database.filterGenericsString(${col.JavaNative})} ${tmpUncapitalisedJavaName}List) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, ${tmpUncapitalisedJavaName}List);
+    public void set${tmpJavaName}_InScope(java.util.Collection<${col.JavaNative}> ${tmpUncapitalisedJavaName}List) {
+        register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, convertToList(${tmpUncapitalisedJavaName}List));
     }
       #end
       #if (${col.isAvailableNumberNotInScope()})
 
     /**
      * Set the value of ${col.UncapitalisedJavaName} using notInScope. { not in (a, b) }
-     * If the element in the list is null or empty-string, the condition-element is ignored.
+     * If the element in the collection is null or empty-string, the condition-element is ignored.
      * 
      * @param ${tmpUncapitalisedJavaName}List The value of ${col.UncapitalisedJavaName} as notInScope.
      */
-    public void set${tmpJavaName}_NotInScope(java.util.List${database.filterGenericsString(${col.JavaNative})} ${tmpUncapitalisedJavaName}List) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, ${tmpUncapitalisedJavaName}List);
+    public void set${tmpJavaName}_NotInScope(java.util.Collection<${col.JavaNative}> ${tmpUncapitalisedJavaName}List) {
+        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, convertToList(${tmpUncapitalisedJavaName}List));
     }
       #end
       #if (${col.isSingleKeyForeignKey()})
