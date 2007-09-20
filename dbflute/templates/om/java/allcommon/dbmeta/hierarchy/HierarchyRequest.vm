@@ -33,7 +33,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     protected List<${glHierarchyRequestElementName}> requestElementList = new ArrayList<${glHierarchyRequestElementName}>();
 
     /** The set of already registered source column info for check. */
-    protected java.util.Set<LdColumnInfo> alreadyRegisteredSourceColumnInfoSet4Check = new java.util.HashSet<LdColumnInfo>();
+    protected java.util.Set<${glColumnInfoName}> alreadyRegisteredSourceColumnInfoSet4Check = new java.util.HashSet<${glColumnInfoName}>();
 
     /** First source column info for check. */
     protected ${glColumnInfoName} firstSourceColumnInfo4Check;
