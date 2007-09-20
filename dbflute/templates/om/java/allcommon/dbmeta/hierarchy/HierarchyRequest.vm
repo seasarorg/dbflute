@@ -32,6 +32,9 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     /** The list of request element. */
     protected List<${glHierarchyRequestElementName}> requestElementList = new ArrayList<${glHierarchyRequestElementName}>();
 
+    /** The set of already registered source column info for check. */
+    protected java.util.Set<LdColumnInfo> alreadyRegisteredSourceColumnInfoSet4Check = new java.util.HashSet<LdColumnInfo>();
+
     /** First source column info for check. */
     protected ${glColumnInfoName} firstSourceColumnInfo4Check;
 
@@ -123,6 +126,17 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
      * @param destinationColumnInfo The column info of destination. (NotNull)
      */
     protected void setupElement(${glColumnInfoName} sourceColumnInfo, ${glColumnInfoName} destinationColumnInfo) {
+        if (alreadyRegisteredSourceColumnInfoSet4Check.contains(sourceColumnInfo)) {
+            String msg = "The wrong sourceColumnInfo!" + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The source column has already been registered:" + getLineSeparator();
+            msg = msg + "- - - - -" + getLineSeparator();
+            msg = msg + " sourceColumnInfo=" + sourceColumnInfo + getLineSeparator();
+            msg = msg + " registeredColumnInfo=" + alreadyRegisteredSourceColumnInfoSet4Check + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+        alreadyRegisteredSourceColumnInfoSet4Check.add(sourceColumnInfo);
         assertSameSourceDBMeta(sourceColumnInfo);
         assertSameLocalDestinationDBMeta(destinationColumnInfo);
         final ${glHierarchyRequestElementName} element = new ${glHierarchyRequestElementName}();
