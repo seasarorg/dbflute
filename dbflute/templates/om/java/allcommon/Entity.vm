@@ -135,6 +135,15 @@ public interface ${glEntityInterfaceName} {
         }
 
         /**
+         * Is empty?
+         * 
+         * @param Determination.
+         */
+        public boolean isEmpty() {
+            return _propertiesSet.isEmpty();
+        }
+
+        /**
          * Clear the set of properties.
          */
         public void clear() {

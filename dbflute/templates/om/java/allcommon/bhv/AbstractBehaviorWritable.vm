@@ -67,6 +67,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // =====================================================================================
     //                                                                       Delegate Method
     //                                                                       ===============
+    // -----------------------------------------------------
+    //                                                Insert
+    //                                                ------
     /**
      * ${database.ImplementComment}
      * 
@@ -74,12 +77,27 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Inserted count.
      */
     protected int callCreate(${glEntityInterfaceName} entity) {
-        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-        filterEntityOfInsert(entity);
-        assertEntityOfInsert(entity);
+        if (!processBeforeInsert(entity)) { return 1;/*as Normal End*/ }
         return getDaoWritable().create(entity);
     }
 
+    /**
+     * Process before insert.
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean processBeforeInsert(${glEntityInterfaceName} entity) {
+        if (!determineExecuteInsert()) { return false; }
+        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        filterEntityOfInsert(entity);
+        assertEntityOfInsert(entity);
+        return true;
+    }
+
+    // -----------------------------------------------------
+    //                                                Update
+    //                                                ------
     /**
      * ${database.ImplementComment}
      * {modified only}
@@ -88,12 +106,27 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Updated count.
      */
     protected int callModify(${glEntityInterfaceName} entity) {
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        filterEntityOfUpdate(entity);
-        assertEntityOfUpdate(entity);
+        if (!processBeforeUpdate(entity)) { return 1;/*as Normal End*/ }
         return getDaoWritable().modifyModifiedOnly(entity);
     }
 
+    /**
+     * Process before update.
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean processBeforeUpdate(${glEntityInterfaceName} entity) {
+        if (!determineExecuteUpdate()) { return false; }
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        filterEntityOfUpdate(entity);
+        assertEntityOfUpdate(entity);
+        return true;
+    }
+
+    // -----------------------------------------------------
+    //                                                Delete
+    //                                                ------
     /**
      * ${database.ImplementComment}
      * 
@@ -101,10 +134,34 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Deleted count.
      */
     protected int callRemove(${glEntityInterfaceName} entity) {
+        if (!processBeforeDelete(entity)) { return 1;/*as Normal End*/ }
+        return getDaoWritable().remove(entity);
+    }
+
+    /**
+     * Process before delete.
+     * 
+     * @param entity Entity that the type is entity-interface. (NotNull)
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean processBeforeDelete(${glEntityInterfaceName} entity) {
+        if (!determineExecuteDelete()) { return false; }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         filterEntityOfDelete(entity);
         assertEntityOfDelete(entity);
-        return getDaoWritable().remove(entity);
+        return true;
+    }
+
+    // -----------------------------------------------------
+    //                                    Pre-Process Insert
+    //                                    ------------------
+    /**
+     * Determine execution of insert.
+     * 
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean determineExecuteInsert() {
+        return true;
     }
 
     /**
@@ -168,6 +225,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     protected void assertEntityOfInsert(${glEntityInterfaceName} entity) {
     }
 
+    // -----------------------------------------------------
+    //                                    Pre-Process Update
+    //                                    ------------------
+    /**
+     * Determine execution of update.
+     * 
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean determineExecuteUpdate() {
+        return true;
+    }
+
     /**
      * Filter the entity of update.
      * 
@@ -224,6 +293,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entity Entity that the type is entity-interface. (NotNull)
      */
     protected void assertEntityOfUpdate(${glEntityInterfaceName} entity) {
+    }
+
+    // -----------------------------------------------------
+    //                                    Pre-Process Delete
+    //                                    ------------------
+    /**
+     * Determine execution of delete.
+     * 
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean determineExecuteDelete() {
+        return true;
     }
 
     /**
@@ -348,27 +429,21 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     protected void helpFilterBeforeInsertInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-            filterEntityOfInsert(entity);
-            assertEntityOfInsert(entity);
+            if (!determineExecuteInsert()) { continue; }
         }
     }
 
     protected void helpFilterBeforeUpdateInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            assertEntityNotNullAndHasPrimaryKeyValue(entity);
-            filterEntityOfUpdate(entity);
-            assertEntityOfUpdate(entity);
+            if (!determineExecuteUpdate()) { continue; }
         }
     }
 
     protected void helpFilterBeforeDeleteInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            assertEntityNotNullAndHasPrimaryKeyValue(entity);
-            filterEntityOfDelete(entity);
-            assertEntityOfDelete(entity);
+            if (!determineExecuteDelete()) { continue; }
         }
     }
 

@@ -369,20 +369,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Has foreign object of ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * Has foreign instance of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * 
      * @return Determination.
      */
-    public boolean hasForeign${foreignKeys.foreignPropertyNameInitCap}() {
-        return ${foreignVariableName} != null && ${foreignVariableName}.hasPrimaryKeyValue();
+    public boolean hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}() {
+        return ${foreignVariableName} != null;
     }
 
     /**
      * @return Determination.
-     * @deprecated Sorry! Please use hasForeign${foreignKeys.foreignPropertyNameInitCap}().
+     * @deprecated Sorry! Please use hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}().
      */
     public boolean hasRelation${foreignKeys.foreignPropertyNameInitCap}() {
-        return hasForeign${foreignKeys.foreignPropertyNameInitCap}();
+        return hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}();
     }
 
     /**
@@ -447,11 +447,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The list of referer table. (Nullable)
      */
     public java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} get${refferer.refererJavaBeansRulePropertyNameInitCap}() {
-#if ($database.isOneToManyReturnNullIfNonSelect())
-        return ${reffererVariableName};
-#else
-        return ${reffererVariableName} != null ? ${reffererVariableName} : new java.util.ArrayList();
+#if (!$database.isOneToManyReturnNullIfNonSelect())
+        if (${reffererVariableName} == null) { ${reffererVariableName} = new java.util.ArrayList(); }
 #end
+        return ${reffererVariableName};
     }
 
     /**
@@ -464,12 +463,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Has relation of ${refferer.refererJavaBeansRulePropertyNameInitCap}.
+     * Has referer elements of ${refferer.refererJavaBeansRulePropertyNameInitCap}.
      * 
      * @return Determination.
      */
-    public boolean hasReferer${refferer.refererJavaBeansRulePropertyNameInitCap}() {
-        return ${reffererVariableName} != null;
+    public boolean hasRefererElements${refferer.refererJavaBeansRulePropertyNameInitCap}() {
+        return ${reffererVariableName} != null && !${reffererVariableName}.isEmpty();
     }
 
 #if (${refferer.isOneToOne()})
@@ -509,20 +508,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Has foreign of ${refferer.reffererPropertyNameAsOne}.
+     * Has foreign instance of ${refferer.reffererPropertyNameAsOne}.
      * 
      * @return Determination.
      */
-    public boolean hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        return get${refferer.reffererPropertyNameInitCapAsOne}() != null && get${refferer.reffererPropertyNameInitCapAsOne}().hasPrimaryKeyValue();
+    public boolean hasForeignInstance${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+        return get${refferer.reffererPropertyNameInitCapAsOne}() != null;
     }
 
     /**
      * @return Determination.
-     * @deprecated Sorry! Please use hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}().
+     * @deprecated Sorry! Please use hasForeignInstance${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}().
      */
     public boolean hasRelation${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        return hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}();
+        return hasForeignInstance${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}();
     }
 
     /**

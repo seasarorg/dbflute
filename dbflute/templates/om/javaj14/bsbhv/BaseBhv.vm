@@ -579,7 +579,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param valueLabelSetupper Value-label-setupper. (NotNull)
      * @return Value-label list. (NotNull)
      */
-    public java.util.List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
+    public java.util.List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName} valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
     }
 #end
@@ -616,150 +616,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //   RefererTable    = [${refferer.table.name}]
     //   RefererProperty = [${refferer.reffererPropertyName}]
     // * * * * * * * * */
-    #if ($database.isAvailableGenerics())
-
-    /**
-     * Load referer of ${refferer.ReffererPropertyName}.
-     * <pre>
-     *   You can load referer.
-     * 
-     *   ex) {Client Example}
-     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *     cb.query().setXxx_Equal("xxx");
-     *     final List&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myBehaviorVariableName}.selectList(cb);
-     *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName});
-     * 
-     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * </pre>
-     * 
-     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        final ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper = new ${glConditionBeanSetupperName}<${reffererCBClassName}>() {
-            public void setup(${reffererCBClassName} cb) {
-            }
-        };
-        load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
-    }
-
-    /**
-     * Load referer of ${refferer.refererJavaBeansRulePropertyName}.
-     * <pre>
-     *   You can load referer with your original condition.
-     * 
-     *   ex) {Client Example}: Referer conditions are 'Xxx' is not null and order-by 'Yyy' desc
-     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *     cb.query().setXxx_Equal("xxx");
-     *     final List&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myBehaviorVariableName}.selectList(cb);
-     *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; conditionBeanSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
-     *         public void setup(${reffererCBClassName} cb) {
-     *             cb.query().setXxx_IsNotNull();
-     *             cb.query().addOrderBy_Yyy_Desc();
-     *         }
-     *     };
-     *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
-     *     - - - - - - - - - -/
-     * 
-     *   The condition-bean that the setupper provides have settings before you touch it. It is as follows:
-     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-     *     cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-     *     - - - - - - - - - -/
-     * 
-     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * </pre>
-     * 
-     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param conditionBeanSetupper Referer condition setupper instance for registering referer condition. (NotNull)
-     */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
-        assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
-        assertObjectNotNull("conditionBeanSetupper<${reffererCBClassName}>", conditionBeanSetupper);
-        if (${myEntityListVariableName}.isEmpty()) {
-            return;
-        }
-        load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
-    }
-
-    /**
-     * Load referer of ${refferer.refererJavaBeansRulePropertyName}.
-     * <pre>
-     *   You can load referer with your original condition.
-     * 
-     *   ex) {Client Example}: Referer conditions are 'Xxx' is not null and order-by 'Yyy' desc
-     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *     cb.query().setXxx_Equal("xxx");
-     *     final List&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myBehaviorVariableName}.selectList(cb);
-     *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; cbSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
-     *         public void setup(${reffererCBClassName} cb) {
-     *             cb.query().setXxx_IsNotNull();
-     *             cb.query().addOrderBy_Yyy_Desc();
-     *         }
-     *     };
-     *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(cbSetupper));
-     *     - - - - - - - - - -/
-     * 
-     *   The condition-bean that the setupper provides have settings before you touch it. It is as follows:
-     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-     *     cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-     *     - - - - - - - - - -/
-     * 
-     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * </pre>
-     * 
-     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadRefererOption Load-referer option. (NotNull)
-     */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
-        assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
-        assertObjectNotNull("loadRefererOption<${reffererEntityClassName}, ${reffererCBClassName}>", loadRefererOption);
-        if (${myEntityListVariableName}.isEmpty()) {
-            return;
-        }
-
-        final java.util.Map<${genericPKMyEntityMap}> pkMyEntityMap = new java.util.LinkedHashMap<${genericPKMyEntityMap}>();
-        final java.util.List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList = new java.util.ArrayList<${table.getPrimaryKeyJavaNativeAsOne()}>();
-        for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
-            pkList.add(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}());
-            pkMyEntityMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()), ${myEntityVariableName});
-        }
-        final ${reffererBhvClassName} refererBhv = getBehaviorSelector().select(${reffererBhvClassName}.class);
-        final ${reffererCBClassName} cb = loadRefererOption.getRefererConditionBean() != null ? loadRefererOption.getRefererConditionBean() : refererBhv.newMyConditionBean();
-        cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-        loadRefererOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
-        if (!loadRefererOption.isStopOrderByKey()) {
-            cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-            cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
-        }
-        loadRefererOption.delegateConditionBeanSettingUp(cb);
-        final java.util.List${database.filterGenericsString(${reffererEntityClassName})} reffererList = refererBhv.selectList(cb);
-        loadRefererOption.delegateEntitySettingUp(reffererList);
-
-        final java.util.Map<${genericPKChildListMap}> pkReffererListMap = new java.util.LinkedHashMap<${genericPKChildListMap}>();
-        for (${reffererEntityClassName} reffererEntity : reffererList) {
-            if (!pkReffererListMap.containsKey(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))) {
-                pkReffererListMap.put((${table.getPrimaryKeyJavaNativeAsOne()})toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()), new java.util.ArrayList<${reffererEntityClassName}>());
-            }
-            (pkReffererListMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()))).add(reffererEntity);
-
-            // for Reverse Reference.
-            final ${myExtendedObjectClassName} myEntity = pkMyEntityMap.get(toLowerCaseIfString(reffererEntity.get${refferer.getLocalColumnJavaNameAsOne()}()));
-            reffererEntity.set${refferer.ForeignPropertyNameInitCap}(myEntity);
-        }
-
-        for (${myExtendedObjectClassName} ${myEntityVariableName} : ${myEntityListVariableName}) {
-            if (pkReffererListMap.containsKey(toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}()))) {
-                ${myEntityVariableName}.set${refferer.ReffererPropertyNameInitCap}((java.util.List${database.filterGenericsString(${reffererEntityClassName})})pkReffererListMap.get(toLowerCaseIfString(${myEntityVariableName}.get${table.getPrimaryKeyJavaNameAsOne()}())));
-            } else {
-                ${myEntityVariableName}.set${refferer.ReffererPropertyNameInitCap}(new java.util.ArrayList<${reffererEntityClassName}>());
-            }
-        }
-    }
-    #else
-
     /**
      * Load refferer of ${refferer.refererJavaBeansRulePropertyName}.
      * <pre>
@@ -852,7 +708,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             }
         }
     }
-    #end
   #end
 #end
 
@@ -1293,34 +1148,72 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                  Basic Batch Update
     //                                                                  ==================
     /**
-     * Insert list.
+     * Batch insert. This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
      * @return Inserted count.
      */
-    public int insertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
+    public int batchInsert(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return delegateInsertList(${myEntityListVariableName});
     }
 
     /**
-     * Update list.
+     * Insert list. This method use 'Batch Update' of java.sql.PreparedStatement.
+     * 
+     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @return Inserted count.
+     * @deprecated Sorry! This method name is very confusing. Please use batchInsert().
+     */
+    public int insertList(java.util.List ${myEntityListVariableName}) {
+        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+        return delegateInsertList(${myEntityListVariableName});
+    }
+
+    /**
+     * Batch update. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
+     * All columns are update target. {NOT modified only}
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
      * @return Updated count.
      */
-    public int updateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
+    public int batchUpdate(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return delegateUpdateList(${myEntityListVariableName});
     }
 
     /**
-     * Delete list.
+     * Update batch. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
+     * All columns are update target. {NOT modified only}
+     * 
+     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @return Updated count.
+     * @deprecated Sorry! This method name is very confusing. Please use batchUpdate().
+     */
+    public int updateList(java.util.List ${myEntityListVariableName}) {
+        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+        return delegateUpdateList(${myEntityListVariableName});
+    }
+
+    /**
+     * Batch delete. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
      * @return Deleted count.
      */
-    public int deleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
+    public int batchDelete(java.util.List ${myEntityListVariableName}) {
+        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+        return delegateDeleteList(${myEntityListVariableName});
+    }
+
+    /**
+     * Delete list by Batch. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
+     * 
+     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @return Deleted count.
+     * @deprecated Sorry! This method name is very confusing. Please use batchDelete().
+     */
+    public int deleteList(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return delegateDeleteList(${myEntityListVariableName});
     }

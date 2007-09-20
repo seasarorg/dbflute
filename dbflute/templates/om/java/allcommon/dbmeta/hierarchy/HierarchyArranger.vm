@@ -407,9 +407,15 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 List<${glEntityInterfaceName}> refererList = extractRefererList(localEntity, refererInfo);
                 if (refererList == null) {
-                    // Initialize the list of referer and inject it.
-                    refererList = new ArrayList<${glEntityInterfaceName}>();
-                    injectRefererList(localEntity, refererInfo, refererList);
+                    String msg = "The referer list should not be null: localEntity=" + localEntity + " refererInfo=" + refererInfo;
+                    throw new IllegalStateException(msg);
+
+                    // - - - - - - - - - - - - - - - - - - - - 
+                    // Change about entity one-to-many returns.
+                    // - - - - - - - - - - - - - - - - - - - - 
+                    // // Initialize the list of referer and inject it.
+                    // refererList = new ArrayList<${glEntityInterfaceName}>();
+                    // injectRefererList(localEntity, refererInfo, refererList);
                 }
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

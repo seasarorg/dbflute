@@ -198,7 +198,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return className.endsWith("Bhv") || className.endsWith("BehaviorReadable") || className.endsWith("BehaviorWritable");
+                return className.endsWith("Bhv") || className.endsWith("BehaviorReadable")
+                        || className.endsWith("BehaviorWritable") || className.contains("Bhv$");
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return removeBasePrefixIfNeeds(simpleClassName);

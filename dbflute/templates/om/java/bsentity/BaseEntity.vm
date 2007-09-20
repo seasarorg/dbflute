@@ -369,24 +369,24 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
-     * Has foreign object of ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * Has foreign instance of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * 
      * @return Determination.
      */
-    public boolean hasForeign${foreignKeys.foreignPropertyNameInitCap}() {
-        return ${foreignVariableName} != null && ${foreignVariableName}.hasPrimaryKeyValue();
+    public boolean hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}() {
+        return ${foreignVariableName} != null;
     }
 
     /**
      * @return Determination.
-     * @deprecated Sorry! Please use hasForeign${foreignKeys.foreignPropertyNameInitCap}().
+     * @deprecated Sorry! Please use hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}().
      */
     public boolean hasRelation${foreignKeys.foreignPropertyNameInitCap}() {
-        return hasForeign${foreignKeys.foreignPropertyNameInitCap}();
+        return hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}();
     }
 
     /**
-     * Trace relation object (for read) of ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * Trace foreign entity (for read) of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * 
      * @return The entity of foreign table. (NotNull: If the object is nul, it returns new empty entity as read-only.)
      */
@@ -438,38 +438,38 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
   #end
 
     /** The list of referer table. */
-    protected java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} $reffererVariableName;
+    protected java.util.List<${reffererEntityLongClassName}> $reffererVariableName;
 
     /**
-     * Get the list of referer table. {without lazyload}
-     * If it's not loaded yet, returns null.
+     * Get the list of referer table. {without lazyload} <br />
+     * If it's not loaded yet, initializes the list instance of referer as empty list. <br />
+     * This list of result is for Read-Only basically.
      * 
      * @return The list of referer table. (Nullable)
      */
     public java.util.List<${reffererEntityLongClassName}> get${refferer.refererJavaBeansRulePropertyNameInitCap}() {
-#if ($database.isOneToManyReturnNullIfNonSelect())
-        return ${reffererVariableName};
-#else
-        return ${reffererVariableName} != null ? ${reffererVariableName} : new java.util.ArrayList<${reffererEntityLongClassName}>();
+#if (!$database.isOneToManyReturnNullIfNonSelect())
+        if (${reffererVariableName} == null) { ${reffererVariableName} = new java.util.ArrayList<${reffererEntityLongClassName}>(); }
 #end
+        return ${reffererVariableName};
     }
 
     /**
      * Set the list of referer table.
      * 
-     * @param ${refferer.reffererPropertyName} The list of refferer table. (Nullable)
+     * @param ${refferer.reffererPropertyName} The list of referer table. (Nullable)
      */
     public void set${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${reffererEntityLongClassName}> ${refferer.reffererPropertyName}) {
         this.${reffererVariableName} = ${refferer.reffererPropertyName};
     }
 
     /**
-     * Has relation of ${refferer.refererJavaBeansRulePropertyNameInitCap}.
+     * Has referer elements of ${refferer.refererJavaBeansRulePropertyNameInitCap}.
      * 
      * @return Determination.
      */
-    public boolean hasReferer${refferer.refererJavaBeansRulePropertyNameInitCap}() {
-        return ${reffererVariableName} != null;
+    public boolean hasRefererElements${refferer.refererJavaBeansRulePropertyNameInitCap}() {
+        return ${reffererVariableName} != null && !${reffererVariableName}.isEmpty();
     }
 
 #if (${refferer.isOneToOne()})
@@ -503,26 +503,26 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
             ${reffererVariableName} = null;
             return;
         }
-        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = new java.util.ArrayList${database.filterGenericsString(${reffererEntityLongClassName})}();
+        final java.util.List${database.filterGenericsString(${reffererEntityLongClassName})} ls = new java.util.ArrayList<${reffererEntityLongClassName}>();
         ls.add(entity);
         ${reffererVariableName} = ls;
     }
 
     /**
-     * Has foreign of ${refferer.reffererPropertyNameAsOne}.
+     * Has foreign instance of ${refferer.reffererPropertyNameAsOne}.
      * 
      * @return Determination.
      */
-    public boolean hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        return get${refferer.reffererPropertyNameInitCapAsOne}() != null && get${refferer.reffererPropertyNameInitCapAsOne}().hasPrimaryKeyValue();
+    public boolean hasForeignInstance${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+        return get${refferer.reffererPropertyNameInitCapAsOne}() != null;
     }
 
     /**
      * @return Determination.
-     * @deprecated Sorry! Please use hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}().
+     * @deprecated Sorry! Please use hasForeignInstance${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}().
      */
     public boolean hasRelation${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        return hasForeign${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}();
+        return hasForeignInstance${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}();
     }
 
     /**
@@ -605,6 +605,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public void clearModifiedPropertyNames() {
         _modifiedProperties.clear();
+    }
+
+    /**
+     * Has modification?
+     * 
+     * @return Determination.
+     */
+    public boolean hasModification() {
+        return !_modifiedProperties.isEmpty();
     }
 
     // ===================================================================================
