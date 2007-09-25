@@ -88,8 +88,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeInsert(${glEntityInterfaceName} entity) {
-        if (!determineExecuteInsert()) { return false; }
+        if (!determineExecuteInsert(entity)) { return false; }
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        frameworkFilterEntityOfInsert(entity);
         filterEntityOfInsert(entity);
         assertEntityOfInsert(entity);
         return true;
@@ -117,8 +118,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeUpdate(${glEntityInterfaceName} entity) {
-        if (!determineExecuteUpdate()) { return false; }
+        if (!determineExecuteUpdate(entity)) { return false; }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        frameworkFilterEntityOfUpdate(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
         return true;
@@ -145,8 +147,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeDelete(${glEntityInterfaceName} entity) {
-        if (!determineExecuteDelete()) { return false; }
+        if (!determineExecuteDelete(entity)) { return false; }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        frameworkFilterEntityOfDelete(entity);
         filterEntityOfDelete(entity);
         assertEntityOfDelete(entity);
         return true;
@@ -158,18 +161,19 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     /**
      * Determine execution of insert.
      * 
+     * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteInsert() {
+    protected boolean determineExecuteInsert(${glEntityInterfaceName} entity) {
         return true;
     }
 
     /**
-     * Filter the entity of insert.
+     * Framework filter the entity of insert.
      * 
      * @param targetEntity Target entity that the type is entity-interface. (NotNull)
      */
-    protected void filterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
 #if ($database.isAvailableBehaviorInsertSequenceInjection())
         injectSequenceToPrimaryKeyIfNeeds(targetEntity);
 #end
@@ -218,6 +222,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
+     * Filter the entity of insert.
+     * 
+     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     */
+    protected void filterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+    }
+
+    /**
      * Assert the entity of insert.
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
@@ -231,18 +243,19 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     /**
      * Determine execution of update.
      * 
+     * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteUpdate() {
+    protected boolean determineExecuteUpdate(${glEntityInterfaceName} entity) {
         return true;
     }
 
     /**
-     * Filter the entity of update.
+     * Framework filter the entity of update.
      * 
      * @param targetEntity Target entity that the type is entity-interface. (NotNull)
      */
-    protected void filterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
@@ -288,6 +301,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
+     * Filter the entity of update.
+     * 
+     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     */
+    protected void filterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+    }
+
+    /**
      * Assert the entity of update.
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
@@ -301,18 +322,19 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     /**
      * Determine execution of delete.
      * 
+     * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
-    protected boolean determineExecuteDelete() {
+    protected boolean determineExecuteDelete(${glEntityInterfaceName} entity) {
         return true;
     }
 
     /**
-     * Filter the entity of delete.
+     * Framework filter the entity of delete.
      * 
      * @param targetEntity Target entity that the type is entity-interface. (NotNull)
      */
-    protected void filterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
@@ -358,6 +380,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
+     * Filter the entity of delete.
+     * 
+     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     */
+    protected void filterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+    }
+
+    /**
      * Assert the entity of delete
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
@@ -365,13 +395,20 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     protected void assertEntityOfDelete(${glEntityInterfaceName} entity) {
     }
 
+#set ($batchUpdateReturnType = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnType = "int[]")
+#else
+  #set ($batchUpdateReturnType = "int")
+#end
+
     /**
      * ${database.ImplementComment}
      * 
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Inserted count.
      */
-    public int callCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public ${batchUpdateReturnType} callCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         helpFilterBeforeInsertInternally(entityList);
         return getDaoWritable().createList(entityList);
@@ -383,7 +420,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Updated count.
      */
-    public int callModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public ${batchUpdateReturnType} callModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         helpFilterBeforeUpdateInternally(entityList);
         return getDaoWritable().modifyList(entityList);
@@ -395,7 +432,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
      * @return Deleted count.
      */
-    public int callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+    public ${batchUpdateReturnType} callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         helpFilterBeforeDeleteInternally(entityList);
         return getDaoWritable().removeList(entityList);
@@ -429,21 +466,24 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     protected void helpFilterBeforeInsertInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            if (!determineExecuteInsert()) { continue; }
+            if (!determineExecuteInsert(entity)) { continue; }
+            processBeforeInsert(entity);
         }
     }
 
     protected void helpFilterBeforeUpdateInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            if (!determineExecuteUpdate()) { continue; }
+            if (!determineExecuteUpdate(entity)) { continue; }
+            processBeforeUpdate(entity);
         }
     }
 
     protected void helpFilterBeforeDeleteInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            if (!determineExecuteDelete()) { continue; }
+            if (!determineExecuteDelete(entity)) { continue; }
+            processBeforeDelete(entity);
         }
     }
 
@@ -740,18 +780,48 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
     }
 
+#set ($batchUpdateReturnValueMethod = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnValueMethod = ".length")
+#else
+  #set ($batchUpdateReturnValueMethod = "")
+#end
+
     // =====================================================================================
-    //                                                                    Basic Batch Update
-    //                                                                    ==================
+    //                                                                     Basic Lump Update
+    //                                                                     =================
+    /**
+     * Lump create the list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return The array of created count.
+     */
+    public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callCreateList(entityList);
+    }
+
     /**
      * Create list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Created count.
+     * @deprecated Sorry! This method name is very confusing. Please use lumpCreate().
      */
     public int createList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        return callCreateList(entityList);
+        return lumpCreate(entityList)${batchUpdateReturnValueMethod};
+    }
+
+    /**
+     * Lump Modify the list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Modified count.
+     */
+    public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callModifyList(entityList);
     }
 
     /**
@@ -759,10 +829,22 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Modified count.
+     * @deprecated Sorry! This method name is very confusing. Please use lumpModify().
      */
     public int modifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        return callModifyList(entityList);
+        return lumpModify(entityList)${batchUpdateReturnValueMethod};
+    }
+
+    /**
+     * Lump remove the list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Removed count.
+     */
+    public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callRemoveList(entityList);
     }
 
     /**
@@ -770,10 +852,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Removed count.
+     * @deprecated Sorry! This method name is very confusing. Please use lumpRemove().
      */
     public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
-        return callRemoveList(entityList);
+        return lumpRemove(entityList)${batchUpdateReturnValueMethod};
     }
 
     /**

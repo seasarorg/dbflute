@@ -74,6 +74,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     protected int callCreate(${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        frameworkFilterEntityOfInsert(entity);
         filterEntityOfInsert(entity);
         assertEntityOfInsert(entity);
         return getDaoWritable().create(entity);
@@ -88,6 +89,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     protected int callModify(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        frameworkFilterEntityOfUpdate(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
         return getDaoWritable().modifyModifiedOnly(entity);
@@ -101,17 +103,18 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      */
     protected int callRemove(${glEntityInterfaceName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        frameworkFilterEntityOfDelete(entity);
         filterEntityOfDelete(entity);
         assertEntityOfDelete(entity);
         return getDaoWritable().remove(entity);
     }
 
     /**
-     * Filter the entity of insert.
+     * Framework filter the entity of insert.
      * 
      * @param targetEntity Target entity that the type is entity-interface. (NotNull)
      */
-    protected void filterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
 #if ($database.isAvailableBehaviorInsertSequenceInjection())
         injectSequenceToPrimaryKeyIfNeeds(targetEntity);
 #end
@@ -160,6 +163,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
+     * Filter the entity of insert.
+     * 
+     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     */
+    protected void filterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
+    }
+
+    /**
      * Assert the entity of insert.
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
@@ -168,11 +179,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
-     * Filter the entity of update.
+     * Framework filter the entity of update.
      * 
      * @param targetEntity Target entity that the type is entity-interface. (NotNull)
      */
-    protected void filterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
@@ -218,6 +229,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
+     * Filter the entity of update.
+     * 
+     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     */
+    protected void filterEntityOfUpdate(${glEntityInterfaceName} targetEntity) {
+    }
+
+    /**
      * Assert the entity of update.
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
@@ -226,11 +245,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
-     * Filter the entity of delete.
+     * Framework filter the entity of delete.
      * 
      * @param targetEntity Target entity that the type is entity-interface. (NotNull)
      */
-    protected void filterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+    protected void frameworkFilterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
         if (!(targetEntity instanceof ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})) {
             return;
@@ -276,6 +295,14 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     }
 
     /**
+     * Filter the entity of delete.
+     * 
+     * @param targetEntity Target entity that the type is entity-interface. (NotNull)
+     */
+    protected void filterEntityOfDelete(${glEntityInterfaceName} targetEntity) {
+    }
+
+    /**
      * Assert the entity of delete
      * 
      * @param entity Entity that the type is entity-interface. (NotNull)
@@ -294,6 +321,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            frameworkFilterEntityOfInsert(entity);
             filterEntityOfInsert(entity);
             assertEntityOfInsert(entity);
         }
@@ -311,6 +339,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            frameworkFilterEntityOfUpdate(entity);
             filterEntityOfUpdate(entity);
             assertEntityOfUpdate(entity);
         }
@@ -328,6 +357,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            frameworkFilterEntityOfDelete(entity);
             filterEntityOfDelete(entity);
             assertEntityOfDelete(entity);
         }

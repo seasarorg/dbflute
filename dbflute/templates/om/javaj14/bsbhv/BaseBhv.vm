@@ -290,6 +290,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        frameworkFilterEntityOfInsert(entity);
         filterEntityOfInsert(entity);
         assertEntityOfInsert(entity);
         return getMyDao().insert(entity);
@@ -303,6 +304,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateUpdate(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        frameworkFilterEntityOfUpdate(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
         return getMyDao().updateModifiedOnly(entity);
@@ -318,6 +320,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     ${database.behaviorDelegateModifier} int delegateUpdateNonstrict(${myExtendedObjectClassName} entity) {
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        frameworkFilterEntityOfDelete(entity);
         filterEntityOfUpdate(entity);
         assertEntityOfUpdate(entity);
         return getMyDao().updateNonstrictModifiedOnly(entity);
@@ -353,17 +356,25 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
   #end
 
+#set ($batchUpdateReturnType = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnType = "int[]")
+#else
+  #set ($batchUpdateReturnType = "int")
+#end
+
     /**
      * Insert several entities. {delegate method, internal for interceptor}
      * 
      * @param entityList Entity-list. (NotNull & NotEmpty)
-     * @return Inserted count.
+     * @return The array of inserted count.
      */
-    ${database.behaviorDelegateModifier} int delegateInsertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
             assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            frameworkFilterEntityOfInsert(entity);
             filterEntityOfInsert(entity);
             assertEntityOfInsert(entity);
         }
@@ -374,13 +385,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Update several entities. {delegate method, internal for interceptor}
      * 
      * @param entityList Entity-list. (NotNull & NotEmpty)
-     * @return Updated count.
+     * @return The array of updated count.
      */
-    ${database.behaviorDelegateModifier} int delegateUpdateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
             assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            frameworkFilterEntityOfUpdate(entity);
             filterEntityOfUpdate(entity);
             assertEntityOfUpdate(entity);
         }
@@ -391,13 +403,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Delete several entities. {delegate method, internal for interceptor}
      * 
      * @param entityList Entity-list. (NotNull & NotEmpty)
-     * @return Deleted count.
+     * @return The array of deleted count.
      */
-    ${database.behaviorDelegateModifier} int delegateDeleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
             final ${myExtendedObjectClassName} entity = (${myExtendedObjectClassName})ite.next();
             assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            frameworkFilterEntityOfDelete(entity);
             filterEntityOfDelete(entity);
             assertEntityOfDelete(entity);
         }
@@ -1144,6 +1157,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
   #end
 
+#set ($batchUpdateReturnValueMethod = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnValueMethod = ".length")
+#else
+  #set ($batchUpdateReturnValueMethod = "")
+#end
+
     // ===================================================================================
     //                                                                  Basic Batch Update
     //                                                                  ==================
@@ -1151,9 +1171,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch insert. This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
-     * @return Inserted count.
+     * @return The array of inserted count.
      */
-    public int batchInsert(java.util.List ${myEntityListVariableName}) {
+    public ${batchUpdateReturnType} batchInsert(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return delegateInsertList(${myEntityListVariableName});
     }
@@ -1167,7 +1187,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public int insertList(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
-        return delegateInsertList(${myEntityListVariableName});
+        return delegateInsertList(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
 
     /**
@@ -1175,9 +1195,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * All columns are update target. {NOT modified only}
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
-     * @return Updated count.
+     * @return The array of updated count.
      */
-    public int batchUpdate(java.util.List ${myEntityListVariableName}) {
+    public ${batchUpdateReturnType} batchUpdate(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return delegateUpdateList(${myEntityListVariableName});
     }
@@ -1192,16 +1212,16 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public int updateList(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
-        return delegateUpdateList(${myEntityListVariableName});
+        return delegateUpdateList(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
 
     /**
      * Batch delete. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
-     * @return Deleted count.
+     * @return The array of deleted count.
      */
-    public int batchDelete(java.util.List ${myEntityListVariableName}) {
+    public ${batchUpdateReturnType} batchDelete(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return delegateDeleteList(${myEntityListVariableName});
     }
@@ -1210,12 +1230,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Delete list by Batch. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
-     * @return Deleted count.
+     * @return The array of deleted count.
      * @deprecated Sorry! This method name is very confusing. Please use batchDelete().
      */
     public int deleteList(java.util.List ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
-        return delegateDeleteList(${myEntityListVariableName});
+        return delegateDeleteList(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
 
     // ===================================================================================

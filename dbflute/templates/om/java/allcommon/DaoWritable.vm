@@ -41,27 +41,34 @@ public interface ${glDaoWritableInterfaceName} extends ${glDaoReadableInterfaceN
      */
     public int remove(${glEntityInterfaceName} entity);
 
+#set ($batchUpdateReturnType = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnType = "int[]")
+#else
+  #set ($batchUpdateReturnType = "int")
+#end
+
     /**
      * Insert several entities that the type is entity-interface.
      * 
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Inserted count.
+     * @return The array of inserted count.
      */
-    public int createList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public ${batchUpdateReturnType} createList(java.util.List<${glEntityInterfaceName}> entityList);
 
     /**
      * Update several entities that the type is entity-interface.
      * 
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Updated count.
+     * @return The array of updated count.
      */
-    public int modifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public ${batchUpdateReturnType} modifyList(java.util.List<${glEntityInterfaceName}> entityList);
 
     /**
      * Delete several entities that the type is entity-interface.
      * 
      * @param entityList Entity-list that the type is entity-interface. (NotNull)
-     * @return Deleted count.
+     * @return The array of deleted count.
      */
-    public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
+    public ${batchUpdateReturnType} removeList(java.util.List<${glEntityInterfaceName}> entityList);
 }

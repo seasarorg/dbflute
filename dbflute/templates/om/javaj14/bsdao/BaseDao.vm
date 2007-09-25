@@ -134,7 +134,7 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectList(${myAttachedCBArgsString});
+    public java.util.List selectList(${myAttachedCBArgsString});
 
 #if ($table.isWritable())
 
@@ -191,29 +191,36 @@ public interface ${myClassName} extends ${InterfaceName} {
     public int deleteNonstrict(${myExtendedObjectClassName} entity);
   #end
 
+#set ($batchUpdateReturnType = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnType = "int[]")
+#else
+  #set ($batchUpdateReturnType = "int")
+#end
+
     /**
      * Insert several entities.
      * 
      * @param entityList Entity-list. (NotNull)
-     * @return Inserted count.
+     * @return The array of inserted count.
      */
-    public int insertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
+    public ${batchUpdateReturnType} insertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
 
     /**
      * Update several entities.
      * 
      * @param entityList Entity-list. (NotNull)
-     * @return Updated count.
+     * @return The array of updated count.
      */
-    public int updateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
+    public ${batchUpdateReturnType} updateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
 
     /**
      * Delete several entities.
      * 
      * @param entityList Entity-list. (NotNull)
-     * @return Deleted count.
+     * @return The array of deleted count.
      */
-    public int deleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
+    public ${batchUpdateReturnType} deleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
 #else
   #if ($table.isAvailableNonPrimaryKeyWritable())
 

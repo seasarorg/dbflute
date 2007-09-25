@@ -156,22 +156,22 @@ public interface ${myClassName} extends ${InterfaceName} {
     public int update(${myExtendedObjectClassName} entity);
 
     /**
-     * Update one entity. (modified only)
+     * Update one entity. {modified only}
      * 
      * @param entity Entity. (NotNull)
      * @return Updated count.
      */
     public int updateModifiedOnly(${myExtendedObjectClassName} entity);
-  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
 
+#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
     /**
-     * Update one entity. (non strict & modified only)
+     * Update one entity non-strictly. {modified only}
      * 
      * @param entity Entity. (NotNull)
      * @return Updated count.
      */
     public int updateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
-  #end
+#end
 
     /**
      * Delete one entity.
@@ -180,40 +180,68 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @return Deleted count.
      */
     public int delete(${myExtendedObjectClassName} entity);
-  #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
 
+#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
     /**
-     * Delete one entity. (non strict)
+     * Delete one entity. {non-strict}
      * 
      * @param entity Entity. (NotNull)
      * @return Deleted count.
      */
     public int deleteNonstrict(${myExtendedObjectClassName} entity);
-  #end
+#end
+
+#set ($batchUpdateReturnType = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnType = "int[]")
+#else
+  #set ($batchUpdateReturnType = "int")
+#end
 
     /**
      * Insert several entities.
      * 
      * @param entityList Entity-list. (NotNull)
-     * @return Inserted count.
+     * @return The array of inserted count.
      */
-    public int insertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
+    public ${batchUpdateReturnType} insertList(java.util.List<${myExtendedObjectClassName}> entityList);
 
     /**
      * Update several entities.
      * 
      * @param entityList Entity-list. (NotNull)
-     * @return Updated count.
+     * @return The array of updated count.
      */
-    public int updateList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
+    public ${batchUpdateReturnType} updateList(java.util.List<${myExtendedObjectClassName}> entityList);
+
+#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+    /**
+     * Update several entities non-strictly.
+     * 
+     * @param entityList Entity-list. (NotNull)
+     * @return The array of updated count.
+     */
+    public ${batchUpdateReturnType} updateListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList);
+#end
 
     /**
      * Delete several entities.
      * 
      * @param entityList Entity-list. (NotNull)
-     * @return Deleted count.
+     * @return The array of deleted count.
      */
-    public int deleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} entityList);
+    public ${batchUpdateReturnType} deleteList(java.util.List<${myExtendedObjectClassName}> entityList);
+
+#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+    /**
+     * Delete several entities non-strictly.
+     * 
+     * @param entityList Entity-list. (NotNull)
+     * @return The array of deleted count.
+     */
+    public ${batchUpdateReturnType} deleteListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList);
+#end
+
 #else
   #if ($table.isAvailableNonPrimaryKeyWritable())
 

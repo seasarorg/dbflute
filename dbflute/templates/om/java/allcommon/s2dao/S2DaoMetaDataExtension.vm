@@ -33,6 +33,7 @@ import org.seasar.dao.impl.AbstractSqlCommand;
 import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoDynamicCommand;
 import org.seasar.dao.impl.UpdateModifiedOnlyCommand;
+import org.seasar.dao.impl.UpdateBatchAutoStaticCommand;
 import org.seasar.dao.impl.DeleteAutoStaticCommand;
 import org.seasar.dao.impl.DeleteBatchAutoStaticCommand;
 
@@ -487,7 +488,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 cmd = new org.seasar.dao.impl.UpdateAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);// Extension Point!
             }
         } else {
-            cmd = new org.seasar.dao.impl.UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);// Extension Point!
+            cmd = new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);// Extension Point!
         }
         sqlCommands.put(method.getName(), cmd);
     }
@@ -526,15 +527,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
 #if ($database.isVersionAfter1047())
     ${database.outputOverrideAnnotation()}
-    protected DeleteAutoStaticCommand createDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
-        return new DeleteAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+    protected UpdateBatchAutoStaticCommand createUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
+        return new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
     }
+#end
 
-    ${database.outputOverrideAnnotation()}
-    protected DeleteBatchAutoStaticCommand createDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
-        return new DeleteBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
-    }
-#else
+#if (!$database.isVersionAfter1047())
     ${database.outputOverrideAnnotation()}
     protected void setupDeleteMethodByAuto(Method method) {
         checkAutoUpdateMethod(method);
@@ -546,6 +544,18 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             cmd = new DeleteBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
         }
         sqlCommands.put(method.getName(), cmd);
+    }
+#end
+
+#if ($database.isVersionAfter1047())
+    ${database.outputOverrideAnnotation()}
+    protected DeleteAutoStaticCommand createDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
+        return new DeleteAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+    }
+
+    ${database.outputOverrideAnnotation()}
+    protected DeleteBatchAutoStaticCommand createDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
+        return new DeleteBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
     }
 #end
 
