@@ -32,7 +32,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
  * [foreign-property]
  *     ${table.ForeignPropertyNameCommaString}
  * 
- * [refferer-property]
+ * [referer-property]
  *     ${table.ReferrerPropertyNameCommaString}
  * 
  * [sequence]

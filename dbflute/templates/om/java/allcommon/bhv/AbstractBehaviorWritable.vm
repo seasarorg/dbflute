@@ -487,9 +487,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         }
     }
 
-    // =====================================================================================
-    //                                                                   Basic Entity Update
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Basic Entity Update
+    //                                                                 ===================
     /**
      * Create.
      * 
@@ -634,9 +634,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     abstract protected void doRemoveAfterSelect(${glEntityInterfaceName} entity);
 #end
 
-    // =====================================================================================
-    //                                                   Basic Entity Update Internal Helper
-    //                                                   ===================================
+    // ===================================================================================
+    //                                                 Basic Entity Update Internal Helper
+    //                                                 ===================================
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
@@ -787,9 +787,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
   #set ($batchUpdateReturnValueMethod = "")
 #end
 
-    // =====================================================================================
-    //                                                                     Basic Lump Update
-    //                                                                     =================
+    // ===================================================================================
+    //                                                                   Basic Lump Update
+    //                                                                   =================
     /**
      * Lump create the list.
      * 
@@ -801,6 +801,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         return callCreateList(entityList);
     }
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Create list.
      * 
@@ -812,52 +813,61 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertListNotNullAndNotEmpty(entityList);
         return lumpCreate(entityList)${batchUpdateReturnValueMethod};
     }
+#end
 
     /**
      * Lump Modify the list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Modified count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
     public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callModifyList(entityList);
     }
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Modify list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Modified count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      * @deprecated Sorry! This method name is very confusing. Please use lumpModify().
      */
     public int modifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return lumpModify(entityList)${batchUpdateReturnValueMethod};
     }
+#end
 
     /**
      * Lump remove the list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Removed count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
     public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return callRemoveList(entityList);
     }
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Remove list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Removed count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      * @deprecated Sorry! This method name is very confusing. Please use lumpRemove().
      */
     public int removeList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
         assertListNotNullAndNotEmpty(entityList);
         return lumpRemove(entityList)${batchUpdateReturnValueMethod};
     }
+#end
 
     /**
      * Inject sequence to primary key if it needs.

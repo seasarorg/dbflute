@@ -48,7 +48,7 @@ import ${glPackageCB}.*;
  * [foreign-property]
  *     ${table.ForeignPropertyNameCommaString}
  * 
- * [refferer-property]
+ * [referer-property]
  *     ${table.ReferrerPropertyNameCommaString}
  * 
  * [sequence]
@@ -1117,6 +1117,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateInsertList(${myEntityListVariableName});
     }
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Insert list. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
@@ -1129,6 +1130,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return batchInsert(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
+#end
 
     /**
      * Batch update the list. All columns are update target. {NOT modified only} <br />
@@ -1136,6 +1138,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
      * @return The array of updated count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
     public ${batchUpdateReturnType} batchUpdate(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
@@ -1156,18 +1159,21 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Update batch. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
      * @return Updated count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      * @deprecated Sorry! This method name is very confusing. Please use batchUpdate().
      */
     public int updateList(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return batchUpdate(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
+#end
 
     /**
      * Batch delete the list. <br />
@@ -1175,6 +1181,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
      * @return The array of deleted count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
     public ${batchUpdateReturnType} batchDelete(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
@@ -1195,17 +1202,20 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Delete list by Batch. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
      * 
      * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
      * @return Deleted count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      * @deprecated Sorry! This method name is very confusing. Please use batchDelete().
      */
     public int deleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
         assertListNotNullAndNotEmpty(${myEntityListVariableName});
         return batchDelete(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
+#end
 
     // ===================================================================================
     //                                                                      Various Insert

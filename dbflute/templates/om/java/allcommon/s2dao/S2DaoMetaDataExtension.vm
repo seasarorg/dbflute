@@ -488,7 +488,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 cmd = new org.seasar.dao.impl.UpdateAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);// Extension Point!
             }
         } else {
-            cmd = new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);// Extension Point!
+            cmd = new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames) {
+                public Object execute(Object[] args) {
+                    final Object result = super.execute(args);
+                    handleBatchUpdateResultWithOptimisticLock(args, result);
+                    return result;
+                }
+            };// Extension Point!
         }
         sqlCommands.put(method.getName(), cmd);
     }
@@ -528,9 +534,33 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #if ($database.isVersionAfter1047())
     ${database.outputOverrideAnnotation()}
     protected UpdateBatchAutoStaticCommand createUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
-        return new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
+        return new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows) {
+            public Object execute(Object[] args) {
+                final Object result = super.execute(args);
+                handleBatchUpdateResultWithOptimisticLock(args, result);
+                return result;
+            }
+        };
     }
 #end
+
+    protected void handleBatchUpdateResultWithOptimisticLock(Object[] args, Object result) {
+        if (args.length == 0) {
+            return;// for Safety!
+        }
+        if (result instanceof int[]) {
+            final int[] updatedCountArray = (int[])result;
+            int index = 0;
+            for (int updatedCount : updatedCountArray) {
+                if (updatedCount == 0) {
+                    if (args.length <= index) {
+                        return;// for Safety!
+                    }
+                    throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(args[index], updatedCount);
+                }
+            }
+        }
+    }
 
 #if (!$database.isVersionAfter1047())
     ${database.outputOverrideAnnotation()}

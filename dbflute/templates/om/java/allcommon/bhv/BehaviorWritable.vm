@@ -123,6 +123,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Create list.
      * 
@@ -131,40 +132,49 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @deprecated Sorry! This method name is very confusing. Please use lumpCreate().
      */
     public int createList(java.util.List<${glEntityInterfaceName}> entityList);
+#end
 
     /**
      * Lump Modify the list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Modified count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
     public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Modify list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Modified count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      * @deprecated Sorry! This method name is very confusing. Please use lumpModify().
      */
     public int modifyList(java.util.List<${glEntityInterfaceName}> entityList);
+#end
 
     /**
      * Lump remove the list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Removed count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
     public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Remove list.
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Removed count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      * @deprecated Sorry! This method name is very confusing. Please use lumpRemove().
      */
     public int removeList(java.util.List<${glEntityInterfaceName}> entityList);
+#end
 
     // =====================================================================================
     //                                                                            Token File
