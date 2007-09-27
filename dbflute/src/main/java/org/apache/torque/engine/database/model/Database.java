@@ -1194,17 +1194,33 @@ public class Database {
     public boolean isMakeConditionQueryEqualEmptyString() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
-
+    
+    public boolean isMakeBehaviorCopyInsert() {
+        return getProperties().getSourceReductionProperties().isMakeBehaviorCopyInsert();
+    }
+    
+    public boolean isMakeBehaviorLoopUpdate() {
+        return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
+    }
+    
+    public boolean isMakeTraceablePreparedStatement() {
+        return getProperties().getSourceReductionProperties().isMakeTraceablePreparedStatement();
+    }
+    
+    /**
+     * @return Determination.
+     * @deprecated
+     */
     public boolean isMakeConditionQueryNumericArgumentLong() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryNumericArgumentLong();
     }
 
+    /**
+     * @return Determination.
+     * @deprecated
+     */
     public boolean isMakeBehaviorForUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorForUpdate();
-    }
-
-    public boolean isMakeTraceablePreparedStatement() {
-        return getProperties().getSourceReductionProperties().isMakeTraceablePreparedStatement();
     }
 
     // -----------------------------------------------------

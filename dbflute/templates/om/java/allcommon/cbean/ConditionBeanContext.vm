@@ -59,59 +59,58 @@ public class ${glConditionBeanContextName} {
     }
 
     // ===================================================================================
-    //                                                     Initialize against LinkageError
-    //                                                     ===============================
+    //                                         Initialize against the ClassLoader Headache
+    //                                         ===========================================
     public static void initialize() {
-        // Stop the LinkageError!
-        _log.debug("/------------------------------------------------ Stop the LinkageError!");
+        boolean debugEnabled = _log.isDebugEnabled();
+        // Against the ClassLoader Headache!
+        if (debugEnabled) {
+            _log.debug("/---------------------------------------- Initialize against the ClassLoader Headache!");
+        }
         {
             final Class clazz = ${glPackageBaseCommonCBean}.${glSimplePagingBeanName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
         {
             final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
         {
             final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
         {
             final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
-#if ($database.isAvailableGenerics())
         {
             final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
         {
             final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
         {
             final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
         {
             final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
-#end
         {
             final Class clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
-#if ($database.isAvailableGenerics())
         {
             final Class clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
-#end
 #if ($database.isVersionAfter1047())
         {
             final Class clazz = ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class;
-            _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader());
+            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
         }
 #end
         _log.debug("----------/");

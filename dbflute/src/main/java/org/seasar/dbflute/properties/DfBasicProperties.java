@@ -47,6 +47,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return stringProp("torque.database", "");
     }
 
+    public boolean isDatabasePostgreSQL() {
+        return getDatabaseName().equalsIgnoreCase("postgresql");
+    }
+    
     public boolean isDatabaseMySQL() {
         return getDatabaseName().equalsIgnoreCase("mysql");
     }

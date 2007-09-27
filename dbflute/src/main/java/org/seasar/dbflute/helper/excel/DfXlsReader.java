@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -13,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.extension.dataset.ColumnType;
+import org.seasar.extension.dataset.DataColumn;
 import org.seasar.extension.dataset.DataReader;
 import org.seasar.extension.dataset.DataRow;
 import org.seasar.extension.dataset.DataSet;
@@ -23,7 +25,6 @@ import org.seasar.extension.dataset.types.ColumnTypes;
 import org.seasar.framework.exception.IORuntimeException;
 import org.seasar.framework.util.Base64Util;
 import org.seasar.framework.util.FileInputStreamUtil;
-import org.seasar.framework.util.ResourceUtil;
 import org.seasar.framework.util.StringUtil;
 import org.seasar.framework.util.TimestampConversionUtil;
 
@@ -37,24 +38,17 @@ public class DfXlsReader implements DataReader, DataSetConstants {
 
     private DfFlexibleNameMap<String, String> tableNameMap;
 
-    public DfXlsReader(String path, DfFlexibleNameMap<String, String> tableNameMap) {
-        this(ResourceUtil.getResourceAsStream(path), tableNameMap);
+    protected DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap;
+
+    public DfXlsReader(File file, DfFlexibleNameMap<String, String> tableNameMap,
+            DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap) {
+        this(FileInputStreamUtil.create(file), tableNameMap, notTrimTableColumnMap);
     }
 
-    public DfXlsReader(String dirName, String fileName, DfFlexibleNameMap<String, String> tableNameMap) {
-        this(ResourceUtil.getResourceAsFile(dirName), fileName, tableNameMap);
-    }
-
-    public DfXlsReader(File dir, String fileName, DfFlexibleNameMap<String, String> tableNameMap) {
-        this(new File(dir, fileName), tableNameMap);
-    }
-
-    public DfXlsReader(File file, DfFlexibleNameMap<String, String> tableNameMap) {
-        this(FileInputStreamUtil.create(file), tableNameMap);
-    }
-
-    public DfXlsReader(InputStream in, DfFlexibleNameMap<String, String> tableNameMap) {
+    public DfXlsReader(InputStream in, DfFlexibleNameMap<String, String> tableNameMap,
+            DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap) {
         this.tableNameMap = tableNameMap;
+        this.notTrimTableColumnMap = notTrimTableColumnMap;
         try {
             workbook_ = new HSSFWorkbook(in);
         } catch (IOException ex) {
@@ -137,7 +131,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         DataRow dataRow = table.addRow();
         for (int i = 0; i < table.getColumnSize(); ++i) {
             HSSFCell cell = row.getCell((short) i);
-            Object value = getValue(cell);
+            Object value = getValue(cell, table);
             dataRow.setValue(i, value);
         }
     }
@@ -161,7 +155,7 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         return false;
     }
 
-    public Object getValue(HSSFCell cell) {
+    public Object getValue(HSSFCell cell, DataTable table) {
         if (cell == null) {
             return null;
         }
@@ -178,7 +172,15 @@ public class DfXlsReader implements DataReader, DataSetConstants {
         case HSSFCell.CELL_TYPE_STRING:
             String s = cell.getStringCellValue();
             if (s != null) {
-                s = StringUtil.rtrim(s);
+                // /----------------------------------------------------------------- Modification
+                if (isNotTrimTarget(cell, table)) {
+                    if (s.length() != s.trim().length()) {
+                        s = "\"" + s + "\"";
+                    }
+                } else {
+                    s = StringUtil.rtrim(s);
+                }
+                // --------------------/
             }
             if ("".equals(s)) {
                 s = null;
@@ -194,6 +196,24 @@ public class DfXlsReader implements DataReader, DataSetConstants {
             return null;
         }
     }
+
+    // /----------------------------------------------------------------- Modification
+    public boolean isNotTrimTarget(HSSFCell cell, DataTable table) {
+        final String tableName = table.getTableName();
+        if (!notTrimTableColumnMap.containsKey(tableName)) {
+            return false;
+        }
+        final List<String> notTrimTargetColumnList = notTrimTableColumnMap.get(tableName);
+        final DataColumn column = table.getColumn(cell.getCellNum());
+        final String targetColumnName = column.getColumnName();
+        for (String currentColumnName : notTrimTargetColumnList) {
+            if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // --------------------/
 
     protected ColumnType getColumnType(HSSFCell cell) {
         switch (cell.getCellType()) {

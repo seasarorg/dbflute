@@ -1966,6 +1966,10 @@ public class Table implements IDMethod {
      * @return Determination.
      */
     public boolean isUseSequence() {
+        // PostgreSQLのSerial型だけ自動で出力
+        if (hasPostgreSQLSerialSequenceName()) {
+            return true;
+        }
         final String sequenceName = getDatabase().getSequenceDefinitionMapSequence(getName());
         if (sequenceName == null) {
             return false;
@@ -1977,11 +1981,15 @@ public class Table implements IDMethod {
     /**
      * Get the value of sequence name from definition map.
      * 
-     * @return Name.
+     * @return Defined sequence name. (NotNull)
      */
     public String getDefinedSequenceName() {
         if (!isUseSequence()) {
             return "";
+        }
+        final String postgreSQLSerialSequenceName = extractPostgreSQLSerialSequenceName();
+        if (postgreSQLSerialSequenceName != null) {
+            return postgreSQLSerialSequenceName;
         }
         return getDatabase().getSequenceDefinitionMapSequence(getName());
     }
@@ -2017,6 +2025,46 @@ public class Table implements IDMethod {
         return sequenceReturnType;
     }
 
+    /**
+     * Has sequence name of postgreSQL serial type column.
+     * 
+     * @return Determination.
+     */
+    protected boolean hasPostgreSQLSerialSequenceName() {
+        final String postgreSQLSerialSequenceName = extractPostgreSQLSerialSequenceName();
+        return postgreSQLSerialSequenceName != null;
+    }
+
+    /**
+     * Extract sequence name of postgreSQL serial type column.
+     * 
+     * @return Sequence name of postgreSQL serial type column. (Nullable: If null, not found)
+     */
+    protected String extractPostgreSQLSerialSequenceName() {
+        final DfBasicProperties basicProperties = getProperties().getBasicProperties();
+        if (!basicProperties.isDatabasePostgreSQL() || !hasAutoIncrementColumn()) {
+            return null;
+        }
+        final Column autoIncrementColumn = getAutoIncrementColumn();
+        if (autoIncrementColumn == null) {
+            return null;
+        }
+        final String defaultValue = autoIncrementColumn.getDefaultValue();
+        if (defaultValue == null) {
+            return null;
+        }
+        final String prefix = "nextval('";
+        if (!defaultValue.startsWith(prefix)) {
+            return null;
+        }
+        final String excludedPrefixString = defaultValue.substring(prefix.length());
+        final int endIndex = excludedPrefixString.indexOf("'");
+        if (endIndex < 0) {
+            return null;
+        }
+        return excludedPrefixString.substring(0, endIndex);
+    }
+
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
@@ -2026,16 +2074,40 @@ public class Table implements IDMethod {
      * @return Determination.
      */
     public boolean isUseIdentity() {
+        final DfBasicProperties basicProperties = getProperties().getBasicProperties();
+
+        // S2DaoはPostgreSQLのIdentity利用をサポートしていないので問答無用でfalse。
+        // かつ、Serial型はSequence利用が一般的なので問答無用でfalse。
+        if (basicProperties.isDatabasePostgreSQL()) {
+            return false;
+        }
 
         // It gives priority to auto-increment information of JDBC.
+        if (hasAutoIncrementColumn()) {
+            return true;
+        }
+
+        return getDatabase().getIdentityDefinitionMapColumnName(getName()) != null;
+    }
+
+    protected boolean hasAutoIncrementColumn() {
         final Column[] columnArray = getColumns();
         for (Column column : columnArray) {
             if (column.isAutoIncrement()) {
                 return true;
             }
         }
+        return false;
+    }
 
-        return getDatabase().getIdentityDefinitionMapColumnName(getName()) != null;
+    protected Column getAutoIncrementColumn() {
+        final Column[] columnArray = getColumns();
+        for (Column column : columnArray) {
+            if (column.isAutoIncrement()) {
+                return column;
+            }
+        }
+        return null;
     }
 
     /**

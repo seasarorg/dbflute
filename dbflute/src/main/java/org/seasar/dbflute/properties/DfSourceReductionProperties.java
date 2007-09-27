@@ -43,6 +43,14 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     // ===============================================================================
     //                                                           Properties - Behavior
     //                                                           =====================
+    public boolean isMakeBehaviorCopyInsert() {
+        return booleanProp("torque.isMakeBehaviorCopyInsert", false);
+    }
+    
+    public boolean isMakeBehaviorLoopUpdate() {
+        return booleanProp("torque.isMakeBehaviorLoopUpdate", false);
+    }
+
     public boolean isMakeBehaviorForUpdate() {
         return booleanProp("torque.isMakeBehaviorForUpdate", false);
     }

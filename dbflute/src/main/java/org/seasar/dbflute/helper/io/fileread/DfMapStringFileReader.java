@@ -15,7 +15,7 @@ import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 public class DfMapStringFileReader {
 
     // TODO: @jflute - staticじゃないように修正すること
-    
+
     public static Map<String, Object> readMap(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
@@ -63,6 +63,16 @@ public class DfMapStringFileReader {
         final Set<String> keySet = map.keySet();
         for (String key : keySet) {
             resultMap.put(key, (String) map.get(key));
+        }
+        return resultMap;
+    }
+
+    public static Map<String, java.util.List<String>> readMapAsListStringValue(String path, String encoding) {
+        final Map<String, java.util.List<String>> resultMap = new LinkedHashMap<String, java.util.List<String>>();
+        final Map<String, Object> map = readMap(path, encoding);
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            resultMap.put(key, (java.util.List<String>) map.get(key));
         }
         return resultMap;
     }

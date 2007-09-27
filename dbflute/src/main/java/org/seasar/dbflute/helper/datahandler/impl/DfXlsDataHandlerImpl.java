@@ -54,6 +54,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final List<File> xlsList = getXlsList(dataDirectoryName);
 
         for (File file : xlsList) {
+            _log.info("");
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
             _log.info("writeData(" + file + ")");
             _log.info("= = = = = = =/");
@@ -93,6 +94,10 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
                         int bindCount = 1;
                         for (String value : valueList) {
+                            if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
+                                value = value.substring(1);
+                                value = value.substring(0, value.length() - 1);
+                            }
 
                             // - - - - - - - - - - - - - - 
                             // Against Timestamp Headache
@@ -204,6 +209,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final List<File> xlsList = getXlsList(dataDirectoryName);
 
         for (File file : xlsList) {
+            _log.info("");
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
             _log.info("writeData(" + file + ")");
             _log.info("= = = = = = =/");
@@ -222,6 +228,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final List<File> xlsList = getXlsList(dataDirectoryName);
 
         for (File file : xlsList) {
+            _log.info("");
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
             _log.info("writeData(" + file + ")");
             _log.info("= = = = = = =/");
@@ -237,7 +244,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     protected DfXlsReader createXlsReader(String dataDirectoryName, File file) {
-        final DfXlsReader xlsReader = new DfXlsReader(file, getTableNameMap(dataDirectoryName));
+        final DfFlexibleNameMap<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
+        final DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
+        final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap);
+        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
+        _log.info("tableNameMap     = " + tableNameMap);
+        _log.info("- - - - - - - - - -/");
         return xlsReader;
     }
 
@@ -321,6 +333,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final String path = dataDirectoryName + "/table-name.txt";
         final Map<String, String> targetMap = DfMapStringFileReader.readMapAsStringValue(path, "UTF-8");
         return new DfFlexibleNameMap<String, String>(targetMap);
+    }
+
+    private DfFlexibleNameMap<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
+        final String path = dataDirectoryName + "/not-trim-column.txt";
+        final Map<String, List<String>> targetMap = DfMapStringFileReader.readMapAsListStringValue(path, "UTF-8");
+        return new DfFlexibleNameMap<String, List<String>>(targetMap);
     }
 
     protected Map getDatabaseMetaColumnMap(String tableName, DataSource dataSource) {

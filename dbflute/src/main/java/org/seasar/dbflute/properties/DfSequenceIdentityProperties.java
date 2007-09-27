@@ -41,7 +41,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public boolean isAvailableBehaviorInsertSequenceInjection() {
-        return booleanProp("torque.isAvailableBehaviorInsertSequenceInjection", false);
+        return booleanProp("torque.isAvailableBehaviorInsertSequenceInjection", true);
     }
 
     public boolean hasSequenceReturnType() {

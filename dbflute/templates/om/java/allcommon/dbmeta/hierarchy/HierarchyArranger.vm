@@ -310,7 +310,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 final ${glHierarchySourceRowName} sourceRow = topInfo.getSourceRow();
                 final Object sourceColumnValue = extractColumnValueFromSource(sourceRow, sourceColumn);
                 final ${glColumnInfoName} destinationColumnInfo = requestElement.getDestinationColumnInfo();
-                injectColumnValueToDestination(localEntity, destinationColumnInfo, sourceColumnValue);
+                injectColumnValueToDestinationIfNotNull(localEntity, destinationColumnInfo, sourceColumnValue);
                 continue;
             }
 
@@ -502,7 +502,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
             final ${glHierarchySourceColumnName} sourceColumnInfo = requestElement.getSourceColumnInfo();
             final Object sourceColumnValue = extractColumnValueFromSource(sourceRow, sourceColumnInfo);
             if (sourceColumnValue != null) {
-                injectColumnValueToDestination(localEntity, destinationColumnInfo, sourceColumnValue);
+                injectColumnValueToDestinationIfNotNull(localEntity, destinationColumnInfo, sourceColumnValue);
             }
         }
     }
@@ -541,13 +541,14 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     //                                                                        Inject Logic
     //                                                                        ============
     /**
-     * 
      * @param entity Entity. (NotNull)
      * @param columnInfo Column info. (NotNull)
      * @param columnValue Column value. (NotNull)
      */
-    protected void injectColumnValueToDestination(${glEntityInterfaceName} entity, ${glColumnInfoName} columnInfo, final Object columnValue) {
-        injectColumnValueToDestination(entity, columnInfo.getColumnDbName(), columnValue);
+    protected void injectColumnValueToDestinationIfNotNull(${glEntityInterfaceName} entity, ${glColumnInfoName} columnInfo, final Object columnValue) {
+        if (columnValue != null) {
+            injectColumnValueToDestination(entity, columnInfo.getColumnDbName(), columnValue);
+        }
     }
 
     protected void injectColumnValueToDestination(${glEntityInterfaceName} entity, String columnDbName, final Object columnValue) {
