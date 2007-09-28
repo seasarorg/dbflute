@@ -445,7 +445,16 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (entity.hasVersionNoValue()) {
             return;
         }
-        String msg = "Not found the value of version no: " + entity;
+        String msg = "Not found the value of 'version no' on the entity!" + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Please confirm the existence of the value of 'version no' on the entity." + getLineSeparator();
+        msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + getLineSeparator();
+        msg = msg + "So 'version no' is required on the entity. " + getLineSeparator();
+        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary." + getLineSeparator();
+        msg = msg + "- - - - - - - - - -" + getLineSeparator();
+        msg = msg + "entity to string = " + entity + getLineSeparator();
+        msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
         throw new IllegalStateException(msg);
     }
 
@@ -456,7 +465,16 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (entity.hasUpdateDateValue()) {
             return;
         }
-        String msg = "Not found the value of update date: " + entity;
+        String msg = "Not found the value of 'update date' on the entity!" + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Please confirm the existence of the value of 'update date' on the entity." + getLineSeparator();
+        msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + getLineSeparator();
+        msg = msg + "So 'update date' is required on the entity. " + getLineSeparator();
+        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary." + getLineSeparator();
+        msg = msg + "- - - - - - - - - -" + getLineSeparator();
+        msg = msg + "entity to string = " + entity + getLineSeparator();
+        msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
         throw new IllegalStateException(msg);
     }
 
