@@ -35,7 +35,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-#foreach ($resource in ${database.commonColumnSetupResourceList})
+#foreach ($resource in $database.commonColumnSetupResourceList)
     /** The property of ${resource.propertyName}. */
     protected ${resource.className} ${resource.propertyVariableName};
 

@@ -10,6 +10,17 @@ ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
 public class ${myClassName} {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                        Column DB-Name
+    //                                        --------------
+#foreach ($col in $table.Columns)
+    /** Db-name of ${col.name}. */
+    public static final String DB_NAME_${col.name} = "$col.name";
+#end
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** Wrapped result set. */

@@ -313,21 +313,15 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
     }
 
     protected ${glFileTokenizingHeaderInfoName} analyzeHeaderInfo(String delimiter, final String lineString) {
-        final java.util.List${database.filterGenericsString('String')} columnNameList = new ArrayList${database.filterGenericsString('String')}();
+        final java.util.List<String> columnNameList = new ArrayList<String>();
         final String[] values = lineString.split(delimiter);
-        int count = 0;
         for (int i=0; i < values.length; i++) {
-            String value = values[i];
-            if (value == null) {
-                columnNameList.add("");
-            }
-            value = value.trim();// Trimming is Header Only!
+            final String value = values[i].trim();// Trimming is Header Only!;
             if (value.startsWith("\"") && value.endsWith("\"")) {
                 columnNameList.add(value.substring(1, value.length() - 1));
             } else {
                 columnNameList.add(value);
             }
-            count++;
         }
         final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = new ${glFileTokenizingHeaderInfoName}();
         fileTokenizingHeaderInfo.setColumnNameList(columnNameList);
@@ -417,16 +411,19 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
             bos = new java.io.BufferedOutputStream(outputStream);
             writer = new java.io.OutputStreamWriter(bos, encoding);
 
+            boolean headerDone = false;
+
             // Make header.
             final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = fileMakingOption.getFileMakingHeaderInfo();
             if (fileMakingHeaderInfo != null) {
-                final List${database.filterGenericsString('String')} columnNameList = fileMakingHeaderInfo.getColumnNameList();
+                final List<String> columnNameList = fileMakingHeaderInfo.getColumnNameList();
                 if (columnNameList != null && !columnNameList.isEmpty()) {
                     final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
                     lineMakingOption.setDelimiter(delimiter);
                     lineMakingOption.trimSpace();// Trimming is Header Only!
                     final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
                     writer.write(columnHeaderString + lineSeparator);
+                    headerDone = true;
                 }
             }
 
@@ -437,7 +434,22 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                 if (rowResource == null) {
                     break;// The End!
                 }
-                final java.util.List${database.filterGenericsString('String')} valueList = rowResource.getValueList();
+                final java.util.List<String> valueList;
+                if (rowResource.getValueList() != null) {
+                    valueList = rowResource.getValueList();
+                } else {
+                    final java.util.LinkedHashMap<String, String> nameValueMap = rowResource.getNameValueMap();
+                    if (!headerDone) {
+                        final java.util.List<String> columnNameList = new java.util.ArrayList<String>(nameValueMap.keySet());
+                        final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
+                        lineMakingOption.setDelimiter(delimiter);
+                        lineMakingOption.trimSpace();// Trimming is Header Only!
+                        final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
+                        writer.write(columnHeaderString + lineSeparator);
+                        headerDone = true;
+                    }
+                    valueList = new ArrayList<String>(nameValueMap.values());
+                }
                 final ${glLineMakingOptionName} lineMakingOption = new ${glLineMakingOptionName}();
                 lineMakingOption.setDelimiter(delimiter);
                 if (!fileMakingOption.isGoodByeDoubleQuotation()) {
