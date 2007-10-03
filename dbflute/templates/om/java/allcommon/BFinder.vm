@@ -21,13 +21,17 @@ public class ${glBFinderName} {
     public static <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE find(Class<BEHAVIOR_TYPE> behaviorType) {
         assertObjectNotNull("behaviorType", behaviorType);
         if (!org.seasar.framework.container.factory.SingletonS2ContainerFactory.hasContainer()) {
-            final String configFile = _dbfluteDiconName;
-            if (org.seasar.framework.util.ResourceUtil.isExist(configFile)) {
-                org.seasar.framework.container.factory.SingletonS2ContainerFactory.setConfigPath(configFile);
-                org.seasar.framework.container.factory.SingletonS2ContainerFactory.init();
-            } else {
-                String msg = "S2Container is not initialized! Confirm your initializer and your dicon files.";
-                throw new IllegalStateException(msg);
+            synchronized (${glBFinderName}.class) {
+                if (!org.seasar.framework.container.factory.SingletonS2ContainerFactory.hasContainer()) {
+                    final String configFile = _dbfluteDiconName;
+                    if (org.seasar.framework.util.ResourceUtil.isExist(configFile)) {
+                        org.seasar.framework.container.factory.SingletonS2ContainerFactory.setConfigPath(configFile);
+                        org.seasar.framework.container.factory.SingletonS2ContainerFactory.init();
+                    } else {
+                        String msg = "S2Container is not initialized! Confirm your initializer and your dicon files.";
+                        throw new IllegalStateException(msg);
+                    }
+                }
             }
         }
         final org.seasar.framework.container.S2Container container = org.seasar.framework.container.factory.SingletonS2ContainerFactory.getContainer();

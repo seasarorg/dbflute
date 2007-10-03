@@ -318,7 +318,7 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
         return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     // -----------------------------------------------------
     //                                            Page Range
     //                                            ----------
