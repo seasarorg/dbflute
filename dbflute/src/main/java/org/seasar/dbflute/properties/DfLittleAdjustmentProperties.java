@@ -1,7 +1,9 @@
 package org.seasar.dbflute.properties;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
@@ -62,6 +64,30 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                        ========================================
     public boolean isOneToManyReturnNullIfNonSelect() {
         return booleanProp("torque.isOneToManyReturnNullIfNonSelect", false);
+    }
+
+    // ===============================================================================
+    //                                                         Disable As-One-Relation
+    //                                                         =======================
+    public static final String KEY_disableAsOneRelationTableMap = "disableAsOneRelationTableMap";
+    protected Map<String, String> _disableAsOneRelationTableMap;
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, String> getDisableAsOneRelationTableMap() {
+        if (_disableAsOneRelationTableMap == null) {
+            _disableAsOneRelationTableMap = new HashMap<String, String>();
+            final Map<String, Object> map = mapProp("torque." + KEY_disableAsOneRelationTableMap, DEFAULT_EMPTY_MAP);
+            final Set<String> keySet = map.keySet();
+            for (String key : keySet) {
+                final String value = (String) map.get(key);
+                _disableAsOneRelationTableMap.put(key.toLowerCase(), value != null ? value.toLowerCase() : null);
+            }
+        }
+        return _disableAsOneRelationTableMap;
+    }
+    
+    public boolean isDisableAsOneRelation(String tableName) {
+        return getDisableAsOneRelationTableMap().containsKey(tableName.toLowerCase());
     }
 
     // ===============================================================================

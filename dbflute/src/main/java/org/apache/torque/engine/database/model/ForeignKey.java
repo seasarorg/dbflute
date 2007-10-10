@@ -266,6 +266,11 @@ public class ForeignKey {
      * @return Determination.
      */
     public boolean isOneToOne() {
+        // If the relation is disable, returns false!
+        if (getForeignTable().isDisableAsOneRelation()) {
+            return false;
+        }
+
         final List<Column> localColumnList = getLocalColumnObjectList();
         final List<Column> localPrimaryColumnList = getTable().getPrimaryKey();
         if (localColumnList.equals(localPrimaryColumnList)) {

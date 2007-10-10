@@ -69,6 +69,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -1196,6 +1197,22 @@ public class Table implements IDMethod {
      */
     public boolean hasForeignKey() {
         return (getForeignKeys().length != 0);
+    }
+
+    /**
+     * Is disable as-one-relation?
+     * 
+     * @return Determination.
+     */
+    public boolean isDisableAsOneRelation() {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        if (prop.isDisableAsOneRelation(getName())) {
+            return true;
+        }
+        if (prop.isDisableAsOneRelation(getJavaName())) {
+            return true;
+        }
+        return false;
     }
 
     // ===================================================================================
