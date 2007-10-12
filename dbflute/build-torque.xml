@@ -32,6 +32,9 @@
     do a general inclusion of the torque.lib.dir to catch any drivers.
   -->
   <path id="torque-classpath">
+    <dirset dir=".">
+      <include name="log"/>
+    </dirset>
     <fileset dir="${torque.lib.dir}">
       <include name="**/*.jar"/>
     </fileset>

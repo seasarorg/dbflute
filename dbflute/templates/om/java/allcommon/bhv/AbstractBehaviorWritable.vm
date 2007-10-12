@@ -55,14 +55,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
 #end
 #end
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
-    /**
-     * Constructor.
-     */
-    public ${myClassName}() {
-    }
 
     // =====================================================================================
     //                                                                       Delegate Method

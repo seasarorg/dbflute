@@ -529,7 +529,7 @@ namespace ${myDBMetaPackageName} {
 
 #foreach ($col in $table.columns)
         public class EntityProperty${col.javaName}Setupper : EntityPropertySetupper<${myExtendedObjectClassName}> {
-            public void setup(${myExtendedObjectClassName} entity, Object value) { entity.${col.javaName} = (${col.javaNative})value; }
+            public void setup(${myExtendedObjectClassName} entity, Object value) { entity.${col.javaName} = (value != null) ? (${col.javaNative})value : null; }
         }
 #end
     }

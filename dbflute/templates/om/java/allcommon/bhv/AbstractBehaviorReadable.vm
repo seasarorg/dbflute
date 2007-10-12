@@ -41,15 +41,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     protected ${glDaoSelectorInterfaceName} _daoSelector;
 
     // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    public ${myClassName}() {
-    }
-
-    // ===================================================================================
     //                                                                            Selector
     //                                                                            ========
     /**

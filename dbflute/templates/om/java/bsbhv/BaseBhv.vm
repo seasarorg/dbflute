@@ -2,6 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 
 #set ($myClassName = "${myBaseBhvClassName}")
 
+import java.util.List;
+
 import ${glPackageBaseCommon}.*;
 #if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
@@ -218,7 +220,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @return All list. (NotNull)
      */
-    ${database.behaviorDelegateModifier} java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} delegateGetListAll() {
+    ${database.behaviorDelegateModifier} List${database.filterGenericsString(${myExtendedObjectClassName})} delegateGetListAll() {
         return getMyDao().getListAll();
     }
 #if ($table.hasPrimaryKey())
@@ -262,7 +264,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
      */
-    ${database.behaviorDelegateModifier} java.util.List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
+    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
         return getMyDao().selectList(cb);
     }
@@ -354,7 +356,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return The array of inserted count.
      */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(java.util.List<${myExtendedObjectClassName}> entityList) {
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(List<${myExtendedObjectClassName}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         helpFilterBeforeInsertInternally(entityList);
         return getMyDao().insertList(entityList);
@@ -366,7 +368,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return The array of updated count.
      */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(java.util.List<${myExtendedObjectClassName}> entityList) {
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(List<${myExtendedObjectClassName}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         helpFilterBeforeUpdateInternally(entityList);
         return getMyDao().updateList(entityList);
@@ -379,7 +381,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return The array of updated count.
      */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList) {
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         helpFilterBeforeUpdateInternally(entityList);
         return getMyDao().updateListNonstrict(entityList);
@@ -392,7 +394,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return The array of deleted count.
      */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(java.util.List<${myExtendedObjectClassName}> entityList) {
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(List<${myExtendedObjectClassName}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         helpFilterBeforeDeleteInternally(entityList);
         return getMyDao().deleteList(entityList);
@@ -405,7 +407,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param entityList Entity-list. (NotNull & NotEmpty)
      * @return The array of deleted count.
      */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList) {
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> entityList) {
         assertListNotNullAndNotEmpty(entityList);
         helpFilterBeforeDeleteInternally(entityList);
         return getMyDao().deleteListNonstrict(entityList);
@@ -456,7 +458,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
-            public java.util.List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
+            public List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
     }
 
     /**
@@ -469,7 +471,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
-            public java.util.List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
+            public List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
     }
 
 #if ($table.hasPrimaryKey())
@@ -549,7 +551,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         final SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})}() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
             public int selectCountIgnoreFetchScope() { return selectCount(cb); }
-            public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectListWithFetchScope() { return selectList(cb); }
+            public List${database.filterGenericsString(${myExtendedObjectClassName})} selectListWithFetchScope() { return selectList(cb); }
         };
         return invoker.invokeSelectPage(pageCallback);
     }
@@ -564,7 +566,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param valueLabelSetupper Value-label-setupper. (NotNull)
      * @return Value-label list. (NotNull)
      */
-    public java.util.List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
+    public List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
     }
 #if ($table.isUseSequence())
@@ -594,7 +596,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
     #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
     #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List${database.filterGenericsString(${reffererEntityClassName})}")
+    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List${database.filterGenericsString(${reffererEntityClassName})}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
     //   RefererTable    = [${refferer.table.name}]
@@ -617,7 +619,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         final ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper = new ${glConditionBeanSetupperName}<${reffererCBClassName}>() {
             public void setup(${reffererCBClassName} cb) {}
         };
@@ -655,7 +657,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param conditionBeanSetupper Referer condition setupper instance for registering referer condition. (NotNull)
      */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("conditionBeanSetupper<${reffererCBClassName}>", conditionBeanSetupper);
         if (${myEntityListVariableName}.isEmpty()) { return; }
@@ -693,18 +695,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadRefererOption Load-referer option. (NotNull)
      */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("loadRefererOption<${reffererEntityClassName}, ${reffererCBClassName}>", loadRefererOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${reffererBhvClassName} refererBhv = getBehaviorSelector().select(${reffererBhvClassName}.class);
         helpLoadRefererInternally(${myEntityListVariableName}, loadRefererOption, new InternalLoadRefererCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${reffererCBClassName}, ${reffererEntityClassName}>() {
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity) { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
-            public void callbackBase_setRefererList(${myExtendedObjectClassName} entity, java.util.List<${reffererEntityClassName}> refererList) { entity.set${refferer.ReffererPropertyNameInitCap}(refererList); }
+            public void callbackBase_setRefererList(${myExtendedObjectClassName} entity, List<${reffererEntityClassName}> refererList) { entity.set${refferer.ReffererPropertyNameInitCap}(refererList); }
             public ${reffererCBClassName} callbackReferer_newMyConditionBean() { return refererBhv.newMyConditionBean(); }
-            public void callbackReferer_queryForeignKeyInScope(${reffererCBClassName} cb, java.util.List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
+            public void callbackReferer_queryForeignKeyInScope(${reffererCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
             public void callbackReferer_queryAddOrderByForeignKeyAsc(${reffererCBClassName} cb) { cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc(); }
-            public java.util.List<${reffererEntityClassName}> callbackReferer_selectList(${reffererCBClassName} cb) { return refererBhv.selectList(cb); }
+            public List<${reffererEntityClassName}> callbackReferer_selectList(${reffererCBClassName} cb) { return refererBhv.selectList(cb); }
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferer_getForeignKeyValue(${reffererEntityClassName} entity) { return entity.get${refferer.getLocalColumnJavaNameAsOne()}(); }
             public void callbackReferer_setForeignEntity(${reffererEntityClassName} refererEntity, ${myExtendedObjectClassName} baseEntity) { refererEntity.set${refferer.foreignPropertyNameInitCap}(baseEntity); }
         } );
@@ -724,7 +726,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
      * @return The list of foreign table. (NotNull)
      */
-    public java.util.List<${foreignEntityClassName}> pullout${foreignKeys.foreignPropertyNameInitCap}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public List<${foreignEntityClassName}> pullout${foreignKeys.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
             public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${foreignKeys.foreignPropertyNameInitCap}(); } });
     }
@@ -740,7 +742,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
      * @return The list of referer-as-one table. (NotNull)
      */
-    public java.util.List<${reffererEntityClassName}> pullout${refferer.reffererPropertyNameInitCapAsOne}(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public List<${reffererEntityClassName}> pullout${refferer.reffererPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${reffererEntityClassName}>() {
             public ${reffererEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${refferer.reffererPropertyNameInitCapAsOne}(); } });
     }
@@ -1087,7 +1089,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This delete ignores concurrency control.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -1109,11 +1110,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Batch insert the list. This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return The array of inserted count.
      */
-    public ${batchUpdateReturnType} batchInsert(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
-        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+    public ${batchUpdateReturnType} batchInsert(List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateInsertList(${myEntityListVariableName});
     }
 
@@ -1122,12 +1123,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Insert list. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return Inserted count.
      * @deprecated Sorry! This method name is very confusing. Please use batchInsert().
      */
-    public int insertList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
-        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+    public int insertList(List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return batchInsert(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
 #end
@@ -1136,12 +1137,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch update the list. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return The array of updated count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
-    public ${batchUpdateReturnType} batchUpdate(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+    public ${batchUpdateReturnType} batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateUpdateList(${myEntityListVariableName});
     }
 
@@ -1150,11 +1151,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch update the list non-strictly. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return The array of updated count.
      */
-    public ${batchUpdateReturnType} batchUpdateNonstrict(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+    public ${batchUpdateReturnType} batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateUpdateListNonstrict(${myEntityListVariableName});
     }
 #end
@@ -1164,13 +1165,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Update batch. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return Updated count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      * @deprecated Sorry! This method name is very confusing. Please use batchUpdate().
      */
-    public int updateList(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+    public int updateList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return batchUpdate(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
 #end
@@ -1179,12 +1180,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch delete the list. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return The array of deleted count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
-    public ${batchUpdateReturnType} batchDelete(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+    public ${batchUpdateReturnType} batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateDeleteList(${myEntityListVariableName});
     }
 
@@ -1193,11 +1194,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch delete the list non-strictly. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return The array of deleted count.
      */
-    public ${batchUpdateReturnType} batchDeleteNonstrict(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+    public ${batchUpdateReturnType} batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateDeleteListNonstrict(${myEntityListVariableName});
     }
 #end
@@ -1206,13 +1207,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Delete list by Batch. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull & NotEmpty)
+     * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return Deleted count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      * @deprecated Sorry! This method name is very confusing. Please use batchDelete().
      */
-    public int deleteList(java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
-        assertListNotNullAndNotEmpty(${myEntityListVariableName});
+    public int deleteList(List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return batchDelete(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
 #end
@@ -1259,7 +1260,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param ${myEntityListVariableName} The list of entity. (NotNull and Empty OK)
      */
-    public void loopUpdateModifiedElementsOnly(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public void loopUpdateModifiedElementsOnly(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         for (${myExtendedObjectClassName} entity : ${myEntityListVariableName}) { if (entity.hasModification()) { update(entity); } }
     }
@@ -1270,7 +1271,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param ${myEntityListVariableName} The list of entity. (NotNull and Empty OK)
      */
-    public void loopUpdateModifiedElementsOnlyNonstrict(java.util.List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public void loopUpdateModifiedElementsOnlyNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         for (${myExtendedObjectClassName} entity : ${myEntityListVariableName}) { if (entity.hasModification()) { updateNonstrict(entity); } }
     }
@@ -1304,7 +1305,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param <SOURCE> The type of source.
      * @return Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
      */
-    public <SOURCE> ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> createHierarchyBasicRequest(java.util.List<SOURCE> sourceList) {
+    public <SOURCE> ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> createHierarchyBasicRequest(List<SOURCE> sourceList) {
         final ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> request = new ${glHierarchyBasicRequestName}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace>(${myExtendedObjectClassName}.class);
         request.registerSourceList(sourceList);
         return request;
@@ -1316,7 +1317,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param request Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
      * @return The list of ${myExtendedObjectClassName}. (NotNull)
      */
-    public java.util.List<${myExtendedObjectClassName}> arrangeHierarchy(${glHierarchyRequestName}<${myExtendedObjectClassName}> request) {
+    public List<${myExtendedObjectClassName}> arrangeHierarchy(${glHierarchyRequestName}<${myExtendedObjectClassName}> request) {
         return new ${glHierarchyArrangerName}<${myExtendedObjectClassName}>().arrangeHierarchy(request);
     }
 
