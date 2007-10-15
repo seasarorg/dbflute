@@ -232,6 +232,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected String getEnvironmentType() {
         return getMyProperties().getEnvironmentType();
     }
+    
+    public boolean isLoggingInsertSql() {
+        return getMyProperties().isLoggingInsertSql();
+    }
 
     protected DfReplaceSchemaProperties getMyProperties() {
         return DfBuildProperties.getInstance().getInvokeReplaceSchemaProperties();
@@ -306,7 +310,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void writeDbFromXls(String directoryPath) {
-        final DfXlsDataHandler xlsDataHandler = new DfXlsDataHandlerImpl();
+        final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
+        xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
@@ -330,6 +335,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected void writeDbFromSeparatedFile(String typeName, String delimter, String directoryPath) {
         final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
+        handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setDataSource(getDataSource());
         final DfSeparatedDataSeveralHandlingInfo handlingInfo = new DfSeparatedDataSeveralHandlingInfo();
         handlingInfo.setBasePath(directoryPath);

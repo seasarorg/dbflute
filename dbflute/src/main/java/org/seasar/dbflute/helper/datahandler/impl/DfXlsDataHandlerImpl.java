@@ -40,6 +40,14 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _loggingInsertSql;
+
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public List<DataSet> readSeveralData(String dataDirectoryName) {
         final List<File> xlsList = getXlsList(dataDirectoryName);
         final List<DataSet> ls = new ArrayList<DataSet>();
@@ -90,7 +98,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                         }
 
                         final List<String> valueList = createValueList(dataTable, dataRow);
-                        _log.info(getSql4Log(tableName, columnNameList, valueList));
+                        if (_loggingInsertSql) {
+                            _log.info(getSql4Log(tableName, columnNameList, valueList));
+                        }
 
                         int bindCount = 1;
                         for (String value : valueList) {
@@ -386,5 +396,16 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             };
             return createdState.toString();
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isLoggingInsertSql() {
+        return _loggingInsertSql;
+    }
+
+    public void setLoggingInsertSql(boolean loggingSql) {
+        this._loggingInsertSql = loggingSql;
     }
 }

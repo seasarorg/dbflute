@@ -87,6 +87,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         //            throw new IllegalStateException(msg);
         //        }
     }
+    
+    public boolean isLoggingInsertSql() {
+        String propString = (String) getReplaceSchemaDefinitionMap().get("loggingInsertSql");
+        if (propString == null) {
+            propString = (String) getReplaceSchemaDefinitionMap().get("isLoggingInsertSql");
+            if (propString == null) {
+                return true;
+            }
+        }
+        return propString.equalsIgnoreCase("true");
+    }
 
     public boolean isReplaceSchemaAutoCommit() {
         final String propString = (String) getReplaceSchemaDefinitionMap().get("isAutoCommit");

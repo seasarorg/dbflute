@@ -28,8 +28,6 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
@@ -37,19 +35,19 @@ import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 
 public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
+    // /** Log instance. */
+    // private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _loggingInsertSql;
+    
     protected DataSource _dataSource;
 
-    public DataSource getDataSource() {
-        return _dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this._dataSource = dataSource;
-    }
-
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public DfSeparatedDataResultInfo writeSeveralData(DfSeparatedDataSeveralHandlingInfo info) {
         final DfSeparatedDataResultInfo resultInfo = new DfSeparatedDataResultInfo();
         final Map<String, Set<String>> notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
@@ -80,6 +78,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                 for (String fileName : sortedFileNameSet) {
                     final String fileNamePath = info.getBasePath() + "/" + elementName + "/" + fileName;
                     final DfSeparatedDataWriterImpl writerImpl = new DfSeparatedDataWriterImpl();
+                    writerImpl.setLoggingInsertSql(isLoggingInsertSql());
                     writerImpl.setDataSource(_dataSource);
                     writerImpl.setFilename(fileNamePath);
                     writerImpl.setEncoding(elementName);
@@ -109,5 +108,24 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
             }
         };
         return filter;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isLoggingInsertSql() {
+        return _loggingInsertSql;
+    }
+    
+    public void setLoggingInsertSql(boolean loggingInsertSql) {
+        this._loggingInsertSql = loggingInsertSql;
+    }
+    
+    public DataSource getDataSource() {
+        return _dataSource;
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this._dataSource = dataSource;
     }
 }

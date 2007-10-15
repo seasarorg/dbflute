@@ -39,6 +39,11 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSeparatedDataWriterImpl.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _loggingInsertSql;
+
     protected DataSource _dataSource;
 
     protected String _filename;
@@ -51,54 +56,9 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
 
     protected Map<String, String> _defaultValueMap;
 
-    public Map<String, String> getDefaultValueMap() {
-        return _defaultValueMap;
-    }
-
-    public void setDefaultValueMap(Map<String, String> defaultValueMap) {
-        this._defaultValueMap = defaultValueMap;
-    }
-
-    public boolean isErrorContinue() {
-        return _errorContinue;
-    }
-
-    public void setErrorContinue(boolean errorContinue) {
-        this._errorContinue = errorContinue;
-    }
-
-    public String getDelimiter() {
-        return _delimiter;
-    }
-
-    public void setDelimiter(String delimiter) {
-        this._delimiter = delimiter;
-    }
-
-    public String getEncoding() {
-        return _encoding;
-    }
-
-    public void setEncoding(String encoding) {
-        this._encoding = encoding;
-    }
-
-    public String getFilename() {
-        return _filename;
-    }
-
-    public void setFilename(String filename) {
-        this._filename = filename;
-    }
-
-    public DataSource getDataSource() {
-        return _dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this._dataSource = dataSource;
-    }
-
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     /**
      * Write data from separated-file.
      * 
@@ -190,8 +150,9 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     try {
                         final String sql = sqlBuildingResult.getSql();
                         final List<Object> bindParameters = sqlBuildingResult.getBindParameters();
-                        _log.info(sql);
-                        _log.info(getSql4Log(tableName, columnNameList, bindParameters));
+                        if (_loggingInsertSql) {
+                            _log.info(getSql4Log(tableName, columnNameList, bindParameters));
+                        }
                         statement = _dataSource.getConnection().prepareStatement(sql);
                         int bindCount = 1;
                         for (Object object : bindParameters) {
@@ -490,4 +451,64 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         }
         return false;
     }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isLoggingInsertSql() {
+        return _loggingInsertSql;
+    }
+
+    public void setLoggingInsertSql(boolean loggingInsertSql) {
+        this._loggingInsertSql = loggingInsertSql;
+    }
+
+    public Map<String, String> getDefaultValueMap() {
+        return _defaultValueMap;
+    }
+
+    public void setDefaultValueMap(Map<String, String> defaultValueMap) {
+        this._defaultValueMap = defaultValueMap;
+    }
+
+    public boolean isErrorContinue() {
+        return _errorContinue;
+    }
+
+    public void setErrorContinue(boolean errorContinue) {
+        this._errorContinue = errorContinue;
+    }
+
+    public String getDelimiter() {
+        return _delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        this._delimiter = delimiter;
+    }
+
+    public String getEncoding() {
+        return _encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this._encoding = encoding;
+    }
+
+    public String getFilename() {
+        return _filename;
+    }
+
+    public void setFilename(String filename) {
+        this._filename = filename;
+    }
+
+    public DataSource getDataSource() {
+        return _dataSource;
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this._dataSource = dataSource;
+    }
+
 }
