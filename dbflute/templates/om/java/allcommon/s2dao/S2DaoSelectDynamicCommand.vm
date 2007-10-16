@@ -31,10 +31,13 @@ import org.seasar.dao.parser.SqlTokenizerImpl;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.impl.BasicSelectHandler;
+import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.seasar.framework.exception.SQLRuntimeException;
 import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
@@ -404,7 +407,34 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     }
 
     protected BasicSelectHandler newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory, ResultSetFactory resultSetFactory) {
-        return new BasicSelectHandler(getDataSource(), sql, resultSetHandler, statementFactory, resultSetFactory);
+        return new BasicSelectHandler(getDataSource(), sql, resultSetHandler, statementFactory, resultSetFactory) {
+            @Override
+            protected void bindArgs(java.sql.PreparedStatement ps, Object[] args, Class[] argTypes) {
+                if (args == null) {
+                    return;
+                }
+                for (int i = 0; i < args.length; ++i) {
+                    final ValueType valueType = findValueType(argTypes[i], args[i]);
+                    try {
+                        valueType.bindValue(ps, i + 1, args[i]);
+                    } catch (java.sql.SQLException ex) {
+                        throw new SQLRuntimeException(ex);
+                    }
+                }
+            }
+            protected ValueType findValueType(Class argType, Object arg) {
+                ValueType valueType = ValueTypes.getValueType(arg);
+                if (valueType != null) {
+                    return valueType;
+                }
+                valueType = ValueTypes.getValueType(argType);
+                if (valueType != null) {
+                    return valueType;
+                }
+                String msg = "Unknown type：argType=" + argType + " args=" + arg;
+                throw new IllegalStateException(msg);
+            }
+        };
     }
 
     protected Class[] toClassArray(List${database.filterGenericsString('Class')} bindVariableTypeList) {

@@ -244,6 +244,11 @@ targetdatabase = $targetDatabase
     #set ($glFileMakingSimpleFacadeName = "${glProjectPrefix}FileMakingSimpleFacade")
     #set ($glFileMakingSimpleFacadeImplName = "${glProjectPrefix}FileMakingSimpleFacadeImpl")
 
+    #set ($glAccordingToOrderName = "${glProjectPrefix}AccordingToOrder")
+    #set ($glAccordingToOrderOptionName = "${glProjectPrefix}AccordingToOrderOption")
+    #set ($glAccordingToOrderIdExtractorName = "${glProjectPrefix}AccordingToOrderIdExtractor")
+    #set ($glAccordingToOrderImplName = "${glProjectPrefix}AccordingToOrderImpl")
+
     ## [Allcommon-Interceptor]
     #set ($glCommonColumnSetupAbstractInterceptor = "${glProjectPrefix}CommonColumnSetupAbstractInterceptor")
     #set ($glCommonColumnSetupBeforeInsertInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeInsertInterceptor")
@@ -317,11 +322,14 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
     #set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.helper.character")
     #set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.helper.character.impl")
+    #set ($glPackageBaseCommonHelperCollectionOrder = "${database.baseCommonPackage}.helper.collection.order")
+    #set ($glPackageBaseCommonHelperCollectionOrderImpl = "${database.baseCommonPackage}.helper.collection.order.impl")
     #set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.helper.token")
     #set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.helper.token.line")
     #set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.helper.token.line.impl")
     #set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.helper.token.file")
     #set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.helper.token.file.impl")
+
     #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
     #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
     #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.jdbc.history")
@@ -358,6 +366,8 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
       #set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.Helper.Character")
       #set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.Helper.Character.Impl")
+      #set ($glPackageBaseCommonHelperCollectionOrder = "${database.baseCommonPackage}.Helper.Collection.Order")
+      #set ($glPackageBaseCommonHelperCollectionOrderImpl = "${database.baseCommonPackage}.Helper.Collection.Order.Impl")
       #set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.Helper.Token")
       #set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.Helper.Token.Line")
       #set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.Helper.Token.Line.Impl")
@@ -1134,6 +1144,30 @@ targetdatabase = $targetDatabase
       $database.debug("    parseJapaneseCharacterImpl();")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCharacterImpl})}${glJapaneseCharacterImplName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/helper/character/impl/JapaneseCharacterImpl.${glTemplateFileExtension}",$path,"", "")
+
+      #if ($database.isAvailableGenerics())
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrder}))
+        $database.makeDirectory($path)
+
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrderImpl}))
+        $database.makeDirectory($path)
+
+        $database.debug("    parseAccordingToOrder();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrder})}${glAccordingToOrderName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/AccordingToOrder.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parseAccordingToOrderOption();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrder})}${glAccordingToOrderOptionName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/AccordingToOrderOption.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parseAccordingToOrderIdExtractor();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrder})}${glAccordingToOrderIdExtractorName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/AccordingToOrderIdExtractor.${glTemplateFileExtension}",$path,"", "")
+
+        $database.debug("    parseAccordingToOrderImpl();")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrderImpl})}${glAccordingToOrderImplName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/impl/AccordingToOrderImpl.${glTemplateFileExtension}",$path,"", "")
+      #end
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelperToken}))
       $database.makeDirectory($path)

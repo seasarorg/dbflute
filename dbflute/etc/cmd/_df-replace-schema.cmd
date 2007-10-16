@@ -4,6 +4,6 @@ set NATIVE_PROPERTIES_PATH=%1
 
 call %DBFLUTE_HOME%\etc\cmd\_df-copy-properties.cmd %NATIVE_PROPERTIES_PATH%
 
-SET /P answer=Database will be initialized. Are you ready?（y/n）
+IF "%answer%"=="" SET /P answer=Database will be initialized. Are you ready?（y/n）
 IF "%answer%"=="y" call ant -f %DBFLUTE_HOME%\build-torque.xml replace-schema
 
