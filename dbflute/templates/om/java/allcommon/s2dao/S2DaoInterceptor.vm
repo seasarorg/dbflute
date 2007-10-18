@@ -1,5 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
+import java.util.Arrays;
+import java.util.List;
+
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -160,10 +163,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             return;
         }
         final String path = clientInvokeName + byPassInvokeName + behaviorInvokeName + "...";
-        final String hyphenBorder = buildFitBorder("/", "-", path, true);
-        _log.debug(hyphenBorder);
+        // *I will delete this at the future.
+        // final String hyphenBorder = buildFitBorder("/", "-", path, true);
+        // _log.debug(hyphenBorder);
         _log.debug(path);
-        _log.debug("- - - - - - - - - -/");
+        // _log.debug("- - - - - - - - - -/");
     }
 
     protected String buildFitBorder(String prefix, String element, String lengthTargetString, boolean space) {
@@ -185,7 +189,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected InvokeNameExtractingResult extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return className.endsWith("Page") || className.endsWith("Action");
+                return isClassNameEndsWith(className, Arrays.asList(new String[]{"Page", "Action"}));
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return simpleClassName;
@@ -206,7 +210,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected InvokeNameExtractingResult extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return className.endsWith("Service") || className.endsWith("Facade");
+                return isClassNameEndsWith(className, Arrays.asList(new String[]{"Service", "ServiceImpl", "Facade", "FacadeImpl"}));
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return simpleClassName;
@@ -227,8 +231,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return className.endsWith("Bhv") || className.endsWith("BehaviorReadable")
-                        || className.endsWith("BehaviorWritable") || className.contains("Bhv$");
+                return isClassNameEndsWith(className, Arrays.asList(new String[]{"Bhv", "Bhv$", "BehaviorReadable", "BehaviorWritable"}));
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return removeBasePrefixIfNeeds(simpleClassName);
@@ -244,6 +247,15 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             }
         };
         return extractInvokeName(callback, stackTrace);
+    }
+
+    protected boolean isClassNameEndsWith(String className, List<String> suffixList) {
+        for (String suffix : suffixList) {
+            if (className.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
