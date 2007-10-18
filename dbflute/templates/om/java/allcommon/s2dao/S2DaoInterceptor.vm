@@ -187,9 +187,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected InvokeNameExtractingResult extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
+        final List<String> suffixList = Arrays.asList(new String[]{"Page", "Action"});
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return isClassNameEndsWith(className, Arrays.asList(new String[]{"Page", "Action"}));
+                return isClassNameEndsWith(className, suffixList);
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return simpleClassName;
@@ -208,9 +209,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected InvokeNameExtractingResult extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
+        final List<String> suffixList = Arrays.asList(new String[]{"Service", "ServiceImpl", "Facade", "FacadeImpl"});
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return isClassNameEndsWith(className, Arrays.asList(new String[]{"Service", "ServiceImpl", "Facade", "FacadeImpl"}));
+                return isClassNameEndsWith(className, suffixList);
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return simpleClassName;
@@ -229,9 +231,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     protected InvokeNameExtractingResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
+        final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "Bhv$", "BehaviorReadable", "BehaviorWritable"});
         final InvokeNameExtractingCallback callback = new InvokeNameExtractingCallback() {
             public boolean isTargetElement(String className, String methodName) {
-                return isClassNameEndsWith(className, Arrays.asList(new String[]{"Bhv", "Bhv$", "BehaviorReadable", "BehaviorWritable"}));
+                return isClassNameEndsWith(className, suffixList);
             }
             public String filterSimpleClassName(String simpleClassName) {
                 return removeBasePrefixIfNeeds(simpleClassName);
