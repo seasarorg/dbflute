@@ -646,11 +646,19 @@ public class ForeignKey {
     }
 
     /**
+     * @return Generated string.
+     * @deprecated
+     */
+    public String getReffererPropertyName() {
+        return getRefererPropertyName();
+    }
+    
+    /**
      * Get thr value of refferer property name.
      * 
      * @return Generated string.
      */
-    public String getReffererPropertyName() {
+    public String getRefererPropertyName() {
         return getReffererPropertyName(false);
     }
 
@@ -805,12 +813,20 @@ public class ForeignKey {
     }
 
     /**
+     * @return Generated string.
+     * @deprecated
+     */
+    public String getReffererPropertyNameInitCap() {
+        return getRefererPropertyNameInitCap();
+    }
+    
+    /**
      * Get the value of refferer property name with capitalising the initial character.
      * 
      * @return Generated string.
      */
-    public String getReffererPropertyNameInitCap() {
-        final String reffererPropertyName = getReffererPropertyName();
+    public String getRefererPropertyNameInitCap() {
+        final String reffererPropertyName = getRefererPropertyName();
         return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
     }
 

@@ -1376,8 +1376,8 @@ public class Table implements IDMethod {
     }
 
     // ===================================================================================
-    //                                                                            Referrer
-    //                                                                            ========
+    //                                                                             Referer
+    //                                                                             =======
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
@@ -1401,8 +1401,16 @@ public class Table implements IDMethod {
      *
      * @return A list of references to this table
      */
-    public List<ForeignKey> getReferrers() {
+    public List<ForeignKey> getRefererList() {
         return _referrers;
+    }
+    
+    /**
+     * @return A list of references to this table
+     * @deprecated
+     */
+    public List<ForeignKey> getReferrers() {
+        return getRefererList();
     }
 
     /**
@@ -1411,7 +1419,7 @@ public class Table implements IDMethod {
      * @return Determination.
      */
     public boolean hasReferrer() {
-        return (getReferrers() != null && !getReferrers().isEmpty());
+        return (getRefererList() != null && !getRefererList().isEmpty());
     }
 
     /**
@@ -1420,7 +1428,7 @@ public class Table implements IDMethod {
      * @return Determination.
      */
     protected boolean hasRefererAsOne() {
-        final List<ForeignKey> referrers = getReferrers();
+        final List<ForeignKey> referrers = getRefererList();
         if (referrers == null || referrers.isEmpty()) {
             return false;
         }

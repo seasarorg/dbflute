@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
+using ${glPackageBaseCommonBhvSetup};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
 using ${myDBMetaPackageName};
@@ -26,17 +27,17 @@ namespace ${glPackageExtendedBhv} {
     /// </summary>
     partial class ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName}, ${myExtendedBhvInterfaceName} {
 
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
         #region Attribute
         /// <summary>Dao instance.</summary>
         protected ${myExtendedDaoClassName} _dao;
         #endregion
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
         #region Constructor
         /// <summary>
         /// Constructor.
@@ -45,9 +46,9 @@ namespace ${glPackageExtendedBhv} {
         }
         #endregion
 
-        // =====================================================================================
-        //                                                                            Table Name
-        //                                                                            ==========
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
         #region Table Name
         /// <summary>
         /// ${database.ImplementComment}
@@ -57,9 +58,9 @@ namespace ${glPackageExtendedBhv} {
         }
         #endregion
 
-        // =====================================================================================
-        //                                                                                DBMeta
-        //                                                                                ======
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
         #region DBMeta
         /// <summary>
         /// ${database.ImplementComment}
@@ -76,9 +77,9 @@ namespace ${glPackageExtendedBhv} {
         }
         #endregion
 
-        // =====================================================================================
-        //                                                                       Self Dispatcher
-        //                                                                       ===============
+        // ===============================================================================
+        //                                                                 Self Dispatcher
+        //                                                                 ===============
         #region Self Dispatcher
         /// <summary>
         /// Behavior's self-dispatch
@@ -101,8 +102,8 @@ namespace ${glPackageExtendedBhv} {
         protected override ${glBehaviorReadableInterfaceName} SelfReadable {
             get { return this; }
         }
-    #if ($table.isWritable())
 
+#if ($table.isWritable())
         /// <summary>
         ///  ${database.OverrideComment}
         /// </summary>
@@ -110,13 +111,13 @@ namespace ${glPackageExtendedBhv} {
         protected override ${glBehaviorWritableInterfaceName} SelfWritable {
             get { return this; }
         }
-    #end
+#end
 
         #endregion
 
-        // =====================================================================================
-        //                                                                          Dao Accessor
-        //                                                                          ============
+        // ===============================================================================
+        //                                                                    Dao Accessor
+        //                                                                    ============
         #region Dao Accessor
         /// <summary>
         /// Get my dao.
@@ -147,9 +148,9 @@ namespace ${glPackageExtendedBhv} {
 
         #endregion
 
-        // =====================================================================================
-        //                                                                          New Instance
-        //                                                                          ============
+        // ===============================================================================
+        //                                                                    New Instance
+        //                                                                    ============
         #region New Instance
         /// <summary>
         /// New entity.
@@ -184,10 +185,10 @@ namespace ${glPackageExtendedBhv} {
         }
         #endregion
 
-        // =====================================================================================
-        //                                                                       Delegate Method
-        //                                                                       ===============
-        #region Delegate-Method
+        // ===============================================================================
+        //                                                                 Delegate Method
+        //                                                                 ===============
+        #region Delegate Method
         /// <summary>
         /// Select all list. (Delegate-Method)
         /// </summary> 
@@ -211,8 +212,8 @@ namespace ${glPackageExtendedBhv} {
         protected System.Collections.Generic.IList<${myExtendedObjectClassName}> DelegateSelectListAll() {// for saving compatible
             return this.Dao.GetListAll();
         }
-#if ($table.hasPrimaryKey())
 
+#if ($table.hasPrimaryKey())
         //
         // Get entity. (Delegate-Method)
         // 
@@ -297,8 +298,7 @@ namespace ${glPackageExtendedBhv} {
             return (System.Collections.Generic.IList<${glEntityInterfaceName}>)this.DelegateSelectList((${myConditionBeanClassName})cb);
         }
 
-    #if ($table.isUseSequence())
-
+#if ($table.isUseSequence())
         /// <summary>
         /// Select next value as sequence. (Delegate-Method)
         /// </summary>
@@ -306,7 +306,7 @@ namespace ${glPackageExtendedBhv} {
         protected int DelegateSelectNextVal() {
             return this.Dao.SelectNextVal();
         }
-    #end
+#end
 
     #if ($table.isWritable())
 
@@ -377,9 +377,9 @@ namespace ${glPackageExtendedBhv} {
 
         #endregion
 
-        // =====================================================================================
-        //                                                                          Basic Select
-        //                                                                          ============
+        // ===============================================================================
+        //                                                                    Basic Select
+        //                                                                    ============
         #region Basic Select
 
         /// <summary>
@@ -424,8 +424,7 @@ namespace ${glPackageExtendedBhv} {
             return (${myExtendedObjectClassName})ls[0];
         }
 
-    #if ($table.hasPrimaryKey())
-
+#if ($table.hasPrimaryKey())
         public ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
             ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
             ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
@@ -433,7 +432,7 @@ namespace ${glPackageExtendedBhv} {
             cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
             return this.SelectEntityWithDeletedCheck(cb);
         }
-    #end
+#end
 
         /// <summary>
         /// Select list.
@@ -471,44 +470,35 @@ namespace ${glPackageExtendedBhv} {
 
 #if (${table.hasOnlyOnePrimaryKey()})
 
-        // =====================================================================================
-        //                                                                          Load Referer
-        //                                                                          ============
+        // ===============================================================================
+        //                                                                    Load Referer
+        //                                                                    ============
         #region Load Referer
-  #foreach ($refferer in $table.Referrers)
-    #set ($reffererTable = $refferer.Table)
-    #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-    #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
-    #set ($reffererBhvClassName = "")
-    #set ($reffererBhvClassName = "${reffererEntityClassName}Bhv")
-    #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
-    #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
-    #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
+  #foreach ($referer in $table.refererList)
+    #set ($refererTable = $referer.Table)
+    #set ($refererEntityClassName = "${glProjectPrefix}${refererTable.JavaName}")
+    #set ($refererDaoClassName = "${refererEntityClassName}Dao")
+    #set ($refererBhvClassName = "")
+    #set ($refererBhvClassName = "${refererEntityClassName}Bhv")
+    #set ($refererCBClassName = "${refererEntityClassName}${glConditionBeanInitialName}")
+    #set ($refererVariableName = "${glChildrenVariablePrefix}${referer.ReffererPropertyNameInitCap}")
+    #set ($refererEntityLongClassName = "${glPackageExtendedEntity}.${refererEntityClassName}")
     #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, System.Collections.Generic.IList<${reffererEntityClassName}>")
+    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, System.Collections.Generic.IList<${refererEntityClassName}>")
 
         // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   ReffererTable    = [${refferer.Table.Name}]
-        //   ReffererProperty = [${refferer.ReffererPropertyName}]
+        //   RefererTable    = [${referer.table.name}]
+        //   RefererProperty = [${referer.refererPropertyName}]
         // * * * * * * * * */
 
         /// <summary>
-        /// Load refferer of ${refferer.ReffererPropertyName}.
-        /// Default refferer condition is 'primary-key asc'.
+        /// Load referer of ${referer.ReffererPropertyName}.
         /// </summary>
         /// <param name="ls">Entity list of main table. (NotNull)</param>
-        public void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls) {
-            Load${refferer.ReffererPropertyNameInitCap}(ls, new ${reffererTable.JavaName}CBSetupperPKAsc());
-        }
-
-        /// <summary>
-        /// Load refferer of ${refferer.ReffererPropertyName}.
-        /// </summary>
-        /// <param name="ls">Entity list of main table. (NotNull)</param>
-        /// <param name="cbSetupper">Refferer condition-bean setupper instance for registering refferer condition. (NotNull)</param>
-        public void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, ${reffererTable.JavaName}CBSetupper cbSetupper) {
+        /// <param name="conditionBeanSetupper">The condition-bean setupper of referer. (NotNull)</param>
+        public void Load${referer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper) {
             AssertObjectNotNull("ls", ls);
-            AssertObjectNotNull("cbSetupper", cbSetupper);
+            AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
             if (ls.Count == 0) {
                 return;
             }
@@ -521,30 +511,30 @@ namespace ${glPackageExtendedBhv} {
                     pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
                 }
             }
-            ${reffererBhvClassName} reffererBhv = (${reffererBhvClassName})this.DaoSelector.GetRBhv(typeof(${reffererBhvClassName}));
-            ${reffererCBClassName} cb = reffererBhv.NewMyConditionBean();
-            cb.Query().Set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-            cb.Query().AddOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-            cbSetupper.Setup(cb);
-            System.Collections.Generic.IList<${reffererEntityClassName}> refererList = reffererBhv.SelectList(cb);
+            ${refererBhvClassName} refererBhv = (${refererBhvClassName})this.DaoSelector.GetRBhv(typeof(${refererBhvClassName}));
+            ${refererCBClassName} cb = refererBhv.NewMyConditionBean();
+            cb.Query().Set${referer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+            cb.Query().AddOrderBy_${referer.getLocalColumnJavaNameAsOne()}_Asc();
+            conditionBeanSetupper.Setup(cb);
+            System.Collections.Generic.IList<${refererEntityClassName}> refererList = refererBhv.SelectList(cb);
 
             System.Collections.Generic.IDictionary<${genericPKChildListMap}> pkRefererListMap = new System.Collections.Generic.Dictionary<${genericPKChildListMap}>();
-            foreach (${reffererEntityClassName} reffererEntity in refererList) {
-                if (!pkRefererListMap.ContainsKey(reffererEntity.${refferer.getLocalColumnJavaNameAsOne()})) {
-                    pkRefererListMap.Add(reffererEntity.${refferer.getLocalColumnJavaNameAsOne()}, new System.Collections.Generic.List<${reffererEntityClassName}>());
+            foreach (${refererEntityClassName} reffererEntity in refererList) {
+                if (!pkRefererListMap.ContainsKey(reffererEntity.${referer.getLocalColumnJavaNameAsOne()})) {
+                    pkRefererListMap.Add(reffererEntity.${referer.getLocalColumnJavaNameAsOne()}, new System.Collections.Generic.List<${refererEntityClassName}>());
                 }
-                ((System.Collections.Generic.IList<${reffererEntityClassName}>)pkRefererListMap[reffererEntity.${refferer.getLocalColumnJavaNameAsOne()}]).Add(reffererEntity);
+                ((System.Collections.Generic.IList<${refererEntityClassName}>)pkRefererListMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}]).Add(reffererEntity);
 
                 // for Reverse Reference.
-                ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap[reffererEntity.${refferer.getLocalColumnJavaNameAsOne()}];
-                reffererEntity.${refferer.ForeignPropertyNameInitCap} = myEntity;
+                ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}];
+                reffererEntity.${referer.ForeignPropertyNameInitCap} = myEntity;
             }
 
             foreach (${myExtendedObjectClassName} entity in ls) {
                 if (pkRefererListMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
-                    entity.${refferer.ReffererPropertyNameInitCap} = (System.Collections.Generic.IList<${reffererEntityClassName}>)pkRefererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
+                    entity.${referer.ReffererPropertyNameInitCap} = (System.Collections.Generic.IList<${refererEntityClassName}>)pkRefererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
                 } else {
-                    entity.${refferer.ReffererPropertyNameInitCap} = new System.Collections.Generic.List<${reffererEntityClassName}>();
+                    entity.${referer.ReffererPropertyNameInitCap} = new System.Collections.Generic.List<${refererEntityClassName}>();
                 }
             }
         }

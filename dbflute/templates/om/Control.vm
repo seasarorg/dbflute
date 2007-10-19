@@ -525,6 +525,14 @@ targetdatabase = $targetDatabase
         $generator.parse("om/${glResourceDirectory}/allcommon/bhv/setup/ValueLabelBox.${glTemplateFileExtension}",$path ,"", "")
       #end
     #end
+    #if ($database.isTargetLanguageCSharp())
+        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhvSetup}))
+        $database.makeDirectory($path)
+
+        $database.debug("    parseConditionBeanSetupper()")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonBhvSetup})}${glConditionBeanSetupperName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/bhv/setup/ConditionBeanSetupper.${glTemplateFileExtension}",$path ,"", "")
+    #end
     $database.debug("}")
 
     ## ===================================================================================

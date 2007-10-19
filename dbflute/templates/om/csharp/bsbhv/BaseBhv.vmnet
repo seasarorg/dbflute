@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
+using ${glPackageBaseCommonBhvSetup};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
 using ${myDBMetaPackageName};
@@ -26,9 +27,9 @@ namespace ${glPackageExtendedBhv} {
     /// </summary>
     public partial interface ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName} {
 
-        // =====================================================================================
-        //                                                                                DBMeta
-        //                                                                                ======
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
         #region DBMeta
         /// <summary>
         /// The property of my dbmeta.
@@ -36,9 +37,9 @@ namespace ${glPackageExtendedBhv} {
         ${myDBMetaClassName} MyDBMeta { get; }
         #endregion
 
-        // =====================================================================================
-        //                                                                          New Instance
-        //                                                                          ============
+        // ===============================================================================
+        //                                                                    New Instance
+        //                                                                    ============
         #region New Instance
         /// <summary>
         /// New my entity.
@@ -53,9 +54,9 @@ namespace ${glPackageExtendedBhv} {
         ${myConditionBeanClassName} NewMyConditionBean();
         #endregion
 
-        // =====================================================================================
-        //                                                                          Basic Select
-        //                                                                          ============
+        // ===============================================================================
+        //                                                                    Basic Select
+        //                                                                    ============
         #region Basic Select
         /// <summary>
         /// Select count by condition-bean.
@@ -68,7 +69,7 @@ namespace ${glPackageExtendedBhv} {
         /// Select entity by condition-bean.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
+        /// <returns>Entity that is selected from database. (Nullable: If the entity does not exist, returns null)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
         ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb);
@@ -76,15 +77,14 @@ namespace ${glPackageExtendedBhv} {
         /// <summary>
         /// Select entity by condition-bean with deleted check.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        /// <returns>Entity that is selected from database by select-for-update. (NotNull)</returns>
+        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull: If the entity does not exist, throws exception)</param>
+        /// <returns>Entity that is selected from database. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
-    #if ($table.hasPrimaryKey())
 
+#if ($table.hasPrimaryKey())
         ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
-    #end
-
+#end
 
         /// <summary>
         /// Select list as result-bean.
@@ -107,47 +107,43 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
         ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker<${myExtendedObjectClassName}> invoker);
-
         #endregion
 
 #if (${table.hasOnlyOnePrimaryKey()})
-
-        // =====================================================================================
-        //                                                                          Load Referer
-        //                                                                          ============
-        #region Load Refferer
-  #foreach ($refferer in $table.Referrers)
-    #set ($reffererTable = $refferer.Table)
-    #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-    #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
-    #set ($reffererBhvClassName = "${reffererEntityClassName}Bhv")
-    #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
-    #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
-    #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List${database.filterGenericsString(${reffererEntityClassName})}")
+        // ===============================================================================
+        //                                                                    Load Referer
+        //                                                                    ============
+        #region Load Referer
+  #foreach ($referer in $table.refererList)
+    #set ($refererTable = $referer.table)
+    #set ($refererEntityClassName = "${glProjectPrefix}${refererTable.JavaName}")
+    #set ($refererDaoClassName = "${refererEntityClassName}Dao")
+    #set ($refererBhvClassName = "${refererEntityClassName}Bhv")
+    #set ($refererCBClassName = "${refererEntityClassName}${glConditionBeanInitialName}")
+    #set ($refererVariableName = "${glChildrenVariablePrefix}${referer.refererPropertyNameInitCap}")
+    #set ($refererEntityLongClassName = "${glPackageExtendedEntity}.${refererEntityClassName}")
+    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List<${refererEntityClassName}>")
 
         // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   RefererTable    = [${refferer.Table.Name}]
-        //   RefererProperty = [${refferer.ReffererPropertyName}]
+        //   RefererTable    = [${referer.table.name}]
+        //   RefererProperty = [${referer.refererPropertyName}]
         // * * * * * * * * */
 
         /// <summary>
-        /// Load refferer of ${refferer.ReffererPropertyName}.
+        /// Load referer of ${referer.refererPropertyName}.
         /// </summary>
-        /// <param name="ls">Entity list of main table. (NotNull)</param>
-        /// <param name="cbSetupper">Refferer condition-bean setupper instance for registering refferer condition. (NotNull)</param>
-        void Load${refferer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, ${reffererTable.JavaName}CBSetupper cbSetupper);
+        /// <param name="ls">The list of entity. (NotNull)</param>
+        /// <param name="conditionBeanSetupper">The condition-bean setupper of referer. (NotNull)</param>
+        void Load${referer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper);
   #end
 
         #endregion
 #end
 #if ($table.isWritable())
-
-        // =====================================================================================
-        //                                                                   Basic Entity Update
-        //                                                                   ===================
+        // ===============================================================================
+        //                                                             Basic Entity Update
+        //                                                             ===================
         #region Basic Entity Update
-
         /// <summary>
         /// Insert.
         /// </summary>
@@ -155,86 +151,36 @@ namespace ${glPackageExtendedBhv} {
         void Insert(${myExtendedObjectClassName} entity);
 
         /// <summary>
-        /// Update.
+        /// Update. {modified only}
+        /// If it updates count zero, throws exception.
+        /// If concurrency control of this table is valid, this update have it.
+        /// So then the entity of argument should have the value of concurrency column.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}"></exception>
         void Update(${myExtendedObjectClassName} entity);
 
         /// <summary>
-        /// Update after select.
+        /// Update non-strictly. {modified only}
+        /// This update ignores concurrency control.
+        /// So if the entity of argument have the value of concurrency column, it is ignored.
         /// </summary>
-        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        void UpdateAfterSelect(${myExtendedObjectClassName} entity);
-
-        /// <summary>
-        /// Insert or update after select.
-        /// </summary>
-        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        void InsertOrUpdateAfterSelect(${myExtendedObjectClassName} entity);
-      #if ($database.isMakeBehaviorForUpdate())
-
-        /// <summary>
-        /// Update after select-for-update.
-        /// </summary>
-        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        void UpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity);
-
-        /// <summary>
-        /// Insert or update after select-for-update.
-        /// </summary>
-        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        void InsertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} entity);
-      #end
+        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}"></exception>
+        // void UpdateNonstrict(${myExtendedObjectClassName} entity);
 
         /// <summary>
         /// Delete.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}"></exception>
         void Delete(${myExtendedObjectClassName} entity);
-
-        #endregion
-
-        // =====================================================================================
-        //                                                                        Various Insert
-        //                                                                        ==============
-        #region Various Insert
-      #if ($table.isUseIdentity())
-        #if ($table.hasPrimaryKey())
-
-        int CopyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString});
-        #end
-      #end
-
         #endregion
 #end
-
-    }
-
-    /// <summary>
-    /// The interface of CBSetupper.
-    /// </summary>
-    public interface ${table.JavaName}CBSetupper : SimpleCBSetupper {
-        /// <summary>
-        /// Set up condition.
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        void Setup(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
-    }
-
-    /// <summary>
-    /// The implementation of CBSetupper. {order by PK Asc}
-    /// </summary>
-    public class ${table.JavaName}CBSetupperPKAsc : ${table.JavaName}CBSetupper {
-        /// <summary>
-        /// Set up condition.
-        /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
-        public void Setup(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}) {
-            ${glAttachedCBArgsVariableName}.AddOrderBy_PK_Asc();
-        }
     }
 }

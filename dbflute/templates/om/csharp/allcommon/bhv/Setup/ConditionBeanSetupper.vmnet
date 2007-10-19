@@ -1,0 +1,11 @@
+
+using System;
+using System.Collections.Generic;
+using ${glPackageBaseCommonCBean};
+
+namespace ${glPackageBaseCommonBhvSetup} {
+
+    public interface ${glConditionBeanSetupperName}<CONDITION_BEAN> {
+        void Setup(CONDITION_BEAN cb);
+    }
+}
