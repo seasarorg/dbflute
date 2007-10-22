@@ -2091,9 +2091,20 @@ public class Table implements IDMethod {
     }
     
     public boolean isAvailableSequenceAssignedIdAnnotation() {
-        return true;
+        final DfSequenceIdentityProperties sequenceIdentityProperties = getProperties().getSequenceIdentityProperties();
+        return sequenceIdentityProperties.isAvailableSequenceAssignedIdAnnotation();
     }
 
+    /**
+     * Get the value of assigned property name.
+     * 
+     * @return Assigned property name. (NotNull)
+     */
+    public String getAssignedPropertyName() {
+        final Column primaryKeyAsOne = getPrimaryKeyAsOne();
+        return primaryKeyAsOne.getUncapitalisedJavaName();
+    }
+    
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
