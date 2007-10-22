@@ -2,6 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 #set ($myClassName = "${glSqlClauseAbstractName}")
 
+import java.util.Set;
+
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
@@ -224,8 +226,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             final String aliasName = (String)ite.next();
             final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
             final String joinTableName = joinInfo.getJoinTableName();
-            final java.util.List${database.filterGenericsString('String')} inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
-            final java.util.Map${database.filterGenericsString('String, String')} joinOnMap = joinInfo.getJoinOnMap();
+            final java.util.List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
+            final java.util.Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
             sb.append(" left outer join ");
@@ -236,13 +238,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             }
             sb.append(" ").append(aliasName).append(" on ");
             int count = 0;
-            for (final java.util.Iterator joinOnMapIte = joinOnMap.keySet().iterator(); joinOnMapIte.hasNext(); count++) {
-                final String localColumnName = (String)joinOnMapIte.next();
+            final Set<String> localColumnNameSet = joinOnMap.keySet();
+            for (String localColumnName : localColumnNameSet) {
                 final String foreignColumnName = (String)joinOnMap.get(localColumnName);
-                if (count != 0) {
+                if (count > 0) {
                     sb.append(" and ");
                 }
-                sb.append(localColumnName).append(" = ").append(foreignColumnName);
+                if (localColumnName.equals("$$fixedCondition$$")) {
+                    sb.append(foreignColumnName);
+                } else {
+                    sb.append(localColumnName).append(" = ").append(foreignColumnName);
+                }
+                ++count;
             }
         }
         return sb.toString();

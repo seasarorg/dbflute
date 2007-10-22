@@ -403,8 +403,8 @@ public class Database {
                     throw new EngineException("Attempt to set foreign" + " key to nonexistent table, "
                             + currFK.getForeignTableName());
                 } else {
-                    List referrers = foreignTable.getReferrers();
-                    if ((referrers == null || !referrers.contains(currFK))) {
+                    final List<ForeignKey> refererList = foreignTable.getRefererList();
+                    if ((refererList == null || !refererList.contains(currFK))) {
                         foreignTable.addReferrer(currFK);
                     }
 

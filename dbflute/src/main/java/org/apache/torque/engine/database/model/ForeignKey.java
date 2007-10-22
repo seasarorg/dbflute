@@ -77,6 +77,9 @@ public class ForeignKey {
 
     private static final Log _log = LogFactory.getLog(ForeignKey.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private Table _baseTable;
 
     private String _foreignTableName;
@@ -89,6 +92,13 @@ public class ForeignKey {
 
     private String _foreignPropertyNamePrefix;
 
+    private String _fixedCondition;
+
+    private String _fixedSuffix;
+
+    // ===================================================================================
+    //                                                                                Load
+    //                                                                                ====
     /**
      * Imports foreign key from an XML specification
      *
@@ -97,24 +107,6 @@ public class ForeignKey {
     public void loadFromXML(Attributes attrib) {
         _foreignTableName = attrib.getValue("foreignTable");
         _name = attrib.getValue("name");
-    }
-
-    /**
-     * Set the base Table of the foreign key
-     *
-     * @param baseTable the table
-     */
-    public void setTable(Table baseTable) {
-        _baseTable = baseTable;
-    }
-
-    /**
-     * Get the base Table of the foreign key
-     *
-     * @return the base table
-     */
-    public Table getTable() {
-        return _baseTable;
     }
 
     public void setForeignPropertyNamePrefix(String propertyNamePrefix) {
@@ -593,28 +585,31 @@ public class ForeignKey {
     protected String getForeignPropertyName(boolean isJavaBeansRule) {
         try {
             final List localColumnList = getLocalColumnObjectList();
-
             final List<String> columnNameList = new ArrayList<String>();
             String result = "";
-            for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
-                final Column col = (Column) ite.next();
+            if (hasFixedSuffix()) {
+                result = getFixedSuffix();
+            } else {
+                for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+                    final Column col = (Column) ite.next();
 
-                if (col.isMultipleFK()) {
-                    columnNameList.add(col.getName());
-                    result = result + col.getJavaName();
-                }
-            }
-            if (result.trim().length() != 0) {
-                final String aliasName = getMultipleFKPropertyColumnAliasName(getTable().getName(), columnNameList);
-                if (aliasName != null && aliasName.trim().length() != 0) {
-                    final String firstUpper = aliasName.substring(0, 1).toUpperCase();
-                    if (aliasName.trim().length() == 1) {
-                        result = "By" + firstUpper;
-                    } else {
-                        result = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+                    if (col.isMultipleFK()) {
+                        columnNameList.add(col.getName());
+                        result = result + col.getJavaName();
                     }
-                } else {
-                    result = "By" + result;
+                }
+                if (result.trim().length() != 0) {
+                    final String aliasName = getMultipleFKPropertyColumnAliasName(getTable().getName(), columnNameList);
+                    if (aliasName != null && aliasName.trim().length() != 0) {
+                        final String firstUpper = aliasName.substring(0, 1).toUpperCase();
+                        if (aliasName.trim().length() == 1) {
+                            result = "By" + firstUpper;
+                        } else {
+                            result = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+                        }
+                    } else {
+                        result = "By" + result;
+                    }
                 }
             }
             if (getForeignTable().getName().equals(getTable().getName())) {
@@ -652,14 +647,14 @@ public class ForeignKey {
     public String getReffererPropertyName() {
         return getRefererPropertyName();
     }
-    
+
     /**
      * Get thr value of refferer property name.
      * 
      * @return Generated string.
      */
     public String getRefererPropertyName() {
-        return getReffererPropertyName(false);
+        return getRefererPropertyName(false);
     }
 
     /**
@@ -668,7 +663,7 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getReffererJavaBeansRulePropertyName() {
-        return getReffererPropertyName(true);
+        return getRefererPropertyName(true);
     }
 
     /**
@@ -677,7 +672,7 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getRefererJavaBeansRulePropertyName() {
-        return getReffererPropertyName(true);
+        return getRefererPropertyName(true);
     }
 
     /**
@@ -686,7 +681,7 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getRefererJavaBeansRulePropertyNameInitCap() {
-        final String refererPropertyName = getReffererPropertyName(true);
+        final String refererPropertyName = getRefererPropertyName(true);
         return initCap(refererPropertyName);
     }
 
@@ -695,35 +690,41 @@ public class ForeignKey {
     }
 
     /**
-     * Get thr value of refferer property name.
+     * Get thr value of referer property name.
      * 
      * @param isJavaBeansRule Is java-beans rule.
-     * @return Generated string.
+     * @return Generated string. (NotNull)
      */
-    public String getReffererPropertyName(boolean isJavaBeansRule) {
+    public String getRefererPropertyName(boolean isJavaBeansRule) {
         final List localColumnList = getLocalColumnObjectList();
 
         final List<String> columnNameList = new ArrayList<String>();
-        String result = "";
-        for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
-            final Column col = (Column) ite.next();
 
-            if (col.isMultipleFK()) {
-                columnNameList.add(col.getName());
-                result = result + col.getJavaName();
-            }
-        }
-        if (result.trim().length() != 0) {
-            final String aliasName = getMultipleFKPropertyColumnAliasName(getForeignTable().getName(), columnNameList);
-            if (aliasName != null && aliasName.trim().length() != 0) {
-                final String firstUpper = aliasName.substring(0, 1).toUpperCase();
-                if (aliasName.trim().length() == 1) {
-                    result = "By" + firstUpper;
-                } else {
-                    result = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+        String result = "";
+        if (hasFixedSuffix()) {
+            result = getFixedSuffix();
+        } else {
+            for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+                final Column col = (Column) ite.next();
+
+                if (col.isMultipleFK()) {
+                    columnNameList.add(col.getName());
+                    result = result + col.getJavaName();
                 }
-            } else {
-                result = "By" + result;
+            }
+            if (result.trim().length() != 0) {// isMultipleFK()==true
+                final String aliasName = getMultipleFKPropertyColumnAliasName(getForeignTable().getName(),
+                        columnNameList);
+                if (aliasName != null && aliasName.trim().length() != 0) {
+                    final String firstUpper = aliasName.substring(0, 1).toUpperCase();
+                    if (aliasName.trim().length() == 1) {
+                        result = "By" + firstUpper;
+                    } else {
+                        result = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+                    }
+                } else {
+                    result = "By" + result;
+                }
             }
         }
         if (getTable().getName().equals(getForeignTable().getName())) {
@@ -734,6 +735,15 @@ public class ForeignKey {
         } else {
             return getTable().getUncapitalisedJavaName() + result + "List";
         }
+    }
+
+    /**
+     * @param isJavaBeansRule Is java-beans rule.
+     * @return Generated string.
+     * @deprecated
+     */
+    public String getReffererPropertyName(boolean isJavaBeansRule) {
+        return getRefererPropertyName(isJavaBeansRule);
     }
 
     /**
@@ -819,7 +829,7 @@ public class ForeignKey {
     public String getReffererPropertyNameInitCap() {
         return getRefererPropertyNameInitCap();
     }
-    
+
     /**
      * Get the value of refferer property name with capitalising the initial character.
      * 
@@ -1031,4 +1041,48 @@ public class ForeignKey {
         return result.toString();
     }
 
+    public boolean hasFixedCondition() {
+        return _fixedCondition != null && _fixedCondition.trim().length() > 0;
+    }
+
+    public boolean hasFixedSuffix() {
+        return _fixedSuffix != null && _fixedSuffix.trim().length() > 0;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Set the base Table of the foreign key
+     *
+     * @param baseTable the table
+     */
+    public void setTable(Table baseTable) {
+        _baseTable = baseTable;
+    }
+
+    /**
+     * Get the base Table of the foreign key
+     *
+     * @return the base table
+     */
+    public Table getTable() {
+        return _baseTable;
+    }
+
+    public String getFixedCondition() {
+        return _fixedCondition;
+    }
+
+    public void setFixedCondition(String fixedCondition) {
+        this._fixedCondition = fixedCondition;
+    }
+
+    public String getFixedSuffix() {
+        return _fixedSuffix;
+    }
+
+    public void setFixedSuffix(String fixedSuffix) {
+        this._fixedSuffix = fixedSuffix;
+    }
 }

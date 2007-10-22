@@ -8,6 +8,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.seasar.framework.util.StringUtil;
+
 /**
  * Build properties for Torque.
  * 
@@ -70,31 +72,37 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return _additionalForeignKeyMap;
     }
 
-    public String getAdditionalForeignKeyComponentLocalTableName(String foreignName) {
+    public String findLocalTableName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get("localTableName");
     }
 
-    public String getAdditionalForeignKeyComponentForeignTableName(String foreignName) {
+    public String findForeignTableName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get("foreignTableName");
     }
 
-    protected String getComponentLocalColumnName(String foreignName) {
+    protected String findLocalColumnName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get("localColumnName");
     }
 
-    protected Map<String, String> getComponentForeignCondition(String foreignName) {
+    public String findFixedCondition(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        final String foreignCondition = componentMap.get("foreignCondition");
-
-        // TODO: Append ForeignCondition.
-        return null;
+        final String fixedCondition = componentMap.get("fixedCondition");
+        if (fixedCondition != null && fixedCondition.trim().length() > 0) {
+            return StringUtil.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
+        }
+        return fixedCondition;
     }
 
-    public List<String> getComponentLocalColumnNameList(String foreignName) {
-        final String property = getComponentLocalColumnName(foreignName);
+    public String findFixedSuffix(String foreignName) {
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
+        return componentMap.get("fixedSuffix");
+    }
+    
+    public List<String> findLocalColumnNameList(String foreignName) {
+        final String property = findLocalColumnName(foreignName);
         if (property == null || property.trim().length() == 0) {
             return null;
         }
@@ -111,7 +119,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return componentMap.get("foreignColumnName");
     }
 
-    public List<String> getComponentForeignColumnNameList(String foreignName) {
+    public List<String> findForeignColumnNameList(String foreignName) {
         final String property = getComponentForeignColumnName(foreignName);
         if (property == null || property.trim().length() == 0) {
             return null;

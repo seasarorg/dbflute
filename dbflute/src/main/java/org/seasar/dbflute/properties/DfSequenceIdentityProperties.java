@@ -22,8 +22,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     // ===============================================================================
-    //                                              Properties - Sequence and Identity
-    //                                              ==================================
+    //                                                         Sequence Definition Map
+    //                                                         =======================
     public static final String KEY_sequenceDefinitionMap = "sequenceDefinitionMap";
     protected Map<String, Object> _sequenceDefinitionMap;
 
@@ -40,10 +40,24 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return (String) flmap.get(flexibleTableName);
     }
 
+    // ===============================================================================
+    //                                                              Sequence Injection
+    //                                                              ==================
     public boolean isAvailableBehaviorInsertSequenceInjection() {
         return booleanProp("torque.isAvailableBehaviorInsertSequenceInjection", true);
     }
 
+    // ===============================================================================
+    //                                                               Sequence Assigned
+    //                                                               =================
+    // for S2Buri
+    public boolean isAvailableSequenceAssignedIdAnnotation() {
+        return booleanProp("torque.isAvailableSequenceAssignedIdAnnotation", false);
+    }
+
+    // ===============================================================================
+    //                                                            Sequence Return Type
+    //                                                            ====================
     public boolean hasSequenceReturnType() {
         final String value = stringProp("torque.sequenceReturnType", "");
         return value != null && value.trim().length() != 0;
@@ -53,6 +67,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return stringProp("torque.sequenceReturnType", "java.math.BigDecimal");
     }
 
+    // ===============================================================================
+    //                                                         Identity Definition Map
+    //                                                         =======================
     public static final String KEY_identityDefinitionMap = "identityDefinitionMap";
     protected Map<String, Object> _identityDefinitionMap;
 

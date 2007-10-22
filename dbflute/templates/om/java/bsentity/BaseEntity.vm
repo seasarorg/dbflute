@@ -70,10 +70,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final String VERSION_NO_PROPERTY = "$table.versionNoUncapitalisedJavaName";
 #end
 #if ($table.isUseIdentity())
-    
+
     /** ID-Annotation */
-    public static final String ${table.IdentityPropertyName}_ID = "identity";
+    public static final String ${table.identityPropertyName}_ID = "identity";
+#else
+#if ($table.isUseSequence() && $table.isAvailableSequenceAssignedIdAnnotation())
+
+    /** ID-Annotation */
+    public static final String ${table.identityPropertyName}_ID = "assigned";
 #end
+#end
+
 
     // ===================================================================================
     //                                                                           Attribute

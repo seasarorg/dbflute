@@ -337,7 +337,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                       Foreign Query
     //                                                                       =============
-#foreach ($foreignKeys in $table.ForeignKeys)
+#foreach ($foreignKeys in $table.foreignKeys)
 #set ($foreignCQClassName = "${relationCQPackagePrefix}${foreignKeys.foreignTableExtendedConditionQueryClassName}")
     
     // /* * * * * * * * * * * * * * * * * * * * * * *
@@ -380,6 +380,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($foreignColumnName = $foreignKeys.getLocalForeignMapping().get($columnName))
         joinOnMap.put(getRealColumnName("${localColumn.Name}"), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealColumnName("${foreignColumnName}"));
 #end
+#if ($foreignKeys.hasFixedCondition())
+        final String fixedCondition = replaceString("${foreignKeys.fixedCondition}", "$$alias$$", getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName());
+        joinOnMap.put("$$fixedCondition$$", fixedCondition);
+#end
         getSqlClause().registerOuterJoin("${foreignKeys.foreignTable.name}", getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName(), joinOnMap);
     }
 
@@ -411,67 +415,71 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 #end
 
-#foreach ($refferer in $table.Referrers)
-#set ($relatedCQClassName = "${relationCQPackagePrefix}${refferer.refererTableExtendedConditionQueryClassName}")
-#if (${refferer.isOneToOne()})
+#foreach ($referer in $table.refererList)
+#set ($relatedCQClassName = "${relationCQPackagePrefix}${referer.refererTableExtendedConditionQueryClassName}")
+#if (${referer.isOneToOne()})
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   RefererTable    = [${refferer.table.basicInfoDispString}]
-    //   RefererProperty = [${refferer.refererJavaBeansRulePropertyNameAsOne}]
+    //   RefererTable    = [${referer.table.basicInfoDispString}]
+    //   RefererProperty = [${referer.refererJavaBeansRulePropertyNameAsOne}]
     // * * * * * * * * */
 
     /**
-     * Query for ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     * Query for ${referer.refererJavaBeansRulePropertyNameAsOne}.
      * 
-     * @return Instance of ${relatedCQClassName} as ${refferer.ReffererPropertyNameAsOne}. (NotNull)
+     * @return Instance of ${relatedCQClassName} as ${referer.ReffererPropertyNameAsOne}. (NotNull)
      */
-    public ${relatedCQClassName} query${refferer.ReffererPropertyNameInitCapAsOne}() {
-        return getConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}();
+    public ${relatedCQClassName} query${referer.ReffererPropertyNameInitCapAsOne}() {
+        return getConditionQuery${referer.ReffererPropertyNameInitCapAsOne}();
     }
 
-    /** Condition-query for ${refferer.refererJavaBeansRulePropertyNameAsOne}. */
-    protected ${relatedCQClassName} _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
+    /** Condition-query for ${referer.refererJavaBeansRulePropertyNameAsOne}. */
+    protected ${relatedCQClassName} _conditionQuery${referer.ReffererPropertyNameInitCapAsOne};
 
     /**
-     * Get condition-query for ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     * Get condition-query for ${referer.refererJavaBeansRulePropertyNameAsOne}.
      * 
-     * @return Instance of ${relatedCQClassName} as ${refferer.refererJavaBeansRulePropertyNameAsOne}. (NotNull)
+     * @return Instance of ${relatedCQClassName} as ${referer.refererJavaBeansRulePropertyNameAsOne}. (NotNull)
      */
-    public ${relatedCQClassName} getConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
-        if (_conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} == null) {
-            _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} = createQuery${refferer.ReffererPropertyNameInitCapAsOne}();
-            setupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}();
+    public ${relatedCQClassName} getConditionQuery${referer.ReffererPropertyNameInitCapAsOne}() {
+        if (_conditionQuery${referer.ReffererPropertyNameInitCapAsOne} == null) {
+            _conditionQuery${referer.ReffererPropertyNameInitCapAsOne} = createQuery${referer.ReffererPropertyNameInitCapAsOne}();
+            setupOuterJoin_${referer.ReffererPropertyNameInitCapAsOne}();
         }
-        return _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
+        return _conditionQuery${referer.ReffererPropertyNameInitCapAsOne};
     }
 
     /**
-     * Setup outer join for ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     * Setup outer join for ${referer.refererJavaBeansRulePropertyNameAsOne}.
      */
-    protected void setupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}() {
+    protected void setupOuterJoin_${referer.ReffererPropertyNameInitCapAsOne}() {
         final java.util.Map<String, String> joinOnMap = new java.util.LinkedHashMap<String, String>();
-#foreach ($columnName in $refferer.ForeignColumns)
+#foreach ($columnName in $referer.ForeignColumns)
 #set ($foreignColumn = $table.getColumn($columnName))
-#set ($reffererColumnName = $refferer.getForeignLocalMapping().get($columnName))
-        joinOnMap.put(getRealColumnName("${foreignColumn.name}"), getConditionQuery${refferer.reffererPropertyNameInitCapAsOne}().getRealColumnName("${reffererColumnName}"));
+#set ($refererColumnName = $referer.getForeignLocalMapping().get($columnName))
+        joinOnMap.put(getRealColumnName("${foreignColumn.name}"), getConditionQuery${referer.reffererPropertyNameInitCapAsOne}().getRealColumnName("${refererColumnName}"));
 #end
-        getSqlClause().registerOuterJoin("${refferer.table.name}", getConditionQuery${refferer.reffererPropertyNameInitCapAsOne}().getRealAliasName(), joinOnMap);
+#if ($referer.hasFixedCondition())
+        final String fixedCondition = replaceString("${referer.fixedCondition}", "$$alias$$", getConditionQuery${referer.reffererPropertyNameInitCapAsOne}().getRealAliasName());
+        joinOnMap.put("$$fixedCondition$$", fixedCondition);
+#end
+        getSqlClause().registerOuterJoin("${referer.table.name}", getConditionQuery${referer.reffererPropertyNameInitCapAsOne}().getRealAliasName(), joinOnMap);
     }
 
     /**
-     * Create query for ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     * Create query for ${referer.refererJavaBeansRulePropertyNameAsOne}.
      * 
-     * @return Query for ${refferer.refererJavaBeansRulePropertyNameAsOne}. (NotNull)
+     * @return Query for ${referer.refererJavaBeansRulePropertyNameAsOne}. (NotNull)
      */
-    protected ${relatedCQClassName} createQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
-        final int relationNo = getSqlClause().resolveRelationNo("${table.name}", "${refferer.reffererPropertyNameAsOne}");
+    protected ${relatedCQClassName} createQuery${referer.ReffererPropertyNameInitCapAsOne}() {
+        final int relationNo = getSqlClause().resolveRelationNo("${table.name}", "${referer.reffererPropertyNameAsOne}");
         String nextRelationPath = "_" + relationNo;
         if (_relationPath != null) {
             nextRelationPath = _relationPath + nextRelationPath;
         }
         final String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
         final ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
-        cq.setForeignPropertyName("${refferer.reffererPropertyNameAsOne}");
+        cq.setForeignPropertyName("${referer.reffererPropertyNameAsOne}");
         cq.setRelationPath(nextRelationPath);
         return cq;
     }
@@ -481,8 +489,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * 
      * @return Determination.
      */
-    public boolean hasConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
-        return _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} != null;
+    public boolean hasConditionQuery${referer.ReffererPropertyNameInitCapAsOne}() {
+        return _conditionQuery${referer.ReffererPropertyNameInitCapAsOne} != null;
     }
 #end
 #end

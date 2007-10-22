@@ -1404,7 +1404,7 @@ public class Table implements IDMethod {
     public List<ForeignKey> getRefererList() {
         return _referrers;
     }
-    
+
     /**
      * @return A list of references to this table
      * @deprecated
@@ -1522,11 +1522,11 @@ public class Table implements IDMethod {
     public String getReferrerPropertyNameCommaString() {
         final StringBuffer sb = new StringBuffer();
 
-        final List<ForeignKey> ls = getReferrers();
+        final List<ForeignKey> ls = getRefererList();
         int size = ls.size();
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = ls.get(i);
-            sb.append(", ").append(fk.getReffererPropertyName());
+            sb.append(", ").append(fk.getRefererPropertyName());
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -2088,6 +2088,10 @@ public class Table implements IDMethod {
             return null;
         }
         return excludedPrefixString.substring(0, endIndex);
+    }
+    
+    public boolean isAvailableSequenceAssignedIdAnnotation() {
+        return true;
     }
 
     // ===================================================================================

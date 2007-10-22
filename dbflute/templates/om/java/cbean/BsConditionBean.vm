@@ -260,10 +260,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                        Setup-Select
     //                                                                        ============
-  #foreach ($foreignKeys in $table.ForeignKeys)
-    #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
-    #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-    #set ($nestSelectSetuppperClassName = "${foreignKeys.foreignTableNestSelectSetupperClassName}")
+#foreach ($foreignKeys in $table.foreignKeys)
+  #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
+  #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
+  #set ($nestSelectSetuppperClassName = "${foreignKeys.foreignTableNestSelectSetupperClassName}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
     //   ForeignTable    = [${foreignKeys.foreignTable.name}]
@@ -308,15 +308,15 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         limitSelect_Off();
         return _nss${tmpPropertyNameInitCap};
     }
-  #end
-  #foreach ($refferer in $table.Referrers)
-    #if (${refferer.isOneToOne()})
-      #set ($tmpPropertyName = "${refferer.ReffererPropertyNameAsOne}")
-      #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
-      #set ($nestSelectSetuppperClassName = "${refferer.refererTableNestSelectSetupperClassName}")
+#end
+#foreach ($referer in $table.refererList)
+  #if (${referer.isOneToOne()})
+    #set ($tmpPropertyName = "${referer.ReffererPropertyNameAsOne}")
+    #set ($tmpPropertyNameInitCap = "${referer.ReffererPropertyNameInitCapAsOne}")
+    #set ($nestSelectSetuppperClassName = "${referer.refererTableNestSelectSetupperClassName}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   RefferTable    = [${refferer.table.name}]
+    //   RefferTable    = [${referer.table.name}]
     //   RefferProperty = [${tmpPropertyName}]
     // * * * * * * * * */
 
@@ -358,8 +358,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         limitSelect_Off();
         return _nss${tmpPropertyNameInitCap};
     }
-    #end
   #end
+#end
 
     // ===================================================================================
     //                                                                      Basic Override
