@@ -1421,9 +1421,9 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                               Parse interceptor class
     ##                                                                               -----------------------
-    #if ($database.isTargetLanguageJava())
-    ## Setup java directory for Interceptor.
-    $database.setupJavaDir_for_interceptor()
+    #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharpOld())
+      ## Setup java directory for Interceptor.
+      $database.setupJavaDir_for_interceptor()
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonInterceptor}))
       $database.makeDirectory($path)
 
