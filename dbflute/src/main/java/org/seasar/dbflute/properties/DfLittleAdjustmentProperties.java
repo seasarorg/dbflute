@@ -141,4 +141,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
                 foreignKeyMap);
         return foreignKeyFxMap;
     }
+    
+    public boolean isUseS2Buri() {
+        return booleanProp("torque.isUseS2Buri", false);
+    }
 }

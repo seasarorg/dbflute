@@ -1291,6 +1291,10 @@ public class Database {
         // TODO: @jflute -- 0.6.0で有効にする。
         // return isAvailableCommonColumnSetupInterceptorToBehavior() ? "public" : protectedString;
     }
+    
+    public boolean isUseS2Buri() {
+        return getProperties().getLittleAdjustmentProperties().isUseS2Buri();
+    }
 
     // -----------------------------------------------------
     //                                                 Other

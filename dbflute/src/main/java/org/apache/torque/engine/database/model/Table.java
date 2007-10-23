@@ -2089,8 +2089,12 @@ public class Table implements IDMethod {
         }
         return excludedPrefixString.substring(0, endIndex);
     }
-    
+
     public boolean isAvailableSequenceAssignedIdAnnotation() {
+        final DfLittleAdjustmentProperties littleAdjustmentProperties = getProperties().getLittleAdjustmentProperties();
+        if (littleAdjustmentProperties.isUseS2Buri()) {
+            return true;
+        }
         final DfSequenceIdentityProperties sequenceIdentityProperties = getProperties().getSequenceIdentityProperties();
         return sequenceIdentityProperties.isAvailableSequenceAssignedIdAnnotation();
     }
@@ -2104,7 +2108,7 @@ public class Table implements IDMethod {
         final Column primaryKeyAsOne = getPrimaryKeyAsOne();
         return primaryKeyAsOne.getUncapitalisedJavaName();
     }
-    
+
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
