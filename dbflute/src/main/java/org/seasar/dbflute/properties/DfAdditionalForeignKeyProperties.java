@@ -11,24 +11,22 @@ import java.util.StringTokenizer;
 import org.seasar.framework.util.StringUtil;
 
 /**
- * Build properties for Torque.
- * 
- * @author mkubo
+ * @author jflute
  */
 public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProperties {
 
-    //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
-
     /**
      * Constructor.
+     * 
+     * @param prop Properties. (NotNull)
      */
     public DfAdditionalForeignKeyProperties(Properties prop) {
         super(prop);
     }
 
-    // ===============================================================================
-    //                                               Properties - AdditionalForeignKey
-    //                                               =================================
+    // ===================================================================================
+    //                                                             additionalForeignKeyMap
+    //                                                             =======================
     public static final String KEY_additionalForeignKeyMap = "additionalForeignKeyMap";
     protected Map<String, Map<String, String>> _additionalForeignKeyMap;
 
@@ -72,6 +70,9 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return _additionalForeignKeyMap;
     }
 
+    // ===================================================================================
+    //                                                                      Finding Helper
+    //                                                                      ==============
     public String findLocalTableName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get("localTableName");
@@ -89,9 +90,11 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
 
     public String findFixedCondition(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
-        final String fixedCondition = componentMap.get("fixedCondition");
+        String fixedCondition = componentMap.get("fixedCondition");
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
-            return StringUtil.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
+            fixedCondition = StringUtil.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
+            fixedCondition = StringUtil.replace(fixedCondition, "$$ForeignAlias$$", "$$foreignAlias$$");
+            fixedCondition = StringUtil.replace(fixedCondition, "$$LocalAlias$$", "$$localAlias$$");
         }
         return fixedCondition;
     }
@@ -114,13 +117,13 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return localColumnNameList;
     }
 
-    protected String getComponentForeignColumnName(String foreignName) {
+    protected String findForeignColumnName(String foreignName) {
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get("foreignColumnName");
     }
 
     public List<String> findForeignColumnNameList(String foreignName) {
-        final String property = getComponentForeignColumnName(foreignName);
+        final String property = findForeignColumnName(foreignName);
         if (property == null || property.trim().length() == 0) {
             return null;
         }
