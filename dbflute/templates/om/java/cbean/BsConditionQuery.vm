@@ -381,8 +381,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         joinOnMap.put(getRealColumnName("${localColumn.Name}"), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealColumnName("${foreignColumnName}"));
 #end
 #if ($foreignKeys.hasFixedCondition())
-        final String fixedCondition = replaceString("${foreignKeys.fixedCondition}", "$$alias$$", getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName());
-        joinOnMap.put("$$fixedCondition$$", fixedCondition);
+        joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${foreignKeys.fixedCondition}", getRealAliasName(), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName()));
 #end
         getSqlClause().registerOuterJoin("${foreignKeys.foreignTable.name}", getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName(), joinOnMap);
     }
@@ -460,8 +459,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         joinOnMap.put(getRealColumnName("${foreignColumn.name}"), getConditionQuery${referer.reffererPropertyNameInitCapAsOne}().getRealColumnName("${refererColumnName}"));
 #end
 #if ($referer.hasFixedCondition())
-        final String fixedCondition = replaceString("${referer.fixedCondition}", "$$alias$$", getConditionQuery${referer.reffererPropertyNameInitCapAsOne}().getRealAliasName());
-        joinOnMap.put("$$fixedCondition$$", fixedCondition);
+        joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${referer.fixedCondition}", getRealAliasName(), getConditionQuery${referer.reffererPropertyNameInitCapAsOne}().getRealAliasName()));
 #end
         getSqlClause().registerOuterJoin("${referer.table.name}", getConditionQuery${referer.reffererPropertyNameInitCapAsOne}().getRealAliasName(), joinOnMap);
     }

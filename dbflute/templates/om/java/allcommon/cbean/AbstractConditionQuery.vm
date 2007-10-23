@@ -470,6 +470,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // ===================================================================================
+    //                                                                     Fixed Condition
+    //                                                                     ===============
+    protected String prepareFixedCondition(String fixedCondition, String localAliasName, String foreignAliasName) {
+        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
+        return fixedCondition;
+    }
+
+    // ===================================================================================
     //                                                                              Invoke
     //                                                                              ======
     /**

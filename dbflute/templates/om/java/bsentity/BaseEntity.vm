@@ -77,7 +77,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #if ($table.isUseSequence() && $table.isAvailableSequenceAssignedIdAnnotation())
 
     /** ID-Annotation */
-    public static final String ${table.identityPropertyName}_ID = "assigned";
+    public static final String ${table.assignedPropertyName}_ID = "assigned";
 #end
 #end
 

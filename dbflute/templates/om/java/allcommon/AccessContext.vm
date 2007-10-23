@@ -77,6 +77,25 @@ public class ${glAccessContextName} {
     }
 
     /**
+     * Get access process on thread.
+     * <pre>
+     * If it can't get access process from access-context, 
+     * returns 'Anonymous' as default value!
+     * </pre>
+     * @return Access process. (NotNull)
+     */
+    public static String getAccessProcessOnThread() {
+        if (isExistAccessContextOnThread()) {
+            final ${glAccessContextName} userContextOnThread = getAccessContextOnThread();
+            final String accessProcess = userContextOnThread.getAccessProcess();
+            if (accessProcess != null) {
+                return accessProcess;
+            }
+        }
+        return "Anonymous";// as Default
+    }
+
+    /**
      * Get access module on thread.
      * <pre>
      * If it can't get access module from access-context, 
@@ -144,6 +163,8 @@ public class ${glAccessContextName} {
     //                                                                           =========
     protected String accessUser;
 
+    protected String accessProcess;
+
     protected String accessModule;
 
     protected java.util.Date accessDate;
@@ -163,6 +184,14 @@ public class ${glAccessContextName} {
 
     public void setAccessUser(String accessUser) {
         this.accessUser = accessUser;
+    }
+
+    public String getAccessProcess() {
+        return accessProcess;
+    }
+
+    public void setAccessProcess(String accessProcess) {
+        this.accessProcess = accessProcess;
     }
 
     public String getAccessModule() {
