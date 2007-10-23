@@ -1194,19 +1194,19 @@ public class Database {
     public boolean isMakeConditionQueryEqualEmptyString() {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
-    
+
     public boolean isMakeBehaviorCopyInsert() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorCopyInsert();
     }
-    
+
     public boolean isMakeBehaviorLoopUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
     }
-    
+
     public boolean isMakeTraceablePreparedStatement() {
         return getProperties().getSourceReductionProperties().isMakeTraceablePreparedStatement();
     }
-    
+
     /**
      * @return Determination.
      * @deprecated
@@ -1291,9 +1291,9 @@ public class Database {
         // TODO: @jflute -- 0.6.0で有効にする。
         // return isAvailableCommonColumnSetupInterceptorToBehavior() ? "public" : protectedString;
     }
-    
-    public boolean isUseS2Buri() {
-        return getProperties().getLittleAdjustmentProperties().isUseS2Buri();
+
+    public boolean isUseBuri() {
+        return getProperties().getLittleAdjustmentProperties().isUseBuri();
     }
 
     // -----------------------------------------------------

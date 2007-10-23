@@ -142,7 +142,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return foreignKeyFxMap;
     }
     
-    public boolean isUseS2Buri() {
+    public boolean isUseBuri() {
+        final boolean isUseBuri = booleanProp("torque.isUseBuri", false);
+        if (isUseBuri) {
+            return true;
+        }
         return booleanProp("torque.isUseS2Buri", false);
     }
 }

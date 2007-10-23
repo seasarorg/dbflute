@@ -2092,7 +2092,7 @@ public class Table implements IDMethod {
 
     public boolean isAvailableSequenceAssignedIdAnnotation() {
         final DfLittleAdjustmentProperties littleAdjustmentProperties = getProperties().getLittleAdjustmentProperties();
-        if (littleAdjustmentProperties.isUseS2Buri()) {
+        if (littleAdjustmentProperties.isUseBuri()) {
             return true;
         }
         final DfSequenceIdentityProperties sequenceIdentityProperties = getProperties().getSequenceIdentityProperties();

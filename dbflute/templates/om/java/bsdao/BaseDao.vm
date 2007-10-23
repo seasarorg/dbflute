@@ -81,10 +81,10 @@ public interface ${myClassName} extends ${InterfaceName} {
      */
     public ${myExtendedObjectClassName} getEntity(${table.PrimaryKeyArgsString});
 #end
-#if ($table.isWritable() && $table.hasOnlyOnePrimaryKey() && $database.isUseS2Buri())
+#if ($table.isWritable() && $table.hasOnlyOnePrimaryKey() && $database.isUseBuri())
 
     public static final String getEntityByIds_ARGS = "ids";
-    public static final String getEntityByIds_QUERY = "id in /*ids*/(1)";
+    public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
     java.util.List<${myExtendedObjectClassName}> getEntityByIds(java.util.List<${table.primaryKeyJavaNativeAsOne}> ids);
 #end
 
