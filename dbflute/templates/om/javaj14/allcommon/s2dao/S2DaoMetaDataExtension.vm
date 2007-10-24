@@ -37,15 +37,22 @@ import org.seasar.dao.impl.DeleteAutoStaticCommand;
 import org.seasar.dao.impl.DeleteBatchAutoStaticCommand;
 
 #if ($database.isVersionAfter1047())
+import org.seasar.dao.BeanAnnotationReader;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
 import org.seasar.dao.TableNaming;
+import org.seasar.dao.ColumnNaming;
+import org.seasar.dao.PropertyTypeFactory;
+import org.seasar.dao.impl.PropertyTypeFactoryImpl;
+import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
 #end
 
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.types.ValueTypes;
+#if (!$database.isVersionAfter1047())
 import org.seasar.framework.beans.BeanDesc;
+#end
 import org.seasar.framework.util.StringUtil;
 
 #if ($database.isAvailableGenerics())
@@ -84,6 +91,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #end
 
 #if ($database.isVersionAfter1047())
+    /** The naming of column. {After S2Dao-1.0.47} */
+    protected ColumnNaming columnNaming;
+
     /** The builder of property type factory. {After S2Dao-1.0.47} */
     protected PropertyTypeFactoryBuilder propertyTypeFactoryBuilder;
 
@@ -677,7 +687,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         };
         originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
 #if ($database.isVersionAfter1047())
-        originalBmdFactory.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
+        originalBmdFactory.setPropertyTypeFactoryBuilder(newOutsideSqlPropertyTypeFactoryBuilderImpl());
         originalBmdFactory.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
         originalBmdFactory.setTableNaming(this.tableNaming);
 #else
@@ -693,11 +703,41 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return new OutsideSqlCustomizeBeanMetaDataImpl();
     }
 
-    public static class OutsideSqlCustomizeBeanMetaDataImpl extends BeanMetaDataImpl {
+    protected static class OutsideSqlCustomizeBeanMetaDataImpl extends BeanMetaDataImpl {
+#if (!$database.isVersionAfter1047())
         protected void setupDatabaseMetaData(BeanDesc beanDesc, DatabaseMetaData dbMetaData, Dbms dbms) {
             // Nothing.
         }
+#end
     }
+
+#if ($database.isVersionAfter1047())
+    protected PropertyTypeFactoryBuilderImpl newOutsideSqlPropertyTypeFactoryBuilderImpl() {
+        final PropertyTypeFactoryBuilderImpl impl = new OutsideSqlPropertyTypeFactoryBuilderImpl();
+        if (columnNaming == null) {
+            String msg = "Internal Error! The columnNaming should not be null! {Failed to Injection!}";
+            throw new IllegalStateException(msg);
+        }
+        impl.setColumnNaming(columnNaming);
+        impl.setDaoNamingConvention(daoNamingConvention);
+        impl.setValueTypeFactory(valueTypeFactory);
+        return impl;
+    }
+
+    public static class OutsideSqlPropertyTypeFactoryBuilderImpl extends PropertyTypeFactoryBuilderImpl {
+        public PropertyTypeFactory build(Class beanClass, BeanAnnotationReader beanAnnotationReader, Dbms dbms, DatabaseMetaData databaseMetaData) {
+            return new PropertyTypeFactoryImpl(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, dbms, databaseMetaData) {
+                protected void setupPrimaryKey(PropertyType[] propertyTypes, String tableName) {
+                    try {
+                        super.setupPrimaryKey(propertyTypes, tableName);
+                    } catch (RuntimeException e) {
+                        // Nothing because MySQL throws Exception when the table does not exist.
+                    }
+                }
+            };
+        }
+    }
+#end
 
     protected Class getOutsideSqlDefaultBeanClass(Method method) {
         final Class retType = method.getReturnType();
@@ -956,6 +996,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                                Version After 1.0.47
     //                                                                ====================
+    public ColumnNaming getColumnNaming() {
+        return columnNaming;
+    }
+
+    public void setColumnNaming(final ColumnNaming columnNaming) {
+        this.columnNaming = columnNaming;
+    }
+
     public PropertyTypeFactoryBuilder getPropertyTypeFactoryBuilder() {
         return propertyTypeFactoryBuilder;
     }

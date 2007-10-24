@@ -11,6 +11,7 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
 import org.seasar.dao.TableNaming;
+import org.seasar.dao.ColumnNaming;
 #end
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
@@ -35,6 +36,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     protected BeanEnhancer beanEnhancer;
 
 #if ($database.isVersionAfter1047())
+    /** The naming of column. {After S2Dao-1.0.47} */
+    protected ColumnNaming columnNaming;
+
     /** The builder of property type factory. {After S2Dao-1.0.47} */
     protected PropertyTypeFactoryBuilder propertyTypeFactoryBuilder;
 
@@ -190,6 +194,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
 #end
 #if ($database.isVersionAfter1047())
+        dmdExtension.setColumnNaming(this.columnNaming);
         dmdExtension.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
         dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
         dmdExtension.setTableNaming(tableNaming);
@@ -224,6 +229,14 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     // ===================================================================================
     //                                                                Version After 1.0.47
     //                                                                ====================
+    public ColumnNaming getColumnNaming() {
+        return columnNaming;
+    }
+
+    public void setColumnNaming(final ColumnNaming columnNaming) {
+        this.columnNaming = columnNaming;
+    }
+
     public PropertyTypeFactoryBuilder getPropertyTypeFactoryBuilder() {
         return propertyTypeFactoryBuilder;
     }
