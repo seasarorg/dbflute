@@ -45,7 +45,9 @@
     <component class="org.seasar.dao.impl.DefaultColumnNaming"/>
     <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
 #end
-
+#if ($database.isVersionAfter1046())
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
+#end
 
 #if (!$database.isCommonColumnInterceptingOnBehaviorFilter())
     <!-- Common column setup interceptor. -->
@@ -63,7 +65,6 @@
     <component name="daoSelector" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
         <destroyMethod name="destroy"/>
     </component>
-
 
     <!-- Original dao component. -->
     #foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())

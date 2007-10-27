@@ -1074,9 +1074,6 @@ public class Column {
     }
 
     public boolean isAvailableStringInScope() {
-        if (hasQueryRestrictionByFlgClassification()) {
-            return false;
-        }
         return getIncludeQueryProperties().isAvailableStringInScope(getTableName(), getName());
     }
 
@@ -1126,9 +1123,6 @@ public class Column {
     }
 
     public boolean isAvailableNumberInScope() {
-        if (hasQueryRestrictionByFlgClassification()) {
-            return false;
-        }
         return getIncludeQueryProperties().isAvailableNumberInScope(getTableName(), getName());
     }
 

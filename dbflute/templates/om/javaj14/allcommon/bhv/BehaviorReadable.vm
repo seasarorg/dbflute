@@ -71,20 +71,6 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public ${glDaoReadableInterfaceName} getDaoReadable();
 
-    /**
-     * Get dao-selector.
-     * 
-     * @return Dao-selector.
-     */
-    public ${glDaoSelectorInterfaceName} getDaoSelector();
-
-    /**
-     * Set dao-selector.
-     * 
-     * @param value Dao-selector.
-     */
-    public void setDaoSelector(${glDaoSelectorInterfaceName} value);
-
     // =====================================================================================
     //                                                                          New Instance
     //                                                                          ============

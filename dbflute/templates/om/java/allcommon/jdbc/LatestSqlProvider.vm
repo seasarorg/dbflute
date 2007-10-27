@@ -1,0 +1,16 @@
+${database.allClassCopyright}package ${glPackageBaseCommonJdbc};
+
+/**
+ * The provider of latest SQL.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glLatestSqlProviderName} {
+
+    /**
+     * Get display SQL.
+     * 
+     * @return Display SQL. (Nullable: If it was not found, returns null.)
+     */
+    String getDisplaySql();
+}

@@ -257,6 +257,7 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-JDBC]
     #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
+    #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
 
     ## [Allcommon-JDBC-History]
     #set ($glPreparedExecutionBeanName = "${glProjectPrefix}PreparedExecutionBean")
@@ -271,6 +272,7 @@ targetdatabase = $targetDatabase
     ## [Allcommon-S2Dao]
     #set ($glSelectDynamicCommand = "${glProjectPrefix}S2DaoSelectDynamicCommand")
     #set ($glDaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
+    #set ($glDaoLatestSqlProvider = "${glProjectPrefix}S2DaoLatestSqlProvider")
     #set ($glDaoMetaDataExtension = "${glProjectPrefix}S2DaoMetaDataExtension")
     #set ($glDaoMetaDataFactoryImpl = "${glProjectPrefix}S2DaoMetaDataFactoryImpl")
     #set ($glBeanMetaDataFactoryImpl = "${glProjectPrefix}S2BeanMetaDataFactoryImpl")
@@ -1458,6 +1460,12 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glCursorHandlerName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/CursorHandler.${glTemplateFileExtension}",$path,"", "")
 
+    #if ($database.isTargetLanguageJava())
+      $database.debug("    parse('LatestSqlProvider');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glLatestSqlProviderName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/LatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
+    #end
+
     #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
       #if ($database.isMakeTraceablePreparedStatement())
         #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory}))
@@ -1497,6 +1505,11 @@ targetdatabase = $targetDatabase
 
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glDaoInterceptor}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoInterceptor.${glTemplateFileExtension}",$path,"", "")
+
+    #if ($database.isTargetLanguageJava() && $database.isVersionAfter1046())
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glDaoLatestSqlProvider}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoLatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
+    #end
 
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glDaoMetaDataExtension}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoMetaDataExtension.${glTemplateFileExtension}",$path,"", "")

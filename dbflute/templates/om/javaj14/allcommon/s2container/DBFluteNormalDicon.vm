@@ -45,7 +45,9 @@
     <component class="org.seasar.dao.impl.DefaultColumnNaming"/>
     <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
 #end
-
+#if ($database.isVersionAfter1046())
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
+#end
 
 #if (!$database.isCommonColumnInterceptingOnBehaviorFilter())
     <!-- Common column setup interceptor. -->

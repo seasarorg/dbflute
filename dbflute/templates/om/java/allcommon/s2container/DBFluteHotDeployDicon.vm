@@ -37,6 +37,9 @@
     <component class="org.seasar.dao.impl.DefaultColumnNaming"/>
     <component class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
 #end
+#if ($database.isVersionAfter1046())
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
+#end
 
     <!-- Common column setup interceptor. -->
     <component name="commonColumnSetupBeforeInsertInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeInsertInterceptor}"/>

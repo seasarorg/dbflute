@@ -24,6 +24,8 @@ import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
 import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImplName};
 
+import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
+
 /**
  * The abstract class of behavior-readable.
  * 
@@ -40,6 +42,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /** Dao-selector instance. */
     protected ${glDaoSelectorInterfaceName} _daoSelector;
 
+    /** The provider of latest SQL. It's basically referred at error handling. (NotRequired) */
+    protected ${glLatestSqlProviderName} _latestSqlProvider;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -47,45 +52,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Constructor.
      */
     public ${myClassName}() {
-    }
-
-    // ===================================================================================
-    //                                                                            Selector
-    //                                                                            ========
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Behavior-selector.
-     */
-    public ${glBehaviorSelectorInterfaceName} getBehaviorSelector() {
-        return _behaviorSelector;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param value Behavior-selector.
-     */
-    public void setBehaviorSelector(${glBehaviorSelectorInterfaceName} value) {
-        _behaviorSelector = value;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Dao-selector.
-     */
-    public ${glDaoSelectorInterfaceName} getDaoSelector() {
-        return _daoSelector;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param value Dao-selector.
-     */
-    public void setDaoSelector(${glDaoSelectorInterfaceName} value) {
-        _daoSelector = value;
     }
 
     // ===================================================================================
@@ -301,7 +267,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected void assertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
         if (entity == null) {
-            String msg = buildRecordHasBeenDeletedMessage(searchKey4log);
+            String msg = buildEntityAlreadyDeletedMessage(searchKey4log);
             throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         }
     }
@@ -315,7 +281,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
-            String msg = buildRecordHasBeenDeletedMessage(searchKey4Log);
+            String msg = buildEntityAlreadyDeletedMessage(searchKey4Log);
             throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         }
     }
@@ -330,21 +296,29 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
-            String msg = buildRecordHasBeenDeletedMessage(searchKey4Log);
+            String msg = buildEntityAlreadyDeletedMessage(searchKey4Log);
             throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         }
         if (ls.size() != 1) {
-            throwRecordHasOverlappedException(ls.size() + "", searchKey4Log, null);
+            throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
         }
     }
 
-    protected void throwRecordHasOverlappedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        String msg = "The selected records should be only one! But the resultCount=" + resultCountString + getLineSeparator();
+    protected void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
+        String msg = "Attension! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Please confirm your condition. Does it really select only one?" + getLineSeparator();
-        msg = msg + "And please confirm your database. Does it really exist only one?" + getLineSeparator();
-        msg = msg + "- - - - -" + getLineSeparator();
-        msg = msg + "The searchKey is as follows:" + getLineSeparator() + searchKey4Log + getLineSeparator();
+        msg = msg + "The selected entity is duplicated. It should be the only one! But the resultCount=" + resultCountString + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm your search condition. Does it really select only one?" + getLineSeparator();
+        msg = msg + "Please confirm your database. Does it really exist only one?" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SearchKey]" + getLineSeparator() + searchKey4Log + getLineSeparator();
+        final String dispalySql = getDisplaySqlForExceptionMessage();
+        if (dispalySql != null) {
+            msg = msg + getLineSeparator();
+            msg = msg + "[DisplaySQL]" + getLineSeparator() + dispalySql + getLineSeparator();
+        }
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         if (cause != null) {
             throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg, cause);
@@ -353,17 +327,43 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
     }
 
-    private String buildRecordHasBeenDeletedMessage(Object searchKey4log) {
-        String msg = "The record has already been deleted!" + getLineSeparator();
+    private String buildEntityAlreadyDeletedMessage(Object searchKey4log) {
+        String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Please confirm the existence of your target record." + getLineSeparator();
+        msg = msg + "Not found the entity. The entity has already been deleted!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm the existence of your target record on your database." + getLineSeparator();
         msg = msg + "Does the target record really created before this operation?" + getLineSeparator();
         msg = msg + "Has the target record been deleted by other thread?" + getLineSeparator();
-        msg = msg + "It is precondition that the record exists on database." + getLineSeparator();
-        msg = msg + "- - - - -" + getLineSeparator();
-        msg = msg + "The searchKey is as follows:" + getLineSeparator() + searchKey4log + getLineSeparator();
+        msg = msg + "It is precondition that the record exists on your database." + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SearchKey]" + getLineSeparator() + searchKey4log + getLineSeparator();
+        final String dispalySql = getDisplaySqlForExceptionMessage();
+        if (dispalySql != null) {
+            msg = msg + getLineSeparator();
+            msg = msg + "[DisplaySQL]" + getLineSeparator() + dispalySql + getLineSeparator();
+        }
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         return msg;
+    }
+
+    private String getDisplaySqlForExceptionMessage() {
+        if (_latestSqlProvider == null) {
+            return null;
+        }
+        final String displaySql = _latestSqlProvider.getDisplaySql();
+        if (displaySql == null || displaySql.trim().length() == 0) {
+            return null;
+        }
+        if (displaySql.indexOf(getLineSeparator()) >= 0) {
+            return displaySql;
+        }
+        int basePointIndex = displaySql.indexOf(" from " + getTableDbName());
+        if (basePointIndex < 0) {
+            return displaySql;
+        }
+        return displaySql.substring(0, basePointIndex) + getLineSeparator() + " " + displaySql.substring(basePointIndex);
     }
 
     /**
@@ -626,4 +626,62 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             throw new IllegalArgumentException(msg);
         }
     }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get the selector of behavior.
+     * 
+     * @return The select of behavior. (Nullable: But normally NotNull)
+     */
+    protected ${glBehaviorSelectorInterfaceName} getBehaviorSelector() {
+        return _behaviorSelector;
+    }
+
+    /**
+     * Set the selector of behavior.
+     * 
+     * @param behaviorSelector The selector of behavior. (NotNull)
+     */
+    public void setBehaviorSelector(${glBehaviorSelectorInterfaceName} behaviorSelector) {
+        this._behaviorSelector = behaviorSelector;
+    }
+
+    /**
+     * Get the selector of dao.
+     * 
+     * @return The select of behavior. (Nullable: But normally NotNull)
+     */
+    protected ${glDaoSelectorInterfaceName} getDaoSelector() {
+        return _daoSelector;
+    }
+
+    /**
+     * Set the selector of dao.
+     * 
+     * @param daoSelector The selector of dao. (NotNull)
+     */
+    public void setDaoSelector(${glDaoSelectorInterfaceName} daoSelector) {
+        _daoSelector = daoSelector;
+    }
+
+    /**
+     * Get the provider of latest SQL.
+     * 
+     * @return The provider of latest SQL. (Nullable: But normally NotNull)
+     */
+    protected ${glLatestSqlProviderName} getLatestSqlProvider() {
+        return _latestSqlProvider;
+    }
+
+    /**
+     * Set the provider of latest SQL.
+     * 
+     * @param latestSqlProvider The provider of latest SQL. (NotNull)
+     */
+    public void setLatestSqlProvider(${glLatestSqlProviderName} latestSqlProvider) {
+        _latestSqlProvider = latestSqlProvider;
+    }
+
 }

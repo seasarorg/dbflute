@@ -466,7 +466,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         try {
             ls = selectList(cb);
         } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
-            throwRecordHasOverlappedException("{Over safetyMaxResultSize '1'}", cb, e);
+            throwEntityDuplicatedException("{Over safetyMaxResultSize '1'}", cb, e);
         }
         if (ls.isEmpty()) {
             return null;
@@ -490,7 +490,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         try {
             ls = selectList(cb);
         } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
-            throwRecordHasOverlappedException("{Over safetyMaxResultSize '1'}", cb, e);
+            throwEntityDuplicatedException("{Over safetyMaxResultSize '1'}", cb, e);
         }
         assertRecordHasNotBeenDeleted(ls, cb);
         assertRecordHasBeenSelectedAsOne(ls, cb);
