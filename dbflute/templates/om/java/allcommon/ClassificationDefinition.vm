@@ -1,6 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
-
 #set ($myClassName = "${glClassificationDefinition}")
+
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Iterator;
 
 /**
  * The definition class that has classification.
@@ -54,32 +60,32 @@ public class ${myClassName} {
     //                                                          Classification CodeNameMap
     //                                                          ==========================
 #foreach ($classificationName in $database.ClassificationNameListValidNameOnly)
-  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+#set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
 
     /** The classification code-name map of ${classificationName}. */
-    public static final java.util.Map${database.filterGenericsString('String, String')} CODE_NAME_MAP_${classificationName};
+    public static final Map<String, String> CODE_NAME_MAP_${classificationName};
     static {
-        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
-  #foreach ($classificationMap in $classificationMapList)
-      map.put(${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
-  #end
+        final Map<String, String> map = new LinkedHashMap<String, String>();
+#foreach ($classificationMap in $classificationMapList)
+        map.put(${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
+#end
 
-        CODE_NAME_MAP_${classificationName} = java.util.Collections.unmodifiableMap(map);
+        CODE_NAME_MAP_${classificationName} = Collections.unmodifiableMap(map);
     }
 #end
 
 #foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
-  #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
+#set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
 
     /** The classification code-alias map of ${classificationName}. */
-    public static final java.util.Map${database.filterGenericsString('String, String')} CODE_ALIAS_MAP_${classificationName};
+    public static final Map<String, String> CODE_ALIAS_MAP_${classificationName};
     static {
-        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
-  #foreach ($classificationMap in $classificationMapList)
-      map.put(${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
-  #end
+        final Map<String, String> map = new LinkedHashMap<String, String>();
+#foreach ($classificationMap in $classificationMapList)
+        map.put(${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
+#end
 
-        CODE_ALIAS_MAP_${classificationName} = java.util.Collections.unmodifiableMap(map);
+        CODE_ALIAS_MAP_${classificationName} = Collections.unmodifiableMap(map);
     }
 #end
 
@@ -91,16 +97,16 @@ public class ${myClassName} {
   #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
 
     /** The classification code-name map of ${classificationName}. */
-    public static final java.util.List${database.filterGenericsString('java.util.Map<String, String>')} VALUE_LABEL_NAME_LIST_${classificationName};
+    public static final List<Map<String, String>> VALUE_LABEL_NAME_LIST_${classificationName};
     static {
-        final java.util.List${database.filterGenericsString('java.util.Map<String, String>')} list = new java.util.ArrayList${database.filterGenericsString('java.util.Map<String, String>')}();
-  #foreach ($classificationMap in $classificationMapList)
-      setupValueLabelElement(list, ${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
-  #end
+        final List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+#foreach ($classificationMap in $classificationMapList)
+        setupValueLabelElement(list, ${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
+#end
 
-        VALUE_LABEL_NAME_LIST_${classificationName} = java.util.Collections.unmodifiableList(list);
+        VALUE_LABEL_NAME_LIST_${classificationName} = Collections.unmodifiableList(list);
     }
-    public static java.util.List${database.filterGenericsString('java.util.Map<String, String>')} createValueLabelNameList${classificationName}() {
+    public static List<Map<String, String>> createValueLabelNameList${classificationName}() {
         return setupValueLabelList(VALUE_LABEL_NAME_LIST_${classificationName});
     }
 #end
@@ -108,16 +114,16 @@ public class ${myClassName} {
   #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
 
     /** The classification code-name map of ${classificationName}. */
-    public static final java.util.List${database.filterGenericsString('java.util.Map<String, String>')} VALUE_LABEL_ALIAS_LIST_${classificationName};
+    public static final List<Map<String, String>> VALUE_LABEL_ALIAS_LIST_${classificationName};
     static {
-        final java.util.List${database.filterGenericsString('java.util.Map<String, String>')} list = new java.util.ArrayList${database.filterGenericsString('java.util.Map<String, String>')}();
-  #foreach ($classificationMap in $classificationMapList)
-      setupValueLabelElement(list, ${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
-  #end
+        final List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+#foreach ($classificationMap in $classificationMapList)
+        setupValueLabelElement(list, ${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
+#end
 
-        VALUE_LABEL_ALIAS_LIST_${classificationName} = java.util.Collections.unmodifiableList(list);
+        VALUE_LABEL_ALIAS_LIST_${classificationName} = Collections.unmodifiableList(list);
     }
-    public static java.util.List${database.filterGenericsString('java.util.Map<String, String>')} createValueLabelAliasList${classificationName}() {
+    public static List<Map<String, String>> createValueLabelAliasList${classificationName}() {
         return setupValueLabelList(VALUE_LABEL_ALIAS_LIST_${classificationName});
     }
 #end
@@ -125,20 +131,20 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
-    protected static java.util.List${database.filterGenericsString('java.util.Map<String, String>')} setupValueLabelList(java.util.List${database.filterGenericsString('java.util.Map<String, String>')} ls) {
-        final java.util.List${database.filterGenericsString('java.util.Map<String, String>')} newList = new java.util.ArrayList${database.filterGenericsString('java.util.Map<String, String>')}();
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
-            final java.util.Map${database.filterGenericsString('String, String')} map = (java.util.Map${database.filterGenericsString('String, String')})ite.next();
-            final java.util.Map${database.filterGenericsString('String, String')} newMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}(map);
+    protected static List<Map<String, String>> setupValueLabelList(List<Map<String, String>> ls) {
+        final List<Map<String, String>> newList = new ArrayList<Map<String, String>>();
+        for (final Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            final Map<String, String> map = (Map<String, String>)ite.next();
+            final Map<String, String> newMap = new LinkedHashMap<String, String>(map);
             newList.add(newMap);
         }
         return newList;
     }
 
-    protected static void setupValueLabelElement(java.util.List${database.filterGenericsString('java.util.Map<String, String>')} ls, String value, String label) {
-        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+    protected static void setupValueLabelElement(List<Map<String, String>> ls, String value, String label) {
+        final Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("value", value);
         map.put("label", label);
-        ls.add(java.util.Collections.unmodifiableMap(map));
+        ls.add(Collections.unmodifiableMap(map));
     }
 }

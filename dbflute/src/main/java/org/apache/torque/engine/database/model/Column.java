@@ -67,6 +67,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
+import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.xml.sax.Attributes;
 
 /**
@@ -1008,88 +1009,139 @@ public class Column {
         return TypeMap.isBooleanChar(_torqueType);
     }
 
-    //    public boolean isUsePrimitive() {
-    //        final String s = getJavaType();
-    //        return (s != null && s.equals("primitive"))
-    //                || (s == null && !"object".equals(getTable().getDatabase().getDefaultJavaType()));
-    //    }
+    // ===================================================================================
+    //                                                                       Include Query
+    //                                                                       =============
+    protected boolean hasQueryRestrictionByClassification() {
+        final DfSourceReductionProperties prop = getTable().getProperties().getSourceReductionProperties();
+        return !prop.isMakeConditionQueryClassificationRestriction() && hasClassification();
+    }
+    
+    protected boolean hasQueryRestrictionByFlgClassification() {
+        return hasQueryRestrictionByClassification() && getClassificationMapList().size() <= 2;
+    }
 
-    // ===============================================================================
-    //                                                              Properties - Query
-    //                                                              ==================
-    // ---------------------------------------
-    //                                  String
-    //                                  ------
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
     public boolean isAvailableStringNotEqual() {
+        if (hasQueryRestrictionByFlgClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringNotEqual(getTableName(), getName());
     }
 
     public boolean isAvailableStringGreaterThan() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringGreaterThan(getTableName(), getName());
     }
 
     public boolean isAvailableStringLessThan() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringLessThan(getTableName(), getName());
     }
 
     public boolean isAvailableStringGreaterEqual() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringGreaterEqual(getTableName(), getName());
     }
 
     public boolean isAvailableStringLessEqual() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringLessEqual(getTableName(), getName());
     }
 
     public boolean isAvailableStringPrefixSearch() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringPrefixSearch(getTableName(), getName());
     }
 
     public boolean isAvailableStringLikeSearch() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringLikeSearch(getTableName(), getName());
     }
 
     public boolean isAvailableStringInScope() {
+        if (hasQueryRestrictionByFlgClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringInScope(getTableName(), getName());
     }
 
     public boolean isAvailableStringNotInScope() {
+        if (hasQueryRestrictionByFlgClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableStringNotInScope(getTableName(), getName());
     }
 
-    // ---------------------------------------
-    //                                  Number
-    //                                  ------
+    // -----------------------------------------------------
+    //                                                Number
+    //                                                ------
     public boolean isAvailableNumberNotEqual() {
+        if (hasQueryRestrictionByFlgClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableNumberNotEqual(getTableName(), getName());
     }
 
     public boolean isAvailableNumberGreaterThan() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableNumberGreaterThan(getTableName(), getName());
     }
 
     public boolean isAvailableNumberLessThan() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableNumberLessThan(getTableName(), getName());
     }
 
     public boolean isAvailableNumberGreaterEqual() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableNumberGreaterEqual(getTableName(), getName());
     }
 
     public boolean isAvailableNumberLessEqual() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableNumberLessEqual(getTableName(), getName());
     }
 
     public boolean isAvailableNumberInScope() {
+        if (hasQueryRestrictionByFlgClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableNumberInScope(getTableName(), getName());
     }
 
     public boolean isAvailableNumberNotInScope() {
+        if (hasQueryRestrictionByFlgClassification()) {
+            return false;
+        }
         return getIncludeQueryProperties().isAvailableNumberNotInScope(getTableName(), getName());
     }
 
-    // ---------------------------------------
-    //                                    Date
-    //                                    ----
+    // -----------------------------------------------------
+    //                                                  Date
+    //                                                  ----
     public boolean isAvailableDateNotEqual() {
         return getIncludeQueryProperties().isAvailableDateNotEqual(getTableName(), getName());
     }
