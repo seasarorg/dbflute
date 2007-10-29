@@ -1,0 +1,92 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
+
+import java.sql.DatabaseMetaData;
+
+import org.seasar.dao.BeanAnnotationReader;
+import org.seasar.dao.ColumnNaming;
+import org.seasar.dao.DaoNamingConvention;
+import org.seasar.dao.Dbms;
+import org.seasar.dao.PropertyTypeFactory;
+import org.seasar.dao.ValueTypeFactory;
+import org.seasar.dao.impl.FastPropertyTypeFactory;
+import org.seasar.dao.impl.FastPropertyTypeFactoryBuilder;
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.framework.beans.PropertyDesc;
+
+import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+
+/**
+ * The factory builder of property type for S2Dao. {Since S2Dao-1.0.47} <br />
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glDaoPropertyTypeFactoryBuilderExtension} extends FastPropertyTypeFactoryBuilder {
+
+    @Override
+    public PropertyTypeFactory build(Class beanClass, BeanAnnotationReader beanAnnotationReader) {
+        return new FastPropertyTypeFactoryExtension(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming);
+    }
+
+    @Override
+    public PropertyTypeFactory build(Class beanClass, BeanAnnotationReader beanAnnotationReader, Dbms dbms, DatabaseMetaData databaseMetaData) {
+        return new FastPropertyTypeFactoryExtension(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, daoNamingConvention, dbms);
+    }
+
+    protected static class FastPropertyTypeFactoryExtension extends FastPropertyTypeFactory {
+
+        protected ${glDBMetaInterfaceName} _dbmeta;
+
+        public FastPropertyTypeFactoryExtension(Class beanClass, BeanAnnotationReader beanAnnotationReader,
+                ValueTypeFactory valueTypeFactory, ColumnNaming columnNaming) {
+            super(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming);
+            if (isEntity()) {
+                _dbmeta = findDBMeta();
+            }
+        }
+
+        public FastPropertyTypeFactoryExtension(Class beanClass, BeanAnnotationReader beanAnnotationReader,
+                ValueTypeFactory valueTypeFactory, ColumnNaming columnNaming, DaoNamingConvention daoNamingConvention,
+                Dbms dbms) {
+            super(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, daoNamingConvention, dbms);
+            if (isEntity()) {
+                _dbmeta = findDBMeta();
+            }
+        }
+
+        protected boolean isEntity() {
+            return ${glEntityInterfaceName}.class.isAssignableFrom(beanClass);
+        }
+
+        protected ${glDBMetaInterfaceName} findDBMeta() {
+            try {
+                final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) beanClass.newInstance();
+                return entity.getDBMeta();
+            } catch (Exception e) {
+                String msg = "beanClass.newInstance() threw the exception: beanClass=" + beanClass;
+                throw new RuntimeException(msg, e);
+            }
+        }
+
+        @Override
+        protected boolean isPrimaryKey(PropertyDesc propertyDesc) {
+            if (isEntity() && _dbmeta.hasPrimaryKey() && _dbmeta.hasColumn(propertyDesc.getPropertyName())) {
+                if (_dbmeta.findColumnInfo(propertyDesc.getPropertyName()).isPrimary()) {
+                    return true;
+                }
+            }
+            return super.isPrimaryKey(propertyDesc);
+        }
+
+        @Override
+        protected boolean isPersistent(PropertyType propertyType) {
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // The columns that has column annotation are persistent.
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            if (beanAnnotationReader.getColumnAnnotation(propertyType.getPropertyDesc()) == null) {
+                return false;
+            }
+            return super.isPersistent(propertyType);
+        }
+    }
+}

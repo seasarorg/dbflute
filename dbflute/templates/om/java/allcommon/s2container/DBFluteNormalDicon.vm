@@ -39,7 +39,11 @@
 #if ($database.isVersionAfter1047())
     <component class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>
     <component class="org.seasar.dao.impl.DtoMetaDataFactoryImpl"/>
+#if ($database.isAvailableDaoMethodMetaDataInitializing())
     <component class="org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl"/>
+#else
+    <component class="${glPackageBaseCommonS2Dao}.${glDaoPropertyTypeFactoryBuilderExtension}"/>
+#end
     <component class="org.seasar.dao.impl.RelationPropertyTypeFactoryBuilderImpl"/>
     <component class="org.seasar.dao.impl.DefaultTableNaming"/>
     <component class="org.seasar.dao.impl.DefaultColumnNaming"/>

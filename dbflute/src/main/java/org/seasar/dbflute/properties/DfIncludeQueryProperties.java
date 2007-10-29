@@ -10,9 +10,7 @@ import java.util.Set;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
 /**
- * Build properties for Torque.
- * 
- * @author mkubo
+ * @author jflute
  */
 public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 

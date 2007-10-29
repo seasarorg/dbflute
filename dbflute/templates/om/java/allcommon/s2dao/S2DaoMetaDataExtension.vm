@@ -44,7 +44,9 @@ import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
 import org.seasar.dao.TableNaming;
 import org.seasar.dao.ColumnNaming;
 import org.seasar.dao.PropertyTypeFactory;
+#if ($database.isAvailableDaoMethodMetaDataInitializing())
 import org.seasar.dao.impl.PropertyTypeFactoryImpl;
+#end
 import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
 #end
 
@@ -768,6 +770,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected static class OutsideSqlPropertyTypeFactoryBuilderImpl extends PropertyTypeFactoryBuilderImpl {
         @Override
         public PropertyTypeFactory build(Class beanClass, BeanAnnotationReader beanAnnotationReader, Dbms dbms, DatabaseMetaData databaseMetaData) {
+#if ($database.isAvailableDaoMethodMetaDataInitializing())
             return new PropertyTypeFactoryImpl(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, dbms, databaseMetaData) {
                 @Override
                 protected void setupPrimaryKey(PropertyType[] propertyTypes, String tableName) {
@@ -778,6 +781,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                     }
                 }
             };
+#else
+            return new ${glDaoPropertyTypeFactoryBuilderExtension}.FastPropertyTypeFactoryExtension(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, daoNamingConvention, dbms);
+#end
         }
     }
 #end
