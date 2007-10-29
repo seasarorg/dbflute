@@ -72,7 +72,11 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
     public boolean isAvailableDaoMethodLazyInitializing() {
         return booleanProp("torque.isAvailableDaoMethodLazyInitializing", false);
     }
-
+    
+    public boolean isAvailableDaoMethodMetaDataInitializing() {
+        return booleanProp("torque.isAvailableDaoMethodMetaDataInitializing", false);
+    }
+    
     // ===============================================================================
     //                                                                    S2Dao Follow
     //                                                                    ============

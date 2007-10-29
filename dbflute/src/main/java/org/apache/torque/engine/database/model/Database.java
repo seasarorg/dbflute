@@ -1246,10 +1246,14 @@ public class Database {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodLazyInitializing();
     }
 
+    public boolean isAvailableDaoMethodMetaDataInitializing() {
+        return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodMetaDataInitializing();
+    }
+    
     public boolean isAvailableOtherConnectionDaoInitialization() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableOtherConnectionDaoInitialization();
     }
-
+    
     public boolean isAvailableChildNoAnnotationGenerating() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableChildNoAnnotationGenerating();
     }
@@ -1269,7 +1273,7 @@ public class Database {
     public String getDaoSqlFileEncoding() {
         return getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding();
     }
-
+    
     // -----------------------------------------------------
     //                                     Little Adjustment
     //                                     -----------------
