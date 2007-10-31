@@ -1,0 +1,44 @@
+#set ($myClassName = "${myExtendedTypeSafeCursorHandlerClassName}")
+
+using System;
+using System.Data;
+
+namespace ${myExtendedDaoCursorPackageName} {
+
+    [System.Serializable]
+    public abstract partial class ${myClassName} : ${glPackageBaseCommonJdbc}.${glCursorHandlerName} {
+
+        /**
+         * Handle.
+         * 
+         * @param rs Result set. (NotNull)
+         * @return Result. (Nullable)
+         * @throws java.sql.SQLException
+         */
+        public Object Handle(IDataReader reader) {
+            return FetchCursor(CreateTypeSafeCursor(reader));
+        }
+
+        /**
+         * Create type safe cursor.
+         * 
+         * @param rs Result set. (NotNull)
+         * @return Type safe cursor. (Nullable)
+         * @throws java.sql.SQLException
+         */
+        protected ${myExtendedTypeSafeCursorClassName} CreateTypeSafeCursor(IDataReader reader) {
+            ${myExtendedTypeSafeCursorClassName} cursor = new ${myExtendedTypeSafeCursorClassName}();
+            cursor.Accept(reader);
+            return cursor;
+        }
+
+        /**
+         * Fetch cursor.
+         * 
+         * @param cursor Type safe cursor. (NotNull)
+         * @return Result. (Nullable)
+         * @throws java.sql.SQLException
+         */
+        abstract protected Object FetchCursor(${myExtendedTypeSafeCursorClassName} cursor);
+    }
+}

@@ -202,7 +202,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 return startIndex;
             }
             public int getLoopSize() {
-                return 20;
+                return 25;
             }
         };
         return extractInvokeName(callback, stackTrace);
@@ -224,7 +224,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 return startIndex;
             }
             public int getLoopSize() {
-                return loopSize >= 0 ? loopSize : 20;
+                return loopSize >= 0 ? loopSize : 25;
             }
         };
         return extractInvokeName(callback, stackTrace);
@@ -246,7 +246,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 return 0;
             }
             public int getLoopSize() {
-                return 20;
+                return 25;
             }
         };
         return extractInvokeName(callback, stackTrace);

@@ -6,6 +6,6 @@ namespace ${glPackageBaseCommonJdbc} {
 
     public interface ${glCursorHandlerName} {
 
-        Object Handle(IDataReader dr);
+        Object Handle(IDataReader reader);
     }
 }

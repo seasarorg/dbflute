@@ -1,0 +1,93 @@
+#set ($myClassName = "${myExtendedTypeSafeCursorClassName}")
+
+using System;
+using System.Data;
+using Seasar.Framework.Util;
+
+namespace ${myExtendedDaoCursorPackageName} {
+
+    public partial class ${myClassName} {
+
+        // ===================================================================================
+        //                                                                          Definition
+        //                                                                          ==========
+        // -----------------------------------------------------
+        //                                        Column DB-Name
+        //                                        --------------
+#foreach ($col in $table.columns)
+        public static String DB_NAME_${col.name} = "$col.name";
+#end
+
+        // ===================================================================================
+        //                                                                           Attribute
+        //                                                                           =========
+        protected IDataReader _reader;
+
+        // ===================================================================================
+        //                                                                             Prepare
+        //                                                                             =======
+        public virtual void Accept(IDataReader reader) {
+            this._reader = reader;
+        }
+
+        // ===================================================================================
+        //                                                                              Direct
+        //                                                                              ======
+        public virtual IDataReader Cursor {
+            get { return _reader; }
+        }
+
+        // ===================================================================================
+        //                                                                            Delegate
+        //                                                                            ========
+        public virtual bool Next() {
+            return _reader.Read();
+        }
+
+        // ===================================================================================
+        //                                                                  Type Safe Accessor
+        //                                                                  ==================
+#foreach ($col in $table.columns)
+        public ${col.javaNative} ${col.javaName} {
+#if ($col.isJavaNativeStringObject())
+            get { return ExtractValueAsString("${col.name}"); }
+#end
+#if ($col.isJavaNativeBooleanObject())
+            get { return ExtractValueAsBoolean("${col.name}"); }
+#end
+#if ($col.isJavaNativeNumberObject())
+            get { return new ${col.javaNative}(ExtractValueAsDecimal(typeof(${col.javaNative}), "${col.name}")); }
+#end
+#if ($col.isJavaNativeDateObject())
+            get { return new ${col.javaNative}(ExtractValueAsDateTime(typeof(${col.javaNative}), "${col.name}")); }
+#end
+#if ($col.isJavaNativeBinaryObject())
+            get { return (${col.javaNative})ExtractValueAsObject("${col.name}"); }
+#end
+        }
+
+#end
+        // ===================================================================================
+        //                                                                              Helper
+        //                                                                              ======
+        protected virtual String ExtractValueAsString(String name) {
+            return (String)_reader[name];
+        }
+
+        protected virtual bool ExtractValueAsBoolean(String name) {
+            return (bool)_reader[name];
+        }
+
+        protected virtual Decimal ExtractValueAsDecimal(Type type, String name) {
+            return DecimalConversionUtil.ToDecimal(ExtractValueAsObject(name));
+        }
+
+        protected virtual DateTime ExtractValueAsDateTime(Type type, String name) {
+            return (DateTime)ExtractValueAsObject(name);
+        }
+
+        protected virtual Object ExtractValueAsObject(String name) {
+            return _reader[name];
+        }
+    }
+}

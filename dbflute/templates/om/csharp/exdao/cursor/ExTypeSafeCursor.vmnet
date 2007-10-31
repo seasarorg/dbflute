@@ -1,0 +1,10 @@
+#set ($myClassName = "${myExtendedTypeSafeCursorClassName}")
+
+using System;
+using System.Data;
+
+namespace ${myExtendedDaoCursorPackageName} {
+
+    partial class ${myClassName} {
+    }
+}

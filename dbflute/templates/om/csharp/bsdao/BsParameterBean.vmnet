@@ -26,9 +26,6 @@ namespace ${glPackageExtendedParameterBean} {
         // =====================================================================================
         //                                                                           Constructor
         //                                                                           ===========
-        /**
-         * Constructor.
-         */
         public ${myClassName}() {
         }
 
@@ -38,11 +35,6 @@ namespace ${glPackageExtendedParameterBean} {
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
   #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
-        /**
-         * Get the value of ${propertyName}.
-         * 
-         * @return The value of ${propertyName}.
-         */
         public ${propertyType} ${database.initCap($propertyName)} {
             get { return _${propertyName}; }
             set { _${propertyName} = value; }
@@ -52,18 +44,11 @@ namespace ${glPackageExtendedParameterBean} {
         // =====================================================================================
         //                                                                 Basic Override Method
         //                                                                 =====================
-        /**
-         * ${database.OverrideComment}
-         * 
-         * @return Property-string. (NotNull)
-         */
         public override String ToString() {
             StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-
             sb.Append(" ${propertyName}=").Append(_${propertyName});
 #end
-
             return sb.ToString();
         }
     }

@@ -280,7 +280,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                             Extension
         //                                                                             =========
         protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler drh) {// for all except condition-bean
-            return new SelectDynamicCommandExtension(_dataSource, _commandFactory, drh, _dataReaderFactory);
+            return new ${glSelectDynamicCommand}(_dataSource, _commandFactory, drh, _dataReaderFactory);
         }
 
         protected override Seasar.Dao.IRowCreator CreateRowCreator() {
@@ -295,38 +295,6 @@ namespace ${glPackageBaseCommonS2Dao} {
     // =====================================================================================
     //                                                                       Extension Class
     //                                                                       ===============
-    public class SelectDynamicCommandExtension : SelectDynamicCommand {
-        /** Log-instance. */
-        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        private readonly IDataReaderHandler _dataReaderHandler;
-        private readonly IDataReaderFactory _dataReaderFactory;
-
-        public SelectDynamicCommandExtension(IDataSource dataSource,
-            ICommandFactory commandFactory,
-            IDataReaderHandler dataReaderHandler, IDataReaderFactory dataReaderFactory)
-            : base(dataSource, commandFactory, dataReaderHandler, dataReaderFactory) {
-            _dataReaderHandler = dataReaderHandler;
-            _dataReaderFactory = dataReaderFactory;
-        }
-
-        public override object Execute(object[] args) {
-            ICommandContext ctx = Apply(args);
-            BasicSelectHandler selectHandler = new BasicSelectHandler(DataSource,
-                ctx.Sql, _dataReaderHandler, CommandFactory, _dataReaderFactory);
-#if ($database.isSelectQueryTimeoutValid())
-
-            int timeout = ${database.SelectQueryTimeout};
-            if (_log.IsDebugEnabled) {
-                _log.Debug("@SelectDynamicCommand: selectHandler.CommandTimeout = " + timeout + ";// from SelectQueryTimeout");
-            }
-            selectHandler.CommandTimeout = timeout;
-#end
-
-            return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
-        }
-    }
-
     public class BeanMetaDataExtension : BeanMetaDataImpl {
         public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {

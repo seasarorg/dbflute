@@ -17,7 +17,7 @@
 
     <!-- S2Dao component. -->
     <component class="Seasar.Dao.Impl.FieldAnnotationReaderFactory" />
-    <component class="${database.extendedAnnotationReaderFactoryClassName}"/>
+    <component class="${database.extendedDaoMetaDataFactoryImplClassName}"/>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
 
     <!-- Dao selector. -->

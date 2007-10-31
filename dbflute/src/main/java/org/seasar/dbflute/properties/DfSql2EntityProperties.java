@@ -103,7 +103,9 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         if (packageString != null && packageString.trim().length() != 0) {
             return packageString;
         } else {
-            final String defaultPackage = getGeneratedClassPackageProperties().getBaseEntityPackage() + ".customize";
+            final String customizePackage = getCustomizePackage();
+            final String defaultPackage = getGeneratedClassPackageProperties().getBaseEntityPackage() + "."
+                    + customizePackage;
             if (defaultPackage != null && defaultPackage.trim().length() != 0) {
                 return defaultPackage;
             } else {
@@ -114,7 +116,11 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
     }
 
     public String getDBMetaPackage() {
-        return getBaseEntityPackage() + ".dbmeta";
+        String dbmetaPackage = "dbmeta";
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            dbmetaPackage = "Dbm";
+        }
+        return getBaseEntityPackage() + "." + dbmetaPackage;
     }
 
     public String getExtendedEntityPackage() {
@@ -122,8 +128,9 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         if (packageString != null && packageString.trim().length() != 0) {
             return packageString;
         } else {
-            final String defaultPackage = getGeneratedClassPackageProperties().getExtendedEntityPackage()
-                    + ".customize";
+            final String customizePackage = getCustomizePackage();
+            final String defaultPackage = getGeneratedClassPackageProperties().getExtendedEntityPackage() + "."
+                    + customizePackage;
             if (defaultPackage != null && defaultPackage.trim().length() != 0) {
                 return defaultPackage;
             } else {
@@ -133,12 +140,22 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         }
     }
 
+    protected String getCustomizePackage() {
+        String customizePackage = "customize";
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            customizePackage = "Customize";
+        }
+        return customizePackage;
+    }
+
     public String getBaseParameterBeanPackage() {
         final String packageString = getPmbeanPackageString();
         if (packageString != null && packageString.trim().length() != 0) {
             return packageString;
         } else {
-            final String defaultPackage = getGeneratedClassPackageProperties().getBaseDaoPackage() + ".pmbean";
+            final String pmbeanPackage = getPmbeanPackage();
+            final String defaultPackage = getGeneratedClassPackageProperties().getBaseDaoPackage() + "."
+                    + pmbeanPackage;
             if (defaultPackage != null && defaultPackage.trim().length() != 0) {
                 return defaultPackage;
             } else {
@@ -153,7 +170,9 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         if (packageString != null && packageString.trim().length() != 0) {
             return packageString;
         } else {
-            final String defaultPackage = getGeneratedClassPackageProperties().getExtendedDaoPackage() + ".pmbean";
+            final String pmbeanPackage = getPmbeanPackage();
+            final String defaultPackage = getGeneratedClassPackageProperties().getExtendedDaoPackage() + "."
+                    + pmbeanPackage;
             if (defaultPackage != null && defaultPackage.trim().length() != 0) {
                 return defaultPackage;
             } else {
@@ -162,4 +181,13 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
             }
         }
     }
+    
+    protected String getPmbeanPackage() {
+        String pmbeanPackage = "pmbean";
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            pmbeanPackage = "PmBean";
+        }
+        return pmbeanPackage;
+    }
+
 }

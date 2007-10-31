@@ -88,6 +88,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.Dbm")
       #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.Dbm.Info")
       #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
+      #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
       #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
       #set ($glPackageBaseDaoCursor = "${database.baseDaoPackage}.Cursor" )
       #set ($glPackageBaseEntity = "${database.baseEntityPackage}")

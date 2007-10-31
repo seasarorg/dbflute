@@ -72,11 +72,11 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
     public boolean isAvailableDaoMethodLazyInitializing() {
         return booleanProp("torque.isAvailableDaoMethodLazyInitializing", false);
     }
-    
+
     public boolean isAvailableDaoMethodMetaDataInitializing() {
         return booleanProp("torque.isAvailableDaoMethodMetaDataInitializing", false);
     }
-    
+
     // ===============================================================================
     //                                                                    S2Dao Follow
     //                                                                    ============
@@ -92,8 +92,18 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
         final DfGeneratedClassPackageProperties generatedClassPackageProperties = getGeneratedClassPackageProperties();
         final String baseCommonPackage = generatedClassPackageProperties.getBaseCommonPackage();
         final String projectPrefix = basicProperties.getProjectPrefix();
-        final String defaultClassName = baseCommonPackage + ".s2dao." + projectPrefix + "S2DaoMetaDataFactoryImpl";
+        final String s2daoPackage = getS2DaoPackage();
+        final String defaultClassName = baseCommonPackage + "." + s2daoPackage + "." + projectPrefix
+                + "S2DaoMetaDataFactoryImpl";
         return stringPropNoEmpty("torque.extendedDaoMetaDataFactoryImplClassName", defaultClassName);
+    }
+
+    protected String getS2DaoPackage() {
+        String name = "s2dao";
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            name = "S2Dao";
+        }
+        return name;
     }
 
     public String getExtendedAnnotationReaderFactoryClassName() {
