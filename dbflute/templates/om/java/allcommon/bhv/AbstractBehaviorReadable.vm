@@ -490,37 +490,37 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * Help load referer internally. <br />
      * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
      * 
-     * @param <BASE_ENTITY_TYPE> The type of base entity.
+     * @param <LOCAL_ENTITY_TYPE> The type of base entity.
      * @param <PK_TYPE> The type of primary key.
      * @param <REFERER_CB_TYPE> The type of referer condition-bean.
      * @param <REFERER_ENTITY_TYPE> The type of referer entity.
-     * @param baseEntityList The list of base entity. (NotNull)
+     * @param localEntityList The list of local entity. (NotNull)
      * @param loadRefererOption The option of load referer. (NotNull)
      * @param callback The internal callback of load referer. (NotNull) 
      */
-    protected <BASE_ENTITY_TYPE extends ${glEntityInterfaceName}, PK_TYPE, REFERER_CB_TYPE extends ${glConditionBeanInterfaceName}, REFERER_ENTITY_TYPE extends ${glEntityInterfaceName}>
-            void helpLoadRefererInternally(java.util.List<BASE_ENTITY_TYPE> baseEntityList
+    protected <LOCAL_ENTITY_TYPE extends ${glEntityInterfaceName}, PK_TYPE, REFERER_CB_TYPE extends ${glConditionBeanInterfaceName}, REFERER_ENTITY_TYPE extends ${glEntityInterfaceName}>
+            void helpLoadRefererInternally(java.util.List<LOCAL_ENTITY_TYPE> localEntityList
                                          , ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<REFERER_CB_TYPE, REFERER_ENTITY_TYPE> loadRefererOption
-                                         , InternalLoadRefererCallback<BASE_ENTITY_TYPE, PK_TYPE, REFERER_CB_TYPE, REFERER_ENTITY_TYPE> callback) {
+                                         , InternalLoadRefererCallback<LOCAL_ENTITY_TYPE, PK_TYPE, REFERER_CB_TYPE, REFERER_ENTITY_TYPE> callback) {
 
         // - - - - - - - - - - -
         // Assert pre-condition
         // - - - - - - - - - - -
-        assertObjectNotNull("baseEntityList", baseEntityList);
+        assertObjectNotNull("localEntityList", localEntityList);
         assertObjectNotNull("loadRefererOption", loadRefererOption);
-        if (baseEntityList.isEmpty()) {
+        if (localEntityList.isEmpty()) {
             return;
         }
 
         // - - - - - - - - - - - - - -
         // Prepare temporary container
         // - - - - - - - - - - - - - -
-        final java.util.Map<PK_TYPE, BASE_ENTITY_TYPE> pkBaseEntityMap = new java.util.LinkedHashMap<PK_TYPE, BASE_ENTITY_TYPE>();
+        final java.util.Map<PK_TYPE, LOCAL_ENTITY_TYPE> pkBaseEntityMap = new java.util.LinkedHashMap<PK_TYPE, LOCAL_ENTITY_TYPE>();
         final java.util.List<PK_TYPE> pkList = new java.util.ArrayList<PK_TYPE>();
-        for (BASE_ENTITY_TYPE baseEntity : baseEntityList) {
-            final PK_TYPE primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(baseEntity);
-            pkList.add(callback.callbackBase_getPrimaryKeyValue(baseEntity));
-            pkBaseEntityMap.put(toLowerCasePrimaryKeyIfString(primaryKeyValue), baseEntity);
+        for (LOCAL_ENTITY_TYPE localEntity : localEntityList) {
+            final PK_TYPE primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(localEntity);
+            pkList.add(callback.callbackBase_getPrimaryKeyValue(localEntity));
+            pkBaseEntityMap.put(toLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
         }
 
         // - - - - - - - - - - - - - - - -
@@ -562,23 +562,23 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             (pkReffererListMap.get(refererListKey)).add(refererEntity);
 
             // for Reverse Reference.
-            final BASE_ENTITY_TYPE baseEntity = pkBaseEntityMap.get(refererListKey);
-            callback.callbackReferer_setForeignEntity(refererEntity, baseEntity);
+            final LOCAL_ENTITY_TYPE localEntity = pkBaseEntityMap.get(refererListKey);
+            callback.callbackReferer_setForeignEntity(refererEntity, localEntity);
         }
 
         // - - - - - - - - - - - - - - - - - -
         // Relate referer list to base entity
         // - - - - - - - - - - - - - - - - - -
-        for (BASE_ENTITY_TYPE baseEntity : baseEntityList) {
+        for (LOCAL_ENTITY_TYPE localEntity : localEntityList) {
             final PK_TYPE refererListKey;
             {
-                final PK_TYPE primaryKey = callback.callbackBase_getPrimaryKeyValue(baseEntity);
+                final PK_TYPE primaryKey = callback.callbackBase_getPrimaryKeyValue(localEntity);
                 refererListKey = toLowerCasePrimaryKeyIfString(primaryKey);
             }
             if (pkReffererListMap.containsKey(refererListKey)) {
-                callback.callbackBase_setRefererList(baseEntity, pkReffererListMap.get(refererListKey));
+                callback.callbackBase_setRefererList(localEntity, pkReffererListMap.get(refererListKey));
             } else {
-                callback.callbackBase_setRefererList(baseEntity, new java.util.ArrayList<REFERER_ENTITY_TYPE>());
+                callback.callbackBase_setRefererList(localEntity, new java.util.ArrayList<REFERER_ENTITY_TYPE>());
             }
         }
     }
@@ -595,17 +595,17 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     /**
-     * @param <BASE_ENTITY_TYPE> The type of base entity.
+     * @param <LOCAL_ENTITY_TYPE> The type of base entity.
      * @param <PK_TYPE> The type of primary key.
      * @param <REFERER_CB_TYPE> The type of referer condition-bean.
      * @param <REFERER_ENTITY_TYPE> The type of referer entity.
      */
-    protected static interface InternalLoadRefererCallback<BASE_ENTITY_TYPE extends ${glEntityInterfaceName}
+    protected static interface InternalLoadRefererCallback<LOCAL_ENTITY_TYPE extends ${glEntityInterfaceName}
                                                          , PK_TYPE, REFERER_CB_TYPE extends ${glConditionBeanInterfaceName}
                                                          , REFERER_ENTITY_TYPE extends ${glEntityInterfaceName}> {
         // For Base
-        public PK_TYPE callbackBase_getPrimaryKeyValue(BASE_ENTITY_TYPE entity);
-        public void callbackBase_setRefererList(BASE_ENTITY_TYPE entity, java.util.List<REFERER_ENTITY_TYPE> refererList);
+        public PK_TYPE callbackBase_getPrimaryKeyValue(LOCAL_ENTITY_TYPE entity);
+        public void callbackBase_setRefererList(LOCAL_ENTITY_TYPE entity, java.util.List<REFERER_ENTITY_TYPE> refererList);
 
         // For Referer
         public REFERER_CB_TYPE callbackReferer_newMyConditionBean();
@@ -613,17 +613,17 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         public void callbackReferer_queryAddOrderByForeignKeyAsc(REFERER_CB_TYPE cb);
         public java.util.List<REFERER_ENTITY_TYPE> callbackReferer_selectList(REFERER_CB_TYPE cb);
         public PK_TYPE callbackReferer_getForeignKeyValue(REFERER_ENTITY_TYPE entity);
-        public void callbackReferer_setForeignEntity(REFERER_ENTITY_TYPE refererEntity, BASE_ENTITY_TYPE baseEntity);
+        public void callbackReferer_setForeignEntity(REFERER_ENTITY_TYPE refererEntity, LOCAL_ENTITY_TYPE localEntity);
     }
 
     // ===================================================================================
     //                                                             Pullout Internal Helper
     //                                                             =======================
-    protected <BASE_ENTITY_TYPE extends ${glEntityInterfaceName}, FOREIGN_ENTITY_TYPE extends ${glEntityInterfaceName}>
-            java.util.List<FOREIGN_ENTITY_TYPE> helpPulloutInternally(java.util.List<BASE_ENTITY_TYPE> baseEntityList, InternalPulloutCallback<BASE_ENTITY_TYPE, FOREIGN_ENTITY_TYPE> callback) {
-        assertObjectNotNull("baseEntityList", baseEntityList);
+    protected <LOCAL_ENTITY_TYPE extends ${glEntityInterfaceName}, FOREIGN_ENTITY_TYPE extends ${glEntityInterfaceName}>
+            java.util.List<FOREIGN_ENTITY_TYPE> helpPulloutInternally(java.util.List<LOCAL_ENTITY_TYPE> localEntityList, InternalPulloutCallback<LOCAL_ENTITY_TYPE, FOREIGN_ENTITY_TYPE> callback) {
+        assertObjectNotNull("localEntityList", localEntityList);
         final java.util.Set<FOREIGN_ENTITY_TYPE> foreignSet = new java.util.LinkedHashSet<FOREIGN_ENTITY_TYPE>();
-        for (BASE_ENTITY_TYPE entity : baseEntityList) {
+        for (LOCAL_ENTITY_TYPE entity : localEntityList) {
             final FOREIGN_ENTITY_TYPE foreignEntity = callback.callbackGetForeignEntity(entity);
             if (foreignEntity == null || foreignSet.contains(foreignEntity)) {
                 continue;
@@ -633,8 +633,8 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return new java.util.ArrayList<FOREIGN_ENTITY_TYPE>(foreignSet);
     }
 
-    protected static interface InternalPulloutCallback<BASE_ENTITY_TYPE extends ${glEntityInterfaceName}, FOREIGN_ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public FOREIGN_ENTITY_TYPE callbackGetForeignEntity(BASE_ENTITY_TYPE entity);
+    protected static interface InternalPulloutCallback<LOCAL_ENTITY_TYPE extends ${glEntityInterfaceName}, FOREIGN_ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public FOREIGN_ENTITY_TYPE callbackGetForeignEntity(LOCAL_ENTITY_TYPE entity);
     }
 
     // ===================================================================================

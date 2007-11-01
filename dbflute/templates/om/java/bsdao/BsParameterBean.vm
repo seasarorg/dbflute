@@ -57,6 +57,9 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     }
 #end
 
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
     /**
      * @param value Query value. (Nullable)
      * @return Converted value. (Nullable)

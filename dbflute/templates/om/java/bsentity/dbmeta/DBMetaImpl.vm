@@ -593,8 +593,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * 
      * @return The list of column db-name. (NotNull and NotEmpty)
      */
-    public java.util.List${database.filterGenericsString(${glColumnInfoName})} getColumnInfoList() {
-        final java.util.List${database.filterGenericsString(${glColumnInfoName})} columnInfoList = new java.util.ArrayList${database.filterGenericsString(${glColumnInfoName})}();
+    public java.util.List<${glColumnInfoName}> getColumnInfoList() {
+        final java.util.List<${glColumnInfoName}> columnInfoList = new java.util.ArrayList<${glColumnInfoName}>();
 #foreach ($col in $table.columns)
         columnInfoList.add(column${col.javaBeansRulePropertyNameInitCap}());
 #end
@@ -900,8 +900,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                       Common Column
-    //                                                                       =============
+    //                                                                  Common Column Info
+    //                                                                  ==================
     /**
      * ${database.ImplementComment}
      * 
@@ -914,7 +914,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                     Entity Handling
     //                                                                     ===============
-#if ($database.isAvailableGenerics())
     // -----------------------------------------------------
     //                                                Accept
     //                                                ------
@@ -951,82 +950,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         String msg = "This table has no primary-keys: " + getTableDbName();
         throw new IllegalStateException(msg);
 #end
-
     }
-#else
-    // -----------------------------------------------------
-    //                                                Accept
-    //                                                ------
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entity Target entity. (NotNull)
-     * @param primaryKeyMap Primary key map. (NotNull and NotEmpty)
-     */
-    public void acceptPrimaryKeyMap(${glEntityInterfaceName} entity, java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
-#if ($table.hasPrimaryKey())
-        final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
-        MapAssertUtil.assertPrimaryKeyMapNotNullAndNotEmpty(primaryKeyMap);
-  #foreach ($col in $table.PrimaryKey)
-
-        MapAssertUtil.assertColumnExistingInPrimaryKeyMap(primaryKeyMap, "${col.Name}");
-        {
-            final Object obj = primaryKeyMap.get("${col.Name}");
-            if (obj == null) {
-                myEntity.set${col.JavaName}(null); entity.getModifiedPropertyNames().remove("${col.JavaBeansRulePropertyName}");
-            } else {
-    #if ($col.isJavaNativeStringObject())
-
-                helpCheckingTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-                myEntity.set${col.JavaName}((String)obj);
-            }
-        }
-    #else
-      #if ($col.isJavaNativeDateObject())
-
-                if (obj instanceof ${col.JavaNative}) {
-                    myEntity.set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    myEntity.set${col.JavaName}(new ${col.JavaNative}(helpParsingDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
-                }
-            }
-        }
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
-
-                if (obj instanceof ${col.JavaNative}) {
-                    myEntity.set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    myEntity.set${col.JavaName}(null);// Binary as String is out of target.
-                }
-            }
-        }
-        #else
-
-                if (obj instanceof ${col.JavaNative}) {
-                    myEntity.set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    try {
-                        myEntity.set${col.JavaName}(new ${col.JavaNative}((String)obj));
-                    } catch (RuntimeException e) {
-                        String msg = "entity.set${col.JavaName}(new ${col.JavaNative}((String)obj))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + obj + "]", e);
-                    }
-                }
-            }
-        }
-        #end
-      #end
-    #end
-  #end
-#else
-
-        String msg = "This table has no primary-keys: " + getTableDbName();
-        throw new IllegalStateException(msg);
-#end
-
-    }
-#end
 
     /**
      * ${database.ImplementComment}
@@ -1038,7 +962,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         MapStringUtil.acceptPrimaryKeyMapString(primaryKeyMapString, entity);
     }
 
-#if ($database.isAvailableGenerics())
     /**
      * ${database.ImplementComment}
      * 
@@ -1067,71 +990,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
     }
 
-#else
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entity Target entity. (NotNull)
-     * @param columnValueMap Column-value map. (NotNull and NotEmpty)
-     */
-    public void acceptColumnValueMap(${glEntityInterfaceName} entity, java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap) {
-        final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
-        MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
-  #foreach ($col in $table.columns)
-
-        {
-            final Object obj = columnValueMap.get("${col.Name}");
-            if (obj == null) {
-                myEntity.set${col.JavaName}(null); entity.getModifiedPropertyNames().remove("${col.JavaBeansRulePropertyName}");
-            } else {
-    #if ($col.isJavaNativeStringObject())
-
-                helpCheckingTypeString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}");
-                myEntity.set${col.JavaName}((String)obj);
-            }
-        }
-    #else
-      #if ($col.isJavaNativeDateObject())
-
-                if (obj instanceof ${col.JavaNative}) {
-                    myEntity.set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    myEntity.set${col.JavaName}(new ${col.JavaNative}(helpParsingDateString(obj, "${col.UncapitalisedJavaName}", "${col.JavaNative}")));
-                }
-            }
-        }
-      #else
-        #if (${col.isJavaNativeBinaryObject()})
-
-                if (obj instanceof ${col.JavaNative}) {
-                    myEntity.set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    myEntity.set${col.JavaName}(null);// Binary as String is out of target.
-                }
-            }
-        }
-        #else
-
-                if (obj instanceof ${col.JavaNative}) {
-                    myEntity.set${col.JavaName}((${col.JavaNative})obj);
-                } else {
-                    try {
-                        myEntity.set${col.JavaName}(new ${col.JavaNative}((String)obj));
-                    } catch (RuntimeException e) {
-                        String msg = "set${col.JavaName}(new ${col.JavaNative}((String)obj))";
-                        throw new RuntimeException(msg + " threw the exception: value=[" + obj + "]", e);
-                    }
-                }
-            }
-        }
-        #end
-      #end
-    #end
-  #end
-
-    }
-#end
-
     /**
      * ${database.ImplementComment}
      * 
@@ -1141,16 +999,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public void acceptColumnValueMapString(${glEntityInterfaceName} entity, String columnValueMapString) {
         MapStringUtil.acceptColumnValueMapString(columnValueMapString, entity);
     }
-
-#if (!$database.isAvailableGenerics())
-    private void helpCheckingTypeString(Object value, String propertyName, String typeName) {
-        MapStringUtil.checkTypeString(value, propertyName, typeName);
-    }
-
-    private long helpParsingDateString(Object value, String propertyName, String typeName) {
-        return MapStringUtil.parseDateStringAsMillis(value, propertyName, typeName);
-    }
-#end
 
     // -----------------------------------------------------
     //                                               Extract
@@ -1215,7 +1063,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         final ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})entity;
         final String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         final StringBuffer sb = new StringBuffer();
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
         helpAppendingColumnValueString(sb, delimiter, equal, "${col.Name}", myEntity.get${col.JavaName}());
 #end
 
@@ -1314,8 +1162,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @param entity Target entity. (NotNull)
      * @return The list of column value. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('Object')} convertToColumnValueList(${glEntityInterfaceName} entity) {
-        return new java.util.ArrayList${database.filterGenericsString('Object')}(convertToColumnValueMap(entity).values());
+    public java.util.List<Object> convertToColumnValueList(${glEntityInterfaceName} entity) {
+        return new java.util.ArrayList<Object>(convertToColumnValueMap(entity).values());
     }
 
     /**
@@ -1324,9 +1172,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @param entity Target entity. (NotNull)
      * @return The map of column value. (NotNull)
      */
-    public java.util.Map${database.filterGenericsString('String, Object')} convertToColumnValueMap(${glEntityInterfaceName} entity) {
+    public java.util.Map<String, Object> convertToColumnValueMap(${glEntityInterfaceName} entity) {
         final ${myExtendedObjectClassName} myEntity = downcast(entity);
-        final java.util.Map${database.filterGenericsString('String, Object')} valueMap = new java.util.LinkedHashMap${database.filterGenericsString('String, Object')}();
+        final java.util.Map<String, Object> valueMap = new java.util.LinkedHashMap<String, Object>();
 #foreach ($col in $table.columns)
         valueMap.put("${col.name}", myEntity.get${col.javaName}());
 #end
@@ -1339,8 +1187,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      * @param entity Target entity. (NotNull)
      * @return The list of column string-value. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('String')} convertToColumnStringValueList(${glEntityInterfaceName} entity) {
-        return new java.util.ArrayList${database.filterGenericsString('String')}(convertToColumnStringValueMap(entity).values());
+    public java.util.List<String> convertToColumnStringValueList(${glEntityInterfaceName} entity) {
+        return new java.util.ArrayList<String>(convertToColumnStringValueMap(entity).values());
     }
 
     /**
@@ -1351,7 +1199,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
      */
     public java.util.Map${database.filterGenericsString('String, String')} convertToColumnStringValueMap(${glEntityInterfaceName} entity) {
         final ${myExtendedObjectClassName} myEntity = downcast(entity);
-        final java.util.Map${database.filterGenericsString('String, String')} valueMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        final java.util.Map<String, String> valueMap = new java.util.LinkedHashMap<String, String>();
 #foreach ($col in $table.columns)
         valueMap.put("${col.name}", helpGettingColumnStringValue(myEntity.get${col.JavaName}()));
 #end

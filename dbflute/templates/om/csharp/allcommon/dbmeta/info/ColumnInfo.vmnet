@@ -1,0 +1,110 @@
+#set ($myClassName = "${glColumnInfoName}")
+
+using System;
+using System.Reflection;
+using ${glPackageBaseCommonDBMeta};
+
+namespace ${glPackageBaseCommonDBMetaInfo} {
+
+   public class ${myClassName} {
+
+       // ===================================================================================
+       //                                                                           Attribute
+       //                                                                           =========
+       protected ${glDBMetaInterfaceName} dbmeta;
+       protected String columnDbName;
+       protected String propertyName;
+       protected Type propertyType;
+       protected bool primary;
+       protected int columnSize;
+
+       // ===================================================================================
+       //                                                                         Easy-to-Use
+       //                                                                         ===========
+       public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName) {
+           this.dbmeta = dbmeta;
+           this.columnDbName = columnDbName;
+       }
+
+       public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int columnSize) {
+           this(dbmeta, columnDbName);
+           this.propertyName = propertyName;
+           this.propertyType = propertyType;
+           this.primary = primary;
+           this.columnSize = columnSize;
+       }
+
+       // ================================================================================
+       //                                                                           Finder
+       //                                                                           ======
+       public PropertyInfo FindProperty() {
+           return FindProperty(dbmeta.EntityType, this.propertyName, new Type[] { this.propertyType });
+       }
+
+       // ================================================================================
+       //                                                                         Accessor
+       //                                                                         ========
+       public ${glDBMetaInterfaceName} MyDBMeta {
+           get { return dbmeta; }
+           set { this.dbmeta = dbmeta; }
+       }
+
+       public String ColumnDbName {
+           get { return this.columnDbName; }
+           set { this.columnDbName = columnDbName; }
+       }
+
+       public String PropertyName {
+           get { return this.propertyName; }
+           set { this.propertyName = propertyName; }
+       }
+
+       public bool IsPrimary {
+           get { return this.primary; }
+           set { this.primary = primary; }
+       }
+
+       public int ColumnSize {
+           get { return this.columnSize; }
+           set { this.columnSize = columnSize; }
+       }
+
+       // ===================================================================================
+       //                                                                     Internal Helper
+       //                                                                     ===============
+       protected virtual PropertyInfo FindProperty(Type clazz, String methodName, Type[] argTypes) {
+           return clazz.GetProperty(methodName, argTypes);
+       }
+
+       // ===================================================================================
+       //                                                                      Basic Override
+       //                                                                      ==============
+       public override int GetHashCode() {
+           return dbmeta.GetHashCode() + columnDbName.GetHashCode();
+       }
+
+       public override bool Equals(Object obj) {
+           if (!(obj is ${myClassName})) {
+               return false;
+           }
+           ${myClassName} target = (${myClassName})obj;
+           if (this.dbmeta == null || target.MyDBMeta == null) {
+               return false;
+           }
+           if (!this.dbmeta.Equals(target.MyDBMeta)) {
+               return false;
+           }
+           if (this.columnDbName == null || target.ColumnDbName == null) {
+               return false;
+           }
+           if (!this.columnDbName.Equals(target.ColumnDbName)) {
+               return false;
+           }
+           return true;
+       }
+
+       public String ToString() {
+           return dbmeta.TableDbName + "." + columnDbName;
+       }
+    }
+}

@@ -17,7 +17,7 @@ namespace ${glPackageExtendedParameterBean} {
         //                                                                             Attribute
         //                                                                             =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-  #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
         /// <summary>The value of ${propertyName}. </summary>
         protected ${propertyType} _${propertyName};
@@ -33,13 +33,25 @@ namespace ${glPackageExtendedParameterBean} {
         //                                                                              Accessor
         //                                                                              ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-  #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
         public ${propertyType} ${database.initCap($propertyName)} {
+#if ($propertyType.endsWith("String"))
+            get { return ($propertyType)ConvertEmptyToNullIfString(_${propertyName});
+#else
             get { return _${propertyName}; }
+#end
             set { _${propertyName} = value; }
         }
 #end
+
+        protected String convertEmptyToNullIfString(String value) {
+            return filterRemoveEmptyString(value);
+        }
+
+        protected String filterRemoveEmptyString(String value) {
+            return ((value != null && !"".equals(value)) ? value : null);
+        }
 
         // =====================================================================================
         //                                                                 Basic Override Method

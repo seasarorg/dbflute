@@ -121,29 +121,28 @@ namespace ${myExtendedEntityPackageName} {
         /// ${database.ImplementComment}
         /// </summary>
         public String TableDbName {
-            get { return "${table.Name}"; }
+            get { return "${table.name}"; }
         }
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         public String TablePropertyName {
-            get { return "${table.javaBeansRulePropertyNameInitCap}"; }
+            get { return "${table.javaName}"; }
         }
-
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         public String TableCapPropName {
-            get { return "${table.JavaName}"; }
+            get { return "${table.javaName}"; }
         }
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         public String TableUncapPropName {
-            get { return "${table.UncapitalisedJavaName}"; }
+            get { return "${table.uncapitalisedJavaName}"; }
         }
         #endregion
 

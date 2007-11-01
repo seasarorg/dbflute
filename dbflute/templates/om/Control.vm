@@ -1049,6 +1049,15 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ColumnInfo.${glTemplateFileExtension}",$path,"", "")
     #end
 
+    #if ($database.isTargetLanguageCSharp())
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parse('ColumnInfo');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glColumnInfoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ColumnInfo.${glTemplateFileExtension}",$path,"", "")
+    #end
+
     ## Setup java directory.
     $database.setupJavaDir_for_dbmetaInstanceHandler()
 

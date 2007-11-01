@@ -14,27 +14,6 @@ namespace ${glPackageBaseCommonDBMeta} {
     public interface ${myClassName} {
 
         // =====================================================================================
-        //                                                                            Table Name
-        //                                                                            ==========
-        /// <summary>
-        /// Get table db-name.
-        /// </summary> 
-        /// <returns>Table db-name. (NotNull)</returns>
-        String GetTableDbName();
-
-        /// <summary>
-        /// Get table cap-prop-name.
-        /// </summary> 
-        /// <returns>Table cap-prop-name. (NotNull)</returns>
-        String GetTableCapPropName();
-
-        /// <summary>
-        /// Get table uncap-prop-name.
-        /// </summary> 
-        /// <returns>Table uncap-prop-name. (NotNull)</returns>
-        String GetTableUncapPropName();
-
-        // =====================================================================================
         //                                                                        DB-Name Method
         //                                                                        ==============
         /// <summary>
@@ -167,71 +146,28 @@ namespace ${glPackageBaseCommonDBMeta} {
         /// <returns>{uncap-prop-name : cap-prop-name} map.</returns>
         System.Collections.Generic.IDictionary<String, String> GetUncapPropNameCapPropNameMap();
 
-        // =====================================================================================
-        //                                                                           Type Getter
-        //                                                                           ===========
-        /**
-         * Get the type of dao.
-         * 
-         * @return The type of dao. (NotNull)
-         */
-        Type GetDaoType();
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        #region Table Name
+        public String TableDbName { get; }
+        public String TablePropertyName { get; }
+        public String TableCapPropName { get; }
+        public String TableUncapPropName { get; }
+        #endregion
 
-        /**
-         * Get the type of entity.
-         * 
-         * @return The type of entity. (NotNull)
-         */
-        Type GetEntityType();
-
-        /**
-         * Get the type of condition-bean.
-         * 
-         * @return The type of condition-bean. (NotNull)
-         */
-        Type GetConditionBeanType();
+        // ===============================================================================
+        //                                                                     Object Type
+        //                                                                     ===========
+        Type DaoType { get; }
+        Type EntityType { get; }
+        Type ConditionBeanType { get; }
 
         // =====================================================================================
         //                                                                       Instance Getter
         //                                                                       ===============
-        /**
-         * New the instance of entity.
-         * 
-         * @return The instance of entity. (NotNull)
-         */
         ${glEntityInterfaceName} NewEntity();
-
-        /**
-         * New the instance of condition-bean.
-         * 
-         * @return The instance of condition-bean. (NotNull)
-         */
         ${glConditionBeanInterfaceName} NewConditionBean();
-#if ($database.isMakeDeprecated())
-
-        // =====================================================================================
-        //                                                                   Entity PropertyInfo
-        //                                                                   ===================
-        #region Entity PropertyInfo
-        /// <summary>
-        /// Get entity property-info by multi-name.
-        /// </summary>
-        /// <param name="multiName">Multi-name. (NotNull)</param>
-        /// <returns>Entity property-info of entity. (NotNull)</returns>
-        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
-        System.Reflection.PropertyInfo GetEntityPropertyInfoByMultiName(String multiName);
-        #endregion
-#end
-
-        // =====================================================================================
-        //                                                                        Foreign DBMeta
-        //                                                                        ==============
-        /// <summary>
-        /// Get foreign dbmeta.
-        /// </summary>
-        /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
-        /// <returns>Foreign DBMeta. (NotNull)</returns>
-        ${myClassName} GetForeignDBMeta(String foreignPropertyName);
 
         // =====================================================================================
         //                                                                         Determination

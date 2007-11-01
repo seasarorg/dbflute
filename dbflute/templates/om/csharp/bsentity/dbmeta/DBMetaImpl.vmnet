@@ -8,6 +8,7 @@ using System.Text;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonDBMetaInfo};
 using ${myExtendedEntityPackageName};
 #if (${isExistDao})
 
@@ -80,375 +81,291 @@ namespace ${myDBMetaPackageName} {
             return _instance;
         }
 
-        // =====================================================================================
-        //                                                                                  Name
-        //                                                                                  ====
+        // ===============================================================================
+        //                                                                 Name Definition
+        //                                                                 ===============
         #region Name
 
+        // -------------------------------------------------
+        //                                             Table
+        //                                             -----
         /// <summary>Table db-name.</summary>
-        public static readonly String TABLE_DB_NAME = "$table.Name";
+        public static readonly String TABLE_DB_NAME = "$table.name";
+
+        /// <summary>Table property-name.</summary>
+        public static readonly String TABLE_PROPERTY_NAME = "$table.c";
 
         /// <summary>Table cap-prop-name.</summary>
-        public static readonly String TABLE_CAP_PROP_NAME = "$table.JavaName";
+        public static readonly String TABLE_CAP_PROP_NAME = "$table.javaName";
 
         /// <summary>Table uncap-prop-name.</summary>
-        public static readonly String TABLE_UNCAP_PROP_NAME = "$table.UncapitalisedJavaName";
+        public static readonly String TABLE_UNCAP_PROP_NAME = "$table.uncapitalisedJavaName";
 
-    #foreach ($col in $table.Columns)
-
-        /// <summary>Deprecated so Use DB_NAME_${col.name}.</summary>
-        public static readonly String COLUMN_DB_NAME_OF_${col.JavaName} = "$col.Name";
-
+        // -------------------------------------------------
+        //                                    Column DB-Name
+        //                                    --------------
+#foreach ($col in $table.columns)
         /// <summary>DB name of ${col.name}.</summary>
-        public static readonly String DB_NAME_${col.name} = "$col.Name";
-    #end
+        public static readonly String DB_NAME_${col.name} = "$col.name";
+#end
 
-    #foreach ($col in $table.Columns)
+        // -------------------------------------------------
+        //                              Column Property-Name
+        //                              --------------------
+#foreach ($col in $table.columns)
+        /// <summary>Property name of ${col.name}.</summary>
+        public static readonly String PROPERTY_NAME_${col.name} = "$col.name";
+#end
 
-        /// <summary>Deprecated so Use CAP_PROP_NAME_${col.name}.</summary>
-        public static readonly String COLUMN_CAP_PROP_NAME_OF_${col.JavaName} = "$col.JavaName";
-
+        // -------------------------------------------------
+        //                   Column Prop-Name(JavaBeansRule)
+        //                   -------------------------------
+#foreach ($col in $table.columns)
         /// <summary>Cap-prop-name of ${col.javaName}.</summary>
         public static readonly String CAP_PROP_NAME_${col.javaName} = "$col.javaName";
-    #end
+#end
 
-    #foreach ($col in $table.Columns)
-
-        /// <summary>Deprecated so Use UNCAP_PROP_NAME_${col.name}.</summary>
-        public static readonly String COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName} = "$col.UncapitalisedJavaName";
-
+        // -------------------------------------------------
+        //                            Column Uncap-Prop-Name
+        //                            ----------------------
+#foreach ($col in $table.columns)
         /// <summary>Uncap-prop-name of ${col.uncapitalisedJavaName}.</summary>
         public static readonly String UNCAP_PROP_NAME_${col.uncapitalisedJavaName} = "$col.uncapitalisedJavaName";
-    #end
+#end
 
-    #foreach ($foreignKeys in $table.ForeignKeys)
+        // -------------------------------------------------
+        //                                      Foreign Name
+        //                                      ------------
+#foreach ($foreignKeys in $table.foreignKeys)
+        /// <summary>Java name of ${foreignKeys.foreignPropertyNameInitCap}.</summary>
+        public static readonly String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.foreignPropertyNameInitCap";
+#end
 
-        /// <summary>Java name of ${foreignKeys.ForeignPropertyName}.</summary>
-        public static readonly String COLUMN_CAP_PROP_NAME_OF_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.ForeignPropertyNameInitCap";
-    #end
-    #foreach ($children in $table.Referrers)
+        // -------------------------------------------------
+        //                                      Referer Name
+        //                                      ------------
+#foreach ($children in $table.refererList)
+        /// <summary>Java name of ${children.refererPropertyNameInitCap}.</summary>
+        public static readonly String REFERER_PROPERTY_NAME_${children.refererPropertyNameInitCap} = "$children.refererPropertyNameInitCap";
+#end
 
-        /// <summary>Java name of ${children.ReffererPropertyNameInitCap}.</summary>
-        public static readonly String COLUMN_CAP_PROP_NAME_OF_${children.ReffererPropertyNameInitCap} = "$children.ReffererPropertyNameInitCap";
-    #end
-
-    #foreach ($foreignKeys in $table.ForeignKeys)
-
-        /// <summary>Property name of ${foreignKeys.ForeignPropertyName}.</summary>
-        public static readonly String COLUMN_UNCAP_PROP_NAME_OF_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.ForeignPropertyName";
-    #end
-    #foreach ($children in $table.Referrers)
-
-        /// <summary>Property name of ${children.ReffererPropertyName}.</summary>
-        public static readonly String COLUMN_UNCAP_PROP_NAME_OF_${children.ReffererPropertyNameInitCap} = "$children.ReffererPropertyName";
-    #end
-
-        /// <summary>{uncap-prop-name : db-name} map.</summary>
-        protected static readonly System.Collections.Generic.IDictionary<String, String> _uncapPropNameDbNameMap;
-
-        /// <summary>{db-name : uncap-prop-name} map.</summary>
-        protected static readonly System.Collections.Generic.IDictionary<String, String> _dbNameUncapPropNameMap;
-
-        /// <summary>{cap-prop-name : db-name} map.</summary>
-        protected static readonly System.Collections.Generic.IDictionary<String, String> _capPropNameDbNameMap;
-
-        /// <summary>{db-name : cap-prop-name} map.</summary>
-        protected static readonly System.Collections.Generic.IDictionary<String, String> _dbNameCapPropNameMap;
-
-        /// <summary>{cap-prop-name : uncap-prop-name} map.</summary>
-        protected static readonly System.Collections.Generic.IDictionary<String, String> _capPropNameUncapPropNameMap;
-
-        /// <summary>{uncap-prop-name : cap-prop-name} map.</summary>
-        protected static readonly System.Collections.Generic.IDictionary<String, String> _uncapPropNameCapPropNameMap;
-
-        /// <summary>The map of entity property setupper.</summary>
-        protected static readonly IDictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap;
+        protected static readonly System.Collections.Generic.IDictionary<String, String> _dbNamePropertyNameKeyToLowerMap;
+        protected static readonly System.Collections.Generic.IDictionary<String, String> _propertyNameDbNameKeyToLowerMap;
 
         /// <summary>
-        /// Constractor
+        /// Static Constructor.
         /// </summary>
         static ${myClassName}() {
             {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
-                map.Add(TABLE_UNCAP_PROP_NAME, TABLE_DB_NAME);
-#foreach ($col in $table.Columns)
-                map.Add(COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName}, COLUMN_DB_NAME_OF_${col.JavaName});
+                map.Add(TABLE_DB_NAME.ToLower(), TABLE_PROPERTY_NAME);
+#foreach ($col in $table.columns)
+                map.Add(DB_NAME_${col.name}.ToLower(), PROPERTY_NAME_${col.javaName});
 #end
-                _uncapPropNameDbNameMap = map;
-            }
-            {
-                System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
-                map.Add(TABLE_DB_NAME, TABLE_UNCAP_PROP_NAME);
-#foreach ($col in $table.Columns)
-                map.Add(COLUMN_DB_NAME_OF_${col.JavaName}, COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName});
-#end
-                _dbNameUncapPropNameMap = map;
-            }
-            {
-                System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
-                map.Add(TABLE_CAP_PROP_NAME, TABLE_DB_NAME);
-#foreach ($col in $table.Columns)
-                map.Add(COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, COLUMN_DB_NAME_OF_${col.JavaName});
-#end
-                _capPropNameDbNameMap = map;
-            }
-            {
-                System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
-                map.Add(TABLE_DB_NAME, TABLE_CAP_PROP_NAME);
-#foreach ($col in $table.Columns)
-                map.Add(COLUMN_DB_NAME_OF_${col.JavaName}, COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
-#end
-                _dbNameCapPropNameMap = map;
-            }
-            {
-                System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
-                map.Add(TABLE_CAP_PROP_NAME, TABLE_UNCAP_PROP_NAME);
-#foreach ($col in $table.Columns)
-                map.Add(COLUMN_CAP_PROP_NAME_OF_${col.JavaName}, COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName});
-#end
-                _capPropNameUncapPropNameMap = map;
-            }
-            {
-                System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
-                map.Add(TABLE_UNCAP_PROP_NAME, TABLE_CAP_PROP_NAME);
-#foreach ($col in $table.Columns)
-                map.Add(COLUMN_UNCAP_PROP_NAME_OF_${col.JavaName}, COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
-#end
-                _uncapPropNameCapPropNameMap = map;
+                _dbNamePropertyNameKeyToLowerMap = map;
             }
 
-            // Entity Property Setupper
             {
-                IDictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>> map = new Dictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
+                System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
+                map.Add(TABLE_PROPERTY_NAME.ToLower(), TABLE_DB_NAME);
 #foreach ($col in $table.Columns)
-                map.Add("${col.javaName}", new ${myClassName}.EntityProperty${col.javaName}Setupper());
+                map.Add(PROPERTY_NAME_${col.javaName}.ToLower(), DB_NAME_${col.name});
 #end
-                _entityPropertySetupperMap = map;
+                _propertyNameDbNameKeyToLowerMap = map;
             }
         }
 
         #endregion
 
-        // =====================================================================================
-        //                                                                            Table Name
-        //                                                                            ==========
-        #region Table Name
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Table db-name. (NotNull)
-         */
-        public override String GetTableDbName() {
-            return TABLE_DB_NAME;
+        // ===============================================================================
+        //                                                                        Name Map
+        //                                                                        ========
+        #region Name Map
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary> 
+        /// <returns>{db-name : property-name} map.</returns>
+        public override System.Collections.Generic.IDictionary<String, String> GetDbNamePropertyNameKeyToLowerMap() {
+            return _dbNamePropertyNameKeyToLowerMap;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Table cap-prop-name. (NotNull)
-         */
-        public override String GetTableCapPropName() {
-            return TABLE_CAP_PROP_NAME;
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Table uncap-prop-name. (NotNull)
-         */
-        public override String GetTableUncapPropName() {
-            return TABLE_UNCAP_PROP_NAME;
-        }
-        #endregion
-
-        // =====================================================================================
-        //                                                                    DB-Name-Map Getter
-        //                                                                    ==================
-        #region DB-Name-Map Getter
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary> 
         /// <returns>{property-name : db-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> GetUncapPropNameDbNameMap() {
-            return _uncapPropNameDbNameMap;
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>{db-name : property-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> GetDbNameUncapPropNameMap() {
-            return _dbNameUncapPropNameMap;
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>{cap-prop-name : db-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> GetCapPropNameDbNameMap() {
-            return _capPropNameDbNameMap;
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>{db-name : cap-prop-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> GetDbNameCapPropNameMap() {
-            return _dbNameCapPropNameMap;
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>{cap-prop-name : uncap-prop-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> GetCapPropNameUncapPropNameMap() {
-            return _capPropNameUncapPropNameMap;
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>{uncap-prop-name : cap-prop-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> GetUncapPropNameCapPropNameMap() {
-            return _uncapPropNameCapPropNameMap;
+        public override System.Collections.Generic.IDictionary<String, String> GetPropertyNameDbNameKeyToLowerMap() {
+            return _propertyNameDbNameKeyToLowerMap;
         }
         #endregion
 
-        // =====================================================================================
-        //                                                                           Type Getter
-        //                                                                           ===========
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return The type of entity. (NotNull)
-         */
-        public override Type GetEntityType() {
-            return ENTITY_TYPE;
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        #region Table Name
+        public override String TableDbName {
+            get { return TABLE_DB_NAME; }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return The type of dao. (NotNull)
-         */
-        public override Type GetDaoType() {
+        public override String TablePropertyName {
+            get { return TABLE_PROPERTY_NAME; }
+        }
+
+        public override String TableCapPropName {
+            get { return TABLE_CAP_PROP_NAME; }
+        }
+
+        public override String TableUncapPropName {
+            get { return TABLE_UNCAP_PROP_NAME; }
+        }
+        #endregion
+
+        // ===============================================================================
+        //                                                                     Object Type
+        //                                                                     ===========
+        public override Type EntityType {
+            get { return ENTITY_TYPE; }
+        }
+
+        public override Type DaoType {
 #if (${isExistDao})
-
-            return DAO_TYPE;
+            get { return DAO_TYPE; }
 #else
-
-            String msg = "The entity does not have dao. So this method is invalid.";
-            throw new SystemException(msg + " dbmeta=" + ToString());
+            get {
+                String msg = "The entity does not have dao. So this method is invalid.";
+                throw new SystemException(msg + " dbmeta=" + ToString());
+            }
 #end
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return The type of condition-bean. (NotNull)
-         */
-        public override Type GetConditionBeanType() {
+        public override Type ConditionBeanType {
 #if (${isExistConditionBean})
-
-            return CONDITION_BEAN_TYPE;
+            get { return CONDITION_BEAN_TYPE; }
 #else
-
-            String msg = "The entity does not have condition-bean. So this method is invalid.";
-            throw new SystemException(msg + " dbmeta=" + ToString());
+            get {
+                String msg = "The entity does not have condition-bean. So this method is invalid.";
+                throw new SystemException(msg + " dbmeta=" + ToString());
+            }
 #end
         }
 
-        // =====================================================================================
-        //                                                                       Instance Getter
-        //                                                                       ===============
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return The instance of entity. (NotNull)
-         */
+        // ===============================================================================
+        //                                                                 Object Instance
+        //                                                                 ===============
         public override ${glEntityInterfaceName} NewEntity() {
             return NewMyEntity();
         }
 
-        /**
-         * New the instance of my entity.
-         * 
-         * @return The instance of my entity. (NotNull)
-         */ 
         public ${myExtendedObjectClassName} NewMyEntity() {
             return new ${myExtendedObjectClassName}();
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return The instance of condition-bean. (NotNull)
-         */
         public override ${glConditionBeanInterfaceName} NewConditionBean() {
 #if (${isExistConditionBean})
-
             return NewMyConditionBean();
 #else
-
             String msg = "The entity does not have condition-bean. So this method is invalid.";
             throw new SystemException(msg + " dbmeta=" + ToString());
 #end
         }
-#if (${isExistConditionBean})
 
-        /**
-         * New the instance of my condition-bean.
-         * 
-         * @return The instance of condition-bean. (NotNull)
-         */ 
+#if (${isExistConditionBean})
         public ${myConditionBeanClassName} NewMyConditionBean() {
             return new ${myConditionBeanClassName}();
         }
 #end
-#if ($database.isMakeDeprecated())
 
-        // =====================================================================================
-        //                                                                          PropertyInfo
-        //                                                                          ============
-        #region PropertyInfo
-
-#foreach ($col in $table.Columns)
-
-        /// <summary>The entity property-info of ${col.UncapitalisedJavaName}.</summary>
-        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
-        public static readonly PropertyInfo ENTITY_PROPERTY_INFO_${col.JavaName} = ENTITY_TYPE.GetProperty(COLUMN_CAP_PROP_NAME_OF_${col.JavaName});
+        // ===============================================================================
+        //                                                                     Column Info
+        //                                                                     ===========
+        public System.Collections.Generic.IList<${glColumnInfoName}> GetColumnInfoList() {
+            System.Collections.Generic.IList<${glColumnInfoName}> columnInfoList = new System.Collections.Generic.List<${glColumnInfoName}>();
+#foreach ($col in $table.columns)
+            columnInfoList.Add(Column${col.javaName}());
 #end
+            return columnInfoList;
+        }
 
-#foreach ($col in $table.Columns)
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>The entity property-info of ${col.UncapitalisedJavaName}.</returns>
-        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
-        public PropertyInfo GetEntityPropertyInfo_${col.JavaName}() {
-            return ENTITY_PROPERTY_INFO_${col.JavaName};
+#foreach ($col in $table.columns)
+        public ${glColumnInfoName} Column${col.javaName} {
+            get { return new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}); }
         }
 #end
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="multiName">Multi-name. (NotNull)</param>
-        /// <returns>Entity property-info. (NotNull)</returns>
-        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
-        public override PropertyInfo GetEntityPropertyInfoByMultiName(String multiName) {
-            String propertyName = GetCapPropNameByDbName(GetDbNameByMultiName(multiName));
-            MethodInfo method = this.GetType().GetMethod("GetEntityPropertyInfo_" + propertyName);
-            return (PropertyInfo)method.Invoke(this, null);
+        // ===============================================================================
+        //                                                                     Unique Info
+        //                                                                     ===========
+        // -------------------------------------------------
+        //                                   Primary Element
+        //                                   ---------------
+        public bool HasPrimaryKey {
+            get { return ${table.hasPrimaryKey()}; }
         }
 
-        #endregion
+        public override bool HasTwoOrMorePrimaryKeys {
+            get { return ${table.hasTwoOrMorePrimaryKeys()}; }
+        }
+
+        // ===============================================================================
+        //                                                                   Relation Info
+        //                                                                   =============
+        // -------------------------------------------------
+        //                                   Foreign Element
+        //                                   ---------------
+#foreach ($foreignKeys in $table.foreignKeys)
+#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+        // public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${foreignKeys.foreignPropertyNameInitCap} {
+        //     get {
+        //         ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
+        //         foreignInfo.ForeignPropertyName = "${foreignKeys.foreignPropertyNameInitCap}";
+        //         foreignInfo.LocalDBMeta = ${table.DBMetaClassName}.getInstance();
+        //         foreignInfo.ForeignDBMeta = ${foreignKeys.foreignTableDBMetaClassName}.getInstance();
+        //         IDictionary<$genericsColumnInfoMap> map = new IDictionary<$genericsColumnInfoMap>();
+#foreach ($column in $foreignKeys.localColumnList)
+        //         map.Add(column${column.javaName}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaName}());
+#end
+        //         foreignInfo.LocalForeignColumnInfoMap = map;
+        //         foreignInfo.RelationNo = ${table.resolveForeignIndex($foreignKeys)};
+        //         foreignInfo.OneToOne = ${foreignKeys.isOneToOne()};
+        //         return foreignInfo;
+        //     }
+        // }
 #end
 
-        // =====================================================================================
-        //                                                                        Foreign DBMeta
-        //                                                                        ==============
+        // -------------------------------------------------
+        //                                   Referer Element
+        //                                   ---------------
+        // -------------------------------------------------
+        //                                    Relation Trace
+        //                                    --------------
+
+        // ===============================================================================
+        //                                                                   Sequence Info
+        //                                                                   =============
+        public bool HasSequence {
+            get { return ${table.isUseSequence()}; }
+        }
+
+        // ===============================================================================
+        //                                                            Optimistic Lock Info
+        //                                                            ====================
+        public bool HasVersionNo {
+            get { return ${table.isUseVersionNo()}; }
+        }
+
+        public bool HasUpdateDate {
+            get { return ${table.isUseUpdateDate()}; }
+        }
+
+        // ===============================================================================
+        //                                                              Common Column Info
+        //                                                              ==================
+        public override bool HasCommonColumn {
+            get { return ${table.hasAllCommonColumn()}; }
+        }
+
+        // ===============================================================================
+        //                                                                  Foreign DBMeta
+        //                                                                  ==============
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
@@ -465,7 +382,7 @@ namespace ${myDBMetaPackageName} {
             }
             return (${glDBMetaInterfaceName})method.Invoke(this, null);
         }
-#foreach ($foreignKeys in $table.ForeignKeys)
+#foreach ($foreignKeys in $table.foreignKeys)
 
         /// <summary>
         /// Get foreign dbmeta of ${foreignKeys.foreignPropertyNameInitCap}.
@@ -475,7 +392,7 @@ namespace ${myDBMetaPackageName} {
             return ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm.GetInstance();
         }
 #end
-#foreach ($refferer in $table.Referrers)
+#foreach ($refferer in $table.refererList)
   #set ($reffererTable = $refferer.Table)
   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
   #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
@@ -494,26 +411,6 @@ namespace ${myDBMetaPackageName} {
   #end
 #end
 
-        // =====================================================================================
-        //                                                                         Determination
-        //                                                                         =============
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determination.
-         */
-        public override bool HasTwoOrMorePrimaryKeys {
-            get { return ${table.hasTwoOrMorePrimaryKeys()}; }
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determination.
-         */
-        public override bool HasCommonColumn {
-            get { return ${table.hasAllCommonColumn()}; }
-        }
 
         // =====================================================================================
         //                                                                 Entity Property Setup
