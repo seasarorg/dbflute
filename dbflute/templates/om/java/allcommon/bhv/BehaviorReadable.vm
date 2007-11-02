@@ -1,6 +1,5 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
-import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
@@ -9,9 +8,6 @@ import ${glPackageBaseCommonCBean}.${glOrderByBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
-
-import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
-import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
 
 /**
  * The interface of behavior-readable.
@@ -171,21 +167,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public ${database.sequenceReturnType} readNextVal();
 
-    // =====================================================================================
-    //                                                                            Token File
-    //                                                                            ==========
-    /**
-     * Output token-file from this table records.
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @param filename Name of the file. (NotNull and NotEmpty)
-     * @param tokenFileOutputOption token-file-output-option. (NotNull and Required{delimiter and encoding})
-     * @return Token-file-output-result. (NotNull)
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     */
-    public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBeanInterfaceName} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException;
-
+    // ===================================================================================
+    //                                                                        Static Class
+    //                                                                        ============
     /**
      * The interface of select-page callback.
      * 

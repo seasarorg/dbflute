@@ -155,8 +155,15 @@ targetdatabase = $targetDatabase
     ## [Allcommon-ConditionBean-Mapping]
     #set ($glEntityDtoMapperName = "${glProjectPrefix}EntityDtoMapper")
 
-    ## [Allcommon-ConditionBean-Mapping]
+    ## [Allcommon-ConditionBean-OutsideSql]
     #set ($glOutsideSqlContextName = "${glProjectPrefix}OutsideSqlContext")
+    #set ($glOutsideSqlDaoName = "${glProjectPrefix}OutsideSqlDao")
+    #set ($glOutsideSqlOptionName = "${glProjectPrefix}OutsideSqlOption")
+
+    ## [Allcommon-ConditionBean-OutsideSql-Executor]
+    #set ($glOutsideSqlBasicExecutorName = "${glProjectPrefix}OutsideSqlBasicExecutor")
+    #set ($glOutsideSqlCursorExecutorName = "${glProjectPrefix}OutsideSqlCursorExecutor")
+    #set ($glOutsideSqlPagingExecutorName = "${glProjectPrefix}OutsideSqlPagingExecutor")
 
     ## [Allcommon-ConditionBean-Pagenavi]
     #set ($glPageNumberLinkName = "${glProjectPrefix}PageNumberLink")
@@ -309,6 +316,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonCBeanMapping = "${database.baseCommonPackage}.cbean.mapping")
     #set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.cbean.grouping")
     #set ($glPackageBaseCommonCBeanOutsidesql = "${database.baseCommonPackage}.cbean.outsidesql")
+    #set ($glPackageBaseCommonCBeanOutsidesqlExecutor = "${database.baseCommonPackage}.cbean.outsidesql.executor")
     #set ($glPackageBaseCommonCBeanPagenavi = "${database.baseCommonPackage}.cbean.pagenavi")
     #set ($glPackageBaseCommonCBeanPagenaviGroup = "${database.baseCommonPackage}.cbean.pagenavi.group")
     #set ($glPackageBaseCommonCBeanPagenaviRange = "${database.baseCommonPackage}.cbean.pagenavi.range")
@@ -353,6 +361,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonCBeanMapping = "${database.baseCommonPackage}.CBean.Mapping")
       #set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.CBean.Grouping")
       #set ($glPackageBaseCommonCBeanOutsidesql = "${database.baseCommonPackage}.CBean.OutsideSql")
+      #set ($glPackageBaseCommonCBeanOutsidesqlExecutor = "${database.baseCommonPackage}.CBean.OutsideSql.Executor")
       #set ($glPackageBaseCommonCBeanPagenavi = "${database.baseCommonPackage}.CBean.PageNavi")
       #set ($glPackageBaseCommonCBeanPagenaviGroup = "${database.baseCommonPackage}.CBean.PageNavi.Group")
       #set ($glPackageBaseCommonCBeanPagenaviRange = "${database.baseCommonPackage}.CBean.PageNavi.Range")
@@ -826,9 +835,32 @@ targetdatabase = $targetDatabase
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql}))
       $database.makeDirectory($path)
 
-      $database.debug("    parseOutsideSqlContext()")
+      $database.debug("    parse('OutsideSqlContext')")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlContextName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlContext.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('OutsideSqlDao')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlDaoName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlDao.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('OutsideSqlOption')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlOptionName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlOption.${glTemplateFileExtension}",$path ,"", "")
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor}))
+      $database.makeDirectory($path)
+
+      $database.debug("    parse('OutsideSqlBasicExecutor')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlBasicExecutorName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlBasicExecutor.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('OutsideSqlCursorExecutor')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlCursorExecutorName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlCursorExecutor.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('OutsideSqlPagingExecutor')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlPagingExecutorName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlPagingExecutor.${glTemplateFileExtension}",$path ,"", "")
     #end
 
     ## -----------------------------------------------------

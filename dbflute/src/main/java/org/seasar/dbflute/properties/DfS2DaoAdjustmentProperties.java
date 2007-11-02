@@ -70,7 +70,8 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
     }
 
     public boolean isAvailableDaoMethodLazyInitializing() {
-        return booleanProp("torque.isAvailableDaoMethodLazyInitializing", false);
+        // The default value is true since DBFlute-0.5.7.
+        return booleanProp("torque.isAvailableDaoMethodLazyInitializing", true);
     }
 
     public boolean isAvailableDaoMethodMetaDataInitializing() {

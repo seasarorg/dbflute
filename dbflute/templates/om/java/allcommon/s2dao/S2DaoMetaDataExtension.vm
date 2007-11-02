@@ -27,6 +27,7 @@ import org.seasar.dao.BeanMetaDataFactory;
 import org.seasar.dao.Dbms;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
+import org.seasar.dao.SqlCommand;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.AbstractSqlCommand;
@@ -50,6 +51,7 @@ import org.seasar.dao.impl.PropertyTypeFactoryImpl;
 import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
 #end
 
+import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.types.ValueTypes;
@@ -58,11 +60,11 @@ import org.seasar.framework.beans.BeanDesc;
 #end
 import org.seasar.framework.util.StringUtil;
 
-#if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
-#end
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
+import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 
 /**
  * DaoMetaDataImpl for DBFlute.
@@ -203,7 +205,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 #end
 
-#if ($database.isAvailableGenerics())
     // ===================================================================================
     //                                                           OutsideSql Check Override
     //                                                           =========================
@@ -216,7 +217,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
         super.setupMethodByAuto(method);
     }
-#end
+
 #if ($database.isVersionAfter1046())
     // ===================================================================================
     //                                                           ResultSetHandler Override
@@ -246,37 +247,56 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 #end
 #end
-#if ($database.isAvailableDaoMethodLazyInitializing())
 
     // ===================================================================================
     //                                                           SqlCommand Setup Override
     //                                                           =========================
+    @Override
     protected void setupSqlCommand() {
         // Do nothing for lazy initializing!
     }
 
-    public org.seasar.dao.SqlCommand getSqlCommand(String methodName) throws org.seasar.framework.beans.MethodNotFoundRuntimeException {
-        {
-            final org.seasar.dao.SqlCommand cmd = (org.seasar.dao.SqlCommand) sqlCommands.get(methodName);
-            if (cmd != null) {
-                return cmd;
+    @Override
+    public SqlCommand getSqlCommand(String methodName) throws MethodNotFoundRuntimeException {
+        final SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
+        if (cmd != null) {
+            return cmd;
+        }
+        return initializeSqlCommand(methodName);
+    }
+
+    protected SqlCommand initializeSqlCommand(String methodName) throws MethodNotFoundRuntimeException {
+        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+            if (outsideSqlContext != null && outsideSqlContext.isSpecifiedOutsideSql()) {
+                return initializeSpecifiedOutsideSqlCommand(methodName, outsideSqlContext);
             }
         }
-
         final Method[] methods = daoBeanDesc.getMethods(methodName);
         if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
             setupMethod(methods[0]);
         }
-
-        {
-            final org.seasar.dao.SqlCommand cmd = (org.seasar.dao.SqlCommand) sqlCommands.get(methodName);
-            if (cmd != null) {
-                return cmd;
-            }
-            throw new org.seasar.framework.beans.MethodNotFoundRuntimeException(daoClass, methodName, null);
+        final SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
+        if (cmd != null) {
+            return cmd;
         }
+        throw new MethodNotFoundRuntimeException(daoClass, methodName, null);
     }
-#end
+
+    protected SqlCommand initializeSpecifiedOutsideSqlCommand(String sqlCommandKey, ${glOutsideSqlContextName} outsideSqlContext) throws MethodNotFoundRuntimeException {
+        final Method[] methods = daoBeanDesc.getMethods(outsideSqlContext.getMethodName());// By real method name.
+        if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
+            setupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, methods[0], outsideSqlContext);
+        }
+        final SqlCommand cmd = (SqlCommand) sqlCommands.get(sqlCommandKey);
+        if (cmd != null) {
+            return cmd;
+        }
+        String msg = "Internal Error! The methodName is not found:";
+        msg = msg + " sqlCommandKey=" + sqlCommandKey;
+        msg = msg + " sqlCommands=" + sqlCommands;
+        throw new IllegalStateException(msg);
+    }
 
     // ===================================================================================
     //                                             Customize SelectDynamicCommand Creation
@@ -667,60 +687,96 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                                 OutsideSql Override
     //                                                                 ===================
+    // -----------------------------------------------------
+    //                                     Normal OutsideSql
+    //                                     -----------------
+    @Override
     protected void setupSelectMethodByManual(Method method, String sql) {
-#if ($database.isAvailableGenerics())
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        Class<?>[] filteredParameterTypes;
+        final Class<?>[] parameterTypes = method.getParameterTypes();
+#if ($database.isVersionAfter1046())
+        final String[] argNames = this.daoAnnotationReader.getArgNames(method);
+#else
+        final String[] argNames = this.annotationReader.getArgNames(method);
+#end
+        final Class<?>[] argTypes;
         if (parameterTypes != null && parameterTypes.length > 0
-                && ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class.isAssignableFrom(parameterTypes[parameterTypes.length-1])) {
-            filteredParameterTypes = new Class<?>[parameterTypes.length - 1];
+                && ${glCursorHandlerName}.class.isAssignableFrom(parameterTypes[parameterTypes.length-1])) {
+            argTypes = new Class<?>[parameterTypes.length - 1];
             for (int i=0; i < parameterTypes.length - 1; i++) {
-                filteredParameterTypes[i] = parameterTypes[i];
+                argTypes[i] = parameterTypes[i];
             }
         } else {
-            filteredParameterTypes = parameterTypes;
+            argTypes = parameterTypes;
         }
-#else
-        Class[] filteredParameterTypes = method.getParameterTypes();
-#end
         final BeanMetaData myBeanMetaData = getOutsideSqlBeanMetaData(method);
-#if ($database.isVersionAfter1046())
-        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(createResultSetHandler(myBeanMetaData, method));
-        cmd.setSql(sql);
-        cmd.setArgNames(this.daoAnnotationReader.getArgNames(method));
-        cmd.setArgTypes(filteredParameterTypes);
-        this.sqlCommands.put(method.getName(), cmd);
-#else
-#if ($database.isVersionAfter1043())
-        final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData, annotationReader, dtoMetaDataFactory);
-#else
-        final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData);
-#end
-
-        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(factory.createResultSetHandler(method));
-        cmd.setSql(sql);
-        cmd.setArgNames(this.annotationReader.getArgNames(method));
-        cmd.setArgTypes(filteredParameterTypes);
-        this.sqlCommands.put(method.getName(), cmd);
-#end
+        registerSqlCommand(method.getName(), method, sql, argNames, argTypes, myBeanMetaData);
     }
 
     protected BeanMetaData getOutsideSqlBeanMetaData(Method method) {
         final Class beanClass4SelectMethodByManual = getOutsideSqlDefaultBeanClass(method);
         if (beanClass4SelectMethodByManual.equals(getBeanClass())) {
-            return getOutsideSqlDefaultBeanMetaData(method);
+            return getBeanMetaData();
         }
-        return getOutsideSqlCustomizeBeanMetaData(method);
-    }
-
-    protected BeanMetaData getOutsideSqlDefaultBeanMetaData(Method method) {
-        return getBeanMetaData();
-    }
-
-    protected BeanMetaData getOutsideSqlCustomizeBeanMetaData(Method method) {
         return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(getOutsideSqlDefaultBeanClass(method));
     }
 
+    // -----------------------------------------------------
+    //                                  Specified OutsideSql
+    //                                  --------------------
+    protected void setupSpecifiedOutsideSqlSelectCommand(String sqlCommandKey, Method method, ${glOutsideSqlContextName} outsideSqlContext) {
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        // The attribute of Specified-OutsideSqlContext.
+        // - - - - - - - - - - - - - - - - - - - - - - -
+        final String sql = outsideSqlContext.readOutsideSqlPath(getSqlFileEncoding());
+        final Object pmb = outsideSqlContext.getParameterBean();
+        final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
+
+        // - - - - - - - - - - - - - - -
+        // The attribute of SqlCommand.
+        // - - - - - - - - - - - - - - -
+        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
+        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
+
+        // - - - - - - - - - - - - - - - -
+        // Create customized BeanMetaData.
+        // - - - - - - - - - - - - - - - -
+        final Class<?> lastestArguementType = method.getParameterTypes()[method.getParameterTypes().length-1];
+        final BeanMetaData myBeanMetaData;
+        if (Class.class.isAssignableFrom(lastestArguementType)) {
+            // - - - - - - - -
+            // EntityHandling
+            // - - - - - - - -
+            final Class<?> customizeEntityType = (Class<?>)resultTypeSpecification;
+            myBeanMetaData = createSpecifiedOutsideSqlCustomizeBeanMetaData(customizeEntityType);
+        } else if (${glCursorHandlerName}.class.isAssignableFrom(lastestArguementType)) {
+            // - - - - - - - -
+            // CursorHandling
+            // - - - - - - - -
+            myBeanMetaData = createSpecifiedOutsideSqlCursorBeanMetaData(method);
+        } else {
+            String msg = "The lastestArguementType is unsupported:";
+            msg = msg + " lastestArguementType=" + lastestArguementType;
+            msg = msg + " method=" + method;
+            throw new IllegalStateException(msg);
+        }
+
+        // - - - - - - - - - - -
+        // Register Sql-Command.
+        // - - - - - - - - - - -
+        registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, myBeanMetaData);
+    }
+
+    protected BeanMetaData createSpecifiedOutsideSqlCustomizeBeanMetaData(Class clazz) {
+        return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(clazz);
+    }
+
+    protected BeanMetaData createSpecifiedOutsideSqlCursorBeanMetaData(Method method) {
+        return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(getOutsideSqlDefaultBeanClass(method));
+    }
+
+    // -----------------------------------------------------
+    //                                  Common of OutsideSql
+    //                                  --------------------
     protected BeanMetaDataFactory createOutsideSqlCustomizeBeanMetaDataFactory() {
         final ${glBeanMetaDataFactoryImpl} originalBmdFactory = new ${glBeanMetaDataFactoryImpl}() {
             protected BeanMetaDataImpl createBeanMetaDataImpl() {
@@ -804,6 +860,28 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         } else {
             return retType;
         }
+    }
+
+    protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, BeanMetaData myBeanMetaData) {
+#if ($database.isVersionAfter1046())
+        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(createResultSetHandler(myBeanMetaData, method));
+        registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
+#else
+#if ($database.isVersionAfter1043())
+        final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData, annotationReader, dtoMetaDataFactory);
+#else
+        final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData);
+#end
+        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(factory.createResultSetHandler(method));
+        registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
+#end
+    }
+
+    protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, SelectDynamicCommand cmd) {
+        cmd.setSql(sql);
+        cmd.setArgNames(argNames);
+        cmd.setArgTypes(argTypes);
+        this.sqlCommands.put(sqlCommandKey, cmd);
     }
 
     // ===================================================================================

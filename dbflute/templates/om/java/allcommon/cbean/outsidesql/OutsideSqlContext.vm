@@ -1,5 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
 
+import org.seasar.framework.util.InputStreamReaderUtil;
+import org.seasar.framework.util.ReaderUtil;
+import org.seasar.framework.util.ResourceUtil;
+
 /**
  * The context of outside-sql.
  * 
@@ -54,15 +58,65 @@ public class ${glOutsideSqlContextName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                  Common of OutsideSql
+    //                                  --------------------
     private boolean _dynamicAnalysis;
 
     private boolean _offsetByCursorForcedly;
 
     private boolean _limitByCursorForcedly;
 
+    // -----------------------------------------------------
+    //                                  Specified OutsideSql
+    //                                  --------------------
+    /** The path of outside-sql. (The mark of Specified-OutsideSql) */
+    protected String _outsideSqlPath;
+
+    protected Object _parameterBean;
+
+    protected Object _resultTypeSpecification;
+
+    protected String _methodName;
+
+    // ===================================================================================
+    //                                                                            Read SQL
+    //                                                                            ========
+    public String readOutsideSqlPath(String sqlFileEncoding) {
+        final String dbmsPath = _outsideSqlPath; // TODO: @jflute -- Not Resolved
+        final String standardPath = _outsideSqlPath;
+        if (ResourceUtil.isExist(dbmsPath)) {
+            return readText(dbmsPath, sqlFileEncoding);
+        } else if (ResourceUtil.isExist(standardPath)) {
+            return readText(standardPath, sqlFileEncoding);
+        } else {
+            String msg = "Not found the path: " + standardPath; // TODO: @jflute -- TO Make Rich Message!
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isSpecifiedOutsideSql() {
+        return _outsideSqlPath != null;
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    protected String readText(final String path, String sqlFileEncoding) {
+        final java.io.InputStream is = ResourceUtil.getResourceAsStream(path);
+        final java.io.Reader reader = InputStreamReaderUtil.create(is, sqlFileEncoding);
+        return ReaderUtil.readText(reader);
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                  Common of OutsideSql
+    //                                  --------------------
     public boolean isDynamicAnalysis() {
         return _dynamicAnalysis;
     }
@@ -86,4 +140,40 @@ public class ${glOutsideSqlContextName} {
     public void setLimitByCursorForcedly(boolean limitByCursorForcedly) {
         this._limitByCursorForcedly = limitByCursorForcedly;
     }
+
+    // -----------------------------------------------------
+    //                                  Specified OutsideSql
+    //                                  --------------------
+    public String getOutsideSqlPath() {
+        return _outsideSqlPath;
+    }
+
+    public void setOutsideSqlPath(String outsideSqlPath) {
+        this._outsideSqlPath = outsideSqlPath;
+    }
+
+    public Object getParameterBean() {
+        return _parameterBean;
+    }
+
+    public void setParameterBean(Object parameterBean) {
+        this._parameterBean = parameterBean;
+    }
+
+    public Object getResultTypeSpecification() {
+        return _resultTypeSpecification;
+    }
+
+    public void setResultTypeSpecification(Object resultTypeSpecification) {
+        this._resultTypeSpecification = resultTypeSpecification;
+    }
+
+    public String getMethodName() {
+        return _methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this._methodName = methodName;
+    }
+
 }

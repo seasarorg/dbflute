@@ -1,0 +1,21 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
+
+import java.util.List;
+
+import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
+import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
+
+/**
+ * The dao of outside-sql.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glOutsideSqlDaoName} extends ${glDaoReadableInterfaceName} {
+
+    // ===================================================================================
+    //                                                                              Select
+    //                                                                              ======
+    <ENTITY_TYPE> List<ENTITY_TYPE> selectList(String path, Object pmb, ${glOutsideSqlOptionName} option, Class<ENTITY_TYPE> entityType);
+
+    <ENTITY_TYPE> void selectCursor(String path, Object pmb, ${glOutsideSqlOptionName} option, ${glCursorHandlerName} handler);
+}

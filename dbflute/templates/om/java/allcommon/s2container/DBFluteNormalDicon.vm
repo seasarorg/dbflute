@@ -70,6 +70,11 @@
         <destroyMethod name="destroy"/>
     </component>
 
+    <!-- The dao of outside-sql. -->
+    <component class="${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName}">
+        <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
+    </component>
+
     <!-- Original dao component. -->
     #foreach ($componentName in $database.getOriginalDaoComponentComponentNameList())
       #set ($className = ${database.getOriginalDaoComponentClassName($componentName)})
@@ -84,7 +89,6 @@
       #end
     #end
 
-
     <!-- Original behavior aspect. -->
     #foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
       #set ($className = ${database.getOriginalBehaviorAspectClassName($componentName)})
@@ -92,23 +96,21 @@
     <component name="${componentName}" class="${className}"/>
     #end
 
-#foreach ($table in $database.Tables)
+#foreach ($table in $database.tables)
 
     <!-- ${table.Name} -->
-  #if (${database.isAvailableCommonColumnSetupInterceptorToDao()})
-
+#if (${database.isAvailableCommonColumnSetupInterceptorToDao()})
     <component name="${table.daoComponentName}" class="${table.extendedDaoFullClassName}">
         <aspect pointcut="${database.ColumnSetupBeforeInsertInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeInsertInterceptor</aspect>
         <aspect pointcut="${database.ColumnSetupBeforeUpdateInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeUpdateInterceptor</aspect>
         <aspect pointcut="${database.ColumnSetupBeforeDeleteInterceptorToDaoPointcut}">${glDBFluteDiconNamespace}.commonColumnSetupBeforeDeleteInterceptor</aspect>
         <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>
-  #else
-
+#else
     <component name="${table.daoComponentName}" class="${table.extendedDaoFullClassName}">
         <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>
-  #end
+#end
   #if (${database.isAvailableBehaviorGeneration()})
     #if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
 

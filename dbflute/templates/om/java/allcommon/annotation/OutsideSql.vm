@@ -10,7 +10,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ${glOutsideSqlAnnotation} {
+
+    /**
+     * @deprecated Please use embeddedBinding().
+     */
     boolean dynamicAnalysis() default false;
+
+    boolean embeddedBinding() default false;
     boolean offsetByCursor() default false;
     boolean limitByCursor() default false;
 }

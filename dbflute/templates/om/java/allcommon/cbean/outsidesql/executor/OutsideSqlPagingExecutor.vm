@@ -1,0 +1,49 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecutor};
+
+import java.util.List;
+
+import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+
+/**
+ * The paging executor of outside-sql.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glOutsideSqlPagingExecutorName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final ${glOutsideSqlDaoName} _outsideSqlDao;
+
+    protected final ${glOutsideSqlOptionName} _outsideSqlOption;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glOutsideSqlPagingExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption) {
+        this._outsideSqlDao = outsideSqlDao;
+        this._outsideSqlOption = outsideSqlOption;
+    }
+
+    // ===================================================================================
+    //                                                                              Select
+    //                                                                              ======
+    public <ENTITY_TYPE> List<ENTITY_TYPE> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY_TYPE> entityType) {
+        return _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public ${glOutsideSqlCursorExecutorName} cursorHandling() {
+        return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
+    }
+
+    public ${glOutsideSqlPagingExecutorName} embeddedBinding() {
+        _outsideSqlOption.embeddedBinding();
+        return this;
+    }
+}

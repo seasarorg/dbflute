@@ -1,0 +1,53 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
+
+/**
+ * The paging executor of outside-sql.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glOutsideSqlOptionName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected String _pagingRequestType = "non";
+
+    protected boolean _embeddedBinding;
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    public void autoPaging() {
+        _pagingRequestType = "auto";
+    }
+
+    public void manualPaging() {
+        _pagingRequestType = "manual";
+    }
+
+    public void embeddedBinding() {
+        _embeddedBinding = true;
+    }
+
+    // ===================================================================================
+    //                                                                          Unique Key
+    //                                                                          ==========
+    public String generateUniqueKey() {
+        return "{" + _pagingRequestType + ":" + _embeddedBinding + "}";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isAutoPaging() {
+        return "auto".equals(_pagingRequestType);
+    }
+
+    public boolean isManualPaging() {
+        return "manual".equals(_pagingRequestType);
+    }
+
+    public boolean isEmbeddedBinding() {
+        return _embeddedBinding;
+    }
+}

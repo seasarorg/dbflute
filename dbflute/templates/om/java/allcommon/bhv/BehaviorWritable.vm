@@ -2,8 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 import ${glPackageBaseCommon}.${glDaoWritableInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionOptionName};
-import ${glPackageBaseCommonBhvBatch}.${glTokenFileReflectionResultName};
 
 /**
  * The interface of behavior-writable.
@@ -123,7 +121,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Create list.
      * 
@@ -143,7 +141,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Modify list.
      * 
@@ -164,7 +162,7 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Remove list.
      * 
@@ -175,29 +173,4 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public int removeList(java.util.List<${glEntityInterfaceName}> entityList);
 #end
-
-    // =====================================================================================
-    //                                                                            Token File
-    //                                                                            ==========
-    /**
-     * Reflect(insert or update) token-file to this table.
-     * 
-     * @param filename Name of the file. (NotNull and NotEmpty)
-     * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
-     * @return Token-file-reflection-result. (NotNull)
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     */
-    public ${glTokenFileReflectionResultName} reflectTokenFile(String filename, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
-
-    /**
-     * Reflect(insert or update) token-file to this table.
-     * 
-     * @param inputStream Input stream. (NotNull and NotClosed)
-     * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
-     * @return Token-file-reflection-result. (NotNull)
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     */
-    public ${glTokenFileReflectionResultName} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException;
 }

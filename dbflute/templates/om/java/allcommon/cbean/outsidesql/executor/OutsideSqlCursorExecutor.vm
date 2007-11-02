@@ -1,0 +1,44 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecutor};
+
+import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+
+/**
+ * The cursor executor of outside-sql.
+ * 
+ * @param <PARAMETER_BEAN_TYPE> The type of parameter-bean.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN_TYPE> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final ${glOutsideSqlDaoName} _outsideSqlDao;
+
+    protected final ${glOutsideSqlOptionName} _outsideSqlOption;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glOutsideSqlCursorExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption) {
+        this._outsideSqlDao = outsideSqlDao;
+        this._outsideSqlOption = outsideSqlOption;
+    }
+
+    // ===================================================================================
+    //                                                                              Select
+    //                                                                              ======
+    public void selectCursor(String path, PARAMETER_BEAN_TYPE pmb, ${glCursorHandlerName} handler) {
+        _outsideSqlDao.selectCursor(path, pmb, _outsideSqlOption, handler);
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public ${glOutsideSqlCursorExecutorName} embeddedBinding() {
+        _outsideSqlOption.embeddedBinding();
+        return this;
+    }
+}

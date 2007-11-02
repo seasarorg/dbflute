@@ -1,8 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
-import ${glPackageBaseCommonSqlClause}.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import ${glPackageBaseCommonSqlClause}.*;
+import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
 
 /**
  * Condition-Bean context. (referring to s2pager)
@@ -268,5 +270,90 @@ public class ${glConditionBeanContextName} {
         } else {
             return new ${glSqlClauseName}${database.DaoGenDbName}(tableDbName);
         }
+    }
+
+    // ===================================================================================
+    //                                                                  Exception Handling
+    //                                                                  ==================
+    public static void throwEntityAlreadyDeletedException(Object searchKey4log) {
+        throwEntityAlreadyDeletedException(searchKey4log, null, null);
+    }
+
+    public static void throwEntityAlreadyDeletedException(Object searchKey4log, ${glLatestSqlProviderName} latestSqlProvider, String tableDbName) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "Not found the entity. The entity has already been deleted!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm the existence of your target record on your database." + getLineSeparator();
+        msg = msg + "Does the target record really created before this operation?" + getLineSeparator();
+        msg = msg + "Has the target record been deleted by other thread?" + getLineSeparator();
+        msg = msg + "It is precondition that the record exists on your database." + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SearchKey]" + getLineSeparator() + searchKey4log + getLineSeparator();
+        final String dispalySql = getDisplaySqlForExceptionMessage(latestSqlProvider, tableDbName);
+        if (dispalySql != null) {
+            msg = msg + getLineSeparator();
+            msg = msg + "[DisplaySQL]" + getLineSeparator() + dispalySql + getLineSeparator();
+        }
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+    }
+
+    public static void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
+        throwEntityDuplicatedException(resultCountString, searchKey4Log, cause, null, null);
+    }
+
+    public static void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause, ${glLatestSqlProviderName} latestSqlProvider, String tableDbName) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The selected entity is duplicated. It should be the only one! But the resultCount=" + resultCountString + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm your search condition. Does it really select the only one?" + getLineSeparator();
+        msg = msg + "Please confirm your database. Does it really exist the only one?" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[SearchKey]" + getLineSeparator() + searchKey4Log + getLineSeparator();
+        final String dispalySql = getDisplaySqlForExceptionMessage(latestSqlProvider, tableDbName);
+        if (dispalySql != null) {
+            msg = msg + getLineSeparator();
+            msg = msg + "[DisplaySQL]" + getLineSeparator() + dispalySql + getLineSeparator();
+        }
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        if (cause != null) {
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg, cause);
+        } else {
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+        }
+    }
+
+    private static String getDisplaySqlForExceptionMessage(${glLatestSqlProviderName} latestSqlProvider, String tableDbName) {
+        if (latestSqlProvider == null) {
+            return null;
+        }
+        final String displaySql = latestSqlProvider.getDisplaySql();
+        if (displaySql == null || displaySql.trim().length() == 0) {
+            return null;
+        }
+        if (displaySql.indexOf(getLineSeparator()) >= 0) {
+            return displaySql;
+        }
+        int basePointIndex = displaySql.indexOf(" from " + tableDbName);
+        if (basePointIndex < 0) {
+            return displaySql;
+        }
+        return displaySql.substring(0, basePointIndex) + getLineSeparator() + " " + displaySql.substring(basePointIndex);
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected static String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 }

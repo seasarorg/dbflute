@@ -9,10 +9,13 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
 #end
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
+import ${glPackageBaseCommonCBeanOutsidesqlExecutor}.${glOutsideSqlBasicExecutorName};
 
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputOptionName};
 import ${glPackageBaseCommonBhvBatch}.${glTokenFileOutputResultName};
@@ -39,7 +42,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /** Behavior-selector instance. It's basically referred at LoadReferer. (Required for LoadReferer) */
     protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
 
-    /** Dao-selector instance. It's basically referred at LoadReferer. (Required for LoadReferer) */
+    /** Dao-selector instance. It's basically referred at LoadReferer. (Required for OutsideSql) */
     protected ${glDaoSelectorInterfaceName} _daoSelector;
 
     /** The provider of latest SQL. It's basically referred at error handling. (NotRequired) */
@@ -245,7 +248,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         public java.util.List<ENTITY_TYPE> callbackSelectList(CB_TYPE cb);
     }
 
-
     // =====================================================================================
     //                                                                       Basic Read List
     //                                                                       ===============
@@ -299,10 +301,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param searchKey4log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      */
-    protected void assertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
+    protected void assertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4Log) {
         if (entity == null) {
-            String msg = buildEntityAlreadyDeletedMessage(searchKey4log);
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+            throwEntityAlreadyDeletedException(searchKey4Log);
         }
     }
 
@@ -315,8 +316,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
-            String msg = buildEntityAlreadyDeletedMessage(searchKey4Log);
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+            throwEntityAlreadyDeletedException(searchKey4Log);
         }
     }
 
@@ -330,74 +330,19 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
-            String msg = buildEntityAlreadyDeletedMessage(searchKey4Log);
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+            throwEntityAlreadyDeletedException(searchKey4Log);
         }
-        if (ls.size() != 1) {
+        if (ls.size() > 1) {
             throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
         }
     }
 
+    private void throwEntityAlreadyDeletedException(Object searchKey4Log) {
+        ${glConditionBeanContextName}.throwEntityAlreadyDeletedException(searchKey4Log, _latestSqlProvider, getTableDbName());
+    }
+
     private void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The selected entity is duplicated. It should be the only one! But the resultCount=" + resultCountString + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm your search condition. Does it really select the only one?" + getLineSeparator();
-        msg = msg + "Please confirm your database. Does it really exist the only one?" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SearchKey]" + getLineSeparator() + searchKey4Log + getLineSeparator();
-        final String dispalySql = getDisplaySqlForExceptionMessage();
-        if (dispalySql != null) {
-            msg = msg + getLineSeparator();
-            msg = msg + "[DisplaySQL]" + getLineSeparator() + dispalySql + getLineSeparator();
-        }
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
-        if (cause != null) {
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg, cause);
-        } else {
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
-        }
-    }
-
-    private String buildEntityAlreadyDeletedMessage(Object searchKey4log) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Not found the entity. The entity has already been deleted!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the existence of your target record on your database." + getLineSeparator();
-        msg = msg + "Does the target record really created before this operation?" + getLineSeparator();
-        msg = msg + "Has the target record been deleted by other thread?" + getLineSeparator();
-        msg = msg + "It is precondition that the record exists on your database." + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SearchKey]" + getLineSeparator() + searchKey4log + getLineSeparator();
-        final String dispalySql = getDisplaySqlForExceptionMessage();
-        if (dispalySql != null) {
-            msg = msg + getLineSeparator();
-            msg = msg + "[DisplaySQL]" + getLineSeparator() + dispalySql + getLineSeparator();
-        }
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
-        return msg;
-    }
-
-    private String getDisplaySqlForExceptionMessage() {
-        if (_latestSqlProvider == null) {
-            return null;
-        }
-        final String displaySql = _latestSqlProvider.getDisplaySql();
-        if (displaySql == null || displaySql.trim().length() == 0) {
-            return null;
-        }
-        if (displaySql.indexOf(getLineSeparator()) >= 0) {
-            return displaySql;
-        }
-        int basePointIndex = displaySql.indexOf(" from " + getTableDbName());
-        if (basePointIndex < 0) {
-            return displaySql;
-        }
-        return displaySql.substring(0, basePointIndex) + getLineSeparator() + " " + displaySql.substring(basePointIndex);
+        ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause, _latestSqlProvider, getTableDbName());
     }
 
     /**
@@ -415,14 +360,38 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
     }
 
-#if ($database.isAvailableGenerics())
     // ===================================================================================
     //                                                                      Various Select
     //                                                                      ==============
+    public ${glOutsideSqlBasicExecutorName} outsideSql() {
+        assertDaoSelectorNotNull("outsideSql");
+        final ${glOutsideSqlDaoName} outsideSqlDao = _daoSelector.select(${glOutsideSqlDaoName}.class);
+        return new ${glOutsideSqlBasicExecutorName}(outsideSqlDao);
+    }
+
+    private void assertDaoSelectorNotNull(String methodName) {
+        if (_daoSelector == null) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "Not found the selector of dao as behavior's attributed!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm the definition of the selector at your 'dbflute.dicon'." + getLineSeparator();
+            msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
+            msg = msg + "  _behaviorSelector  : " + _behaviorSelector + getLineSeparator();
+            msg = msg + "  _daoSelector       : " + _daoSelector + getLineSeparator();
+            msg = msg + "  _latestSqlProvider : " + _latestSqlProvider + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+    }
+
     /**
-     * Select value-label list.
+     * Create value-label list.
      * 
-     * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity.')}
+     * @param <ENTITY> The type of entity.
      * @param cb Condition-bean. (NotNull)
      * @param valueLabelSetupper Value-label-setupper. (NotNull)
      * @return Value-label list. (NotNull)
@@ -439,7 +408,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
         return valueLabelList;
     }
-#end
 
     // ===================================================================================
     //                                                                            Sequence
@@ -506,6 +474,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         // - - - - - - - - - - -
         // Assert pre-condition
         // - - - - - - - - - - -
+        assertBehaviorSelectorNotNull("loadReferer");
         assertObjectNotNull("localEntityList", localEntityList);
         assertObjectNotNull("loadRefererOption", loadRefererOption);
         if (localEntityList.isEmpty()) {
@@ -616,6 +585,25 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         public void callbackReferer_setForeignEntity(REFERER_ENTITY_TYPE refererEntity, LOCAL_ENTITY_TYPE localEntity);
     }
 
+    private void assertBehaviorSelectorNotNull(String methodName) {
+        if (_behaviorSelector == null) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "Not found the selector of behavior as behavior's attributed!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm the definition of the selector at your 'dbflute.dicon'." + getLineSeparator();
+            msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
+            msg = msg + "  _behaviorSelector  : " + _behaviorSelector + getLineSeparator();
+            msg = msg + "  _daoSelector       : " + _daoSelector + getLineSeparator();
+            msg = msg + "  _latestSqlProvider : " + _latestSqlProvider + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+    }
+
     // ===================================================================================
     //                                                             Pullout Internal Helper
     //                                                             =======================
@@ -640,42 +628,49 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     // ===================================================================================
     //                                                                          Token File
     //                                                                          ==========
-    /**
-     * Output token-file from this table records.
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @param filename Name of the file. (NotNull and NotEmpty)
-     * @param tokenFileOutputOption token-file-output-option. (NotNull and Required{delimiter and encoding})
-     * @return Token-file-output-result. (NotNull)
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     */
-    public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBeanInterfaceName} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
-        assertConditionBeanNotNull(cb);
-        assertStringNotNullAndNotTrimmedEmpty("filename", filename);
-        assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
+    public TokenFileOutputExecutor tokenFileOutput() throws java.io.FileNotFoundException, java.io.IOException {
+        return new TokenFileOutputExecutor();
+    }
 
-        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = readList(cb);
-        java.util.List${database.filterGenericsString('java.util.List<String>')} rowList = new java.util.ArrayList${database.filterGenericsString('java.util.List<String>')}();
-        for (java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            final java.util.List${database.filterGenericsString('String')} valueList = getDBMeta().convertToColumnStringValueList(entity);
-            rowList.add(valueList);
+    public class TokenFileOutputExecutor {
+
+        /**
+         * Output token-file from this table records.
+         * 
+         * @param cb Condition-bean. (NotNull)
+         * @param filename Name of the file. (NotNull and NotEmpty)
+         * @param tokenFileOutputOption token-file-output-option. (NotNull and Required{delimiter and encoding})
+         * @return Token-file-output-result. (NotNull)
+         * @throws java.io.FileNotFoundException
+         * @throws java.io.IOException
+         */
+        public ${glTokenFileOutputResultName} outputTokenFile(${glConditionBeanInterfaceName} cb, String filename, ${glTokenFileOutputOptionName} tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
+            assertConditionBeanNotNull(cb);
+            assertStringNotNullAndNotTrimmedEmpty("filename", filename);
+            assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
+
+            final java.util.List<${glEntityInterfaceName}> ls = readList(cb);
+            java.util.List${database.filterGenericsString('java.util.List<String>')} rowList = new java.util.ArrayList${database.filterGenericsString('java.util.List<String>')}();
+            for (java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+                final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
+                final java.util.List<String> valueList = getDBMeta().convertToColumnStringValueList(entity);
+                rowList.add(valueList);
+            }
+            final ${glFileMakingSimpleFacadeName} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImplName}();
+            final ${glFileMakingOptionName} fileMakingOption = tokenFileOutputOption.getFileMakingOption();
+            final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
+            final java.util.List<String> columnDbNameList = new java.util.ArrayList<String>();
+            for (final java.util.Iterator ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
+                final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
+                columnDbNameList.add(columnInfo.getColumnDbName());
+            }
+            fileMakingHeaderInfo.setColumnNameList(columnDbNameList);
+            fileMakingOption.setFileMakingHeaderInfo(fileMakingHeaderInfo);
+            fileMakingSimpleFacade.makeFromRowList(filename, rowList, fileMakingOption);
+            final ${glTokenFileOutputResultName} tokeFileOutputResult = new ${glTokenFileOutputResultName}();
+            tokeFileOutputResult.setSelectedList(ls);
+            return tokeFileOutputResult;
         }
-        final ${glFileMakingSimpleFacadeName} fileMakingSimpleFacade = new ${glFileMakingSimpleFacadeImplName}();
-        final ${glFileMakingOptionName} fileMakingOption = tokenFileOutputOption.getFileMakingOption();
-        final ${glFileMakingHeaderInfoName} fileMakingHeaderInfo = new ${glFileMakingHeaderInfoName}();
-        final java.util.List${database.filterGenericsString('String')} columnDbNameList = new java.util.ArrayList${database.filterGenericsString('String')}();
-        for (final java.util.Iterator ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
-            final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
-            columnDbNameList.add(columnInfo.getColumnDbName());
-        }
-        fileMakingHeaderInfo.setColumnNameList(columnDbNameList);
-        fileMakingOption.setFileMakingHeaderInfo(fileMakingHeaderInfo);
-        fileMakingSimpleFacade.makeFromRowList(filename, rowList, fileMakingOption);
-        final ${glTokenFileOutputResultName} tokeFileOutputResult = new ${glTokenFileOutputResultName}();
-        tokeFileOutputResult.setSelectedList(ls);
-        return tokeFileOutputResult;
     }
 
     // ===================================================================================

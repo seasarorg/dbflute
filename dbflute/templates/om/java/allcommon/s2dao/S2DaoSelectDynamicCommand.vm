@@ -42,6 +42,7 @@ import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
 
 /**
@@ -232,15 +233,14 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      */${database.outputOverrideAnnotationAfterNewLineOutput()}
     public Object execute(Object[] args) {
         if (!${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-#if ($database.isAvailableGenerics())
-            if (${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-                final ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName} outsideSqlContext = ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-                if (!outsideSqlContext.isDynamicAnalysis() || args == null || args.length == 0 || args[0] == null) {
-                    return doDefaulExecute(args);
+            if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+                if (outsideSqlContext.isDynamicAnalysis()) {
+                    return executeOutsideSqlAsDynamic(args, outsideSqlContext);
+                } else {
+                    return executeOutsideSqlAsStatic(args, outsideSqlContext);
                 }
-                return executeOutsideSql(args, outsideSqlContext);
             }
-#end
             return doDefaulExecute(args);
         }
         assertSelectClauseCommand();
@@ -284,11 +284,28 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
     }
 
-#if ($database.isAvailableGenerics())
     // -----------------------------------------------------
-    //                                           Outside-Sql
-    //                                           -----------
-    protected Object executeOutsideSql(Object[] args, ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName} outsideSqlContext) {
+    //                                            OutsideSql
+    //                                            ----------
+    protected Object executeOutsideSqlAsStatic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+        // Supports SpecifiedResultSetHandler
+        final ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
+
+        final Object[] filteredArgs;
+        if (outsideSqlContext.isSpecifiedOutsideSql()) {
+            final Object parameterBean = outsideSqlContext.getParameterBean();
+            filteredArgs = new Object[] {parameterBean};
+        } else {
+            filteredArgs = filterArgumentsForResultSetHandler(args);
+        }
+
+        final org.seasar.dao.CommandContext ctx = apply(filteredArgs);
+        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
+        return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
+
+    }
+
+    protected Object executeOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
         final Object firstArg = args[0];
         final org.seasar.framework.beans.BeanDesc beanDesc = org.seasar.framework.beans.factory.BeanDescFactory.getBeanDesc(firstArg.getClass());
         String filteredSql = getSql();
@@ -312,7 +329,14 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 
         // Supports SpecifiedResultSetHandler
         final ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
-        final Object[] filteredArgs = filterArgumentsForResultSetHandler(args);
+
+        final Object[] filteredArgs;
+        if (outsideSqlContext.isSpecifiedOutsideSql()) {
+            final Object parameterBean = outsideSqlContext.getParameterBean();
+            filteredArgs = new Object[] {parameterBean};
+        } else {
+            filteredArgs = filterArgumentsForResultSetHandler(args);
+        }
 
         final org.seasar.dao.CommandContext ctx = outsideSqlCommand.doApply(filteredArgs);
         final java.util.List<Object> bindVariableList = new java.util.ArrayList<Object>();
@@ -321,7 +345,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
-#end
 
     protected Object[] filterArgumentsForResultSetHandler(Object[] args) {
         if (args == null || args.length == 0) {

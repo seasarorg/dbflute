@@ -1,0 +1,144 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecutor};
+
+import java.util.List;
+
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+
+/**
+ * The executor of outside-sql. <br />
+ * <pre>
+ * {Basic}
+ *   o selectEntity()
+ *   o selectEntityWithDeletedCheck()
+ *   o selectList()
+ * 
+ * {Option -- Paging}
+ *   o autoPaging().selectList()
+ *   o manualPaging().selectList()
+ * 
+ * {Option -- Cursor}
+ *   o cursorHandling().selectCursor()
+ * 
+ * {Option -- Embedded}
+ *   o embeddedBinding().selectList()
+ * 
+ * {Option -- Paging and Cursor}
+ *   o autoPaging().cursorHandling().selectCursor()
+ *   o manualPaging().cursorHandling().selectCursor()
+ * 
+ * {Option -- Paging and Embedded}
+ *   o autoPaging().embeddedBinding().selectList()
+ *   o manualPaging().embeddedBinding().selectList()
+ * 
+ * </pre>
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glOutsideSqlBasicExecutorName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final ${glOutsideSqlDaoName} _outsideSqlDao;
+
+    protected boolean _embeddedBinding;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDaoName} outsideSqlDao) {
+        this._outsideSqlDao = outsideSqlDao;
+    }
+
+    // ===================================================================================
+    //                                                                              Select
+    //                                                                              ======
+    public <ENTITY_TYPE> ENTITY_TYPE selectEntity(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
+        final List<ENTITY_TYPE> ls = selectList(path, pmb, entityType);
+        if (ls.isEmpty()) {
+            return null;
+        }
+        if (ls.size() > 1) {
+            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+            throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
+        }
+        return ls.get(0);
+    }
+
+    public <ENTITY_TYPE> ENTITY_TYPE selectEntityWithDeletedCheck(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
+        final List<ENTITY_TYPE> ls = selectList(path, pmb, entityType);
+        if (ls == null || ls.isEmpty()) {
+            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+            throwEntityAlreadyDeletedException(searchKey4Log);
+        }
+        if (ls.size() > 1) {
+            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+            throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
+        }
+        return ls.get(0);
+    }
+
+    public <ENTITY_TYPE> List<ENTITY_TYPE> selectList(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
+        return _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
+    }
+
+    protected void throwEntityAlreadyDeletedException(Object searchKey4Log) {
+        ${glConditionBeanContextName}.throwEntityAlreadyDeletedException(searchKey4Log);
+    }
+
+    protected void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
+        ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+    }
+
+    // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
+    public void insert(String path, Object pmb) {
+        // TODO: @jflute -- 戻り値どうしよう
+        throw new UnsupportedOperationException("Sorry! The method of insert() has not been implemented yet.");
+    }
+
+    public void update(String path, Object pmb) {
+        // TODO: @jflute -- 戻り値どうしよう
+        throw new UnsupportedOperationException("Sorry! The method of update() has not been implemented yet.");
+    }
+
+    public void delete(String path, Object pmb) {
+        // TODO: @jflute -- 戻り値どうしよう
+        throw new UnsupportedOperationException("Sorry! The method of delete() has not been implemented yet.");
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    protected ${glOutsideSqlOptionName} createOutsideSqlOption() {
+        final ${glOutsideSqlOptionName} option = new ${glOutsideSqlOptionName}();
+        if (_embeddedBinding) {
+            option.embeddedBinding();
+        }
+        return option;
+    }
+
+    public ${glOutsideSqlPagingExecutorName} autoPaging() {
+        final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
+        option.autoPaging();
+        return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option);
+    }
+
+    public ${glOutsideSqlPagingExecutorName} manualPaging() {
+        final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
+        option.manualPaging();
+        return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option);
+    }
+
+    public ${glOutsideSqlCursorExecutorName} cursorHandling() {
+        return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
+    }
+
+    public ${glOutsideSqlBasicExecutorName} embeddedBinding() {
+        _embeddedBinding = true;
+        return this;
+    }
+}
