@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.framework.util.StringUtil;
 
 public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
@@ -36,10 +35,10 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
         final String sqlDirectory = getSqlDirectory();
         final DfSqlFileGetter getter = new DfSqlFileGetter();
         final List<File> sqlFileList = getter.getSqlFileList(sqlDirectory);
-        if (!sqlDirectory.contains("src/main/java/")) {
+        if (!sqlDirectory.contains("src/main/java")) {
             return sqlFileList;
         }
-        final String srcMainResources = StringUtil.replace(sqlDirectory, "src/main/java/", "src/main/resources/");
+        final String srcMainResources = StringUtil.replace(sqlDirectory, "src/main/java", "src/main/resources");
         try {
             final List<File> resourcesSqlFileList = new DfSqlFileGetter().getSqlFileList(srcMainResources);
             sqlFileList.addAll(resourcesSqlFileList);
@@ -53,10 +52,8 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
     protected String getSqlDirectory() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         final DfBasicProperties basicProp = prop.getBasicProperties();
-        final DfGeneratedClassPackageProperties packageProp = prop.getGeneratedClassPackageProperties();
         final String javaDir = basicProp.getJavaDir_for_main();
-        final String extendedDaoPackage = packageProp.getExtendedDaoPackage();
-        return javaDir + "/" + extendedDaoPackage.replace('.', '/');
+        return javaDir;
     }
 
     protected boolean isAutoCommit() {

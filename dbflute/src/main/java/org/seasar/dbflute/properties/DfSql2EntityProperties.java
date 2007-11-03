@@ -29,11 +29,7 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
     public Map<String, Object> getSql2EntityDefinitionMap() {
         if (_sql2EntityDefinitionMap == null) {
             final Map<String, Object> sql2EntityDefaultMap = new LinkedHashMap<String, Object>();
-
-            final DfGeneratedClassPackageProperties packageProp = new DfGeneratedClassPackageProperties(getProperties());
             getBasicProperties().getJavaLocation_for_main();
-            packageProp.getExtendedDaoPackage();
-
             final String defaultSqlDirectory = getDefaultSqlDirectory();
             sql2EntityDefaultMap.put("sqlDirectory", defaultSqlDirectory);
             sql2EntityDefaultMap.put("isPlainEntity", "" + isDefaultPlainEntity());
@@ -43,10 +39,7 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
     }
 
     protected String getDefaultSqlDirectory() {
-        final String javaDir = getBasicProperties().getJavaDir_for_main();
-        final String exdaoPackage = getGeneratedClassPackageProperties().getExtendedDaoPackage();
-        final String defaultSqlDirectory = javaDir + "/" + exdaoPackage.replace('.', '/');
-        return defaultSqlDirectory;
+        return getBasicProperties().getJavaDir_for_main();
     }
 
     protected boolean isDefaultPlainEntity() {
@@ -181,7 +174,7 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
             }
         }
     }
-    
+
     protected String getPmbeanPackage() {
         String pmbeanPackage = "pmbean";
         if (getBasicProperties().isTargetLanguageCSharp()) {

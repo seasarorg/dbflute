@@ -10,12 +10,11 @@ import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
  * @author ${database.ClassAuthor}
  */
 public interface ${glDaoSelectorInterfaceName} {
-#if ($database.isAvailableGenerics())
 
     /**
      * Select dao.
      * 
-     * ${database.filterGenericsParamOutput('<DAO_TYPE>', 'The type of behavior.')}
+     * @param <DAO_TYPE> The type of behavior.
      * @param daoType Dao type. (NotNull)
      * @return Dao. (NotNull)
      */
@@ -28,65 +27,4 @@ public interface ${glDaoSelectorInterfaceName} {
      * @return Dao-readable. (NotNull)
      */
     public ${glDaoReadableInterfaceName} byName(String tableFlexibleName);
-
-
-
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * Deprecated
-    /**
-     * Get dao.
-     * 
-     * ${database.filterGenericsParamOutput('<DAO_TYPE>', 'The type of dao.')}
-     * @param daoType Dao type. (NotNull)
-     * @return Dao. (NotNull)
-     * @deprecated Please Use select()
-     */
-    public <DAO_TYPE extends ${glDaoReadableInterfaceName}> DAO_TYPE getDao(Class<DAO_TYPE> daoType);
-
-    /**
-     * Get dao-readable.
-     * 
-     * @param tableMultiName Table multi-name. (NotNull)
-     * @return Dao-readable. (NotNull)
-     * @deprecated Please Use byName()
-     */
-    public ${glDaoReadableInterfaceName} byNameAsDaoReadable(String tableMultiName);
-
-#if ($database.isAvailableBehaviorGeneration())
-    /**
-     * Get behavior.
-     * 
-     * ${database.filterGenericsParamOutput('<BEHAVIOR_TYPE>', 'The type of behavior.')}
-     * @param behaviorType Behavior type. (NotNull)
-     * @return Behavior. (NotNull)
-     * @deprecated Please Use BehaviorSelect#select()
-     */
-    public <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE getBehavior(Class<BEHAVIOR_TYPE> behaviorType);
-
-    /**
-     * Get behavior-readable.
-     * 
-     * @param tableMultiName Table multi-name. (NotNull)
-     * @return Behavior-readable. (NotNull)
-     * @deprecated Please Use BehaviorSelect#byName()
-     */
-    public ${glBehaviorReadableInterfaceName} byNameAsBehaviorReadable(String tableMultiName);
-#end
-#else
-
-    /**
-     * Get dao.
-     * 
-     * @param daoType Dao type. (NotNull)
-     * @return Dao. (NotNull)
-     */
-    public ${glDaoReadableInterfaceName} select(Class daoType);
-
-    /**
-     * Select dao-readable by name.
-     * 
-     * @param tableFlexibleName Table flexible name. (NotNull)
-     * @return Dao-readable. (NotNull)
-     */
-    public ${glDaoReadableInterfaceName} byName(String tableFlexibleName);
-#end
 }

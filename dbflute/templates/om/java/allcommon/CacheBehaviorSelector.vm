@@ -12,24 +12,22 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glCacheBehaviorSelectorName} implements ${glBehaviorSelectorInterfaceName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** The container of Seasar. */
     protected org.seasar.framework.container.S2Container _container;
 
-    public void setContainer(org.seasar.framework.container.S2Container container) {
-        this._container = container;
-    }
-
-#if ($database.isAvailableGenerics())
     /** The cache of behavior. (It's the generics hell!) */
     protected java.util.Map<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}> _behaviorCache = new java.util.LinkedHashMap<Class<? extends ${glBehaviorReadableInterfaceName}>, ${glBehaviorReadableInterfaceName}>();
 
-#end
-
-#if ($database.isAvailableGenerics())
+    // ===================================================================================
+    //                                                                            Selector
+    //                                                                            ========
     /**
      * Select behavior.
      * 
-     * ${database.filterGenericsParamOutput('<BEHAVIOR_TYPE>', 'The type of behavior.')}
+     * @param <BEHAVIOR_TYPE> The type of behavior.
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
      */
@@ -53,29 +51,6 @@ public class ${glCacheBehaviorSelectorName} implements ${glBehaviorSelectorInter
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
         return select(getBehaviorType(dbmeta));
     }
-#else
-    /**
-     * Select behavior.
-     * 
-     * @param behaviorType Behavior type. (NotNull)
-     * @return Behavior. (NotNull)
-     */
-    public ${glBehaviorReadableInterfaceName} select(Class behaviorType) {
-        return (${glBehaviorReadableInterfaceName})_container.getComponent(behaviorType);
-    }
-
-    /**
-     * Select behavior-readable by name.
-     * 
-     * @param tableFlexibleName Table flexible-name. (NotNull)
-     * @return Behavior-readable. (NotNull)
-     */
-    public ${glBehaviorReadableInterfaceName} byName(String tableFlexibleName) {
-        assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(tableFlexibleName);
-        return select(getBehaviorType(dbmeta));
-    }
-#end
 
     /**
      * Get behavior-type by dbmeta.
@@ -98,16 +73,19 @@ public class ${glCacheBehaviorSelectorName} implements ${glBehaviorSelectorInter
         return behaviorType;
     }
 
-    // =====================================================================================
-    //                                                                               Destroy
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                             Destroy
+    //                                                                             =======
     public void destroy() {
         _container = null;
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    // ===================================================================================
+    //                                                                              Assert
+    //                                                                              ======
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
     /**
      * Assert that the object is not null.
      * 
@@ -126,9 +104,9 @@ public class ${glCacheBehaviorSelectorName} implements ${glBehaviorSelectorInter
         }
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert String
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
      * 
@@ -143,4 +121,12 @@ public class ${glCacheBehaviorSelectorName} implements ${glBehaviorSelectorInter
             throw new IllegalArgumentException(msg);
         }
     }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setContainer(org.seasar.framework.container.S2Container container) {
+        this._container = container;
+    }
+
 }

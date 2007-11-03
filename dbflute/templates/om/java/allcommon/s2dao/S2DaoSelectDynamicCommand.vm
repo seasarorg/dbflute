@@ -119,16 +119,17 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 #end
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                            Very Important Extension
+    //                                                            ========================
     // -----------------------------------------------------
-    //                               Very Important Override
-    //                               -----------------------
+    //                                              Override
+    //                                              --------
     /**
      * The override for extension.
      * 
      * @param sql SQL. (NotNull)
-     */${database.outputOverrideAnnotationAfterNewLineOutput()}
+     */
+    @Override
     public void setSql(String sql) {// Override!
         super.setSql(sql);
         this.rootNode = new InternalSqlParserImpl(sql).parse();// Use internal sql parser.
@@ -138,7 +139,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      * The override for extension.
      * 
      * @param args The array of argument. (NotNull)
-     */${database.outputOverrideAnnotationAfterNewLineOutput()}
+     */
+    @Override
     protected CommandContext apply(Object[] args) {// Override!
         CommandContext ctx = createCommandContext(args);
         rootNode.accept(ctx);
@@ -149,7 +151,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      * The override for extension.
      * 
      * @param argNames The array of argument name. (NotNull)
-     */${database.outputOverrideAnnotationAfterNewLineOutput()}
+     */
+    @Override
     public void setArgNames(String[] argNames) {
         if (_selectClauseCommand != null) {
             _selectClauseCommand.setArgNames(argNames);
@@ -164,7 +167,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      * The override for extension.
      * 
      * @param argTypes The array of argument type. (NotNull)
-     */${database.outputOverrideAnnotationAfterNewLineOutput()}
+     */
+    @Override
     public void setArgTypes(Class[] argTypes) {
         if (_selectClauseCommand != null) {
             _selectClauseCommand.setArgTypes(argTypes);
@@ -222,17 +226,28 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return new ${glSelectDynamicCommand}(getDataSource(), getStatementFactory(), resultSetHandler, resultSetFactory);
     }
 
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     // -----------------------------------------------------
-    //                                               Execute
-    //                                               -------
+    //                                           Top Execute
+    //                                           -----------
     /**
      * The override for extension.
      * 
      * @param args The array of argument. (Nullable)
      * @return Result. (Nullable)
-     */${database.outputOverrideAnnotationAfterNewLineOutput()}
+     */
+    @Override
     public Object execute(Object[] args) {
+        // - - - - - - - - - - - -
+        // This is top execution.
+        // - - - - - - - - - - - -
+
         if (!${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+            // - - - - - - - - - -
+            // Execute outsideSql.
+            // - - - - - - - - - -
             if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
                 final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
                 if (outsideSqlContext.isDynamicAnalysis()) {
@@ -241,8 +256,16 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                     return executeOutsideSqlAsStatic(args, outsideSqlContext);
                 }
             }
-            return doDefaulExecute(args);
+
+            // - - - - - - - - -
+            // Execute default.
+            // - - - - - - - - -
+            return executeDefault(args);
         }
+
+        // - - - - - - - - - - - -
+        // Execute conditionBean.
+        // - - - - - - - - - - - -
         assertSelectClauseCommand();
         final List${database.filterGenericsString('Object')} bindVariableList = new ArrayList${database.filterGenericsString('Object')}();
         final List${database.filterGenericsString('Class')} bindVariableTypeList = new ArrayList${database.filterGenericsString('Class')}();
@@ -274,9 +297,24 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
 
-    protected Object doDefaulExecute(Object args[]) {
-        // Supports SpecifiedResultSetHandler
+    // -----------------------------------------------------
+    //                                       Default Execute
+    //                                       ---------------
+    /**
+     * Execute default.
+     * 
+     * @param args The array of argument. (Nullable)
+     * @return Result. (Nullable)
+     */
+    protected Object executeDefault(Object args[]) {
+        // - - - - - - - - - - - - - - - - -
+        // Find specified resultSetHandler.
+        // - - - - - - - - - - - - - - - - -
         final ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
+
+        // - - - - - - - - -
+        // Filter arguments.
+        // - - - - - - - - -
         final Object[] filteredArgs = filterArgumentsForResultSetHandler(args);
 
         final org.seasar.dao.CommandContext ctx = apply(filteredArgs);
@@ -285,12 +323,24 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     }
 
     // -----------------------------------------------------
-    //                                            OutsideSql
-    //                                            ----------
+    //                                    OutsideSql Execute
+    //                                    ------------------
+    /**
+     * Execute outsideSql as static.
+     * 
+     * @param args The array of argument. (Nullable)
+     * @param outsideSqlContext The context of outsideSql. (NotNull)
+     * @return Result. (Nullable)
+     */
     protected Object executeOutsideSqlAsStatic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
-        // Supports SpecifiedResultSetHandler
+        // - - - - - - - - - - - - - - - - -
+        // Find specified resultSetHandler.
+        // - - - - - - - - - - - - - - - - -
         final ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
 
+        // - - - - - - - - -
+        // Filter arguments.
+        // - - - - - - - - -
         final Object[] filteredArgs;
         if (outsideSqlContext.isSpecifiedOutsideSql()) {
             final Object parameterBean = outsideSqlContext.getParameterBean();
@@ -305,10 +355,21 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 
     }
 
+    /**
+     * Execute outsideSql as Dynamic.
+     * 
+     * @param args The array of argument. (Nullable)
+     * @param outsideSqlContext The context of outsideSql. (NotNull)
+     * @return Result. (Nullable)
+     */
     protected Object executeOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
         final Object firstArg = args[0];
         final org.seasar.framework.beans.BeanDesc beanDesc = org.seasar.framework.beans.factory.BeanDescFactory.getBeanDesc(firstArg.getClass());
         String filteredSql = getSql();
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Resolve embedded comment for parsing bind variable comment in embedded comment.
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         for (int i = 0; i < beanDesc.getPropertyDescSize(); i++) {
             final PropertyDesc propertyDesc = beanDesc.getPropertyDesc(i);
             final Class propertyType = propertyDesc.getPropertyType();
@@ -327,9 +388,14 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         outsideSqlCommand.setArgTypes(getArgTypes());
         outsideSqlCommand.setSql(filteredSql);
 
-        // Supports SpecifiedResultSetHandler
+        // - - - - - - - - - - - - - - - - -
+        // Find specified resultSetHandler.
+        // - - - - - - - - - - - - - - - - -
         final ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
 
+        // - - - - - - - - -
+        // Filter arguments.
+        // - - - - - - - - -
         final Object[] filteredArgs;
         if (outsideSqlContext.isSpecifiedOutsideSql()) {
             final Object parameterBean = outsideSqlContext.getParameterBean();
@@ -460,6 +526,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         };
     }
 
+    // -----------------------------------------------------
+    //                                          Setup Helper
+    //                                          ------------
     protected Class[] toClassArray(List${database.filterGenericsString('Class')} bindVariableTypeList) {
         final Class[] bindVariableTypesArray = new Class[bindVariableTypeList.size()];
         for (int i = 0; i < bindVariableTypeList.size(); i++) {
@@ -504,12 +573,12 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return System.getProperty("line.separator");
     }
 
-    // =====================================================================================
-    //                                                                 Internal Static Class
-    //                                                                 =====================
-    // --------------------------------------
-    //                              SqlParser
-    //                              ---------
+    // ===================================================================================
+    //                                                               Internal Static Class
+    //                                                               =====================
+    // -----------------------------------------------------
+    //                                             SqlParser
+    //                                             ---------
     protected static class InternalSqlParserImpl implements SqlParser {
 
         private SqlTokenizer tokenizer;
@@ -692,9 +761,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
     }
 
-    // --------------------------------------
-    //                       BindVariableNode
-    //                       ----------------
+    // -----------------------------------------------------
+    //                                      BindVariableNode
+    //                                      ----------------
     protected static class InternalBindVariableNode extends BindVariableNode {
         private String expression;
 
@@ -769,9 +838,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
     }
 
-    // --------------------------------------
-    //                      EmbeddedValueNode
-    //                      -----------------
+    // -----------------------------------------------------
+    //                                     EmbeddedValueNode
+    //                                     -----------------
     protected static class InternalEmbeddedValueNode extends EmbeddedValueNode {
         private String expression;
 
@@ -823,9 +892,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
     }
 
-    // --------------------------------------
-    //                             StringUtil
-    //                             ----------
+    // -----------------------------------------------------
+    //                                            StringUtil
+    //                                            ----------
     protected static class InternalStringUtil {
 
         public static final String[] EMPTY_STRINGS = new String[0];

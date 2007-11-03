@@ -9,7 +9,6 @@ import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
  */
 public interface ${glBehaviorSelectorInterfaceName} {
 
-#if ($database.isAvailableGenerics())
     /**
      * Select behavior.
      * 
@@ -26,22 +25,4 @@ public interface ${glBehaviorSelectorInterfaceName} {
      * @return Behavior-readable. (NotNull)
      */
     public ${glBehaviorReadableInterfaceName} byName(String tableFlexibleName);
-#else
-    /**
-     * Select behavior.
-     * 
-     * ${database.filterGenericsParamOutput('<BEHAVIOR_TYPE>', 'The type of behavior.')}
-     * @param behaviorType Behavior type. (NotNull)
-     * @return Behavior. (NotNull)
-     */
-    public ${glBehaviorReadableInterfaceName} select(Class behaviorType);
-
-    /**
-     * Select behavior-readable by name.
-     * 
-     * @param tableFlexibleName Table flexible-name. (NotNull)
-     * @return Behavior-readable. (NotNull)
-     */
-    public ${glBehaviorReadableInterfaceName} byName(String tableFlexibleName);
-#end
 }

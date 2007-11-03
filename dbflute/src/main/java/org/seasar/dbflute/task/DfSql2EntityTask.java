@@ -156,10 +156,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected List<File> collectSqlFileIntoList() {
         final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
         final List<File> sqlFileList = new DfSqlFileGetter().getSqlFileList(sqlDirectory);
-        if (!sqlDirectory.contains("src/main/java/")) {
+        if (!sqlDirectory.contains("src/main/java")) {
             return sqlFileList;
         }
-        final String srcMainResources = StringUtil.replace(sqlDirectory, "src/main/java/", "src/main/resources/");
+        final String srcMainResources = StringUtil.replace(sqlDirectory, "src/main/java", "src/main/resources");
         try {
             final List<File> resourcesSqlFileList = new DfSqlFileGetter().getSqlFileList(srcMainResources);
             sqlFileList.addAll(resourcesSqlFileList);

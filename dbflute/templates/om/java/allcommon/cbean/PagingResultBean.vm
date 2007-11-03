@@ -247,7 +247,6 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
         }
     }
 
-#if ($database.isAvailableGenerics())
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
@@ -264,7 +263,6 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
         mappingList.setPageGroupOption(_pageGroupOption);
         return mappingList;
     }
-#end
 
     // ===================================================================================
     //                                                                           Calculate
@@ -317,127 +315,6 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${
     public boolean isExistNextPage() {
         return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
     }
-
-#if ($database.isMakeDeprecated())
-    // -----------------------------------------------------
-    //                                            Page Range
-    //                                            ----------
-    /**
-     * Get current page-range page-number-list.
-     * Using values are pageRangeOption and currentPageNumber and allPageCount.
-     * 
-     * @return Current page-range page-number-list. (NotNull)
-     * @deprecated Please use PagingResultBean#pageRange().getCurrentPageRangePageNumberList();
-     */
-    public java.util.List${database.filterGenericsString('Integer')} getCurrentPageRangePageNumberList() {
-        return pageRange().createPageNumberList();
-    }
-
-    /**
-     * Get current page-range page-number-array.
-     * Using values are pageRangeOption and currentPageNumber and allPageCount.
-     * 
-     * @return Current page-range page-number-array.
-     * @deprecated Please use PagingResultBean#pageRange().getCurrentPageRangePageNumberArray();
-     */
-    public int[] getCurrentPageRangePageNumberArray() {
-        return pageRange().createPageNumberArray();
-    }
-
-    /**
-     * Is existing previous page-range?
-     * Using values are pageRangeOption and currentPageNumber and allPageCount.
-     * 
-     * @return Determination.
-     * @deprecated Please use PagingResultBean#pageRange().isExistPrePageRange();
-     */
-    public boolean isExistPrePageRange() {
-        return pageRange().isExistPrePageRange();
-    }
-
-    /**
-     * Is existing next page-range?
-     * Using values are pageRangeOption and currentPageNumber and allPageCount.
-     * 
-     * @return Determination.
-     * @deprecated Please use PagingResultBean#pageRange().isExistNextPageRange();
-     */
-    public boolean isExistNextPageRange() {
-        return pageRange().isExistNextPageRange();
-    }
-
-    // -----------------------------------------------------
-    //                                            Page Group
-    //                                            ----------
-    /**
-     * Calculate current page-group start-page-number.
-     * Using values are currentPageNumber and pageGroupSize.
-     * 
-     * @return Current page-group start-page-number.
-     * @deprecated Please use PagingResultBean#pageGroup().calculateCurrentPageGroupStartPageNumber();
-     */
-    public int calculateCurrentPageGroupStartPageNumber() {
-        return pageGroup().calculateStartPageNumber();
-    }
-
-    /**
-     * Get current page-group page-number-list.
-     * Using values are currentPageNumber and pageGroupSize and allPageCount.
-     * 
-     * @return Current page-group page-number-list.
-     * @deprecated Please use PagingResultBean#pageGroup().getCurrentPageGroupPageNumberList();
-     */
-    public java.util.List${database.filterGenericsString('Integer')} getCurrentPageGroupPageNumberList() {
-        return pageGroup().createPageNumberList();
-    }
-
-    /**
-     * Get current page-group page-number-array.
-     * Using values are currentPageNumber and pageGroupSize and allPageCount.
-     * 
-     * @return Current page-group page-number-array.
-     * @deprecated Please use PagingResultBean#pageGroup().getCurrentPageGroupPageNumberArray();
-     */
-    public int[] getCurrentPageGroupPageNumberArray() {
-        return pageGroup().createPageNumberArray();
-    }
-
-    /**
-     * Is existing previous page-group?
-     * Using values are currentPageNumber and pageGroupSize.
-     * 
-     * @return Determination.
-     * @deprecated Please use PagingResultBean#pageGroup().isExistPrePageGroup();
-     */
-    public boolean isExistPrePageGroup() {
-        return pageGroup().isExistPrePageGroup();
-    }
-
-    /**
-     * Is existing next page-group?
-     * Using values are currentPageNumber and pageGroupSize and allPageCount.
-     * 
-     * @return Determination.
-     * @deprecated Please use PagingResultBean#pageGroup().isExistNextPageGroup();
-     */
-    public boolean isExistNextPageGroup() {
-        return pageGroup().isExistNextPageGroup();
-    }
-
-    /**
-     * @deprecated Please use ${glPackageBaseCommonCBeanPagenavi}.${glPageRangeOptionName}
-     */
-    public static class PageRangeOption extends ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName} {
-        private static final long serialVersionUID = 1L;
-    }
-
-    /**
-     * @deprecated Please use ${glPackageBaseCommonCBeanPagenavi}.${glPageGroupOptionName}
-     */
-    public static class PageGroupOption extends ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupOptionName} {
-        private static final long serialVersionUID = 1L;
-    }
-#end
 
     // ===================================================================================
     //                                                                      Basic Override
