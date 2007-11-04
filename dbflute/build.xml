@@ -11,6 +11,7 @@
   <property name="dbflute.deploy.dir" value="/pj/java/dbflute-${version}"/>
   <property name="dbflute.example.dir" value="/pj/ws/dbflute-example"/>
   <property name="dbflute.basic.example.dir" value="/pj/ws/dbflute-basic-example"/>
+  <property name="dbflute.teeda.example.dir" value="/pj/ws/dbflute-teeda-example"/>
   <property name="dbflute.postgresdemo.dir" value="/pj/ws/dbflute-postgresdemo"/>
 
   <target name="dist" description="==> generates distribution">
@@ -63,6 +64,9 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.postgresdemo.dir}/mydbflute/dbflute-${version}">

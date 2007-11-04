@@ -569,8 +569,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
     }
-#if ($table.isUseSequence())
 
+#if ($table.isUseSequence())
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
@@ -583,12 +583,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateSelectNextVal();
     }
 #end
-#if (${table.hasOnlyOnePrimaryKey()})
 
+#if (${table.hasOnlyOnePrimaryKey()})
     // ===================================================================================
     //                                                                        Load Referer
     //                                                                        ============
-  #foreach ($refferer in $table.Referrers)
+  #foreach ($refferer in $table.refererList)
     #set ($reffererTable = $refferer.Table)
     #set ($reffererEntityClassName = "${refferer.refererTableExtendedEntityClassName}")
     #set ($reffererBhvClassName = "${refferer.refererTableExtendedBehaviorClassName}")

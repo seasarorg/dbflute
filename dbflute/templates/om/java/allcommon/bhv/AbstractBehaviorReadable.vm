@@ -5,10 +5,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
-#if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
-#end
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};

@@ -658,6 +658,10 @@ public class Database {
         return getBasicProperties().isTargetLanguageCSharpOld();
     }
 
+    public boolean isJavaVersionGreaterEqualTiger() {
+        return getBasicProperties().isJavaVersionGreaterEqualTiger();
+    }
+    
     public boolean isJavaVersionGreaterEqualMustang() {
         return getBasicProperties().isJavaVersionGreaterEqualMustang();
     }

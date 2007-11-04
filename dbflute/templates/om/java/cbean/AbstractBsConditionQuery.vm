@@ -621,8 +621,12 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @param toDate The to-date of ${col.UncapitalisedJavaName}. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo($col.JavaNative fromDate, $col.JavaNative toDate, ${glPackageBaseCommonCOption}.${glConditionOptionFromToName} fromToOption) {
+    public void set${tmpJavaName}_FromTo(java.util.Date fromDate, java.util.Date toDate, ${glPackageBaseCommonCOption}.${glConditionOptionFromToName} fromToOption) {
+#if ($col.javaNative == "java.util.Date")
         registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.Name}", "${col.JavaName}", "${col.UncapitalisedJavaName}", fromToOption);
+#else
+        registerFromToQuery((fromDate != null ? new ${col.javaNative}(fromDate.getTime()) : null), (toDate != null ? new ${col.javaNative}(toDate.getTime()) : null), getCValue${tmpJavaName}(), "${col.Name}", "${col.JavaName}", "${col.UncapitalisedJavaName}", fromToOption);
+#end
     }
 
     /**
@@ -631,7 +635,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @param fromDate The from-date of ${col.UncapitalisedJavaName}. (Nullable)
      * @param toDate The to-date of ${col.UncapitalisedJavaName}. (Nullable)
      */
-    public void set${tmpJavaName}_DateFromTo($col.JavaNative fromDate, $col.JavaNative toDate) {
+    public void set${tmpJavaName}_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
         set${tmpJavaName}_FromTo(fromDate, toDate, new ${glPackageBaseCommonCOption}.${glConditionOptionDateFromToName}());
     }
       #end

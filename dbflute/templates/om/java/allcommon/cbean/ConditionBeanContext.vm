@@ -282,7 +282,7 @@ public class ${glConditionBeanContextName} {
     public static void throwEntityAlreadyDeletedException(Object searchKey4log, ${glLatestSqlProviderName} latestSqlProvider, String tableDbName) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Not found the entity. The entity has already been deleted!" + getLineSeparator();
+        msg = msg + "The entity was Not Found! The entity has already been deleted!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + "Please confirm the existence of your target record on your database." + getLineSeparator();
@@ -307,7 +307,7 @@ public class ${glConditionBeanContextName} {
     public static void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause, ${glLatestSqlProviderName} latestSqlProvider, String tableDbName) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The selected entity is duplicated. It should be the only one! But the resultCount=" + resultCountString + getLineSeparator();
+        msg = msg + "The selected entity was duplicated. It should be the only one! But the resultCount=" + resultCountString + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + "Please confirm your search condition. Does it really select the only one?" + getLineSeparator();

@@ -56,6 +56,23 @@ public class ${glOutsideSqlContextName} {
     }
 
     // ===================================================================================
+    //                                                                  Exception Handling
+    //                                                                  ==================
+    public static void throwOutsideSqlNotFoundException(String path) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The outside-sql was Not Found!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm the existence of your target file of outside-sql on your classpath." + getLineSeparator();
+        msg = msg + "And please confirm the file name and the file path STRICTLY!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Specified OutsideSql Path]" + getLineSeparator() + path + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        throw new ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException}(msg);
+    }
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     // -----------------------------------------------------
@@ -90,8 +107,8 @@ public class ${glOutsideSqlContextName} {
         } else if (ResourceUtil.isExist(standardPath)) {
             return readText(standardPath, sqlFileEncoding);
         } else {
-            String msg = "Not found the path: " + standardPath; // TODO: @jflute -- TO Make Rich Message!
-            throw new IllegalStateException(msg);
+            throwOutsideSqlNotFoundException(standardPath);
+            return null; // Non Reachable.
         }
     }
 
@@ -109,6 +126,15 @@ public class ${glOutsideSqlContextName} {
         final java.io.InputStream is = ResourceUtil.getResourceAsStream(path);
         final java.io.Reader reader = InputStreamReaderUtil.create(is, sqlFileEncoding);
         return ReaderUtil.readText(reader);
+    }
+
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected static String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 
     // ===================================================================================

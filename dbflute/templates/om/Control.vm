@@ -214,7 +214,7 @@ targetdatabase = $targetDatabase
     #set ($glEntityAlreadyUpdatedException = "${glProjectPrefix}EntityAlreadyUpdatedException")
     #set ($glEntityAlreadyDeletedException = "${glProjectPrefix}EntityAlreadyDeletedException")
     #set ($glEntityDuplicatedException = "${glProjectPrefix}EntityDuplicatedException")
-    #set ($glDaoExceptionContextName = "${glProjectPrefix}DaoExceptionContext")
+    #set ($glOutsideSqlNotFoundException = "${glProjectPrefix}OutsideSqlNotFoundException")
     #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
     #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
     #set ($glSelectedCountExceedMaxCountExceptionName = "${glProjectPrefix}SelectedCountExceedMaxCountException")
@@ -1110,11 +1110,6 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.debug("public void parseExceptionClass() {")
-##    #if ($database.isTargetLanguageCSharp())
-##      $database.debug("    parseDaoExceptionContext();")
-##      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glDaoExceptionContextName}.${glClassFileExtension}" )
-##      $generator.parse("om/${glResourceDirectory}/allcommon/exception/DaoExceptionContext.${glTemplateFileExtension}",$path,"", "")
-##    #end
 
     #if ($database.isTargetLanguageJava())
       $database.debug("    parse('DangerousResultSizeException');")
@@ -1132,6 +1127,12 @@ targetdatabase = $targetDatabase
       $database.debug("    parse('EntityDuplicatedException');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEntityDuplicatedException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/exception/EntityDuplicatedException.${glTemplateFileExtension}",$path,"", "")
+
+      #if ($database.isJavaVersionGreaterEqualTiger())
+        $database.debug("    parse('OutsideSqlNotFoundException');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glOutsideSqlNotFoundException}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/exception/OutsideSqlNotFoundException.${glTemplateFileExtension}",$path,"", "")
+      #end
     #end
 
     $database.debug("    parseRecordHasAlreadyBeenDeletedException();")

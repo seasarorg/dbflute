@@ -1,0 +1,31 @@
+${database.allClassCopyright}package ${glPackageBaseCommonException};
+
+/**
+ * The exception when the outside-sql has been not found.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glOutsideSqlNotFoundException} extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     */
+    public ${glOutsideSqlNotFoundException}(String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     * @param cause Throwable.
+     */
+    public ${glOutsideSqlNotFoundException}(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+}

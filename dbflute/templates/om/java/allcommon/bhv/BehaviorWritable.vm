@@ -43,24 +43,6 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public void modifyNonstrict(${glEntityInterfaceName} entity);
 
-#if ($database.isMakeRecentlyDeprecated())
-    /**
-     * Modify after select. <br />
-     * {modify: modified only}
-     * <pre>
-     * The merit of this method is only Deleted-Check before updating!
-     * If you don't want the merit, please use update().
-     * And the demerit of this method is as follows:
-     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
-     *   : it does not throw optimistic lock exception. It can updates.
-     * </pre>
-     * @param entity Entity.
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @deprecated Thie method is old style and has wrong performance. Please use modify().
-     */
-    public void modifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-#end
-
     /**
      * Create or modify. <br />
      * {modify: modified only} <br />
@@ -78,23 +60,6 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      */
     public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-
-#if ($database.isMakeRecentlyDeprecated())
-    /**
-     * Create or modify after select. <br />
-     * {modify: modified only}
-     * <pre>
-     * The merit of this method is only Deleted-Check before updating!
-     * If you don't want the merit, please use update().
-     * And the demerit of this method is as follows:
-     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
-     *   : it does not throw optimistic lock exception. It can updates.
-     * </pre>
-     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @deprecated Thie method is old style and has wrong performance. Please use createOrModify().
-     */
-    public void createOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-#end
 
     /**
      * Remove.
@@ -121,17 +86,6 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Create list.
-     * 
-     * @param entityList Entity-list. (NotNull and NotEmpty)
-     * @return Created count.
-     * @deprecated Sorry! This method name is very confusing. Please use lumpCreate().
-     */
-    public int createList(java.util.List<${glEntityInterfaceName}> entityList);
-#end
-
     /**
      * Lump Modify the list.
      * 
@@ -141,18 +95,6 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      */
     public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Modify list.
-     * 
-     * @param entityList Entity-list. (NotNull and NotEmpty)
-     * @return Modified count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
-     * @deprecated Sorry! This method name is very confusing. Please use lumpModify().
-     */
-    public int modifyList(java.util.List<${glEntityInterfaceName}> entityList);
-#end
-
     /**
      * Lump remove the list.
      * 
@@ -161,16 +103,4 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
     public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
-
-#if ($database.isMakeDeprecated())
-    /**
-     * Remove list.
-     * 
-     * @param entityList Entity-list. (NotNull and NotEmpty)
-     * @return Removed count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
-     * @deprecated Sorry! This method name is very confusing. Please use lumpRemove().
-     */
-    public int removeList(java.util.List<${glEntityInterfaceName}> entityList);
-#end
 }

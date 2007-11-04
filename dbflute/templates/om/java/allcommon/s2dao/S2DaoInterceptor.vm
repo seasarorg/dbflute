@@ -468,9 +468,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected void preprocessOutsideSql(MethodInvocation invocation) {
         final Class<${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}> outsideSqlType = ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}.class;
         final ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation} outsideSql = invocation.getMethod().getAnnotation(outsideSqlType);
-        if (outsideSql != null && (outsideSql.dynamicAnalysis() || outsideSql.offsetByCursor() || outsideSql.offsetByCursor() || outsideSql.limitByCursor())) {
+        if (outsideSql != null && (outsideSql.embeddedBinding() || outsideSql.offsetByCursor() || outsideSql.offsetByCursor() || outsideSql.limitByCursor())) {
             final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-            outsideSqlContext.setDynamicAnalysis(outsideSql.embeddedBinding() || outsideSql.dynamicAnalysis());
+            outsideSqlContext.setDynamicAnalysis(outsideSql.embeddedBinding());
             outsideSqlContext.setOffsetByCursorForcedly(outsideSql.offsetByCursor());
             outsideSqlContext.setLimitByCursorForcedly(outsideSql.limitByCursor());
             ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
