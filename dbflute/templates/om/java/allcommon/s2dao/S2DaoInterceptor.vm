@@ -147,14 +147,23 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         final Class targetClass = getTargetClass(invocation);
         final DaoMetaData dmd = daoMetaDataFactory_.getDaoMetaData(targetClass);
         if (${glOutsideSqlDaoName}.class.isAssignableFrom(targetClass)) {
-            final Object[] args = invocation.getArguments();
-            final String path = (String)args[0];
-            final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
-            cmd = dmd.getSqlCommand(invocation.getMethod().getName() + ":" + path + ":" + option.generateUniqueKey());
+            if (isOutsideSqlDaoMethodSelect(invocation)) {
+                cmd = dmd.getSqlCommand(generateUniqueKeySpecifiedOutsideSqlSelect(invocation));
+            } else {
+                throw new UnsupportedOperationException();
+            }
         } else {
             cmd = dmd.getSqlCommand(invocation.getMethod().getName());
         }
         return cmd;
+    }
+
+    protected String generateUniqueKeySpecifiedOutsideSqlSelect(MethodInvocation invocation) {
+        final Object[] args = invocation.getArguments();
+        final String path = (String)args[0];
+        final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+        final Object resultTypeSpecification = args[3];
+        return invocation.getMethod().getName() + ":" + path + ":" + option.generateUniqueKey() + ":" + resultTypeSpecification;
     }
 
     // -----------------------------------------------------
@@ -479,9 +488,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         if (${glOutsideSqlDaoName}.class.isAssignableFrom(getTargetClass(invocation))) {
             if (isOutsideSqlDaoMethodSelect(invocation)) {
                 setupOutsideSqlContextSelect(invocation);
-            } else if (isOutsideSqlDaoMethodInsert(invocation)) {
-            } else if (isOutsideSqlDaoMethodUpdate(invocation)) {
-            } else if (isOutsideSqlDaoMethodDelete(invocation)) {
+            } else {
+                throw new UnsupportedOperationException();
             }
             return;
         }
@@ -512,16 +520,23 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
     }
 
-    protected boolean isOutsideSqlDaoMethodInsert(MethodInvocation invocation) {
-        return invocation.getMethod().getName().startsWith("insert");
-    }
-
-    protected boolean isOutsideSqlDaoMethodUpdate(MethodInvocation invocation) {
-        return invocation.getMethod().getName().startsWith("update");
-    }
-
-    protected boolean isOutsideSqlDaoMethodDelete(MethodInvocation invocation) {
-        return invocation.getMethod().getName().startsWith("delete");
+    protected void setupOutsideSqlContextUpdate(MethodInvocation invocation) {
+        final Object[] args = invocation.getArguments();
+        if (args.length != 3) {
+            String msg = "Internal Error! OutsideSqlDao's method should have 3 arguements: args.length=" + args.length;
+            throw new IllegalStateException(msg);
+        }
+        final String path = (String)args[0];
+        final Object pmb = args[1];
+        final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+        final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+        outsideSqlContext.setDynamicAnalysis(option.isEmbeddedBinding());
+        outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
+        outsideSqlContext.setOutsideSqlPath(path);
+        outsideSqlContext.setParameterBean(pmb);
+        outsideSqlContext.setMethodName(invocation.getMethod().getName());
+        ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
     }
 
     /**

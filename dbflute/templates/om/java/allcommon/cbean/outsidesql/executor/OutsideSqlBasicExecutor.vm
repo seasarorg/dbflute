@@ -108,16 +108,19 @@ public class ${glOutsideSqlBasicExecutorName} {
     public int insert(String path, Object pmb) {
         // TODO: @jflute -- 戻り値どうしよう → int型で特になにも制御しないで実行するだけかな！？
         throw new UnsupportedOperationException("Sorry! The method of insert() has not been implemented yet.");
+        // return _outsideSqlDao.update(path, pmb, createOutsideSqlOption());
     }
 
     public int update(String path, Object pmb) {
         // TODO: @jflute -- 戻り値どうしよう
         throw new UnsupportedOperationException("Sorry! The method of update() has not been implemented yet.");
+        // return _outsideSqlDao.update(path, pmb, createOutsideSqlOption());
     }
 
     public int delete(String path, Object pmb) {
         // TODO: @jflute -- 戻り値どうしよう
         throw new UnsupportedOperationException("Sorry! The method of delete() has not been implemented yet.");
+        // return _outsideSqlDao.update(path, pmb, createOutsideSqlOption());
     }
 
     // ===================================================================================
