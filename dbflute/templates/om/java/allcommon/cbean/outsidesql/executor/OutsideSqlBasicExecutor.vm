@@ -55,6 +55,16 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                              Select
     //                                                                              ======
+    /**
+     * Select entity.
+     * 
+     * @param path The path of SQL file. (NotNull)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @param entityType The type of entity. (NotNull)
+     * @return The selected entity. (Nullable)
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     */
     public <ENTITY_TYPE> ENTITY_TYPE selectEntity(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
         final List<ENTITY_TYPE> ls = selectList(path, pmb, entityType);
         if (ls.isEmpty()) {
@@ -95,17 +105,17 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                              Update
     //                                                                              ======
-    public void insert(String path, Object pmb) {
-        // TODO: @jflute -- 戻り値どうしよう
+    public int insert(String path, Object pmb) {
+        // TODO: @jflute -- 戻り値どうしよう → int型で特になにも制御しないで実行するだけかな！？
         throw new UnsupportedOperationException("Sorry! The method of insert() has not been implemented yet.");
     }
 
-    public void update(String path, Object pmb) {
+    public int update(String path, Object pmb) {
         // TODO: @jflute -- 戻り値どうしよう
         throw new UnsupportedOperationException("Sorry! The method of update() has not been implemented yet.");
     }
 
-    public void delete(String path, Object pmb) {
+    public int delete(String path, Object pmb) {
         // TODO: @jflute -- 戻り値どうしよう
         throw new UnsupportedOperationException("Sorry! The method of delete() has not been implemented yet.");
     }

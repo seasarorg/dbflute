@@ -306,7 +306,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return getMyDao().updateModifiedOnly(entity);
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
      * Update one entity non-strictly. {delegate method & modified only}
      * 
@@ -330,7 +330,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return getMyDao().delete(entity);
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
      * Delete one entity non-strictly. {delegate method}
      * 
@@ -374,7 +374,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return getMyDao().updateList(entityList);
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
      * Update several entities non-strictly. {delegate method} <br />
      * 
@@ -400,7 +400,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return getMyDao().deleteList(entityList);
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
      * Delete several entities non-strictly. {delegate method}
      * 
@@ -490,28 +490,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
         return selectEntityWithDeletedCheck(cb);
     }
-#end
-
-#if ($table.hasPrimaryKey() && $database.isMakeBehaviorForUpdate())
-#if ($database.isMakeDeprecated())
-    /*
-     * Select entity for update with deleted check. {by primary-key}
-     * 
-     * @param primaryKey
-     * @return Selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
-     * @deprecated This method is deprecated.
-     */
-    public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheckForUpdate(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
-        cb.lockForUpdate();
-        return selectEntityWithDeletedCheck(cb);
-    }
-#end
 #end
 
     // ===================================================================================
@@ -936,68 +914,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
-#if ($database.isMakeBehaviorForUpdate() && $database.isMakeDeprecated())
-    /**
-     * Update after select-for-update.
-     * 
-     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @deprecated This method is deprecated.
-     */
-    public void updateAfterSelectForUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
-        cb.lockForUpdate();
-        final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
-        mergeEntity(${myEntityVariableName}, currentEntity);
-        update(currentEntity);
-    }
-
-    /**
-     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
-     * @deprecated This method is deprecated.
-     */
-    protected void doModifyAfterSelectForUpdate(${glEntityInterfaceName} entity) {
-        updateAfterSelectForUpdate((${myExtendedObjectClassName})entity);
-    }
-
-    /**
-     * Insert or update after select-for-update. {update: modified only} <br />
-     * 
-     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @deprecated This method is deprecated.
-     */
-    public void insertOrUpdateAfterSelectForUpdate(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        if (!${myEntityVariableName}.hasPrimaryKeyValue()) {
-            insert(${myEntityVariableName});
-            return;
-        }
-        ${myExtendedObjectClassName} currentEntity = null;
-        try {
-            final ${myConditionBeanClassName} cb = newMyConditionBean();
-            cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
-            cb.lockForUpdate();
-            currentEntity = selectEntityWithDeletedCheck(cb);
-        } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
-            insert(${myEntityVariableName});
-            return;
-        }
-        assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        mergeEntity(${myEntityVariableName}, currentEntity);
-        update(${myEntityVariableName});
-    }
-
-    /**
-     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @deprecated This method is deprecated.
-     */
-    protected void doCreateOrModifyAfterSelectForUpdate(${glEntityInterfaceName} ${myEntityVariableName}) {
-        insertOrUpdateAfterSelectForUpdate((${myExtendedObjectClassName})${myEntityVariableName});
-    }
-#end
-
 #if ($database.isMakeRecentlyDeprecated())
     /**
      * ${database.ImplementComment}
@@ -1118,21 +1034,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateInsertList(${myEntityListVariableName});
     }
 
-#if ($database.isMakeRecentlyDeprecated())
-    /**
-     * Insert list. <br />
-     * This method use 'Batch Update' of java.sql.PreparedStatement.
-     * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull)
-     * @return Inserted count.
-     * @deprecated Sorry! This method name is very confusing. Please use batchInsert().
-     */
-    public int insertList(List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return batchInsert(${myEntityListVariableName})${batchUpdateReturnValueMethod};
-    }
-#end
-
     /**
      * Batch update the list. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
@@ -1146,7 +1047,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateUpdateList(${myEntityListVariableName});
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
      * Batch update the list non-strictly. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
@@ -1157,22 +1058,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${batchUpdateReturnType} batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateUpdateListNonstrict(${myEntityListVariableName});
-    }
-#end
-
-#if ($database.isMakeRecentlyDeprecated())
-    /**
-     * Update batch. All columns are update target. {NOT modified only} <br />
-     * This method use 'Batch Update' of java.sql.PreparedStatement.
-     * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull)
-     * @return Updated count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
-     * @deprecated Sorry! This method name is very confusing. Please use batchUpdate().
-     */
-    public int updateList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return batchUpdate(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
 #end
 
@@ -1189,7 +1074,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateDeleteList(${myEntityListVariableName});
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
      * Batch delete the list non-strictly. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
@@ -1200,21 +1085,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     public ${batchUpdateReturnType} batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateDeleteListNonstrict(${myEntityListVariableName});
-    }
-#end
-
-#if ($database.isMakeRecentlyDeprecated())
-    /**
-     * Delete list by Batch. This method use 'Batch Update' of java.sql.PreparedStatement. <br />
-     * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull)
-     * @return Deleted count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
-     * @deprecated Sorry! This method name is very confusing. Please use batchDelete().
-     */
-    public int deleteList(List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
-        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        return batchDelete(${myEntityListVariableName})${batchUpdateReturnValueMethod};
     }
 #end
 
@@ -1265,7 +1135,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         for (${myExtendedObjectClassName} entity : ${myEntityListVariableName}) { if (entity.hasModification()) { update(entity); } }
     }
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
      * Loop update modified elements only non-strictly.
      * 

@@ -99,17 +99,38 @@ public class ${glOutsideSqlContextName} {
     // ===================================================================================
     //                                                                            Read SQL
     //                                                                            ========
-    public String readOutsideSqlPath(String sqlFileEncoding) {
-        final String dbmsPath = _outsideSqlPath; // TODO: @jflute -- Not Resolved
+    /**
+     * Read outside-sql path. <br />
+     * Required attribute is 'outsideSqlPath'.
+     * 
+     * @param sqlFileEncoding The encoding of SQL file. (NotNull)
+     * @param dbmsSuffix The suffix of DBMS. (NotNull)
+     * @return The text of SQL. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     */
+    public String readOutsideSqlPath(String sqlFileEncoding, String dbmsSuffix) {
         final String standardPath = _outsideSqlPath;
-        if (ResourceUtil.isExist(dbmsPath)) {
+        final String dbmsPath = buildDbmsPath(standardPath, dbmsSuffix);
+        if (isExistResource(dbmsPath)) {
             return readText(dbmsPath, sqlFileEncoding);
-        } else if (ResourceUtil.isExist(standardPath)) {
+        } else if (isExistResource(standardPath)) {
             return readText(standardPath, sqlFileEncoding);
         } else {
             throwOutsideSqlNotFoundException(standardPath);
             return null; // Non Reachable.
         }
+    }
+
+    protected String buildDbmsPath(String standardPath, String dbmsSuffix) {
+        final String dbmsPath;
+        final int lastIndexOfDot = standardPath.lastIndexOf(".");
+        if (lastIndexOfDot >= 0 && !standardPath.substring(lastIndexOfDot).contains("/")) {
+            final String base = standardPath.substring(0, lastIndexOfDot);
+            dbmsPath = base + dbmsSuffix + standardPath.substring(lastIndexOfDot);
+        } else {
+            dbmsPath = standardPath + dbmsSuffix;
+        }
+        return dbmsPath;
     }
 
     // ===================================================================================
@@ -122,6 +143,10 @@ public class ${glOutsideSqlContextName} {
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
+    protected boolean isExistResource(String path) {
+        return ResourceUtil.isExist(path);
+    }
+
     protected String readText(final String path, String sqlFileEncoding) {
         final java.io.InputStream is = ResourceUtil.getResourceAsStream(path);
         final java.io.Reader reader = InputStreamReaderUtil.create(is, sqlFileEncoding);
