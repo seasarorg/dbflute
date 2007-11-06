@@ -56,6 +56,13 @@ public class ${glOutsideSqlContextName} {
     }
 
     // ===================================================================================
+    //                                                                          Unique Key
+    //                                                                          ==========
+    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
+        return methodName + "():" + path + ":" + option.generateUniqueKey() + (resultTypeSpecification != null ? ":" + resultTypeSpecification : "");
+    }
+
+    // ===================================================================================
     //                                                                  Exception Handling
     //                                                                  ==================
     public static void throwOutsideSqlNotFoundException(String path) {

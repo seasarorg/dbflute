@@ -220,7 +220,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @return All list. (NotNull)
      */
-    ${database.behaviorDelegateModifier} List${database.filterGenericsString(${myExtendedObjectClassName})} delegateGetListAll() {
+    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateGetListAll() {
         return getMyDao().getListAll();
     }
 #if ($table.hasPrimaryKey())
@@ -454,7 +454,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. (Nullalble)
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
      */
     public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -466,8 +466,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
      */
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -501,9 +501,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb Condition-bean. (NotNull)
      * @return Selected list-result-bean. (NotNull)
      */
-    public ${glListResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectList(${myConditionBeanClassName} cb) {
+    public ${glListResultBeanName}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        return new ResultBeanBuilder${database.filterGenericsString(${myExtendedObjectClassName})}(this).buildListResultBean(cb, delegateSelectList(cb));
+        return new ResultBeanBuilder<${myExtendedObjectClassName}>(this).buildListResultBean(cb, delegateSelectList(cb));
     }
 
     /**
@@ -512,9 +512,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb Condition-bean. (NotNull)
      * @return Selected paging-result-bean. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} cb) {
+    public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        return selectPage(cb, new SelectPageSimpleInvoker${database.filterGenericsString(${myExtendedObjectClassName})}(this));
+        return selectPage(cb, new SelectPageSimpleInvoker<${myExtendedObjectClassName}>(this));
     }
 
     /**
@@ -524,12 +524,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param invoker Select-page-invoker (NotNull)
      * @return Selected paging-result-bean. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${myExtendedObjectClassName})} selectPage(final ${myConditionBeanClassName} cb, SelectPageInvoker${database.filterGenericsString(${myExtendedObjectClassName})} invoker) {
+    public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb, SelectPageInvoker<${myExtendedObjectClassName}> invoker) {
         assertConditionBeanNotNull(cb);
-        final SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${myExtendedObjectClassName})}() {
+        final SelectPageCallback<${myExtendedObjectClassName}> pageCallback = new SelectPageCallback<${myExtendedObjectClassName}>() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
             public int selectCountIgnoreFetchScope() { return selectCount(cb); }
-            public List${database.filterGenericsString(${myExtendedObjectClassName})} selectListWithFetchScope() { return selectList(cb); }
+            public List<${myExtendedObjectClassName}> selectListWithFetchScope() { return selectList(cb); }
         };
         return invoker.invokeSelectPage(pageCallback);
     }
@@ -1029,7 +1029,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param ${myEntityListVariableName} Entity-list. (NotNull)
      * @return The array of inserted count.
      */
-    public ${batchUpdateReturnType} batchInsert(List${database.filterGenericsString(${myExtendedObjectClassName})} ${myEntityListVariableName}) {
+    public ${batchUpdateReturnType} batchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateInsertList(${myEntityListVariableName});
     }

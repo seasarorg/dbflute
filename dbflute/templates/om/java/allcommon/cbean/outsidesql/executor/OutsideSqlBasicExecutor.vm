@@ -22,15 +22,15 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
  *   o cursorHandling().selectCursor()
  * 
  * {Option -- Embedded}
- *   o embeddedBinding().selectList()
+ *   o dynamicBinding().selectList()
  * 
  * {Option -- Paging and Cursor}
  *   o autoPaging().cursorHandling().selectCursor()
  *   o manualPaging().cursorHandling().selectCursor()
  * 
  * {Option -- Paging and Embedded}
- *   o autoPaging().embeddedBinding().selectList()
- *   o manualPaging().embeddedBinding().selectList()
+ *   o autoPaging().dynamicBinding().selectList()
+ *   o manualPaging().dynamicBinding().selectList()
  * 
  * </pre>
  * 
@@ -43,7 +43,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     //                                                                           =========
     protected final ${glOutsideSqlDaoName} _outsideSqlDao;
 
-    protected boolean _embeddedBinding;
+    protected boolean _dynamicBinding;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -77,6 +77,17 @@ public class ${glOutsideSqlBasicExecutorName} {
         return ls.get(0);
     }
 
+    /**
+     * Select entity with deleted check.
+     * 
+     * @param path The path of SQL file. (NotNull)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @param entityType The type of entity. (NotNull)
+     * @return The selected entity. (Nullable)
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
+     */
     public <ENTITY_TYPE> ENTITY_TYPE selectEntityWithDeletedCheck(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
         final List<ENTITY_TYPE> ls = selectList(path, pmb, entityType);
         if (ls == null || ls.isEmpty()) {
@@ -90,10 +101,24 @@ public class ${glOutsideSqlBasicExecutorName} {
         return ls.get(0);
     }
 
+    /**
+     * Select list.
+     * 
+     * @param path The path of SQL file. (NotNull)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @param entityType The element type of entity. (NotNull)
+     * @return The list of selected entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
+     */
     public <ENTITY_TYPE> List<ENTITY_TYPE> selectList(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
         return _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
     }
 
+    // -----------------------------------------------------
+    //                                                Helper
+    //                                                ------
     protected void throwEntityAlreadyDeletedException(Object searchKey4Log) {
         ${glConditionBeanContextName}.throwEntityAlreadyDeletedException(searchKey4Log);
     }
@@ -103,43 +128,68 @@ public class ${glOutsideSqlBasicExecutorName} {
     }
 
     // ===================================================================================
-    //                                                                              Update
-    //                                                                              ======
-    public int insert(String path, Object pmb) {
-        // TODO: @jflute -- 戻り値どうしよう → int型で特になにも制御しないで実行するだけかな！？
-        throw new UnsupportedOperationException("Sorry! The method of insert() has not been implemented yet.");
-        // return _outsideSqlDao.update(path, pmb, createOutsideSqlOption());
+    //                                                                             Execute
+    //                                                                             =======
+    // {Insert/Update/Delete/Etc...}
+    /**
+     * Execute.
+     * 
+     * @param path The path of SQL file. (NotNull)
+     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
+     * @return The count of execution.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     */
+    public int execute(String path, Object pmb) {
+        return _outsideSqlDao.execute(path, pmb, createOutsideSqlOption());
     }
 
-    public int update(String path, Object pmb) {
-        // TODO: @jflute -- 戻り値どうしよう
-        throw new UnsupportedOperationException("Sorry! The method of update() has not been implemented yet.");
-        // return _outsideSqlDao.update(path, pmb, createOutsideSqlOption());
-    }
-
-    public int delete(String path, Object pmb) {
-        // TODO: @jflute -- 戻り値どうしよう
-        throw new UnsupportedOperationException("Sorry! The method of delete() has not been implemented yet.");
-        // return _outsideSqlDao.update(path, pmb, createOutsideSqlOption());
-    }
+// Implements at the future!
+//    public int batchExecute(String path, Object pmb) {
+//        throw new UnsupportedOperationException("Sorry! The method of batchExecute() has not been implemented yet.");
+//        // return _outsideSqlDao.batchExecute(path, pmb, createOutsideSqlOption());
+//    }
 
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    protected ${glOutsideSqlOptionName} createOutsideSqlOption() {
-        final ${glOutsideSqlOptionName} option = new ${glOutsideSqlOptionName}();
-        if (_embeddedBinding) {
-            option.embeddedBinding();
-        }
-        return option;
-    }
-
+    /**
+     * Option of autoPaging. <br />
+     * If you invoke this, you don't need to write paging condition on your SQL. <br />
+     * <pre>
+     * # ex) Your SQL {MySQL}
+     * #
+     * # select member.MEMBER_ID, member...
+     * #   from Member member
+     * #  where ...
+     * #  order by ...
+     * # -- limit 40, 20 *Here is unnecessary!
+     * #
+     * </pre>
+     * 
+     * @return The executor of paging. (NotNull)
+     */
     public ${glOutsideSqlPagingExecutorName} autoPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.autoPaging();
         return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option);
     }
 
+    /**
+     * Option of manualPaging. <br />
+     * If you invoke this, you need to write paging condition on your SQL. <br />
+     * <pre>
+     * # ex) Your SQL {MySQL}
+     * #
+     * # select member.MEMBER_ID, member...
+     * #   from Member member
+     * #  where ...
+     * #  order by ...
+     * #  limit 40, 20 *Here is necessary!
+     * #
+     * </pre>
+     * 
+     * @return The executor of paging. (NotNull)
+     */
     public ${glOutsideSqlPagingExecutorName} manualPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.manualPaging();
@@ -150,8 +200,19 @@ public class ${glOutsideSqlBasicExecutorName} {
         return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
     }
 
-    public ${glOutsideSqlBasicExecutorName} embeddedBinding() {
-        _embeddedBinding = true;
+    public ${glOutsideSqlBasicExecutorName} dynamicBinding() {
+        _dynamicBinding = true;
         return this;
+    }
+
+    // -----------------------------------------------------
+    //                                                Helper
+    //                                                ------
+    protected ${glOutsideSqlOptionName} createOutsideSqlOption() {
+        final ${glOutsideSqlOptionName} option = new ${glOutsideSqlOptionName}();
+        if (_dynamicBinding) {
+            option.dynamicBinding();
+        }
+        return option;
     }
 }

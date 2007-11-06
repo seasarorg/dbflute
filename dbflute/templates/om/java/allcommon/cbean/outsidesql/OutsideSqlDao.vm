@@ -19,6 +19,7 @@ public interface ${glOutsideSqlDaoName} extends ${glDaoReadableInterfaceName} {
 
     <ENTITY_TYPE> void selectCursor(String path, Object pmb, ${glOutsideSqlOptionName} option, ${glCursorHandlerName} handler);
 
-    // TODO: @jflute
-    // int update(String path, Object pmb, ${glOutsideSqlOptionName} option);
+    int execute(String path, Object pmb, ${glOutsideSqlOptionName} option);
+
+    // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOptionName} option);
 }

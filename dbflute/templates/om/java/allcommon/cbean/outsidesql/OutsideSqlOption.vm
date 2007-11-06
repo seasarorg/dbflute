@@ -12,7 +12,7 @@ public class ${glOutsideSqlOptionName} {
     //                                                                           =========
     protected String _pagingRequestType = "non";
 
-    protected boolean _embeddedBinding;
+    protected boolean _dynamicBinding;
 
     // ===================================================================================
     //                                                                         Easy-to-Use
@@ -25,15 +25,15 @@ public class ${glOutsideSqlOptionName} {
         _pagingRequestType = "manual";
     }
 
-    public void embeddedBinding() {
-        _embeddedBinding = true;
+    public void dynamicBinding() {
+        _dynamicBinding = true;
     }
 
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
     public String generateUniqueKey() {
-        return "{" + _pagingRequestType + ":" + _embeddedBinding + "}";
+        return "{" + _pagingRequestType + ":" + _dynamicBinding + "}";
     }
 
     // ===================================================================================
@@ -47,7 +47,7 @@ public class ${glOutsideSqlOptionName} {
         return "manual".equals(_pagingRequestType);
     }
 
-    public boolean isEmbeddedBinding() {
-        return _embeddedBinding;
+    public boolean isDynamicBinding() {
+        return _dynamicBinding;
     }
 }

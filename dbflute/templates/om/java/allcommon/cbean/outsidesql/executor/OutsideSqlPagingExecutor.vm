@@ -42,8 +42,8 @@ public class ${glOutsideSqlPagingExecutorName} {
         return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
     }
 
-    public ${glOutsideSqlPagingExecutorName} embeddedBinding() {
-        _outsideSqlOption.embeddedBinding();
+    public ${glOutsideSqlPagingExecutorName} dynamicBinding() {
+        _outsideSqlOption.dynamicBinding();
         return this;
     }
 }
