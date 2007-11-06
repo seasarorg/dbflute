@@ -267,7 +267,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (cmd != null) {
             return cmd;
         }
-        if (_log.isDebugEnabled()) {
+        if (_internalDebug) {
             _log.debug("...initializing sqlCommand: " + methodName);
         }
         return initializeSqlCommand(methodName);
