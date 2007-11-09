@@ -37,7 +37,7 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN_TYPE> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glOutsideSqlCursorExecutorName} dynamicBinding() {
+    public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN_TYPE> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
     }

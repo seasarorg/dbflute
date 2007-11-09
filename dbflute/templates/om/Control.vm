@@ -164,6 +164,7 @@ targetdatabase = $targetDatabase
     #set ($glOutsideSqlBasicExecutorName = "${glProjectPrefix}OutsideSqlBasicExecutor")
     #set ($glOutsideSqlCursorExecutorName = "${glProjectPrefix}OutsideSqlCursorExecutor")
     #set ($glOutsideSqlPagingExecutorName = "${glProjectPrefix}OutsideSqlPagingExecutor")
+    #set ($glOutsideSqlEntityExecutorName = "${glProjectPrefix}OutsideSqlEntityExecutor")
 
     ## [Allcommon-ConditionBean-Pagenavi]
     #set ($glPageNumberLinkName = "${glProjectPrefix}PageNumberLink")
@@ -861,6 +862,10 @@ targetdatabase = $targetDatabase
       $database.debug("    parse('OutsideSqlPagingExecutor')")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlPagingExecutorName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlPagingExecutor.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('OutsideSqlEntityExecutor')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlEntityExecutorName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlEntityExecutor.${glTemplateFileExtension}",$path ,"", "")
     #end
 
     ## -----------------------------------------------------

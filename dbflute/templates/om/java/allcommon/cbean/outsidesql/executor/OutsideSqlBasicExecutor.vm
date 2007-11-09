@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 
 import java.util.List;
 
-import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
@@ -56,54 +55,9 @@ public class ${glOutsideSqlBasicExecutorName} {
     //                                                                              Select
     //                                                                              ======
     /**
-     * Select entity.
-     * 
-     * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
-     * @param entityType The type of entity. (NotNull)
-     * @return The selected entity. (Nullable)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
-     */
-    public <ENTITY_TYPE> ENTITY_TYPE selectEntity(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
-        final List<ENTITY_TYPE> ls = selectList(path, pmb, entityType);
-        if (ls.isEmpty()) {
-            return null;
-        }
-        if (ls.size() > 1) {
-            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-            throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
-        }
-        return ls.get(0);
-    }
-
-    /**
-     * Select entity with deleted check.
-     * 
-     * @param path The path of SQL file. (NotNull)
-     * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
-     * @param entityType The type of entity. (NotNull)
-     * @return The selected entity. (Nullable)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
-     */
-    public <ENTITY_TYPE> ENTITY_TYPE selectEntityWithDeletedCheck(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
-        final List<ENTITY_TYPE> ls = selectList(path, pmb, entityType);
-        if (ls == null || ls.isEmpty()) {
-            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-            throwEntityAlreadyDeletedException(searchKey4Log);
-        }
-        if (ls.size() > 1) {
-            String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
-            throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
-        }
-        return ls.get(0);
-    }
-
-    /**
      * Select list.
      * 
+     * @param <ENTITY_TYPE> The type of entity for element.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The element type of entity. (NotNull)
@@ -114,17 +68,6 @@ public class ${glOutsideSqlBasicExecutorName} {
      */
     public <ENTITY_TYPE> List<ENTITY_TYPE> selectList(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
         return _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
-    }
-
-    // -----------------------------------------------------
-    //                                                Helper
-    //                                                ------
-    protected void throwEntityAlreadyDeletedException(Object searchKey4Log) {
-        ${glConditionBeanContextName}.throwEntityAlreadyDeletedException(searchKey4Log);
-    }
-
-    protected void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
     }
 
     // ===================================================================================
@@ -152,6 +95,14 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    public ${glOutsideSqlCursorExecutorName}<Object> cursorHandling() {
+        return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
+    }
+
+    public ${glOutsideSqlEntityExecutorName}<Object> entityHandling() {
+        return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
+    }
+
     /**
      * Option of autoPaging. <br />
      * If you invoke this, you don't need to write paging condition on your SQL. <br />
@@ -162,7 +113,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * #   from Member member
      * #  where ...
      * #  order by ...
-     * # -- limit 40, 20 *Here is unnecessary!
+     * # -- limit 40, 20        *Here is unnecessary!
      * #
      * </pre>
      * 
@@ -184,7 +135,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * #   from Member member
      * #  where ...
      * #  order by ...
-     * #  limit 40, 20 *Here is necessary!
+     * #  limit 40, 20        *Here is necessary!
      * #
      * </pre>
      * 
@@ -194,10 +145,6 @@ public class ${glOutsideSqlBasicExecutorName} {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.manualPaging();
         return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option);
-    }
-
-    public ${glOutsideSqlCursorExecutorName} cursorHandling() {
-        return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
     }
 
     public ${glOutsideSqlBasicExecutorName} dynamicBinding() {
