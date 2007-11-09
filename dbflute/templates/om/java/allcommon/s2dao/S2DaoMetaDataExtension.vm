@@ -990,7 +990,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, BeanMetaData myBeanMetaData) {
-        registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, createResultSetHandler(myBeanMetaData, method));
 #if ($database.isVersionAfter1046())
         registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, createResultSetHandler(myBeanMetaData, method));
 #else

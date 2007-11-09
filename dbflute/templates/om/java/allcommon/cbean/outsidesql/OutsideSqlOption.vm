@@ -33,7 +33,7 @@ public class ${glOutsideSqlOptionName} {
     //                                                                          Unique Key
     //                                                                          ==========
     public String generateUniqueKey() {
-        return "{" + _pagingRequestType + ":" + _dynamicBinding + "}";
+        return "{" + _pagingRequestType + "/" + _dynamicBinding + "}";
     }
 
     // ===================================================================================
