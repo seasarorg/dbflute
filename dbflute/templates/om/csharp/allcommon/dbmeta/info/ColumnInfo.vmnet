@@ -26,8 +26,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
            this.columnDbName = columnDbName;
        }
 
-       public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int columnSize) {
-           this(dbmeta, columnDbName);
+       public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int columnSize)
+           :this(dbmeta, columnDbName) {
            this.propertyName = propertyName;
            this.propertyType = propertyType;
            this.primary = primary;
@@ -46,27 +46,27 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
        //                                                                         ========
        public ${glDBMetaInterfaceName} MyDBMeta {
            get { return dbmeta; }
-           set { this.dbmeta = dbmeta; }
+           set { this.dbmeta = value; }
        }
 
        public String ColumnDbName {
            get { return this.columnDbName; }
-           set { this.columnDbName = columnDbName; }
+           set { this.columnDbName = value; }
        }
 
        public String PropertyName {
            get { return this.propertyName; }
-           set { this.propertyName = propertyName; }
+           set { this.propertyName = value; }
        }
 
        public bool IsPrimary {
            get { return this.primary; }
-           set { this.primary = primary; }
+           set { this.primary = value; }
        }
 
        public int ColumnSize {
            get { return this.columnSize; }
-           set { this.columnSize = columnSize; }
+           set { this.columnSize = value; }
        }
 
        // ===================================================================================
@@ -103,7 +103,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
            return true;
        }
 
-       public String ToString() {
+       public override String ToString() {
            return dbmeta.TableDbName + "." + columnDbName;
        }
     }

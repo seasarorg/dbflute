@@ -39,60 +39,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return false;
     }
 
-#if ($database.isMakeDeprecated())
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param dbName Db-name. (NotNull)
-     * @return Determination.
-     * @deprecated Please use isExistByFlexibleName()
-     */
-    public boolean isExistDbName(String dbName) {
-        return getDbNameCapPropNameMap().containsKey(dbName);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param capPropName Cap-prop-name. (NotNull)
-     * @return Determination.
-     * @deprecated Please use isExistByFlexibleName()
-     */
-    public boolean isExistCapPropName(String capPropName) {
-        return getCapPropNameDbNameMap().containsKey(capPropName);
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param uncapPropName Uncap-prop-name. (NotNull)
-     * @return Determination.
-     * @deprecated Please use isExistByFlexibleName()
-     */
-    public boolean isExistUncapPropName(String uncapPropName) {
-        return getUncapPropNameDbNameMap().containsKey(uncapPropName);
-    }
-
-    /**
-     * 
-     * @param multiName Mult-name. (NotNull)
-     * @return Determination.
-     * @deprecated Please use isExistByFlexibleName()
-     */
-    public boolean isExistMultiName(String multiName) {
-        if (isExistDbName(multiName)) {
-            return true;
-        }
-        if (isExistCapPropName(multiName)) {
-            return true;
-        }
-        if (isExistUncapPropName(multiName)) {
-            return true;
-        }
-        return false;
-    }
-#end
-
     /**
      * ${database.ImplementComment}
      * 
@@ -110,7 +56,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
                 return (String)getPropertyNameDbNameKeyToLowerMap().get(dbNameKeyToLower);
             }
         }
-        String msg = "Nof found object by the flexible name: flexibleName=" + flexibleName;
+        String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
         throw new IllegalStateException(msg);
     }
 
@@ -131,182 +77,9 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
                 return (String)getDbNamePropertyNameKeyToLowerMap().get(dbNameToLower);
             }
         }
-        String msg = "Nof found object by the flexible name: flexibleName=" + flexibleName;
+        String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
         throw new IllegalStateException(msg);
     }
-
-#if ($database.isMakeDeprecated())
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param capPropName Cap-prop-name. (NotNull and NotEmpty)
-     * @return Db-name. (NotNull and NotEmpty)
-     * @deprecated Please use getDbNameByFlexibleName()
-     */
-    public String getDbNameByCapPropName(String capPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("capPropName", capPropName);
-        final String dbName = (String)getCapPropNameDbNameMap().get(capPropName);
-        if (dbName == null) {
-            String msg = "The capPropNameDbNameMap didn't contain the key of '" + capPropName + "': ";
-            throw new IllegalStateException(msg + getCapPropNameDbNameMap());
-        }
-        return dbName;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param uncapPropName Uncap-prop-name. (NotNull)
-     * @return {db-name : java-name} map. (NotNull)
-     * @deprecated Please use getDbNameByFlexibleName()
-     */
-    public String getDbNameByUncapPropName(String uncapPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("uncapPropName", uncapPropName);
-        final String dbName = (String)getUncapPropNameDbNameMap().get(uncapPropName);
-        if (dbName == null) {
-            String msg = "The uncapPropNameDbNameMap didn't contain the key of '" + uncapPropName + "': ";
-            throw new IllegalStateException(msg + getUncapPropNameDbNameMap());
-        }
-        return dbName;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param dbName Db-name. (NotNull)
-     * @return Cap-prop-name. (NotNull)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getCapPropNameByDbName(String dbName) {
-        assertStringNotNullAndNotTrimmedEmpty("dbName", dbName);
-        final String capPropName = (String)getDbNameCapPropNameMap().get(dbName);
-        if (capPropName == null) {
-            String msg = "The dbNameCapPropNameMap didn't contain the key of '" + dbName + "': ";
-            throw new IllegalStateException(msg + getDbNameCapPropNameMap());
-        }
-        return capPropName;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param uncapPropName Uncap-prop-name. (NotNull)
-     * @return Cap-prop-name. (NotNull)
-     * @deprecated Please use getDbNameByFlexibleName()
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getCapPropNameByUncapPropName(String uncapPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("uncapPropName", uncapPropName);
-        final String dbName = getDbNameByMultiName(uncapPropName);
-        final String capPropName = (String)getDbNameCapPropNameMap().get(dbName);
-        if (capPropName == null) {
-            String msg = "The dbNameCapPropNameMap didn't contain the key of '" + dbName + "': ";
-            throw new IllegalStateException(msg + getDbNameCapPropNameMap());
-        }
-        return capPropName;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param dbName Db-name. (NotNull)
-     * @return Uncap-prop-name. (NotNull)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getUncapPropNameByDbName(String dbName) {
-        assertStringNotNullAndNotTrimmedEmpty("dbName", dbName);
-        final String uncapPropName = (String)getDbNameUncapPropNameMap().get(dbName);
-        if (uncapPropName == null) {
-            String msg = "The dbNameUncapPropNameMap didn't contain the key of '" + dbName + "': ";
-            throw new IllegalStateException(msg + getDbNameUncapPropNameMap());
-        }
-        return uncapPropName;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param capPropName Cap-prop-name. (NotNull)
-     * @return Uncap-prop-name. (NotNull)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getUncapPropNameByCapPropName(String capPropName) {
-        assertStringNotNullAndNotTrimmedEmpty("capPropName", capPropName);
-        final String dbName = getDbNameByMultiName(capPropName);
-        final String uncapPropName = (String)getDbNameUncapPropNameMap().get(dbName);
-        if (uncapPropName == null) {
-            String msg = "The dbNameUncapPropNameMap didn't contain the key of '" + capPropName + "': ";
-            throw new IllegalStateException(msg + getDbNameUncapPropNameMap());
-        }
-        return uncapPropName;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param multiName Multi-name. (NotNull)
-     * @return Db-name. (NotNull)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getDbNameByMultiName(String multiName) {
-        assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
-        if (isExistDbName(multiName)) {
-            return multiName;
-        }
-        if (isExistCapPropName(multiName)) {
-            return getDbNameByCapPropName(multiName);
-        }
-        if (isExistUncapPropName(multiName)) {
-            return getDbNameByUncapPropName(multiName);
-        }
-        String msg = "The multi-name is invalid: multiName=" + multiName;
-        throw new IllegalStateException(msg);
-    }
-
-    /**
-     * Get java-name by multi-name.
-     * 
-     * @param multiName Multi-name.
-     * @return Cap-prop-name.
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getCapPropNameByMultiName(String multiName) {
-        assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
-        if (isExistDbName(multiName)) {
-            return getCapPropNameByDbName(multiName);
-        }
-        if (isExistCapPropName(multiName)) {
-            return multiName;
-        }
-        if (isExistUncapPropName(multiName)) {
-            return getCapPropNameByUncapPropName(multiName);
-        }
-        String msg = "The multi-name is invalid: multiName=" + multiName;
-        throw new IllegalStateException(msg);
-    }
-
-    /**
-     * Get property-name by multi-name.
-     * 
-     * @param multiName Multi-name.
-     * @return Uncap-prop-name.
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getUncapPropNameByMultiName(String multiName) {
-        assertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
-        if (isExistDbName(multiName)) {
-            return getUncapPropNameByDbName(multiName);
-        }
-        if (isExistCapPropName(multiName)) {
-            return getUncapPropNameByCapPropName(multiName);
-        }
-        if (isExistUncapPropName(multiName)) {
-            return multiName;
-        }
-        String msg = "The multi-name is invalid: multiName=" + multiName;
-        throw new IllegalStateException(msg);
-    }
-#end
 
     // ===================================================================================
     //                                                                         Column Info
@@ -823,8 +596,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
-#if ($database.isAvailableGenerics())
-
     /**
      * This class is for Internal. Don't use this!
      */
@@ -926,8 +697,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             }
         }
     }
-
-#end
 
     // =====================================================================================
     //                                                                                Helper

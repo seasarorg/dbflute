@@ -185,16 +185,16 @@ namespace ${myDBMetaPackageName} {
         /// ${database.ImplementComment}
         /// </summary> 
         /// <returns>{db-name : property-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> GetDbNamePropertyNameKeyToLowerMap() {
-            return _dbNamePropertyNameKeyToLowerMap;
+        public override System.Collections.Generic.IDictionary<String, String> DbNamePropertyNameKeyToLowerMap {
+            get { return _dbNamePropertyNameKeyToLowerMap; }
         }
 
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary> 
         /// <returns>{property-name : db-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> GetPropertyNameDbNameKeyToLowerMap() {
-            return _propertyNameDbNameKeyToLowerMap;
+        public override System.Collections.Generic.IDictionary<String, String> PropertyNameDbNameKeyToLowerMap {
+            get { return _propertyNameDbNameKeyToLowerMap; }
         }
         #endregion
 

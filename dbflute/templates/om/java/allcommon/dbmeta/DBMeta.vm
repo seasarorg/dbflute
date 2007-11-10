@@ -81,44 +81,6 @@ public interface ${myClassName} {
      */
     public boolean hasFlexibleName(String flexibleName);
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Is existing db-name? {Target objects are TABLE and COLUMN}
-     * 
-     * @param dbName Db name. (NotNull and NotEmpty)
-     * @return Determination.
-     * @deprecated Please use isExistByFlexibleName()
-     */
-    public boolean isExistDbName(String dbName);
-
-    /**
-     * Is existing cap-prop-name? {Target objects are TABLE and COLUMN}
-     * 
-     * @param capPropName Cap prop name. (NotNull and NotEmpty)
-     * @return Determination.
-     * @deprecated Please use isExistByFlexibleName()
-     */
-    public boolean isExistCapPropName(String capPropName);
-
-    /**
-     * Is existing uncap-prop-name? {Target objects are TABLE and COLUMN}
-     * 
-     * @param uncapPropName Uncap prop name. (NotNull and NotEmpty)
-     * @return Determination.
-     * @deprecated Please use isExistByFlexibleName()
-     */
-    public boolean isExistUncapPropName(String uncapPropName);
-
-    /**
-     * Is existing multi-name? {Target objects are TABLE and COLUMN}
-     * 
-     * @param multiName Multi-name. (NotNull and NotEmpty)
-     * @return Determination.
-     * @deprecated Please use isExistByFlexibleName()
-     */
-    public boolean isExistMultiName(String multiName);
-#end
-
     /**
      * Find db name by flexible name. {Target objects are TABLE and COLUMN}
      * 
@@ -135,89 +97,6 @@ public interface ${myClassName} {
      */
     public String findPropertyName(String flexibleName);
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Get db-name by property-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param capPropName Cap-prop-name. (NotNull and NotEmpty)
-     * @return Db-name. (NotNull and NotEmpty)
-     * @deprecated Please use getDbNameByFlexibleName()
-     */
-    public String getDbNameByCapPropName(String capPropName);
-
-    /**
-     * Get db-name by property-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param propertyName Uncap-prop-name. (NotNull and NotEmpty)
-     * @return Db-name. (NotNull and NotEmpty)
-     * @deprecated Please use getDbNameByFlexibleName()
-     */
-    public String getDbNameByUncapPropName(String propertyName);
-
-    /**
-     * Get cap-prop-name by db-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param dbName Db-name. (NotNull and NotEmpty)
-     * @return Cap-prop-name. (NotNull and NotEmpty)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getCapPropNameByDbName(String dbName);
-
-    /**
-     * Get cap-prop-name by property-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param propertyName Uncap-prop-name. (NotNull and NotEmpty)
-     * @return Cap-prop-name. (NotNull and NotEmpty)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getCapPropNameByUncapPropName(String propertyName);
-
-    /**
-     * Get property-name by db-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param dbName Db-name. (NotNull and NotEmpty)
-     * @return Uncap-prop-name. (NotNull and NotEmpty)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getUncapPropNameByDbName(String dbName);
-
-    /**
-     * Get property-name by cap-prop-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param capPropName Cap-prop-name. (NotNull and NotEmpty)
-     * @return Uncap-prop-name. (NotNull and NotEmpty)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getUncapPropNameByCapPropName(String capPropName);
-
-    /**
-     * Get db-name by multi-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param multiName Multi-name. (NotNull and NotEmpty)
-     * @return Db-name. (NotNull and NotEmpty)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getDbNameByMultiName(String multiName);
-
-    /**
-     * Get cap-prop-name by multi-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param multiName Multi-name. (NotNull and NotEmpty)
-     * @return Cap-prop-name. (NotNull and NotEmpty)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getCapPropNameByMultiName(String multiName);
-
-    /**
-     * Get property-name by multi-name. {Target objects are TABLE and COLUMN}
-     * 
-     * @param multiName Multi-name. (NotNull and NotEmpty)
-     * @return Uncap-prop-name. (NotNull and NotEmpty)
-     * @deprecated Please use getPropNameByFlexibleName()
-     */
-    public String getUncapPropNameByMultiName(String multiName);
-#end
-
     // ===================================================================================
     //                                                                            Name Map
     //                                                                            ========
@@ -226,64 +105,14 @@ public interface ${myClassName} {
      * 
      * @return The key-to-lower map of db name(lower) and property name. (NotNull)
      */
-    public java.util.Map${database.filterGenericsString('String, String')} getDbNamePropertyNameKeyToLowerMap();
+    public java.util.Map<String, String> getDbNamePropertyNameKeyToLowerMap();
 
     /**
      * Get the key-to-lower map of property name(lower) and db name.
      * 
      * @return The key-to-lower map of property name(lower) and db name. (NotNull)
      */
-    public java.util.Map${database.filterGenericsString('String, String')} getPropertyNameDbNameKeyToLowerMap();
-
-#if ($database.isMakeDeprecated())
-    /**
-     * Get db-name cap-prop-name map. {Target objects are TABLE and COLUMN}
-     * 
-     * @return {db-name : cap-prop-name} map. (NotNull)
-     * @deprecated Please use getDbNamePropNameKeyToLowerMap()
-     */
-    public java.util.Map${database.filterGenericsString('String, String')} getDbNameCapPropNameMap();
-
-    /**
-     * Get db-name uncap-prop-name map. {Target objects are TABLE and COLUMN}
-     * 
-     * @return {db-name : uncap-prop-name} map. (NotNull)
-     * @deprecated Please use getDbNamePropNameKeyToLowerMap()
-     */
-    public java.util.Map${database.filterGenericsString('String, String')} getDbNameUncapPropNameMap();
-
-    /**
-     * Get cap-prop-name db-name map. {Target objects are TABLE and COLUMN}
-     * 
-     * @return {cap-prop-name : db-name} map. (NotNull)
-     * @deprecated Please use getPropNameDbNameKeyToLowerMap()
-     */
-    public java.util.Map${database.filterGenericsString('String, String')} getCapPropNameDbNameMap();
-
-    /**
-     * Get cap-prop-name uncap-cap-name map. {Target objects are TABLE and COLUMN}
-     * 
-     * @return {cap-prop-name : uncap-prop-name} map. (NotNull)
-     * @deprecated Please use getPropNameDbNameKeyToLowerMap()
-     */
-    public java.util.Map${database.filterGenericsString('String, String')} getCapPropNameUncapPropNameMap();
-
-    /**
-     * Get uncap-prop-name db-name map. {Target objects are TABLE and COLUMN}
-     * 
-     * @return {uncap-prop-name : db-name} map. (NotNull)
-     * @deprecated Please use getPropNameDbNameKeyToLowerMap()
-     */
-    public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameDbNameMap();
-
-    /**
-     * Get uncap-prop-name cap-prop-name map. {Target objects are TABLE and COLUMN}
-     * 
-     * @return {uncap-prop-name : cap-prop-name} map. (NotNull)
-     * @deprecated Please use getPropNameDbNameKeyToLowerMap()
-     */
-    public java.util.Map${database.filterGenericsString('String, String')} getUncapPropNameCapPropNameMap();
-#end
+    public java.util.Map<String, String> getPropertyNameDbNameKeyToLowerMap();
 
     // ===================================================================================
     //                                                                           Type Name
@@ -344,41 +173,7 @@ public interface ${myClassName} {
      * 
      * @return The list of column db-name. (NotNull and NotEmpty)
      */
-    public java.util.List${database.filterGenericsString(${glColumnInfoName})} getColumnInfoList();
-
-#if ($database.isMakeDeprecated())
-    /**
-     * Get the list of column db-name.
-     * 
-     * @return The list of column db-name. (NotNull and NotEmpty)
-     * @deprecated Please use getColumnInfoList()
-     */
-    public java.util.List${database.filterGenericsString('String')} getColumnDbNameList();
-
-    /**
-     * Get the list of column cap-prop-name.
-     * 
-     * @return The list of column cap-prop-name. (NotNull and NotEmpty)
-     * @deprecated Please use getColumnInfoList()
-     */
-    public java.util.List${database.filterGenericsString('String')} getColumnCapPropNameList();
-
-    /**
-     * Get the list of column uncap-prop-name.
-     * 
-     * @return The list of column uncap-prop-name. (NotNull and NotEmpty)
-     * @deprecated Please use getColumnInfoList()
-     */
-    public java.util.List${database.filterGenericsString('String')} getColumnUncapPropNameList();
-
-    /**
-     * Get column-db-name comma-string.
-     * 
-     * @return Column-db-name comma-string. (NotNull and NotEmpty)
-     * @deprecated Please use getColumnInfoList()
-     */
-    public String getColumnDbNameCommaString();
-#end
+    public java.util.List<${glColumnInfoName}> getColumnInfoList();
 
     /**
      * Has column?
@@ -548,8 +343,8 @@ public interface ${myClassName} {
     public boolean hasUpdateDate();
 
     // ===================================================================================
-    //                                                                       Common Column
-    //                                                                       =============
+    //                                                                  Common Column Info
+    //                                                                  ==================
     /**
      * Has common column?
      * 

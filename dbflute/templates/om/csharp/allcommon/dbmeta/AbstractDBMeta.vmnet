@@ -15,279 +15,111 @@ namespace ${glPackageBaseCommonDBMeta} {
     /// </summary>
     public abstract class ${myClassName} : ${glDBMetaInterfaceName} {
 
-        // =====================================================================================
-        //                                                                            Table Name
-        //                                                                            ==========
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>Table db-name. (NotNull)</returns>
-        abstract public String GetTableDbName();
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        abstract String TableDbName { get; }
+        abstract String TablePropertyName { get; }
+        abstract String TableCapPropName { get; }
+        abstract String TableUncapPropName { get; }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>Table cap-prop-name. (NotNull)</returns>
-        abstract public String GetTableCapPropName();
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <returns>Table uncap-prop-name. (NotNull)</returns>
-        abstract public String GetTableUncapPropName();
-
-        // =====================================================================================
-        //                                                                        DB-Name Method
-        //                                                                        ==============
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="dbName">Db-name. (NotNull)</param>
-        /// <returns>Determination.</returns>
-        public bool IsExistDbName(String dbName) {
-            return GetDbNameCapPropNameMap().ContainsKey(dbName);
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="capPropName">Capitalized property-name. (NotNull)</param>
-        /// <returns>Determination.</returns>
-        public bool IsExistCapPropName(String capPropName) {
-            return GetCapPropNameDbNameMap().ContainsKey(capPropName);
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="unCapPropName">Uncapitalized property-name. (NotNull)</param>
-        /// <returns>Determination.</returns>
-        public bool IsExistUncapPropName(String unCapPropName) {
-            return GetUncapPropNameDbNameMap().ContainsKey(unCapPropName);
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="multiName">Multi-name. (NotNull)</param>
-        /// <returns>Determination.</returns>
-        public bool IsExistMultiName(String multiName) {
-            if (IsExistDbName(multiName)) {
+        // ===============================================================================
+        //                                                                   Name Handling
+        //                                                                   =============
+        public bool HasFlexibleName(String flexibleName) {
+            String key = flexibleName.ToLowerCase();
+            if (DbNamePropertyNameKeyToLowerMap.ContainsKey(key)) {
                 return true;
             }
-            if (IsExistCapPropName(multiName)) {
-                return true;
-            }
-            if (IsExistUncapPropName(multiName)) {
+            if (PropertyNameDbNameKeyToLowerMap.ContainsKey(key)) {
                 return true;
             }
             return false;
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <param name="unCapPropName">Uncapitalized property-name. (NotNull)</param>
-        /// <returns>{db-name : cap-prop-name} map.</returns>
-        public String GetDbNameByUncapPropName(String unCapPropName) {
-            AssertStringNotNullAndNotTrimmedEmpty("unCapPropName", unCapPropName);
-            String dbName = null;
-            try {
-                dbName = (String)GetUncapPropNameDbNameMap()[unCapPropName];
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The propertyNameDbNameMap didn't contain the key of '" + unCapPropName + "': ";
-                throw new ArgumentOutOfRangeException(msg + Seasar.Framework.Util.ToStringUtil.ToString(GetUncapPropNameDbNameMap()), e);
+        public String FindDbName(String flexibleName) {
+            String key = flexibleName.ToLowerCase();
+            if (PropertyNameDbNameKeyToLowerMap.ContainsKey(key)) {
+                return PropertyNameDbNameKeyToLowerMap[key];
             }
-            return dbName;
+            if (DbNamePropertyNameKeyToLowerMap.ContainsKey(key)) {
+                String dbNameKeyToLower = DbNamePropertyNameKeyToLowerMap[key].ToLowerCase();
+                if (PropertyNameDbNameKeyToLowerMap.ContainsKey(dbNameKeyToLower)) {
+                    return PropertyNameDbNameKeyToLowerMap[dbNameKeyToLower];
+                }
+            }
+            String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
+            throw new SystemException(msg);
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <param name="dbName">Db-name. (NotNull)</param>
-        /// <returns>Uncapitalized property-name. (NotNull)</returns>
-        public String GetUncapPropNameByDbName(String dbName) {
-            AssertStringNotNullAndNotTrimmedEmpty("dbName", dbName);
-            if (dbName == null) {
-                String msg = "The argument[dbName] must not be null.";
-                throw new ArgumentNullException(msg);
+        public String FindPropertyName(String flexibleName) {
+            String key = flexibleName.ToLowerCase();
+            if (DbNamePropertyNameKeyToLowerMap.containsKey(key)) {
+                return DbNamePropertyNameKeyToLowerMap[key];
             }
-            String unCapPropName = null;
-            try {
-                unCapPropName = (String)GetDbNameUncapPropNameMap()[dbName];
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The dbNameUncapPropNameMap didn't contain the key of '" + dbName + "': ";
-                throw new ArgumentOutOfRangeException(msg + Seasar.Framework.Util.ToStringUtil.ToString(GetDbNameUncapPropNameMap()), e);
+            if (PropertyNameDbNameKeyToLowerMap.ContainsKey(key)) {
+                String dbNameToLower = PropertyNameDbNameKeyToLowerMap[key].ToLowerCase();
+                if (DbNamePropertyNameKeyToLowerMap.ContainsKey(dbNameToLower)) {
+                    return DbNamePropertyNameKeyToLowerMap[dbNameToLower];
+                }
             }
-            return unCapPropName;
+            String msg = "Not found object by the flexible name: flexibleName=" + flexibleName;
+            throw new SystemException(msg);
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </samarry> 
-        /// <param name="capPropName">Capitalized property-name. (NotNull)</param>
-        /// <returns>Db-name.</returns>
-        public String GetDbNameByCapPropName(String capPropName) {
-            AssertStringNotNullAndNotTrimmedEmpty("capPropName", capPropName);
-            String dbName = null;
-            try {
-                dbName = (String)GetCapPropNameDbNameMap()[capPropName];
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The capPropNameDbNameMap didn't contain the key of '" + capPropName + "': ";
-                throw new ArgumentOutOfRangeException(msg + Seasar.Framework.Util.ToStringUtil.ToString(GetCapPropNameDbNameMap()), e);
+        // ===============================================================================
+        //                                                                     Column Info
+        //                                                                     ===========
+        public bool HasColumn(String columnFlexibleName) {
+            if (!HasFlexibleName(columnFlexibleName)) {
+                return false;
             }
-            return dbName;
+            String propertyName = findPropertyName(columnFlexibleName);
+            return HasMethod("column" + initCap(propertyName));
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="dbName">Db-name. (NotNull)</param>
-        /// <returns>Capitalized property-name.</returns>
-        public String GetCapPropNameByDbName(String dbName) {
-            AssertStringNotNullAndNotTrimmedEmpty("dbName", dbName);
-            String capPropName = null;
-            try {
-                capPropName = (String)GetDbNameCapPropNameMap()[dbName];
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The dbNameCapPropNameMap didn't contain the key of '" + dbName + "': ";
-                throw new ArgumentOutOfRangeException(msg + Seasar.Framework.Util.ToStringUtil.ToString(GetDbNameCapPropNameMap()), e);
+        public ${glColumnInfoName} FindColumnInfo(String columnFlexibleName) {
+            AssertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
+            if (!HasColumn(columnFlexibleName)) {
+                String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
+                msg = msg + " tableName=" + getTableDbName();
+                throw new SystemException(msg);
             }
-            return capPropName;
+            String propertyName = FindPropertyName(columnFlexibleName);
+            String methodName = "Column" + InitCap(propertyName);
+            PropertyInfo propertyInfo = GetType().GetPropertyInfo(methodName);
+            return (${glColumnInfoName})propertyInfo.GetValue(this);
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <param name="unCapProp">Uncap-prop-name. (NotNull)</param>
-        /// <returns>Capitalized property-name. (NotNull)</returns>
-        public String GetCapPropNameByUncapPropName(String unCapProp) {
-            AssertStringNotNullAndNotTrimmedEmpty("unCapProp", unCapProp);
-            String capPropName = null;
-            try {
-                capPropName = (String)GetUncapPropNameCapPropNameMap()[unCapProp];
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The uncapPropNameCapPropNameMap didn't contain the key of '" + unCapProp + "': ";
-                throw new ArgumentOutOfRangeException(msg + Seasar.Framework.Util.ToStringUtil.ToString(GetUncapPropNameCapPropNameMap()), e);
-            }
-            return capPropName;
-        }
+        // ===============================================================================
+        //                                                                   Relation Info
+        //                                                                   =============
+	    public ${glRelationInfoName} FindRelationInfo(String relationPropertyName) {
+	        AssertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
+	        return HasForeign(relationPropertyName) ? (${glRelationInfoName})FindForeignInfo(relationPropertyName) : (${glRelationInfoName})FindRefererInfo(relationPropertyName);
+	    }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <param name="capProp">Cap-prop-name. (NotNull)</param>
-        /// <returns>Uncapitalized property-name. (NotNull)</returns>
-        public String GetUncapPropNameByCapPropName(String capProp) {
-            AssertStringNotNullAndNotTrimmedEmpty("capProp", capProp);
-            String uncapPropName = null;
-            try {
-                uncapPropName = (String)GetCapPropNameUncapPropNameMap()[capProp];
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The capPropNameCapPropNameMap didn't contain the key of '" + capProp + "': ";
-                throw new ArgumentOutOfRangeException(msg + Seasar.Framework.Util.ToStringUtil.ToString(GetCapPropNameUncapPropNameMap()), e);
-            }
-            return uncapPropName;
-        }
+        // -------------------------------------------------
+        //                                   Foreign Element
+        //                                   ---------------
+	    public bool HasForeign(String foreignPropertyName) {
+	        AssertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+	        String methodName = BuildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
+	        return HasMethod(methodName);
+	    }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="multiName">Multi-name. (NotNull)</param>
-        /// <returns>Db-name.</returns>
-        public String GetDbNameByMultiName(String multiName) {
-            AssertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
-            if (IsExistDbName(multiName)) {
-                return multiName;
-            }
-            if (IsExistCapPropName(multiName)) {
-                return GetDbNameByCapPropName(multiName);
-            }
-            if (IsExistUncapPropName(multiName)) {
-                return GetDbNameByUncapPropName(multiName);
-            }
-            String msg = "The multi-name is invalid: multiName=" + multiName;
-            throw new ArgumentOutOfRangeException(msg);
-        }
+	    public ${glDBMetaInterfaceName} FindForeignDBMeta(String foreignPropertyName) {
+	        return FindForeignInfo(foreignPropertyName).ForeignDBMeta;
+	    }
 
-        /// <summary>
-        /// Get cap-prop-name by multi-name.
-        /// </summary> 
-        /// <param name="multiName">Multi-name. (NotNull)</param>
-        /// <returns>Cap-prop-name. (NotNull)</returns>
-        public String GetCapPropNameByMultiName(String multiName) {
-            AssertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
-            if (IsExistDbName(multiName)) {
-                return GetCapPropNameByDbName(multiName);
-            }
-            if (IsExistCapPropName(multiName)) {
-                return multiName;
-            }
-            if (IsExistUncapPropName(multiName)) {
-                return GetCapPropNameByUncapPropName(multiName);
-            }
-            String msg = "The multi-name is invalid: multiName=" + multiName;
-            throw new ArgumentOutOfRangeException(msg);
-        }
 
-        /// <summary>
-        /// Get uncap-prop-name by multi-name.
-        /// </summary> 
-        /// <param name="multiName">Multi-name. (NotNull)</param>
-        /// <returns>Uncap-prop-name. (NotNull)</returns>
-        public String GetUncapPropNameByMultiName(String multiName) {
-            AssertStringNotNullAndNotTrimmedEmpty("multiName", multiName);
-            if (IsExistDbName(multiName)) {
-                return GetUncapPropNameByDbName(multiName);
-            }
-            if (IsExistCapPropName(multiName)) {
-                return GetUncapPropNameByCapPropName(multiName);
-            }
-            if (IsExistUncapPropName(multiName)) {
-                return multiName;
-            }
-            String msg = "The multi-name is invalid: multiName=" + multiName;
-            throw new ArgumentOutOfRangeException(msg);
-        }
+        // -------------------------------------------------
+        //                                   Referer Element
+        //                                   ---------------
 
-        // =====================================================================================
-        //                                                                    DB-Name-Map Getter
-        //                                                                    ==================
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>{uncap-prop-name : db-name} map.</returns>
-        abstract public System.Collections.Generic.IDictionary<String, String> GetUncapPropNameDbNameMap();
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <returns>{db-name : uncap-prop-name} map.</returns>
-        abstract public System.Collections.Generic.IDictionary<String, String> GetDbNameUncapPropNameMap();
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <returns>{cap-prop-name : db-name} map.</returns>
-        abstract public System.Collections.Generic.IDictionary<String, String> GetCapPropNameDbNameMap();
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <returns>{db-name : cap-prop-name} map.</returns>
-        abstract public System.Collections.Generic.IDictionary<String, String> GetDbNameCapPropNameMap();
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>{cap-prop-name : uncap-prop-name} map.</returns>
-        abstract public System.Collections.Generic.IDictionary<String, String> GetCapPropNameUncapPropNameMap();
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>{uncap-prop-name : cap-prop-name} map.</returns>
-        abstract public System.Collections.Generic.IDictionary<String, String> GetUncapPropNameCapPropNameMap();
+	    protected String BuildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
+	        return targetName + relationPropertyName.Substring(0, 1).ToUpperCase() + relationPropertyName.Substring(1);
+	    }
 
         // =====================================================================================
         //                                                                           Type Getter
@@ -297,21 +129,21 @@ namespace ${glPackageBaseCommonDBMeta} {
          * 
          * @return The type of dao. (NotNull)
          */
-        abstract public Type GetDaoType();
+        abstract public Type DaoType { get; }
 
         /**
          * Get the type of entity.
          * 
          * @return The type of entity. (NotNull)
          */
-        abstract public Type GetEntityType();
+        abstract public Type EntityType { get; }
 
         /**
          * Get the type of condition-bean.
          * 
          * @return The type of condition-bean. (NotNull)
          */
-        abstract public Type GetConditionBeanType();
+        abstract public Type ConditionBeanType { get; }
 
         // =====================================================================================
         //                                                                       Instance Getter
@@ -329,53 +161,44 @@ namespace ${glPackageBaseCommonDBMeta} {
          * @return The instance of condition-bean. (NotNull)
          */
         abstract public ${glConditionBeanInterfaceName} NewConditionBean();
-#if ($database.isMakeDeprecated())
-
-        // =====================================================================================
-        //                                                                   Entity PropertyInfo
-        //                                                                   ===================
-        #region Entity PropertyInfo
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="multiName">Multi-name. (NotNull)</param>
-        /// <returns>Entity property-info. (NotNull)</returns>
-        [Obsolete("There is more available object. {org.seasar.framework.beans.factory.BeanDescFactory}")]
-        abstract public System.Reflection.PropertyInfo GetEntityPropertyInfoByMultiName(String multiName);
-        #endregion
-#end
-
-        // =====================================================================================
-        //                                                                        Foreign DBMeta
-        //                                                                        ==============
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
-        /// <returns>Foreign DBMeta. (NotNull)</returns>
-        abstract public ${glDBMetaInterfaceName} GetForeignDBMeta(String foreignPropertyName);
-
-        // =====================================================================================
-        //                                                                         Determination
-        //                                                                         =============
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determination.
-         */
-        abstract public bool HasTwoOrMorePrimaryKeys { get; }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determination.
-         */
-        abstract public bool HasCommonColumn { get; }
 
         // =====================================================================================
         //                                                                 Entity Property Setup
         //                                                                 =====================
         abstract public bool SetupEntityProperty(String propertyName, Object entity, Object value);
+
+        // ===============================================================================
+        //                                                                          Helper
+        //                                                                          ======
+        abstract protected void checkDowncast(${glEntityInterfaceName} entity);
+
+//        protected String helpGettingColumnStringValue(Object value) {
+//            if (value instanceof java.sql.Timestamp) {
+//                return (value != null ? helpFormatingTimestamp((java.sql.Timestamp)value) : "");
+//            } else if (value instanceof java.util.Date) {
+//                return (value != null ? helpFormatingDate((java.util.Date)value) : "");
+//            } else {
+//                return (value != null ? value.toString() : "");
+//            }
+//        }
+
+//        protected String helpFormatingDate(java.util.Date date) {
+//            return MapStringUtil.formatDate(date);
+//        }
+
+//        protected String helpFormatingTimestamp(java.sql.Timestamp timestamp) {
+//            return MapStringUtil.formatTimestamp(timestamp);
+//        }
+
+        protected String InitCap(String str) {
+            return str.Substring(0, 1).ToUpperCase() + str.Substring(1);
+        }
+
+        protected bool HasProperty(String propertyName) {
+            assertStringNotNullAndNotTrimmedEmpty("propertyName", propertyName);
+            PropertyInfo propertyInfo = this.GetType().GetPropertyInfo(propertyName);
+            return propertyInfo != null;
+        }
 
         // ----------------------------------------------------------------
         //                                                    Assert Object
