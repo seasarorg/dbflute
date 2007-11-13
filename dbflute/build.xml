@@ -4,15 +4,17 @@
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
   <property name="version" value="0.5.7"/>
+  <property name="deploy.base" value="/pj/java"/>
+  <property name="workspace.base" value="/pj/oss/ws"/>
+
   <property name="dbflute.jar.file" value="dbflute.jar"/>
   <property name="dbflute.jar.dirfile" value="dist/${dbflute.jar.file}"/>
   <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
   <property name="dbflute.zip.dirfile" value="dist/${dbflute.zip.file}"/>
-  <property name="dbflute.deploy.dir" value="/pj/java/dbflute-${version}"/>
-  <property name="dbflute.example.dir" value="/pj/ws/dbflute-example"/>
-  <property name="dbflute.basic.example.dir" value="/pj/ws/dbflute-basic-example"/>
-  <property name="dbflute.teeda.example.dir" value="/pj/ws/dbflute-teeda-example"/>
-  <property name="dbflute.postgresdemo.dir" value="/pj/ws/dbflute-postgresdemo"/>
+  <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+  <property name="dbflute.example.dir" value="${workspace.base}/dbflute-example"/>
+  <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
+  <property name="dbflute.teeda.example.dir" value="${workspace.base}/dbflute-teeda-example"/>
 
   <target name="dist" description="==> generates distribution">
 
@@ -67,9 +69,6 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <copy todir="${dbflute.postgresdemo.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>

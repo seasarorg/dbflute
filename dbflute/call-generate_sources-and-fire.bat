@@ -31,9 +31,8 @@ rem Execute {Generate}.
 rem nnnnnnnnnn/
 call %DBFLUTE_HOME%\etc\cmd\_df-generate.cmd %MY_PROPERTIES_PATH%
 
-cd ..\..\dbflute
 
-cd ..\..\nws\dfncsharp\dbflute_nldb
+cd ..\..\dfncsharp\dbflute_nldb
 
 @echo off
 
