@@ -9,27 +9,21 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
  * The executor of outside-sql. <br />
  * <pre>
  * {Basic}
- *   o selectEntity()
- *   o selectEntityWithDeletedCheck()
  *   o selectList()
  * 
- * {Option -- Paging}
+ * {Entity}
+ *   o entityHandling().selectEntity()
+ *   o entityHandling().selectEntityWithDeletedCheck()
+ * 
+ * {Cursor}
+ *   o cursorHandling().selectCursor()
+ * 
+ * {Paging}
  *   o autoPaging().selectList()
  *   o manualPaging().selectList()
  * 
- * {Option -- Cursor}
- *   o cursorHandling().selectCursor()
- * 
- * {Option -- Embedded}
+ * {Option -- Dynamic}
  *   o dynamicBinding().selectList()
- * 
- * {Option -- Paging and Cursor}
- *   o autoPaging().cursorHandling().selectCursor()
- *   o manualPaging().cursorHandling().selectCursor()
- * 
- * {Option -- Paging and Embedded}
- *   o autoPaging().dynamicBinding().selectList()
- *   o manualPaging().dynamicBinding().selectList()
  * 
  * </pre>
  * 
@@ -73,9 +67,8 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    // {Insert/Update/Delete/Etc...}
     /**
-     * Execute.
+     * Execute. {Insert/Update/Delete/Etc...}
      * 
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
@@ -95,10 +88,30 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    /**
+     * Specify cursor handling. <br />
+     * <pre>
+     * # ex) Your Program
+     * #
+     * # executor.cursorHandling().selectCursor(path, pmb, handler);
+     * #
+     * </pre>
+     * @return The cursor executor of outside-sql. (NotNull)
+     */
     public ${glOutsideSqlCursorExecutorName}<Object> cursorHandling() {
         return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
     }
 
+    /**
+     * Specify entity handling. <br />
+     * <pre>
+     * # ex) Your Program
+     * #
+     * # executor.entityHandling().selectEntityWithDeletedCheck(path, pmb, Xxx.class);
+     * #
+     * </pre>
+     * @return The cursor executor of outside-sql. (NotNull)
+     */
     public ${glOutsideSqlEntityExecutorName}<Object> entityHandling() {
         return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, createOutsideSqlOption());
     }
