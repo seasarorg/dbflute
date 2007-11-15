@@ -1347,7 +1347,7 @@ targetdatabase = $targetDatabase
     ##                                   ---------------------
     ## Setup java directory for daoDicon.
     $database.setupJavaDir_for_daoDicon()
-    #if ($database.isTargetLanguageJava() && $database.isTargetLanguageCSharp())
+    #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
       $database.debug("parseAllcommonS2Container() {")
       #if ($database.isAvailableHotDeploy())
         #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2Container}))

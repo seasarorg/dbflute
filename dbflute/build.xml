@@ -3,7 +3,7 @@
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
-  <property name="version" value="0.5.7"/>
+  <property name="version" value="0.5.8-SNAPSHOT"/>
   <property name="deploy.base" value="/pj/java"/>
   <property name="workspace.base" value="/pj/oss/ws"/>
 
