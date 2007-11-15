@@ -1413,6 +1413,14 @@ public class Database {
     // **********************************************************************************************
     //                                                                             Hard code property
     //                                                                             ******************
+    public String getDaoSelectorComponentName() {
+        return filterProjectSuffixForComponentName("daoSelector");
+    }
+    
+    public String getBehaviorSelectorComponentName() {
+        return filterProjectSuffixForComponentName("behaviorSelector");
+    }
+    
     // ==================================================================
     //                                         databaseInfoMap (Internal)
     //                                         ==========================

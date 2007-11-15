@@ -32,16 +32,6 @@ namespace ${glPackageBaseCommonBhv} {
         ${glDBMetaInterfaceName} DBMeta { get; }
 
         // =====================================================================================
-        //                                                                          Dao Accessor
-        //                                                                          ============
-        /**
-         * Get dao-readable.
-         * 
-         * @return Dao-readable. (NotNull)
-         */
-        ${glDaoReadableInterfaceName} GetDaoReadable();
-
-        // =====================================================================================
         //                                                                          New Instance
         //                                                                          ============
         /// <summary>

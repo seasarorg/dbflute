@@ -63,7 +63,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        abstract public String GetTableDbName();
+        public abstract String TableDbName { get; }
 
         // =====================================================================================
         //                                                                                Getter
@@ -254,90 +254,6 @@ namespace ${glPackageBaseCommonCBean} {
             return selectClause + " " + fromClause + " " + whereClause + parentCondition;
         }
 
-        // =====================================================================================
-        //                                                                                Invoke
-        //                                                                                ======
-        public ${glConditionValueName} InvokeGetter(String columnMultiName) {
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableDbName(GetTableDbName());
-            String columnCapPropName = dbmeta.GetCapPropNameByMultiName(columnMultiName);
-
-            String methodName = columnCapPropName;
-            PropertyInfo propertyInfo = this.GetType().GetProperty(methodName);
-            if (propertyInfo == null) {
-                String msg = "The columnCapPropName is not existing in this table: columnCapPropName=" + columnCapPropName + " tableName=" + GetTableDbName();
-                msg = msg + " methodName=" + methodName;
-                throw new SystemException(msg);
-            }
-            Object result = propertyInfo.GetValue(this, null);
-            return (${glConditionValueName})result;
-        }
-
-        public void InvokeSetterEqual(String columnMultiName, Object value) {
-            InvokeSetter(columnMultiName, value, "equal");
-        }
-
-        public void InvokeSetterNotEqual(String columnMultiName, Object value) {
-            InvokeSetter(columnMultiName, value, "notEqual");
-        }
-
-        public void InvokeSetterGreaterThan(String columnMultiName, Object value) {
-            InvokeSetter(columnMultiName, value, "greaterThan");
-        }
-
-        public void InvokeSetterLessThan(String columnMultiName, Object value) {
-            InvokeSetter(columnMultiName, value, "lessThan");
-        }
-
-        public void InvokeSetterGreaterEqual(String columnMultiName, Object value) {
-            InvokeSetter(columnMultiName, value, "greaterEqual");
-        }
-
-        public void InvokeSetterLessEqual(String columnMultiName, Object value) {
-            InvokeSetter(columnMultiName, value, "lessEqual");
-        }
-
-        protected void InvokeSetter(String columnMultiName, Object value, String conditionKeyName) {
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableDbName(GetTableDbName());
-            String columnCapPropName = dbmeta.GetCapPropNameByMultiName(columnMultiName);
-
-            String methodName = "Set" + columnCapPropName + "_" + conditionKeyName.Substring(0, 1).ToUpper() + conditionKeyName.Substring(1);
-            MethodInfo methodInfo = this.GetType().GetMethod(methodName);
-            if (methodInfo == null) {
-                String msg = "The columnCapPropName is not existing in this table: columnCapPropName=" + columnCapPropName + " tableName=" + GetTableDbName();
-                msg = msg + " methodName=" + methodName;
-                throw new SystemException(msg);
-            }
-            methodInfo.Invoke(this, new Object[]{value});
-        }
-
-        public void InvokeAddOrderByAsc(String columnCapPropName) {
-            InvokeOrderBy(columnCapPropName, true);
-        }
-
-        public void InvokeAddOrderByDesc(String columnCapPropName) {
-            InvokeOrderBy(columnCapPropName, false);
-        }
-
-        protected void InvokeOrderBy(String columnMultiName, bool isAsc) {
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableDbName(GetTableDbName());
-            String columnCapPropName = dbmeta.GetCapPropNameByMultiName(columnMultiName);
-
-            String ascDesc = null;
-            if (isAsc) {
-                ascDesc = "Asc";
-            } else {
-                ascDesc = "Desc";
-            }
-            String methodName = "AddOrderBy_" + columnCapPropName + "_" + ascDesc;
-            MethodInfo methodInfo = this.GetType().GetMethod(methodName);
-            if (methodInfo == null) {
-                String msg = "The columnCapPropName is not existing in this table: columnCapPropName=" + columnCapPropName;
-                msg = msg + " tableName=" + GetTableDbName() + " methodName=" + methodName;
-                throw new SystemException(msg);
-            }
-            methodInfo.Invoke(this, null);
-        }
-
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
@@ -348,7 +264,7 @@ namespace ${glPackageBaseCommonCBean} {
             MethodInfo methodInfo = this.GetType().GetMethod(methodName);
             if (methodInfo == null) {
                 String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;
-                msg = msg + " tableName=" + GetTableDbName() + " methodName=" + methodName;
+                msg = msg + " tableName=" + TableDbName + " methodName=" + methodName;
                 throw new SystemException(msg);
             }
             return (${glConditionQueryInterfaceName})methodInfo.Invoke(this, null);

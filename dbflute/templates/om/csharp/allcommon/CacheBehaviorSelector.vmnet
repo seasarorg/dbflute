@@ -2,11 +2,12 @@
 using System;
 using System.Collections;
 
+using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonDBMeta};
 
 namespace ${glPackageBaseCommon} {
 
-    public class ${glCacheDaoSelectorName} : ${glDaoSelectorInterfaceName} {
+    public class ${glCacheBehaviorSelectorName} : ${glBehaviorSelectorInterfaceName} {
 
         // ===============================================================================
         //                                                                       Attribute
@@ -16,24 +17,24 @@ namespace ${glPackageBaseCommon} {
         // ===============================================================================
         //                                                                        Selector
         //                                                                        ========
-        public virtual DAO_TYPE Select<DAO_TYPE>(Type daoType) where DAO_TYPE : ${glDaoReadableInterfaceName} {
+        public virtual DAO_TYPE Select<DAO_TYPE>(Type daoType) where DAO_TYPE : ${glBehaviorReadableInterfaceName} {
             return (DAO_TYPE)_container.GetComponent(daoType);
         }
 
-        public virtual ${glDaoReadableInterfaceName} ByName(String tableFlexibleName) {
+        public virtual ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
             ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(tableFlexibleName);
-            return Select<${glDaoReadableInterfaceName}>(GetDaoType(dbmeta));
+            return Select<${glBehaviorReadableInterfaceName}>(GetBehaviorType(dbmeta));
         }
 
-        protected static Type GetDaoType(${glDBMetaInterfaceName} dbmeta) {
-            String daoTypeName = dbmeta.DaoTypeName;
-            if (daoTypeName == null) {
-                String msg = "The dbmeta.DaoTypeName should not return null: dbmeta=" + dbmeta;
+        protected static Type GetBehaviorType(${glDBMetaInterfaceName} dbmeta) {
+            String behaviorTypeName = dbmeta.BehaviorTypeName;
+            if (behaviorTypeName == null) {
+                String msg = "The dbmeta.BehaviorTypeName should not return null: dbmeta=" + dbmeta;
                 throw new SystemException(msg);
             }
             Seasar.Framework.Xml.S2Section config = Seasar.Framework.Xml.S2SectionHandler.GetS2Section();
-            return ForName(daoTypeName, config.Assemblys);
+            return ForName(behaviorTypeName, config.Assemblys);
         }
 
         protected static Type ForName(string className, System.Collections.IList assemblys) {

@@ -1,72 +1,63 @@
-${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
-
 #set ($myClassName = "${glUniqueInfoName}")
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+using System;
+using System.Collections.Generic;
+using ${glPackageBaseCommonDBMeta};
 
-/**
- * The class of unique info.
- * 
- * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${myClassName} {
+namespace ${glPackageBaseCommonDBMetaInfo} {
 
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected ${glDBMetaInterfaceName} dbmeta;
-    protected java.util.List${database.filterGenericsString(${glColumnInfoName})} uniqueColumnList = new java.util.ArrayList${database.filterGenericsString(${glColumnInfoName})}();
-    protected boolean primary;
+    public class ${myClassName} {
 
-    // ===================================================================================
-    //                                                                         Easy-to-Use
-    //                                                                         ===========
-    public boolean containsColumn(String columnName) {
-        for (final java.util.Iterator ite = uniqueColumnList.iterator(); ite.hasNext(); ) {
-            final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
-            if (columnInfo.getColumnDbName().equals(columnName)) {
-                return true;
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glDBMetaInterfaceName} dbmeta;
+        protected IList<${glColumnInfoName}> uniqueColumnList = new List<${glColumnInfoName}>();
+        protected bool primary;
+
+        // ===============================================================================
+        //                                                                     Easy-to-Use
+        //                                                                     ===========
+        public bool ContainsColumn(String columnName) {
+            foreach (${glColumnInfoName} columnInfo in uniqueColumnList) {
+                if (columnInfo.ColumnDbName.Equals(columnName)) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
-    }
 
-    public boolean containsColumn(${glColumnInfoName} column) {
-        return containsColumn(column.getColumnDbName());
-    }
+        public bool ContainsColumn(${glColumnInfoName} column) {
+            return ContainsColumn(column.ColumnDbName);
+        }
 
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public ${glDBMetaInterfaceName} getDBMeta() {
-        return dbmeta;
-    }
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+       public ${glDBMetaInterfaceName} MyDBMeta {
+           get { return dbmeta; }
+           set { this.dbmeta = value; }
+       }
 
-    public void setDBMeta(${glDBMetaInterfaceName} dbmeta) {
-        this.dbmeta = dbmeta;
-    }
+        public IList<${glColumnInfoName}> UniqueColumnList {
+            get { return uniqueColumnList; }
+        }
 
-    public java.util.List${database.filterGenericsString(${glColumnInfoName})} getUniqueColumnList() {
-        return uniqueColumnList;
-    }
+        public void AddUniqueColumnList(${glColumnInfoName} uniqueColumn) {
+            this.uniqueColumnList.Add(uniqueColumn);
+        }
 
-    public void addUniqueColumnList(${glColumnInfoName} uniqueColumn) {
-        this.uniqueColumnList.add(uniqueColumn);
-    }
+        public ${glColumnInfoName} FirstColumn {
+            get { return (${glColumnInfoName})this.uniqueColumnList[0]; }
+        }
 
-    public ${glColumnInfoName} getFirstColumn() {
-        return (${glColumnInfoName})this.uniqueColumnList.get(0);
-    }
+        public bool IsTwoOrMore {
+            get { return this.uniqueColumnList.Count > 1; }
+        }
 
-    public boolean isTwoOrMore() {
-        return this.uniqueColumnList.size() > 1;
-    }
-
-    public boolean isPrimary() {
-        return this.primary;
-    }
-
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
+        public bool IsPrimary {
+            get { return this.primary; }
+            set { this.primary = value; }
+        }
     }
 }

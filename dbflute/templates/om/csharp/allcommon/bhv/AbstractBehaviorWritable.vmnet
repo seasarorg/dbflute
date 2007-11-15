@@ -31,29 +31,6 @@ namespace ${glPackageBaseCommonBhv} {
         #endregion
 
         // =====================================================================================
-        //                                                                       Self Dispatcher
-        //                                                                       ===============
-        #region Self Dispatcher
-        /// <summary>
-        /// Behavior's self dispatcher as writable
-        /// </summary>
-        /// <returns>${glBehaviorWritableInterfaceName}</returns>
-        abstract protected ${glBehaviorWritableInterfaceName} SelfWritable { get; }
-        #endregion
-
-        // =====================================================================================
-        //                                                                          Dao Accessor
-        //                                                                          ============
-        #region Dao Getter
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Dao-writable. (NotNull)
-         */
-        abstract public ${glDaoWritableInterfaceName} GetDaoWritable();
-        #endregion
-
-        // =====================================================================================
         //                                                                       Delegate Method
         //                                                                       ===============
         #region Delegate-Method
@@ -277,7 +254,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="entity"> Entity. (NotNull)</param>
         public void Create(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
-            this.SelfWritable.CallCreate(entity);
+            ((${glBehaviorWritableInterfaceName})this).CallCreate(entity);
         }
 
         /// <summary>
@@ -286,61 +263,11 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="entity"> Entity. (NotNull)</param>
         public void Modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
-            int modifiedCount = this.SelfWritable.CallModify(entity);
+            int modifiedCount = ((${glBehaviorWritableInterfaceName})this).CallModify(entity);
             if (modifiedCount != 1) {
                 throw new Seasar.Dao.NotSingleRowUpdatedRuntimeException(entity, modifiedCount);
             }
         }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param entity Entity.
-         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-         */
-        public void ModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName} = this.DBMeta.NewConditionBean();
-            ${glAttachedCBArgsVariableName}.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = this.SelfReadable.ReadEntity(${glAttachedCBArgsVariableName});
-            AssertRecordHasNotBeenDeleted(currentEntity, entity.ExtractPrimaryKeyMapString());
-            MergeEntity(entity, currentEntity);
-            this.SelfWritable.Modify(currentEntity);
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        public void CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-            AssertEntityNotNull(entity);
-            if (!entity.HasPrimaryKeyValue) {
-                this.SelfWritable.Create(entity);
-                return;
-            }
-            ${glPackageBaseCommon}.${glEntityInterfaceName} currentEntity = null;
-            try {
-                ${glConditionBeanInterfaceName} cb = NewConditionBean();
-                cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
-                currentEntity = ReadEntityWithDeletedCheck(cb);
-            } catch (${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}) {
-                this.SelfWritable.Create(entity);
-                return;
-            }
-            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            MergeEntity(entity, currentEntity);
-            this.SelfWritable.Modify(currentEntity);
-        }
-
-        /**
-         * Merge entity.
-         * Copy the column data of sourceEntity that the setter has been invoked to destinationEntity.
-         * 
-         * @param sourceEntity Source entity.
-         * @param destinationEntity Destination entity.
-         */
-        abstract protected void MergeEntity(${glPackageBaseCommon}.${glEntityInterfaceName} sourceEntity, ${glPackageBaseCommon}.${glEntityInterfaceName} destinationEntity);
 
         /// <summary>
         /// Remove.
@@ -348,7 +275,7 @@ namespace ${glPackageBaseCommonBhv} {
         /// <param name="entity"> Entity. (NotNull)</param>
         public void Remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
-            this.SelfWritable.CallRemove(entity);
+            ((${glBehaviorWritableInterfaceName})this).CallRemove(entity);
         }
         #endregion
 

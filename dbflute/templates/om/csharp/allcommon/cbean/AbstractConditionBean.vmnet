@@ -32,7 +32,7 @@ namespace ${glPackageBaseCommonCBean} {
          * Constructor.
          */
         public ${myClassName}() {
-            _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(GetTableDbName());
+            _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(TableDbName);
         }
 
         // =====================================================================================
@@ -41,22 +41,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        abstract public String GetTableDbName();
-
-        // =====================================================================================
-        //                                                                            PrimaryKey
-        //                                                                            ==========
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="primaryKeyMap">Primary key map. (NotNull and NotEmpty)</param>
-        abstract public void AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary key map-string. (NotNull and NotEmpty)</param>
-        abstract public void AcceptPrimaryKeyMapString(String primaryKeyMapString);
+        public abstract String TableDbName { get; }
 
         // =====================================================================================
         //                                                                             SqlClause
@@ -350,14 +335,14 @@ namespace ${glPackageBaseCommonCBean} {
         protected String FilterOrderByProperty(String orderByProperty) {
             String[] orderBySlashArray = orderByProperty.Split('/');
             StringBuilder sb = new StringBuilder();
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.GetInstanceByTableDbName(GetTableDbName());
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(TableDbName);
             ${glConditionQueryInterfaceName} query = this.ConditionQueryAsInterface;
             foreach (String orderBySlashElement in orderBySlashArray) {
                 String[] orderByDotArray = orderBySlashElement.Split('.');
 
                 if (orderByDotArray.Length == 1) {
-                    if (dbmeta.IsExistMultiName(orderBySlashElement)) {
-                        sb.Append("/").Append(query.GetRealColumnName(dbmeta.GetDbNameByMultiName(orderBySlashElement)));
+                    if (dbmeta.HasColumn(orderBySlashElement)) {
+                        sb.Append("/").Append(query.GetRealColumnName(dbmeta.FindDbName(orderBySlashElement)));
                     } else {
                         sb.Append("/").Append(orderBySlashElement);
                     }
@@ -369,16 +354,17 @@ namespace ${glPackageBaseCommonCBean} {
                         count++;
 
                         if (orderByDotArray.Length == count) {// Last Loop!
-                            if (!foreignDBMeta.IsExistMultiName(orderByDotElement)) {
+                            if (!foreignDBMeta.HasColumn(orderByDotElement)) {
                                 String msg = "The name for order-by is not existing: name=" + orderByDotElement;
                                 msg = msg + " orderBySlashElement=" + orderBySlashElement + " orderByProperty=" + orderByProperty;
                                 throw new SystemException(msg);
                             }
-                            sb.Append("/").Append(foreignQuery.GetRealColumnName(foreignDBMeta.GetDbNameByMultiName(orderByDotElement)));
+                            sb.Append("/").Append(foreignQuery.GetRealColumnName(foreignDBMeta.FindDbName(orderByDotElement)));
                             break;
                         }
 
-                        foreignDBMeta = foreignDBMeta.GetForeignDBMeta(orderByDotElement);
+                        // TODO: @jflute
+                        // foreignDBMeta = foreignDBMeta.GetForeignDBMeta(orderByDotElement);
                         foreignQuery = foreignQuery.GetForeignConditionQuery(orderByDotElement);
                     }
                 }

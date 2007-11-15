@@ -1,26 +1,23 @@
-${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
-
 #set ($myClassName = "${glRelationInfoName}")
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+using System;
+using System.Collections.Generic;
+using ${glPackageBaseCommonDBMeta};
 
-/**
- * The class of referer information.
- * 
- * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
-public interface ${myClassName} {
+namespace ${glPackageBaseCommonDBMetaInfo} {
+    
+    public interface ${myClassName} {
 
-    public String getRelationPropertyName();
+        String RelationPropertyName { get; }
 
-    public ${glDBMetaInterfaceName} getLocalDBMeta();
+        ${glDBMetaInterfaceName} LocalDBMeta { get; }
 
-    public ${glDBMetaInterfaceName} getTargetDBMeta();
+        ${glDBMetaInterfaceName} TargetDBMeta { get; }
 
-#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
-    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalTargetColumnInfoMap();
+        IDictionary<${glColumnInfoName},${glColumnInfoName}> LocalTargetColumnInfoMap { get; }
 
-    public boolean isOneToOne();
+        bool IsOneToOne { get; }
 
-    public boolean isReferer();
+        bool IsReferer { get; }
+    }
 }

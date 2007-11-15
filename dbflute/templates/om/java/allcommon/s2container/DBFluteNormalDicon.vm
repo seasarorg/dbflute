@@ -61,12 +61,12 @@
 #end
 
     <!-- Behavior selector. -->
-    <component name="behaviorSelector" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
+    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}">
         <destroyMethod name="destroy"/>
     </component>
 
     <!-- Dao selector. -->
-    <component name="daoSelector" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
+    <component name="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
         <destroyMethod name="destroy"/>
     </component>
 

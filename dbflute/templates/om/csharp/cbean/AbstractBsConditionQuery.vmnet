@@ -37,8 +37,8 @@ namespace ${glPackageBaseCQ} {
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
-        public override String GetTableDbName() {
-            return "${table.Name}";
+        public override String TableDbName {
+            get { return "${table.Name}"; }
         }
 
         // =====================================================================================
@@ -47,7 +47,7 @@ namespace ${glPackageBaseCQ} {
         // /* * * * * * * * * * * * * * * * * * * * * * *
         //   MyTable = [$table.name]
         // * * * * * * * * */
-  #foreach ($col in $table.Columns)
+  #foreach ($col in $table.columns)
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
     #if (${col.isJavaNativeStringObject()})

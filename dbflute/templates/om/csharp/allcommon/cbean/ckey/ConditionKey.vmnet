@@ -181,7 +181,7 @@ namespace ${glPackageBaseCommonCKey} {
         }
 
         protected bool isNullableTypeNull(Object obj) {
-            if (obj != null && obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
+            if (obj != null) {
                 return true;
             } else {
                 return false;

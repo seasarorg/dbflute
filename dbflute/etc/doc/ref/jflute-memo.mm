@@ -82,7 +82,7 @@
 <node CREATED="1179302326859" ID="Freemind_Link_742338085" MODIFIED="1179302349734" TEXT="logger&#x306e;&#x4f8b;&#x5916;&#x5f15;&#x6570;&#x9593;&#x9055;&#x3048;"/>
 <node CREATED="1179797300078" ID="Freemind_Link_1379826252" MODIFIED="1179797305390" TEXT="&#x5909;&#x6570;&#x306e;&#x96a0;&#x853d;"/>
 </node>
-<node CREATED="1179734909009" FOLDED="true" ID="Freemind_Link_1064117862" MODIFIED="1179734913337" TEXT="{Seasar}">
+<node CREATED="1179734909009" ID="Freemind_Link_1064117862" MODIFIED="1179734913337" TEXT="{Seasar}">
 <node CREATED="1179734913759" FOLDED="true" ID="Freemind_Link_1673479277" MODIFIED="1179734915931" TEXT="{Teeda}">
 <node CREATED="1179735495790" ID="Freemind_Link_490903534" MODIFIED="1179735500321" TEXT="What?">
 <node CREATED="1179735503446" ID="Freemind_Link_1757407408" MODIFIED="1179735530978" TEXT="Impl of JSF that is provided from Seasar"/>
@@ -114,9 +114,12 @@
 </node>
 </node>
 </node>
-<node CREATED="1184289605125" ID="Freemind_Link_1088205588" MODIFIED="1184289610343" TEXT="{S2Container}">
-<node CREATED="1184289611468" ID="Freemind_Link_238890854" MODIFIED="1184289618453" TEXT="Aspect">
+<node CREATED="1184289605125" FOLDED="true" ID="Freemind_Link_1088205588" MODIFIED="1184289610343" TEXT="{S2Container}">
+<node CREATED="1184289611468" FOLDED="true" ID="Freemind_Link_238890854" MODIFIED="1184289618453" TEXT="Aspect">
 <node CREATED="1184289619843" ID="Freemind_Link_980638901" MODIFIED="1184289633187" TEXT="&lt;aspect&gt;&#x3068;&lt;aspect pointcut=&quot;.*&quot;&gt;&#x306f;&#x5225;&#x7269;&#xa;      * A.&lt;aspect&gt;&#x2192;&#x30a4;&#x30f3;&#x30bf;&#x30fc;&#x30d5;&#x30a7;&#x30fc;&#x30b9;&#x3092;&#x5b9f;&#x88c5;&#x3057;&#x3066;&#x3044;&#x308b;&#x30e1;&#x30bd;&#x30c3;&#x30c9;&#x5168;&#x3066;&#x306b;&#x304b;&#x304b;&#x308b;&#xa;     * B.&lt;aspect pointcut=&quot;.*&quot;&gt;&#x2192;&#x30a4;&#x30f3;&#x30bf;&#x30fc;&#x30d5;&#x30a7;&#x30fc;&#x30b9;&#x3068;&#x95a2;&#x4fc2;&#x306a;&#x304f;&#xa;       &#x5b9f;&#x88c5;&#x30af;&#x30e9;&#x30b9;&#x306e;public&#x30e1;&#x30bd;&#x30c3;&#x30c9;&#x5168;&#x3066;&#x306b;&#x304b;&#x304b;&#x308b;"/>
+</node>
+<node CREATED="1195034964156" FOLDED="true" ID="Freemind_Link_1797133716" MODIFIED="1195034967281" TEXT="Servlet">
+<node CREATED="1195034967750" ID="Freemind_Link_1569691896" MODIFIED="1195034989109" TEXT="web.xml&#x306b;&#xa;&#xa;  &lt;context-param&gt;&#xa;    &lt;param-name&gt;DDDDDD&lt;/param-name&gt;&#xa;    &lt;param-value&gt;ZZZZZZZ&lt;/param-value&gt;&#xa;  &lt;/context-param&gt;&#xa;&#xa;&#x3092;&#xa;&#xa;&lt;property name=&quot;aaa&quot;&gt;application.getInitParameter(&quot;DDDDDD&quot;)&lt;/property&gt;&#xa;&#xa;&#x3067;&#x53d6;&#x5f97;&#x3067;&#x304d;&#x308b;&#x3002;"/>
 </node>
 </node>
 </node>

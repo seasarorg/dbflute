@@ -160,7 +160,7 @@ namespace ${myDBMetaPackageName} {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
                 map.Add(TABLE_DB_NAME.ToLower(), TABLE_PROPERTY_NAME);
 #foreach ($col in $table.columns)
-                map.Add(DB_NAME_${col.name}.ToLower(), PROPERTY_NAME_${col.javaName});
+                map.Add(DB_NAME_${col.name}.ToLower(), PROPERTY_NAME_${col.name});
 #end
                 _dbNamePropertyNameKeyToLowerMap = map;
             }
@@ -169,7 +169,7 @@ namespace ${myDBMetaPackageName} {
                 System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
                 map.Add(TABLE_PROPERTY_NAME.ToLower(), TABLE_DB_NAME);
 #foreach ($col in $table.Columns)
-                map.Add(PROPERTY_NAME_${col.javaName}.ToLower(), DB_NAME_${col.name});
+                map.Add(PROPERTY_NAME_${col.name}.ToLower(), DB_NAME_${col.name});
 #end
                 _propertyNameDbNameKeyToLowerMap = map;
             }
@@ -218,6 +218,26 @@ namespace ${myDBMetaPackageName} {
             get { return TABLE_UNCAP_PROP_NAME; }
         }
         #endregion
+
+        // ===============================================================================
+        //                                                                       Type Name
+        //                                                                       =========
+        public override String EntityTypeName { get { return "${myExtendedEntityPackageName}.${myExtendedObjectClassName}"; } }
+#if (${isExistDao})
+        public override String DaoTypeName { get { return "${myExtendedDaoPackageName}.${myExtendedDaoClassName}"; } }
+#else
+        public override String DaoTypeName { get { return null; } }
+#end
+#if (${isExistConditionBean})
+        public override String ConditionBeanTypeName { get { return "${glPackageBaseCB}.${myConditionBeanClassName}"; } }
+#else
+        public override String ConditionBeanTypeName { get { return null; } }
+#end
+#if (${isExistBehavior})
+        public override String BehaviorTypeName { get { return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}"; } }
+#else
+        public override String BehaviorTypeName { get { return null; } }
+#end
 
         // ===============================================================================
         //                                                                     Object Type
@@ -277,10 +297,10 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        public System.Collections.Generic.IList<${glColumnInfoName}> GetColumnInfoList() {
+        public override System.Collections.Generic.IList<${glColumnInfoName}> GetColumnInfoList() {
             System.Collections.Generic.IList<${glColumnInfoName}> columnInfoList = new System.Collections.Generic.List<${glColumnInfoName}>();
 #foreach ($col in $table.columns)
-            columnInfoList.Add(Column${col.javaName}());
+            columnInfoList.Add(Column${col.javaName});
 #end
             return columnInfoList;
         }
@@ -294,10 +314,16 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                     Unique Info
         //                                                                     ===========
+
+        public override ${glUniqueInfoName} GetPrimaryUniqueInfo() {
+            // TODO: @jflute
+            return null;
+        }
+
         // -------------------------------------------------
         //                                   Primary Element
         //                                   ---------------
-        public bool HasPrimaryKey {
+        public override bool HasPrimaryKey {
             get { return ${table.hasPrimaryKey()}; }
         }
 
@@ -341,18 +367,18 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                   Sequence Info
         //                                                                   =============
-        public bool HasSequence {
+        public override bool HasSequence {
             get { return ${table.isUseSequence()}; }
         }
 
         // ===============================================================================
         //                                                            Optimistic Lock Info
         //                                                            ====================
-        public bool HasVersionNo {
+        public override bool HasVersionNo {
             get { return ${table.isUseVersionNo()}; }
         }
 
-        public bool HasUpdateDate {
+        public override bool HasUpdateDate {
             get { return ${table.isUseUpdateDate()}; }
         }
 
@@ -371,7 +397,7 @@ namespace ${myDBMetaPackageName} {
         /// </summary>
         /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
         /// <returns>Foreign DBMeta. (NotNull)</returns>
-        public override ${glDBMetaInterfaceName} GetForeignDBMeta(String foreignPropertyName) {
+        public ${glDBMetaInterfaceName} GetForeignDBMeta(String foreignPropertyName) {
             AssertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
             String methodName = "GetForeignDBMeta_" + foreignPropertyName.Substring(0, 1).ToUpper() + foreignPropertyName.Substring(1);
             MethodInfo method = this.GetType().GetMethod(methodName);
@@ -411,10 +437,11 @@ namespace ${myDBMetaPackageName} {
   #end
 #end
 
-
         // =====================================================================================
         //                                                                 Entity Property Setup
         //                                                                 =====================
+        protected IDictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new Dictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
+
         public override bool SetupEntityProperty(String propertyName, Object entity, Object value) {
             if (!_entityPropertySetupperMap.ContainsKey(propertyName)) {
                 return false;

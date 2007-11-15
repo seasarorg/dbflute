@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using Seasar.Quill.Attrs;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
@@ -9,128 +10,47 @@ using ${glPackageBaseCommonDBMeta};
 
 namespace ${glPackageBaseCommonBhv} {
 
-    /**
-     * The abstract class of behavior-readable.
-     * 
-     * @author ${database.ClassAuthor}
-     */
     public abstract class $myClassName : ${glBehaviorReadableInterfaceName} {
 
-        // =====================================================================================
-        //                                                                            Definition
-        //                                                                            ==========
-        /** Map-string map-mark. */
-        protected static readonly String MAP_STRING_MAP_MARK = "map:";
-
-        /** Map-string list-mark. */
-        protected static readonly String MAP_STRING_LIST_MARK = "list:";
-
-        /** Map-string start-brace. */
-        protected static readonly String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
-
-        /** Map-string end-brace. */
-        protected static readonly String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
-
-        /** Map-string delimiter. */
-        protected static readonly String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
-
-        /** Map-string equal. */
-        protected static readonly String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
-
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
         #region Attribute
-        /// <summary>Dao-selector instance.</summary>
+        [Binding("${database.daoSelectorComponentName}")]
         protected ${glDaoSelectorInterfaceName} _daoSelector;
+
+        [Binding("${database.behaviorSelectorComponentName}")]
+        protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
         #endregion
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
-        #region Constructor
-        /**
-         * Constructor.
-         */
-        public ${myClassName}() {
-        }
-        #endregion
-
-        // =====================================================================================
-        //                                                                             TableName
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
         /// <summary>
         /// The property of table db-Name. (readonly)
         /// </summary>
-        abstract public String TableDbName { get; }
+        public abstract String TableDbName { get; }
 
-        // =====================================================================================
-        //                                                                                DBMeta
-        //                                                                                ======
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
         /// <summary>
         /// The property of DBMeta. (readonly)
         /// </summary>
-        abstract public ${glDBMetaInterfaceName} DBMeta { get; }
+        public abstract ${glDBMetaInterfaceName} DBMeta { get; }
 
-        // =====================================================================================
-        //                                                                       Self Dispatcher
-        //                                                                       ===============
-        #region Self Dispatcher
-        /// <summary>
-        /// Behavior's self dispatcher as readable
-        /// </summary>
-        /// <returns>${glBehaviorReadableInterfaceName}</returns>
-        abstract protected ${glBehaviorReadableInterfaceName} SelfReadable { get; }
-        #endregion
-
-        // =====================================================================================
-        //                                                                          Dao Accessor
-        //                                                                          ============
-        #region Dao Accessor
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Dao-readable. (NotNull)
-         */
-        abstract public ${glDaoReadableInterfaceName} GetDaoReadable();
-        #endregion
-
-        // =====================================================================================
-        //                                                                          New Instance
-        //                                                                          ============
+        // ===============================================================================
+        //                                                                    New Instance
+        //                                                                    ============
         #region New Instance
-        /// <summary>
-        /// New entity.
-        /// </summary>
-        /// <returns>Entity. (NotNull)</returns>
-        abstract public ${glEntityInterfaceName} NewEntity();
-
-        /// <summary>
-        /// New condition-bean.
-        /// </summary>
-        /// <returns>Condition-bean. (NotNull)</returns>
-        abstract public ${glConditionBeanInterfaceName} NewConditionBean();
+        public abstract ${glEntityInterfaceName} NewEntity();
+        public abstract ${glConditionBeanInterfaceName} NewConditionBean();
         #endregion
 
-        // =====================================================================================
-        //                                                                          Dao Selector
-        //                                                                          ============
-        #region Dao Selector
-
-        /// <summary>
-        ///  The property of dao-selector.
-        /// </summary>
-        public ${glDaoSelectorInterfaceName} DaoSelector {
-            get { return _daoSelector; }
-            set { _daoSelector = value; }
-        }
-        #endregion
-
-        // =====================================================================================
-        //                                                                       Delegate Method
-        //                                                                       ===============
-        #region Delegate-Method
-
+        // ===============================================================================
+        //                                                                 Delegate Method
+        //                                                                 ===============
+        #region Delegate Method
         /**
          * ${database.ImplementComment}
          * 
@@ -140,7 +60,7 @@ namespace ${glPackageBaseCommonBhv} {
         protected int CallGetCountAll() {
             return DoCallGetCountAll();
         }
-        abstract protected int DoCallGetCountAll();
+        protected abstract int DoCallGetCountAll();
 
         /**
          * ${database.ImplementComment}
@@ -151,7 +71,7 @@ namespace ${glPackageBaseCommonBhv} {
         protected System.Collections.Generic.IList<${glEntityInterfaceName}> CallGetListAll() {
             return DoCallGetListAll();
         }
-        abstract protected System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallGetListAll();
+        protected abstract System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallGetListAll();
 
         /**
          * ${database.ImplementComment}
@@ -162,7 +82,7 @@ namespace ${glPackageBaseCommonBhv} {
         protected int CallReadCount(${glConditionBeanInterfaceName} cb) {
             return DoCallReadCount(cb);
         }
-        abstract protected int DoCallReadCount(${glConditionBeanInterfaceName} cb);
+        protected abstract int DoCallReadCount(${glConditionBeanInterfaceName} cb);
 
         /**
          * ${database.ImplementComment}
@@ -173,7 +93,7 @@ namespace ${glPackageBaseCommonBhv} {
         protected ${glEntityInterfaceName} CallReadEntity(${glConditionBeanInterfaceName} cb) {
             return DoCallReadEntity(cb);
         }
-        abstract protected ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb);
+        protected abstract ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb);
 
         /**
          * ${database.ImplementComment}
@@ -184,7 +104,7 @@ namespace ${glPackageBaseCommonBhv} {
         protected System.Collections.Generic.IList<${glEntityInterfaceName}> CallReadList(${glConditionBeanInterfaceName} cb) {
             return DoCallReadList(cb);
         }
-        abstract protected System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb);
+        protected abstract System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb);
 
         #endregion
 
@@ -477,5 +397,27 @@ namespace ${glPackageBaseCommonBhv} {
         }
         #endregion
         #endregion
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        #region Accessor
+        /// <summary>
+        ///  The property of dao selector.
+        /// </summary>
+        public ${glDaoSelectorInterfaceName} DaoSelector {
+            get { return _daoSelector; }
+            set { _daoSelector = value; }
+        }
+
+        /// <summary>
+        ///  The property of behavior selector.
+        /// </summary>
+        public ${glBehaviorSelectorInterfaceName} BehaviorSelector {
+            get { return _behaviorSelector; }
+            set { _behaviorSelector = value; }
+        }
+        #endregion
+
     }
 }

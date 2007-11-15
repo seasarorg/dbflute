@@ -4,16 +4,13 @@
 
 <components namespace="${glDaoDiconNamespace}">
 #foreach ($includePath in $database.DBFluteDiconBeforeJ2eeIncludePathList)
-
     <include path="${includePath}"/>
 #end
 
     <include path="${glJdbcDiconResourceName}"/>
 #foreach ($includePath in $database.DBFluteDiconOtherIncludePathList)
-
     <include path="${includePath}"/>
 #end
-
 
     <!-- S2Dao component. -->
     <component class="Seasar.Dao.Impl.FieldAnnotationReaderFactory" />

@@ -66,6 +66,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.xml.sax.Attributes;
@@ -570,7 +572,9 @@ public class Column {
         }
         try {
             Integer.parseInt(_size);
-            return "Integer.valueOf(\"" + _size + "\")";
+            DfBasicProperties prop = getTable().getProperties().getBasicProperties();
+            DfLanguageDependencyInfo languageDependencyInfo = prop.getLanguageDependencyInfo();
+            return languageDependencyInfo.getIntegerConvertExpression(_size);
         } catch (NumberFormatException e) {
             return "null";
         }
@@ -1009,6 +1013,10 @@ public class Column {
         return TypeMap.isBooleanChar(_torqueType);
     }
 
+    public boolean isJavaNativeCSharpNullable() {
+        return getJavaNative().startsWith("Nullable");
+    }
+    
     // ===================================================================================
     //                                                                       Include Query
     //                                                                       =============

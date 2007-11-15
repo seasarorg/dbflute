@@ -2,10 +2,13 @@
 #set ($myClassName = "${glDBMetaAbstractName}")
 
 using System;
+using System.Reflection;
 using System.Text;
+using System.Collections.Generic;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonDBMetaInfo};
 
 namespace ${glPackageBaseCommonDBMeta} {
 
@@ -18,16 +21,16 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        abstract String TableDbName { get; }
-        abstract String TablePropertyName { get; }
-        abstract String TableCapPropName { get; }
-        abstract String TableUncapPropName { get; }
+        public abstract String TableDbName { get; }
+        public abstract String TablePropertyName { get; }
+        public abstract String TableCapPropName { get; }
+        public abstract String TableUncapPropName { get; }
 
         // ===============================================================================
         //                                                                   Name Handling
         //                                                                   =============
         public bool HasFlexibleName(String flexibleName) {
-            String key = flexibleName.ToLowerCase();
+            String key = flexibleName.ToLower();
             if (DbNamePropertyNameKeyToLowerMap.ContainsKey(key)) {
                 return true;
             }
@@ -38,12 +41,12 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         public String FindDbName(String flexibleName) {
-            String key = flexibleName.ToLowerCase();
+            String key = flexibleName.ToLower();
             if (PropertyNameDbNameKeyToLowerMap.ContainsKey(key)) {
                 return PropertyNameDbNameKeyToLowerMap[key];
             }
             if (DbNamePropertyNameKeyToLowerMap.ContainsKey(key)) {
-                String dbNameKeyToLower = DbNamePropertyNameKeyToLowerMap[key].ToLowerCase();
+                String dbNameKeyToLower = DbNamePropertyNameKeyToLowerMap[key].ToLower();
                 if (PropertyNameDbNameKeyToLowerMap.ContainsKey(dbNameKeyToLower)) {
                     return PropertyNameDbNameKeyToLowerMap[dbNameKeyToLower];
                 }
@@ -53,12 +56,12 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         public String FindPropertyName(String flexibleName) {
-            String key = flexibleName.ToLowerCase();
-            if (DbNamePropertyNameKeyToLowerMap.containsKey(key)) {
+            String key = flexibleName.ToLower();
+            if (DbNamePropertyNameKeyToLowerMap.ContainsKey(key)) {
                 return DbNamePropertyNameKeyToLowerMap[key];
             }
             if (PropertyNameDbNameKeyToLowerMap.ContainsKey(key)) {
-                String dbNameToLower = PropertyNameDbNameKeyToLowerMap[key].ToLowerCase();
+                String dbNameToLower = PropertyNameDbNameKeyToLowerMap[key].ToLower();
                 if (DbNamePropertyNameKeyToLowerMap.ContainsKey(dbNameToLower)) {
                     return DbNamePropertyNameKeyToLowerMap[dbNameToLower];
                 }
@@ -68,110 +71,155 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // ===============================================================================
+        //                                                                        Name Map
+        //                                                                        ========
+        public abstract IDictionary<String, String> DbNamePropertyNameKeyToLowerMap { get; }
+        public abstract IDictionary<String, String> PropertyNameDbNameKeyToLowerMap { get; }
+
+        // ===============================================================================
+        //                                                                       Type Name
+        //                                                                       =========
+        public abstract String EntityTypeName { get; }
+        public abstract String DaoTypeName { get; }
+        public abstract String ConditionBeanTypeName { get; }
+        public abstract String BehaviorTypeName { get; }
+
+        // ===============================================================================
+        //                                                                     Object Type
+        //                                                                     ===========
+        public abstract Type EntityType { get; }
+        public abstract Type DaoType { get; }
+        public abstract Type ConditionBeanType { get; }
+        // TODO: @jflute
+        // public abstract Type BehaviorType { get; }
+
+        // ===============================================================================
+        //                                                                 Object Instance
+        //                                                                 ===============
+        public abstract ${glEntityInterfaceName} NewEntity();
+        public abstract ${glConditionBeanInterfaceName} NewConditionBean();
+
+        // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
+        public abstract IList<${glColumnInfoName}> GetColumnInfoList();
+
         public bool HasColumn(String columnFlexibleName) {
             if (!HasFlexibleName(columnFlexibleName)) {
                 return false;
             }
-            String propertyName = findPropertyName(columnFlexibleName);
-            return HasMethod("column" + initCap(propertyName));
+            String propertyName = FindPropertyName(columnFlexibleName);
+            return HasProperty("Column" + InitCap(propertyName));
         }
 
         public ${glColumnInfoName} FindColumnInfo(String columnFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
             if (!HasColumn(columnFlexibleName)) {
                 String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
-                msg = msg + " tableName=" + getTableDbName();
+                msg = msg + " tableName=" + TableDbName;
                 throw new SystemException(msg);
             }
-            String propertyName = FindPropertyName(columnFlexibleName);
-            String methodName = "Column" + InitCap(propertyName);
-            PropertyInfo propertyInfo = GetType().GetPropertyInfo(methodName);
-            return (${glColumnInfoName})propertyInfo.GetValue(this);
+            String propertyName = "Column" + InitCap(FindPropertyName(columnFlexibleName));
+            PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
+            return (${glColumnInfoName})propertyInfo.GetValue(propertyInfo, null);
         }
+
+        // ===============================================================================
+        //                                                                     Unique Info
+        //                                                                     ===========
+        /**
+         * Get primary unique info.
+         * 
+         * @return Primary unique info. (NotNull)
+         */
+        public abstract ${glUniqueInfoName} GetPrimaryUniqueInfo();
+        public abstract bool HasPrimaryKey { get; }
+        public abstract bool HasTwoOrMorePrimaryKeys { get; }
 
         // ===============================================================================
         //                                                                   Relation Info
         //                                                                   =============
-	    public ${glRelationInfoName} FindRelationInfo(String relationPropertyName) {
-	        AssertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-	        return HasForeign(relationPropertyName) ? (${glRelationInfoName})FindForeignInfo(relationPropertyName) : (${glRelationInfoName})FindRefererInfo(relationPropertyName);
-	    }
+        public ${glRelationInfoName} FindRelationInfo(String relationPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
+            return HasForeign(relationPropertyName) ? (${glRelationInfoName})FindForeignInfo(relationPropertyName) : (${glRelationInfoName})FindRefererInfo(relationPropertyName);
+        }
 
         // -------------------------------------------------
         //                                   Foreign Element
         //                                   ---------------
-	    public bool HasForeign(String foreignPropertyName) {
-	        AssertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-	        String methodName = BuildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
-	        return HasMethod(methodName);
-	    }
+        public bool HasForeign(String foreignPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+            String propertyName = BuildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropertyName);
+            return HasProperty(propertyName);
+        }
 
-	    public ${glDBMetaInterfaceName} FindForeignDBMeta(String foreignPropertyName) {
-	        return FindForeignInfo(foreignPropertyName).ForeignDBMeta;
-	    }
+        public ${glDBMetaInterfaceName} FindForeignDBMeta(String foreignPropertyName) {
+            return FindForeignInfo(foreignPropertyName).ForeignDBMeta;
+        }
 
+        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} FindForeignInfo(String foreignPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
+            String propertyName = BuildRelationInfoGetterMethodNameInitCap("Foreign", foreignPropertyName);
+            PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
+            // TODO: @jflute -- Null Check
+            return (${glForeignInfoName})propertyInfo.GetValue(propertyInfo, null);
+        }
 
         // -------------------------------------------------
         //                                   Referer Element
         //                                   ---------------
+        public bool HasReferer(String refererPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+            String propertyName = BuildRelationInfoGetterMethodNameInitCap("Referer", refererPropertyName);
+            return HasProperty(propertyName);
+        }
 
-	    protected String BuildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
-	        return targetName + relationPropertyName.Substring(0, 1).ToUpperCase() + relationPropertyName.Substring(1);
-	    }
+        public ${glDBMetaInterfaceName} FindRefererDBMeta(String refererPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+            return FindRefererInfo(refererPropertyName).RefererDBMeta;
+        }
 
-        // =====================================================================================
-        //                                                                           Type Getter
-        //                                                                           ===========
-        /**
-         * Get the type of dao.
-         * 
-         * @return The type of dao. (NotNull)
-         */
-        abstract public Type DaoType { get; }
+        public ${glRefererInfoName} FindRefererInfo(String refererPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
+            String propertyName = BuildRelationInfoGetterMethodNameInitCap("Referer", refererPropertyName);
+            PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
+            // TODO: @jflute -- Null Check
+            return (${glRefererInfoName})propertyInfo.GetValue(propertyInfo, null);
+        }
 
-        /**
-         * Get the type of entity.
-         * 
-         * @return The type of entity. (NotNull)
-         */
-        abstract public Type EntityType { get; }
+        // -------------------------------------------------
+        //                                     Common Helper
+        //                                     -------------
+        protected static String BuildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
+            return targetName + relationPropertyName.Substring(0, 1).ToUpper() + relationPropertyName.Substring(1);
+        }
 
-        /**
-         * Get the type of condition-bean.
-         * 
-         * @return The type of condition-bean. (NotNull)
-         */
-        abstract public Type ConditionBeanType { get; }
+        // ===============================================================================
+        //                                                                   Sequence Info
+        //                                                                   =============
+        public abstract bool HasSequence { get; }
 
-        // =====================================================================================
-        //                                                                       Instance Getter
-        //                                                                       ===============
-        /**
-         * New the instance of entity.
-         * 
-         * @return The instance of entity. (NotNull)
-         */
-        abstract public ${glEntityInterfaceName} NewEntity();
+        // ===============================================================================
+        //                                                            Optimistic Lock Info
+        //                                                            ====================
+        public abstract bool HasVersionNo { get; }
+        public abstract bool HasUpdateDate { get; }
 
-        /**
-         * New the instance of condition-bean.
-         * 
-         * @return The instance of condition-bean. (NotNull)
-         */
-        abstract public ${glConditionBeanInterfaceName} NewConditionBean();
+        // ===============================================================================
+        //                                                              Common Column Info
+        //                                                              ==================
+        public abstract bool HasCommonColumn { get; }
 
         // =====================================================================================
         //                                                                 Entity Property Setup
         //                                                                 =====================
-        abstract public bool SetupEntityProperty(String propertyName, Object entity, Object value);
+        public abstract bool SetupEntityProperty(String propertyName, Object entity, Object value);
 
         // ===============================================================================
         //                                                                          Helper
         //                                                                          ======
-        abstract protected void checkDowncast(${glEntityInterfaceName} entity);
-
+//        protected abstract void checkDowncast(${glEntityInterfaceName} entity);
+// 
 //        protected String helpGettingColumnStringValue(Object value) {
 //            if (value instanceof java.sql.Timestamp) {
 //                return (value != null ? helpFormatingTimestamp((java.sql.Timestamp)value) : "");
@@ -190,28 +238,21 @@ namespace ${glPackageBaseCommonDBMeta} {
 //            return MapStringUtil.formatTimestamp(timestamp);
 //        }
 
-        protected String InitCap(String str) {
-            return str.Substring(0, 1).ToUpperCase() + str.Substring(1);
+        protected bool HasProperty(String propertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("propertyName", propertyName);
+            PropertyInfo propertyInfo = this.GetType().GetProperty(propertyName);
+            return propertyInfo != null;
         }
 
-        protected bool HasProperty(String propertyName) {
-            assertStringNotNullAndNotTrimmedEmpty("propertyName", propertyName);
-            PropertyInfo propertyInfo = this.GetType().GetPropertyInfo(propertyName);
-            return propertyInfo != null;
+        protected static String InitCap(String str) {
+            return str.Substring(0, 1).ToUpper() + str.Substring(1);
         }
 
         // ----------------------------------------------------------------
         //                                                    Assert Object
         //                                                    -------------
         #region Assert Object
-
-        /**
-         * Assert that the argument is not null.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param arg Argument. (NotNull)
-         */
-        protected void AssertObjectNotNull(String variableName, Object arg) {
+        protected static void AssertObjectNotNull(String variableName, Object arg) {
             if (variableName == null) {
                 String msg = "Argument[variableName] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -221,21 +262,13 @@ namespace ${glPackageBaseCommonDBMeta} {
                 throw new ArgumentNullException(msg);
             }
         }
-
         #endregion
 
         // ----------------------------------------------------------------
         //                                                    Assert String
         //                                                    -------------
         #region Assert Argument
-
-        /**
-         * Assert that the string is not null and not trimmed empty.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param arg Argument. (NotNull)
-         */
-        protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        protected static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
             if (variableName == null) {
                 String msg = "Variable[variableName] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -249,7 +282,6 @@ namespace ${glPackageBaseCommonDBMeta} {
                 throw new ArgumentOutOfRangeException(msg);
             }
         }
-
         #endregion
     }
 }

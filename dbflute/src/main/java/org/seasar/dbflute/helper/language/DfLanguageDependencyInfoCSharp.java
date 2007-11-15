@@ -10,7 +10,7 @@ import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefa
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultCSharp;
 
 /**
- * The language depndency info of CSharp.
+ * The language dependency info of CSharp.
  * 
  * @author jflute
  */
@@ -37,5 +37,9 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
 
     public String getDefaultSourceDirectory() {
         return "../source";
+    }
+    
+    public String getIntegerConvertExpression(String value) {
+        return "new Nullable<int>(" + value + ")";
     }
 }

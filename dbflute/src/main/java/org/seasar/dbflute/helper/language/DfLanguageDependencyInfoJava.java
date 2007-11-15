@@ -39,4 +39,8 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
     public String getDefaultSourceDirectory() {
         return "../src/main/java";
     }
+    
+    public String getIntegerConvertExpression(String value) {
+        return "Integer.valueOf(\"" + value + "\")";
+    }
 }

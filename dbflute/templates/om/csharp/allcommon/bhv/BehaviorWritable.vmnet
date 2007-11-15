@@ -14,13 +14,6 @@ namespace ${glPackageBaseCommonBhv} {
     public interface ${glBehaviorWritableInterfaceName} : ${glBehaviorReadableInterfaceName} {
 
         /**
-         * Get dao-writable.
-         * 
-         * @return Dao-writable. (NotNull)
-         */
-        ${glDaoWritableInterfaceName} GetDaoWritable();
-
-        /**
          * Create entity. (Call-Method)
          * 
          * @param entity Entity that the type is entity-interface. (NotNull)
@@ -59,22 +52,6 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
         void Modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-
-        /**
-        /// Modify after select.
-         * 
-         * @param entity Entity.
-         * @return Updated count.
-         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-         */
-        void ModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-
-        /// <summary>
-        /// Create or modify after select.
-        /// </summary>
-        /// <param name="entity">Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        void CreateOrModifyAfterSelect(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
         /// <summary>
         /// Remove.

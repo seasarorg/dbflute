@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Seasar.Quill.Attrs;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonBhvSetup};
@@ -14,27 +15,69 @@ using ${glPackageCB};
 
 #set ($myExtendClassName = "")
 #if ($table.isWritable())
-  #set ($myExtendClassName = "${glBehaviorWritableInterfaceName}")
+  #set ($myExtendClassName = "${glBehaviorWritableAbstractName}")
 #else
-  #set ($myExtendClassName = "${glBehaviorReadableInterfaceName}")
+  #set ($myExtendClassName = "${glBehaviorReadableAbstractName}")
 #end
 
 namespace ${glPackageExtendedBhv} {
 
     /// <summary>
-    /// The behavior-interface of ${table.Name}. (partial class for auto-generation)
+    /// The behavior of ${table.Name}. (partial class for auto-generation)
     /// Author : ${database.ClassAuthor}
     /// </summary>
-    public partial interface ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName} {
+    [Implementation]
+    public partial class ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        #region Attribute
+        /// <summary>Dao instance.</summary>
+        [Binding("${table.daoComponentName}")]
+        protected ${myExtendedDaoClassName} _dao;
+        #endregion
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        #region Constructor
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ${myClassName}() {
+        }
+        #endregion
+
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        #region Table Name
+        /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        public override String TableDbName {
+            get { return "${table.Name}"; }
+        }
+        #endregion
 
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
         #region DBMeta
         /// <summary>
+        /// ${database.ImplementComment}
+        /// </summary>
+        public override ${glDBMetaInterfaceName} DBMeta {
+            get { return ${myDBMetaClassName}.GetInstance(); }
+        }
+
+        /// <summary>
         /// The property of my dbmeta.
         /// </summary>
-        ${myDBMetaClassName} MyDBMeta { get; }
+        public ${myDBMetaClassName} MyDBMeta {
+            get { return ${myDBMetaClassName}.GetInstance(); }
+        }
         #endregion
 
         // ===============================================================================
@@ -42,71 +85,320 @@ namespace ${glPackageExtendedBhv} {
         //                                                                    ============
         #region New Instance
         /// <summary>
+        /// New entity.
+        /// </summary>
+        /// <returns>Entity. (NotNull)</returns>
+        public override ${glEntityInterfaceName} NewEntity() {
+            return NewMyEntity();
+        }
+
+        /// <summary>
+        /// New condition-bean.
+        /// </summary>
+        /// <returns>Condition-bean. (NotNull)</returns>
+        public override ${glConditionBeanInterfaceName} NewConditionBean() {
+            return NewMyConditionBean();
+        }
+
+        /// <summary>
         /// New my entity.
         /// </summary>
         /// <returns>My condition-bean. (NotNull)</returns>
-        ${myExtendedObjectClassName} NewMyEntity();
+        public ${myExtendedObjectClassName} NewMyEntity() {
+            return new ${myExtendedObjectClassName}();
+        }
 
         /// <summary>
         /// New my condition-bean.
         /// </summary>
         /// <returns>My condition-bean. (NotNull)</returns>
-        ${myConditionBeanClassName} NewMyConditionBean();
+        public ${myConditionBeanClassName} NewMyConditionBean() {
+            return new ${myConditionBeanClassName}();
+        }
+        #endregion
+
+        // ===============================================================================
+        //                                                                 Delegate Method
+        //                                                                 ===============
+        #region Delegate Method
+        /// <summary>
+        /// Select all list. (Delegate-Method)
+        /// </summary> 
+        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        protected int DelegateGetCountAll() {
+            return this.Dao.GetCountAll();
+        }
+
+        /// <summary>
+        /// Select all list. (Delegate-Method)
+        /// </summary> 
+        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        protected System.Collections.Generic.IList<${myExtendedObjectClassName}> DelegateGetListAll() {
+            return this.Dao.GetListAll();
+        }
+
+        /// <summary>
+        /// Select all list. (Delegate-Method)
+        /// </summary> 
+        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        protected System.Collections.Generic.IList<${myExtendedObjectClassName}> DelegateSelectListAll() {// for saving compatible
+            return this.Dao.GetListAll();
+        }
+
+#if ($table.hasPrimaryKey())
+        //
+        // Get entity. (Delegate-Method)
+        // 
+        // @param Primary-keys (NotNull)
+        // @return Entity. (NotNull)
+        //
+        protected ${myExtendedObjectClassName} DelegateGetEntity(${table.PrimaryKeyArgsString}) {
+            return this.Dao.GetEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()});
+        }
+#end
+
+        /// <summary>
+        /// Select count by condition-bean. (Delegate-Method)
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Selected count. (NotNull)</returns>
+        protected int DelegateSelectCount(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.Dao.SelectCount(cb);
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Selected count. (NotNull)</returns>
+        protected override int DoCallReadCount(${glConditionBeanInterfaceName} cb) {
+            return this.DelegateSelectCount((${myConditionBeanClassName})cb);
+        }
+
+        /// <summary>
+        /// Select entity by condition-bean. (Delegate-Method)
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
+        protected ${myExtendedObjectClassName} DelegateSelectEntity(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.Dao.SelectEntity(cb);
+        }
+
+        /// <summary>
+        /// Select list by condition-bean. (Delegate-Method)
+        /// </summary> 
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        protected System.Collections.Generic.IList<${myExtendedObjectClassName}> DelegateSelectList(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.Dao.SelectList(cb);
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary> 
+        /// <returns>Selected all count. If the select result is zero, it returns empty list. (NotNull)</returns>
+        protected override int DoCallGetCountAll() {
+            return this.DelegateGetCountAll();
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary> 
+        /// <returns>Selected all list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        protected override System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallGetListAll() {
+            return (System.Collections.Generic.IList<${glEntityInterfaceName}>)this.DelegateGetListAll();
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
+        protected override ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb) {
+            return this.DelegateSelectEntity((${myConditionBeanClassName})cb);
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary> 
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
+        protected override System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb) {
+            return (System.Collections.Generic.IList<${glEntityInterfaceName}>)this.DelegateSelectList((${myConditionBeanClassName})cb);
+        }
+
+#if ($table.isUseSequence())
+        /// <summary>
+        /// Select next value as sequence. (Delegate-Method)
+        /// </summary>
+        /// <returns>Next value. (NotNull)</returns>
+        protected int DelegateSelectNextVal() {
+            return this.Dao.SelectNextVal();
+        }
+#end
+
+    #if ($table.isWritable())
+
+        /// <summary>
+        /// Insert one entity. (Delegate-Method)
+        /// </summary>
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <returns>Inserted count.</returns>
+        protected int DelegateInsert(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+            FilterEntityOfInsert(entity);
+            AssertEntityOfInsert(entity);
+            return this.Dao.Insert(entity);
+        }
+
+        /// <summary>
+        /// Update one entity. (Delegate-Method)
+        /// </summary>
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        protected int DelegateUpdate(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            FilterEntityOfUpdate(entity);
+            AssertEntityOfUpdate(entity);
+            return this.Dao.Update(entity);
+        }
+
+        /// <summary>
+        /// Delete one entity. (Delegate-Method)
+        /// </summary>
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <returns>Deleted count.</returns>
+        protected int DelegateDelete(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
+            FilterEntityOfDelete(entity);
+            AssertEntityOfDelete(entity);
+            return this.Dao.Delete(entity);
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary>
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <returns>Inserted count.</returns>
+        protected override int DoCallCreate(${glEntityInterfaceName} entity) {
+            return this.DelegateInsert((${myExtendedObjectClassName})entity);
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary>
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <returns>Updated count.</returns>
+        protected override int DoCallModify(${glEntityInterfaceName} entity) {
+            return this.DelegateUpdate((${myExtendedObjectClassName})entity);
+        }
+
+        /// <summary>
+        /// ${database.OverrideComment}
+        /// </summary>
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <returns>Deleted count.</returns>
+        protected override int DoCallRemove(${glEntityInterfaceName} entity) {
+            return this.DelegateDelete((${myExtendedObjectClassName})entity);
+        }
+
+    #end
+
         #endregion
 
         // ===============================================================================
         //                                                                    Basic Select
         //                                                                    ============
         #region Basic Select
+
         /// <summary>
         /// Select count by condition-bean.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected count. (NotNull)</returns>
-        int SelectCount(${myConditionBeanClassName} cb);
+        public int SelectCount(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.DelegateSelectCount(cb);
+        }
 
         /// <summary>
         /// Select entity by condition-bean.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Entity that is selected from database. (Nullable: If the entity does not exist, returns null)</returns>
+        /// <returns>Selected entity. (Nullalble)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
-        ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb);
+        public ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            System.Collections.Generic.IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
+            if (ls.Count == 0) {
+                return null;
+            }
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
+            return (${myExtendedObjectClassName})ls[0];
+        }
 
         /// <summary>
         /// Select entity by condition-bean with deleted check.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull: If the entity does not exist, throws exception)</param>
-        /// <returns>Entity that is selected from database. (NotNull)</returns>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
+        /// <returns>Selected entity. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        public ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            System.Collections.Generic.IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
+            AssertRecordHasNotBeenDeleted(ls, cb);
+            AssertRecordHasBeenSelectedAsOne(ls, cb);
+            return (${myExtendedObjectClassName})ls[0];
+        }
 
 #if ($table.hasPrimaryKey())
-        ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString});
+// TODO: @jflute
+//        public ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
+//            ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+//            ${table.getPrimaryKeyArgsSetupStringCSharp('entity')}
+//            ${myConditionBeanClassName} cb = NewMyConditionBean();
+//            cb.AcceptPrimaryKeyMapString(entity.ExtractPrimaryKeyMapString());
+//            return this.SelectEntityWithDeletedCheck(cb);
+//        }
 #end
 
         /// <summary>
-        /// Select list as result-bean.
+        /// Select list.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
-        ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+        /// <exception cref="${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}"></exception>
+        public ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return new ResultBeanBuilder<${myExtendedObjectClassName}>(this).BuildListResultBean(cb, this.DelegateSelectList(cb));
+        }
 
         /// <summary>
-        /// Select page as result-bean.
+        /// Select page.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected page. (NotNull)</returns>
-        ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName});
+        public ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
+            AssertConditionBeanNotNull(cb);
+            return this.SelectPage(cb, new SelectPageSimpleInvoker<${myExtendedObjectClassName}>(this));
+        }
 
         /// <summary>
-        /// Select page as result-bean.
+        /// Select page.
         /// </summary>
-        /// <param name="${glAttachedCBArgsVariableName}">Condition-bean. (NotNull)</param>
+        /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} ${glAttachedCBArgsVariableName}, SelectPageInvoker<${myExtendedObjectClassName}> invoker);
+        public ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb, SelectPageInvoker<${myExtendedObjectClassName}> invoker) {
+            AssertConditionBeanNotNull(cb);
+            return invoker.InvokeSelectPage(new SelectPageSimpleCallback<${myExtendedObjectClassName}>(cb, this));
+        }
+
         #endregion
 
 #if (${table.hasOnlyOnePrimaryKey()})
@@ -115,14 +407,16 @@ namespace ${glPackageExtendedBhv} {
         //                                                                    ============
         #region Load Referer
   #foreach ($referer in $table.refererList)
-    #set ($refererTable = $referer.table)
+    #set ($refererTable = $referer.Table)
     #set ($refererEntityClassName = "${glProjectPrefix}${refererTable.JavaName}")
     #set ($refererDaoClassName = "${refererEntityClassName}Dao")
+    #set ($refererBhvClassName = "")
     #set ($refererBhvClassName = "${refererEntityClassName}Bhv")
     #set ($refererCBClassName = "${refererEntityClassName}${glConditionBeanInitialName}")
-    #set ($refererVariableName = "${glChildrenVariablePrefix}${referer.refererPropertyNameInitCap}")
+    #set ($refererVariableName = "${glChildrenVariablePrefix}${referer.ReffererPropertyNameInitCap}")
     #set ($refererEntityLongClassName = "${glPackageExtendedEntity}.${refererEntityClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, java.util.List<${refererEntityClassName}>")
+    #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, System.Collections.Generic.IList<${refererEntityClassName}>")
 
         // /* * * * * * * * * * * * * * * * * * * * * * *
         //   RefererTable    = [${referer.table.name}]
@@ -130,15 +424,58 @@ namespace ${glPackageExtendedBhv} {
         // * * * * * * * * */
 
         /// <summary>
-        /// Load referer of ${referer.refererPropertyName}.
+        /// Load referer of ${referer.ReffererPropertyName}.
         /// </summary>
-        /// <param name="ls">The list of entity. (NotNull)</param>
+        /// <param name="ls">Entity list of main table. (NotNull)</param>
         /// <param name="conditionBeanSetupper">The condition-bean setupper of referer. (NotNull)</param>
-        void Load${referer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper);
+        public void Load${referer.ReffererPropertyNameInitCap}(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper) {
+            AssertObjectNotNull("ls", ls);
+            AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+            if (ls.Count == 0) {
+                return;
+            }
+
+            System.Collections.Generic.IDictionary<${genericPKMyEntityMap}> pkMyEntityMap = new System.Collections.Generic.Dictionary<${genericPKMyEntityMap}>();
+            System.Collections.Generic.IList<${table.getPrimaryKeyJavaNativeAsOne()}> pkList = new System.Collections.Generic.List<${table.getPrimaryKeyJavaNativeAsOne()}>();
+            foreach (${myExtendedObjectClassName} entity in ls) {
+                pkList.Add(entity.${table.getPrimaryKeyJavaNameAsOne()});
+                if (pkMyEntityMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
+                    pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
+                }
+            }
+            ${refererBhvClassName} refererBhv = this.BehaviorSelector.Select<${refererBhvClassName}>(typeof(${refererBhvClassName}));
+            ${refererCBClassName} cb = refererBhv.NewMyConditionBean();
+            cb.Query().Set${referer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+            cb.Query().AddOrderBy_${referer.getLocalColumnJavaNameAsOne()}_Asc();
+            conditionBeanSetupper.Setup(cb);
+            System.Collections.Generic.IList<${refererEntityClassName}> refererList = refererBhv.SelectList(cb);
+
+            System.Collections.Generic.IDictionary<${genericPKChildListMap}> pkRefererListMap = new System.Collections.Generic.Dictionary<${genericPKChildListMap}>();
+            foreach (${refererEntityClassName} reffererEntity in refererList) {
+                if (!pkRefererListMap.ContainsKey(reffererEntity.${referer.getLocalColumnJavaNameAsOne()})) {
+                    pkRefererListMap.Add(reffererEntity.${referer.getLocalColumnJavaNameAsOne()}, new System.Collections.Generic.List<${refererEntityClassName}>());
+                }
+                ((System.Collections.Generic.IList<${refererEntityClassName}>)pkRefererListMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}]).Add(reffererEntity);
+
+                // for Reverse Reference.
+                ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}];
+                reffererEntity.${referer.ForeignPropertyNameInitCap} = myEntity;
+            }
+
+            foreach (${myExtendedObjectClassName} entity in ls) {
+                if (pkRefererListMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
+                    entity.${referer.ReffererPropertyNameInitCap} = (System.Collections.Generic.IList<${refererEntityClassName}>)pkRefererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
+                } else {
+                    entity.${referer.ReffererPropertyNameInitCap} = new System.Collections.Generic.List<${refererEntityClassName}>();
+                }
+            }
+        }
+
   #end
 
         #endregion
 #end
+
 #if ($table.isWritable())
         // ===============================================================================
         //                                                             Basic Entity Update
@@ -148,39 +485,82 @@ namespace ${glPackageExtendedBhv} {
         /// Insert.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        void Insert(${myExtendedObjectClassName} entity);
+        public void Insert(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            this.DelegateInsert(entity);
+        }
 
         /// <summary>
-        /// Update. {modified only}
-        /// If it updates count zero, throws exception.
-        /// If concurrency control of this table is valid, this update have it.
-        /// So then the entity of argument should have the value of concurrency column.
+        /// Update.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}"></exception>
-        void Update(${myExtendedObjectClassName} entity);
+        public void Update(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            int updatedCount = this.DelegateUpdate(entity);
+            if (updatedCount != 1) {
+                throw new Seasar.Dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
+            }
+        }
 
         /// <summary>
-        /// Update non-strictly. {modified only}
-        /// This update ignores concurrency control.
-        /// So if the entity of argument have the value of concurrency column, it is ignored.
+        /// Insert or update.
         /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}"></exception>
-        // void UpdateNonstrict(${myExtendedObjectClassName} entity);
+        /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+// TODO: @jflute - In development
+//        public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
+//            AssertEntityNotNull(entity);
+//            if (!entity.HasPrimaryKeyValue) {
+//                this.Insert(entity);
+//                return;
+//            }
+//            try {
+//                this.Update(entity);
+//            } catch (Exception) {
+//                this.Insert(entity);
+//                return;
+//            }
+//        }
 
         /// <summary>
         /// Delete.
         /// </summary>
         /// <param name="entity"> Entity. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}"></exception>
-        void Delete(${myExtendedObjectClassName} entity);
+        public void Delete(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            this.DelegateDelete(entity);
+        }
         #endregion
 #end
+
+        protected void AssertRecordHasNotBeenDeleted(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, Object searchKey4log) {
+            if (ls == null || ls.Count == 0) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            }
+        }
+
+        protected void AssertRecordHasBeenSelectedAsOne(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, Object searchKey4log) {
+            if (ls == null || ls.Count == 0) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+            }
+            if (ls.Count != 1) {
+                String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
+                msg = msg + " resultCount=" + ls.Count;
+                throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+            }
+        }
+
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        #region Accessor
+        public ${myExtendedDaoClassName} Dao {
+            get { return _dao; }
+            set { _dao = value; }
+        }
+        #endregion
     }
 }

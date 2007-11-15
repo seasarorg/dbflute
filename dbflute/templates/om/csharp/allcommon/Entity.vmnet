@@ -16,19 +16,14 @@ namespace ${glPackageBaseCommon} {
         //                                                                             TableName
         //                                                                             =========
         /// <summary>
-        /// The property of table db-Name. (readonly)
+        /// The property of table db-name. (readonly)
         /// </summary>
         String TableDbName { get; }
 
         /// <summary>
-        /// The property of table cap-prop-Name. (readonly)
+        /// The property of table property-name. (readonly)
         /// </summary>
-        String TableCapPropName { get; }
-
-        /// <summary>
-        /// The property of table uncap-prop-Name. (readonly)
-        /// </summary>
-        String TableUncapPropName { get; }
+        String TablePropertyName { get; }
 
         // =====================================================================================
         //                                                                                DBMeta
@@ -37,30 +32,6 @@ namespace ${glPackageBaseCommon} {
         /// The property of DBMeta. (readonly)
         /// </summary>
         ${glDBMetaInterfaceName} DBMeta { get; }
-
-        // =====================================================================================
-        //                                                                     Accept Map-String
-        //                                                                     =================
-        /// <summary>
-        /// Accept primary-key map.
-        /// </summary>
-        /// <param name="primaryKeyMap">Primary-key map. (NotNull and NotEmpty)</param>
-        void AcceptPrimaryKeyMap(System.Collections.Generic.IDictionary<String, Object> primaryKeyMap);
-
-        /// <summary>
-        /// Accept primary-key map-string.
-        /// </summary>
-        /// <param name="primaryKeyMapString">Primary-key map-string. (NotNull)</param>
-        void AcceptPrimaryKeyMapString(String primaryKeyMapString);
-
-        // =====================================================================================
-        //                                                                    Extract Map-String
-        //                                                                    ==================
-        /// <summary>
-        /// Extract primary-key map-string. Delimiter is atmark and semicolon {@;}.
-        /// </summary>
-        /// <returns>Primary-key map-string.</returns>
-        String ExtractPrimaryKeyMapString();
 
         // =====================================================================================
         //                                                                         Determination

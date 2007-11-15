@@ -1,4 +1,3 @@
-
 #set ($myClassName = "${glDBMetaInstanceHandlerName}")
 #set ($instanceMapGenericDefinition = "String, ${glDBMetaInterfaceName}")
 
@@ -7,52 +6,49 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommonDBMeta} {
 
-    /// <sumarry>
+    /// <summary>
     /// DBMeta instance handler.
     /// Author : ${database.ClassAuthor}
     public class ${myClassName} {
 
-        /// <sumarry>Table db-name instance map.</sumarry>
+        /// <summary>Table db-name instance map.</summary>
         protected static readonly IDictionary<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap;
 
-        /// <sumarry>Table cap-prop-name instance map.</sumarry>
-        protected static readonly IDictionary<String, ${glDBMetaInterfaceName}> _tableCapPropNameInstanceMap;
+        /// <summary>Table db-name property-name to-lower-map.</summary>
+        protected static readonly IDictionary<String, String> _tableDbNamePropertyNameKeyToLowerMap;
 
-        /// <sumarry>Table uncap-prop-name instance map.</sumarry>
-        protected static readonly IDictionary<String, ${glDBMetaInterfaceName}> _tableUncapPropNameInstanceMap;
+        /// <summary>Table property-name db-name to-lower-map.</summary>
+        protected static readonly IDictionary<String, String> _tablePropertyNameDbNameKeyToLowerMap;
 
         static ${myClassName}() {
             {
                 IDictionary<String, ${glDBMetaInterfaceName}> tmpMap = new Dictionary<String, ${glDBMetaInterfaceName}>();
 
-    #foreach ($table in $database.Tables)
-
-                tmpMap.Add("${table.Name}", GetDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
-    #end
+#foreach ($table in $database.tables)
+                tmpMap.Add("${table.name}", GetDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+#end
 
                 _tableDbNameInstanceMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
 
             {
-                IDictionary<String, ${glDBMetaInterfaceName}> tmpMap = new Dictionary<String, ${glDBMetaInterfaceName}>();
+                IDictionary<String, String> tmpMap = new Dictionary<String, String>();
 
-    #foreach ($table in $database.Tables)
+#foreach ($table in $database.tables)
+                tmpMap.Add("${table.name}".ToLower(), "${table.javaBeansRulePropertyName}");
+#end
 
-                tmpMap.Add("${table.JavaName}", GetDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
-    #end
-
-                _tableCapPropNameInstanceMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
+                _tableDbNamePropertyNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
 
             {
-                IDictionary<String, ${glDBMetaInterfaceName}> tmpMap = new Dictionary<String, ${glDBMetaInterfaceName}>();
+                IDictionary<String, String> tmpMap = new Dictionary<String, String>();
 
-    #foreach ($table in $database.Tables)
+#foreach ($table in $database.tables)
+                tmpMap.Add("${table.javaName}".ToLower(), "${table.name}");
+#end
 
-                tmpMap.Add("${table.UncapitalisedJavaName}", GetDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
-    #end
-
-                _tableUncapPropNameInstanceMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
+                _tablePropertyNameDbNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
         }
 
@@ -84,12 +80,39 @@ namespace ${glPackageBaseCommonDBMeta} {
             return type;
         }
 
-        /// <sumarry>
+        /// <summary>
+        /// Find dbmeta by table flexible-name.
+        /// If the table name is 'ORDER_DETAIL', you can find the dbmeta by ...(as follows)
+        ///     'ORDER_DETAIL', 'ORDer_DeTAiL', 'order_detail'
+        ///   , 'OrderDetail', 'orderdetail', 'oRderDetaIl'
+        /// </summary>
+        /// <param name="tableFlexibleName">Table flexible-name. (NotNull and NotEmpty)</param>
+        /// <returns>DBMeta. (NotNull)</returns>
+        public static ${glDBMetaInterfaceName} FindDBMeta(String tableFlexibleName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+            if (_tableDbNameInstanceMap.ContainsKey(tableFlexibleName)) {
+                return ByTableDbName(tableFlexibleName);
+            }
+            String toLowerKey = tableFlexibleName.ToLower();
+            if (_tableDbNamePropertyNameKeyToLowerMap.ContainsKey(toLowerKey)) {
+                String propertyName = (String)_tableDbNamePropertyNameKeyToLowerMap[toLowerKey];
+                String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap[propertyName.ToLower()];
+                return ByTableDbName(dbName);
+            }
+            if (_tablePropertyNameDbNameKeyToLowerMap.ContainsKey(toLowerKey)) {
+                String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap[toLowerKey];
+                return ByTableDbName(dbName);
+            }
+            String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
+            throw new SystemException(msg);
+        }
+
+        /// <summary>
         /// Get instance by table db-name.
-        /// </sumarry> 
+        /// </summary>
         /// <param name="tableDbName">Table db-name. (NotNull)</param>
         /// <returns>Instance. (NotNull)</returns>
-        public static ${glDBMetaInterfaceName} GetInstanceByTableDbName(String tableDbName) {
+        protected static ${glDBMetaInterfaceName} ByTableDbName(String tableDbName) {
             AssertObjectNotNull("tableDbName", tableDbName);
             try {
                 return (${glDBMetaInterfaceName})_tableDbNameInstanceMap[tableDbName];
@@ -99,70 +122,12 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
         }
 
-        /// <sumarry>
-        /// Get instance by table cap-prop-name.
-        /// </sumarry> 
-        /// <param name="tableCapPropName">Table cap-prop-name. (NotNull)</param>
-        /// <returns>Instance. (NotNull)</returns>
-        public static ${glDBMetaInterfaceName} GetInstanceByTableCapPropName(String tableCapPropName) {
-            AssertObjectNotNull("tableCapPropName", tableCapPropName);
-            try {
-                return (${glDBMetaInterfaceName})_tableCapPropNameInstanceMap[tableCapPropName];
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The tableCapPropNameInstanceMap didn't contain the key of '" + tableCapPropName + "': ";
-                throw new ArgumentOutOfRangeException(msg + _tableCapPropNameInstanceMap, e);
-            }
-        }
-
-        /// <sumarry>
-        /// Get instance by table uncap-prop-name.
-        /// </sumarry> 
-        /// <param name="tableUncapPropName">Table uncap-prop-name. (NotNull)</param>
-        /// <returns>Instance. (NotNull)</returns>
-        public static ${glDBMetaInterfaceName} GetInstanceByTableUncapPropName(String tableUncapPropName) {
-            AssertObjectNotNull("tableUncapPropName", tableUncapPropName);
-            try {
-                return (${glDBMetaInterfaceName})_tableUncapPropNameInstanceMap[tableUncapPropName];
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The tableUncapPropNameInstanceMap didn't contain the key of '" + tableUncapPropName + "': ";
-                throw new ArgumentOutOfRangeException(msg + _tableUncapPropNameInstanceMap, e);
-            }
-        }
-
-        /// <sumarry>
-        /// Get instance by table multi-name.
-        /// </sumarry> 
-        /// <param name="tableMultiName">Table multi-name. (NotNull)</param>
-        /// <returns>Instance. (NotNull)</returns>
-        public static ${glDBMetaInterfaceName} GetInstanceByTableMultiName(String tableMultiName) {
-            AssertObjectNotNull("tableMultiName", tableMultiName);
-            
-            try {
-                return (${glDBMetaInterfaceName})_tableDbNameInstanceMap[tableMultiName];
-            } catch (System.Collections.Generic.KeyNotFoundException) {
-            }
-            try {
-                return (${glDBMetaInterfaceName})_tableCapPropNameInstanceMap[tableMultiName];
-            } catch (System.Collections.Generic.KeyNotFoundException) {
-            }
-            try {
-                return (${glDBMetaInterfaceName})_tableUncapPropNameInstanceMap[tableMultiName];
-            } catch (System.Collections.Generic.KeyNotFoundException) {
-            }
-
-            String msg = "The tableMultiName does not exist in all-instance-map: tableMultiName=" + tableMultiName;
-            msg = msg + " tableDbNameInstanceMap=" + Seasar.Framework.Util.ToStringUtil.ToString(_tableDbNameInstanceMap);
-            msg = msg + " tableCapPropNameInstanceMap=" + Seasar.Framework.Util.ToStringUtil.ToString(_tableCapPropNameInstanceMap);
-            msg = msg + " tableUncapPropNameInstanceMap=" + Seasar.Framework.Util.ToStringUtil.ToString(_tableUncapPropNameInstanceMap);
-            throw new ArgumentOutOfRangeException(msg);
-        }
-
         // ----------------------------------------------------------------
         //                                                  Assert Argument
         //                                                  ---------------
-        /// <sumarry>
+        /// <summary>
         /// Assert that the object is not null.
-        /// </sumarry> 
+        /// </summary> 
         /// <param name="variableName">Variable name. (NotNull)</param>
         /// <param name="arg">Argument. (NotNull)</param>
         protected static void AssertObjectNotNull(String variableName, Object arg) {
@@ -175,5 +140,25 @@ namespace ${glPackageBaseCommonDBMeta} {
                 throw new ArgumentNullException(msg);
             }
         }
+
+        // ----------------------------------------------------------------
+        //                                                    Assert String
+        //                                                    -------------
+        #region Assert Argument
+        protected static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+            if (variableName == null) {
+                String msg = "Variable[variableName] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (value == null) {
+                String msg = "Variable[" + variableName + "] should not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            if (value.Trim().Length == 0) {
+                String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
+                throw new ArgumentOutOfRangeException(msg);
+            }
+        }
+        #endregion
     }
 }

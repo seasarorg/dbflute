@@ -20,4 +20,6 @@ public interface DfLanguageDependencyInfo {
     public LanguageMetaData createLanguageMetaData();
 
     public String getDefaultSourceDirectory();
+    
+    public String getIntegerConvertExpression(String value);
 }
