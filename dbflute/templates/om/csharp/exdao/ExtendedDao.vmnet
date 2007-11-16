@@ -5,10 +5,6 @@ using System.Collections;
 
 namespace ${myExtendedDaoPackageName} {
 
-    /// <summary>
-    /// The dao interface of ${table.Name}. (partial interface for customizing)
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     partial interface ${myClassName} {
     }
 }

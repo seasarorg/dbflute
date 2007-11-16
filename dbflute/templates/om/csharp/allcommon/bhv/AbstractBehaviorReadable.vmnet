@@ -74,9 +74,9 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                   Basic Get All
         //                                                                   =============
-	    public int GetCountAll() {
-	        return this.CallGetCountAll();
-	    }
+        public int GetCountAll() {
+            return this.CallGetCountAll();
+        }
 
         // ===============================================================================
         //                                                                    Basic Select
@@ -92,15 +92,15 @@ namespace ${glPackageBaseCommonBhv} {
             if (ls.Count == 0) {
                 return null;
             }
-            AssertRecordHasBeenSelectedAsOne(ls, cb);
+            AssertEntitySelectedAsOne(ls, cb);
             return (${glEntityInterfaceName})ls[0];
         }
 
         public ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
             IList<${glEntityInterfaceName}> ls = this.CallReadList(cb);
-            AssertRecordHasNotBeenDeleted(ls, cb);
-            AssertRecordHasBeenSelectedAsOne(ls, cb);
+            AssertEntityNotDeleted(ls, cb);
+            AssertEntitySelectedAsOne(ls, cb);
             return (${glEntityInterfaceName})ls[0];
         }
 
@@ -122,23 +122,23 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                     Assert Result
         //                                     -------------
-        protected static void AssertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
+        protected static void AssertEntityNotDeleted(${glEntityInterfaceName} entity, Object searchKey4log) {
             if (entity == null) {
-                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                String msg = "The entity has already been deleted by other thread: searchKey=" + searchKey4log;
                 throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
             }
         }
 
-        protected static void AssertRecordHasNotBeenDeleted(IList<${glEntityInterfaceName}> ls, Object searchKey4log) {
+        protected static void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4log) where ENTITY_TYPE : ${glEntityInterfaceName} {
             if (ls == null || ls.Count == 0) {
-                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                String msg = "The entity has already been deleted by other thread: searchKey=" + searchKey4log;
                 throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
             }
         }
 
-        protected static void AssertRecordHasBeenSelectedAsOne(IList<${glEntityInterfaceName}> ls, Object searchKey4log) {
+        protected static void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4log) where ENTITY_TYPE : ${glEntityInterfaceName} {
             if (ls == null || ls.Count == 0) {
-                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                String msg = "The entity has already been deleted by other thread: searchKey=" + searchKey4log;
                 throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
             }
             if (ls.Count != 1) {

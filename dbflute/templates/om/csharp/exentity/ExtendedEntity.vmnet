@@ -5,10 +5,6 @@ using System.Collections;
 
 namespace ${myExtendedEntityPackageName} {
 
-    /// <summary>
-    /// The entity of ${table.Name}. (partial class for customizing)
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     partial class $myClassName {
     }
 }

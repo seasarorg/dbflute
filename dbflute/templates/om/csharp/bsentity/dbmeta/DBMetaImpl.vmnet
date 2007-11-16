@@ -22,17 +22,17 @@ namespace ${myDBMetaPackageName} {
 
     /// <summary>
     /// The dbmeta of ${table.Name}.
-    /// 
+    /// <![CDATA[
     /// [primary-key]
     ///     ${table.PrimaryKeyNameCommaString}
     /// 
     /// [all-columns]
     ///     ${table.ColumnNameCommaString}
     /// 
-    /// [foreign-property]
+    /// [foreign-table]
     ///     ${table.ForeignPropertyNameCommaString}
     /// 
-    /// [refferer-property]
+    /// [refferer-table]
     ///     ${table.ReferrerPropertyNameCommaString}
     /// 
     /// [sequence]
@@ -47,6 +47,7 @@ namespace ${myDBMetaPackageName} {
     /// [version-no]
     ///     ${table.VersionNoJavaName}
     /// 
+    /// ]]>
     /// Author: ${database.ClassAuthor}
     /// </summary>
     public class ${myClassName} : ${glDBMetaAbstractName} {
@@ -95,12 +96,6 @@ namespace ${myDBMetaPackageName} {
         /// <summary>Table property-name.</summary>
         public static readonly String TABLE_PROPERTY_NAME = "$table.c";
 
-        /// <summary>Table cap-prop-name.</summary>
-        public static readonly String TABLE_CAP_PROP_NAME = "$table.javaName";
-
-        /// <summary>Table uncap-prop-name.</summary>
-        public static readonly String TABLE_UNCAP_PROP_NAME = "$table.uncapitalisedJavaName";
-
         // -------------------------------------------------
         //                                    Column DB-Name
         //                                    --------------
@@ -115,22 +110,6 @@ namespace ${myDBMetaPackageName} {
 #foreach ($col in $table.columns)
         /// <summary>Property name of ${col.name}.</summary>
         public static readonly String PROPERTY_NAME_${col.name} = "$col.name";
-#end
-
-        // -------------------------------------------------
-        //                   Column Prop-Name(JavaBeansRule)
-        //                   -------------------------------
-#foreach ($col in $table.columns)
-        /// <summary>Cap-prop-name of ${col.javaName}.</summary>
-        public static readonly String CAP_PROP_NAME_${col.javaName} = "$col.javaName";
-#end
-
-        // -------------------------------------------------
-        //                            Column Uncap-Prop-Name
-        //                            ----------------------
-#foreach ($col in $table.columns)
-        /// <summary>Uncap-prop-name of ${col.uncapitalisedJavaName}.</summary>
-        public static readonly String UNCAP_PROP_NAME_${col.uncapitalisedJavaName} = "$col.uncapitalisedJavaName";
 #end
 
         // -------------------------------------------------
@@ -149,15 +128,15 @@ namespace ${myDBMetaPackageName} {
         public static readonly String REFERER_PROPERTY_NAME_${children.refererPropertyNameInitCap} = "$children.refererPropertyNameInitCap";
 #end
 
-        protected static readonly System.Collections.Generic.IDictionary<String, String> _dbNamePropertyNameKeyToLowerMap;
-        protected static readonly System.Collections.Generic.IDictionary<String, String> _propertyNameDbNameKeyToLowerMap;
+        // -------------------------------------------------
+        //                               DB-Property Mapping
+        //                               -------------------
+        protected static readonly IDictionary<String, String> _dbNamePropertyNameKeyToLowerMap;
+        protected static readonly IDictionary<String, String> _propertyNameDbNameKeyToLowerMap;
 
-        /// <summary>
-        /// Static Constructor.
-        /// </summary>
         static ${myClassName}() {
             {
-                System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
+                IDictionary<String, String> map = new Dictionary<String, String>();
                 map.Add(TABLE_DB_NAME.ToLower(), TABLE_PROPERTY_NAME);
 #foreach ($col in $table.columns)
                 map.Add(DB_NAME_${col.name}.ToLower(), PROPERTY_NAME_${col.name});
@@ -166,7 +145,7 @@ namespace ${myDBMetaPackageName} {
             }
 
             {
-                System.Collections.Generic.IDictionary<String, String> map = new System.Collections.Generic.Dictionary<String, String>();
+                IDictionary<String, String> map = new Dictionary<String, String>();
                 map.Add(TABLE_PROPERTY_NAME.ToLower(), TABLE_DB_NAME);
 #foreach ($col in $table.Columns)
                 map.Add(PROPERTY_NAME_${col.name}.ToLower(), DB_NAME_${col.name});
@@ -178,6 +157,14 @@ namespace ${myDBMetaPackageName} {
         #endregion
 
         // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        #region Table Name
+        public override String TableDbName { get { return TABLE_DB_NAME; } }
+        public override String TablePropertyName { get { return TABLE_PROPERTY_NAME; } }
+        #endregion
+
+        // ===============================================================================
         //                                                                        Name Map
         //                                                                        ========
         #region Name Map
@@ -185,7 +172,7 @@ namespace ${myDBMetaPackageName} {
         /// ${database.ImplementComment}
         /// </summary> 
         /// <returns>{db-name : property-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> DbNamePropertyNameKeyToLowerMap {
+        public override IDictionary<String, String> DbNamePropertyNameKeyToLowerMap {
             get { return _dbNamePropertyNameKeyToLowerMap; }
         }
 
@@ -193,29 +180,8 @@ namespace ${myDBMetaPackageName} {
         /// ${database.ImplementComment}
         /// </summary> 
         /// <returns>{property-name : db-name} map.</returns>
-        public override System.Collections.Generic.IDictionary<String, String> PropertyNameDbNameKeyToLowerMap {
+        public override IDictionary<String, String> PropertyNameDbNameKeyToLowerMap {
             get { return _propertyNameDbNameKeyToLowerMap; }
-        }
-        #endregion
-
-        // ===============================================================================
-        //                                                                      Table Name
-        //                                                                      ==========
-        #region Table Name
-        public override String TableDbName {
-            get { return TABLE_DB_NAME; }
-        }
-
-        public override String TablePropertyName {
-            get { return TABLE_PROPERTY_NAME; }
-        }
-
-        public override String TableCapPropName {
-            get { return TABLE_CAP_PROP_NAME; }
-        }
-
-        public override String TableUncapPropName {
-            get { return TABLE_UNCAP_PROP_NAME; }
         }
         #endregion
 
@@ -242,63 +208,50 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                     Object Type
         //                                                                     ===========
-        public override Type EntityType {
-            get { return ENTITY_TYPE; }
-        }
-
-        public override Type DaoType {
+        public override Type EntityType { get { return ENTITY_TYPE; } }
 #if (${isExistDao})
-            get { return DAO_TYPE; }
+        public override Type DaoType { get { return DAO_TYPE; } }
 #else
+        public override Type DaoType {
             get {
                 String msg = "The entity does not have dao. So this method is invalid.";
                 throw new SystemException(msg + " dbmeta=" + ToString());
             }
-#end
         }
-
-        public override Type ConditionBeanType {
+#end
 #if (${isExistConditionBean})
-            get { return CONDITION_BEAN_TYPE; }
+        public override Type ConditionBeanType { get { return CONDITION_BEAN_TYPE; } }
 #else
+        public override Type ConditionBeanType {
             get {
                 String msg = "The entity does not have condition-bean. So this method is invalid.";
                 throw new SystemException(msg + " dbmeta=" + ToString());
             }
-#end
         }
+#end
 
         // ===============================================================================
         //                                                                 Object Instance
         //                                                                 ===============
-        public override ${glEntityInterfaceName} NewEntity() {
-            return NewMyEntity();
-        }
-
-        public ${myExtendedObjectClassName} NewMyEntity() {
-            return new ${myExtendedObjectClassName}();
-        }
-
-        public override ${glConditionBeanInterfaceName} NewConditionBean() {
+        public override ${glEntityInterfaceName} NewEntity() { return NewMyEntity(); }
+        public ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
 #if (${isExistConditionBean})
-            return NewMyConditionBean();
+        public override ${glConditionBeanInterfaceName} NewConditionBean() { return NewMyConditionBean(); }
 #else
+        public override ${glConditionBeanInterfaceName} NewConditionBean() {
             String msg = "The entity does not have condition-bean. So this method is invalid.";
             throw new SystemException(msg + " dbmeta=" + ToString());
+        }
 #end
-        }
-
 #if (${isExistConditionBean})
-        public ${myConditionBeanClassName} NewMyConditionBean() {
-            return new ${myConditionBeanClassName}();
-        }
+        public ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
 #end
 
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        public override System.Collections.Generic.IList<${glColumnInfoName}> GetColumnInfoList() {
-            System.Collections.Generic.IList<${glColumnInfoName}> columnInfoList = new System.Collections.Generic.List<${glColumnInfoName}>();
+        public override IList<${glColumnInfoName}> GetColumnInfoList() {
+            IList<${glColumnInfoName}> columnInfoList = new List<${glColumnInfoName}>();
 #foreach ($col in $table.columns)
             columnInfoList.Add(Column${col.javaName});
 #end
@@ -306,9 +259,7 @@ namespace ${myDBMetaPackageName} {
         }
 
 #foreach ($col in $table.columns)
-        public ${glColumnInfoName} Column${col.javaName} {
-            get { return new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}); }
-        }
+        public ${glColumnInfoName} Column${col.javaName} { get { return new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}); } }
 #end
 
         // ===============================================================================
@@ -323,13 +274,8 @@ namespace ${myDBMetaPackageName} {
         // -------------------------------------------------
         //                                   Primary Element
         //                                   ---------------
-        public override bool HasPrimaryKey {
-            get { return ${table.hasPrimaryKey()}; }
-        }
-
-        public override bool HasTwoOrMorePrimaryKeys {
-            get { return ${table.hasTwoOrMorePrimaryKeys()}; }
-        }
+        public override bool HasPrimaryKey { get { return ${table.hasPrimaryKey()}; } }
+        public override bool HasTwoOrMorePrimaryKeys { get { return ${table.hasTwoOrMorePrimaryKeys()}; } }
 
         // ===============================================================================
         //                                                                   Relation Info
@@ -367,27 +313,18 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                   Sequence Info
         //                                                                   =============
-        public override bool HasSequence {
-            get { return ${table.isUseSequence()}; }
-        }
+        public override bool HasSequence { get { return ${table.isUseSequence()}; } }
 
         // ===============================================================================
         //                                                            Optimistic Lock Info
         //                                                            ====================
-        public override bool HasVersionNo {
-            get { return ${table.isUseVersionNo()}; }
-        }
-
-        public override bool HasUpdateDate {
-            get { return ${table.isUseUpdateDate()}; }
-        }
+        public override bool HasVersionNo { get { return ${table.isUseVersionNo()}; } }
+        public override bool HasUpdateDate { get { return ${table.isUseUpdateDate()}; } }
 
         // ===============================================================================
         //                                                              Common Column Info
         //                                                              ==================
-        public override bool HasCommonColumn {
-            get { return ${table.hasAllCommonColumn()}; }
-        }
+        public override bool HasCommonColumn { get { return ${table.hasAllCommonColumn()}; } }
 
         // ===============================================================================
         //                                                                  Foreign DBMeta
@@ -418,12 +355,12 @@ namespace ${myDBMetaPackageName} {
             return ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm.GetInstance();
         }
 #end
-#foreach ($refferer in $table.refererList)
-  #set ($reffererTable = $refferer.Table)
+#foreach ($referer in $table.refererList)
+  #set ($reffererTable = $referer.table)
   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
   #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
   #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
-  #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
+  #set ($reffererVariableName = "${glChildrenVariablePrefix}${referer.ReffererPropertyNameInitCap}")
   #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
   #if (${refferer.isOneToOne()})
 
@@ -431,8 +368,8 @@ namespace ${myDBMetaPackageName} {
         /// Get foreign dbmeta of ${foreignKeys.reffererPropertyNameInitCapAsOne}.
         /// </summary>
         /// <returns>Foreign DBMeta. (NotNull)</returns>
-        public ${glProjectPrefix}${refferer.Table.JavaName}Dbm GetForeignDBMeta_${refferer.reffererPropertyNameInitCapAsOne}() {
-            return ${glProjectPrefix}${refferer.Table.JavaName}Dbm.GetInstance();
+        public ${glProjectPrefix}${referer.Table.JavaName}Dbm GetForeignDBMeta_${referer.reffererPropertyNameInitCapAsOne}() {
+            return ${glProjectPrefix}${referer.Table.JavaName}Dbm.GetInstance();
         }
   #end
 #end

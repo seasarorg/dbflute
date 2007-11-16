@@ -20,8 +20,6 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                      ==========
         String TableDbName { get; }
         String TablePropertyName { get; }
-        String TableCapPropName { get; }
-        String TableUncapPropName { get; }
 
         // ===============================================================================
         //                                                                   Name Handling

@@ -2184,6 +2184,13 @@ public class Table implements IDMethod {
     }
 
     // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
+    public boolean hasOptimisticLock() {
+        return isUseUpdateDate() || isUseVersionNo();
+    }
+
+    // ===================================================================================
     //                                                                          UpdateDate
     //                                                                          ==========
     /**

@@ -56,10 +56,12 @@ public interface ${myClassName} {
      */
     public String getTablePropertyName();
 
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * Get table cap-prop-name. (Not JavaBeansRule)
      * 
      * @return Table cap-prop-name. (NotNull)
+     * @deprecated Please use getTablePropertyName()
      */
     public String getTableCapPropName();
 
@@ -67,8 +69,10 @@ public interface ${myClassName} {
      * Get table uncap-prop-name. (Not JavaBeansRule)
      * 
      * @return Table uncap-prop-name. (NotNull)
+     * @deprecated Please use getTablePropertyName()
      */
     public String getTableUncapPropName();
+#end
 
     // ===================================================================================
     //                                                                       Name Handling

@@ -12,31 +12,17 @@ namespace ${myBaseEntityPackageName} {
      */
     public class ${myClassName} {
 
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
-#foreach ($col in $table.Columns)
-        
-        /** The value of ${col.UncapitalisedJavaName}. */
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+#foreach ($col in $table.columns)
         protected ${col.JavaNative} _${col.UncapitalisedJavaName};
 #end
 
-        // =====================================================================================
-        //                                                                              Accessor
-        //                                                                              ========
-#foreach ($col in $table.Columns)
-
-        public ${col.JavaNative} ${col.JavaName} {
-            get { return _${col.UncapitalisedJavaName}; }
-            set { _${col.UncapitalisedJavaName} = value; }
-        }
-#end
-
-        // =====================================================================================
-        //                                                                        Basic Override
-        //                                                                        ==============
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
 #if ($table.hasPrimaryKey())
-
         /// <summary>
         /// ${database.OverrideComment}
         /// If the primary-key of the other is same as this one, returns true.
@@ -147,5 +133,16 @@ namespace ${myBaseEntityPackageName} {
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
         }
+
+
+        // =====================================================================================
+        //                                                                              Accessor
+        //                                                                              ========
+#foreach ($col in $table.columns)
+        public ${col.JavaNative} ${col.JavaName} {
+            get { return _${col.UncapitalisedJavaName}; }
+            set { _${col.UncapitalisedJavaName} = value; }
+        }
+#end
     }
 }

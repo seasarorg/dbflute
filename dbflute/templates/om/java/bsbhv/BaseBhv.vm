@@ -38,7 +38,7 @@ import ${glPackageCB}.*;
 
 
 /**
- * The behavior of ${table.Name}.
+ * The behavior of ${table.name}.
  * 
  * <pre>
  * [primary-key]
@@ -174,7 +174,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * New condition-bean.
+     * New conditionBean.
      * 
      * @return Condition-bean. (NotNull)
      */
@@ -192,254 +192,25 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * New my condition-bean.
+     * New my conditionBean.
      * 
-     * @return My condition-bean. (NotNull)
+     * @return My conditionBean. (NotNull)
      */
     public ${myConditionBeanClassName} newMyConditionBean() {
         return new ${myConditionBeanClassName}();
     }
 
     // ===================================================================================
-    //                                                                     Delegate Method
-    //                                                                     ===============
-    // -----------------------------------------------------
-    //                                                Select
-    //                                                ------
-    /**
-     * Get count as all. {delegate method}
-     * 
-     * @return All count. (NotNull)
-     */
-    ${database.behaviorDelegateModifier} int delegateGetCountAll() {
-        return getMyDao().getCountAll();
-    }
-
-    /**
-     * Get list as all. {delegate method}
-     * 
-     * @return All list. (NotNull)
-     */
-    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateGetListAll() {
-        return getMyDao().getListAll();
-    }
-#if ($table.hasPrimaryKey())
-
-    //
-    // Get entity. {delegate method}
-    // 
-    // @param Primary-keys (NotNull)
-    // @return Entity. (NotNull)
-    //
-    ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateGetEntity(${table.PrimaryKeyArgsString}) {
-        return getMyDao().getEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()});
-    }
-#end
-
-    /**
-     * Select count by condition-bean. {delegate method}
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected count. (NotNull)
-     */
-    ${database.behaviorDelegateModifier} int delegateSelectCount(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        return getMyDao().selectCount(cb);
-    }
-
-    /**
-     * Select entity by condition-bean. {delegate method}
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected entity. If the select result is zero, it returns null. (Nullable)
-     */
-    ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateSelectEntity(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        return getMyDao().selectEntity(cb);
-    }
-
-    /**
-     * Select list by condition-bean. {delegate method}
-     * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
-     */
-    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
-        assertConditionBeanNotNull(cb);
-        return getMyDao().selectList(cb);
-    }
-
-#if ($table.isUseSequence())
-    /**
-     * Select next value as sequence. {delegate method}
-     * 
-     * @return Next value. (NotNull)
-     */
-    ${database.behaviorDelegateModifier} ${table.sequenceReturnType} delegateSelectNextVal() {
-        return getMyDao().selectNextVal();
-    }
-#end
-
-#if ($table.isWritable())
-    // -----------------------------------------------------
-    //                                                Update
-    //                                                ------
-    /**
-     * Insert one entity. {delegate method}
-     * 
-     * @param entity Entity. (NotNull)
-     * @return Inserted count.
-     */
-    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
-        if (!processBeforeInsert(entity)) { return 1;/*as Normal End*/ }
-        return getMyDao().insert(entity);
-    }
-
-    /**
-     * Update one entity. {delegate method & modified only}
-     * 
-     * @param entity Entity. (NotNull)
-     * @return Updated count.
-     */
-    ${database.behaviorDelegateModifier} int delegateUpdate(${myExtendedObjectClassName} entity) {
-        if (!processBeforeUpdate(entity)) { return 1;/*as Normal End*/ }
-        return getMyDao().updateModifiedOnly(entity);
-    }
-
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
-    /**
-     * Update one entity non-strictly. {delegate method & modified only}
-     * 
-     * @param entity Entity. (NotNull)
-     * @return Updated count.
-     */
-    ${database.behaviorDelegateModifier} int delegateUpdateNonstrict(${myExtendedObjectClassName} entity) {
-        if (!processBeforeUpdate(entity)) { return 1;/*as Normal End*/ }
-        return getMyDao().updateNonstrictModifiedOnly(entity);
-    }
-#end
-
-    /**
-     * Delete one entity. {delegate method}
-     * 
-     * @param entity Entity. (NotNull)
-     * @return Deleted count.
-     */
-    ${database.behaviorDelegateModifier} int delegateDelete(${myExtendedObjectClassName} entity) {
-        if (!processBeforeDelete(entity)) { return 1;/*as Normal End*/ }
-        return getMyDao().delete(entity);
-    }
-
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
-    /**
-     * Delete one entity non-strictly. {delegate method}
-     * 
-     * @param entity Entity. (NotNull)
-     * @return Deleted count.
-     */
-    ${database.behaviorDelegateModifier} int delegateDeleteNonstrict(${myExtendedObjectClassName} entity) {
-        if (!processBeforeDelete(entity)) { return 1;/*as Normal End*/ }
-        return getMyDao().deleteNonstrict(entity);
-    }
-#end
-
-#set ($batchUpdateReturnType = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnType = "int[]")
-#else
-  #set ($batchUpdateReturnType = "int")
-#end
-
-    /**
-     * Insert several entities. {delegate method}
-     * 
-     * @param entityList Entity-list. (NotNull & NotEmpty)
-     * @return The array of inserted count.
-     */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        helpFilterBeforeInsertInternally(entityList);
-        return getMyDao().insertList(entityList);
-    }
-
-    /**
-     * Update several entities. {delegate method} <br />
-     * 
-     * @param entityList Entity-list. (NotNull & NotEmpty)
-     * @return The array of updated count.
-     */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        helpFilterBeforeUpdateInternally(entityList);
-        return getMyDao().updateList(entityList);
-    }
-
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
-    /**
-     * Update several entities non-strictly. {delegate method} <br />
-     * 
-     * @param entityList Entity-list. (NotNull & NotEmpty)
-     * @return The array of updated count.
-     */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        helpFilterBeforeUpdateInternally(entityList);
-        return getMyDao().updateListNonstrict(entityList);
-    }
-#end
-
-    /**
-     * Delete several entities. {delegate method}
-     * 
-     * @param entityList Entity-list. (NotNull & NotEmpty)
-     * @return The array of deleted count.
-     */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        helpFilterBeforeDeleteInternally(entityList);
-        return getMyDao().deleteList(entityList);
-    }
-
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
-    /**
-     * Delete several entities non-strictly. {delegate method}
-     * 
-     * @param entityList Entity-list. (NotNull & NotEmpty)
-     * @return The array of deleted count.
-     */
-    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        helpFilterBeforeDeleteInternally(entityList);
-        return getMyDao().deleteListNonstrict(entityList);
-    }
-#end
-#else
-  #if ($table.isAvailableNonPrimaryKeyWritable())
-
-    /**
-     * Insert one entity. {delegate method}
-     * 
-     * @param entity Entity. (NotNull)
-     * @return Inserted count.
-     */
-    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
-        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-        return getMyDao().insert(entity);
-    }
-  #end
-#end
-
-    // ===================================================================================
     //                                                                  Basic Select Count
     //                                                                  ==================
     /**
-     * Select count by condition-bean.
+     * Select the count by conditionBean.
      * <pre>
-     * If the argument 'condition-bean' is effective about fetch-scope,
+     * If the argument 'conditionBean' is effective about fetch-scope,
      * this method invoke select count ignoring the fetch-scope.
      * </pre>
-     * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
-     * @return Selected count.
+     * @param cb The conditionBean of ${myExtendedObjectClassName}. This conditionBean should not be set up about fetch-scope. (NotNull)
+     * @return The selected count.
      */
     public int selectCount(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
@@ -450,10 +221,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                 Basic Select Entity
     //                                                                 ===================
     /**
-     * Select entity by condition-bean.
+     * Select the entity by conditionBean.
      * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected entity. (Nullalble)
+     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The selected entity. (Nullalble)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
@@ -462,10 +233,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Select entity by condition-bean with deleted check.
+     * Select the entity by conditionBean with deleted check.
      * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected entity. (NotNull)
+     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The selected entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -476,10 +247,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
 #if ($table.hasPrimaryKey())
     /*
-     * Select entity with deleted check. {by primary-key}
+     * Select the entity with deleted check. {by primary-key}
      * 
      * @param primaryKey
-     * @return Selected entity. (NotNull)
+     * @return The selected entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -496,10 +267,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                   Basic Select List
     //                                                                   =================
     /**
-     * Select list as result-bean.
+     * Select the list as result-bean.
      * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected list-result-bean. (NotNull)
+     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The result-bean of selected list. (NotNull)
      */
     public ${glListResultBeanName}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
@@ -507,10 +278,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Select page as result-bean.
+     * Select the page as result-bean.
      * 
-     * @param cb Condition-bean. (NotNull)
-     * @return Selected paging-result-bean. (NotNull)
+     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The result-bean of selected page. (NotNull)
      */
     public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
@@ -518,11 +289,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Select page.
+     * Select the page as result-bean.
      * 
-     * @param cb Condition-bean. (NotNull)
-     * @param invoker Select-page-invoker (NotNull)
-     * @return Selected paging-result-bean. (NotNull)
+     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @param invoker The invoker of select-page. (NotNull)
+     * @return The result-bean of selected page. (NotNull)
      */
     public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb, SelectPageInvoker<${myExtendedObjectClassName}> invoker) {
         assertConditionBeanNotNull(cb);
@@ -538,11 +309,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                      Various Select
     //                                                                      ==============
     /**
-     * Select value-label list.
+     * Select the list of value-label.
      * 
-     * @param cb Condition-bean. (NotNull)
-     * @param valueLabelSetupper Value-label-setupper. (NotNull)
-     * @return Value-label list. (NotNull)
+     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @param valueLabelSetupper The setupper of value-label. (NotNull)
+     * @return The list of value-label. (NotNull)
      */
     public List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupperName}<${myExtendedObjectClassName}> valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
@@ -553,9 +324,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                            Sequence
     //                                                                            ========
     /**
-     * Select next value as sequence.
+     * Select the next value as sequence.
      * 
-     * @return Next value. (NotNull)
+     * @return The next value. (NotNull)
      */
     public ${table.sequenceReturnType} selectNextVal() {
         return delegateSelectNextVal();
@@ -623,7 +394,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
      *     - - - - - - - - - -/
      * 
-     *   The condition-bean that the setupper provides have settings before you touch it. It is as follows:
+     *   The conditionBean that the setupper provides have settings before you touch it. It is as follows:
      *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
      *     cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
      *     cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
@@ -661,7 +432,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(cbSetupper));
      *     - - - - - - - - - -/
      * 
-     *   The condition-bean that the setupper provides have settings before you touch it. It is as follows:
+     *   The conditionBean that the setupper provides have settings before you touch it. It is as follows:
      *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
      *     cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
      *     cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
@@ -732,26 +503,27 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                 Basic Entity Update
     //                                                                 ===================
     /**
-     * Insert.
+     * Insert the entity.
      * 
-     * @param ${myEntityVariableName} Entity. (NotNull)
+     * @param ${myEntityVariableName} The entity of insert target. (NotNull)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
         delegateInsert(${myEntityVariableName});
     }
 
+    @Override
     protected void doCreate(${glEntityInterfaceName} ${myEntityVariableName}) {
         insert((${myExtendedObjectClassName})${myEntityVariableName});
     }
 
     /**
-     * Update. {modified only} <br />
+     * Update the entity modified-only. <br />
      * If it updates count zero, throws exception. <br />
      * If concurrency control of this table is valid, this update have it. <br />
      * So then the entity of argument should have the value of concurrency column.
      * 
-     * @param ${myEntityVariableName} Entity. (NotNull)
+     * @param ${myEntityVariableName} The entity of update target. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -761,17 +533,18 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             public int callbackDelegateUpdate(${myExtendedObjectClassName} entity) { return delegateUpdate(entity); } });
     }
 
+    @Override
     protected void doModify(${glEntityInterfaceName} entity) {
         update((${myExtendedObjectClassName})entity);
     }
 
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+#if ($table.hasOptimisticLock())
     /**
-     * Update non-strictly. {modified only} <br />
+     * Update the entity non-strictly modified-only. <br />
      * This update ignores concurrency control. <br />
      * So if the entity of argument have the value of concurrency column, it is ignored.
      * 
-     * @param ${myEntityVariableName} Entity. (NotNull)
+     * @param ${myEntityVariableName} The entity of update target. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -781,6 +554,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
+    @Override
     protected void doModifyNonstrict(${glEntityInterfaceName} entity) {
 #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
         updateNonstrict((${myExtendedObjectClassName})entity);
@@ -789,7 +563,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Update after select. {modified only}
      * <pre>
@@ -799,7 +573,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
      *   : it does not throw optimistic lock exception. It can updates.
      * </pre>
-     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
+     * @param ${myEntityVariableName} The entity of update target. This must contain primary-key value at least. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
@@ -813,16 +587,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         mergeEntity(${myEntityVariableName}, currentEntity);
         update(currentEntity);
     }
-
-    protected void doModifyAfterSelect(${glEntityInterfaceName} entity) {
-        updateAfterSelect((${myExtendedObjectClassName})entity);
-    }
 #end
 
     /**
-     * Insert or update. {update: modified only}
+     * Insert or update the entity modified-only.
      * 
-     * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     * @param ${myEntityVariableName} The entity of insert or update target. This should contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -836,16 +606,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         });
     }
 
+    @Override
     protected void doCreateOrUpdate(${glEntityInterfaceName} ${myEntityVariableName}) {
         insertOrUpdate((${myExtendedObjectClassName})${myEntityVariableName});
     }
 
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
-#if ($database.isMakeRecentlyDeprecated())
+#if ($table.hasOptimisticLock())
+#if ($database.isMakeDeprecated())
     /**
-     * Insert or update non-strictly. {update: modified only}
+     * Insert or update the entity non-strictly modified-only.
      * 
-     * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     * @param ${myEntityVariableName} The entity of insert of update target. This should contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      * @deprecated Sorry! Please use insertOrUpdateNonstrict(). This method name is wrong name.
      */
@@ -855,9 +626,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     /**
-     * Insert or update non-strictly. {update: modified only}
+     * Insert or update the entity non-strictly modified-only.
      * 
-     * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
+     * @param ${myEntityVariableName} The entity of insert or update target. This should contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -869,6 +640,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
+    @Override
     protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity) {
 #if ($table.isUseUpdateDate() || $table.isUseVersionNo())
         insertOrUpdateNonstrict((${myExtendedObjectClassName})entity);
@@ -877,7 +649,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Insert or update after select. {update: modified properties only}
      * <pre>
@@ -910,13 +682,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         mergeEntity(${myEntityVariableName}, currentEntity);
         update(currentEntity);
     }
-
-    protected void doCreateOrModifyAfterSelect(${glEntityInterfaceName} entity) {
-        insertOrUpdateAfterSelect((${myExtendedObjectClassName})entity);
-    }
 #end
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * ${database.ImplementComment}
      * 
@@ -940,9 +708,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     /**
-     * Delete.
+     * Delete the entity.
      * 
-     * @param ${myEntityVariableName} Entity. (NotNull)
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -952,11 +720,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             public int callbackDelegateDelete(${myExtendedObjectClassName} entity) { return delegateDelete(entity); } });
     }
 
+    @Override
     protected void doRemove(${glEntityInterfaceName} ${myEntityVariableName}) {
         delete((${myExtendedObjectClassName})${myEntityVariableName});
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Delete after select.
      * <pre>
@@ -978,19 +747,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         selectEntityWithDeletedCheck(cb);
         delete(${myEntityVariableName});
     }
-
-    /**
-     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
-     * @deprecated Thie method is old style and has wrong performance. Please use delete().
-     */
-    protected void doRemoveAfterSelect(${glEntityInterfaceName} entity) {
-        deleteAfterSelect((${myExtendedObjectClassName})entity);
-    }
 #end
 
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+#if ($table.hasOptimisticLock())
     /**
-     * Delete non-strictly. <br />
+     * Delete the entity non-strictly. <br />
      * This delete ignores concurrency control.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
@@ -1003,7 +764,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Delete non-strictly ignoring deleted. <br />
+     * Delete the entity non-strictly ignoring deleted. <br />
      * This delete ignores concurrency control.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
@@ -1016,6 +777,12 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 
+#set ($batchUpdateReturnType = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnType = "int[]")
+#else
+  #set ($batchUpdateReturnType = "int")
+#end
 #set ($batchUpdateReturnValueMethod = "")
 #if ($database.isVersionAfter1047())
   #set ($batchUpdateReturnValueMethod = ".length")
@@ -1029,7 +796,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Batch insert the list. This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of inserted count.
      */
     public ${batchUpdateReturnType} batchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -1041,7 +808,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch update the list. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
@@ -1055,7 +822,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch update the list non-strictly. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
      */
     public ${batchUpdateReturnType} batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -1068,7 +835,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch delete the list. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
      */
@@ -1082,7 +849,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Batch delete the list non-strictly. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
      * 
-     * @param ${myEntityListVariableName} Entity-list. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
      */
     public ${batchUpdateReturnType} batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -1169,6 +936,77 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     // ===================================================================================
+    //                                                                     Delegate Method
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                                Select
+    //                                                ------
+    ${database.behaviorDelegateModifier} int delegateGetCountAll() { return getMyDao().getCountAll(); }
+    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateGetListAll() { return getMyDao().getListAll(); }
+#if ($table.hasPrimaryKey())
+    ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateGetEntity(${table.PrimaryKeyArgsString}) { return getMyDao().getEntity(${table.getPrimaryKeyUncapitalisedJavaNameCommaString()}); }
+#end
+    ${database.behaviorDelegateModifier} int delegateSelectCount(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectCount(cb); }
+    ${database.behaviorDelegateModifier} ${myExtendedObjectClassName} delegateSelectEntity(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectEntity(cb); }
+    ${database.behaviorDelegateModifier} List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) { assertConditionBeanNotNull(cb); return getMyDao().selectList(cb); }
+#if ($table.isUseSequence())
+    ${database.behaviorDelegateModifier} ${table.sequenceReturnType} delegateSelectNextVal() { return getMyDao().selectNextVal(); }
+#end
+#if ($table.isWritable())
+
+    // -----------------------------------------------------
+    //                                                Update
+    //                                                ------
+    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) { if (!processBeforeInsert(entity)) { return 1; } return getMyDao().insert(entity); }
+    ${database.behaviorDelegateModifier} int delegateUpdate(${myExtendedObjectClassName} entity) { if (!processBeforeUpdate(entity)) { return 1; } return getMyDao().updateModifiedOnly(entity); }
+#if ($table.hasOptimisticLock())
+    ${database.behaviorDelegateModifier} int delegateUpdateNonstrict(${myExtendedObjectClassName} entity) { if (!processBeforeUpdate(entity)) { return 1; } return getMyDao().updateNonstrictModifiedOnly(entity); }
+#end
+    ${database.behaviorDelegateModifier} int delegateDelete(${myExtendedObjectClassName} entity) { if (!processBeforeDelete(entity)) { return 1; } return getMyDao().delete(entity); }
+#if ($table.hasOptimisticLock())
+    ${database.behaviorDelegateModifier} int delegateDeleteNonstrict(${myExtendedObjectClassName} entity) { if (!processBeforeDelete(entity)) { return 1; } return getMyDao().deleteNonstrict(entity); }
+#end
+#set ($batchUpdateReturnType = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnType = "int[]")
+#else
+  #set ($batchUpdateReturnType = "int")
+#end
+
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(List<${myExtendedObjectClassName}> entityList) {
+        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeInsertInternally(entityList); return getMyDao().insertList(entityList);
+    }
+
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(List<${myExtendedObjectClassName}> entityList) {
+        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeUpdateInternally(entityList); return getMyDao().updateList(entityList);
+    }
+#if ($table.hasOptimisticLock())
+
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> entityList) {
+        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeUpdateInternally(entityList); return getMyDao().updateListNonstrict(entityList);
+    }
+#end
+
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(List<${myExtendedObjectClassName}> entityList) {
+        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeDeleteInternally(entityList); return getMyDao().deleteList(entityList);
+    }
+#if ($table.hasOptimisticLock())
+
+    ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> entityList) {
+        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeDeleteInternally(entityList); return getMyDao().deleteListNonstrict(entityList);
+    }
+#end
+#else
+#if ($table.isAvailableNonPrimaryKeyWritable())
+
+    ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
+        assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
+        return getMyDao().insert(entity);
+    }
+#end
+#end
+
+    // ===================================================================================
     //                                                                           Hierarchy
     //                                                                           =========
     /**
@@ -1198,14 +1036,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                          CBSetupper
     //                                                                          ==========
     /**
-     * The interface of condition-bean setupper.
+     * The interface of conditionBean setupper.
      */
     public static interface CBSetupper extends ${glConditionBeanSetupperName}<${myConditionBeanClassName}> {
 
         /**
          * Set up condition.
          * 
-         * @param cb Condition-bean. (NotNull)
+         * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
          */
         public void setup(${myConditionBeanClassName} cb);
     }

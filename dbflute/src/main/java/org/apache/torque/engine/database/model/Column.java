@@ -391,7 +391,7 @@ public class Column {
     /**
      * Get the inheritance definitions.
      */
-    public List getChildren() {
+    public List<Inheritance> getChildren() {
         return _inheritanceList;
     }
 

@@ -3,7 +3,7 @@
 
 using System;
 using System.Reflection;
-using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 using ${glPackageBaseCommon};
@@ -21,20 +21,8 @@ using ${myDBMetaPackageName};
 
 namespace ${myExtendedEntityPackageName} {
 
-    [Seasar.Dao.Attrs.Table("${table.AnnotationTableName}")]
-
-#if ($table.isUseUpdateDate())
-    [Seasar.Dao.Attrs.TimestampProperty("${table.UpdateDateUncapitalisedJavaName}")]
-#end
-#if ($table.isUseVersionNo())
-
-    [Seasar.Dao.Attrs.VersionNoProperty("${table.VersionNoUncapitalisedJavaName}")]
-#end
-
-    [System.Serializable]
     /// <summary>
     /// The entity of ${table.name}. (partial class for auto-generation)
-    /// 
     /// <![CDATA[
     /// [primary-key]
     ///     ${table.PrimaryKeyNameCommaString}
@@ -63,6 +51,14 @@ namespace ${myExtendedEntityPackageName} {
     /// ]]>
     /// Author: ${database.ClassAuthor}
     /// </summary>
+    [Seasar.Dao.Attrs.Table("${table.AnnotationTableName}")]
+#if ($table.isUseUpdateDate())
+    [Seasar.Dao.Attrs.TimestampProperty("${table.UpdateDateUncapitalisedJavaName}")]
+#end
+#if ($table.isUseVersionNo())
+    [Seasar.Dao.Attrs.VersionNoProperty("${table.VersionNoUncapitalisedJavaName}")]
+#end
+    [System.Serializable]
     public partial class ${myClassName} : ${myEntityInterfaceName} {
 
         // ===============================================================================
@@ -71,120 +67,81 @@ namespace ${myExtendedEntityPackageName} {
         #region Attribute
         /// <summary>The modified properties of entity. (for S2Dao)</summary>
         protected EntityModifiedProperties _modifiedProperties = new EntityModifiedProperties();
-
 #foreach ($col in $table.columns)
 
-        /// <summary>The value of ${col.UncapitalisedJavaName}. ${col.columnDefinitionLineDisp}</summary>
-        protected ${col.JavaNative} _${col.UncapitalisedJavaName};
+        /// <summary>The value of ${col.uncapitalisedJavaName}. {${col.columnDefinitionLineDisp}}</summary>
+        protected ${col.JavaNative} _${col.uncapitalisedJavaName};
 #end
         #endregion
 
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        #region Table Name
-        /// <summary>${database.ImplementComment}</summary>
         public String TableDbName { get { return "${table.name}"; } }
-
-        /// <summary>${database.ImplementComment}</summary>
         public String TablePropertyName { get { return "${table.javaName}"; } }
-        #endregion
 
+#if ($isSql2Entity)
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        public ${glDBMetaInterfaceName} DBMeta {
-            get { return ${myDBMetaClassName}.GetInstance(); }
-        }
-
-        // =====================================================================================
-        //                                                                              Accessor
-        //                                                                              ========
-        #region Property
-#foreach ($col in $table.Columns)
-
-
-        /// <summary>
-        /// The property of ${col.UncapitalisedJavaName}.
-        /// {${col.columnDefinitionLineDisp}}
-        /// </summary>
-#if ($col.isIdentity())
-        [Seasar.Dao.Attrs.ID("identity")]
-#end
-        [Seasar.Dao.Attrs.Column("${col.Name}")]
-        public ${col.JavaNative} ${col.JavaName} {
-            get { return _${col.UncapitalisedJavaName}; }
-            set {
-#if ($table.isAvailableEntityModifiedPropertiesAddLogicIfNeeds())
-                _modifiedProperties.AddPropertyNameIfNeeds("${col.javaBeansRulePropertyNameInitCap}", this._${col.UncapitalisedJavaName}, value);
+        public ${glDBMetaInterfaceName} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
 #else
-                _modifiedProperties.AddPropertyName("${col.javaBeansRulePropertyNameInitCap}");
-#end
-                _${col.UncapitalisedJavaName} = value;
-            }
-        }
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
+        public ${glDBMetaInterfaceName} DBMeta { get { return ${glDBMetaInstanceHandlerName}.FindDBMeta(TableDbName); } }
 #end
 
-        #endregion
-
-        // =====================================================================================
-        //                                                                       Classify Method
-        //                                                                       ===============
+        // ===============================================================================
+        //                                                      Classification Classifying
+        //                                                      ==========================
         #region Classify Method
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
-        /// Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}.
+        /// Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}.
+        /// <![CDATA[
         /// ${classificationMap.get('comment')}
+        /// ]]>
         /// </summary>
-        public void Classify${col.JavaName}${classificationMap.get('name')}() {
+        public void Classify${col.javaName}${classificationMap.get('name')}() {
             String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
-        #if (${col.isJavaNativeStringObject()})
-
-            ${col.JavaName} = code;
+#if (${col.isJavaNativeStringObject()})
+            ${col.javaName} = code;
         }
-        #else
-
-            ${col.JavaName} = ${col.JavaNative}.Parse(code);
+#else
+            ${col.javaName} = new ${col.javaNative}(code);
         }
-        #end
+#end
     #end
   #end
 #end
 
         #endregion
 
-        // =====================================================================================
-        //                                                          Classification Determination
-        //                                                          ============================
+        // ===============================================================================
+        //                                                    Classification Determination
+        //                                                    ============================
         #region Classification Determination
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
   #if (${col.hasClassification()})
     #foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
-        /// Is the value of ${col.UncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// <![CDATA[
         /// The difference of capital letters and small letters is NOT distinguished.
         /// If the value is null, this method returns false!
         /// ${classificationMap.get('comment')}
+        /// ]]>
         /// </summary>
-        /// <returns>Determanation.</returns>
-        public bool Is${col.JavaName}${classificationMap.get('name')} {
+        public bool Is${col.javaName}${classificationMap.get('name')} {
             get {
-                if (_${col.UncapitalisedJavaName} == null) {
-                    return false;
-                }
-                Object obj = _${col.UncapitalisedJavaName};
-                if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
-                    return false;
-                }
+                if (_${col.uncapitalisedJavaName} == null) { return false; }
                 String code = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
-                return code.ToLower().Equals(_${col.UncapitalisedJavaName}.ToString().ToLower());
+                return code.ToLower().Equals(_${col.uncapitalisedJavaName}.ToString().ToLower());
             }
         }
     #end
@@ -193,49 +150,29 @@ namespace ${myExtendedEntityPackageName} {
 
         #endregion
 
-        // =====================================================================================
-        //                                                                 Classification Getter
-        //                                                                 =====================
-        #region Classification Getter
+        // ===============================================================================
+        //                                                       Classification Name/Alias
+        //                                                       =========================
+        #region Classification Name/Alias
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
     #if (${col.hasClassificationName()})
 
-        /// <summary>
-        /// Get the value of ${col.UncapitalisedJavaName} as classification-name.
-        /// </summary>
-        /// <returns>The value of ${col.UncapitalisedJavaName} as classification-name.</returns>
-        public String ${col.JavaName}Name {
+        public String ${col.javaName}Name {
             get {
-                if (_${col.UncapitalisedJavaName} == null) {
-                    return null;
-                }
-                Object obj = _${col.UncapitalisedJavaName};
-                if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
-                    return null;
-                }
-                System.Collections.IDictionary hash = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
-                return (String)hash[_${col.UncapitalisedJavaName}.ToString()];
+                if (_${col.uncapitalisedJavaName} == null) { return null; }
+                IDictionary<String, String> map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_NAME_MAP_${col.ClassificationName};
+                return map[_${col.uncapitalisedJavaName}.ToString()];
             }
         }
     #end
     #if (${col.hasClassificationAlias()})
 
-        /// <summary>
-        /// Get the value of ${col.UncapitalisedJavaName} as classification-alias.
-        /// </summary>
-        /// <returns>The value of ${col.UncapitalisedJavaName} as classification-alias.</returns>
-        public String ${col.JavaName}Alias {
+        public String ${col.javaName}Alias {
             get {
-                if (_${col.UncapitalisedJavaName} == null) {
-                    return null;
-                }
-                Object obj = _${col.UncapitalisedJavaName};
-                if (obj is Nullables.INullableType && !((Nullables.INullableType)obj).HasValue) {
-                    return null;
-                }
-                System.Collections.IDictionary hash = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
-                return (String)hash[_${col.UncapitalisedJavaName}.ToString()];
+                if (_${col.uncapitalisedJavaName} == null) { return null; }
+                IDictionary<String, String> map = ${glPackageBaseCommon}.${glClassificationDefinition}.CODE_ALIAS_MAP_${col.ClassificationName};
+                return map[_${col.uncapitalisedJavaName}.ToString()];
             }
         }
     #end
@@ -244,9 +181,9 @@ namespace ${myExtendedEntityPackageName} {
 
         #endregion
 
-        // =====================================================================================
-        //                                                                         Foreign Table
-        //                                                                         =============
+        // ===============================================================================
+        //                                                                   Foreign Table
+        //                                                                   =============
         #region Foreign Table
 #set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.ForeignKeys)
@@ -255,27 +192,22 @@ namespace ${myExtendedEntityPackageName} {
   #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}")
   #set ($parentCBClassName = "${glProjectPrefix}${foreignKeys.foreignTable.JavaName}${glConditionBeanInitialName}")
 
-        // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   ForeignTable    = [${foreignKeys.foreignTable.name}]
-        //   ForeignProperty = [${foreignKeys.foreignPropertyName}]
+        // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+        //   ForeignTable    = [${foreignKeys.foreignTable.basicInfoDispString}]
+        //   ForeignProperty = [${foreignKeys.foreignPropertyNameInitCap}]
         // * * * * * * * * */
 
-        /// <summary>The entity of foreign table.</summary>
         protected ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
 
-        /// <summary>
-        /// Property of ${foreignKeys.ForeignPropertyName} as the entity of foreign table.
-        /// </summary>
         [Seasar.Dao.Attrs.Relno(${foreignKeysIndex}), Seasar.Dao.Attrs.Relkeys("$foreignKeys.RelationKeysCommaString")]
         public ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignKeys.foreignPropertyNameInitCap} {
             get { return ${foreignVariableName}; }
             set { ${foreignVariableName} = value; }
         }
 
-        public bool HasRelation${foreignKeys.foreignPropertyNameInitCap} {
-            get { return ${foreignVariableName} != null && ${foreignVariableName}.HasPrimaryKeyValue; }
+        public bool HasForeignInstance${foreignKeys.foreignPropertyNameInitCap} {
+            get { return ${foreignVariableName} != null; }
         }
-
   #set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
 
@@ -285,7 +217,7 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                   Referer Table
         //                                                                   =============
         #region Referer Table
-#foreach ($refferer in $table.Referrers)
+#foreach ($refferer in $table.refererList)
   #set ($reffererTable = $refferer.Table)
   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
   #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
@@ -295,46 +227,35 @@ namespace ${myExtendedEntityPackageName} {
 
   #if (${refferer.isOneToOne()})
 
-        // /* * * * * * * * * * * * * * * * * * * * * * * {one-to-one}
-        //   RefererTable    = [${refferer.Table.Name}]
-        //   RefererProperty = [${refferer.ReffererPropertyName}]
+        // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
+        //   RefererTable    = [${refferer.table.basicInfoDispString}]
+        //   RefererProperty = [${refferer.reffererPropertyNameInitCapAsOne}]
         // * * * * * * * * */
   #else
 
-        // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   RefererTable    = [${refferer.Table.Name}]
-        //   RefererProperty = [${refferer.ReffererPropertyName}]
+        // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+        //   RefererTable    = [${refferer.table.basicInfoDispString}]
+        //   RefererProperty = [${refferer.reffererPropertyNameInitCap}]
         // * * * * * * * * */
   #end
 
-        /// <summary>The list of refferer table.</summary>
-        protected System.Collections.Generic.IList<${reffererEntityClassName}> $reffererVariableName;
+        protected IList<${reffererEntityClassName}> $reffererVariableName;
 
-        /// <summary>
-        /// Property of ${refferer.ReffererPropertyName} as the list of refferer table.
-        /// </summary>
-        public System.Collections.Generic.IList<${reffererEntityClassName}> ${refferer.ReffererPropertyNameInitCap} {
-            get { return ${reffererVariableName}; }
-            set {
-                if (value == null) {
-                    ${reffererVariableName} = null;
-                } else {
-                    ${reffererVariableName} = value;
-                }
-            }
+        public IList<${reffererEntityClassName}> ${refferer.reffererPropertyNameInitCap} {
+            get { if (${reffererVariableName} == null) { ${reffererVariableName} = new List<${reffererEntityLongClassName}>(); } return ${reffererVariableName}; }
+            set { ${reffererVariableName} = value; }
+        }
+
+        public bool HasRefererElements${refferer.reffererPropertyNameInitCap} {
+            get { return ${reffererVariableName} != null && ${reffererVariableName}.Count > 0; }
         }
   #if (${refferer.isOneToOne()})
 
-        /// <summary>
-        /// Property of ${refferer.ReffererPropertyName} as one of refferer table.
-        /// </summary>
         [Seasar.Dao.Attrs.Relno(${foreignKeysIndex}), Seasar.Dao.Attrs.Relkeys("$refferer.relationKeysCommaStringForOneToOneRefferer")]
         public ${reffererEntityLongClassName} ${refferer.reffererPropertyNameInitCapAsOne} {
             get {
-                System.Collections.Generic.IList<${reffererEntityClassName}> ls = this.${refferer.reffererPropertyNameInitCap};
-                if (ls == null || ls.Count == 0) {
-                    return null;
-                }
+                IList<${reffererEntityClassName}> ls = this.${refferer.reffererPropertyNameInitCap};
+                if (ls == null || ls.Count == 0) { return null; }
                 if (ls.Count > 1) {
                     String msg = "The size of the list must be one because this relation is 'one-to-one'";
                     msg = msg + ": list=" + ls + ": ToString()=" + ToString();
@@ -343,18 +264,15 @@ namespace ${myExtendedEntityPackageName} {
                 return (${reffererEntityLongClassName})ls[0];
             }
             set {
-                if (value == null) {
-                    ${reffererVariableName} = null;
-                    return;
-                }
-                System.Collections.Generic.IList<${reffererEntityClassName}> ls = new System.Collections.Generic.List<${reffererEntityClassName}>();
+                if (value == null) { ${reffererVariableName} = null; return; }
+                IList<${reffererEntityClassName}> ls = new List<${reffererEntityClassName}>();
                 ls.Add(value);
                 ${reffererVariableName} = ls;
             }
         }
 
-        public bool HasRelation${refferer.reffererPropertyNameInitCapAsOne} {
-            get { return ${refferer.reffererPropertyNameInitCapAsOne} != null && ${refferer.reffererPropertyNameInitCapAsOne}.HasPrimaryKeyValue; }
+        public bool HasForeignInstance${refferer.reffererPropertyNameInitCapAsOne} {
+            get { return ${refferer.reffererPropertyNameInitCapAsOne} != null; }
         }
     #set ($foreignKeysIndex = $foreignKeysIndex + 1)
   #end
@@ -374,28 +292,22 @@ namespace ${myExtendedEntityPackageName} {
             }
         }
 
-        // ===================================================================================
-        //                                                                 Modified Properties
-        //                                                                 ===================
-        public System.Collections.Generic.IDictionary<String, Object> ModifiedPropertyNames {
+        // ===============================================================================
+        //                                                             Modified Properties
+        //                                                             ===================
+        public virtual IDictionary<String, Object> ModifiedPropertyNames {
             get { return _modifiedProperties.PropertyNames; }
         }
 
-        public void ClearModifiedPropertyNames() {
+        public virtual void ClearModifiedPropertyNames() {
             _modifiedProperties.Clear();
         }
 
-        // =====================================================================================
-        //                                                                        Basic Override
-        //                                                                        ==============
-        #region Basic Override Method
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+        #region Basic Override
 #if ($table.hasPrimaryKey())
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// If the primary-key of the other is same as this one, returns true.
-        /// </summary>
-        /// <param name="other">Other entity.</param>
-        /// <returns>Comparing result.</returns>
         public override bool Equals(Object other) {
             if (other == null) {
                 return false;
@@ -404,37 +316,25 @@ namespace ${myExtendedEntityPackageName} {
                 return false;
             }
             $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.PrimaryKey)
-            if (this.${col.JavaName} == null || !this.${col.JavaName}.Equals(otherEntity.${col.JavaName})) { return false; }
+#foreach ($col in $table.primaryKey)
+            if (this.${col.javaName} == null || !this.${col.javaName}.Equals(otherEntity.${col.javaName})) { return false; }
 #end
             return true;
         }
 
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// Calculates hash-code from primary-key.
-        /// </summary>
-        /// <returns>Hash-code from primary-keys.</returns>
         public override int GetHashCode() {
             int result = 0;
 #foreach ($col in $table.primaryKey)
 #if (!${col.isJavaNativeNumberObject()})
-            if (_${col.UncapitalisedJavaName} != null) { result = result + _${col.UncapitalisedJavaName}.GetHashCode(); }
+            if (_${col.uncapitalisedJavaName} != null) { result = result + _${col.uncapitalisedJavaName}.GetHashCode(); }
 #else
-            result = result + _${col.UncapitalisedJavaName}.GetHashCode();
+            result = result + _${col.uncapitalisedJavaName}.GetHashCode();
 #end
 #end
-
             return result;
         }
 #else
 
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// If the all-column value of the other is same as this one, returns true.
-        /// </summary>
-        /// <param name="other">Other entity.</param>
-        /// <returns>Comparing result.</returns>
         public override bool Equals(Object other) {
             if (other == null) {
                 return false;
@@ -443,48 +343,61 @@ namespace ${myExtendedEntityPackageName} {
                 return false;
             }
             $myClassName otherEntity = ($myClassName)other;
-
 #foreach ($col in $table.columns)
-            if (this.${col.JavaName} == null || !this.${col.JavaName}.Equals(otherEntity.${col.JavaName})) { return false; }
+            if (this.${col.javaName} == null || !this.${col.javaName}.Equals(otherEntity.${col.javaName})) { return false; }
 #end
-
             return true;
         }
 
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// Calculates hash-code from all-columns.
-        /// </summary>
-        /// <returns>Hash-code from all-columns.</returns>
         public override int GetHashCode() {
             int result = 0;
 #foreach ($col in $table.Columns)
 #if (!${col.isJavaNativeNumberObject()})
-            if (_${col.UncapitalisedJavaName} != null) { result = result + _${col.UncapitalisedJavaName}.GetHashCode(); }
+            if (_${col.uncapitalisedJavaName} != null) { result = result + _${col.uncapitalisedJavaName}.GetHashCode(); }
 #else
-            result = result + _${col.UncapitalisedJavaName}.GetHashCode();
+            result = result + _${col.uncapitalisedJavaName}.GetHashCode();
 #end
 #end
-     
             return result;
         }
 #end
 
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// </summary>
-        /// <returns>Column-map. (NotNull)</returns>
         public override String ToString() {
             String delimiter = ",";
             StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
-            sb.Append(delimiter).Append(this.${col.JavaName});
+            sb.Append(delimiter).Append(this.${col.javaName});
 #end
             sb.Remove(0, delimiter.Length);
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
         }
 
+        #endregion
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        #region Accessor
+#foreach ($col in $table.columns)
+
+        /// <summary>The property of ${col.uncapitalisedJavaName}. {${col.columnDefinitionLineDisp}}</summary>
+#if ($col.isIdentity())
+        [Seasar.Dao.Attrs.ID("identity")]
+#end
+        [Seasar.Dao.Attrs.Column("${col.Name}")]
+        public ${col.JavaNative} ${col.javaName} {
+            get { return _${col.uncapitalisedJavaName}; }
+            set {
+#if ($table.isAvailableEntityModifiedPropertiesAddLogicIfNeeds())
+                _modifiedProperties.AddPropertyNameIfNeeds("${col.javaBeansRulePropertyNameInitCap}", this._${col.uncapitalisedJavaName}, value);
+#else
+                _modifiedProperties.AddPropertyName("${col.javaBeansRulePropertyNameInitCap}");
+#end
+                _${col.uncapitalisedJavaName} = value;
+            }
+        }
+#end
         #endregion
     }
 }

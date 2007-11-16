@@ -13,25 +13,20 @@ namespace ${glPackageExtendedParameterBean} {
     [System.Serializable]
     public partial class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
 
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        #region Attribute
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-
-        /// <summary>The value of ${propertyName}. </summary>
         protected ${propertyType} _${propertyName};
 #end
+        #endregion
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
-        public ${myClassName}() {
-        }
-
-        // =====================================================================================
-        //                                                                              Accessor
-        //                                                                              ========
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        #region Accessor
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
@@ -45,17 +40,18 @@ namespace ${glPackageExtendedParameterBean} {
         }
 #end
 
-        protected String convertEmptyToNullIfString(String value) {
-            return filterRemoveEmptyString(value);
+        protected String ConvertEmptyToNullIfString(String value) {
+            return FilterRemoveEmptyString(value);
         }
 
-        protected String filterRemoveEmptyString(String value) {
+        protected String FilterRemoveEmptyString(String value) {
             return ((value != null && !"".equals(value)) ? value : null);
         }
+        #endregion
 
-        // =====================================================================================
-        //                                                                 Basic Override Method
-        //                                                                 =====================
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
         public override String ToString() {
             StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))

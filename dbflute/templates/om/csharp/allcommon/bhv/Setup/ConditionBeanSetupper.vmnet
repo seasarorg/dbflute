@@ -5,7 +5,9 @@ using ${glPackageBaseCommonCBean};
 
 namespace ${glPackageBaseCommonBhvSetup} {
 
-    public interface ${glConditionBeanSetupperName}<CONDITION_BEAN> {
-        void Setup(CONDITION_BEAN cb);
-    }
+    public delegate void ${glConditionBeanSetupperName}<CONDITION_BEAN>(CONDITION_BEAN cb) where CONDITION_BEAN : ConditionBean;
+
+//    public interface ${glConditionBeanSetupperName}<CONDITION_BEAN> where CONDITION_BEAN : ConditionBean {
+//        void Setup(CONDITION_BEAN cb);
+//    }
 }

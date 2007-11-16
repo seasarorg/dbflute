@@ -11,7 +11,7 @@ import ${glPackageExtendedEntity}.${myExtendedObjectClassName};
 #end
 
 /**
- * The dao interface of ${table.Name}.
+ * The dao interface of ${table.name}.
  * 
  * <pre>
  * [primary-key]
@@ -51,7 +51,7 @@ public interface ${myClassName} extends ${InterfaceName} {
     public static final String getCountAll_SQL = "select count(*) from ${table.Name}";
 
     /**
-     * Get count as all.
+     * Get the count as all.
      * 
      * @return All count.
      */
@@ -61,7 +61,7 @@ public interface ${myClassName} extends ${InterfaceName} {
     public static final String getListAll_SQL = "select ${table.columnNameCommaString} from ${table.Name}";
 
     /**
-     * Get list as all.
+     * Get the list as all.
      * 
      * @return All list. (NotNull)
      */
@@ -75,7 +75,7 @@ public interface ${myClassName} extends ${InterfaceName} {
     public static final String getEntity_ARGS = "${table.PrimaryKeyUncapitalisedJavaNameCommaString}";
 
     /* (non-javadoc)
-     * Get entity by primary key.
+     * Get the entity by primary key.
      * 
      * @param primaryKey Primary key. (NotNull)
      */
@@ -89,17 +89,9 @@ public interface ${myClassName} extends ${InterfaceName} {
 #end
 
     /**
-     * Select count by condition-bean.
-     * <pre>
-     * Ignore fetchFirst() and fetchScope() and fetchPage().
+     * Select the count by condition-bean. <br />
+     * Ignore fetchFirst() and fetchScope() and fetchPage(). <br />
      * But the fetch status of the condition-bean remains as it is.
-     * This select method generates SQL based on condition-bean.
-     * 
-     * Example)
-     *   final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *   cb.query().setXxx_GreaterEqual(new BigDecimal(14));
-     *   final int count = dao.selectCount(cb);
-     * </pre>
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
@@ -107,16 +99,7 @@ public interface ${myClassName} extends ${InterfaceName} {
     public int selectCount(${myAttachedCBArgsString});
 
     /**
-     * Select entity '${myExtendedObjectClassName}' by condition-bean.
-     * <pre>
-     * This select method generates SQL based on condition-bean.
-     * 
-     * Example)
-     *   final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *   cb.query().setXxxCode_Equal("abc");// It is assumed that this is the primary key...
-     *   cb.lockForUpdate();
-     *   final ${myExtendedObjectClassName} entity = dao.selectEntity(cb);
-     * </pre>
+     * Select the entity '${myExtendedObjectClassName}' by condition-bean.
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. If the select result is zero, it returns null. (Nullable)
@@ -124,75 +107,65 @@ public interface ${myClassName} extends ${InterfaceName} {
     public ${myExtendedObjectClassName} selectEntity(${myAttachedCBArgsString});
 
     /**
-     * Select list by condition-bean.
-     * <pre>
-     * This select method generates SQL based on condition-bean.
-     * 
-     * Example)
-     *   final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *   cb.setupSelect_Xxx(); // Including the foreign table in select clause
-     *   cb.query().setXxxName_PrefixSearch("abc");
-     *   cb.query().setXxxStartDate_IsNotNull();
-     *   cb.addOrderBy_PK_Asc().fetchFirst(20);
-     *   final List resultList = dao.selectList(cb);
-     * </pre>
+     * Select the list by condition-bean.
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
      */
     public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectList(${myAttachedCBArgsString});
-
 #if ($table.isWritable())
 
     /**
-     * Insert one entity.
+     * Insert the entity.
      * 
-     * @param entity Entity. (NotNull)
-     * @return Inserted count.
+     * @param entity The entity of insert target. (NotNull)
+     * @return The count of insert.
      */
     public int insert(${myExtendedObjectClassName} entity);
+#if ($database.isMakeDeprecated())
 
     /**
-     * Update one entity.
+     * Update the entity.
      * 
-     * @param entity Entity. (NotNull)
-     * @return Updated count.
+     * @param entity The entity of update target. (NotNull)
+     * @return The count of update.
      * @deprecated Please use updateModifiedOnly()
      */
     public int update(${myExtendedObjectClassName} entity);
+#end
 
     /**
-     * Update one entity. {modified only}
+     * Update the entity modified-only.
      * 
-     * @param entity Entity. (NotNull)
-     * @return Updated count.
+     * @param entity The entity of update target. (NotNull)
+     * @return The count of Update.
      */
     public int updateModifiedOnly(${myExtendedObjectClassName} entity);
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.hasOptimisticLock())
     /**
-     * Update one entity non-strictly. {modified only}
+     * Update the entity non-strictly modified-only.
      * 
-     * @param entity Entity. (NotNull)
-     * @return Updated count.
+     * @param entity The entity of update target. (NotNull)
+     * @return The count of Update.
      */
     public int updateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
 #end
 
     /**
-     * Delete one entity.
+     * Delete the entity.
      * 
-     * @param entity Entity. (NotNull)
-     * @return Deleted count.
+     * @param entity The entity of delete target. (NotNull)
+     * @return The count of delete.
      */
     public int delete(${myExtendedObjectClassName} entity);
 
-#if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
+#if ($table.hasOptimisticLock())
     /**
-     * Delete one entity. {non-strict}
+     * Delete the entity non-strictly.
      * 
-     * @param entity Entity. (NotNull)
-     * @return Deleted count.
+     * @param entity The entity of delete target. (NotNull)
+     * @return The count of delete.
      */
     public int deleteNonstrict(${myExtendedObjectClassName} entity);
 #end
@@ -205,17 +178,17 @@ public interface ${myClassName} extends ${InterfaceName} {
 #end
 
     /**
-     * Insert several entities.
+     * Insert the several entities.
      * 
-     * @param entityList Entity-list. (NotNull)
+     * @param entityList The list of entity. (NotNull)
      * @return The array of inserted count.
      */
     public ${batchUpdateReturnType} insertList(java.util.List<${myExtendedObjectClassName}> entityList);
 
     /**
-     * Update several entities.
+     * Update the several entities.
      * 
-     * @param entityList Entity-list. (NotNull)
+     * @param entityList The list of entity. (NotNull)
      * @return The array of updated count.
      */
     public ${batchUpdateReturnType} updateList(java.util.List<${myExtendedObjectClassName}> entityList);
@@ -224,25 +197,25 @@ public interface ${myClassName} extends ${InterfaceName} {
     /**
      * Update several entities non-strictly.
      * 
-     * @param entityList Entity-list. (NotNull)
+     * @param the entityList The list of entity. (NotNull)
      * @return The array of updated count.
      */
     public ${batchUpdateReturnType} updateListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList);
 #end
 
     /**
-     * Delete several entities.
+     * Delete the several entities.
      * 
-     * @param entityList Entity-list. (NotNull)
+     * @param entityList The list of entity. (NotNull)
      * @return The array of deleted count.
      */
     public ${batchUpdateReturnType} deleteList(java.util.List<${myExtendedObjectClassName}> entityList);
 
 #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
     /**
-     * Delete several entities non-strictly.
+     * Delete the several entities non-strictly.
      * 
-     * @param entityList Entity-list. (NotNull)
+     * @param entityList The list of entity. (NotNull)
      * @return The array of deleted count.
      */
     public ${batchUpdateReturnType} deleteListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList);
@@ -255,9 +228,9 @@ public interface ${myClassName} extends ${InterfaceName} {
     public static final String insert_SQL = "insert into ${table.Name}(${table.columnNameCommaString}) values(${table.insertClauseValuesAsSqlComment})";
 
     /**
-     * Insert one entity.
+     * Insert the entity.
      * 
-     * @param entity Entity. (NotNull)
+     * @param entity The entity of insert target. (NotNull)
      * @return Inserted count.
      */
     public int insert(${myExtendedObjectClassName} entity);

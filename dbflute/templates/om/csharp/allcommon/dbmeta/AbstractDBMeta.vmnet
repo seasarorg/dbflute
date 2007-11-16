@@ -23,8 +23,6 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                      ==========
         public abstract String TableDbName { get; }
         public abstract String TablePropertyName { get; }
-        public abstract String TableCapPropName { get; }
-        public abstract String TableUncapPropName { get; }
 
         // ===============================================================================
         //                                                                   Name Handling
