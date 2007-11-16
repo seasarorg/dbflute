@@ -1,0 +1,16 @@
+
+using System;
+using Seasar.Dao;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the entity has already been updated by other thread.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public class ${glEntityAlreadyUpdatedException} : NotSingleRowUpdatedRuntimeException {
+
+        public ${glEntityAlreadyUpdatedException}(Object bean, int rows)
+        : base(bean, rows) {}
+    }
+}

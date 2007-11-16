@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonException};
 
 /**
  * The exception when the record has overlapped.
+ * This class is old.
  * 
  * @author ${database.ClassAuthor}
  */

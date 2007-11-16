@@ -437,13 +437,15 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (entity.hasVersionNoValue()) {
             return;
         }
-        String msg = "Not found the value of 'version no' on the entity!" + getLineSeparator();
+        String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The value of 'version no' on the entity was Not Found!" + getLineSeparator() + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + "Please confirm the existence of the value of 'version no' on the entity." + getLineSeparator();
         msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + getLineSeparator();
         msg = msg + "So 'version no' is required on the entity. " + getLineSeparator();
-        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary." + getLineSeparator();
-        msg = msg + "- - - - - - - - - -" + getLineSeparator();
+        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary." + getLineSeparator() + getLineSeparator();
+        msg = msg + "[Entity]" + getLineSeparator();
         msg = msg + "entity to string = " + entity + getLineSeparator();
         msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + getLineSeparator();
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
@@ -457,13 +459,15 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (entity.hasUpdateDateValue()) {
             return;
         }
-        String msg = "Not found the value of 'update date' on the entity!" + getLineSeparator();
+        String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The value of 'update date' on the entity was Not Found!" + getLineSeparator() + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + "Please confirm the existence of the value of 'update date' on the entity." + getLineSeparator();
         msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + getLineSeparator();
         msg = msg + "So 'update date' is required on the entity. " + getLineSeparator();
-        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary." + getLineSeparator();
-        msg = msg + "- - - - - - - - - -" + getLineSeparator();
+        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary." + getLineSeparator() + getLineSeparator();
+        msg = msg + "[Entity]" + getLineSeparator();
         msg = msg + "entity to string = " + entity + getLineSeparator();
         msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + getLineSeparator();
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
@@ -515,8 +519,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Modify.
      * 
      * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void modify(${glEntityInterfaceName} entity) {
         doModify(entity);
@@ -528,8 +533,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Modify non strict.
      * 
      * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void modifyNonstrict(${glEntityInterfaceName} entity) {
         doModifyNonstrict(entity);
@@ -541,6 +546,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * ${database.ImplementComment}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
@@ -553,6 +561,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * ${database.ImplementComment}
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
@@ -565,8 +575,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * Remove.
      * 
      * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         assertEntityNotNull(entity);
@@ -587,9 +598,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertEntityHasUpdateDateValue(entity);
         final int updatedCount = callback.callbackDelegateUpdate(entity);
         if (updatedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(entity.toString());
+            String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         } else if (updatedCount > 1) {
-            String msg = "updatedCount=" + updatedCount + ": " + entity.toString();
+            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+            msg = msg + ": entity=" + entity;
             throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
         }
     }
@@ -602,10 +615,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertEntityNotNull(entity);
         final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
         if (updatedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(entity.toString());
+            String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         } else if (updatedCount > 1) {
-            String msg = "updatedCount=" + updatedCount + ": " + entity.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+            msg = msg + ": entity=" + entity;
         }
     }
 
@@ -680,10 +694,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertEntityHasUpdateDateValue(entity);
         final int deletedCount = callback.callbackDelegateDelete(entity);
         if (deletedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(entity.toString());
+            String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         } else if (deletedCount > 1) {
-            String msg = "deletedCount=" + deletedCount + ": " + entity.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            msg = msg + ": entity=" + entity;
         }
     }
 
@@ -695,10 +710,11 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         assertEntityNotNull(entity);
         final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
         if (deletedCount == 0) {
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(entity.toString());
+            String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
         } else if (deletedCount > 1) {
-            String msg = "deletedCount=" + deletedCount + ": " + entity.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            msg = msg + ": entity=" + entity;
         }
     }
 
@@ -712,8 +728,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         if (deletedCount == 0) {
             return;
         } else if (deletedCount > 1) {
-            String msg = "deletedCount=" + deletedCount + ": " + entity.toString();
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            msg = msg + ": entity=" + entity;
         }
     }
 

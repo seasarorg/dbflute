@@ -175,7 +175,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (Nullalble)
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${glEntityInterfaceName} readEntity(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
@@ -183,7 +183,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         if (ls.isEmpty()) {
             return null;
         }
-        assertRecordHasBeenSelectedAsOne(ls, cb);
+        assertEntitySelectedAsOne(ls, cb);
         return (${glEntityInterfaceName})ls.get(0);
     }
 
@@ -192,14 +192,14 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
         final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = readList(cb);
-        assertRecordHasNotBeenDeleted(ls, cb);
-        assertRecordHasBeenSelectedAsOne(ls, cb);
+        assertEntityNotDeleted(ls, cb);
+        assertEntitySelectedAsOne(ls, cb);
         return (${glEntityInterfaceName})ls.get(0);
     }
 
@@ -213,13 +213,13 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         java.util.List<ENTITY_TYPE> ls = null;
         try {
             ls = callback.callbackSelectList(cb);
-        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
+        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeException} e) {
             throwEntityDuplicatedException("{Over safetyMaxResultSize '1'}", cb, e);
         }
         if (ls.isEmpty()) {
             return null;
         }
-        assertRecordHasBeenSelectedAsOne(ls, cb);
+        assertEntitySelectedAsOne(ls, cb);
         return (ENTITY_TYPE)ls.get(0);
     }
 
@@ -234,11 +234,11 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         java.util.List<ENTITY_TYPE> ls = null;
         try {
             ls = callback.callbackSelectList(cb);
-        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName} e) {
+        } catch (${glPackageBaseCommonException}.${glDangerousResultSizeException} e) {
             throwEntityDuplicatedException("{Over safetyMaxResultSize '1'}", cb, e);
         }
-        assertRecordHasNotBeenDeleted(ls, cb);
-        assertRecordHasBeenSelectedAsOne(ls, cb);
+        assertEntityNotDeleted(ls, cb);
+        assertEntitySelectedAsOne(ls, cb);
         return (ENTITY_TYPE)ls.get(0);
     }
 
@@ -298,11 +298,10 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param entity Selected entity.
      * @param searchKey4log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @deprecated Please use assertEntityNotDeleted().
      */
     protected void assertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4Log) {
-        if (entity == null) {
-            throwEntityAlreadyDeletedException(searchKey4Log);
-        }
+        assertEntityNotDeleted(entity, searchKey4Log);
     }
 
     /**
@@ -311,22 +310,58 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param ls Selected list.
      * @param searchKey4Log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @deprecated Please use assertEntityNotDeleted().
      */
     protected void assertRecordHasNotBeenDeleted(java.util.List ls, Object searchKey4Log) {
+        assertEntityNotDeleted(ls, searchKey4Log);
+    }
+
+    /**
+     * Assert that the entity is not deleted.
+     * 
+     * @param entity Selected entity. (Nullable)
+     * @param searchKey4log Search-key for Logging.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     */
+    protected void assertEntityNotDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4Log) {
+        if (entity == null) {
+            throwEntityAlreadyDeletedException(searchKey4Log);
+        }
+    }
+
+    /**
+     * Assert that the entity is not deleted.
+     * 
+     * @param ls Selected list. (Nullable)
+     * @param searchKey4Log Search-key for Logging. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     */
+    protected void assertEntityNotDeleted(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
     }
 
     /**
-     * Assert that record has been selected as one.
-     * 
      * @param ls Selected list.
      * @param searchKey4Log Search-key for Logging.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @deprecated Please use assertEntitySelectedAsOne.
      */
     protected void assertRecordHasBeenSelectedAsOne(java.util.List ls, Object searchKey4Log) {
+        assertEntitySelectedAsOne(ls, searchKey4Log);
+    }
+
+    /**
+     * Assert that the entity is selected as one.
+     * 
+     * @param ls Selected list. (NotNull)
+     * @param searchKey4Log Search-key for Logging. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     */
+    protected void assertEntitySelectedAsOne(java.util.List ls, Object searchKey4Log) {
         if (ls == null || ls.isEmpty()) {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
@@ -341,21 +376,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     private void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
         ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause, _latestSqlProvider, getTableDbName());
-    }
-
-    /**
-     * Assert that selected count has not exceeded max count.
-     * 
-     * @param selectedCount Selected count.
-     * @param maxCount Max count.
-     * @param clauseObject Clause object for exception message.
-     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-     */
-    protected void assertSelectedCountHasNotExceededMaxCount(int selectedCount, int maxCount, Object clauseObject) {
-        if (selectedCount > maxCount) {
-            String msg = "Selected count[" + selectedCount + "] has exceeded max count[" + maxCount + "]: clauseObject=" + clauseObject;
-            throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
-        }
     }
 
     // ===================================================================================

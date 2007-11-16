@@ -5,16 +5,16 @@ using System.Collections;
 namespace ${glPackageBaseCommonException} {
 
     /// <summary>
-    /// The exception when the record has already been deleted (by other thread).
+    /// The exception when the entity has been duplicated.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public class ${glRecordHasAlreadyBeenDeletedException} : ApplicationException {
+    public class ${glEntityDuplicatedException} : SystemException {
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param="msg">Exception message.</param>
-        public ${glRecordHasAlreadyBeenDeletedException}(String msg)
+        public ${glEntityDuplicatedException}(String msg)
         : base(msg) {}
     }
 }

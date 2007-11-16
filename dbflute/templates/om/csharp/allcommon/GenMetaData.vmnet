@@ -11,11 +11,14 @@ namespace ${glPackageBaseCommon} {
     /// </summary>
     public class ${myClassName} {
 
+        // ===============================================================================
+        //                                                                       Sinpleton
+        //                                                                       =========
         /// <summary>Singleton instance.</summary>
         private static readonly ${myClassName} _instance = new ${myClassName}();
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         private ${myClassName}() {
         }
@@ -28,12 +31,9 @@ namespace ${glPackageBaseCommon} {
             return _instance;
         }
 
-        // =========================================================================================
-        //                                             Only when having generated, the effective one
-        //                                             =============================================
-        // -------------------------------------------------------------------------------
+        // ===============================================================================
         //                                                                           Basic
-        //                                                                           -----
+        //                                                                           =====
         /// <sumarry>
         /// Get the property-value of targetLanguage.
         /// </sumarry>
@@ -74,9 +74,9 @@ namespace ${glPackageBaseCommon} {
             return "${database.ClassAuthor}";
         }
 
-        // -------------------------------------------------------------------------------
-        //                                                                       Available
-        //                                                                       ---------
+        // ===============================================================================
+        //                                                                          Naming
+        //                                                                          ======
         /// <sumarry>
         /// Is java name of table same as db name? Answer is ${database.isJavaNameOfTableSameAsDbName()}!
         /// </sumarry>
@@ -93,9 +93,9 @@ namespace ${glPackageBaseCommon} {
             return ${database.isJavaNameOfColumnSameAsDbName()};
         }
 
-        // -------------------------------------------------------------------------------
+        // ===============================================================================
         //                                                                          Prefix
-        //                                                                          ------
+        //                                                                          ======
         /// <sumarry>
         /// Get the property-value of projectPrefix.
         /// </sumarry>
@@ -110,131 +110,6 @@ namespace ${glPackageBaseCommon} {
         /// <returns>The property-value.</returns>
         public String GetBasePrefix() {
             return "${database.BasePrefix}";
-        }
-
-        // -------------------------------------------------------------------------------
-        //                                                                         Package
-        //                                                                         -------
-        /// <sumarry>
-        /// Get the property-value of baseCommonPackage.
-        ///
-        /// <returns>The property-value.</returns>
-        public String GetBaseCommonPackage() {
-            return "${database.BaseCommonPackage}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of baseBehaviorPackage.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetBaseBehaviorPackage() {
-            return "${database.BaseBehaviorPackage}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of baseDaoPackage.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetBaseDaoPackage() {
-            return "${database.BaseDaoPackage}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of baseEntityPackage.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetBaseEntityPackage() {
-            return "${database.BaseEntityPackage}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of conditionBeanPackage.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetConditionBeanPackage() {
-            return "${database.ConditionBeanPackage}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of extendedDaoPackage.
-        /// </sumarry>
-        /// <returns>The property-value.</retuns>
-        public String GetExtendedDaoPackage() {
-            return "${database.ExtendedDaoPackage}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of extendedBehaviorPackage.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetExtendedBehaviorPackage() {
-            return "${database.ExtendedBehaviorPackage}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of extendedEntityPackage.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetExtendedEntityPackage() {
-            return "${database.ExtendedEntityPackage}";
-        }
-
-        // -------------------------------------------------------------------------------
-        //                                                                 Optimistic Lock
-        //                                                                 ---------------
-        /// <sumarry>
-        /// Get the property-value of updateDateFieldName.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetUpdateDateFieldName() {
-            return "${database.UpdateDateFieldName}";
-        }
-
-        /// <sumarry>
-        /// Get the property-value of versionNoFieldName.
-        /// </sumarry>
-        /// <returns>The property-value.</returns>
-        public String GetVersionNoFieldName() {
-            return "${database.VersionNoFieldName}";
-        }
-
-        // -------------------------------------------------------------------------------
-        //                                                                         Extract
-        //                                                                         -------
-        /**
-         * Get the value of 'extractAcceptStartBrace'.
-         *
-         * @return The property-value. (NotNull)
-         */
-        public String GetExtractAcceptStartBrace() {
-            return "${database.extractAcceptStartBrace}";
-        }
-
-        /**
-         * Get the value of 'extractAcceptEndBrace'.
-         *
-         * @return The property-value. (NotNull)
-         */
-        public String GetExtractAcceptEndBrace() {
-            return "${database.extractAcceptEndBrace}";
-        }
-
-        /**
-         * Get the value of 'extractAcceptDelimiter'.
-         *
-         * @return The property-value. (NotNull)
-         */
-        public String GetExtractAcceptDelimiter() {
-            return "${database.extractAcceptDelimiter}";
-        }
-
-        /**
-         * Get the value of 'extractAcceptEqual'.
-         *
-         * @return The property-value. (NotNull)
-         */
-        public String GetExtractAcceptEqual() {
-            return "${database.extractAcceptEqual}";
         }
     }
 }

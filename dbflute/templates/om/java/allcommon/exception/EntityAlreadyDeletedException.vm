@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonException};
 
 /**
- * The exception when the entity has been deleted (by other thread).
+ * The exception of when the entity has already been deleted by other thread.
  * 
  * @author ${database.ClassAuthor}
  */

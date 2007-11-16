@@ -1,18 +1,10 @@
 
 using System;
 using System.Collections;
-#if ($database.isAvailableBehaviorGeneration())
-
-using ${glPackageBaseCommonBhv};
-#end
 
 namespace ${glPackageBaseCommon} {
 
     public interface ${glDaoSelectorInterfaceName} {
-
-        // ===============================================================================
-        //                                                                        Selector
-        //                                                                        ========
         DAO_TYPE Select<DAO_TYPE>(Type daoType) where DAO_TYPE : ${glDaoReadableInterfaceName};
         ${glDaoReadableInterfaceName} ByName(String tableFlexibleName);
     }

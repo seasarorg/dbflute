@@ -31,6 +31,9 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * Modify.
      * 
      * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
@@ -38,8 +41,8 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * Modify non-strict.
      * 
      * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void modifyNonstrict(${glEntityInterfaceName} entity);
 
@@ -49,6 +52,9 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * This method is faster than createOrModifyAfterSelect().
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
@@ -58,6 +64,8 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * This method is faster than createOrModifyAfterSelect().
      * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
@@ -65,6 +73,9 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * Remove.
      * 
      * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
 
@@ -91,7 +102,8 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Modified count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated. And Only when s2dao's version is over 1.0.47 (contains 1.0.47).
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 
@@ -100,7 +112,8 @@ public interface ${glBehaviorWritableInterfaceName} extends ${glBehaviorReadable
      * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Removed count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated. And Only when s2dao's version is over 1.0.47 (contains 1.0.47).
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList);
 }

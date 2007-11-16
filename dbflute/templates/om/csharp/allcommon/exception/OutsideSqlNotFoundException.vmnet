@@ -5,16 +5,16 @@ using System.Collections;
 namespace ${glPackageBaseCommonException} {
 
     /// <summary>
-    /// The exception when the record has overlapped.
+    /// The exception of when the outside-sql is not found.
     /// Author: ${database.ClassAuthor}
     /// </summary>
-    public class ${glRecordHasOverlappedException} : ApplicationException {
+    public class ${glOutsideSqlNotFoundException} : SystemException {
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param="msg">Exception message.</param>
-        public ${glRecordHasOverlappedException}(String msg)
+        public ${glOutsideSqlNotFoundException}(String msg)
         : base(msg) {}
     }
 }

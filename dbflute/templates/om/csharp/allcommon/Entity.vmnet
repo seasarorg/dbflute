@@ -1,6 +1,6 @@
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 using ${glPackageBaseCommonDBMeta};
 
@@ -12,9 +12,9 @@ namespace ${glPackageBaseCommon} {
     /// </summary>
     public interface ${glEntityInterfaceName} {
 
-        // =====================================================================================
-        //                                                                             TableName
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
         /// <summary>
         /// The property of table db-name. (readonly)
         /// </summary>
@@ -25,33 +25,37 @@ namespace ${glPackageBaseCommon} {
         /// </summary>
         String TablePropertyName { get; }
 
-        // =====================================================================================
-        //                                                                                DBMeta
-        //                                                                                ======
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
         /// <summary>
         /// The property of DBMeta. (readonly)
         /// </summary>
         ${glDBMetaInterfaceName} DBMeta { get; }
 
-        // =====================================================================================
-        //                                                                         Determination
-        //                                                                         =============
+        // ===============================================================================
+        //                                                                   Determination
+        //                                                                   =============
         /// <summary>
-        /// Has primary-key value?
+        /// Has primary-key value? (readonly)
         /// </summary>
-        /// <returns>Determinationg.</returns>
         bool HasPrimaryKeyValue { get; }
     }
 
+    /// <summary>
+    /// The modified properties of entity.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
     public class EntityModifiedProperties {
 
-        protected System.Collections.Generic.IDictionary<String, Object> _propertiesSet = new System.Collections.Generic.Dictionary<String, Object>();
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected IDictionary<String, Object> _propertiesSet = new Dictionary<String, Object>();
 
-        /**
-         * Add property name. (JavaBeansRule)
-         * 
-         * @param propertyName Property name. (Nullable)
-         */
+        // ===============================================================================
+        //                                                                             Add
+        //                                                                             ===
         public void AddPropertyName(String propertyName) {
             if (_propertiesSet.ContainsKey(propertyName)) {
                 return;
@@ -59,13 +63,6 @@ namespace ${glPackageBaseCommon} {
             _propertiesSet.Add(propertyName, null);
         }
 
-        /**
-         * Add property name. (JavaBeansRule)
-         * 
-         * @param propertyName Property name. (NotNull)
-         * @param before Before value. (Nullable)
-         * @param after After value. (Nullable)
-         */
         public void AddPropertyNameIfNeeds(String propertyName, Object before, Object after) {
             if (_propertiesSet.ContainsKey(propertyName)) {
                 return;
@@ -75,29 +72,23 @@ namespace ${glPackageBaseCommon} {
             }
         }
 
-        /**
-         * Get the set of properties.
-         * 
-         * @return The set of properties. (NotNull)
-         */
-        public System.Collections.Generic.IDictionary<String, Object> PropertyNames {
-            get { return _propertiesSet; }
-        }
-
-        /**
-         * Clear the set of properties.
-         */
-        public void clear() {
+        // ===============================================================================
+        //                                                                           Other
+        //                                                                           =====
+        public void Clear() {
             _propertiesSet.Clear();
         }
 
-        /**
-         * Remove property name from the set. (JavaBeansRule)
-         * 
-         * @param propertyName Property name. (Nullable)
-         */
-        public void remove(String propertyName) {
+        public void Remove(String propertyName) {
             _propertiesSet.Remove(propertyName);
         }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IDictionary<String, Object> PropertyNames {
+            get { return _propertiesSet; }
+        }
+
     }
 }

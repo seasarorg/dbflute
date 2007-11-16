@@ -20,7 +20,6 @@ namespace ${glPackageBaseCommon} {
         /// The property of ${uncapitalisedJavaName}.
         /// </summary>
         ${javaNative} ${javaName} { get; set; }
-
   #if (${database.isAllClassificationColumn($columnName)})
     #set ($classificationName = $database.getAllClassificationName($columnName))
     #set ($classificationList = $database.getClassificationMapList($classificationName))

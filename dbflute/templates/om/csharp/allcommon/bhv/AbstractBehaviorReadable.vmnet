@@ -1,7 +1,7 @@
 #set ($myClassName = "${glBehaviorReadableAbstractName}")
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using Seasar.Quill.Attrs;
 
 using ${glPackageBaseCommon};
@@ -15,13 +15,11 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        #region Attribute
         [Binding("${database.daoSelectorComponentName}")]
         protected ${glDaoSelectorInterfaceName} _daoSelector;
 
         [Binding("${database.behaviorSelectorComponentName}")]
         protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
-        #endregion
 
         // ===============================================================================
         //                                                                      Table Name
@@ -42,108 +40,55 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                    New Instance
         //                                                                    ============
-        #region New Instance
         public abstract ${glEntityInterfaceName} NewEntity();
         public abstract ${glConditionBeanInterfaceName} NewConditionBean();
-        #endregion
 
         // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
-        #region Delegate Method
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-         * @return Read count. (NotNull)
-         */
         protected int CallGetCountAll() {
             return DoCallGetCountAll();
         }
         protected abstract int DoCallGetCountAll();
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-         * @return Read count. (NotNull)
-         */
-        protected System.Collections.Generic.IList<${glEntityInterfaceName}> CallGetListAll() {
+        protected IList<${glEntityInterfaceName}> CallGetListAll() {
             return DoCallGetListAll();
         }
-        protected abstract System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallGetListAll();
+        protected abstract IList<${glEntityInterfaceName}> DoCallGetListAll();
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-         * @return Read count. (NotNull)
-         */
         protected int CallReadCount(${glConditionBeanInterfaceName} cb) {
             return DoCallReadCount(cb);
         }
         protected abstract int DoCallReadCount(${glConditionBeanInterfaceName} cb);
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-         * @return Read entity. If the select result is zero, it returns null. (Nullable)
-         */
         protected ${glEntityInterfaceName} CallReadEntity(${glConditionBeanInterfaceName} cb) {
             return DoCallReadEntity(cb);
         }
         protected abstract ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb);
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-         * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-         */
-        protected System.Collections.Generic.IList<${glEntityInterfaceName}> CallReadList(${glConditionBeanInterfaceName} cb) {
+        protected IList<${glEntityInterfaceName}> CallReadList(${glConditionBeanInterfaceName} cb) {
             return DoCallReadList(cb);
         }
-        protected abstract System.Collections.Generic.IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb);
+        protected abstract IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb);
 
-        #endregion
-
-	    // =====================================================================================
-	    //                                                                         Basic Get All
-	    //                                                                         =============
-	    /**
-	     * Get count all.
-	     * 
-	     * @return Count all.
-	     */
+        // ===============================================================================
+        //                                                                   Basic Get All
+        //                                                                   =============
 	    public int GetCountAll() {
 	        return this.CallGetCountAll();
 	    }
 
-        // =====================================================================================
-        //                                                                          Basic Select
-        //                                                                          ============
-        #region Basic Select
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read count.</returns>
+        // ===============================================================================
+        //                                                                    Basic Select
+        //                                                                    ============
         public int ReadCount(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.CallReadCount(cb);
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read entity. (Nullable)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
         public ${glEntityInterfaceName} ReadEntity(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
-            System.Collections.Generic.IList<${glEntityInterfaceName}> ls = this.CallReadList(cb);
+            IList<${glEntityInterfaceName}> ls = this.CallReadList(cb);
             if (ls.Count == 0) {
                 return null;
             }
@@ -151,136 +96,66 @@ namespace ${glPackageBaseCommonBhv} {
             return (${glEntityInterfaceName})ls[0];
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read entity. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
         public ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
-            System.Collections.Generic.IList<${glEntityInterfaceName}> ls = this.CallReadList(cb);
+            IList<${glEntityInterfaceName}> ls = this.CallReadList(cb);
             AssertRecordHasNotBeenDeleted(ls, cb);
             AssertRecordHasBeenSelectedAsOne(ls, cb);
             return (${glEntityInterfaceName})ls[0];
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>List-result-bean. (NotNull)</returns>
         public ${glListResultBeanName}<${glEntityInterfaceName}> ReadList(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
             return new ResultBeanBuilder<${glEntityInterfaceName}>(this).BuildListResultBean(cb, this.CallReadList(cb));
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read page. (NotNull)</returns>
         public ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.ReadPage(cb, new SelectPageSimpleInvoker<${glEntityInterfaceName}>(this));
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <param name="invoker">Select-page-invoker. (NotNull)</param>
-        /// <returns>Read page. (NotNull)</returns>
         public ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker<${glEntityInterfaceName}> invoker) {
             AssertConditionBeanNotNull(cb);
             return invoker.InvokeSelectPage(new SelectPageSimpleCallback<${glEntityInterfaceName}>(cb, this));
         }
 
-
-        /**
-         * Assert that record has not been deleted.
-         * 
-         * @param entity Selected entity.
-         * @param searchKey Search-key for Logging.
-         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-         */
-        protected void AssertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
+        // -------------------------------------------------
+        //                                     Assert Result
+        //                                     -------------
+        protected static void AssertRecordHasNotBeenDeleted(${glPackageBaseCommon}.${glEntityInterfaceName} entity, Object searchKey4log) {
             if (entity == null) {
                 String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
-                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+                throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
             }
         }
 
-        /**
-         * Assert that record has not been deleted.
-         * 
-         * @param ls List.
-         * @param searchKey Search-key for Logging.
-         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-         */
-        protected void AssertRecordHasNotBeenDeleted(System.Collections.Generic.IList<${glEntityInterfaceName}> ls, Object searchKey4log) {
+        protected static void AssertRecordHasNotBeenDeleted(IList<${glEntityInterfaceName}> ls, Object searchKey4log) {
             if (ls == null || ls.Count == 0) {
                 String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
-                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+                throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
             }
         }
 
-        /**
-         * Assert that record has been selected as one.
-         * 
-         * @param ls List.
-         * @param searchKey Search-key for Logging.
-         * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
-         * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
-         */
-        protected void AssertRecordHasBeenSelectedAsOne(System.Collections.Generic.IList<${glEntityInterfaceName}> ls, Object searchKey4log) {
+        protected static void AssertRecordHasBeenSelectedAsOne(IList<${glEntityInterfaceName}> ls, Object searchKey4log) {
             if (ls == null || ls.Count == 0) {
                 String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
-                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
+                throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
             }
             if (ls.Count != 1) {
                 String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
                 msg = msg + " resultCount=" + ls.Count;
-                throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
+                throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
             }
         }
 
-        /**
-         * Assert that selected count has not exceeded max count.
-         * 
-         * @param selectedCount Selected count.
-         * @param maxCount Max count.
-         * @param clauseObject Clause object for exception message.
-         * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-         */
-        protected void AssertSelectedCountHasNotExceededMaxCount(int selectedCount, int maxCount, Object clauseObject) {
-            AssertObjectNotNull("selectedCount", selectedCount);
-            AssertObjectNotNull("maxCount", maxCount);
-            if (selectedCount > maxCount) {
-                String msg = "Selected count[" + selectedCount + "] has exceeded max count[" + maxCount + "]: clauseObject=" + clauseObject;
-                throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
-            }
-        }
-        #endregion
-
-        // =====================================================================================
-        //                                                                         Helper Method
-        //                                                                         =============
-        #region Helper Method
-
-        // ----------------------------------------------------------------
-        //                                                    Assert Object
-        //                                                    -------------
-        #region Assert Object
-
-        /**
-         * Assert that the argument is not null.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param arg Argument. (NotNull)
-         */
-        protected void AssertObjectNotNull(String variableName, Object arg) {
+        // ===============================================================================
+        //                                                                          Helper
+        //                                                                          ======
+        #region Helper
+        // -------------------------------------------------
+        //                                     Assert Object
+        //                                     -------------
+        protected static void AssertObjectNotNull(String variableName, Object arg) {
             if (variableName == null) {
                 String msg = "Argument[variableName] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -291,30 +166,15 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        /**
-         * Assert that the entity is not null.
-         * 
-         * @param entity Entity. (NotNull)
-         */
-        protected void AssertEntityNotNull(${glEntityInterfaceName} entity) {
+        protected static void AssertEntityNotNull(${glEntityInterfaceName} entity) {
             AssertObjectNotNull("entity", entity);
         }
 
-        /**
-         * Assert that the condition-bean is not null.
-         * 
-         * @param cb Condition-bean. (NotNull)
-         */
-        protected void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
+        protected static void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
             AssertObjectNotNull("cb", cb);
         }
 
-        /**
-         * Assert that the entity has primary-key value.
-         * 
-         * @param entity Entity. (NotNull)
-         */
-        protected void AssertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
+        protected static void AssertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
                 String msg = "The entity must should primary-key: entity=" + entity;
@@ -322,19 +182,9 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        #endregion
-
-        // ----------------------------------------------------------------
-        //                                                    Assert String
-        //                                                    -------------
-        #region Assert String
-
-        /**
-         * Assert that the string is not null and not trimmed empty.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param arg Argument. (NotNull)
-         */
+        // -------------------------------------------------
+        //                                     Assert String
+        //                                     -------------
         protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
             if (variableName == null) {
                 String msg = "Variable[variableName] should not be null.";
@@ -350,19 +200,10 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        #endregion
-
-
-        // ----------------------------------------------------------------
-        //                                                      Assert List
-        //                                                      -----------
-        #region Assert List
-        /**
-         * Assert that the list is empty.
-         * 
-         * @param ls List. (NotNull)
-         */
-        protected void AssertListNotNullAndEmpty(String variableName, IList ls) {
+        // -------------------------------------------------
+        //                                       Assert List
+        //                                       -----------
+        protected void AssertListNotNullAndEmpty<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
             AssertObjectNotNull(variableName, ls);
             if (!(ls.Count == 0)) {
                 String msg = "The list[" + variableName + "] should be empty: ls=" + ls.ToString();
@@ -370,12 +211,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        /**
-         * Assert that the list is not empty.
-         * 
-         * @param ls List. (NotNull)
-         */
-        protected void AssertListNotNullAndNotEmpty(String variableName, IList ls) {
+        protected void AssertListNotNullAndNotEmpty<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
             AssertObjectNotNull(variableName, ls);
             if (ls.Count == 0) {
                 String msg = "The list[" + variableName + "] should not be empty: ls=" + ls.ToString();
@@ -383,19 +219,13 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        /**
-         * Assert that the list having only one.
-         * 
-         * @param ls List. (NotNull)
-         */
-        protected void AssertListNotNullAndHasOnlyOne(String variableName, IList ls) {
+        protected void AssertListNotNullAndHasOnlyOne<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
             AssertObjectNotNull(variableName, ls);
             if (ls.Count != 1) {
                 String msg = "The list[" + variableName + "] should contain only one object: ls=" + ls.ToString();
                 throw new ArgumentOutOfRangeException(msg);
             }
         }
-        #endregion
         #endregion
 
         // ===============================================================================
@@ -418,6 +248,5 @@ namespace ${glPackageBaseCommonBhv} {
             set { _behaviorSelector = value; }
         }
         #endregion
-
     }
 }

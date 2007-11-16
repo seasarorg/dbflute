@@ -329,8 +329,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected entity. (Nullalble)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             System.Collections.Generic.IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
@@ -346,8 +345,8 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Selected entity. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             System.Collections.Generic.IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
@@ -372,7 +371,6 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>List-result-bean. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}"></exception>
         public ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return new ResultBeanBuilder<${myExtendedObjectClassName}>(this).BuildListResultBean(cb, this.DelegateSelectList(cb));
@@ -397,6 +395,25 @@ namespace ${glPackageExtendedBhv} {
         public ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb, SelectPageInvoker<${myExtendedObjectClassName}> invoker) {
             AssertConditionBeanNotNull(cb);
             return invoker.InvokeSelectPage(new SelectPageSimpleCallback<${myExtendedObjectClassName}>(cb, this));
+        }
+
+        protected static void AssertRecordHasNotBeenDeleted(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, Object searchKey4log) {
+            if (ls == null || ls.Count == 0) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+            }
+        }
+
+        protected static void AssertRecordHasBeenSelectedAsOne(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, Object searchKey4log) {
+            if (ls == null || ls.Count == 0) {
+                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
+                throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+            }
+            if (ls.Count != 1) {
+                String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
+                msg = msg + " resultCount=" + ls.Count;
+                throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+            }
         }
 
         #endregion
@@ -484,7 +501,7 @@ namespace ${glPackageExtendedBhv} {
         /// <summary>
         /// Insert.
         /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <param name="entity">Entity. (NotNull)</param>
         public void Insert(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             this.DelegateInsert(entity);
@@ -493,20 +510,23 @@ namespace ${glPackageExtendedBhv} {
         /// <summary>
         /// Update.
         /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public void Update(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int updatedCount = this.DelegateUpdate(entity);
-            if (updatedCount != 1) {
-                throw new Seasar.Dao.NotSingleRowUpdatedRuntimeException(entity, updatedCount);
-            }
+            AssertUpdatedEntity(entity, updatedCount);
         }
 
         /// <summary>
         /// Insert or update.
         /// </summary>
         /// <param name="entity"> Entity. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
 // TODO: @jflute - In development
 //        public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
 //            AssertEntityNotNull(entity);
@@ -525,33 +545,17 @@ namespace ${glPackageExtendedBhv} {
         /// <summary>
         /// Delete.
         /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public void Delete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
-            this.DelegateDelete(entity);
+            int deletedCount = this.DelegateDelete(entity);
+            AssertUpdatedEntity(entity, deletedCount);
         }
         #endregion
 #end
-
-        protected void AssertRecordHasNotBeenDeleted(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, Object searchKey4log) {
-            if (ls == null || ls.Count == 0) {
-                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
-                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
-            }
-        }
-
-        protected void AssertRecordHasBeenSelectedAsOne(System.Collections.Generic.IList<${myExtendedObjectClassName}> ls, Object searchKey4log) {
-            if (ls == null || ls.Count == 0) {
-                String msg = "The record has already been deleted by other thread: searchKey=" + searchKey4log;
-                throw new ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}(msg);
-            }
-            if (ls.Count != 1) {
-                String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
-                msg = msg + " resultCount=" + ls.Count;
-                throw new ${glPackageBaseCommonException}.${glRecordHasOverlappedException}(msg);
-            }
-        }
-
 
         // ===============================================================================
         //                                                                        Accessor

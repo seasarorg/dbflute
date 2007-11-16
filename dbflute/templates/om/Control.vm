@@ -212,13 +212,13 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Exception]
     #set ($glDangerousResultSizeExceptionName = "${glProjectPrefix}DangerousResultSizeException")
+    #set ($glDangerousResultSizeException = "${glProjectPrefix}DangerousResultSizeException")
     #set ($glEntityAlreadyUpdatedException = "${glProjectPrefix}EntityAlreadyUpdatedException")
     #set ($glEntityAlreadyDeletedException = "${glProjectPrefix}EntityAlreadyDeletedException")
     #set ($glEntityDuplicatedException = "${glProjectPrefix}EntityDuplicatedException")
     #set ($glOutsideSqlNotFoundException = "${glProjectPrefix}OutsideSqlNotFoundException")
     #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
     #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
-    #set ($glSelectedCountExceedMaxCountExceptionName = "${glProjectPrefix}SelectedCountExceedMaxCountException")
 
     ## [Allcommon-Helper]
     #set ($glMapListStringName = "${glProjectPrefix}MapListString")
@@ -1132,9 +1132,9 @@ targetdatabase = $targetDatabase
 
     $database.debug("public void parseExceptionClass() {")
 
-    #if ($database.isTargetLanguageJava())
+    #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
       $database.debug("    parse('DangerousResultSizeException');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glDangerousResultSizeExceptionName}.${glClassFileExtension}" )
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glDangerousResultSizeException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/exception/DangerousResultSizeException.${glTemplateFileExtension}",$path,"", "")
 
       $database.debug("    parse('EntityAlreadyUpdatedException');")
@@ -1149,24 +1149,22 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEntityDuplicatedException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/exception/EntityDuplicatedException.${glTemplateFileExtension}",$path,"", "")
 
-      #if ($database.isJavaVersionGreaterEqualTiger())
+      #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
         $database.debug("    parse('OutsideSqlNotFoundException');")
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glOutsideSqlNotFoundException}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/allcommon/exception/OutsideSqlNotFoundException.${glTemplateFileExtension}",$path,"", "")
       #end
     #end
 
-    $database.debug("    parseRecordHasAlreadyBeenDeletedException();")
-    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glRecordHasAlreadyBeenDeletedException}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/exception/RecordHasAlreadyBeenDeletedException.${glTemplateFileExtension}",$path,"", "")
+    #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharpOld())
+      $database.debug("    parseRecordHasAlreadyBeenDeletedException();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glRecordHasAlreadyBeenDeletedException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/RecordHasAlreadyBeenDeletedException.${glTemplateFileExtension}",$path,"", "")
 
-    $database.debug("    parseRecordHasOverlappedException();")
-    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glRecordHasOverlappedException}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/exception/RecordHasOverlappedException.${glTemplateFileExtension}",$path,"", "")
-
-    $database.debug("    parseSelectedCountExceedMaxCountException();")
-    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glSelectedCountExceedMaxCountExceptionName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/exception/SelectedCountExceedMaxCountException.${glTemplateFileExtension}",$path,"", "")
+      $database.debug("    parseRecordHasOverlappedException();")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glRecordHasOverlappedException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/RecordHasOverlappedException.${glTemplateFileExtension}",$path,"", "")
+    #end
     $database.debug("}")
 
     ## -------------------------------------------------------

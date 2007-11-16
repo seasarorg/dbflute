@@ -33,8 +33,9 @@ namespace ${myExtendedEntityPackageName} {
 
     [System.Serializable]
     /// <summary>
-    /// The entity of ${table.Name}. (partial interface for auto-generation)
+    /// The entity of ${table.name}. (partial class for auto-generation)
     /// 
+    /// <![CDATA[
     /// [primary-key]
     ///     ${table.PrimaryKeyNameCommaString}
     /// 
@@ -59,82 +60,39 @@ namespace ${myExtendedEntityPackageName} {
     /// [version-no]
     ///     ${table.VersionNoJavaName}
     /// 
+    /// ]]>
     /// Author: ${database.ClassAuthor}
     /// </summary>
     public partial class ${myClassName} : ${myEntityInterfaceName} {
 
-        // =====================================================================================
-        //                                                                            Definition
-        //                                                                            ==========
-        /** Map-string map-mark. */
-        public static readonly String MAP_STRING_MAP_MARK = "map:";
-
-        /** Map-string list-mark. */
-        public static readonly String MAP_STRING_LIST_MARK = "list:";
-
-        /** Map-string start-brace. */
-        public static readonly String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
-
-        /** Map-string end-brace. */
-        public static readonly String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
-
-        /** Map-string delimiter. */
-        public static readonly String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
-
-        /** Map-string equal. */
-        public static readonly String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
-
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
         #region Attribute
-
-        /** Entity modified properties. (for S2Dao) */
+        /// <summary>The modified properties of entity. (for S2Dao)</summary>
         protected EntityModifiedProperties _modifiedProperties = new EntityModifiedProperties();
 
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
 
         /// <summary>The value of ${col.UncapitalisedJavaName}. ${col.columnDefinitionLineDisp}</summary>
         protected ${col.JavaNative} _${col.UncapitalisedJavaName};
 #end
-
         #endregion
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
-        #region Constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ${myClassName}() {
-        }
-
-        #endregion
-
-        // =====================================================================================
-        //                                                                            Table Name
-        //                                                                            ==========
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
         #region Table Name
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        public String TableDbName {
-            get { return "${table.name}"; }
-        }
+        /// <summary>${database.ImplementComment}</summary>
+        public String TableDbName { get { return "${table.name}"; } }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        public String TablePropertyName {
-            get { return "${table.javaName}"; }
-        }
+        /// <summary>${database.ImplementComment}</summary>
+        public String TablePropertyName { get { return "${table.javaName}"; } }
         #endregion
 
-        // =====================================================================================
-        //                                                                                DBMeta
-        //                                                                                ======
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
@@ -424,7 +382,7 @@ namespace ${myExtendedEntityPackageName} {
         }
 
         public void ClearModifiedPropertyNames() {
-            _modifiedProperties.clear();
+            _modifiedProperties.Clear();
         }
 
         // =====================================================================================

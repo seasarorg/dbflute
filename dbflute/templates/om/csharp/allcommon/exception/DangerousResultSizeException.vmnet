@@ -1,0 +1,22 @@
+
+using System;
+using Seasar.Dao;
+
+namespace ${glPackageBaseCommonException} {
+
+    /// <summary>
+    /// The exception of when the result size is dangerous.
+    /// Author: ${database.ClassAuthor}
+    /// </summary>
+    public class ${glDangerousResultSizeException} : SystemException {
+
+        protected int _safetyMaxResultSize;
+
+        public ${glDangerousResultSizeException}(String msg, int safetyMaxResultSize)
+        : base(msg) { _safetyMaxResultSize = safetyMaxResultSize; }
+
+        public int SafetyMaxResultSize {
+            get { return _safetyMaxResultSize; }
+        }
+    }
+}

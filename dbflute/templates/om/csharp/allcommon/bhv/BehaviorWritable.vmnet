@@ -6,58 +6,30 @@ using ${glPackageBaseCommon};
 
 namespace ${glPackageBaseCommonBhv} {
 
-    /**
-     * The interface of behavior-writable.
-     * 
-     * @author ${database.ClassAuthor}
-     */
     public interface ${glBehaviorWritableInterfaceName} : ${glBehaviorReadableInterfaceName} {
 
-        /**
-         * Create entity. (Call-Method)
-         * 
-         * @param entity Entity that the type is entity-interface. (NotNull)
-         * @return Inserted count.
-         */
-        int CallCreate(${glEntityInterfaceName} entity);
-
-        /**
-         * Modify entity. (Call-Method)
-         * 
-         * @param entity Entity that the type is entity-interface. (NotNull)
-         * @return Updated count.
-         */
-        int CallModify(${glEntityInterfaceName} entity);
-
-        /**
-         * Remove entity. (Call-Method)
-         * 
-         * @param entity Entity that the type is entity-interface. (NotNull)
-         * @return Deleted count.
-         */
-        int CallRemove(${glEntityInterfaceName} entity);
-
-        // =====================================================================================
-        //                                                                   Basic Entity Update
-        //                                                                   ===================
-        #region Basic Entity Update
         /// <summary>
-        /// Create.
+        /// Create entity.
         /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
-        void Create(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        /// <param name="entity">Entity. (NotNull)</param>
+        void Create(${glEntityInterfaceName} entity);
 
         /// <summary>
-        /// Modify.
+        /// Modify entity.
         /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
-        void Modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
+        void Modify(${glEntityInterfaceName} entity);
 
         /// <summary>
-        /// Remove.
+        /// Remove entity.
         /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
-        void Remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity);
-        #endregion
+        /// <param name="entity">Entity. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
+        void Remove(${glEntityInterfaceName} entity);
     }
 }

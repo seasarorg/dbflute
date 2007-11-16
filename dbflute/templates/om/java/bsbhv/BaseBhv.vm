@@ -454,7 +454,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. (Nullalble)
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -466,8 +466,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -480,8 +480,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param primaryKey
      * @return Selected entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
@@ -752,9 +752,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * So then the entity of argument should have the value of concurrency column.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void update(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
@@ -772,8 +772,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * So if the entity of argument have the value of concurrency column, it is ignored.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void updateNonstrict(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -823,8 +823,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Insert or update. {update: modified only}
      * 
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void insertOrUpdate(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
@@ -857,7 +858,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Insert or update non-strictly. {update: modified only}
      * 
      * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void insertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -941,9 +943,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * Delete.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteInternally(${myEntityVariableName}, new InternalDeleteCallback<${myExtendedObjectClassName}>() {
@@ -992,8 +994,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * This delete ignores concurrency control.
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteNonstrictInternally(${myEntityVariableName}, new InternalDeleteNonstrictCallback<${myExtendedObjectClassName}>() {
@@ -1006,6 +1008,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * 
      * @param ${myEntityVariableName} Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
         helpDeleteNonstrictIgnoreDeletedInternally(${myEntityVariableName}, new InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}>() {

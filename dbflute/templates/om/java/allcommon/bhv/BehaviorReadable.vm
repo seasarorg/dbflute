@@ -116,7 +116,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (Nullalble)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasOverlappedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${glEntityInterfaceName} readEntity(${glConditionBeanInterfaceName} cb);
 
@@ -125,7 +125,8 @@ public interface ${glBehaviorReadableInterfaceName} {
      * 
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @return Read entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
     public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 

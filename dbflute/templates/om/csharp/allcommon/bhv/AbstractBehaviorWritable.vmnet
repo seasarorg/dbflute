@@ -6,52 +6,33 @@ using System.Collections;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonHelper};
+using ${glPackageBaseCommonException};
 
 namespace ${glPackageBaseCommonBhv} {
 
-    /**
-     * The abstract class of behavior-writable.
-     * 
-     * @author ${database.ClassAuthor}
-     */
     public abstract class $myClassName : ${glBehaviorReadableAbstractName}, ${glBehaviorWritableInterfaceName} {
 
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
         /// <sumarry>Log-instance.</sumarry>
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
-        #region Constructor
-        /**
-         * Constructor.
-         */
-        public ${myClassName}() {
-        }
-        #endregion
+        // ===============================================================================
+        //                                                                 Delegate Method
+        //                                                                 ===============
+        #region Delegate Method
 
-        // =====================================================================================
-        //                                                                       Delegate Method
-        //                                                                       ===============
-        #region Delegate-Method
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param entity Entity that the type is entity-interface. (NotNull)
-         * @return Inserted count.
-         */
-        int ${glBehaviorWritableInterfaceName}.CallCreate(${glEntityInterfaceName} entity) {
+        // -------------------------------------------------
+        //                                            Create
+        //                                            ------
+        protected virtual int CallCreate(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             FilterEntityOfInsert(entity);
             AssertEntityOfInsert(entity);
             return DoCallCreate(entity);
         }
 
-        /// <summary>
-        /// Filter the entity of insert.
-        /// </summary>
-        /// <param name="targetEntity">Entity. (NotNull)</param>
         protected virtual void FilterEntityOfInsert(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
@@ -90,32 +71,21 @@ namespace ${glPackageBaseCommonBhv} {
 
         }
 
-        /// <summary>
-        /// Assert the entity of insert.
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
         protected virtual void AssertEntityOfInsert(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         }
 
-        abstract protected int DoCallCreate(${glEntityInterfaceName} entity);
+        protected abstract int DoCallCreate(${glEntityInterfaceName} entity);
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param entity Entity that the type is entity-interface. (NotNull)
-         * @return Updated count.
-         */
-        int ${glBehaviorWritableInterfaceName}.CallModify(${glEntityInterfaceName} entity) {
+        // -------------------------------------------------
+        //                                            Modify
+        //                                            ------
+        protected virtual int CallModify(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             FilterEntityOfUpdate(entity);
             AssertEntityOfUpdate(entity);
             return DoCallModify(entity);
         }
 
-        /// <summary>
-        /// Filter the entity of update.
-        /// </summary>
-        /// <param name="targetEntity">Entity. (NotNull)</param>
         protected virtual void FilterEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
@@ -154,32 +124,21 @@ namespace ${glPackageBaseCommonBhv} {
 
         }
 
-        /// <summary>
-        /// Assert the entity of update.
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
         protected virtual void AssertEntityOfUpdate(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         }
 
-        abstract protected int DoCallModify(${glEntityInterfaceName} entity);
+        protected abstract int DoCallModify(${glEntityInterfaceName} entity);
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param entity Entity that the type is entity-interface. (NotNull)
-         * @return Deleted count.
-         */
-        int ${glBehaviorWritableInterfaceName}.CallRemove(${glEntityInterfaceName} entity) {
+        // -------------------------------------------------
+        //                                            Remove
+        //                                            ------
+        protected virtual int CallRemove(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             FilterEntityOfDelete(entity);
             AssertEntityOfDelete(entity);
             return DoCallRemove(entity);
         }
 
-        /// <summary>
-        /// Filter the entity of delete.
-        /// </summary>
-        /// <param name="targetEntity">Entity. (NotNull)</param>
         protected virtual void FilterEntityOfDelete(${glPackageBaseCommon}.${glEntityInterfaceName} targetEntity) {
 #if ($database.isCommonColumnInterceptingOnBehaviorFilter())
             if (!IsEntityDefinedCommonColumn(targetEntity)) {
@@ -218,21 +177,15 @@ namespace ${glPackageBaseCommonBhv} {
 
         }
 
-        /// <summary>
-        /// Assert the entity of delete.
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
         protected virtual void AssertEntityOfDelete(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
         }
 
-        abstract protected int DoCallRemove(${glEntityInterfaceName} entity);
+        protected abstract int DoCallRemove(${glEntityInterfaceName} entity);
 
-        /// <sumarry>
-        /// Is the object entity defined common column?
-        /// </sumarry>
-        /// <param name="obj">Object. If the object is null, returns false. (Nullable)</param>
-        /// <returns>Determination.</returns>
-        protected bool IsEntityDefinedCommonColumn(Object obj) {
+        // -------------------------------------------------
+        //                                            Helper
+        //                                            ------
+        protected virtual bool IsEntityDefinedCommonColumn(Object obj) {
             if (obj == null) {
                 return false;
             }
@@ -244,52 +197,48 @@ namespace ${glPackageBaseCommonBhv} {
         }
         #endregion
 
-        // =====================================================================================
-        //                                                                   Basic Entity Update
-        //                                                                   ===================
-        #region Basic Entity Update
-        /// <summary>
-        /// Create.
-        /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
-        public void Create(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        // ===============================================================================
+        //                                                             Basic Entity Update
+        //                                                             ===================
+        public void Create(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
-            ((${glBehaviorWritableInterfaceName})this).CallCreate(entity);
+            CallCreate(entity);
         }
 
-        /// <summary>
-        /// Modify.
-        /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
-        public void Modify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        public void Modify(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
-            int modifiedCount = ((${glBehaviorWritableInterfaceName})this).CallModify(entity);
-            if (modifiedCount != 1) {
-                throw new Seasar.Dao.NotSingleRowUpdatedRuntimeException(entity, modifiedCount);
+            int modifiedCount = CallModify(entity);
+            AssertUpdatedEntity(entity, modifiedCount);
+        }
+
+        protected static void AssertUpdatedEntity(${glEntityInterfaceName} entity, int updatedCount) {
+            if (updatedCount == 0) {
+                String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            }
+            if (updatedCount > 1) {
+                String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+                msg = msg + ": entity=" + entity;
+                throw new ${glEntityDuplicatedException}(msg);
             }
         }
 
-        /// <summary>
-        /// Remove.
-        /// </summary>
-        /// <param name="entity"> Entity. (NotNull)</param>
-        public void Remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        public void Remove(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
-            ((${glBehaviorWritableInterfaceName})this).CallRemove(entity);
+            int removedCount = CallRemove(entity);
+            AssertDeletedEntity(entity, removedCount);
         }
-        #endregion
 
-        // =====================================================================================
-        //                                                                        Various Insert
-        //                                                                        ==============
-        #region Various Insert
-        /// <summary>
-        /// Filter copy-insert entity.
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        protected virtual void FilterCopyInsertEntity(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-            // Nothing.
+        protected static void AssertDeletedEntity(${glEntityInterfaceName} entity, int deletedCount) {
+            if (deletedCount == 0) {
+                String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            }
+            if (deletedCount > 1) {
+                String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+                msg = msg + ": entity=" + entity;
+                throw new ${glEntityDuplicatedException}(msg);
+            }
         }
-        #endregion
     }
 }

@@ -8,32 +8,27 @@ using ${glPackageBaseCommonDBMeta};
 
 namespace ${glPackageBaseCommonBhv} {
 
-    /**
-     * The interface of behavior-readable.
-     * 
-     * @author ${database.ClassAuthor}
-     */
     public interface ${glBehaviorReadableInterfaceName} {
 
-        // =====================================================================================
-        //                                                                             TableName
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
         /// <summary>
         /// The property of table db-Name. (readonly)
         /// </summary>
         String TableDbName { get; }
 
-        // =====================================================================================
-        //                                                                                DBMeta
-        //                                                                                ======
+        // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
         /// <summary>
         /// The property of DBMeta. (readonly)
         /// </summary>
         ${glDBMetaInterfaceName} DBMeta { get; }
 
-        // =====================================================================================
-        //                                                                          New Instance
-        //                                                                          ============
+        // ===============================================================================
+        //                                                                    New Instance
+        //                                                                    ============
         /// <summary>
         /// New entity.
         /// </summary>
@@ -46,34 +41,27 @@ namespace ${glPackageBaseCommonBhv} {
         /// <returns>Condition-bean. (NotNull)</returns>
         ${glConditionBeanInterfaceName} NewConditionBean();
 
-	    // =====================================================================================
-	    //                                                                         Basic Get All
-	    //                                                                         =============
-	    /**
-	     * Get count all.
-	     * 
-	     * @return Count all.
-	     */
+        // ===============================================================================
+        //                                                                   Basic Get All
+        //                                                                   =============
 	    int GetCountAll();
 
-        // =====================================================================================
-        //                                                                          Basic Select
-        //                                                                          ============
-        #region Basic Select
+        // ===============================================================================
+        //                                                                    Basic Select
+        //                                                                    ============
         /// <summary>
-        /// ${database.ImplementComment}
+        /// Read count.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read count.</returns>
         int ReadCount(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
-        /// ${database.ImplementComment}
+        /// Read entity.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read entity. (Nullable)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}"></exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasOverlappedException}"></exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         ${glEntityInterfaceName} ReadEntity(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
@@ -81,32 +69,31 @@ namespace ${glPackageBaseCommonBhv} {
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read entity. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glRecordHasAlreadyBeenDeletedException}">If the result is nothing.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         ${glEntityInterfaceName} ReadEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
         /// Read list.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>List-result-bean. (NotNull)</returns>
+        /// <returns>Read list. (NotNull)</returns>
         ${glListResultBeanName}<${glEntityInterfaceName}> ReadList(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
-        /// ${database.ImplementComment}
+        /// Read page.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
         ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb);
 
         /// <summary>
-        /// ${database.ImplementComment}
+        /// Read page.
         /// </summary>
         /// <param name="cb">Condition-bean. (NotNull)</param>
         /// <param name="invoker">Select-page-invoker. (NotNull)</param>
         /// <returns>Read page. (NotNull)</returns>
         ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker<${glEntityInterfaceName}> invoker);
-
-        #endregion
     }
 
     /// <summary>
@@ -143,9 +130,6 @@ namespace ${glPackageBaseCommonBhv} {
         System.Collections.Generic.IList<ENTITY> SelectListWithFetchScope();
     }
 
-    /// <summary>
-    /// The simple-implementation of select-page-as-first callback.
-    /// </summary>
     public class SelectPageSimpleCallback<ENTITY> : SelectPageCallback<ENTITY> {
         protected ${glPagingBeanInterfaceName} _pb;
         protected ${glBehaviorReadableInterfaceName} _bhv;
@@ -165,7 +149,6 @@ namespace ${glPackageBaseCommonBhv} {
     }
 
     public class ResultBeanBuilder<ENTITY> {
-
         protected ${glBehaviorReadableInterfaceName} _bhv;
         public ResultBeanBuilder(${glBehaviorReadableInterfaceName} bhv) {
             _bhv = bhv;
@@ -174,13 +157,6 @@ namespace ${glPackageBaseCommonBhv} {
             get { return _bhv; }
         }
 
-        /**
-         * Build list-reuslt-bean.
-         * 
-         * @param ob Order-by-bean. (NotNull)
-         * @param selectedList Selected list. (NotNull)
-         * @return List-result-bean. (NotNull)
-         */
         public ${glListResultBeanName}<ENTITY> BuildListResultBean(${glOrderByBeanInterfaceName} ob, System.Collections.Generic.IList<ENTITY> selectedList) {
             ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
             rb.TableDbName = this.Bhv.TableDbName;
@@ -190,11 +166,6 @@ namespace ${glPackageBaseCommonBhv} {
             return rb;
         }
 
-        /// <summary>
-        /// Build paging-result-bean.
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Paging result bean. (NotNull)</returns>
         public ${glPagingResultBeanName}<ENTITY> BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, System.Collections.Generic.IList<ENTITY> selectedList) {
             ${glPagingResultBeanName}<ENTITY> rb = new ${glPagingResultBeanName}<ENTITY>();
             rb.TableDbName = this.Bhv.TableDbName;
@@ -208,10 +179,6 @@ namespace ${glPackageBaseCommonBhv} {
     }
 
     public interface SelectPageInvoker<ENTITY> {
-        /// <summary>
-        /// Invoke select-page by callback.
-        /// </summary>
-        /// <param name="callback">Callback. (NotNull)</param>
         ${glPagingResultBeanName}<ENTITY> InvokeSelectPage(SelectPageCallback<ENTITY> callback);
     }
 
@@ -225,10 +192,6 @@ namespace ${glPackageBaseCommonBhv} {
             get { return _bhv; }
         }
 
-        /// <summary>
-        /// Invoke select-page by callback.
-        /// </summary>
-        /// <param name="callback">Callback. (NotNull)</param>
         public ${glPagingResultBeanName}<ENTITY> InvokeSelectPage(SelectPageCallback<ENTITY> callback) {
             AssertObjectNotNull("callback", callback);
             AssertObjectNotNull("callback.PagingBean", callback.PagingBean);
@@ -250,22 +213,11 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        /// <summary>
-        /// Is it necessary to read page again?
-        /// </summary>
-        /// <param name="rb">Paging-result-bean. (NotNull)<param>
-        /// <returns>Determination.</return>
-        protected bool IsNecessaryToReadPageAgain(${glPagingResultBeanName}<ENTITY> rb) {
+        protected virtual bool IsNecessaryToReadPageAgain(${glPagingResultBeanName}<ENTITY> rb) {
             return rb.AllRecordCount > 0 && rb.SelectedList.Count == 0;
         }
 
-        /**
-         * Assert that the argument is not null.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param arg Argument. (NotNull)
-         */
-        protected void AssertObjectNotNull(String variableName, Object arg) {
+        protected static void AssertObjectNotNull(String variableName, Object arg) {
             if (variableName == null) {
                 String msg = "Argument[variableName] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -275,11 +227,5 @@ namespace ${glPackageBaseCommonBhv} {
                 throw new ArgumentNullException(msg);
             }
         }
-    }
-
-    /// <summary>
-    /// The marker interface of simple condition-bean setupper.
-    /// </summary>
-    public interface SimpleCBSetupper {
     }
 }

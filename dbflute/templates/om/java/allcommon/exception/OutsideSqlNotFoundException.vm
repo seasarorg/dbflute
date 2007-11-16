@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonException};
 
 /**
- * The exception when the outside-sql has been not found.
+ * The exception of when the outside-sql is not found.
  * 
  * @author ${database.ClassAuthor}
  */

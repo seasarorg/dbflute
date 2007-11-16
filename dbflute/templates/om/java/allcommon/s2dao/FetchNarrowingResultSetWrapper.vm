@@ -142,7 +142,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
         if (hasNext && getSafetyMaxResultSize() > 0 && _requestCounter > (getSafetyMaxResultSize() + 1)) {
             String msg = "You have already been in Danger Zone!";
             msg = msg + " Please confirm your query or data of table: safetyMaxResultSize=" + getSafetyMaxResultSize();
-            throw new ${glPackageBaseCommonException}.${glDangerousResultSizeExceptionName}(msg, getSafetyMaxResultSize());
+            throw new ${glPackageBaseCommonException}.${glDangerousResultSizeException}(msg, getSafetyMaxResultSize());
         }
     }
 

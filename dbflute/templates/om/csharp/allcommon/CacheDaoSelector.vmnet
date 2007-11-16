@@ -58,13 +58,6 @@ namespace ${glPackageBaseCommon} {
         // -------------------------------------------------
         //                                     Assert Object
         //                                     -------------
-        /**
-         * Assert that the object is not null.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param value Value. (NotNull)
-         * @exception IllegalArgumentException
-         */
         protected static void AssertObjectNotNull(String variableName, Object value) {
             if (variableName == null) {
                 String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
@@ -79,12 +72,6 @@ namespace ${glPackageBaseCommon} {
         // -------------------------------------------------
         //                                     Assert String
         //                                     -------------
-        /**
-         * Assert that the entity is not null and not trimmed empty.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param value Value. (NotNull)
-         */
         protected static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
             AssertObjectNotNull("variableName", variableName);
             AssertObjectNotNull(variableName, value);

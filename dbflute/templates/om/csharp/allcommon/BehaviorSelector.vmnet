@@ -7,10 +7,6 @@ using ${glPackageBaseCommonBhv};
 namespace ${glPackageBaseCommon} {
 
     public interface ${glBehaviorSelectorInterfaceName} {
-
-        // ===============================================================================
-        //                                                                        Selector
-        //                                                                        ========
         BEHAVIOR_TYPE Select<BEHAVIOR_TYPE>(Type behaviorType) where BEHAVIOR_TYPE : ${glBehaviorReadableInterfaceName};
         ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName);
     }
