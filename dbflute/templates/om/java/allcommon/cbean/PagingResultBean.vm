@@ -12,10 +12,10 @@ import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName};
 /**
  * The paging-result-bean for ${myClassName}.
  * 
- * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity for the element of selectedList()')}
+ * @param <ENTITY> The type of entity for the element of selectedList()
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName}${database.filterGenericsString('ENTITY')} extends ${glListResultBeanName}${database.filterGenericsString('ENTITY')} {
+public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;

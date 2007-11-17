@@ -20,9 +20,15 @@ namespace ${glPackageBaseCommonS2Dao} {
      */
     public class ${glSelectDynamicCommand} : Seasar.Dao.Impl.SelectDynamicCommand {
 
-        /** Log-instance. */
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        /** Log instance. */
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
         private IDataReaderHandler dataReaderHandler;
         private IDataReaderFactory dataReaderFactory;
 
@@ -32,14 +38,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         /** Cache of select clause PK-only command. */
         protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
 
-        /**
-         * Constructor.
-         * 
-         * @param dataSource Data source.
-         * @param statementFactory Statement factory.
-         * @param resultSetHandler Result set handler.
-         * @param resultSetFactory Result set factory.
-         */
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
         public ${glSelectDynamicCommand}(IDataSource dataSource, ICommandFactory commandFactory
                 , IDataReaderHandler dataReaderHandler, IDataReaderFactory dataReaderFactory)
             : base(dataSource, commandFactory, dataReaderHandler, dataReaderFactory) {

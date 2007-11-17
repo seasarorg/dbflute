@@ -61,36 +61,25 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     // ===================================================================================
-    //                                                                     Include-as-Mine
-    //                                                                     ===============
-  #foreach ($col in $table.Columns)
-
-    /**
-     * Include select-column of ${col.UncapitalisedJavaName} as mine.
-     * Alias name is java-name of this column.
-     * Be careful to whether your table have the same column.
-     */
-    public void includeAsMine_${col.JavaName}() {
-        registerIncludedSelectColumn("${col.JavaName}", getRealColumnName("${col.Name}"));
-    }
-
-    /**
-     * Include select-column of ${col.UncapitalisedJavaName} as mine.
-     * 
-     * @param aliasName Alias name. {select columnName as aliasName from ...} This should not contain comma. (NotNull)
-     */
-    public void includeAsMine_${col.JavaName}(String aliasName) {
-        registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}"));
-    }
-  #end
+    //                                                                       IncludeAsMine
+    //                                                                       =============
+    // public void includeAsMine_Xxx()
+    //   Include select-column of Xxx as mine.
+    //   Alias name is property name of this column.
+    //   Be careful to whether your table have the same column.
+    // 
+    // public void includeAsMine_Xxx(String aliasName) {
+    //   Your aliasName should not contain comma.
+    // 
+#foreach ($col in $table.columns)
+    public void includeAsMine_${col.JavaName}() { registerIncludedSelectColumn("${col.JavaName}", getRealColumnName("${col.Name}")); }
+    public void includeAsMine_${col.JavaName}(String aliasName) { registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}")); }
+#end
 
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
-    // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   MyTable = [$table.Name]
-    // * * * * * * * * */
-  #foreach ($col in $table.Columns)
+  #foreach ($col in $table.columns)
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 

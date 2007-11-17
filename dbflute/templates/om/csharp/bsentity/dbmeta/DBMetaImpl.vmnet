@@ -52,32 +52,11 @@ namespace ${myDBMetaPackageName} {
     /// </summary>
     public class ${myClassName} : ${glDBMetaAbstractName} {
 
-        /// <summary>The type of entity.</summary>
         public static readonly Type ENTITY_TYPE = typeof(${myExtendedObjectClassName});
-#if (${isExistDao})
 
-        /// <summary>The type of dao.</summary>
-        public static readonly Type DAO_TYPE = typeof(${myExtendedDaoClassName});
-#end
-#if (${isExistConditionBean})
-
-        /// <summary>The type of condition-bean.</summary>
-        public static readonly Type CONDITION_BEAN_TYPE = typeof(${myConditionBeanClassName});
-#end
-
-        /// <summary>Singleton instance.</summary>
         private static readonly ${myClassName} _instance = new ${myClassName}();
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         private ${myClassName}() {
         }
-
-        /// <summary>
-        /// Get instance.
-        /// </summary>
-        /// <returns>Singleton instance.</returns>
         public static ${myClassName} GetInstance() {
             return _instance;
         }
@@ -90,17 +69,13 @@ namespace ${myDBMetaPackageName} {
         // -------------------------------------------------
         //                                             Table
         //                                             -----
-        /// <summary>Table db-name.</summary>
         public static readonly String TABLE_DB_NAME = "$table.name";
-
-        /// <summary>Table property-name.</summary>
         public static readonly String TABLE_PROPERTY_NAME = "$table.c";
 
         // -------------------------------------------------
         //                                    Column DB-Name
         //                                    --------------
 #foreach ($col in $table.columns)
-        /// <summary>DB name of ${col.name}.</summary>
         public static readonly String DB_NAME_${col.name} = "$col.name";
 #end
 
@@ -108,7 +83,6 @@ namespace ${myDBMetaPackageName} {
         //                              Column Property-Name
         //                              --------------------
 #foreach ($col in $table.columns)
-        /// <summary>Property name of ${col.name}.</summary>
         public static readonly String PROPERTY_NAME_${col.name} = "$col.name";
 #end
 
@@ -116,7 +90,6 @@ namespace ${myDBMetaPackageName} {
         //                                      Foreign Name
         //                                      ------------
 #foreach ($foreignKeys in $table.foreignKeys)
-        /// <summary>Java name of ${foreignKeys.foreignPropertyNameInitCap}.</summary>
         public static readonly String FOREIGN_PROPERTY_NAME_${foreignKeys.foreignPropertyNameInitCap} = "$foreignKeys.foreignPropertyNameInitCap";
 #end
 
@@ -124,7 +97,6 @@ namespace ${myDBMetaPackageName} {
         //                                      Referer Name
         //                                      ------------
 #foreach ($children in $table.refererList)
-        /// <summary>Java name of ${children.refererPropertyNameInitCap}.</summary>
         public static readonly String REFERER_PROPERTY_NAME_${children.refererPropertyNameInitCap} = "$children.refererPropertyNameInitCap";
 #end
 
@@ -296,54 +268,10 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                  Foreign DBMeta
         //                                                                  ==============
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
-        /// <returns>Foreign DBMeta. (NotNull)</returns>
-        public ${glDBMetaInterfaceName} GetForeignDBMeta(String foreignPropertyName) {
-            AssertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-            String methodName = "GetForeignDBMeta_" + foreignPropertyName.Substring(0, 1).ToUpper() + foreignPropertyName.Substring(1);
-            MethodInfo method = this.GetType().GetMethod(methodName);
-            if (method == null) {
-                String msg = "The foreignPropertyName is not existing: foreignPropertyName=" + foreignPropertyName;
-                msg = msg + " tableName=" + TABLE_DB_NAME + " methodName=" + methodName;
-                throw new SystemException(msg);
-            }
-            return (${glDBMetaInterfaceName})method.Invoke(this, null);
-        }
-#foreach ($foreignKeys in $table.foreignKeys)
 
-        /// <summary>
-        /// Get foreign dbmeta of ${foreignKeys.foreignPropertyNameInitCap}.
-        /// </summary>
-        /// <returns>Foreign DBMeta. (NotNull)</returns>
-        public ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm GetForeignDBMeta_${foreignKeys.foreignPropertyNameInitCap}() {
-            return ${glProjectPrefix}${foreignKeys.ForeignTable.JavaName}Dbm.GetInstance();
-        }
-#end
-#foreach ($referer in $table.refererList)
-  #set ($reffererTable = $referer.table)
-  #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-  #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
-  #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
-  #set ($reffererVariableName = "${glChildrenVariablePrefix}${referer.ReffererPropertyNameInitCap}")
-  #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
-  #if (${refferer.isOneToOne()})
-
-        /// <summary>
-        /// Get foreign dbmeta of ${foreignKeys.reffererPropertyNameInitCapAsOne}.
-        /// </summary>
-        /// <returns>Foreign DBMeta. (NotNull)</returns>
-        public ${glProjectPrefix}${referer.Table.JavaName}Dbm GetForeignDBMeta_${referer.reffererPropertyNameInitCapAsOne}() {
-            return ${glProjectPrefix}${referer.Table.JavaName}Dbm.GetInstance();
-        }
-  #end
-#end
-
-        // =====================================================================================
-        //                                                                 Entity Property Setup
-        //                                                                 =====================
+        // ===============================================================================
+        //                                                           Entity Property Setup
+        //                                                           =====================
         protected IDictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new Dictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
 
         public override bool SetupEntityProperty(String propertyName, Object entity, Object value) {

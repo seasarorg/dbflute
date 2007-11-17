@@ -18,9 +18,9 @@ import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName}
  */
 public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** SQL clause instance. */
     protected final ${glSqlClauseName} _sqlClause;
     {
@@ -30,9 +30,9 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     /** Safety max result size. */
     protected int _safetyMaxResultSize;
 
-    // =====================================================================================
-    //                                                                            Sql-Clause
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
     /**
      * ${database.ImplementComment}
      * 
@@ -42,16 +42,16 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         return _sqlClause;
     }
 
-    // =====================================================================================
-    //                                                                   Where Clause Filter
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 Where Clause Filter
+    //                                                                 ===================
     public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter) {
         this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
     }
 
-    // =====================================================================================
-    //                                                                       Condition-Query
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                      ConditionQuery
+    //                                                                      ==============
     /**
      * Get condition query as interface.
      * 
@@ -59,9 +59,9 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     abstract public ${glConditionQueryInterfaceName} getConditionQueryAsInterface();
 
-    // =====================================================================================
-    //                                                                    Accept Primary-Key
-    //                                                                    ==================
+    // ===================================================================================
+    //                                                                   Accept PrimaryKey
+    //                                                                   =================
     /**
      * ${database.ImplementComment}
      * 
@@ -123,75 +123,35 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         return java.text.DateFormat.getDateTimeInstance();
     }
 
-    // =====================================================================================
-    //                                                                       Fetch-Narrowing
-    //                                                                       ===============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch start index.
-     */
-    public int getFetchNarrowingSkipStartIndex() {
-        return getSqlClause().getFetchNarrowingSkipStartIndex();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch size.
-     */
-    public int getFetchNarrowingLoopCount() {
-        return getSqlClause().getFetchNarrowingLoopCount();
-    }
-
+    // ===================================================================================
+    //                                                                Paging Determination
+    //                                                                ====================
+    // * * * * * * * *
+    // For SQL Comment
+    // * * * * * * * *
     /**
      * ${database.ImplementComment}
      * 
      * @return Determination.
      */
-    public boolean isFetchNarrowingSkipStartIndexEffective() {
-        return !getSqlClause().isFetchStartIndexSupported();
+    public boolean isPaging() {
+        String msg = "This method is unsupported on ConditionBean!";
+        throw new UnsupportedOperationException(msg);
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @return Determination.
+     * @param paging Determination.
      */
-    public boolean isFetchNarrowingLoopCountEffective() {
-        return !getSqlClause().isFetchSizeSupported();
+    public void xsetPaging(boolean paging) {
+        String msg = "This method is unsupported on ConditionBean!";
+        throw new UnsupportedOperationException(msg);
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determiantion.
-     */
-    public boolean isFetchNarrowingEffective() {
-        return getSqlClause().isFetchNarrowingEffective();
-    }
-
-    /**
-     * Get safety max result size.
-     * 
-     * @return Safety max result size.
-     */
-    public int getSafetyMaxResultSize() {
-        return _safetyMaxResultSize;
-    }
-
-    /**
-     * Check safety result.
-     * 
-     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
-     */
-    public void checkSafetyResult(int safetyMaxResultSize) {
-        this._safetyMaxResultSize = safetyMaxResultSize;
-    }
-
-    // =====================================================================================
-    //                                                                                Paging
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                       Fetch Setting
+    //                                                                       =============
     /**
      * ${database.ImplementComment}
      * 
@@ -226,6 +186,63 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         return this;
     }
 
+    // -----------------------------------------------------
+    //                                     for conditionBean
+    //                                     -----------------
+    /**
+     * Set up various things for select-count-ignore-fetch-scope. {Internal}
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
+        _isSelectCountIgnoreFetchScope = true;
+
+        // If the query uses union query, it needs included-select-column.
+        if (!hasUnionQueryOrUnionAllQuery()) {
+            getSqlClause().ignoreIncludedSelectColumn();
+        }
+
+        getSqlClause().ignoreOrderBy();
+        getSqlClause().ignoreFetchScope();
+        return this;
+    }
+
+    /**
+     * Do after-care for select-count-ignore-fetch-scope. {Internal}
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope() {
+        _isSelectCountIgnoreFetchScope = false;
+
+        // If the query uses union query, it needs included-select-column.
+        if (!hasUnionQueryOrUnionAllQuery()) {
+            getSqlClause().makeIncludedSelectColumnEffective();
+        }
+
+        getSqlClause().makeOrderByEffective();
+        getSqlClause().makeFetchScopeEffective();
+        return this;
+    }
+
+    /** Is set up various things for select-count-ignore-fetch-scope? */
+    protected boolean _isSelectCountIgnoreFetchScope;
+
+    /**
+     * Is set up various things for select-count-ignore-fetch-scope?
+     * This method is for INTERNAL. Don't invoke this!
+     * 
+     * @return Determination.
+     */
+    public boolean isSelectCountIgnoreFetchScope() {
+        return _isSelectCountIgnoreFetchScope;
+    }
+
+    // ===================================================================================
+    //                                                                     Paging Property
+    //                                                                     ===============
     /**
      * ${database.ImplementComment}
      * 
@@ -280,9 +297,9 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         return getSqlClause().isFetchScopeEffective();
     }
 
-    // =====================================================================================
-    //                                                                              Order-By
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                    OrderBy Property
+    //                                                                    ================
     /**
      * ${database.ImplementComment}
      * 
@@ -430,9 +447,75 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         return sb.toString();
     }
 
-    // =====================================================================================
-    //                                                                          Limit-Select
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                     Fetch Narrowing
+    //                                                                     ===============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch start index.
+     */
+    public int getFetchNarrowingSkipStartIndex() {
+        return getSqlClause().getFetchNarrowingSkipStartIndex();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch size.
+     */
+    public int getFetchNarrowingLoopCount() {
+        return getSqlClause().getFetchNarrowingLoopCount();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchNarrowingSkipStartIndexEffective() {
+        return !getSqlClause().isFetchStartIndexSupported();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchNarrowingLoopCountEffective() {
+        return !getSqlClause().isFetchSizeSupported();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determiantion.
+     */
+    public boolean isFetchNarrowingEffective() {
+        return getSqlClause().isFetchNarrowingEffective();
+    }
+
+    /**
+     * Get safety max result size.
+     * 
+     * @return Safety max result size.
+     */
+    public int getSafetyMaxResultSize() {
+        return _safetyMaxResultSize;
+    }
+
+    /**
+     * Check safety result.
+     * 
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        this._safetyMaxResultSize = safetyMaxResultSize;
+    }
+
+    // ===================================================================================
+    //                                                                        Limit Select
+    //                                                                        ============
     /** Is limit-select PK only? */
     protected boolean _isLimitSelectPKOnly;
 
@@ -465,9 +548,9 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         return this;
     }
 
-    // =====================================================================================
-    //                                                                               Advance
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                        Lock Setting
+    //                                                                        ============
     /**
      * ${database.ImplementComment}
      * 
@@ -478,9 +561,9 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         return this;
     }
 
-    // =====================================================================================
-    //                                                                        For SqlComment
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                       Hint Property
+    //                                                                       =============
     /**
      * Get select-hint. {select [select-hint] * from table...}
      * 
@@ -525,59 +608,4 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     public String getSqlSuffix() {
         return getSqlClause().getSqlSuffix();
     }
-
-    // ------------------------------
-    //                   for Internal
-    //                   ------------
-    /**
-     * Set up various things for select-count-ignore-fetch-scope. {Internal}
-     * This method is for INTERNAL. Don't invoke this!
-     * 
-     * @return this. (NotNull)
-     */
-    public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
-        _isSelectCountIgnoreFetchScope = true;
-
-        // If the query uses union query, it needs included-select-column.
-        if (!hasUnionQueryOrUnionAllQuery()) {
-            getSqlClause().ignoreIncludedSelectColumn();
-        }
-
-        getSqlClause().ignoreOrderBy();
-        getSqlClause().ignoreFetchScope();
-        return this;
-    }
-
-    /**
-     * Do after-care for select-count-ignore-fetch-scope. {Internal}
-     * This method is for INTERNAL. Don't invoke this!
-     * 
-     * @return this. (NotNull)
-     */
-    public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope() {
-        _isSelectCountIgnoreFetchScope = false;
-
-        // If the query uses union query, it needs included-select-column.
-        if (!hasUnionQueryOrUnionAllQuery()) {
-            getSqlClause().makeIncludedSelectColumnEffective();
-        }
-
-        getSqlClause().makeOrderByEffective();
-        getSqlClause().makeFetchScopeEffective();
-        return this;
-    }
-
-    /** Is set up various things for select-count-ignore-fetch-scope? */
-    protected boolean _isSelectCountIgnoreFetchScope;
-
-    /**
-     * Is set up various things for select-count-ignore-fetch-scope?
-     * This method is for INTERNAL. Don't invoke this!
-     * 
-     * @return Determination.
-     */
-    public boolean isSelectCountIgnoreFetchScope() {
-        return _isSelectCountIgnoreFetchScope;
-    }
-
 }

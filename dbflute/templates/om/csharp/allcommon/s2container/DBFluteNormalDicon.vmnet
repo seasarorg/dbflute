@@ -41,6 +41,9 @@
   #end
 #end
 
+    <!-- * * * * * * * * * * * -->
+    <!-- Domain dao component. -->
+    <!-- * * * * * * * * * * * -->
 #foreach ($table in $database.tables)
 
     <!-- ${table.Name} -->

@@ -12,5 +12,8 @@ namespace ${glPackageBaseCommonException} {
 
         public ${glEntityAlreadyUpdatedException}(Object bean, int rows)
         : base(bean, rows) {}
+
+        public ${glEntityAlreadyUpdatedException}(NotSingleRowUpdatedRuntimeException e)
+        : base(e.Bean, e.Rows) {}
     }
 }

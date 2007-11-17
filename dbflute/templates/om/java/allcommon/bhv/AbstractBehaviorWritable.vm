@@ -303,6 +303,12 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
     }
 
+#set ($batchUpdateReturnType = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnType = "int[]")
+#else
+  #set ($batchUpdateReturnType = "int")
+#end
 #set ($batchUpdateReturnValueMethod = "")
 #if ($database.isVersionAfter1047())
   #set ($batchUpdateReturnValueMethod = ".length")

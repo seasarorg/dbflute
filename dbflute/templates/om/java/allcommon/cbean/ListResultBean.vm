@@ -17,14 +17,17 @@ import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
  * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity for the element of selectedList()')}
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName}${database.filterGenericsString('ENTITY')} implements java.util.List${database.filterGenericsString('ENTITY')}, java.io.Serializable {
+public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** The value of table db-name. */
     protected String _tableDbName;
 
@@ -32,99 +35,23 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
     protected int _allRecordCount;
 
     /** Selected list. */
-    protected java.util.List${database.filterGenericsString('ENTITY')} _selectedList = new java.util.ArrayList${database.filterGenericsString('ENTITY')}();
+    protected java.util.List<ENTITY> _selectedList = new java.util.ArrayList<ENTITY>();
 
     /** Order-by clause. */
     protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
     public ${myClassName}() {
     }
 
-    // =====================================================================================
-    //                                                                         Getter Setter
-    //                                                                         =============
-    /**
-     * Get the value of tableDbName.
-     * 
-     * @return The value of tableDbName.
-     */
-    public String getTableDbName() {
-        return _tableDbName;
-    }
-
-    /**
-     * Set the value of tableDbName.
-     * 
-     * @param tableDbName The value of tableDbName.
-     */
-    public void setTableDbName(String tableDbName) {
-        _tableDbName = tableDbName;
-    }
-
-    /**
-     * Get the value of allRecordCount.
-     * 
-     * @return The value of allRecordCount.
-     */
-    public int getAllRecordCount() {
-        return _allRecordCount;
-    }
-
-    /**
-     * Set the value of allRecordCount.
-     * 
-     * @param allRecordCount The value of allRecordCount.
-     */
-    public void setAllRecordCount(int allRecordCount) {
-        _allRecordCount = allRecordCount;
-    }
-
-    /**
-     * Get the value of selectedList.
-     * 
-     * @return Selected list. (NotNull)
-     */
-    public java.util.List${database.filterGenericsString('ENTITY')} getSelectedList() {
-        return _selectedList;
-    }
-
-    /**
-     * Set the value of selectedList.
-     * 
-     * @param selectedList Selected list. (NotNull)
-     */
-    public void setSelectedList(java.util.List${database.filterGenericsString('ENTITY')} selectedList) {
-        _selectedList = selectedList;
-    }
-
-    /**
-     * Get the value of orderByClause.
-     * 
-     * @return The value of orderByClause. (NotNull)
-     */
-    public ${glOrderByClauseName} getOrderByClause() {
-        return _orderByClause;
-    }
-
-    /**
-     * Set the value of orderByClause.
-     * 
-     * @param orderByClause The value of orderByClause. (NotNull)
-     */
-    public void setOrderByClause(${glOrderByClauseName} orderByClause) {
-        _orderByClause = orderByClause;
-    }
-
-#if ($database.isAvailableGenerics())
-    // =====================================================================================
-    //                                                                              Grouping
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Grouping
+    //                                                                            ========
     public <ROW> java.util.List<ROW> groupingList(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
         final java.util.List<ROW> groupingList = new java.util.ArrayList<ROW>();
         ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
@@ -177,9 +104,9 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
         return groupingList;
     }
 
-    // =====================================================================================
-    //                                                                               Mapping
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
     public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
         final ${myClassName}<DTO> mappingList = new ${myClassName}<DTO>();
         for (ENTITY entity : _selectedList) {
@@ -190,11 +117,10 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
         mappingList.setOrderByClause(getOrderByClause());
         return mappingList;
     }
-#end
 
-    // =====================================================================================
-    //                                                                         Determination
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Has this result selected?
      * <pre>
@@ -207,9 +133,9 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
         return _tableDbName != null;
     }
 
-    // =====================================================================================
-    //                                                                        Basic Override
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     /**
      * ${database.OverrideComment}
      * 
@@ -256,11 +182,10 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
 
         return sb.toString();
     }
-#if ($database.isAvailableGenerics())
 
-    // =====================================================================================
-    //                                                                         List Elements
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       List Elements
+    //                                                                       =============
     public boolean add(ENTITY o) {
         return _selectedList.add(o);
     }
@@ -285,7 +210,7 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
         return _selectedList.isEmpty();
     }
 
-    public java.util.Iterator${database.filterGenericsString('ENTITY')} iterator() {
+    public java.util.Iterator<ENTITY> iterator() {
         return _selectedList.iterator();
     }
 
@@ -333,11 +258,11 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
         return _selectedList.lastIndexOf(o);
     }
 
-    public java.util.ListIterator${database.filterGenericsString('ENTITY')} listIterator() {
+    public java.util.ListIterator<ENTITY> listIterator() {
         return _selectedList.listIterator();
     }
 
-    public java.util.ListIterator${database.filterGenericsString('ENTITY')} listIterator(int index) {
+    public java.util.ListIterator<ENTITY> listIterator(int index) {
         return _selectedList.listIterator(index);
     }
 
@@ -349,105 +274,82 @@ public class ${myClassName}${database.filterGenericsString('ENTITY')} implements
         return _selectedList.set(index, element);
     }
 
-    public java.util.List${database.filterGenericsString('ENTITY')} subList(int fromIndex, int toIndex) {
-        return _selectedList.subList(fromIndex, toIndex);
-    }
-#else
-
-    // =====================================================================================
-    //                                                                         List Elements
-    //                                                                         =============
-    public boolean add(Object arg0) {
-        return _selectedList.add(arg0);
-    }
-
-    public void add(int arg0, Object arg1) {
-        _selectedList.add(arg0, arg1);
-    }
-
-    public boolean addAll(java.util.Collection arg0) {
-        return _selectedList.addAll(arg0);
-    }
-
-    public boolean addAll(int arg0, java.util.Collection arg1) {
-        return _selectedList.addAll(arg0, arg1);
-    }
-
-    public void clear() {
-        _selectedList.clear();
-    }
-
-    public boolean contains(Object o) {
-        return _selectedList.contains(o);
-    }
-
-    public boolean containsAll(java.util.Collection arg0) {
-        return _selectedList.containsAll(arg0);
-    }
-
-    public Object get(int index) {
-        return _selectedList.get(index);
-    }
-
-    public int indexOf(Object o) {
-        return _selectedList.indexOf(o);
-    }
-
-    public boolean isEmpty() {
-        return _selectedList.isEmpty();
-    }
-
-    public java.util.Iterator iterator() {
-        return _selectedList.iterator();
-    }
-
-    public int lastIndexOf(Object o) {
-        return _selectedList.lastIndexOf(o);
-    }
-
-    public java.util.ListIterator listIterator() {
-        return _selectedList.listIterator();
-    }
-
-    public java.util.ListIterator listIterator(int index) {
-        return _selectedList.listIterator();
-    }
-
-    public boolean remove(Object o) {
-        return _selectedList.remove(o);
-    }
-
-    public Object remove(int index) {
-        return _selectedList.remove(index);
-    }
-
-    public boolean removeAll(java.util.Collection arg0) {
-        return _selectedList.removeAll(arg0);
-    }
-
-    public boolean retainAll(java.util.Collection arg0) {
-        return _selectedList.retainAll(arg0);
-    }
-
-    public Object set(int arg0, Object arg1) {
-        return _selectedList.set(arg0, arg1);
-    }
-
-    public int size() {
-        return _selectedList.size();
-    }
-
-    public java.util.List subList(int fromIndex, int toIndex) {
+    public java.util.List<ENTITY> subList(int fromIndex, int toIndex) {
         return _selectedList.subList(fromIndex, toIndex);
     }
 
-    public Object[] toArray() {
-        return _selectedList.toArray();
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get the value of tableDbName.
+     * 
+     * @return The value of tableDbName.
+     */
+    public String getTableDbName() {
+        return _tableDbName;
     }
 
-    public Object[] toArray(Object[] arg0) {
-        return _selectedList.toArray(arg0);
+    /**
+     * Set the value of tableDbName.
+     * 
+     * @param tableDbName The value of tableDbName.
+     */
+    public void setTableDbName(String tableDbName) {
+        _tableDbName = tableDbName;
     }
-#end
 
+    /**
+     * Get the value of allRecordCount.
+     * 
+     * @return The value of allRecordCount.
+     */
+    public int getAllRecordCount() {
+        return _allRecordCount;
+    }
+
+    /**
+     * Set the value of allRecordCount.
+     * 
+     * @param allRecordCount The value of allRecordCount.
+     */
+    public void setAllRecordCount(int allRecordCount) {
+        _allRecordCount = allRecordCount;
+    }
+
+    /**
+     * Get the value of selectedList.
+     * 
+     * @return Selected list. (NotNull)
+     */
+    public java.util.List<ENTITY> getSelectedList() {
+        return _selectedList;
+    }
+
+    /**
+     * Set the value of selectedList.
+     * 
+     * @param selectedList Selected list. (NotNull)
+     */
+    public void setSelectedList(java.util.List<ENTITY> selectedList) {
+        _selectedList = selectedList;
+    }
+
+    /**
+     * Get the value of orderByClause.
+     * 
+     * @return The value of orderByClause. (NotNull)
+     */
+    public ${glOrderByClauseName} getOrderByClause() {
+        return _orderByClause;
+    }
+
+    /**
+     * Set the value of orderByClause.
+     * 
+     * @param orderByClause The value of orderByClause. (NotNull)
+     */
+    public void setOrderByClause(${glOrderByClauseName} orderByClause) {
+        _orderByClause = orderByClause;
+    }
 }

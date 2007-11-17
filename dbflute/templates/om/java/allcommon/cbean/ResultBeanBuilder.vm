@@ -1,0 +1,63 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
+
+import java.util.List;
+import java.io.Serializable;
+
+/**
+ * The list-result-bean for ${myClassName}.
+ * 
+ * @param <ENTITY> The type of entity.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glResultBeanBuilderName}<ENTITY> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected String _tableDbName;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glResultBeanBuilderName}(String tableDbName) {
+        _tableDbName = tableDbName;
+    }
+
+    // ===================================================================================
+    //                                                                             Builder
+    //                                                                             =======
+    /**
+     * Build the result bean of list.
+     * 
+     * @param ob The bean of orderBy. (NotNull)
+     * @param selectedList Selected list. (NotNull)
+     * @return The result bean of list. (NotNull)
+     */
+    public ${glListResultBeanName}<ENTITY> buildListResultBean(${glOrderByBeanInterfaceName} ob, List<ENTITY> selectedList) {
+        ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(selectedList.size());
+        rb.setSelectedList(selectedList);
+        rb.setOrderByClause(ob.getSqlComponentOfOrderByClause());
+        return rb;
+    }
+
+    /**
+     * Build the result bean of paging.
+     * 
+     * @param pb The bean of paging. (NotNull)
+     * @param allRecordCount All record count.
+     * @param selectedList The list of selected entity. (NotNull)
+     * @return The result bean of paging. (NotNull)
+     */
+    public ${glPagingResultBeanName}<ENTITY> buildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, List<ENTITY> selectedList) {
+        ${glPagingResultBeanName}<ENTITY> rb = new ${glPagingResultBeanName}<ENTITY>();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(allRecordCount);
+        rb.setSelectedList(selectedList);
+        rb.setPageSize(pb.getFetchSize());
+        rb.setCurrentPageNumber(pb.getFetchPageNumber());
+        rb.setOrderByClause(pb.getSqlComponentOfOrderByClause());
+        return rb;
+    }
+}

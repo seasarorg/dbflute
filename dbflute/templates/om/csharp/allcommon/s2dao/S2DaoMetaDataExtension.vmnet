@@ -23,10 +23,16 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glDaoMetaDataExtension} : Seasar.Dao.Impl.DaoMetaDataImpl {
 
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
         public ${glDaoMetaDataExtension}(Type daoType, IDataSource dataSource,ICommandFactory commandFactory,
             IDataReaderFactory dataReaderFactory, IDatabaseMetaData dbMetaData)
             : base(daoType, dataSource, commandFactory, dataReaderFactory, dbMetaData) {}
 
+        // ===============================================================================
+        //                                                         Initialization Override
+        //                                                         =======================
         public override void Initialize()
         {
             _daoInterface = GetDaoInterface(_daoType);
@@ -39,9 +45,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             SetupSqlCommand();
         }
 
-        // =====================================================================================
-        //                                                            Outside Sql Check Override
-        //                                                            ==========================
+        // ===============================================================================
+        //                                                      Outside Sql Check Override
+        //                                                      ==========================
         protected override void SetupMethodByAuto(MethodInfo mi) {
             ${glOutsideSqlAnnotation} outsideSql = Attribute.GetCustomAttribute(mi, typeof(${glOutsideSqlAnnotation})) as ${glOutsideSqlAnnotation};
             if (outsideSql != null) {
@@ -52,9 +58,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             base.SetupMethodByAuto(mi);
         }
 
-        // =====================================================================================
-        //                                                                ConditionBean Override
-        //                                                                ======================
+        // ===============================================================================
+        //                                                          ConditionBean Override
+        //                                                          ======================
         protected override void SetupSelectMethodByAuto(MethodInfo methodInfo) {
             String query = _annotationReader.GetQuery(methodInfo.Name);
             IDataReaderHandler handler = CreateDataReaderHandler(methodInfo);
@@ -195,13 +201,25 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-        protected ${glSelectDynamicCommand} NewMySelectDynamicCommand(IDataReaderHandler handler) {// for condition-bean
-            return new ${glSelectDynamicCommand}(_dataSource, _commandFactory, handler, _dataReaderFactory);
-        }
+        // ===============================================================================
+        //                                              Update and Delete By Auto Override
+        //                                              ==================================
+// TODO: @jflute -- Must modify S2Dao.
+//        protected virtual AbstractSqlCommand CreateUpdateModifiedOnlyCommand(IDataSource _dataSource, ICommandFactory _commandFactory, IBeanMetaData _beanMetaData, string[] propertyNames) {
+//            return new UpdateModifiedOnlyCommand(_dataSource, _commandFactory, _beanMetaData, propertyNames);
+//        }
+//
+//        protected IBeanMetaData CreateBeanMetaData4UpdateDeleteByAuto(Method method) {
+//            if (method.getName().contains("Nonstrict")) {
+//                return createNonConcurrencyBmdFactory().createBeanMetaData(getBeanClass());
+//            } else {
+//                return getBeanMetaData();
+//            }
+//        }
 
-        // =====================================================================================
-        //                                                                   OutsideSql Override
-        //                                                                   ===================
+        // ===============================================================================
+        //                                                             OutsideSql Override
+        //                                                             ===================
         protected override void SetupSelectMethodByManual(MethodInfo mi, string sql) {
             string[] parameterNames = MethodUtil.GetParameterNames(mi);
             Type[] parameterTypes = MethodUtil.GetParameterTypes(mi);
@@ -276,11 +294,15 @@ namespace ${glPackageBaseCommonS2Dao} {
             return bmd.BeanType.IsAssignableFrom(type) || type.IsAssignableFrom(bmd.BeanType);
         }
 
-        // =====================================================================================
-        //                                                                             Extension
-        //                                                                             =========
-        protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler drh) {// for all except condition-bean
-            return new ${glSelectDynamicCommand}(_dataSource, _commandFactory, drh, _dataReaderFactory);
+        // ===============================================================================
+        //                                                              Extension Override
+        //                                                              ==================
+        protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler handler) {// for all except condition-bean
+            return NewMySelectDynamicCommand(handler);
+        }
+
+        protected virtual ${glSelectDynamicCommand} NewMySelectDynamicCommand(IDataReaderHandler handler) {// for condition-bean
+            return new ${glSelectDynamicCommand}(_dataSource, _commandFactory, handler, _dataReaderFactory);
         }
 
         protected override Seasar.Dao.IRowCreator CreateRowCreator() {
@@ -292,9 +314,9 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-    // =====================================================================================
-    //                                                                       Extension Class
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                     Extension Class
+    //                                                                     ===============
     public class BeanMetaDataExtension : BeanMetaDataImpl {
         public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {

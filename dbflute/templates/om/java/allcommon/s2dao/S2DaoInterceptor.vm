@@ -35,7 +35,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Dao meta data factory. */
+    /** The factory of dao meta data. */
     private DaoMetaDataFactory daoMetaDataFactory_;
 
     // ===================================================================================
@@ -44,7 +44,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     /**
      * Constructor.
      * 
-     * @param daoMetaDataFactory Dao meta data factory.
+     * @param daoMetaDataFactory The factory of dao meta data. (NotNull)
      */
     public ${glDaoInterceptor}(DaoMetaDataFactory daoMetaDataFactory) {
         daoMetaDataFactory_ = daoMetaDataFactory;
@@ -54,22 +54,29 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                                Main
     //                                                                                ====
     /**
-     * Invoke.
+     * Invoke the method.
      * 
-     * @param invocation Method invocation.
-     * @return Result of the method.
+     * @param invocation The methodinvocation. (NotNull)
+     * @return The result of the method. (Nullable)
      * @throws Throwable
      */
     public Object invoke(MethodInvocation invocation) throws Throwable {
         clearThreadLocal();
         try {
-            return dispatchInvoke(invocation);
+            return dispatchInvoking(invocation);
         } finally {
             clearThreadLocal();
         }
     }
 
-    protected Object dispatchInvoke(MethodInvocation invocation) throws Throwable {
+    /**
+     * Dispatch invoking the method.
+     * 
+     * @param invocation The methodinvocation. (NotNull)
+     * @return The result of the method. (Nullable)
+     * @throws Throwable
+     */
+    protected Object dispatchInvoking(MethodInvocation invocation) throws Throwable {
         final java.lang.reflect.Method method = invocation.getMethod();
         if (!org.seasar.framework.util.MethodUtil.isAbstract(method)) {
             return invocation.proceed();
@@ -450,6 +457,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                     final java.util.List ls = (java.util.List) ret;
                     if (ls.isEmpty()) {
                         _log.debug(daoResultPrefix + "Selected list: 0]");
+                    } else if (ls.size() == 1 && ls.get(0) instanceof Number) {
+                        _log.debug(daoResultPrefix + "Selected count: " + ls.get(0) + "]");
                     } else {
                         _log.debug(daoResultPrefix + "Selected list: " + ls.size() + " first=" + ls.get(0) + "]");
                     }
@@ -624,7 +633,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      * @param cb Condition-bean. (Nullable)
      */
     protected void postprocessConditionBean(org.aopalliance.intercept.MethodInvocation invocation, ${glConditionBeanInterfaceName} cb) {
-        if (cb != null && isSelectCountIgnoreFetchScopeMethod(invocation)) {
+        if (cb == null) {
+            return;
+        }
+        if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
             cb.xafterCareSelectCountIgnoreFetchScope();
         }
     }
@@ -670,13 +682,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
      */
     protected boolean isSelectCountIgnoreFetchScopeMethod(org.aopalliance.intercept.MethodInvocation invocation) {
         final String name = invocation.getMethod().getName();
-        if (name.startsWith("readCount")
-                || name.startsWith("selectCount")
-                || name.startsWith("readCountIgnoreFetchScope")
-                || name.startsWith("selectCountIgnoreFetchScope")) {
-            return true;
-        } else {
-            return false;
-        }
+        return name.startsWith("readCount") || name.startsWith("selectCount");
     }
 }

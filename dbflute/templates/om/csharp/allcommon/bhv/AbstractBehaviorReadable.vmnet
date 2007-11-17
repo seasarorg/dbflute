@@ -141,7 +141,7 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                     Assert Object
         //                                     -------------
-        protected static void AssertObjectNotNull(String variableName, Object arg) {
+        protected virtual void AssertObjectNotNull(String variableName, Object arg) {
             if (variableName == null) {
                 String msg = "Argument[variableName] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -152,15 +152,15 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        protected static void AssertEntityNotNull(${glEntityInterfaceName} entity) {
+        protected virtual void AssertEntityNotNull(${glEntityInterfaceName} entity) {
             AssertObjectNotNull("entity", entity);
         }
 
-        protected static void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
+        protected virtual void AssertConditionBeanNotNull(${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName} cb) {
             AssertObjectNotNull("cb", cb);
         }
 
-        protected static void AssertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
+        protected virtual void AssertEntityNotNullAndHasPrimaryKeyValue(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             if (!entity.HasPrimaryKeyValue) {
                 String msg = "The entity must should primary-key: entity=" + entity;
@@ -171,7 +171,7 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                     Assert String
         //                                     -------------
-        protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        protected virtual void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
             if (variableName == null) {
                 String msg = "Variable[variableName] should not be null.";
                 throw new ArgumentNullException(msg);
@@ -189,7 +189,7 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                       Assert List
         //                                       -----------
-        protected void AssertListNotNullAndEmpty<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
+        protected virtual void AssertListNotNullAndEmpty<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
             AssertObjectNotNull(variableName, ls);
             if (!(ls.Count == 0)) {
                 String msg = "The list[" + variableName + "] should be empty: ls=" + ls.ToString();
@@ -197,7 +197,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        protected void AssertListNotNullAndNotEmpty<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
+        protected virtual void AssertListNotNullAndNotEmpty<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
             AssertObjectNotNull(variableName, ls);
             if (ls.Count == 0) {
                 String msg = "The list[" + variableName + "] should not be empty: ls=" + ls.ToString();
@@ -205,7 +205,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        protected void AssertListNotNullAndHasOnlyOne<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
+        protected virtual void AssertListNotNullAndHasOnlyOne<ELEMENT_TYPE>(String variableName, IList<ELEMENT_TYPE> ls) {
             AssertObjectNotNull(variableName, ls);
             if (ls.Count != 1) {
                 String msg = "The list[" + variableName + "] should contain only one object: ls=" + ls.ToString();

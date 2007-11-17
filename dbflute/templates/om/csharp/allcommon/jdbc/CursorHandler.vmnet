@@ -4,8 +4,17 @@ using System.Data;
 
 namespace ${glPackageBaseCommonJdbc} {
 
+    /// <summary>
+    /// The handler of cursor.
+    /// Author : ${database.ClassAuthor}
+    /// </summary>
     public interface ${glCursorHandlerName} {
 
+        /// <summary>
+        /// Handle dataReader.
+        /// </summary>
+        /// <param name="reader">The dataReader of handling target. (NotNull)</param>
+        /// <returns>The result of handling. (Nullable)</returns>
         Object Handle(IDataReader reader);
     }
 }

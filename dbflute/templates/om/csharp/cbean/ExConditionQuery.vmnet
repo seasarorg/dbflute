@@ -10,16 +10,12 @@ using ${glPackageBaseCQ};
 
 namespace ${glPackageCQ} {
 
-    /// <summary>
-    /// The condition-query of {table.Name}.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     [System.Serializable]
     public class ${myClassName} : ${myBaseConditionQueryClassName} {
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -29,5 +25,9 @@ namespace ${glPackageCQ} {
         /// <param name="nestLevel">Nest level.</param>
         public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel)
             : base(childQuery, sqlClause, aliasName, nestLevel) {}
+
+        // ===============================================================================
+        //                                                                    Your Orignal
+        //                                                                    ============
     }
 }

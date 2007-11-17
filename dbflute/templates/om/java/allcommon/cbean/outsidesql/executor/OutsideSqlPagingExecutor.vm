@@ -3,11 +3,14 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesqlExecuto
 import java.util.List;
 
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
+import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
+import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 
 /**
- * The paging executor of outside-sql.
+ * The paging executor of outsideSql.
  * 
  * @author ${database.ClassAuthor}
  */
@@ -16,29 +19,68 @@ public class ${glOutsideSqlPagingExecutorName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The DAO of outsideSql. (NotNull) */
     protected final ${glOutsideSqlDaoName} _outsideSqlDao;
 
+    /** The option of outsideSql. (NotNull) */
     protected final ${glOutsideSqlOptionName} _outsideSqlOption;
+
+    /** The DB name of table. (NotNull) */
+    protected final String _tableDbName;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlPagingExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption) {
+    public ${glOutsideSqlPagingExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
         this._outsideSqlDao = outsideSqlDao;
         this._outsideSqlOption = outsideSqlOption;
+        this._tableDbName = tableDbName;
     }
 
     // ===================================================================================
     //                                                                              Select
     //                                                                              ======
-    public <ENTITY_TYPE> List<ENTITY_TYPE> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY_TYPE> entityType) {
+    public <ENTITY> List<ENTITY> selectList(String path, ${glPagingBeanInterfaceName} pmb, Class<ENTITY> entityType) {
         return _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
+    }
+
+    /**
+     * Select page.
+     * 
+     * @param <ENTITY> The type of entity.
+     * @param countPath The path of count SQL. (NotNull)
+     * @param pagingPath The path of paging SQL. (NotNull)
+     * @param pmb The bean of paging parameter. (NotNull)
+     * @param entityType The type of result entity. (NotNull)
+     * @return The result bean of paging. (NotNull)
+     */
+    public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String countPath
+                                                               , final String pagingPath
+                                                               , final ${glPagingBeanInterfaceName} pmb
+                                                               , final Class<ENTITY> entityType) {
+        final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
+        final ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
+        final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {
+            public ${glPagingBeanInterfaceName} getPagingBean() {
+                return pmb;
+            }
+            public int count() {
+                pmb.xsetPaging(false);
+                return countExecutor.selectEntityWithDeletedCheck(countPath, pmb, Integer.class);
+            }
+            public java.util.List<ENTITY> paging() {
+                pmb.xsetPaging(true);
+                return selectList(pagingPath, pmb, entityType);
+            }
+        };
+        final ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY> (_tableDbName);
+        return invoker.invokePaging(handler);
     }
 
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glOutsideSqlCursorExecutorName} cursorHandling() {
+    public ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}> cursorHandling() {
         return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
     }
 

@@ -6,7 +6,10 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glOrderByBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
+import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
+import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
+import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
@@ -16,9 +19,9 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  */
 public interface ${glBehaviorReadableInterfaceName} {
 
-    // =====================================================================================
-    //                                                                            Definition
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Map-string map-mark. */
     public static final String MAP_STRING_MAP_MARK = "map:";
 
@@ -37,9 +40,9 @@ public interface ${glBehaviorReadableInterfaceName} {
     /** Map-string equal. */
     public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
 
-    // =====================================================================================
-    //                                                                            Table name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table name
+    //                                                                          ==========
     /**
      * Get table db-name.
      * 
@@ -47,9 +50,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public String getTableDbName();
 
-    // =====================================================================================
-    //                                                                                DBMeta
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
     /**
      * Get dbmeta.
      * 
@@ -57,9 +60,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public ${glDBMetaInterfaceName} getDBMeta();
 
-    // =====================================================================================
-    //                                                                          Dao Accessor
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Dao Accessor
+    //                                                                        ============
     /**
      * Get dao-readable.
      * 
@@ -67,9 +70,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public ${glDaoReadableInterfaceName} getDaoReadable();
 
-    // =====================================================================================
-    //                                                                          New Instance
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        New Instance
+    //                                                                        ============
     /**
      * New entity.
      * 
@@ -84,9 +87,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public ${glConditionBeanInterfaceName} newConditionBean();
 
-    // =====================================================================================
-    //                                                                         Basic Get All
-    //                                                                         =============
+    // ===================================================================================
+    //                                                                       Basic Get All
+    //                                                                       =============
     /**
      * Get count all.
      * 
@@ -94,9 +97,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public int getCountAll();
 
-    // =====================================================================================
-    //                                                                      Basic Read Count
-    //                                                                      ================
+    // ===================================================================================
+    //                                                                    Basic Read Count
+    //                                                                    ================
     /**
      * Read count by condition-bean.
      * <pre>
@@ -108,9 +111,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public int readCount(${glConditionBeanInterfaceName} cb);
 
-    // =====================================================================================
-    //                                                                     Basic Read Entity
-    //                                                                     =================
+    // ===================================================================================
+    //                                                                   Basic Read Entity
+    //                                                                   =================
     /**
      * Read entity by condition-bean.
      * 
@@ -130,9 +133,9 @@ public interface ${glBehaviorReadableInterfaceName} {
      */
     public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
 
-    // =====================================================================================
-    //                                                                       Basic Read List
-    //                                                                       ===============
+    // ===================================================================================
+    //                                                                     Basic Read List
+    //                                                                     ===============
     /**
      * Read list as result-bean.
      * 
@@ -176,138 +179,44 @@ public interface ${glBehaviorReadableInterfaceName} {
      * 
      * @param <T> The generic template for 'selectedList'.
      */
-    public static interface SelectPageCallback${database.filterGenericsString('T')} {
+    public static interface SelectPageCallback<ENTITY> {
         public ${glPagingBeanInterfaceName} getPagingBean();
         public int selectCountIgnoreFetchScope();
-        public java.util.List${database.filterGenericsString('T')} selectListWithFetchScope();
+        public java.util.List<ENTITY> selectListWithFetchScope();
     }
 
-    /**
-     * The object of result-bean builder.
-     * 
-     * @param <T> The generic template for 'resultBean'.
-     */
-    public static class ResultBeanBuilder${database.filterGenericsString('T')} {
-        protected ${glBehaviorReadableInterfaceName} _bhv;
+    public static class ResultBeanBuilder<ENTITY> extends ${glResultBeanBuilderName}<ENTITY> {
         public ResultBeanBuilder(${glBehaviorReadableInterfaceName} bhv) {
-            _bhv = bhv;
-        }
-        /**
-         * Build list-reuslt-bean.
-         * 
-         * @param ob Order-by-bean. (NotNull)
-         * @param selectedList Selected list. (NotNull)
-         * @return List-result-bean. (NotNull)
-         */
-        public ${glListResultBeanName}${database.filterGenericsString('T')} buildListResultBean(${glOrderByBeanInterfaceName} ob, java.util.List${database.filterGenericsString('T')} selectedList) {
-            ${glListResultBeanName}${database.filterGenericsString('T')} rb = new ${glListResultBeanName}${database.filterGenericsString('T')}();
-            rb.setTableDbName(_bhv.getTableDbName());
-            rb.setAllRecordCount(selectedList.size());
-            rb.setSelectedList(selectedList);
-            rb.setOrderByClause(ob.getSqlComponentOfOrderByClause());
-            return rb;
-        }
-        /**
-         * Build paging-reuslt-bean.
-         * 
-         * @param pb Paging-bean. (NotNull)
-         * @param allRecordCount All-record-count.
-         * @param selectedList Selected list. (NotNull)
-         * @return Paging-result-bean. (NotNull)
-         */
-        public ${glPagingResultBeanName}${database.filterGenericsString('T')} buildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, java.util.List${database.filterGenericsString('T')} selectedList) {
-            ${glPagingResultBeanName}${database.filterGenericsString('T')} rb = new ${glPagingResultBeanName}${database.filterGenericsString('T')}();
-            rb.setTableDbName(_bhv.getTableDbName());
-            rb.setAllRecordCount(allRecordCount);
-            rb.setSelectedList(selectedList);
-            rb.setPageSize(pb.getFetchSize());
-            rb.setCurrentPageNumber(pb.getFetchPageNumber());
-            rb.setOrderByClause(pb.getSqlComponentOfOrderByClause());
-            return rb;
+            super(bhv.getTableDbName());
         }
     }
 
-    public static interface SelectPageInvoker${database.filterGenericsString('T')} {
-        /**
-         * Invoke select-page by callback.
-         * 
-         * @param callback Callback. (NotNull)
-         * @return Paging-result-bean. (NotNull)
-         */
-        public ${glPagingResultBeanName}${database.filterGenericsString('T')} invokeSelectPage(SelectPageCallback${database.filterGenericsString('T')} callback);
+    public static interface SelectPageInvoker<ENTITY> {
+        public ${glPagingResultBeanName}<ENTITY> invokeSelectPage(SelectPageCallback<ENTITY> callback);
     }
 
-    /**
-     * The object of result-bean builder.
-     * 
-     * @param <T> The generic template for 'resultBean'.
-     */
-    public static class SelectPageSimpleInvoker${database.filterGenericsString('T')} implements SelectPageInvoker${database.filterGenericsString('T')} {
+    public static class SelectPageSimpleInvoker<ENTITY> implements SelectPageInvoker<ENTITY> {
         protected ${glBehaviorReadableInterfaceName} _bhv;
         public SelectPageSimpleInvoker(${glBehaviorReadableInterfaceName} bhv) {
             _bhv = bhv;
         }
 
-        /**
-         * Invoke select-page by callback.
-         * 
-         * @param callback Callback. (NotNull)
-         * @return Paging-result-bean. (NotNull)
-         */
-        public ${glPagingResultBeanName}${database.filterGenericsString('T')} invokeSelectPage(SelectPageCallback${database.filterGenericsString('T')} callback) {
-            assertObjectNotNull("callback", callback);
-            assertObjectNotNull("callback.getPagingBean()", callback.getPagingBean());
-            if (!callback.getPagingBean().isFetchScopeEffective()) {
-                String msg = "The paging bean is not effective about fetch-scope!";
-                msg = msg + " When you select page, you should set up fetch-scope of paging bean(Should invoke fetchFirst() and fetchPage()!).";
-                msg = msg + " The paging bean is: " + callback.getPagingBean();
-                throw new IllegalStateException(msg);
-            }
-            final int allRecordCount = callback.selectCountIgnoreFetchScope();
-            final java.util.List${database.filterGenericsString('T')} selectedList = callback.selectListWithFetchScope();
-            final ${glPagingResultBeanName}${database.filterGenericsString('T')} rb = new ResultBeanBuilder${database.filterGenericsString('T')}(_bhv).buildPagingResultBean(callback.getPagingBean(), allRecordCount, selectedList);
-            if (isNecessaryToReadPageAgain(rb)) {
-                callback.getPagingBean().fetchPage(rb.getAllPageCount());
-                final int reAllRecordCount = callback.selectCountIgnoreFetchScope();
-                final java.util.List${database.filterGenericsString('T')} reSelectedList = callback.selectListWithFetchScope();
-                return new ResultBeanBuilder${database.filterGenericsString('T')}(_bhv).buildPagingResultBean(callback.getPagingBean(), reAllRecordCount, reSelectedList);
-            } else {
-                return rb;
-            }
-        }
-
-        /**
-         * Is it necessary to read page again?
-         * 
-         * @param rb Paging-result-bean. (NotNull)
-         * @return Determination.
-         */
-        protected boolean isNecessaryToReadPageAgain(${glPagingResultBeanName}${database.filterGenericsString('T')} rb) {
-            return rb.getAllRecordCount() > 0 && rb.getSelectedList().isEmpty();
-        }
-
-        /**
-         * Assert that the object is not null.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param value Value. (NotNull)
-         * @exception IllegalArgumentException
-         */
-        protected void assertObjectNotNull(String variableName, Object value) {
-            if (variableName == null) {
-                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
-                throw new IllegalArgumentException(msg);
-            }
-            if (value == null) {
-                String msg = "The value should not be null: variableName=" + variableName;
-                throw new IllegalArgumentException(msg);
-            }
+        public ${glPagingResultBeanName}<ENTITY> invokeSelectPage(final SelectPageCallback<ENTITY> callback) {
+            final ${glPagingHandlerName}<ENTITY> handler = new ${glPagingHandlerName}<ENTITY>() {
+                public ${glPagingBeanInterfaceName} getPagingBean() {
+                    return callback.getPagingBean();
+                }
+                public int count() {
+                    return callback.selectCountIgnoreFetchScope();
+                }
+                public java.util.List<ENTITY> paging() {
+                    return callback.selectListWithFetchScope();
+                }
+            };
+            return new ${glPagingInvokerName}(_bhv.getTableDbName()).invokePaging(handler);
         }
     }
 
-    /**
-     * The marker interface of simple condition-bean setupper.
-     */
     public static interface SimpleCBSetupper {
     }
 }

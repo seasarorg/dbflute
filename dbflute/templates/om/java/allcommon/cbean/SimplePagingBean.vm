@@ -10,23 +10,187 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implements ${glPagingBeanInterfaceName} {
 
     // ===================================================================================
-    //                                                                           SqlClause
+    //                                                                           Attribute
     //                                                                           =========
-    /**
-     * Get sql-clause.
-     * 
-     * @return Sql clause. (NotNull)
-     */
-    protected ${glSqlClauseName} getSqlClause() {
-        return _sqlClause;
-    }
-
     /** Safety max result size. */
     protected int _safetyMaxResultSize;
 
+    /** Is the execution for paging(NOT count)? */
+    protected boolean _paging = true;
+
     // ===================================================================================
-    //                                                                      FetchNarrowing
-    //                                                                      ==============
+    //                                                                Paging Determination
+    //                                                                ====================
+    // * * * * * * * *
+    // For SQL Comment
+    // * * * * * * * *
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isPaging() {
+        return _paging;
+    }
+
+    /**
+     * ${database.ImplementComment} {INTERNAL METHOD: Don't Invoke This!}
+     * 
+     * @param paging Determination.
+     */
+    public void xsetPaging(boolean paging) {
+        if (paging) {
+            getSqlClause().makeFetchScopeEffective();
+        } else {
+            getSqlClause().ignoreFetchScope();
+        }
+        this._paging = paging;
+    }
+
+    // ===================================================================================
+    //                                                                       Fetch Setting
+    //                                                                       =============
+    /**
+     * Fetch first.
+     * <pre>
+     * If you invoke this, your SQL returns [fetch-size] records from first.
+     * </pre>
+     * @param fetchSize Fetch-size. (NotMinus & NotZero)
+     * @return this. (NotNull)
+     */
+    public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize) {
+        getSqlClause().fetchFirst(fetchSize);
+        return this;
+    }
+
+    /**
+     * Fetch scope.
+     * <pre>
+     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
+     * </pre>
+     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
+     * @param fetchSize Fetch-size. (NotMinus & NotZero)
+     * @return this. (NotNull)
+     */
+    public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize) {
+        getSqlClause().fetchScope(fetchStartIndex, fetchSize);
+        return this;
+    }
+
+    /**
+     * Fetch page.
+     * <pre>
+     * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
+     *  But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
+     *  If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
+     * </pre>
+     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
+     * @return this. (NotNull)
+     */
+    public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber) {
+        getSqlClause().fetchPage(fetchPageNumber);
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                     Paging Property
+    //                                                                     ===============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch-start-index.
+     */
+    public int getFetchStartIndex() {
+        return getSqlClause().getFetchStartIndex();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch-size.
+     */
+    public int getFetchSize() {
+        return getSqlClause().getFetchSize();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch-page-number.
+     */
+    public int getFetchPageNumber() {
+        return getSqlClause().getFetchPageNumber();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Page start index. 0 origin. (NotMinus)
+     */
+    public int getPageStartIndex() {
+        return getSqlClause().getPageStartIndex();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Page end index. 0 origin. (NotMinus)
+     */
+    public int getPageEndIndex() {
+        return getSqlClause().getPageEndIndex();
+    }
+
+    /**
+     * Is fetch scope effective?
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchScopeEffective() {
+        return getSqlClause().isFetchScopeEffective();
+    }
+
+    // ===================================================================================
+    //                                                                       Hint Property
+    //                                                                       =============
+    /**
+     * Get select-hint. {select [select-hint] * from table...}
+     * 
+     * @return Select-hint. (NotNull)
+     */
+    public String getSelectHint() {
+        return getSqlClause().getSelectHint();
+    }
+
+    /**
+     * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
+     * 
+     * @return from-base-table-hint. (NotNull)
+     */
+    public String getFromBaseTableHint() {
+        return getSqlClause().getFromBaseTableHint();
+    }
+
+    /**
+     * Get from-hint. {select * from table [from-hint] where ...}
+     * 
+     * @return From-hint. (NotNull)
+     */
+    public String getFromHint() {
+        return getSqlClause().getFromHint();
+    }
+
+    /**
+     * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
+     * 
+     * @return Sql-suffix. (NotNull)
+     */
+    public String getSqlSuffix() {
+        return getSqlClause().getSqlSuffix();
+    }
+
+    // ===================================================================================
+    //                                                                     Fetch Narrowing
+    //                                                                     ===============
     /**
      * Get fetch-narrowing start-index.
      * 
@@ -94,140 +258,17 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
     }
 
     // ===================================================================================
-    //                                                                              Paging
-    //                                                                              ======
+    //                                                                            Accessor
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                             SqlClause
+    //                                             ---------
     /**
-     * Fetch first.
-     * <pre>
-     * If you invoke this, your SQL returns [fetch-size] records from first.
-     * </pre>
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)
-     * @return this. (NotNull)
-     */
-    public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize) {
-        getSqlClause().fetchFirst(fetchSize);
-        return this;
-    }
-
-    /**
-     * Fetch scope.
-     * <pre>
-     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
-     * </pre>
-     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)</param>
-     * @return this. (NotNull)
-     */
-    public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize) {
-        getSqlClause().fetchScope(fetchStartIndex, fetchSize);
-        return this;
-    }
-
-    /**
-     * Fetch page.
-     * <pre>
-     * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
-     *  But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
-     *  If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
-     * </pre>
-     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
-     * @return this. (NotNull)
-     */
-    public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber) {
-        getSqlClause().fetchPage(fetchPageNumber);
-        return this;
-    }
-
-    /**
-     * ${database.ImplementComment}
+     * Get sql-clause.
      * 
-     * @return Fetch-start-index.
+     * @return Sql clause. (NotNull)
      */
-    public int getFetchStartIndex() {
-        return getSqlClause().getFetchStartIndex();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch-size.
-     */
-    public int getFetchSize() {
-        return getSqlClause().getFetchSize();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch-page-number.
-     */
-    public int getFetchPageNumber() {
-        return getSqlClause().getFetchPageNumber();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Page start index. 0 origin. (NotMinus)
-     */
-    public int getPageStartIndex() {
-        return getSqlClause().getPageStartIndex();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Page end index. 0 origin. (NotMinus)
-     */
-    public int getPageEndIndex() {
-        return getSqlClause().getPageEndIndex();
-    }
-
-    /**
-     * Is fetch scope effective?
-     * 
-     * @return Determiantion.
-     */
-    public boolean isFetchScopeEffective() {
-        return getSqlClause().isFetchScopeEffective();
-    }
-
-    // ===================================================================================
-    //                                                                      For SqlComment
-    //                                                                      ==============
-    /**
-     * Get select-hint. {select [select-hint] * from table...}
-     * 
-     * @return Select-hint. (NotNull)
-     */
-    public String getSelectHint() {
-        return getSqlClause().getSelectHint();
-    }
-
-    /**
-     * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
-     * 
-     * @return from-base-table-hint. (NotNull)
-     */
-    public String getFromBaseTableHint() {
-        return getSqlClause().getFromBaseTableHint();
-    }
-
-    /**
-     * Get from-hint. {select * from table [from-hint] where ...}
-     * 
-     * @return From-hint. (NotNull)
-     */
-    public String getFromHint() {
-        return getSqlClause().getFromHint();
-    }
-
-    /**
-     * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
-     * 
-     * @return Sql-suffix. (NotNull)
-     */
-    public String getSqlSuffix() {
-        return getSqlClause().getSqlSuffix();
+    protected ${glSqlClauseName} getSqlClause() {
+        return _sqlClause;
     }
 }

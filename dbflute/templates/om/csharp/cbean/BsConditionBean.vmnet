@@ -148,8 +148,8 @@ namespace ${glPackageBaseCB} {
     #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${refferer.table.javaName}Nss")
 
         // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-        //   RefferTable    = [${refferer.Table.Name}]
-        //   RefferProperty = [${tmpPropertyName}]
+        //   RefererTable    = [${refferer.Table.Name}]
+        //   RefererProperty = [${tmpPropertyName}]
         // * * * * * * * * */
 
         /// <summary> Is select for ${tmpPropertyName}?</summary>
@@ -195,6 +195,6 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============
-        override public String ToString() { return GetClause(); }
+        public override String ToString() { return GetClause(); }
     }
 }

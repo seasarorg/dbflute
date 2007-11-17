@@ -20,7 +20,9 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
  * 
  * {Paging}
  *   o autoPaging().selectList()
+ *   o autoPaging().selectPage()
  *   o manualPaging().selectList()
+ *   o manualPaging().selectPage()
  * 
  * {Option -- Dynamic}
  *   o dynamicBinding().selectList()
@@ -34,15 +36,21 @@ public class ${glOutsideSqlBasicExecutorName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The dao of outsideSql. (NotNull) */
     protected final ${glOutsideSqlDaoName} _outsideSqlDao;
 
+    /** Table db name. (NotNull) */
+    protected final String _tableDbName;
+
+    /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDaoName} outsideSqlDao) {
+    public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, String tableDbName) {
         this._outsideSqlDao = outsideSqlDao;
+        this._tableDbName = tableDbName;
     }
 
     // ===================================================================================
@@ -135,7 +143,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     public ${glOutsideSqlPagingExecutorName} autoPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.autoPaging();
-        return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option);
+        return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
     }
 
     /**
@@ -157,7 +165,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     public ${glOutsideSqlPagingExecutorName} manualPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
         option.manualPaging();
-        return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option);
+        return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
     }
 
     public ${glOutsideSqlBasicExecutorName} dynamicBinding() {

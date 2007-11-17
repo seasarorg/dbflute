@@ -1,19 +1,42 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 /**
- * The interface of paging-bean.
+ * The bean of paging.
  * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInterfaceName}, ${glOrderByBeanInterfaceName} {
 
+    // ===================================================================================
+    //                                                                Paging Determination
+    //                                                                ====================
+    // * * * * * * * *
+    // For SQL Comment
+    // * * * * * * * *
+    /**
+     * Is the execution for paging(NOT count)?
+     * 
+     * @return Determination.
+     */
+    public boolean isPaging();
+
+    /**
+     * Set whether the execution for paging(NOT count). {INTERNAL METHOD}
+     * 
+     * @param paging Determination.
+     */
+    public void xsetPaging(boolean paging);
+
+    // ===================================================================================
+    //                                                                       Fetch Setting
+    //                                                                       =============
     /**
      * Fetch first.
      * 
      * If you invoke this, your SQL returns [fetch-size] records from first.
      * 
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
-     * @return this. (NotNUll)
+     * @return this. (NotNull)
      */
     public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize);
 
@@ -24,7 +47,7 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
      * 
      * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
-     * @return this. (NotNUll)
+     * @return this. (NotNull)
      */
     public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize);
 
@@ -40,6 +63,9 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
      */
     public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber);
 
+    // ===================================================================================
+    //                                                                     Paging Property
+    //                                                                     ===============
     /**
      * Get fetch-start-index.
      * 
@@ -78,13 +104,16 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
     /**
      * Is fetch scope effective?
      * 
-     * @return Determiantion.
+     * @return Determination.
      */
     public boolean isFetchScopeEffective();
 
-    // =====================================================================================
-    //                                                                        For SqlComment
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                       Hint Property
+    //                                                                       =============
+    // * * * * * * * *
+    // For SQL Comment
+    // * * * * * * * *
     /**
      * Get select-hint. {select [select-hint] * from table...}
      * 

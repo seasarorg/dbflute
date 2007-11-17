@@ -48,7 +48,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /** Union clause list. */
     protected java.util.List${database.filterGenericsString('UnionQueryInfo')} _unionQueryInfoList = new java.util.ArrayList${database.filterGenericsString('UnionQueryInfo')}();
 
-    /** Is incoluded-select-column effective? Default value is false. */
+    /** Is included-select-column effective? Default value is false. */
     protected boolean _isIncludedSelectColumnEffective = false;
 
     /** Is order-by effective? Default value is false. */

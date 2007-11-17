@@ -87,14 +87,14 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
 #if ($database.isMakeRecentlyDeprecated())
     /**
-     * Table cap-prop name.
+     * Table cap prop name.
      * 
      * @deprecated Please use getTablePropertyName()
      */
     public static final String TABLE_CAP_PROP_NAME = "$table.javaName";
 
     /**
-     * Table uncap-prop name.
+     * Table uncap prop name.
      * 
      * @deprecated Please use getTablePropertyName()
      */
@@ -102,35 +102,35 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #end
 
     // -----------------------------------------------------
-    //                                        Column DB-Name
+    //                                        Column DB Name
     //                                        --------------
 #foreach ($col in $table.columns)
-    /** Db-name of ${col.name}. ${col.columnDefinitionLineDisp} */
+    /** DB name of ${col.name}. ${col.columnDefinitionLineDisp} */
     public static final String DB_NAME_${col.name} = "$col.name";
 #end
 
     // -----------------------------------------------------
-    //                                  Column Property-Name
+    //                                  Column Property Name
     //                                  (JavaBeansRule)
     //                                  --------------------
 #foreach ($col in $table.columns)
-    /** Property-name(JavaBeansRule) of ${col.javaBeansRulePropertyName}. ${col.columnDefinitionLineDisp} */
+    /** Property name(JavaBeansRule) of ${col.javaBeansRulePropertyName}. ${col.columnDefinitionLineDisp} */
     public static final String PROPERTY_NAME_${col.javaBeansRulePropertyName} = "$col.javaBeansRulePropertyName";
 
 #end
     // -----------------------------------------------------
-    //                                  Column Cap-Prop-Name
+    //                                  Column Cap Prop Name
     //                                  --------------------
 #foreach ($col in $table.columns)
-    /** Cap-prop-name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
+    /** Cap prop name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
     public static final String CAP_PROP_NAME_${col.javaName} = "$col.javaName";
 
 #end
     // -----------------------------------------------------
-    //                                Column Uncap-Prop-Name
+    //                                Column Uncap Prop Name
     //                                ----------------------
 #foreach ($col in $table.columns)
-    /** Uncap-prop-name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
+    /** Uncap prop name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
     public static final String UNCAP_PROP_NAME_${col.uncapitalisedJavaName} = "$col.uncapitalisedJavaName";
 
 #end
@@ -150,7 +150,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String REFERER_PROPERTY_NAME_${children.refererJavaBeansRulePropertyName} = "$children.refererJavaBeansRulePropertyName";
 
 #end
-    /** The map of {db-name : prop-name} key-to-lower. */
+    /** The map of {DB name : property name} key-to-lower. */
     private static java.util.Map<String, String> _dbNamePropertyNameKeyToLowerMap;
     protected static java.util.Map<String, String> createDbNamePropertyNameKeyToLowerMap() {
         if (_dbNamePropertyNameKeyToLowerMap != null) {
@@ -167,7 +167,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return _dbNamePropertyNameKeyToLowerMap;
     }
 
-    /** The map of {prop-name : db-name} key-to-lower. */
+    /** The map of {property name : DB name} key-to-lower. */
     private static java.util.Map<String, String> _propertyNameDbNameKeyToLowerMap;
     protected static java.util.Map<String, String> createPropertyNameDbNameKeyToLowerMap() {
         if (_propertyNameDbNameKeyToLowerMap != null) {

@@ -44,10 +44,10 @@ public class ${glTraceViewUtilName} {
     }
 
     /**
-     * Convert object array to string divided with comma.
+     * Convert object array to string view.
      * 
-     * @param objArray Object array. (Nullable)
-     * @return String (NotNull: If the argument is null, returns empty string.)
+     * @param objArray The array of object. (Nullable)
+     * @return The string divided with comma. (NotNull: If the argument is null, returns empty string.)
      */
     public static String convertObjectArrayToStringView(Object[] objArray) {
         if (objArray == null) {

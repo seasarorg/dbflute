@@ -289,7 +289,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     public ${glOutsideSqlBasicExecutorName} outsideSql() {
         assertDaoSelectorNotNull("outsideSql");
         final ${glOutsideSqlDaoName} outsideSqlDao = _daoSelector.select(${glOutsideSqlDaoName}.class);
-        return new ${glOutsideSqlBasicExecutorName}(outsideSqlDao);
+        return new ${glOutsideSqlBasicExecutorName}(outsideSqlDao, getTableDbName());
     }
 
     private void assertDaoSelectorNotNull(String methodName) {

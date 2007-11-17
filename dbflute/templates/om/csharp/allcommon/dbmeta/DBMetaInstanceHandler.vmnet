@@ -7,47 +7,36 @@ using System.Collections.Generic;
 namespace ${glPackageBaseCommonDBMeta} {
 
     /// <summary>
-    /// DBMeta instance handler.
+    /// The handler of dbmeta instance.
     /// Author : ${database.ClassAuthor}
     public class ${myClassName} {
 
-        /// <summary>Table db-name instance map.</summary>
         protected static readonly IDictionary<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap;
-
-        /// <summary>Table db-name property-name to-lower-map.</summary>
         protected static readonly IDictionary<String, String> _tableDbNamePropertyNameKeyToLowerMap;
-
-        /// <summary>Table property-name db-name to-lower-map.</summary>
         protected static readonly IDictionary<String, String> _tablePropertyNameDbNameKeyToLowerMap;
 
         static ${myClassName}() {
             {
                 IDictionary<String, ${glDBMetaInterfaceName}> tmpMap = new Dictionary<String, ${glDBMetaInterfaceName}>();
-
 #foreach ($table in $database.tables)
                 tmpMap.Add("${table.name}", GetDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
 #end
-
                 _tableDbNameInstanceMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
 
             {
                 IDictionary<String, String> tmpMap = new Dictionary<String, String>();
-
 #foreach ($table in $database.tables)
                 tmpMap.Add("${table.name}".ToLower(), "${table.javaBeansRulePropertyName}");
 #end
-
                 _tableDbNamePropertyNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
 
             {
                 IDictionary<String, String> tmpMap = new Dictionary<String, String>();
-
 #foreach ($table in $database.tables)
                 tmpMap.Add("${table.javaName}".ToLower(), "${table.name}");
 #end
-
                 _tablePropertyNameDbNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
         }
@@ -82,9 +71,11 @@ namespace ${glPackageBaseCommonDBMeta} {
 
         /// <summary>
         /// Find dbmeta by table flexible-name.
+        /// <![CDATA[
         /// If the table name is 'ORDER_DETAIL', you can find the dbmeta by ...(as follows)
         ///     'ORDER_DETAIL', 'ORDer_DeTAiL', 'order_detail'
         ///   , 'OrderDetail', 'orderdetail', 'oRderDetaIl'
+        /// ]]>
         /// </summary>
         /// <param name="tableFlexibleName">Table flexible-name. (NotNull and NotEmpty)</param>
         /// <returns>DBMeta. (NotNull)</returns>
@@ -107,11 +98,6 @@ namespace ${glPackageBaseCommonDBMeta} {
             throw new SystemException(msg);
         }
 
-        /// <summary>
-        /// Get instance by table db-name.
-        /// </summary>
-        /// <param name="tableDbName">Table db-name. (NotNull)</param>
-        /// <returns>Instance. (NotNull)</returns>
         protected static ${glDBMetaInterfaceName} ByTableDbName(String tableDbName) {
             AssertObjectNotNull("tableDbName", tableDbName);
             try {
@@ -125,11 +111,6 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ----------------------------------------------------------------
         //                                                  Assert Argument
         //                                                  ---------------
-        /// <summary>
-        /// Assert that the object is not null.
-        /// </summary> 
-        /// <param name="variableName">Variable name. (NotNull)</param>
-        /// <param name="arg">Argument. (NotNull)</param>
         protected static void AssertObjectNotNull(String variableName, Object arg) {
             if (variableName == null) {
                 String msg = "Argument[variableName] must not be null.";
@@ -144,7 +125,6 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ----------------------------------------------------------------
         //                                                    Assert String
         //                                                    -------------
-        #region Assert Argument
         protected static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
             if (variableName == null) {
                 String msg = "Variable[variableName] should not be null.";
@@ -159,6 +139,5 @@ namespace ${glPackageBaseCommonDBMeta} {
                 throw new ArgumentOutOfRangeException(msg);
             }
         }
-        #endregion
     }
 }

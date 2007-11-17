@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
 
 /**
- * The paging executor of outside-sql.
+ * The option of outside-sql.
  * 
  * @author ${database.ClassAuthor}
  */
@@ -34,6 +34,17 @@ public class ${glOutsideSqlOptionName} {
     //                                                                          ==========
     public String generateUniqueKey() {
         return "{" + _pagingRequestType + "/" + _dynamicBinding + "}";
+    }
+
+    // ===================================================================================
+    //                                                                                Copy
+    //                                                                                ====
+    public ${glOutsideSqlOptionName} copyOptionWithoutPaging() {
+        final ${glOutsideSqlOptionName} copyOption = new ${glOutsideSqlOptionName}();
+        if (isDynamicBinding()) {
+            copyOption.dynamicBinding();
+        }
+        return copyOption;
     }
 
     // ===================================================================================

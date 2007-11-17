@@ -126,8 +126,11 @@ targetdatabase = $targetDatabase
     #set ($glPagingBeanInterfaceName = "${glProjectPrefix}PagingBean")
     #set ($glSelectResourceInterfaceName = "${glProjectPrefix}SelectResource")
     #set ($glFetchNarrowingBeanContextName = "${glProjectPrefix}FetchNarrowingBeanContext")
+    #set ($glPagingHandlerName = "${glProjectPrefix}PagingHandler")
+    #set ($glPagingInvokerName = "${glProjectPrefix}PagingInvoker")
     #set ($glPagingResultBeanName = "${glProjectPrefix}PagingResultBean")
     #set ($glListResultBeanName = "${glProjectPrefix}ListResultBean")
+    #set ($glResultBeanBuilderName = "${glProjectPrefix}ResultBeanBuilder")
     #set ($glConditionBeanContextName = "${glProjectPrefix}ConditionBeanContext")
     #set ($glConditionBeanAbstractName = "${glProjectPrefix}AbstractConditionBean")
     #set ($glConditionQueryAbstractName = "${glProjectPrefix}AbstractConditionQuery")
@@ -616,13 +619,29 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimplePagingBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SimplePagingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    parsePagingResultBean()")
+    #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
+      $database.debug("    parse('PagingHandler')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glPagingHandlerName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/PagingHandler.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('PagingInvoker')")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glPagingInvokerName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/PagingInvoker.${glTemplateFileExtension}",$path ,"", "")
+    #end
+
+    $database.debug("    parse('PagingResultBean');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glPagingResultBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/PagingResultBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    parseListResultBean()")
+    $database.debug("    parse('ListResultBean');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glListResultBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ListResultBean.${glTemplateFileExtension}",$path ,"", "")
+
+    #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
+      $database.debug("    parse('ResultBeanBuilder');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glResultBeanBuilderName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ResultBeanBuilder.${glTemplateFileExtension}",$path ,"", "")
+    #end
 
     $database.debug("    parseConditionBeanContext()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glConditionBeanContextName}.${glClassFileExtension}" )
@@ -1603,13 +1622,13 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                            Parse util
     ##                                                                                            ----------
-    #if ($database.isTargetLanguageJava())
+    #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
       $database.setupJavaDir_for_allcommon()
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonUtil}))
       $database.makeDirectory($path)
 
-      #if ($database.isAvailableGenerics())
+      #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtilName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/allcommon/util/ValueLabelUtil.${glTemplateFileExtension}",$path,"", "")
       #end

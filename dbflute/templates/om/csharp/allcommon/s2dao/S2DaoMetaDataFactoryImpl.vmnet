@@ -31,12 +31,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             this.dbMetaData = new DatabaseMetaDataImpl(dataSource);
         }
 
-        /**
-         * Get data meta data.
-         * 
-         * @param daoType Dao class
-         * @return Data meta data.
-         */
         public Seasar.Dao.IDaoMetaData GetDaoMetaData(Type daoType) {
             lock(this) {
                 String key = daoType.Name;
