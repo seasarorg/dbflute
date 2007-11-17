@@ -587,7 +587,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                  Common
     //                   - - -
     protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
-        if (!${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
+        if (pmb == null || !${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
             return;
         }
         final ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean = (${glFetchNarrowingBeanInterfaceName})pmb;
