@@ -46,101 +46,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     /** The provider of latest SQL. It's basically referred at error handling. (NotRequired) */
     protected ${glLatestSqlProviderName} _latestSqlProvider;
 
-    // ===================================================================================
-    //                                                                     Delegate Method
-    //                                                                     ===============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return All count.
-     */
-    protected int callGetCountAll() {
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getCountAll", new Class[]{});
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
-        return ((Integer)result).intValue();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return All list. (NotNull)
-     */
-    protected java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callGetListAll() {
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getListAll", new Class[]{});
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
-        return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read count. (NotNull)
-     */
-    protected int callReadCount(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCount", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return ((Integer)result).intValue();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read entity. If the select result is zero, it returns null. (Nullable)
-     */
-    protected ${glEntityInterfaceName} callReadEntity(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectEntity", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return (${glEntityInterfaceName})result;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-     */
-    protected java.util.List${database.filterGenericsString(${glEntityInterfaceName})} callReadList(${glConditionBeanInterfaceName} cb) {
-        assertConditionBeanNotNull(cb);
-        final Class[] types = new Class[]{cb.getClass()};
-        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectList", types);
-        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
-        return (java.util.List${database.filterGenericsString(${glEntityInterfaceName})})result;
-    }
-
-    private java.lang.reflect.Method getMethod(Class clazz, String methodName, Class[] argTypes) {
-        try {
-            return clazz.getMethod(methodName, argTypes);
-        } catch (NoSuchMethodException ex) {
-            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
-            throw new RuntimeException(msg, ex);
-        }
-    }
-
-    private Object invoke(java.lang.reflect.Method method, Object target, Object[] args) {
-        try {
-            return method.invoke(target, args);
-        } catch (java.lang.reflect.InvocationTargetException ex) {
-            Throwable t = ex.getCause();
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
-            if (t instanceof Error) {
-                throw (Error) t;
-            }
-            String msg = "target=" + target + " method=" + method + "-" + java.util.Arrays.asList(args);
-            throw new RuntimeException(msg, ex);
-        } catch (IllegalAccessException ex) {
-            String msg = "target=" + target + " method=" + method + "-" + java.util.Arrays.asList(args);
-            throw new RuntimeException(msg, ex);
-        }
-    }
-
     // =====================================================================================
     //                                                                         Basic Get All
     //                                                                         =============
@@ -179,7 +84,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glEntityInterfaceName} readEntity(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
-        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = readList(cb);
+        final java.util.List<${glEntityInterfaceName}> ls = readList(cb);
         if (ls.isEmpty()) {
             return null;
         }
@@ -197,7 +102,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glEntityInterfaceName} readEntityWithDeletedCheck(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
-        final java.util.List${database.filterGenericsString(${glEntityInterfaceName})} ls = readList(cb);
+        final java.util.List<${glEntityInterfaceName}> ls = readList(cb);
         assertEntityNotDeleted(ls, cb);
         assertEntitySelectedAsOne(ls, cb);
         return (${glEntityInterfaceName})ls.get(0);
@@ -255,9 +160,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    public ${glListResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readList(${glConditionBeanInterfaceName} cb) {
+    public ${glListResultBeanName}<${glEntityInterfaceName}> readList(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
-        return new ResultBeanBuilder${database.filterGenericsString(${glEntityInterfaceName})}(this).buildListResultBean(cb, callReadList(cb));
+        return new ResultBeanBuilder<${glEntityInterfaceName}>(this).buildListResultBean(cb, callReadList(cb));
     }
 
     /**
@@ -266,9 +171,9 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} cb) {
+    public ${glPagingResultBeanName}<${glEntityInterfaceName}> readPage(final ${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
-        return readPage(cb, new SelectPageSimpleInvoker${database.filterGenericsString(${glEntityInterfaceName})}(this));
+        return readPage(cb, new SelectPageSimpleInvoker<${glEntityInterfaceName}>(this));
     }
 
     /**
@@ -278,14 +183,14 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param invoker Select-page-invoker (NotNull)
      * @return Read page. (NotNull)
      */
-    public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} cb, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker) {
+    public ${glPagingResultBeanName}<${glEntityInterfaceName}> readPage(final ${glConditionBeanInterfaceName} cb, SelectPageInvoker<${glEntityInterfaceName}> invoker) {
         assertConditionBeanNotNull(cb);
-        final SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})} pageCallback = new SelectPageCallback${database.filterGenericsString(${glEntityInterfaceName})}() {
+        final SelectPageCallback<${glEntityInterfaceName}> pageCallback = new SelectPageCallback<${glEntityInterfaceName}>() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
             public int selectCountIgnoreFetchScope() {
                 return readCount(cb);
             }
-            public java.util.List${database.filterGenericsString(${glEntityInterfaceName})} selectListWithFetchScope() {
+            public java.util.List<${glEntityInterfaceName}> selectListWithFetchScope() {
                 return readList(cb);
             }
         };
@@ -688,6 +593,101 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             final ${glTokenFileOutputResultName} tokeFileOutputResult = new ${glTokenFileOutputResultName}();
             tokeFileOutputResult.setSelectedList(ls);
             return tokeFileOutputResult;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                     Delegate Method
+    //                                                                     ===============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return All count.
+     */
+    protected int callGetCountAll() {
+        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getCountAll", new Class[]{});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
+        return ((Integer)result).intValue();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return All list. (NotNull)
+     */
+    protected java.util.List<${glEntityInterfaceName}> callGetListAll() {
+        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "getListAll", new Class[]{});
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{});
+        return (java.util.List<${glEntityInterfaceName}>)result;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @return Read count. (NotNull)
+     */
+    protected int callReadCount(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
+        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectCount", types);
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
+        return ((Integer)result).intValue();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @return Read entity. If the select result is zero, it returns null. (Nullable)
+     */
+    protected ${glEntityInterfaceName} callReadEntity(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
+        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectEntity", types);
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
+        return (${glEntityInterfaceName})result;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
+     * @return Read list. If the select result is zero, it returns empty list. (NotNull)
+     */
+    protected java.util.List<${glEntityInterfaceName}> callReadList(${glConditionBeanInterfaceName} cb) {
+        assertConditionBeanNotNull(cb);
+        final Class[] types = new Class[]{cb.getClass()};
+        final java.lang.reflect.Method mtd = getMethod(getDaoReadable().getClass(), "selectList", types);
+        final Object result = invoke(mtd, getDaoReadable(), new Object[]{cb});
+        return (java.util.List<${glEntityInterfaceName}>)result;
+    }
+
+    private java.lang.reflect.Method getMethod(Class clazz, String methodName, Class[] argTypes) {
+        try {
+            return clazz.getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException ex) {
+            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
+            throw new RuntimeException(msg, ex);
+        }
+    }
+
+    private Object invoke(java.lang.reflect.Method method, Object target, Object[] args) {
+        try {
+            return method.invoke(target, args);
+        } catch (java.lang.reflect.InvocationTargetException ex) {
+            Throwable t = ex.getCause();
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
+            if (t instanceof Error) {
+                throw (Error) t;
+            }
+            String msg = "target=" + target + " method=" + method + "-" + java.util.Arrays.asList(args);
+            throw new RuntimeException(msg, ex);
+        } catch (IllegalAccessException ex) {
+            String msg = "target=" + target + " method=" + method + "-" + java.util.Arrays.asList(args);
+            throw new RuntimeException(msg, ex);
         }
     }
 

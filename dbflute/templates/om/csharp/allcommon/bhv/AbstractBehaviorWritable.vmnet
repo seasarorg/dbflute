@@ -55,14 +55,14 @@ namespace ${glPackageBaseCommonBhv} {
 
             ${filteredLogic}
             if (_log.IsDebugEnabled) {
-                _log.Debug("  CommonColumnSetup - ${columnName} has been set up: invoking=${filteredLogic}");
+                _log.Debug("    ${columnName} has been set up: invoking=${filteredLogic}");
             }
     #else
 
             ${javaNative} ${uncapitalisedJavaName} = ${logic};
             entity.${javaName} = ${uncapitalisedJavaName};
             if (_log.IsDebugEnabled) {
-                _log.Debug("  CommonColumnSetup - ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
+                _log.Debug("    ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
             }
     #end
   #end
@@ -108,14 +108,14 @@ namespace ${glPackageBaseCommonBhv} {
 
             ${filteredLogic}
             if (_log.IsDebugEnabled) {
-                _log.Debug("  CommonColumnSetup - ${columnName} has been set up: invoking=${filteredLogic}");
+                _log.Debug("    ${columnName} has been set up: invoking=${filteredLogic}");
             }
     #else
 
             ${javaNative} ${uncapitalisedJavaName} = ${logic};
             entity.${javaName} = ${uncapitalisedJavaName};
             if (_log.IsDebugEnabled) {
-                _log.Debug("  CommonColumnSetup - ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
+                _log.Debug("    ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
             }
     #end
   #end

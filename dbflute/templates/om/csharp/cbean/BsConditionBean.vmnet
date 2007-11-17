@@ -13,105 +13,57 @@ using ${glPackageNss};
 namespace ${glPackageBaseCB} {
 
     /// <summary>
-    /// The condition-bean of ${table.Name}.
+    /// The condition-bean of ${table.name}.
     /// Author: ${database.ClassAuthor}
     /// </summary>
     [Seasar.Dao.Attrs.Table("$table.Name")]
     [System.Serializable]
     public class ${myClassName} : ${glConditionBeanAbstractName} {
 
-        // =====================================================================================
-        //                                                                            Definition
-        //                                                                            ==========
-        /** Map-string map-mark. */
-        public static readonly String MAP_STRING_MAP_MARK = "map:";
-
-        /** Map-string list-mark. */
-        public static readonly String MAP_STRING_LIST_MARK = "list:";
-
-        /** Map-string start-brace. */
-        public static readonly String MAP_STRING_START_BRACE = "${database.extractAcceptStartBrace}";
-
-        /** Map-string end-brace. */
-        public static readonly String MAP_STRING_END_BRACE = "${database.extractAcceptEndBrace}";
-
-        /** Map-string delimiter. */
-        public static readonly String MAP_STRING_DELIMITER = "${database.extractAcceptDelimiter}";
-
-        /** Map-string equal. */
-        public static readonly String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
-
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
-        /// <summary> Condition query.</summary>
-        protected ${myConditionQueryClassName} _conditionQuery;
-
         // ===============================================================================
-        //                                                                     Constructor
-        //                                                                     ===========
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ${myClassName}() {
-        }
+        //                                                                       Attribute
+        //                                                                       =========
+        /// <summary>Condition query.</summary>
+        protected ${myConditionQueryClassName} _conditionQuery;
 
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        public override String TableDbName {
-            get { return "${table.Name}"; }
-        }
+        /// <summary>${database.ImplementComment}</summary>
+        public override String TableDbName { get { return "${table.Name}"; } }
 
-        // =====================================================================================
-        //                                                                        Add-OrderBy-PK
-        //                                                                        ==============
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>this. (NotNull)</returns>
+        // ===============================================================================
+        //                                                                  Add OrderBy PK
+        //                                                                  ==============
+        /// <summary>${database.ImplementComment}</summary><returns>this. (NotNull)</returns>
         public override ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
-  #foreach ($col in $table.PrimaryKey)
-
+#foreach ($col in $table.primaryKey)
             Query().AddOrderBy_${col.JavaName}_Asc();
-  #end
-
+#end
             return this;
 #else
-
             String msg = "This method is unsupported in this table that doesn't have primary key: ";
             throw new NotSupportedException(msg + ToString());
 #end
-
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>this. (NotNull)</returns>
+        /// <summary>${database.ImplementComment}</summary><returns>this. (NotNull)</returns>
         public override ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc() {
 #if ($table.hasPrimaryKey())
-  #foreach ($col in $table.PrimaryKey)
-
+#foreach ($col in $table.PrimaryKey)
             Query().AddOrderBy_${col.JavaName}_Desc();
-  #end
-
+#end
             return this;
 #else
-
             String msg = "This method is unsupported in this table that doesn't have primary key: ";
             throw new NotSupportedException(msg + ToString());
 #end
-
         }
 
-        // =====================================================================================
-        //                                                                                 Query
-        //                                                                                 =====
+        // ===============================================================================
+        //                                                                           Query
+        //                                                                           =====
         /// <summary>
         /// Query.
         /// </summary>
@@ -240,16 +192,9 @@ namespace ${glPackageBaseCB} {
   #end
 #end
 
-        // =====================================================================================
-        //                                                                 Basic-Override Method
-        //                                                                 =====================
-        /// <summary>
-        /// This method overrides the method that is declared at super.
-        /// </summary>
-        /// <returns>Clause string. (NotNull)</returns>
-        override public String ToString() {
-            return GetClause();
-        }
-
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+        override public String ToString() { return GetClause(); }
     }
 }

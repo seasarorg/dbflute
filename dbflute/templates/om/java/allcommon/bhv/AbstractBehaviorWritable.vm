@@ -55,6 +55,469 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
 #end
 #end
+    // ===================================================================================
+    //                                                                 Basic Entity Update
+    //                                                                 ===================
+    // -----------------------------------------------------
+    //                                                Create
+    //                                                ------
+    /**
+     * Create.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    public void create(${glEntityInterfaceName} entity) {
+        doCreate(entity);
+    }
+
+    protected abstract void doCreate(${glEntityInterfaceName} entity);
+
+    // -----------------------------------------------------
+    //                                                Modify
+    //                                                ------
+    /**
+     * Modify.
+     * 
+     * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     */
+    public void modify(${glEntityInterfaceName} entity) {
+        doModify(entity);
+    }
+
+    protected abstract void doModify(${glEntityInterfaceName} entity);
+
+    /**
+     * Modify non strict.
+     * 
+     * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     */
+    public void modifyNonstrict(${glEntityInterfaceName} entity) {
+        doModifyNonstrict(entity);
+    }
+
+    protected abstract void doModifyNonstrict(${glEntityInterfaceName} entity);
+
+    // -----------------------------------------------------
+    //                                      Create or Modify
+    //                                      ----------------
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     */
+    public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        doCreateOrUpdate(entity);
+    }
+
+    protected abstract void doCreateOrUpdate(${glEntityInterfaceName} entity);
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     */
+    public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        doCreateOrUpdateNonstrict(entity);
+    }
+
+    protected abstract void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity);
+
+    // -----------------------------------------------------
+    //                                                Remove
+    //                                                ------
+    /**
+     * Remove.
+     * 
+     * @param entity Entity. (NotNull)
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
+     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
+     */
+    public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
+        assertEntityNotNull(entity);
+        callRemove(entity);
+    }
+
+    protected abstract void doRemove(${glEntityInterfaceName} entity);
+
+    // ===================================================================================
+    //                                                 Basic Entity Update Internal Helper
+    //                                                 ===================================
+    // -----------------------------------------------------
+    //                                                Update
+    //                                                ------
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateInternally(ENTITY_TYPE entity, InternalUpdateCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        assertEntityHasVersionNoValue(entity);
+        assertEntityHasUpdateDateValue(entity);
+        final int updatedCount = callback.callbackDelegateUpdate(entity);
+        if (updatedCount == 0) {
+            String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+        } else if (updatedCount > 1) {
+            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+            msg = msg + ": entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+        }
+    }
+
+    protected static interface InternalUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateUpdate(ENTITY_TYPE entity);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateNonstrictInternally(ENTITY_TYPE entity, InternalUpdateNonstrictCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
+        if (updatedCount == 0) {
+            String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+        } else if (updatedCount > 1) {
+            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+            msg = msg + ": entity=" + entity;
+        }
+    }
+
+    protected static interface InternalUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateUpdateNonstrict(ENTITY_TYPE entity);
+    }
+
+    // -----------------------------------------------------
+    //                                        InsertOrUpdate
+    //                                        --------------
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
+            void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback) {
+        assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            callback.callbackInsert(entity);
+        } else {
+            RuntimeException exception = null;
+            try {
+                callback.callbackUpdate(entity);
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
+                if (e.getRows() == 0) {
+                    exception = e;
+                }
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
+                exception = e;
+            }
+            if (exception != null) {
+                final CB_TYPE cb = callback.callbackNewMyConditionBean();
+                cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
+                if (callback.callbackSelectCount(cb) == 0) {
+                    callback.callbackInsert(entity);
+                } else {
+                    throw exception;
+                }
+            }
+        }
+    }
+
+    protected static interface InternalInsertOrUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
+        public void callbackInsert(ENTITY_TYPE entity);
+        public void callbackUpdate(ENTITY_TYPE entity);
+        public CB_TYPE callbackNewMyConditionBean();
+        public int callbackSelectCount(CB_TYPE cb);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        if (!entity.hasPrimaryKeyValue()) {
+            callback.callbackInsert(entity);
+        } else {
+            try {
+                callback.callbackUpdateNonstrict(entity);
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
+                callback.callbackInsert(entity);
+            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
+                callback.callbackInsert(entity);
+            }
+        }
+    }
+
+    protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public void callbackInsert(ENTITY_TYPE entity);
+        public void callbackUpdateNonstrict(ENTITY_TYPE entity);
+    }
+
+    // -----------------------------------------------------
+    //                                                Delete
+    //                                                ------
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteInternally(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        assertEntityHasVersionNoValue(entity);
+        assertEntityHasUpdateDateValue(entity);
+        final int deletedCount = callback.callbackDelegateDelete(entity);
+        if (deletedCount == 0) {
+            String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+        } else if (deletedCount > 1) {
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            msg = msg + ": entity=" + entity;
+        }
+    }
+
+    protected static interface InternalDeleteCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDelete(ENTITY_TYPE entity);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteNonstrictInternally(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
+        if (deletedCount == 0) {
+            String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+        } else if (deletedCount > 1) {
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            msg = msg + ": entity=" + entity;
+        }
+    }
+
+    protected static interface InternalDeleteNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
+    }
+
+    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) {
+        assertEntityNotNull(entity);
+        final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
+        if (deletedCount == 0) {
+            return;
+        } else if (deletedCount > 1) {
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            msg = msg + ": entity=" + entity;
+        }
+    }
+
+    protected static interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+        public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
+    }
+
+#set ($batchUpdateReturnValueMethod = "")
+#if ($database.isVersionAfter1047())
+  #set ($batchUpdateReturnValueMethod = ".length")
+#else
+  #set ($batchUpdateReturnValueMethod = "")
+#end
+
+    // ===================================================================================
+    //                                                                   Basic Lump Update
+    //                                                                   =================
+    /**
+     * Lump create the list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return The array of created count.
+     */
+    public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callCreateList(entityList);
+    }
+
+    /**
+     * Lump Modify the list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Modified count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
+     */
+    public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callModifyList(entityList);
+    }
+
+    /**
+     * Lump remove the list.
+     * 
+     * @param entityList Entity-list. (NotNull and NotEmpty)
+     * @return Removed count.
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
+     */
+    public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
+        assertListNotNullAndNotEmpty(entityList);
+        return callRemoveList(entityList);
+    }
+
+    /**
+     * Inject sequence to primary key if it needs.
+     * 
+     * @param entity Entity. (NotNull)
+     */
+    protected void injectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
+        final ${glDBMetaInterfaceName} dbmeta = entity.getDBMeta();
+        if (!dbmeta.hasSequence() || dbmeta.hasTwoOrMorePrimaryKeys() || entity.hasPrimaryKeyValue()) {
+            return;
+        }
+        final ${database.sequenceReturnType} sequenceValue = readNextVal();
+        final String columnDbName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.HashMap${database.filterGenericsString('String, String')}();
+        map.put(columnDbName, sequenceValue.toString());
+        dbmeta.acceptPrimaryKeyMap(entity, map);
+    }
+
+    // =====================================================================================
+    //                                                                            Token File
+    //                                                                            ==========
+    public TokenFileReflectionExecutor tokenFileReflection() {
+        return new TokenFileReflectionExecutor();
+    }
+
+    public class TokenFileReflectionExecutor {
+
+        /**
+         * Reflect(insert or update) token-file to this table.
+         * 
+         * @param filename Name of the file. (NotNull and NotEmpty)
+         * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
+         * @return Token-file-reflection-result. (NotNull)
+         * @throws java.io.FileNotFoundException
+         * @throws java.io.IOException
+         */
+        public ${glTokenFileReflectionResultName} reflectTokenFile(String filename, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+            assertStringNotNullAndNotTrimmedEmpty("filename", filename);
+            assertFileTokenReflectionOption(tokenFileReflectionOption);
+
+            final ${glTokenFileReflectionResultName} result = buildTokenFileReflectionResult();
+            final ${glFileTokenizingCallbackName} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
+            final ${glFileTokenizingOptionName} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
+            final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
+            fileToken.tokenize(filename, fileTokenizingCallback, fileTokenizingOption);
+            return result;
+        }
+
+        /**
+         * Reflect(insert or update) token-file to this table.
+         * 
+         * @param inputStream Input stream. (NotNull and NotClosed)
+         * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
+         * @return Token-file-reflection-result. (NotNull)
+         * @throws java.io.FileNotFoundException
+         * @throws java.io.IOException
+         */
+        public ${glTokenFileReflectionResultName} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+            assertObjectNotNull("inputStream", inputStream);
+            assertFileTokenReflectionOption(tokenFileReflectionOption);
+
+            final ${glTokenFileReflectionResultName} result = buildTokenFileReflectionResult();
+            final ${glFileTokenizingCallbackName} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
+            final ${glFileTokenizingOptionName} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
+            final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
+            fileToken.tokenize(inputStream, fileTokenizingCallback, fileTokenizingOption);
+            return result;
+        }
+
+        protected void assertFileTokenReflectionOption(${glTokenFileReflectionOptionName} tokenFileReflectionOption) {
+            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
+
+            final String encoding = tokenFileReflectionOption.getEncoding();
+            final String delimiter = tokenFileReflectionOption.getDelimiter();
+            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+            assertObjectNotNull("delimiter", delimiter);
+        }
+
+        protected ${glTokenFileReflectionResultName} buildTokenFileReflectionResult() {
+            final ${glTokenFileReflectionResultName} result = new ${glTokenFileReflectionResultName}();
+            final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList = new java.util.ArrayList${database.filterGenericsString(${glTokenFileReflectionFailureName})}();
+            result.setFailureList(failureList);
+            return result;
+        }
+
+        protected ${glFileTokenizingCallbackName} buildFileTokenReflectionFileTokenizingCallback(${glTokenFileReflectionOptionName} tokenFileReflectionOption, final ${glTokenFileReflectionResultName} result) throws java.io.FileNotFoundException, java.io.IOException {
+            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
+
+            final String encoding = tokenFileReflectionOption.getEncoding();
+            final String delimiter = tokenFileReflectionOption.getDelimiter();
+            final boolean interruptIfError = tokenFileReflectionOption.isInterruptIfError();
+            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+            assertObjectNotNull("delimiter", delimiter);
+            final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList = result.getFailureList();
+            assertObjectNotNull("failureList", failureList);
+
+            final ${glFileTokenizingCallbackName} fileTokenizingCallback = new ${glFileTokenizingCallbackName}() {
+                public void handleRowResource(${glFileTokenizingRowResourceName} fileTokenizingRowResource) {
+                    final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = fileTokenizingRowResource.getFileTokenizingHeaderInfo();
+                    final java.util.List${database.filterGenericsString('String')} columnNameList = fileTokenizingHeaderInfo.getColumnNameList();
+                    final java.util.List${database.filterGenericsString('String')} valueList = fileTokenizingRowResource.getValueList();
+
+                    // Set up columnNameList of result object.
+                    if (result.getColumnNameList() == null) {
+                        result.setColumnNameList(columnNameList);
+                    }
+
+                    ${glEntityInterfaceName} entity = null;
+                    try {
+                        // Create entity by the list of value composed of String.
+                        entity = createEntityByStringValueList(columnNameList, valueList);
+
+                        // Create or modify as non-strict.
+                        doCreateOrUpdateNonstrict(entity);
+
+                        // Increment successCount of result object.
+                        result.incrementSuccessCount();
+                    } catch (RuntimeException e) {
+                        if (interruptIfError) {
+                            throw e;
+                        }
+                        final ${glTokenFileReflectionFailureName} failure = new ${glTokenFileReflectionFailureName}();
+                        failure.setColumnNameList(columnNameList);
+                        failure.setValueList(valueList);
+                        failure.setRowString(fileTokenizingRowResource.getRowString());
+                        failure.setRowNumber(fileTokenizingRowResource.getRowNumber());
+                        failure.setLineNumber(fileTokenizingRowResource.getLineNumber());
+                        if (entity != null) {
+                            failure.setEntity(entity);
+                        }
+                        failure.setException(e);
+                        failureList.add(failure);
+                    }
+                }
+            };
+            return fileTokenizingCallback;
+        }
+
+        protected ${glEntityInterfaceName} createEntityByStringValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
+            final ${glMapStringBuilderName} builder = new ${glMapStringBuilderImplName}();
+            builder.setMsMapMark(MAP_STRING_MAP_MARK);
+            builder.setMsStartBrace(MAP_STRING_START_BRACE);
+            builder.setMsEndBrace(MAP_STRING_END_BRACE);
+            builder.setMsDelimiter(MAP_STRING_DELIMITER);
+            builder.setMsEqual(MAP_STRING_EQUAL);
+            builder.setColumnNameList(columnNameList);
+            final String mapString = builder.buildFromList(valueList);
+
+            final ${glEntityInterfaceName} entity = getDBMeta().newEntity();
+            getDBMeta().acceptColumnValueMapString(entity, mapString);
+            return entity;
+        }
+
+        protected ${glFileTokenizingOptionName} buildFileTokenReflectionFileTokenizingOption(${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
+
+            final String encoding = tokenFileReflectionOption.getEncoding();
+            final String delimiter = tokenFileReflectionOption.getDelimiter();
+            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+            assertObjectNotNull("delimiter", delimiter);
+
+            final ${glFileTokenizingOptionName} fileTokenizingOption = new ${glFileTokenizingOptionName}();
+            fileTokenizingOption.setEncoding(encoding);
+            fileTokenizingOption.setDelimiter(delimiter);
+            if (tokenFileReflectionOption.isHandleEmptyAsNull()) {
+                fileTokenizingOption.handleEmptyAsNull();
+            }
+            return fileTokenizingOption;
+        }
+    }
+
 
     // =====================================================================================
     //                                                                       Delegate Method
@@ -498,457 +961,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
             final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
             if (!determineExecuteDelete(entity)) { continue; }
             processBeforeDelete(entity);
-        }
-    }
-
-    // ===================================================================================
-    //                                                                 Basic Entity Update
-    //                                                                 ===================
-    /**
-     * Create.
-     * 
-     * @param entity Entity. (NotNull)
-     */
-    public void create(${glEntityInterfaceName} entity) {
-        doCreate(entity);
-    }
-
-    abstract protected void doCreate(${glEntityInterfaceName} entity);
-
-    /**
-     * Modify.
-     * 
-     * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     */
-    public void modify(${glEntityInterfaceName} entity) {
-        doModify(entity);
-    }
-
-    abstract protected void doModify(${glEntityInterfaceName} entity);
-
-    /**
-     * Modify non strict.
-     * 
-     * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     */
-    public void modifyNonstrict(${glEntityInterfaceName} entity) {
-        doModifyNonstrict(entity);
-    }
-
-    abstract protected void doModifyNonstrict(${glEntityInterfaceName} entity);
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     */
-    public void createOrModify(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-        assertEntityNotNull(entity);
-        doCreateOrUpdate(entity);
-    }
-
-    abstract protected void doCreateOrUpdate(${glEntityInterfaceName} entity);
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     */
-    public void createOrModifyNonstrict(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-        assertEntityNotNull(entity);
-        doCreateOrUpdateNonstrict(entity);
-    }
-
-    abstract protected void doCreateOrUpdateNonstrict(${glEntityInterfaceName} entity);
-
-    /**
-     * Remove.
-     * 
-     * @param entity Entity. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
-     */
-    public void remove(${glPackageBaseCommon}.${glEntityInterfaceName} entity) {
-        assertEntityNotNull(entity);
-        callRemove(entity);
-    }
-
-    abstract protected void doRemove(${glEntityInterfaceName} entity);
-
-    // ===================================================================================
-    //                                                 Basic Entity Update Internal Helper
-    //                                                 ===================================
-    // -----------------------------------------------------
-    //                                                Update
-    //                                                ------
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateInternally(ENTITY_TYPE entity, InternalUpdateCallback<ENTITY_TYPE> callback) {
-        assertEntityNotNull(entity);
-        assertEntityHasVersionNoValue(entity);
-        assertEntityHasUpdateDateValue(entity);
-        final int updatedCount = callback.callbackDelegateUpdate(entity);
-        if (updatedCount == 0) {
-            String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
-        } else if (updatedCount > 1) {
-            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
-            msg = msg + ": entity=" + entity;
-            throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
-        }
-    }
-
-    protected static interface InternalUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateUpdate(ENTITY_TYPE entity);
-    }
-
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpUpdateNonstrictInternally(ENTITY_TYPE entity, InternalUpdateNonstrictCallback<ENTITY_TYPE> callback) {
-        assertEntityNotNull(entity);
-        final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
-        if (updatedCount == 0) {
-            String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
-        } else if (updatedCount > 1) {
-            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
-            msg = msg + ": entity=" + entity;
-        }
-    }
-
-    protected static interface InternalUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateUpdateNonstrict(ENTITY_TYPE entity);
-    }
-
-    // -----------------------------------------------------
-    //                                        InsertOrUpdate
-    //                                        --------------
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}>
-            void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateCallback<ENTITY_TYPE, CB_TYPE> callback) {
-        assertEntityNotNull(entity);
-        if (!entity.hasPrimaryKeyValue()) {
-            callback.callbackInsert(entity);
-        } else {
-            RuntimeException exception = null;
-            try {
-                callback.callbackUpdate(entity);
-            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
-                if (e.getRows() == 0) {
-                    exception = e;
-                }
-            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
-                exception = e;
-            }
-            if (exception != null) {
-                final CB_TYPE cb = callback.callbackNewMyConditionBean();
-                cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
-                if (callback.callbackSelectCount(cb) == 0) {
-                    callback.callbackInsert(entity);
-                } else {
-                    throw exception;
-                }
-            }
-        }
-    }
-
-    protected static interface InternalInsertOrUpdateCallback<ENTITY_TYPE extends ${glEntityInterfaceName}, CB_TYPE extends ${glConditionBeanInterfaceName}> {
-        public void callbackInsert(ENTITY_TYPE entity);
-        public void callbackUpdate(ENTITY_TYPE entity);
-        public CB_TYPE callbackNewMyConditionBean();
-        public int callbackSelectCount(CB_TYPE cb);
-    }
-
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpInsertOrUpdateInternally(ENTITY_TYPE entity, InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE> callback) {
-        assertEntityNotNull(entity);
-        if (!entity.hasPrimaryKeyValue()) {
-            callback.callbackInsert(entity);
-        } else {
-            try {
-                callback.callbackUpdateNonstrict(entity);
-            } catch (${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} e) {
-                callback.callbackInsert(entity);
-            } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
-                callback.callbackInsert(entity);
-            }
-        }
-    }
-
-    protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public void callbackInsert(ENTITY_TYPE entity);
-        public void callbackUpdateNonstrict(ENTITY_TYPE entity);
-    }
-
-    // -----------------------------------------------------
-    //                                                Delete
-    //                                                ------
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteInternally(ENTITY_TYPE entity, InternalDeleteCallback<ENTITY_TYPE> callback) {
-        assertEntityNotNull(entity);
-        assertEntityHasVersionNoValue(entity);
-        assertEntityHasUpdateDateValue(entity);
-        final int deletedCount = callback.callbackDelegateDelete(entity);
-        if (deletedCount == 0) {
-            String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
-        } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
-            msg = msg + ": entity=" + entity;
-        }
-    }
-
-    protected static interface InternalDeleteCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateDelete(ENTITY_TYPE entity);
-    }
-
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteNonstrictInternally(ENTITY_TYPE entity, InternalDeleteNonstrictCallback<ENTITY_TYPE> callback) {
-        assertEntityNotNull(entity);
-        final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
-        if (deletedCount == 0) {
-            String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
-            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
-        } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
-            msg = msg + ": entity=" + entity;
-        }
-    }
-
-    protected static interface InternalDeleteNonstrictCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
-    }
-
-    protected <ENTITY_TYPE extends ${glEntityInterfaceName}> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY_TYPE entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE> callback) {
-        assertEntityNotNull(entity);
-        final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
-        if (deletedCount == 0) {
-            return;
-        } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
-            msg = msg + ": entity=" + entity;
-        }
-    }
-
-    protected static interface InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY_TYPE extends ${glEntityInterfaceName}> {
-        public int callbackDelegateDeleteNonstrict(ENTITY_TYPE entity);
-    }
-
-#set ($batchUpdateReturnValueMethod = "")
-#if ($database.isVersionAfter1047())
-  #set ($batchUpdateReturnValueMethod = ".length")
-#else
-  #set ($batchUpdateReturnValueMethod = "")
-#end
-
-    // ===================================================================================
-    //                                                                   Basic Lump Update
-    //                                                                   =================
-    /**
-     * Lump create the list.
-     * 
-     * @param entityList Entity-list. (NotNull and NotEmpty)
-     * @return The array of created count.
-     */
-    public ${batchUpdateReturnType} lumpCreate(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        return callCreateList(entityList);
-    }
-
-    /**
-     * Lump Modify the list.
-     * 
-     * @param entityList Entity-list. (NotNull and NotEmpty)
-     * @return Modified count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
-     */
-    public ${batchUpdateReturnType} lumpModify(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        return callModifyList(entityList);
-    }
-
-    /**
-     * Lump remove the list.
-     * 
-     * @param entityList Entity-list. (NotNull and NotEmpty)
-     * @return Removed count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
-     */
-    public ${batchUpdateReturnType} lumpRemove(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
-        return callRemoveList(entityList);
-    }
-
-    /**
-     * Inject sequence to primary key if it needs.
-     * 
-     * @param entity Entity. (NotNull)
-     */
-    protected void injectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
-        final ${glDBMetaInterfaceName} dbmeta = entity.getDBMeta();
-        if (!dbmeta.hasSequence() || dbmeta.hasTwoOrMorePrimaryKeys() || entity.hasPrimaryKeyValue()) {
-            return;
-        }
-        final ${database.sequenceReturnType} sequenceValue = readNextVal();
-        final String columnDbName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
-        final java.util.Map${database.filterGenericsString('String, String')} map = new java.util.HashMap${database.filterGenericsString('String, String')}();
-        map.put(columnDbName, sequenceValue.toString());
-        dbmeta.acceptPrimaryKeyMap(entity, map);
-    }
-
-    // =====================================================================================
-    //                                                                            Token File
-    //                                                                            ==========
-    public TokenFileReflectionExecutor tokenFileReflection() {
-        return new TokenFileReflectionExecutor();
-    }
-
-    public class TokenFileReflectionExecutor {
-
-        /**
-         * Reflect(insert or update) token-file to this table.
-         * 
-         * @param filename Name of the file. (NotNull and NotEmpty)
-         * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
-         * @return Token-file-reflection-result. (NotNull)
-         * @throws java.io.FileNotFoundException
-         * @throws java.io.IOException
-         */
-        public ${glTokenFileReflectionResultName} reflectTokenFile(String filename, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
-            assertStringNotNullAndNotTrimmedEmpty("filename", filename);
-            assertFileTokenReflectionOption(tokenFileReflectionOption);
-
-            final ${glTokenFileReflectionResultName} result = buildTokenFileReflectionResult();
-            final ${glFileTokenizingCallbackName} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
-            final ${glFileTokenizingOptionName} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
-            final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
-            fileToken.tokenize(filename, fileTokenizingCallback, fileTokenizingOption);
-            return result;
-        }
-
-        /**
-         * Reflect(insert or update) token-file to this table.
-         * 
-         * @param inputStream Input stream. (NotNull and NotClosed)
-         * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
-         * @return Token-file-reflection-result. (NotNull)
-         * @throws java.io.FileNotFoundException
-         * @throws java.io.IOException
-         */
-        public ${glTokenFileReflectionResultName} reflectTokenFile(java.io.InputStream inputStream, ${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
-            assertObjectNotNull("inputStream", inputStream);
-            assertFileTokenReflectionOption(tokenFileReflectionOption);
-
-            final ${glTokenFileReflectionResultName} result = buildTokenFileReflectionResult();
-            final ${glFileTokenizingCallbackName} fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
-            final ${glFileTokenizingOptionName} fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
-            final ${glFileTokenName} fileToken = new ${glFileTokenImplName}();
-            fileToken.tokenize(inputStream, fileTokenizingCallback, fileTokenizingOption);
-            return result;
-        }
-
-        protected void assertFileTokenReflectionOption(${glTokenFileReflectionOptionName} tokenFileReflectionOption) {
-            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
-
-            final String encoding = tokenFileReflectionOption.getEncoding();
-            final String delimiter = tokenFileReflectionOption.getDelimiter();
-            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-            assertObjectNotNull("delimiter", delimiter);
-        }
-
-        protected ${glTokenFileReflectionResultName} buildTokenFileReflectionResult() {
-            final ${glTokenFileReflectionResultName} result = new ${glTokenFileReflectionResultName}();
-            final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList = new java.util.ArrayList${database.filterGenericsString(${glTokenFileReflectionFailureName})}();
-            result.setFailureList(failureList);
-            return result;
-        }
-
-        protected ${glFileTokenizingCallbackName} buildFileTokenReflectionFileTokenizingCallback(${glTokenFileReflectionOptionName} tokenFileReflectionOption, final ${glTokenFileReflectionResultName} result) throws java.io.FileNotFoundException, java.io.IOException {
-            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
-
-            final String encoding = tokenFileReflectionOption.getEncoding();
-            final String delimiter = tokenFileReflectionOption.getDelimiter();
-            final boolean interruptIfError = tokenFileReflectionOption.isInterruptIfError();
-            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-            assertObjectNotNull("delimiter", delimiter);
-            final java.util.List${database.filterGenericsString(${glTokenFileReflectionFailureName})} failureList = result.getFailureList();
-            assertObjectNotNull("failureList", failureList);
-
-            final ${glFileTokenizingCallbackName} fileTokenizingCallback = new ${glFileTokenizingCallbackName}() {
-                public void handleRowResource(${glFileTokenizingRowResourceName} fileTokenizingRowResource) {
-                    final ${glFileTokenizingHeaderInfoName} fileTokenizingHeaderInfo = fileTokenizingRowResource.getFileTokenizingHeaderInfo();
-                    final java.util.List${database.filterGenericsString('String')} columnNameList = fileTokenizingHeaderInfo.getColumnNameList();
-                    final java.util.List${database.filterGenericsString('String')} valueList = fileTokenizingRowResource.getValueList();
-
-                    // Set up columnNameList of result object.
-                    if (result.getColumnNameList() == null) {
-                        result.setColumnNameList(columnNameList);
-                    }
-
-                    ${glEntityInterfaceName} entity = null;
-                    try {
-                        // Create entity by the list of value composed of String.
-                        entity = createEntityByStringValueList(columnNameList, valueList);
-
-                        // Create or modify as non-strict.
-                        doCreateOrUpdateNonstrict(entity);
-
-                        // Increment successCount of result object.
-                        result.incrementSuccessCount();
-                    } catch (RuntimeException e) {
-                        if (interruptIfError) {
-                            throw e;
-                        }
-                        final ${glTokenFileReflectionFailureName} failure = new ${glTokenFileReflectionFailureName}();
-                        failure.setColumnNameList(columnNameList);
-                        failure.setValueList(valueList);
-                        failure.setRowString(fileTokenizingRowResource.getRowString());
-                        failure.setRowNumber(fileTokenizingRowResource.getRowNumber());
-                        failure.setLineNumber(fileTokenizingRowResource.getLineNumber());
-                        if (entity != null) {
-                            failure.setEntity(entity);
-                        }
-                        failure.setException(e);
-                        failureList.add(failure);
-                    }
-                }
-            };
-            return fileTokenizingCallback;
-        }
-
-        protected ${glEntityInterfaceName} createEntityByStringValueList(java.util.List${database.filterGenericsString('String')} columnNameList, java.util.List${database.filterGenericsString('String')} valueList) {
-            final ${glMapStringBuilderName} builder = new ${glMapStringBuilderImplName}();
-            builder.setMsMapMark(MAP_STRING_MAP_MARK);
-            builder.setMsStartBrace(MAP_STRING_START_BRACE);
-            builder.setMsEndBrace(MAP_STRING_END_BRACE);
-            builder.setMsDelimiter(MAP_STRING_DELIMITER);
-            builder.setMsEqual(MAP_STRING_EQUAL);
-            builder.setColumnNameList(columnNameList);
-            final String mapString = builder.buildFromList(valueList);
-
-            final ${glEntityInterfaceName} entity = getDBMeta().newEntity();
-            getDBMeta().acceptColumnValueMapString(entity, mapString);
-            return entity;
-        }
-
-        protected ${glFileTokenizingOptionName} buildFileTokenReflectionFileTokenizingOption(${glTokenFileReflectionOptionName} tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
-            assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
-
-            final String encoding = tokenFileReflectionOption.getEncoding();
-            final String delimiter = tokenFileReflectionOption.getDelimiter();
-            assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-            assertObjectNotNull("delimiter", delimiter);
-
-            final ${glFileTokenizingOptionName} fileTokenizingOption = new ${glFileTokenizingOptionName}();
-            fileTokenizingOption.setEncoding(encoding);
-            fileTokenizingOption.setDelimiter(delimiter);
-            if (tokenFileReflectionOption.isHandleEmptyAsNull()) {
-                fileTokenizingOption.handleEmptyAsNull();
-            }
-            return fileTokenizingOption;
         }
     }
 }

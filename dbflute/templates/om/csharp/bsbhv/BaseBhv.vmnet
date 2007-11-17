@@ -39,82 +39,39 @@ namespace ${glPackageExtendedBhv} {
         #endregion
 
         // ===============================================================================
-        //                                                                     Constructor
-        //                                                                     ===========
-        #region Constructor
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ${myClassName}() {
-        }
-        #endregion
-
-        // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
         #region Table Name
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        public override String TableDbName {
-            get { return "${table.Name}"; }
-        }
+        /// <summary>${database.ImplementComment}</summary>
+        public override String TableDbName { get { return "${table.Name}"; } }
         #endregion
 
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
         #region DBMeta
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        public override ${glDBMetaInterfaceName} DBMeta {
-            get { return ${myDBMetaClassName}.GetInstance(); }
-        }
+        /// <summary>${database.ImplementComment}</summary>
+        public override ${glDBMetaInterfaceName} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
 
-        /// <summary>
-        /// The property of my dbmeta.
-        /// </summary>
-        public ${myDBMetaClassName} MyDBMeta {
-            get { return ${myDBMetaClassName}.GetInstance(); }
-        }
+        /// <summary>The property of my dbmeta.</summary>
+        public ${myDBMetaClassName} MyDBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
         #endregion
 
         // ===============================================================================
         //                                                                    New Instance
         //                                                                    ============
         #region New Instance
-        /// <summary>
-        /// New entity.
-        /// </summary>
-        /// <returns>Entity. (NotNull)</returns>
-        public override ${glEntityInterfaceName} NewEntity() {
-            return NewMyEntity();
-        }
+        /// <summary>New entity.</summary><returns>Entity. (NotNull)</returns>
+        public override ${glEntityInterfaceName} NewEntity() { return NewMyEntity(); }
 
-        /// <summary>
-        /// New conditionBean.
-        /// </summary>
-        /// <returns>Condition-bean. (NotNull)</returns>
-        public override ${glConditionBeanInterfaceName} NewConditionBean() {
-            return NewMyConditionBean();
-        }
+        /// <summary>New conditionBean.</summary><returns>Condition-bean. (NotNull)</returns>
+        public override ${glConditionBeanInterfaceName} NewConditionBean() { return NewMyConditionBean(); }
 
-        /// <summary>
-        /// New my entity.
-        /// </summary>
-        /// <returns>My conditionBean. (NotNull)</returns>
-        public ${myExtendedObjectClassName} NewMyEntity() {
-            return new ${myExtendedObjectClassName}();
-        }
+        /// <summary>New my entity.</summary><returns>My conditionBean. (NotNull)</returns>
+        public ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
 
-        /// <summary>
-        /// New my conditionBean.
-        /// </summary>
-        /// <returns>My conditionBean. (NotNull)</returns>
-        public ${myConditionBeanClassName} NewMyConditionBean() {
-            return new ${myConditionBeanClassName}();
-        }
+        /// <summary>New my conditionBean.</summary><returns>My conditionBean. (NotNull)</returns>
+        public ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
         #endregion
 
         // ===============================================================================

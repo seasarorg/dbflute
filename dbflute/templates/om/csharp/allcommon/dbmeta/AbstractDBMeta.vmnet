@@ -86,10 +86,6 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                     Object Type
         //                                                                     ===========
         public abstract Type EntityType { get; }
-        public abstract Type DaoType { get; }
-        public abstract Type ConditionBeanType { get; }
-        // TODO: @jflute
-        // public abstract Type BehaviorType { get; }
 
         // ===============================================================================
         //                                                                 Object Instance

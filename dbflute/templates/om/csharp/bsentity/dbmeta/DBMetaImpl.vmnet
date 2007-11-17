@@ -168,21 +168,8 @@ namespace ${myDBMetaPackageName} {
         //                                                                        Name Map
         //                                                                        ========
         #region Name Map
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <returns>{db-name : property-name} map.</returns>
-        public override IDictionary<String, String> DbNamePropertyNameKeyToLowerMap {
-            get { return _dbNamePropertyNameKeyToLowerMap; }
-        }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary> 
-        /// <returns>{property-name : db-name} map.</returns>
-        public override IDictionary<String, String> PropertyNameDbNameKeyToLowerMap {
-            get { return _propertyNameDbNameKeyToLowerMap; }
-        }
+        public override IDictionary<String, String> DbNamePropertyNameKeyToLowerMap { get { return _dbNamePropertyNameKeyToLowerMap; } }
+        public override IDictionary<String, String> PropertyNameDbNameKeyToLowerMap { get { return _propertyNameDbNameKeyToLowerMap; } }
         #endregion
 
         // ===============================================================================
@@ -209,26 +196,6 @@ namespace ${myDBMetaPackageName} {
         //                                                                     Object Type
         //                                                                     ===========
         public override Type EntityType { get { return ENTITY_TYPE; } }
-#if (${isExistDao})
-        public override Type DaoType { get { return DAO_TYPE; } }
-#else
-        public override Type DaoType {
-            get {
-                String msg = "The entity does not have dao. So this method is invalid.";
-                throw new SystemException(msg + " dbmeta=" + ToString());
-            }
-        }
-#end
-#if (${isExistConditionBean})
-        public override Type ConditionBeanType { get { return CONDITION_BEAN_TYPE; } }
-#else
-        public override Type ConditionBeanType {
-            get {
-                String msg = "The entity does not have condition-bean. So this method is invalid.";
-                throw new SystemException(msg + " dbmeta=" + ToString());
-            }
-        }
-#end
 
         // ===============================================================================
         //                                                                 Object Instance

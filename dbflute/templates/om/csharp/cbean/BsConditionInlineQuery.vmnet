@@ -20,7 +20,7 @@ using ${glPackageCQ};
 namespace ${glPackageCIQ} {
 
     /// <summary>
-    /// The condition-query of {table.Name}.
+    /// The condition-query of ${table.name}.
     /// Author: ${database.ClassAuthor}
     /// </summary>
     [System.Serializable]

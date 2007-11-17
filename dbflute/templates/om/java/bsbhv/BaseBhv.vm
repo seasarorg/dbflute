@@ -285,7 +285,17 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        return selectPage(cb, new SelectPageSimpleInvoker<${myExtendedObjectClassName}>(this));
+        final SelectPageInvoker<${myExtendedObjectClassName}> invoker = createDefaultSelectPageInvoker();
+        final SelectPageCallback<${myExtendedObjectClassName}> callback = new SelectPageCallback<${myExtendedObjectClassName}>() {
+            public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
+            public int selectCountIgnoreFetchScope() { return selectCount(cb); }
+            public List<${myExtendedObjectClassName}> selectListWithFetchScope() { return selectList(cb); }
+        };
+        return invoker.invokeSelectPage(callback);
+    }
+
+    protected SelectPageInvoker<${myExtendedObjectClassName}> createDefaultSelectPageInvoker() {
+        return new SelectPageSimpleInvoker<${myExtendedObjectClassName}>(this);
     }
 
     /**
@@ -294,6 +304,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
      * @param invoker The invoker of select-page. (NotNull)
      * @return The result-bean of selected page. (NotNull)
+     * @deprecated
      */
     public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb, SelectPageInvoker<${myExtendedObjectClassName}> invoker) {
         assertConditionBeanNotNull(cb);

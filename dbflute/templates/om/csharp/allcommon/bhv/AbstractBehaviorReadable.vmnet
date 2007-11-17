@@ -44,34 +44,6 @@ namespace ${glPackageBaseCommonBhv} {
         public abstract ${glConditionBeanInterfaceName} NewConditionBean();
 
         // ===============================================================================
-        //                                                                 Delegate Method
-        //                                                                 ===============
-        protected int CallGetCountAll() {
-            return DoCallGetCountAll();
-        }
-        protected abstract int DoCallGetCountAll();
-
-        protected IList<${glEntityInterfaceName}> CallGetListAll() {
-            return DoCallGetListAll();
-        }
-        protected abstract IList<${glEntityInterfaceName}> DoCallGetListAll();
-
-        protected int CallReadCount(${glConditionBeanInterfaceName} cb) {
-            return DoCallReadCount(cb);
-        }
-        protected abstract int DoCallReadCount(${glConditionBeanInterfaceName} cb);
-
-        protected ${glEntityInterfaceName} CallReadEntity(${glConditionBeanInterfaceName} cb) {
-            return DoCallReadEntity(cb);
-        }
-        protected abstract ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb);
-
-        protected IList<${glEntityInterfaceName}> CallReadList(${glConditionBeanInterfaceName} cb) {
-            return DoCallReadList(cb);
-        }
-        protected abstract IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb);
-
-        // ===============================================================================
         //                                                                   Basic Get All
         //                                                                   =============
         public int GetCountAll() {
@@ -147,6 +119,20 @@ namespace ${glPackageBaseCommonBhv} {
                 throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
             }
         }
+
+        // ===============================================================================
+        //                                                                 Delegate Method
+        //                                                                 ===============
+        protected int CallGetCountAll() { return DoCallGetCountAll(); }
+        protected abstract int DoCallGetCountAll();
+        protected IList<${glEntityInterfaceName}> CallGetListAll() { return DoCallGetListAll(); }
+        protected abstract IList<${glEntityInterfaceName}> DoCallGetListAll();
+        protected int CallReadCount(${glConditionBeanInterfaceName} cb) { return DoCallReadCount(cb); }
+        protected abstract int DoCallReadCount(${glConditionBeanInterfaceName} cb);
+        protected ${glEntityInterfaceName} CallReadEntity(${glConditionBeanInterfaceName} cb) { return DoCallReadEntity(cb); }
+        protected abstract ${glEntityInterfaceName} DoCallReadEntity(${glConditionBeanInterfaceName} cb);
+        protected IList<${glEntityInterfaceName}> CallReadList(${glConditionBeanInterfaceName} cb) { return DoCallReadList(cb); }
+        protected abstract IList<${glEntityInterfaceName}> DoCallReadList(${glConditionBeanInterfaceName} cb);
 
         // ===============================================================================
         //                                                                          Helper
