@@ -85,11 +85,11 @@ public class ${glOutsideSqlContextName} {
     // -----------------------------------------------------
     //                                  Common of OutsideSql
     //                                  --------------------
-    private boolean _dynamicAnalysis;
+    protected boolean _dynamicBinding;
 
-    private boolean _offsetByCursorForcedly;
+    protected boolean _offsetByCursorForcedly;
 
-    private boolean _limitByCursorForcedly;
+    protected boolean _limitByCursorForcedly;
 
     // -----------------------------------------------------
     //                                  Specified OutsideSql
@@ -175,12 +175,12 @@ public class ${glOutsideSqlContextName} {
     // -----------------------------------------------------
     //                                  Common of OutsideSql
     //                                  --------------------
-    public boolean isDynamicAnalysis() {
-        return _dynamicAnalysis;
+    public boolean isDynamicBinding() {
+        return _dynamicBinding;
     }
 
-    public void setDynamicAnalysis(boolean dynamicAnalysis) {
-        this._dynamicAnalysis = dynamicAnalysis;
+    public void setDynamicBinding(boolean dynamicBinding) {
+        this._dynamicBinding = dynamicBinding;
     }
 
     public boolean isOffsetByCursorForcedly() {
@@ -233,5 +233,4 @@ public class ${glOutsideSqlContextName} {
     public void setMethodName(String methodName) {
         this._methodName = methodName;
     }
-
 }

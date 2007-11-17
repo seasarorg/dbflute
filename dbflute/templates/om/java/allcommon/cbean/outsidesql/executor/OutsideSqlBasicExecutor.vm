@@ -138,7 +138,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * #
      * </pre>
      * 
-     * @return The executor of paging. (NotNull)
+     * @return The executor of paging that the paging mode is auto. (NotNull)
      */
     public ${glOutsideSqlPagingExecutorName} autoPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();
@@ -160,7 +160,7 @@ public class ${glOutsideSqlBasicExecutorName} {
      * #
      * </pre>
      * 
-     * @return The executor of paging. (NotNull)
+     * @return The executor of paging that the paging mode is manual. (NotNull)
      */
     public ${glOutsideSqlPagingExecutorName} manualPaging() {
         final ${glOutsideSqlOptionName} option = createOutsideSqlOption();

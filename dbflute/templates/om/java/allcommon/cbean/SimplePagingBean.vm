@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
+import java.util.Map;
+import java.util.HashMap;
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
 /**
@@ -17,6 +19,12 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
 
     /** Is the execution for paging(NOT count)? */
     protected boolean _paging = true;
+
+    /** Is fetch narrowing valid? */
+    protected boolean _fetchNarrowing = true;
+
+    /** The map for parameter. */
+    protected Map<String, Object> _map;
 
     // ===================================================================================
     //                                                                Paging Determination
@@ -230,10 +238,24 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
     /**
      * Is fetch-narrowing effective?
      * 
-     * @return Determiantion.
+     * @return Determination.
      */
     public boolean isFetchNarrowingEffective() {
-        return getSqlClause().isFetchNarrowingEffective();
+        return _fetchNarrowing && getSqlClause().isFetchNarrowingEffective();
+    }
+
+    /**
+     * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+     */
+    public void ignoreFetchNarrowing() {
+        _fetchNarrowing = false;
+    }
+
+    /**
+     * Restore ignored fetch narrowing. {INTERNAL METHOD}
+     */
+    public void restoreIgnoredFetchNarrowing() {
+        _fetchNarrowing = true;
     }
 
     /**
@@ -258,15 +280,32 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
     }
 
     // ===================================================================================
+    //                                                                       Parameter Map
+    //                                                                       =============
+    public Map<String, Object> getMap() {
+        if (_map == null) {
+            _map = new HashMap<String, Object>();
+        }
+        return _map;
+    }
+
+    public void addToMap(String key, Object value) {
+        if (_map == null) {
+            _map = new HashMap<String, Object>();
+        }
+        _map.put(key, value);
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     // -----------------------------------------------------
     //                                             SqlClause
     //                                             ---------
     /**
-     * Get sql-clause.
+     * Get sqlClause.
      * 
-     * @return Sql clause. (NotNull)
+     * @return SqlClause. (NotNull)
      */
     protected ${glSqlClauseName} getSqlClause() {
         return _sqlClause;

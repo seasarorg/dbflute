@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 /**
- * The condition-bean as interface.
+ * The bean of fetch narrowing.
  * 
  * @author ${database.ClassAuthor}
  */
@@ -38,9 +38,19 @@ public interface ${glFetchNarrowingBeanInterfaceName} {
     /**
      * Is fetch-narrowing effective?
      * 
-     * @return Determiantion.
+     * @return Determination.
      */
     public boolean isFetchNarrowingEffective();
+
+    /**
+     * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+     */
+    public void ignoreFetchNarrowing();
+
+    /**
+     * Restore ignored fetch narrowing. {INTERNAL METHOD}
+     */
+    public void restoreIgnoredFetchNarrowing();
 
     /**
      * Get safety max result size.

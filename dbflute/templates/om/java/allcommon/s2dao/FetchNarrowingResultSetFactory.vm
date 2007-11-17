@@ -79,7 +79,6 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
         if (!isUseFetchNarrowingResultSetWrapper(cb)) {
             return resultSet;
         }
-#if ($database.isAvailableGenerics())
         final ${glFetchNarrowingResultSetWrapper} wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName});
         if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
             final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
@@ -87,9 +86,6 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
             wrapper.setLimitByCursorForcedly(outsideSqlContext.isLimitByCursorForcedly());
         }
         return wrapper;
-#else
-        return new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName});
-#end
     }
 
     protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {

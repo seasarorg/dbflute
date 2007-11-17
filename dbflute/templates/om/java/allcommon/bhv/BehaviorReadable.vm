@@ -9,7 +9,6 @@ import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
-import ${glPackageBaseCommonCBean}.${glResultBeanBuilderName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
@@ -185,7 +184,7 @@ public interface ${glBehaviorReadableInterfaceName} {
         public java.util.List<ENTITY> selectListWithFetchScope();
     }
 
-    public static class ResultBeanBuilder<ENTITY> extends ${glResultBeanBuilderName}<ENTITY> {
+    public static class ResultBeanBuilder<ENTITY> extends ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<ENTITY> {
         public ResultBeanBuilder(${glBehaviorReadableInterfaceName} bhv) {
             super(bhv.getTableDbName());
         }

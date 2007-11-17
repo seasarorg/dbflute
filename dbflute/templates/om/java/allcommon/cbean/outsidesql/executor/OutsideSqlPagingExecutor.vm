@@ -46,16 +46,62 @@ public class ${glOutsideSqlPagingExecutorName} {
 
     /**
      * Select page.
+     * <p>
+     * The SQL should have Count and Paging. <br />
+     * You can realize by pagingBean's isPaging() method on your 'SQL Comment'. For example, 'IF Comment'. <br />
+     * It returns false when it executes Count. And it returns true when it executes Paging. <br />
+     * <pre>
+     * - - - - - - - - - - - - - - - - - - - - - - -
+     * ex) Your Correct SQL {MySQL and manualPaging}
+     * - - - - - - - - - - - - - - - - - - - - - - -
+     * # /[*]IF pmb.isPaging()[*]/
+     * # select member.MEMBER_ID
+     * #      , member.MEMBER_NAME
+     * #      , memberStatus.MEMBER_STATUS_NAME
+     * # -- ELSE select count(*)
+     * # /[*]END[*]/
+     * #   from MEMBER member
+     * #     /[*]IF pmb.isPaging()[*]/
+     * #     left outer join MEMBER_STATUS memberStatus
+     * #       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
+     * #     /[*]END[*]/
+     * #  /[*]BEGIN[*]/where
+     * #    /[*]IF pmb.memberId != null[*]/member.MEMBER_ID = /[*]pmb.memberId[*]/'123'/[*]END[*]/
+     * #    /[*]IF pmb.memberName != null[*]/and member.MEMBER_NAME like /[*]pmb.memberName[*]/'Billy' || '%'/[*]END[*]/
+     * #  /[*]END[*]/
+     * #  /[*]IF pmb.isPaging()[*]/
+     * #  order by member.UPDATE_DATETIME desc
+     * #  /[*]END[*]/
+     * #  /[*]IF pmb.isPaging()[*]/
+     * #  limit /[*]$pmb.pageStartIndex[*]/80, /[*]$pmb.fetchSize[*]/20
+     * #  /[*]END[*]/
+     * # 
+     * o [*] is easy escape to Java Doc Comment.
+     * o If it's autoPaging, the line of 'limit 80, 20' is unnecessary!
+     * 
+     * - - - - - - - - - - - - - - - - - - - - - - - - -
+     * ex) Wrong SQL {part 1}
+     *     -- Line comment before ELSE comment --
+     * - - - - - - - - - - - - - - - - - - - - - - - - -
+     * # /[*]IF pmb.isPaging()[*]/
+     * # select member.MEMBER_ID
+     * #      , member.MEMBER_NAME -- The name of member...    *NG
+     * #      -- The status name of member...                  *NG
+     * #      , memberStatus.MEMBER_STATUS_NAME
+     * # -- ELSE select count(*)
+     * # /[*]END[*]/
+     * # ...
+     * o It's S2Dao's restriction...Sorry
+     * </pre>
      * 
      * @param <ENTITY> The type of entity.
-     * @param countPath The path of count SQL. (NotNull)
+     * @param path The path of SQL that executes count and paging. (NotNull)
      * @param pagingPath The path of paging SQL. (NotNull)
      * @param pmb The bean of paging parameter. (NotNull)
      * @param entityType The type of result entity. (NotNull)
      * @return The result bean of paging. (NotNull)
      */
-    public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String countPath
-                                                               , final String pagingPath
+    public <ENTITY> ${glPagingResultBeanName}<ENTITY> selectPage(final String path
                                                                , final ${glPagingBeanInterfaceName} pmb
                                                                , final Class<ENTITY> entityType) {
         final ${glOutsideSqlOptionName} countOption = _outsideSqlOption.copyOptionWithoutPaging();
@@ -66,14 +112,14 @@ public class ${glOutsideSqlPagingExecutorName} {
             }
             public int count() {
                 pmb.xsetPaging(false);
-                return countExecutor.selectEntityWithDeletedCheck(countPath, pmb, Integer.class);
+                return countExecutor.selectEntityWithDeletedCheck(path, pmb, Integer.class);
             }
             public java.util.List<ENTITY> paging() {
                 pmb.xsetPaging(true);
-                return selectList(pagingPath, pmb, entityType);
+                return selectList(path, pmb, entityType);
             }
         };
-        final ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY> (_tableDbName);
+        final ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
         return invoker.invokePaging(handler);
     }
 

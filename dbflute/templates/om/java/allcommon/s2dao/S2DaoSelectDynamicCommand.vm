@@ -250,7 +250,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             // - - - - - - - - - -
             if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
                 final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-                if (outsideSqlContext.isDynamicAnalysis()) {
+                if (outsideSqlContext.isDynamicBinding()) {
                     return executeOutsideSqlAsDynamic(args, outsideSqlContext);
                 } else {
                     return executeOutsideSqlAsStatic(args, outsideSqlContext);

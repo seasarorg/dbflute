@@ -496,17 +496,26 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected void preprocessOutsideSql(MethodInvocation invocation) {
         final Class<${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}> outsideSqlType = ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation}.class;
         final ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation} outsideSql = invocation.getMethod().getAnnotation(outsideSqlType);
-        
+
         // Traditional OutsideSql
         if (outsideSql != null && (outsideSql.dynamicBinding() || outsideSql.offsetByCursor() || outsideSql.offsetByCursor() || outsideSql.limitByCursor())) {
             final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-            outsideSqlContext.setDynamicAnalysis(outsideSql.dynamicBinding());
+            outsideSqlContext.setDynamicBinding(outsideSql.dynamicBinding());
             outsideSqlContext.setOffsetByCursorForcedly(outsideSql.offsetByCursor());
             outsideSqlContext.setLimitByCursorForcedly(outsideSql.limitByCursor());
             ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+
+            // Set up fetchNarrowingBean.
+            final Object[] args = invocation.getArguments();
+            if (args == null || args.length == 0) {
+                return;
+            }
+            if (${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(args[0].getClass())) {
+                ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})args[0]);
+            }
             return;
         }
-        
+
         // Specified OutsideSql
         if (${glOutsideSqlDaoName}.class.isAssignableFrom(getTargetClass(invocation))) {
             if (isOutsideSqlDaoMethodSelect(invocation)) {
@@ -536,7 +545,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
         final Object resultTypeSpecification = args[3];
         final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-        outsideSqlContext.setDynamicAnalysis(option.isDynamicBinding());
+        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setOutsideSqlPath(path);
@@ -544,6 +553,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
         outsideSqlContext.setMethodName(invocation.getMethod().getName());
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+
+        // Set up fetchNarrowingBean.
+        setupOutsideSqlFetchNarrowingBean(pmb, option);
     }
 
     // - - - - - - - - - - - -
@@ -559,47 +571,60 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         final Object pmb = args[1];
         final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
         final ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
-        outsideSqlContext.setDynamicAnalysis(option.isDynamicBinding());
+        outsideSqlContext.setDynamicBinding(option.isDynamicBinding());
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setMethodName(invocation.getMethod().getName());
         ${glOutsideSqlContextName}.setOutsideSqlContextOnThread(outsideSqlContext);
+
+        // Set up fetchNarrowingBean.
+        setupOutsideSqlFetchNarrowingBean(pmb, option);
+    }
+
+    // - - - - - - - - - - - -
+    //                  Common
+    //                   - - -
+    protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
+        if (!${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(pmb.getClass())) {
+            return;
+        }
+        final ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean = (${glFetchNarrowingBeanInterfaceName})pmb;
+        if (option.isManualPaging()) {
+            fetchNarrowingBean.ignoreFetchNarrowing();
+        }
+        ${glFetchNarrowingBeanContextName}.setFetchNarrowingBeanOnThread(fetchNarrowingBean);
     }
 
     // -----------------------------------------------------
     //                                         ConditionBean
     //                                         -------------
     /**
-     * Preprocess condition-bean.
+     * Preprocess conditionBean.
      * <p>
-     * If this method is condition bean select target, make dynamic sql.
+     * If this method is condition bean select target, make dynamic SQL.
      * Else nothing.
      * 
      * @param invocation Method invocation. (NotNull)
-     * @param cmd Sql command. (NotNull)
-     * @return Condition-bean. (Nullable)
+     * @param cmd SqlCommand. (NotNull)
+     * @return ConditionBean. (Nullable)
      */
     protected ${glConditionBeanInterfaceName} preprocessConditionBean(org.aopalliance.intercept.MethodInvocation invocation, org.seasar.dao.SqlCommand cmd) {
+        final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
+        if (outsideSqlContext != null) {
+            return null; // Because it has already finished setting up fetchNarrowingBean for outsideSql here.
+        }
         final ${glConditionBeanInterfaceName} cb;
         {
-            final Object[] args;
-            final ${glOutsideSqlContextName} outsideSqlContext = getOutsideSqlContext();
-            if (outsideSqlContext != null && outsideSqlContext.isSpecifiedOutsideSql()) {
-                args = new Object[] {outsideSqlContext.getParameterBean()};
-            } else {
-                args = invocation.getArguments();
-            }
-            if (args == null || !(args.length >= 1)) {
+            final Object[] args = invocation.getArguments();
+            if (args == null || args.length == 0) {
                 return null;
             }
-
             final Object arg0 = args[0];
             if (arg0 == null) {
                 return null;
             }
-
             if (!${glConditionBeanContextName}.isTheTypeConditionBean(arg0.getClass())) {// The argument is not condition-bean...
                 if (${glFetchNarrowingBeanContextName}.isTheTypeFetchNarrowingBean(arg0.getClass()) && !isSelectCountIgnoreFetchScopeMethod(invocation)) {
                     // Fetch-narrowing-bean and Not select count!
@@ -607,7 +632,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                 }
                 return null;
             }
-
             cb = (${glConditionBeanInterfaceName})arg0;
         }
 
@@ -649,6 +673,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.clearOutsideSqlContextOnThread();
         }
         if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // Because there is possible that fetch narrowing has been ignored for manualPaging of outsideSql.
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            ${glFetchNarrowingBeanContextName}.getFetchNarrowingBeanOnThread().restoreIgnoredFetchNarrowing();
+
             ${glFetchNarrowingBeanContextName}.clearFetchNarrowingBeanOnThread();
         }
         if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {

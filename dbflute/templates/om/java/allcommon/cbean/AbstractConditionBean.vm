@@ -496,6 +496,21 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     /**
+     * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+     */
+    public void ignoreFetchNarrowing() {
+        String msg = "This method is unsupported on ConditionBean!";
+        throw new UnsupportedOperationException(msg);
+    }
+
+    /**
+     * Restore ignored fetch narrowing. {INTERNAL METHOD}
+     */
+    public void restoreIgnoredFetchNarrowing() {
+        // Do nothing!
+    }
+
+    /**
      * Get safety max result size.
      * 
      * @return Safety max result size.

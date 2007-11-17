@@ -366,21 +366,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         return displaySql.substring(0, basePointIndex) + getLineSeparator() + " " + displaySql.substring(basePointIndex);
     }
 
-    /**
-     * Assert that selected count has not exceeded max count.
-     * 
-     * @param selectedCount Selected count.
-     * @param maxCount Max count.
-     * @param clauseObject Clause object for exception message.
-     * @exception ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}
-     */
-    protected void assertSelectedCountHasNotExceededMaxCount(int selectedCount, int maxCount, Object clauseObject) {
-        if (selectedCount > maxCount) {
-            String msg = "Selected count[" + selectedCount + "] has exceeded max count[" + maxCount + "]: clauseObject=" + clauseObject;
-            throw new ${glPackageBaseCommonException}.${glSelectedCountExceedMaxCountExceptionName}(msg, selectedCount, maxCount);
-        }
-    }
-
 #if ($database.isAvailableGenerics())
     // ===================================================================================
     //                                                                      Various Select

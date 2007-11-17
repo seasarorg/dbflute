@@ -118,11 +118,12 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String PROPERTY_NAME_${col.javaBeansRulePropertyName} = "$col.javaBeansRulePropertyName";
 
 #end
+#if ($database.isMakeRecentlyDeprecated())
     // -----------------------------------------------------
     //                                  Column Cap Prop Name
     //                                  --------------------
 #foreach ($col in $table.columns)
-    /** Cap prop name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
+    /** Cap prop name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} @deprecated Please use PROPERTY_NAME_${col.javaBeansRulePropertyName}. */
     public static final String CAP_PROP_NAME_${col.javaName} = "$col.javaName";
 
 #end
@@ -130,9 +131,10 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                Column Uncap Prop Name
     //                                ----------------------
 #foreach ($col in $table.columns)
-    /** Uncap prop name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} */
+    /** Uncap prop name of ${col.uncapitalisedJavaName}. ${col.columnDefinitionLineDisp} @deprecated Please use PROPERTY_NAME_${col.javaBeansRulePropertyName}. */
     public static final String UNCAP_PROP_NAME_${col.uncapitalisedJavaName} = "$col.uncapitalisedJavaName";
 
+#end
 #end
     // -----------------------------------------------------
     //                                          Foreign Name
@@ -190,7 +192,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return Table db-name. (NotNull)
+     * @return Table DB name. (NotNull)
      */
     public String getTableDbName() {
         return TABLE_DB_NAME;
@@ -199,7 +201,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return Table property-name(JavaBeansRule). (NotNull)
+     * @return Table property name(JavaBeansRule). (NotNull)
      */
     public String getTablePropertyName() {
         return TABLE_PROPERTY_NAME;
@@ -233,7 +235,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The key-to-lower map of db-name(lower) and property-name. (NotNull)
+     * @return The key-to-lower map of DB name(lower) and property name. (NotNull)
      */
     public java.util.Map<String, String> getDbNamePropertyNameKeyToLowerMap() {
         return createDbNamePropertyNameKeyToLowerMap();
@@ -242,7 +244,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The key-to-lower map of property-name(lower) and db-name. (NotNull)
+     * @return The key-to-lower map of property name(lower) and DB name. (NotNull)
      */
     public java.util.Map<String, String> getPropertyNameDbNameKeyToLowerMap() {
         return createPropertyNameDbNameKeyToLowerMap();
@@ -254,7 +256,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type-name of entity. (NotNull)
+     * @return The type name of entity. (NotNull)
      */ 
     public String getEntityTypeName() {
         return "${myExtendedEntityPackageName}.${myExtendedObjectClassName}";
@@ -264,7 +266,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type-name of condition-bean. (NotNull)
+     * @return The type name of conditionBean. (NotNull)
      */ 
     public String getConditionBeanTypeName() {
         return "${glPackageBaseCB}.${myConditionBeanClassName}";
@@ -274,7 +276,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type-name of condition-bean. (Nullable: If the condition-bean does not exist)
+     * @return The type name of conditionBean. (Nullable: If the conditionBean does not exist)
      */ 
     public String getConditionBeanTypeName() {
         return null;
@@ -285,7 +287,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type-name of dao. (NotNull)
+     * @return The type name of dao. (NotNull)
      */ 
     public String getDaoTypeName() {
         return "${myExtendedDaoPackageName}.${myExtendedDaoClassName}";
@@ -295,7 +297,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type-name of dao. (Nullable: If the dao does not exist)
+     * @return The type name of dao. (Nullable: If the dao does not exist)
      */ 
     public String getDaoTypeName() {
         return null;
@@ -306,7 +308,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type-name of behavior. (NotNull)
+     * @return The type name of behavior. (NotNull)
      */ 
     public String getBehaviorTypeName() {
         return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}";
@@ -316,7 +318,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type-name of behavior. (Nullable: If the behavior does not exist)
+     * @return The type name of behavior. (Nullable: If the behavior does not exist)
      */ 
     public String getBehaviorTypeName() {
         return null;
@@ -363,7 +365,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The list of column db-name. (NotNull and NotEmpty)
+     * @return The list of column DB name. (NotNull and NotEmpty)
      */
     public java.util.List<${glColumnInfoName}> getColumnInfoList() {
         final java.util.List<${glColumnInfoName}> columnInfoList = new java.util.ArrayList<${glColumnInfoName}>();
