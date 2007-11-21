@@ -33,11 +33,11 @@ namespace ${glPackageBaseCommonCKey} {
          * @return Determination.
          */
         public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
-            if (value == null || isNullableTypeNull(value)) {
+            if (value == null) {
                 return false;
             }
             Object valueObject = conditionValue.GreaterThan;
-            if (valueObject != null && !isNullableTypeNull(valueObject) && valueObject.Equals(value)) {
+            if (valueObject != null && valueObject.Equals(value)) {
                 _log.Warn("The value has already registered at " + callerName + ": " + valueObject + " = " + value);
                 return false;
             }
@@ -56,9 +56,6 @@ namespace ${glPackageBaseCommonCKey} {
                 return;
             }
             Object valueObject = value.GreaterThan;
-            if (isNullableTypeNull(valueObject)) {
-                return;
-            }
             conditionList.Add(BuildBindClause(columnName, value.GetGreaterThanLocation()));
         }
 

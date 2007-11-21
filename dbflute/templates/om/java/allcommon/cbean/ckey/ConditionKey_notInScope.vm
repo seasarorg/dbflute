@@ -70,7 +70,7 @@ public class ${myClassName} extends ${glConditionKeyName} {
         final java.util.List${database.filterGenericsString('Object')} checkedValueList = new java.util.ArrayList${database.filterGenericsString('Object')}();
         for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
             final Object checkTargetValue = ite.next();
-            if (checkTargetValue != null) {;
+            if (checkTargetValue != null) {
                 checkedValueList.add(checkTargetValue);
             }
         }

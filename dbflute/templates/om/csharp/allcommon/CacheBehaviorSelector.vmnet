@@ -17,8 +17,8 @@ namespace ${glPackageBaseCommon} {
         // ===============================================================================
         //                                                                        Selector
         //                                                                        ========
-        public virtual DAO_TYPE Select<DAO_TYPE>(Type daoType) where DAO_TYPE : ${glBehaviorReadableInterfaceName} {
-            return (DAO_TYPE)_container.GetComponent(daoType);
+        public virtual BEHAVIOR_TYPE Select<BEHAVIOR_TYPE>(Type behaviorType) where BEHAVIOR_TYPE : ${glBehaviorReadableInterfaceName} {
+            return (BEHAVIOR_TYPE)_container.GetComponent(behaviorType);
         }
 
         public virtual ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName) {

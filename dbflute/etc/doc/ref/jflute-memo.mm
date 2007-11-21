@@ -219,6 +219,7 @@
 </node>
 <node CREATED="1194938320781" ID="Freemind_Link_606292027" MODIFIED="1194938323171" TEXT="Subversion">
 <node CREATED="1194938323984" ID="Freemind_Link_1479744119" MODIFIED="1194938324843" TEXT="http://www.polarion.org/projects/subversive/download/1.1/update-site/"/>
+<node CREATED="1195527437890" ID="Freemind_Link_358231879" MODIFIED="1195527438843" TEXT="http://gihyo.jp/dev/column/01/management/2007/0622"/>
 </node>
 </node>
 <node CREATED="1187847261656" ID="Freemind_Link_1228142762" MODIFIED="1187847265281" TEXT="Deployment">
@@ -392,6 +393,11 @@
 <node CREATED="1185846821062" ID="Freemind_Link_386558603" MODIFIED="1185846824890" TEXT="CodeFormat"/>
 <node CREATED="1185846826000" ID="Freemind_Link_121681278" MODIFIED="1185846830328" TEXT="JavaDoc&#x8b66;&#x544a;"/>
 <node CREATED="1185846831125" ID="Freemind_Link_1566074680" MODIFIED="1185846837437" TEXT="&#x305d;&#x306e;&#x4ed6;&#x8b66;&#x544a;"/>
+</node>
+<node CREATED="1195527448265" ID="Freemind_Link_331793329" MODIFIED="1195527454765" TEXT="Version&#x7ba1;&#x7406;">
+<node CREATED="1195527455515" ID="Freemind_Link_169841438" MODIFIED="1195527457421" TEXT="Subversion">
+<node CREATED="1195527458078" ID="Freemind_Link_1280213774" MODIFIED="1195527459859" TEXT="http://gihyo.jp/dev/column/01/management/2007/0622"/>
+</node>
 </node>
 </node>
 <node CREATED="1179803344125" ID="Freemind_Link_973129193" MODIFIED="1185854222031" TEXT="Screen">

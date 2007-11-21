@@ -180,15 +180,6 @@ namespace ${glPackageBaseCommonCKey} {
             return "${database.WildCard}";
         }
 
-        protected bool isNullableTypeNull(Object obj) {
-            if (obj != null) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-
         /**
          * ${database.OverrideComment}
          * Returns hash-code of this condition-key string.

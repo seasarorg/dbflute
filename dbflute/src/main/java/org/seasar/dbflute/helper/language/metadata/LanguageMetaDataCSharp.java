@@ -15,19 +15,19 @@ public class LanguageMetaDataCSharp implements LanguageMetaData {
         map.put("CHAR", "String");
         map.put("VARCHAR", "String");
         map.put("LONGVARCHAR", "String");
-        map.put("NUMERIC", "Nullable<decimal>");
-        map.put("DECIMAL", "Nullable<decimal>");
-        map.put("BIT", "Nullable<bool>");
-        map.put("TINYINT", "Nullable<int>");
-        map.put("SMALLINT", "Nullable<int>");
-        map.put("INTEGER", "Nullable<int>");
-        map.put("BIGINT", "Nullable<long>");
-        map.put("REAL", "Nullable<decimal>");
-        map.put("FLOAT", "Nullable<decimal>");
-        map.put("DOUBLE", "Nullable<decimal>");
-        map.put("DATE", "Nullable<DateTime>");
-        map.put("TIME", "Nullable<DateTime>");
-        map.put("TIMESTAMP", "Nullable<DateTime>");
+        map.put("NUMERIC", "decimal?");
+        map.put("DECIMAL", "decimal?");
+        map.put("BIT", "bool?");
+        map.put("TINYINT", "int?");
+        map.put("SMALLINT", "int?");
+        map.put("INTEGER", "int?");
+        map.put("BIGINT", "long?");
+        map.put("REAL", "decimal?");
+        map.put("FLOAT", "decimal?");
+        map.put("DOUBLE", "decimal?");
+        map.put("DATE", "DateTime?");
+        map.put("TIME", "DateTime?");
+        map.put("TIMESTAMP", "DateTime?");
         return map;
     }
 
@@ -36,15 +36,15 @@ public class LanguageMetaDataCSharp implements LanguageMetaData {
     }
 
     public List<Object> getBooleanList() {
-        return Arrays.asList(new Object[] { "Nullable<bool>" });
+        return Arrays.asList(new Object[] { "bool?" });
     }
 
     public List<Object> getNumberList() {
-        return Arrays.asList(new Object[] { "Nullable<decimal>", "Nullable<int>", "Nullable<long>" });
+        return Arrays.asList(new Object[] { "decimal?", "int?", "long?" });
     }
 
     public List<Object> getDateList() {
-        return Arrays.asList(new Object[] { "Nullable<DateTime>" });
+        return Arrays.asList(new Object[] { "DateTime?" });
     }
 
     public List<Object> getBinaryList() {

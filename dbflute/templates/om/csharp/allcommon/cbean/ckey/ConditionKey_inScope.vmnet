@@ -30,7 +30,7 @@ namespace ${glPackageBaseCommonCKey} {
          * @return Determination.
          */
         public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
-            if (value == null || isNullableTypeNull(value)) {
+            if (value == null) {
                 return false;
             }
             if (value is System.Collections.IList && ((System.Collections.IList)value).Count == 0) {
@@ -54,9 +54,6 @@ namespace ${glPackageBaseCommonCKey} {
             System.Collections.IList checkedValueList = new System.Collections.Generic.List<Object>();
             foreach (Object checkTargetValue in valueList) {
                 if (checkTargetValue == null) {
-                    continue;
-                }
-                if (isNullableTypeNull(checkTargetValue)) {
                     continue;
                 }
                 checkedValueList.Add(checkTargetValue);

@@ -32,7 +32,7 @@ namespace ${glPackageExtendedParameterBean} {
 
         public ${propertyType} ${database.initCap($propertyName)} {
 #if ($propertyType.endsWith("String"))
-            get { return ($propertyType)ConvertEmptyToNullIfString(_${propertyName});
+            get { return ($propertyType)ConvertEmptyToNullIfString(_${propertyName}); }
 #else
             get { return _${propertyName}; }
 #end
@@ -45,7 +45,7 @@ namespace ${glPackageExtendedParameterBean} {
         }
 
         protected String FilterRemoveEmptyString(String value) {
-            return ((value != null && !"".equals(value)) ? value : null);
+            return ((value != null && !"".Equals(value)) ? value : null);
         }
         #endregion
 

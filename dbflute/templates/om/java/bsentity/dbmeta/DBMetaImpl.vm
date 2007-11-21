@@ -649,16 +649,16 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 #foreach ($col in $table.primaryKey)
         MapAssertUtil.assertColumnExistingInPrimaryKeyMap(primaryKeyMap, "${col.Name}");
 #if ($col.isJavaNativeStringObject())
-        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeString(${col.JavaNative}.class)); };
+        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeString(${col.JavaNative}.class)); }
 #end
 #if ($col.isJavaNativeNumberObject())
-        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeNumber(${col.JavaNative}.class)); };
+        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeNumber(${col.JavaNative}.class)); }
 #end
 #if ($col.isJavaNativeDateObject())
-        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeDate(${col.JavaNative}.class)); };
+        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeDate(${col.JavaNative}.class)); }
 #end
 #if (!$col.isJavaNativeStringObject() && !$col.isJavaNativeNumberObject() && !$col.isJavaNativeDateObject())
-        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeOther(${col.JavaNative}.class)); };
+        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeOther(${col.JavaNative}.class)); }
 #end
 #end
 
@@ -692,16 +692,16 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
 
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeStringObject())
-        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeString(${col.JavaNative}.class)); };
+        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeString(${col.JavaNative}.class)); }
 #end
 #if ($col.isJavaNativeNumberObject())
-        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeNumber(${col.JavaNative}.class)); };
+        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeNumber(${col.JavaNative}.class)); }
 #end
 #if ($col.isJavaNativeDateObject())
-        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeDate(${col.JavaNative}.class)); };
+        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeDate(${col.JavaNative}.class)); }
 #end
 #if (!$col.isJavaNativeStringObject() && !$col.isJavaNativeNumberObject() && !$col.isJavaNativeDateObject())
-        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeOther(${col.JavaNative}.class)); };
+        if (analyzer.init("${col.Name}", "${col.UncapitalisedJavaName}", "${col.JavaBeansRulePropertyName}")) { myEntity.set${col.javaName}(analyzer.analyzeOther(${col.JavaNative}.class)); }
 #end
 #end
 

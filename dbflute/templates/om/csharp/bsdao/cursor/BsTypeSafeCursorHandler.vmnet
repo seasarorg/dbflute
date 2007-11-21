@@ -2,43 +2,31 @@
 
 using System;
 using System.Data;
+using ${glPackageBaseCommonJdbc};
 
 namespace ${myExtendedDaoCursorPackageName} {
 
     [System.Serializable]
-    public abstract partial class ${myClassName} : ${glPackageBaseCommonJdbc}.${glCursorHandlerName} {
+    public partial class ${myClassName} : ${glPackageBaseCommonJdbc}.${glCursorHandlerName} {
 
-        /**
-         * Handle.
-         * 
-         * @param rs Result set. (NotNull)
-         * @return Result. (Nullable)
-         * @throws java.sql.SQLException
-         */
-        public Object Handle(IDataReader reader) {
-            return FetchCursor(CreateTypeSafeCursor(reader));
+        protected ${glCursorFetcherName}<${myExtendedTypeSafeCursorClassName}> _cursorFetcher;
+
+        public ${myClassName}(${glCursorFetcherName}<${myExtendedTypeSafeCursorClassName}> cursorFetcher) {
+            _cursorFetcher = cursorFetcher;
         }
 
-        /**
-         * Create type safe cursor.
-         * 
-         * @param rs Result set. (NotNull)
-         * @return Type safe cursor. (Nullable)
-         * @throws java.sql.SQLException
-         */
-        protected ${myExtendedTypeSafeCursorClassName} CreateTypeSafeCursor(IDataReader reader) {
+        public virtual Object Handle(IDataReader reader) {
+            return FetchCursor();
+        }
+
+        protected virtual Object FetchCursor() {
+            return _cursorFetcher.Invoke(CreateTypeSafeCursor(reader));
+        }
+
+        protected virtual ${myExtendedTypeSafeCursorClassName} CreateTypeSafeCursor(IDataReader reader) {
             ${myExtendedTypeSafeCursorClassName} cursor = new ${myExtendedTypeSafeCursorClassName}();
             cursor.Accept(reader);
             return cursor;
         }
-
-        /**
-         * Fetch cursor.
-         * 
-         * @param cursor Type safe cursor. (NotNull)
-         * @return Result. (Nullable)
-         * @throws java.sql.SQLException
-         */
-        abstract protected Object FetchCursor(${myExtendedTypeSafeCursorClassName} cursor);
     }
 }

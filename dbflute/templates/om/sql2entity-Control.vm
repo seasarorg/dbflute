@@ -65,6 +65,8 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-JDBC]
     #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
+    #set ($glCursorFetcherName = "${glProjectPrefix}CursorFetcher")
+    #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
 
     ## [ClassificationDefinition]
     #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")

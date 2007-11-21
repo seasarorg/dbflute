@@ -357,22 +357,22 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} findDBMeta(Object row) {
-            ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} dbmeta = (${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName})InternalMapContext.GetObject("CreateRow-DBMeta");
+            ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} dbmeta = (${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName})${glInternalMapContextName}.GetObject("CreateRow-DBMeta");
             if (dbmeta != null) {
                 return dbmeta;
             }
-            if (InternalMapContext.GetObject("CreateRow-NotFound") != null) {
+            if (${glInternalMapContextName}.GetObject("CreateRow-NotFound") != null) {
                 return null;
             }
             PropertyInfo propertyOfDBMeta = row.GetType().GetProperty("DBMeta");
             if (propertyOfDBMeta != null) {
                 dbmeta = (${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName})propertyOfDBMeta.GetValue(row, null);
                 if (dbmeta != null) {
-                    InternalMapContext.SetObject("CreateRow-DBMeta", dbmeta);
+                    ${glInternalMapContextName}.SetObject("CreateRow-DBMeta", dbmeta);
                     return dbmeta;
                 }
             }
-            InternalMapContext.SetObject("CreateRow-NotFound", "dummy");
+            ${glInternalMapContextName}.SetObject("CreateRow-NotFound", "dummy");
             return null;
         }
     }

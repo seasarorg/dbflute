@@ -15,6 +15,7 @@
   <property name="dbflute.example.dir" value="${workspace.base}/dbflute-example"/>
   <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
   <property name="dbflute.teeda.example.dir" value="${workspace.base}/dbflute-teeda-example"/>
+  <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
 
   <target name="dist" description="==> generates distribution">
 
@@ -69,6 +70,9 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>

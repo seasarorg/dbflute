@@ -1,0 +1,18 @@
+# /---------------------------------------------------------------------------
+# [Database Information]
+#   databaseInfoMap: 
+#     driver   -- The class name of JDBC-Driver.
+#     url      -- The url for connecting database.
+#     schema   -- The schema name.
+#     user     -- The database user name.
+#     password -- The database password.
+#
+# @FirstProperty
+map:{
+	; driver		= {Please write your setting! at './dfprop/databaseInfoMap.dfprop'}
+	; url			= ...
+	; schema		= ...
+	; user			= ...
+	; password		= ...
+}
+# ----------------/

@@ -1014,7 +1014,7 @@ public class Column {
     }
 
     public boolean isJavaNativeCSharpNullable() {
-        return getJavaNative().startsWith("Nullable");
+        return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
     
     // ===================================================================================

@@ -1,5 +1,6 @@
 @echo off
 
+cd %~p0
 call _project.bat
 
 rem /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn

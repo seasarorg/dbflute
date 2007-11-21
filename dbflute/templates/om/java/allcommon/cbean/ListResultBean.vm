@@ -80,7 +80,7 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
             }
 
             ENTITY nextElement = null;
-            if (_selectedList.size() > (rowIndex + 1)) {;
+            if (_selectedList.size() > (rowIndex + 1)) {
                 nextElement = _selectedList.get(rowIndex);
             }
 

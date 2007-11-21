@@ -30,8 +30,8 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN_TYPE> {
     // ===================================================================================
     //                                                                              Select
     //                                                                              ======
-    public void selectCursor(String path, PARAMETER_BEAN_TYPE pmb, ${glCursorHandlerName} handler) {
-        _outsideSqlDao.selectCursor(path, pmb, _outsideSqlOption, handler);
+    public Object selectCursor(String path, PARAMETER_BEAN_TYPE pmb, ${glCursorHandlerName} handler) {
+        return _outsideSqlDao.selectCursor(path, pmb, _outsideSqlOption, handler);
     }
 
     // ===================================================================================

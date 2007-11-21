@@ -43,7 +43,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     protected java.util.Map${database.filterGenericsString('String, String')} _selectClauseColumnAliasMap;
 
     /** The filter for where clause. */
-    protected java.util.List${database.filterGenericsString(${glWhereClauseSimpleFilterInterfaceName})} _whereClauseSimpleFilterList = new java.util.ArrayList${database.filterGenericsString(${glWhereClauseSimpleFilterInterfaceName})}();;
+    protected java.util.List${database.filterGenericsString(${glWhereClauseSimpleFilterInterfaceName})} _whereClauseSimpleFilterList = new java.util.ArrayList${database.filterGenericsString(${glWhereClauseSimpleFilterInterfaceName})}();
 
     /** Union clause list. */
     protected java.util.List${database.filterGenericsString('UnionQueryInfo')} _unionQueryInfoList = new java.util.ArrayList${database.filterGenericsString('UnionQueryInfo')}();
