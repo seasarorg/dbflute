@@ -761,10 +761,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             return content != null && "END".equals(content);
         }
 
-        protected ContainerNode createIfNode(String expr) {// Extension!
-            return new InternalIfNode(expr, specifiedSql);
-        }
-
         protected AbstractNode createBindVariableNode(String expr) {// Extension!
             return new InternalBindVariableNode(expr, specifiedSql);
         }
@@ -772,98 +768,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         protected AbstractNode createEmbeddedValueNode(String expr) {// Extension!
             return new InternalEmbeddedValueNode(expr, specifiedSql);
         }
-    }
 
-    // -----------------------------------------------------
-    //                                                IfNode
-    //                                                ------
-    protected static class InternalIfNode extends ContainerNode {
-        private String _expression;
-        private Object _parsedExpression;
-        private InternalElseNode _elseNode;
-        private String _specifiedSql;
-
-        public InternalIfNode(String expression, String specifiedSql) {
-            this._expression = expression;
-            this._parsedExpression = OgnlUtil.parseExpression(expression);
-            this._specifiedSql = specifiedSql;
-        }
-
-        public String getExpression() {
-            return _expression;
-        }
-
-        public InternalElseNode getElseNode() {
-            return _elseNode;
-        }
-
-        public void setElseNode(InternalElseNode elseNode) {
-            this._elseNode = elseNode;
-        }
-
-        public void accept(CommandContext ctx) {
-            Object result = null;
-            try {
-                result = OgnlUtil.getValue(_parsedExpression, ctx);
-            } catch (RuntimeException e) {
-                if (!_expression.contains("pmb.")) {
-                    throwWrongIfCommentException(_expression, e, _specifiedSql);
-                }
-                final String replaced = InternalStringUtil.replace(_expression, "pmb.", "pmb.parameterMap.");
-                final Object secondParsedExpression = OgnlUtil.parseExpression(replaced);
-                try {
-                    result = OgnlUtil.getValue(secondParsedExpression, ctx);
-                } catch (RuntimeException ignored) {
-                    throwWrongIfCommentException(_expression, e, _specifiedSql);
-                }
-                if (result == null) {
-                    throwWrongIfCommentException(_expression, e, _specifiedSql);
-                }
-                _parsedExpression = secondParsedExpression;
-            }
-            if (result != null && result instanceof Boolean) {
-                if (((Boolean) result).booleanValue()) {
-                    super.accept(ctx);
-                    ctx.setEnabled(true);
-                } else if (_elseNode != null) {
-                    _elseNode.accept(ctx);
-                    ctx.setEnabled(true);
-                }
-            } else {
-                throw new IllegalBoolExpressionRuntimeException(_expression);
-            }
-        }
-
-        protected void throwWrongIfCommentException(String expression, RuntimeException cause, String specifiedSql) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The IF comment of your specified SQL was Wrong!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
-            msg = msg + "And confirm the IF comment of your specified SQL." + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[SQL Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Cause Message]" + getLineSeparator() + cause.getMessage() + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
-            msg = msg + "* * * * * * * * * */" + getLineSeparator();
-            throw new IllegalStateException(msg);
-        }
-
-        protected String getLineSeparator() {
-            return System.getProperty("line.separator");
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                              ElseNode
-    //                                              --------
-    protected static class InternalElseNode extends ContainerNode {
-        public void accept(CommandContext ctx) {
-            super.accept(ctx);
-            ctx.setEnabled(true);
+        protected ContainerNode createIfNode(String expr) {// Extension!
+            return new InternalIfNode(expr, specifiedSql);
         }
     }
 
@@ -1044,6 +951,99 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 
         protected String getLineSeparator() {
             return System.getProperty("line.separator");
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                IfNode
+    //                                                ------
+    protected static class InternalIfNode extends ContainerNode {
+        private String _expression;
+        private Object _parsedExpression;
+        private InternalElseNode _elseNode;
+        private String _specifiedSql;
+
+        public InternalIfNode(String expression, String specifiedSql) {
+            this._expression = expression;
+            this._parsedExpression = OgnlUtil.parseExpression(expression);
+            this._specifiedSql = specifiedSql;
+        }
+
+        public String getExpression() {
+            return _expression;
+        }
+
+        public InternalElseNode getElseNode() {
+            return _elseNode;
+        }
+
+        public void setElseNode(InternalElseNode elseNode) {
+            this._elseNode = elseNode;
+        }
+
+        public void accept(CommandContext ctx) {
+            Object result = null;
+            try {
+                result = OgnlUtil.getValue(_parsedExpression, ctx);
+            } catch (RuntimeException e) {
+                if (!_expression.contains("pmb.")) {
+                    throwWrongIfCommentException(_expression, e, _specifiedSql);
+                }
+                final String replaced = InternalStringUtil.replace(_expression, "pmb.", "pmb.parameterMap.");
+                final Object secondParsedExpression = OgnlUtil.parseExpression(replaced);
+                try {
+                    result = OgnlUtil.getValue(secondParsedExpression, ctx);
+                } catch (RuntimeException ignored) {
+                    throwWrongIfCommentException(_expression, e, _specifiedSql);
+                }
+                if (result == null) {
+                    throwWrongIfCommentException(_expression, e, _specifiedSql);
+                }
+                _parsedExpression = secondParsedExpression;
+            }
+            if (result != null && result instanceof Boolean) {
+                if (((Boolean) result).booleanValue()) {
+                    super.accept(ctx);
+                    ctx.setEnabled(true);
+                } else if (_elseNode != null) {
+                    _elseNode.accept(ctx);
+                    ctx.setEnabled(true);
+                }
+            } else {
+                throw new IllegalBoolExpressionRuntimeException(_expression);
+            }
+        }
+
+        protected void throwWrongIfCommentException(String expression, RuntimeException cause, String specifiedSql) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The IF comment of your specified SQL was Wrong!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
+            msg = msg + "And confirm the IF comment of your specified SQL." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[SQL Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Cause Message]" + getLineSeparator() + cause.getMessage() + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+
+        protected String getLineSeparator() {
+            return System.getProperty("line.separator");
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                              ElseNode
+    //                                              --------
+    protected static class InternalElseNode extends ContainerNode {
+        public void accept(CommandContext ctx) {
+            super.accept(ctx);
+            ctx.setEnabled(true);
         }
     }
 
