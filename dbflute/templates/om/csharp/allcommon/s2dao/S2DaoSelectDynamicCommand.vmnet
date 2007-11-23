@@ -12,6 +12,7 @@ using Seasar.Dao.Node;
 using Seasar.Dao.Parser;
 
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -113,9 +114,32 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                         Execute
         //                                                                         =======
         public override object Execute(object[] args) {
+            // - - - - - - - - - - - -
+            // This is top execution.
+            // - - - - - - - - - - - -
+
             if (!${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
-                return doDefaultExecute(args);
+                // - - - - - - - - - -
+                // Execute outsideSql.
+                // - - - - - - - - - -
+                if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
+                    ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+                    if (outsideSqlContext.IsDynamicBinding) {
+                        return ExecuteOutsideSqlAsDynamic(args, outsideSqlContext);
+                    } else {
+                        return ExecuteOutsideSqlAsStatic(args, outsideSqlContext);
+                    }
+                }
+
+                // - - - - - - - - -
+                // Execute default.
+                // - - - - - - - - -
+                return ExecuteDefault(args);
             }
+
+            // - - - - - - - - - - - -
+            // Execute conditionBean.
+            // - - - - - - - - - - - -
             AssertSelectClauseCommand();
             IList<Object> bindVariableList = new List<Object>();
             IList<Type> bindVariableTypeList = new List<Type>();
@@ -136,14 +160,103 @@ namespace ${glPackageBaseCommonS2Dao} {
             return selectHandler.Execute(bindVariableArray, bindVariableTypeArray, bindVariableNameArray);
         }
 
-        protected virtual object doDefaultExecute(object[] args) {
-            ICommandContext ctx = Apply(args);
-            IDataReaderHandler specifiedDataReaderHandler = FindSpecifiedResultSetHandler(args);
+        // -------------------------------------------------
+        //                                   Default Execute
+        //                                   ---------------
+
+        protected virtual object ExecuteDefault(object[] args) {
+            // - - - - - - - - - - - - - - - - -
+            // Find specified resultSetHandler.
+            // - - - - - - - - - - - - - - - - -
+            IDataReaderHandler specifiedDataReaderHandler = FindSpecifiedDataReaderHandler(args);
+
+            // - - - - - - - - -
+            // Filter arguments.
+            // - - - - - - - - -
+            Object[] filteredArgs = FilterArgumentsForDataReaderHandler(args);
+
+            ICommandContext ctx = Apply(filteredArgs);
             BasicSelectHandler selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
             return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
         }
 
-        protected virtual object[] FilterArgumentsForResultSetHandler(object[] args) {
+        // -----------------------------------------------------
+        //                                    OutsideSql Execute
+        //                                    ------------------
+        protected Object ExecuteOutsideSqlAsStatic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+            // - - - - - - - - - - - - - - - - -
+            // Find specified resultSetHandler.
+            // - - - - - - - - - - - - - - - - -
+            IDataReaderHandler specifiedDataReaderHandler = FindSpecifiedDataReaderHandler(args);
+
+            // - - - - - - - - -
+            // Filter arguments.
+            // - - - - - - - - -
+            Object[] filteredArgs;
+            if (outsideSqlContext.IsSpecifiedOutsideSql) {
+                Object parameterBean = outsideSqlContext.ParameterBean;
+                filteredArgs = new Object[] {parameterBean};
+            } else {
+                filteredArgs = FilterArgumentsForDataReaderHandler(args);
+            }
+
+            ICommandContext ctx = Apply(filteredArgs);
+            BasicSelectHandler selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
+            return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
+        }
+
+        protected Object ExecuteOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
+            throw new NotSupportedException("ExecuteOutsideSqlAsDynamic is unsupported!");
+//            Object firstArg = args[0];
+//            BeanDesc beanDesc = BeanDescFactory.getBeanDesc(firstArg.getClass());
+//            String filteredSql = this.Sql;
+//
+//            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//            // Resolve embedded comment for parsing bind variable comment in embedded comment.
+//            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//            for (int i = 0; i < beanDesc.getPropertyDescSize(); i++) {
+//                PropertyDesc propertyDesc = beanDesc.getPropertyDesc(i);
+//                Class propertyType = propertyDesc.getPropertyType();
+//                if (!propertyType.equals(String.class)) {
+//                    continue;
+//                }
+//                String outsideSqlPiece = (String) propertyDesc.getValue(firstArg);
+//                if (outsideSqlPiece == null) {
+//                    continue;
+//                }
+//                String embeddedComment = "/*$pmb." + propertyDesc.getPropertyName() + "*/";
+//                filteredSql = InternalStringUtil.replace(filteredSql, embeddedComment, outsideSqlPiece);
+//            }
+//            ${glSelectDynamicCommand} outsideSqlCommand = createMySelectDynamicCommand();
+//            outsideSqlCommand.setArgNames(getArgNames());
+//            outsideSqlCommand.setArgTypes(getArgTypes());
+//            outsideSqlCommand.setSql(filteredSql);
+//
+//            // - - - - - - - - - - - - - - - - -
+//            // Find specified resultSetHandler.
+//            // - - - - - - - - - - - - - - - - -
+//            ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
+//
+//            // - - - - - - - - -
+//            // Filter arguments.
+//            // - - - - - - - - -
+//            Object[] filteredArgs;
+//            if (outsideSqlContext.isSpecifiedOutsideSql()) {
+//                Object parameterBean = outsideSqlContext.getParameterBean();
+//                filteredArgs = new Object[] {parameterBean};
+//            } else {
+//                filteredArgs = filterArgumentsForResultSetHandler(args);
+//            }
+//
+//            org.seasar.dao.CommandContext ctx = outsideSqlCommand.doApply(filteredArgs);
+//            java.util.List<Object> bindVariableList = new java.util.ArrayList<Object>();
+//            java.util.List<Class> bindVariableTypeList = new java.util.ArrayList<Class>();
+//            addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
+//            BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
+//            return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
+        }
+
+        protected virtual object[] FilterArgumentsForDataReaderHandler(object[] args) {
             if (args == null || args.Length == 0) {
                 return args;
             }
@@ -159,7 +272,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return filteredArgs;
         }
 
-        protected IDataReaderHandler FindSpecifiedResultSetHandler(object[] args) {
+        protected IDataReaderHandler FindSpecifiedDataReaderHandler(object[] args) {
             if (args == null || args.Length == 0) {
                 return this.dataReaderHandler;
             }

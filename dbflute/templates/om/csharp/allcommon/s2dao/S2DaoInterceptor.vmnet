@@ -10,6 +10,7 @@ using Seasar.Dao;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonUtil};
 
@@ -61,8 +62,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 before = DateTime.Now; // for performance view
             }
 
-            // TODO: @jflute -- In Development for OutsideSql
-            // PreprocessOutsideSql(invocation);
+            PreprocessOutsideSql(invocation);
 
             ISqlCommand cmd = null;
             {
@@ -133,6 +133,35 @@ namespace ${glPackageBaseCommonS2Dao} {
             return ret;
         }
 
+        // ===============================================================================
+        //                                                                      SqlCommand
+        //                                                                      ==========
+        protected ISqlCommand FindSqlCommand(IMethodInvocation invocation) {
+            ISqlCommand cmd;
+            Type targetType = GetComponentDef(invocation).ComponentType;
+            IDaoMetaData dmd = daoMetaDataFactory_.GetDaoMetaData(targetType);
+            if (typeof(${glOutsideSqlDaoName}).IsAssignableFrom(targetType)) {
+                cmd = dmd.GetSqlCommand(GenerateSpecifiedOutsideSqlUniqueKey(invocation));
+            } else {
+                cmd = dmd.GetSqlCommand(invocation.Method.Name);
+            }
+            return cmd;
+        }
+
+        protected String GenerateSpecifiedOutsideSqlUniqueKey(IMethodInvocation invocation) {
+            Object[] args = invocation.Arguments;
+            String path = (String)args[0];
+            ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+            Object resultTypeSpecification = null;
+            if (args.Length > 3) {
+                resultTypeSpecification = args[3];
+            }
+            return ${glOutsideSqlContextName}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, option, resultTypeSpecification);
+        }
+
+        // ===============================================================================
+        //                                                                    Trace Method
+        //                                                                    ============
         protected void TraceMethod(IMethodInvocation invocation) {
             if (!_log.IsDebugEnabled) {
                 return;
@@ -149,6 +178,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             _log.Debug("                                                      " + sb.ToString() + "=/");
         }
 
+        // ===============================================================================
+        //                                                                Trace SqlCommand
+        //                                                                ================
         protected void TraceSqlCommand(IMethodInvocation invocation, ISqlCommand cmd, DateTime beforeCmd, DateTime afterCmd) {
             if (!_log.IsDebugEnabled) {
                 return;
@@ -156,6 +188,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             _log.Debug("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.ConvertToPerformanceView(beforeCmd, afterCmd) + "]");
         }
 
+        // ===============================================================================
+        //                                                                    Trace Return
+        //                                                                    ============
         protected void TraceReturn(IMethodInvocation invocation, Type retType, Object ret, DateTime before, DateTime after) {
             if (!_log.IsDebugEnabled) {
                 return;
@@ -201,39 +236,120 @@ namespace ${glPackageBaseCommonS2Dao} {
         // -------------------------------------------------
         //                                        OutsideSql
         //                                        ----------
+        protected void PreprocessOutsideSql(IMethodInvocation invocation) {
+            // Specified OutsideSql
+            if (typeof(${glOutsideSqlDaoName}).IsAssignableFrom(GetComponentDef(invocation).ComponentType)) {
+                if (IsOutsideSqlDaoMethodSelect(invocation)) {
+                    SetupOutsideSqlContextSelect(invocation);
+                } else {
+                    SetupOutsideSqlContextExecute(invocation);
+                }
+                return;
+            }
+        }
+
         // - - - - - - - - - -
         //              Select
         //               - - -
+        protected bool IsOutsideSqlDaoMethodSelect(IMethodInvocation invocation) {
+            return invocation.Method.Name.StartsWith("Select");
+        }
+
+        protected void SetupOutsideSqlContextSelect(IMethodInvocation invocation) {
+            Object[] args = invocation.Arguments;
+            if (args.Length != 4) {
+                String msg = "Internal Error! OutsideSqlDao.selectXxx() should have 4 arguements: args.Length=" + args.Length;
+                throw new SystemException(msg);
+            }
+            String path = (String)args[0];
+            Object pmb = args[1];
+            ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+            Object resultTypeSpecification = args[3];
+            ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+            outsideSqlContext.IsDynamicBinding = option.IsDynamicBinding;
+            outsideSqlContext.IsOffsetByCursorForcedly = option.IsAutoPaging;
+            outsideSqlContext.IsLimitByCursorForcedly = option.IsAutoPaging;
+            outsideSqlContext.OutsideSqlPath = path;
+            outsideSqlContext.ParameterBean = pmb;
+            outsideSqlContext.ResultTypeSpecification = resultTypeSpecification;
+            outsideSqlContext.MethodName = invocation.Method.Name;
+            ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
+
+            // Set up fetchNarrowingBean.
+            SetupOutsideSqlFetchNarrowingBean(pmb, option);
+        }
+
         // - - - - - - - - - -
         //             Execute
         //             - - - -
+        protected void SetupOutsideSqlContextExecute(IMethodInvocation invocation) {
+            Object[] args = invocation.Arguments;
+            if (args.Length != 3) {
+                String msg = "Internal Error! OutsideSqlDao.execute() should have 3 arguements: args.Length=" + args.Length;
+                throw new SystemException(msg);
+            }
+            String path = (String)args[0];
+            Object pmb = args[1];
+            ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
+            ${glOutsideSqlContextName} outsideSqlContext = new ${glOutsideSqlContextName}();
+            outsideSqlContext.IsDynamicBinding = option.IsDynamicBinding;
+            outsideSqlContext.IsOffsetByCursorForcedly = option.IsAutoPaging;
+            outsideSqlContext.IsLimitByCursorForcedly = option.IsAutoPaging;
+            outsideSqlContext.OutsideSqlPath = path;
+            outsideSqlContext.ParameterBean = pmb;
+            outsideSqlContext.MethodName = invocation.Method.Name;
+            ${glOutsideSqlContextName}.SetOutsideSqlContextOnThread(outsideSqlContext);
+
+            // Set up fetchNarrowingBean.
+            SetupOutsideSqlFetchNarrowingBean(pmb, option);
+        }
+
+        // - - - - - - - - - -
+        //              Common
+        //               - - -
+        protected void SetupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOptionName} option) {
+            if (pmb == null || !${glFetchNarrowingBeanContextName}.IsTheTypeFetchNarrowingBean(pmb.GetType())) {
+                return;
+            }
+            ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean = (${glFetchNarrowingBeanInterfaceName})pmb;
+            if (option.IsManualPaging) {
+                fetchNarrowingBean.IgnoreFetchNarrowing();
+            }
+            ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread(fetchNarrowingBean);
+        }
+
         // -------------------------------------------------
         //                                     ConditionBean
         //                                     -------------
         protected ${glConditionBeanInterfaceName} PreprocessConditionBean(IMethodInvocation invocation, ISqlCommand cmd) {
+            ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+            if (outsideSqlContext != null) {
+                return null; // Because it has already finished setting up fetchNarrowingBean for outsideSql here.
+            }
             ${glConditionBeanInterfaceName} cb = null;
             {
                 Object[] args = invocation.Arguments;
                 if (args == null || !(args.Length >= 1)) {
                     return null;
                 }
-                if (args[0] == null) {
+                Object arg0 = args[0];
+                if (arg0 == null) {
                     return null;
                 }
 
-                if (!${glConditionBeanContextName}.IsTheArgumentConditionBean(args[0])) {// The argument is not condition-bean...
-                    if (${glFetchNarrowingBeanContextName}.IsTheArgumentFetchNarrowingBean(args[0]) && !IsSelectCountIgnoreFetchScopeMethod(invocation)) {
+                if (!${glConditionBeanContextName}.IsTheArgumentConditionBean(arg0)) {// The argument is not condition-bean...
+                    if (${glFetchNarrowingBeanContextName}.IsTheArgumentFetchNarrowingBean(arg0) && !IsSelectCountIgnoreFetchScopeMethod(invocation)) {
                         // Fetch-narrowing-bean and Not select count!
-                        ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})args[0]);
+                        ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})arg0);
                     }
                     return null;
                 }
 
                 if (!(cmd is ${glSelectDynamicCommand})) {// The argument is condition-bean, but this method using outer-file-sql...
-                    ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})args[0]);
+                    ${glFetchNarrowingBeanContextName}.SetFetchNarrowingBeanOnThread((${glFetchNarrowingBeanInterfaceName})arg0);
                     return null;
                 }
-                cb = (${glConditionBeanInterfaceName})args[0];
+                cb = (${glConditionBeanInterfaceName})arg0;
             }
 
             if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
@@ -255,6 +371,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
+        // -------------------------------------------------
+        //                                Clear Thread Local
+        //                                ------------------
         protected void ClearThreadLocal() {
             if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
                 ${glFetchNarrowingBeanContextName}.ClearFetchNarrowingBeanOnThread();
@@ -267,6 +386,24 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
+        // ===============================================================================
+        //                                                                  Context Helper
+        //                                                                  ==============
+        protected ${glOutsideSqlContextName} GetOutsideSqlContext() {
+            if (!${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
+                return null;
+            }
+            return ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+        }
+        
+        protected bool IsSpecifiedOutsideSql() {
+            ${glOutsideSqlContextName} outsideSqlContext = GetOutsideSqlContext();
+            return outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql;
+        }
+
+        // ===============================================================================
+        //                                                                   Determination
+        //                                                                   =============
         protected bool IsSelectCountIgnoreFetchScopeMethod(IMethodInvocation invocation) {
             String name = invocation.Method.Name;
             return name.StartsWith("ReadCount") || name.StartsWith("SelectCount");

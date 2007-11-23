@@ -348,7 +348,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         final org.seasar.dao.CommandContext ctx = apply(filteredArgs);
         final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
         return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
-
     }
 
     /**
@@ -776,8 +775,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     }
 
     // -----------------------------------------------------
-    //                                      BindVariableNode
-    //                                      ----------------
+    //                                                IfNode
+    //                                                ------
     protected static class InternalIfNode extends ContainerNode {
         private String _expression;
         private Object _parsedExpression;
@@ -858,6 +857,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
     }
 
+    // -----------------------------------------------------
+    //                                              ElseNode
+    //                                              --------
     protected static class InternalElseNode extends ContainerNode {
         public void accept(CommandContext ctx) {
             super.accept(ctx);

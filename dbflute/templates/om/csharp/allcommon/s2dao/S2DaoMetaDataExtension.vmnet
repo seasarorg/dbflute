@@ -45,6 +45,72 @@ namespace ${glPackageBaseCommonS2Dao} {
             SetupSqlCommand();
         }
 
+//        protected override void SetupSqlCommand() {
+//            MethodInfo[] allMethods = _daoInterface.GetMethods();
+//            Hashtable names = new Hashtable();
+//            foreach (MethodInfo mi in allMethods) {
+//                names[mi.Name] = mi;
+//            }
+//            IDictionaryEnumerator enu = names.GetEnumerator();
+//            while (enu.MoveNext()) {
+//                try {
+//                    MethodInfo method = _daoType.GetMethod((string) enu.Key);
+//                    if (method.IsAbstract) SetupMethod(method);
+//                }
+//                catch (AmbiguousMatchException) { }
+//            }
+//        }
+
+//        public override ISqlCommand GetSqlCommand(String methodName) {
+//            ISqlCommand cmd = (ISqlCommand) _sqlCommands[methodName];
+//            if (cmd == null)
+//                throw new MethodNotFoundRuntimeException(_daoType, methodName, null);
+//            return cmd;
+//        }
+
+//        protected ISqlCommand InitializeSqlCommand(String methodName) {
+//            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
+//                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+//                if (outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql) {
+//                    return InitializeSpecifiedOutsideSqlCommand(methodName, outsideSqlContext);
+//                }
+//            }
+//            MethodInfo[] methods = daoBeanDesc.GetMethods(methodName);
+//            if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
+//                setupMethod(methods[0]);
+//            }
+//            final SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
+//            if (cmd != null) {
+//                return cmd;
+//            }
+//            throw new MethodNotFoundRuntimeException(daoClass, methodName, null);
+//        }
+
+
+//    protected SqlCommand initializeSpecifiedOutsideSqlCommand(String sqlCommandKey, ${glOutsideSqlContextName} outsideSqlContext) throws MethodNotFoundRuntimeException {
+//        final Method[] methods = daoBeanDesc.getMethods(outsideSqlContext.getMethodName());// By real method name.
+//        if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
+//            final Method method = methods[0];
+//            if (isOutsideSqlDaoMethodSelect(method)) {
+//                setupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, method, outsideSqlContext);
+//            } else {
+//                setupSpecifiedOutsideSqlExecuteCommand(sqlCommandKey, method, outsideSqlContext);
+//            }
+//        }
+//        final SqlCommand cmd = (SqlCommand) sqlCommands.get(sqlCommandKey);
+//        if (cmd != null) {
+//            return cmd;
+//        }
+//        String msg = "Internal Error! The methodName is not found:";
+//        msg = msg + " sqlCommandKey=" + sqlCommandKey;
+//        msg = msg + " sqlCommands=" + sqlCommands;
+//        throw new IllegalStateException(msg);
+//    }
+
+//    protected boolean isOutsideSqlDaoMethodSelect(Method method) {
+//        return method.getName().startsWith("select");
+//    }
+
         // ===============================================================================
         //                                                      Outside Sql Check Override
         //                                                      ==========================

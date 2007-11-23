@@ -51,8 +51,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                              Invoke
+    //                                                                              ======
     /**
      * Invoke the method.
      * 
@@ -149,6 +149,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
+    // ===================================================================================
+    //                                                                          SqlCommand
+    //                                                                          ==========
     protected SqlCommand findSqlCommand(MethodInvocation invocation) {
         final SqlCommand cmd;
         final Class targetClass = getTargetClass(invocation);
@@ -172,9 +175,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(invocation.getMethod().getName(), path, option, resultTypeSpecification);
     }
 
-    // -----------------------------------------------------
-    //                                          Trace Method
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        Trace Method
+    //                                                                        ============
     protected void traceMethod(org.aopalliance.intercept.MethodInvocation invocation) {
         final java.lang.reflect.Method method = invocation.getMethod();
         final String name = method.getDeclaringClass().getSimpleName();
@@ -421,9 +424,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         return "${glProjectPrefix}" + name.substring(prefixLength);
     }
 
-    // -----------------------------------------------------
-    //                                      Trace SqlCommand
-    //                                      ----------------
+    // ===================================================================================
+    //                                                                    Trace SqlCommand
+    //                                                                    ================
     protected void traceSqlCommand(org.aopalliance.intercept.MethodInvocation invocation, org.seasar.dao.SqlCommand cmd, long beforeCmd, long afterCmd) {
         _log.debug("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
@@ -444,9 +447,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
     }
 
-    // -----------------------------------------------------
-    //                                          Trace Return
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        Trace Return
+    //                                                                        ============
     protected void traceReturn(org.aopalliance.intercept.MethodInvocation invocation, Class retType, Object ret, long before, long after) throws Throwable {
         try {
             final String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + " - ";

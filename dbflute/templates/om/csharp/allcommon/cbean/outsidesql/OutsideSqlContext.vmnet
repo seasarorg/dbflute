@@ -146,17 +146,17 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // -------------------------------------------------
         //                              Common of OutsideSql
         //                              --------------------
-        public bool DynamicBinding {
+        public bool IsDynamicBinding {
             get { return _dynamicBinding; }
             set { this._dynamicBinding = value; }
         }
 
-        public bool OffsetByCursorForcedly {
+        public bool IsOffsetByCursorForcedly {
             get { return _offsetByCursorForcedly; }
             set { this._offsetByCursorForcedly = value; }
         }
         
-        public bool LimitByCursorForcedly {
+        public bool IsLimitByCursorForcedly {
             get { return _limitByCursorForcedly; }
             set { this._limitByCursorForcedly = value; }
         }
