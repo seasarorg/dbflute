@@ -290,11 +290,11 @@ public class ${glConditionBeanContextName} {
         msg = msg + "Has the target record been deleted by other thread?" + getLineSeparator();
         msg = msg + "It is precondition that the record exists on your database." + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[SearchKey]" + getLineSeparator() + searchKey4log + getLineSeparator();
+        msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4log + getLineSeparator();
         final String dispalySql = getDisplaySqlForExceptionMessage(latestSqlProvider, tableDbName);
         if (dispalySql != null) {
             msg = msg + getLineSeparator();
-            msg = msg + "[DisplaySQL]" + getLineSeparator() + dispalySql + getLineSeparator();
+            msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
         }
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
@@ -313,11 +313,11 @@ public class ${glConditionBeanContextName} {
         msg = msg + "Please confirm your search condition. Does it really select the only one?" + getLineSeparator();
         msg = msg + "Please confirm your database. Does it really exist the only one?" + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[SearchKey]" + getLineSeparator() + searchKey4Log + getLineSeparator();
+        msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         final String dispalySql = getDisplaySqlForExceptionMessage(latestSqlProvider, tableDbName);
         if (dispalySql != null) {
             msg = msg + getLineSeparator();
-            msg = msg + "[DisplaySQL]" + getLineSeparator() + dispalySql + getLineSeparator();
+            msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
         }
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         if (cause != null) {

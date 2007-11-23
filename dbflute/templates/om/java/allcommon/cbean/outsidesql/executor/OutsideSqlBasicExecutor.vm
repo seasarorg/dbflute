@@ -59,16 +59,14 @@ public class ${glOutsideSqlBasicExecutorName} {
     /**
      * Select list.
      * 
-     * @param <ENTITY_TYPE> The type of entity for element.
+     * @param <ENTITY> The type of entity for element.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The element type of entity. (NotNull)
      * @return The list of selected entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
      */
-    public <ENTITY_TYPE> List<ENTITY_TYPE> selectList(String path, Object pmb, Class<ENTITY_TYPE> entityType) {
+    public <ENTITY> List<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
         return _outsideSqlDao.selectList(path, pmb, createOutsideSqlOption(), entityType);
     }
 

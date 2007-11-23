@@ -1,0 +1,114 @@
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommonCBeanOutsidesql};
+
+namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
+
+    /// <summary>
+    /// The executor of outside-sql.
+    /// <![CDATA[
+    /// {Basic}
+    ///   o selectList()
+    /// 
+    /// {Entity}
+    ///   o entityHandling().selectEntity()
+    ///   o entityHandling().selectEntityWithDeletedCheck()
+    /// 
+    /// {Cursor}
+    ///   o cursorHandling().selectCursor()
+    /// 
+    /// {Paging}
+    ///   o autoPaging().selectList()
+    ///   o autoPaging().selectPage()
+    ///   o manualPaging().selectList()
+    ///   o manualPaging().selectPage()
+    /// 
+    /// {Option -- Dynamic}
+    ///   o dynamicBinding().selectList()
+    /// ]]>
+    /// Author: ${database.classAuthor}
+    /// </summary>
+    public class ${glOutsideSqlBasicExecutorName} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        /** The dao of outsideSql. (NotNull) */
+        protected ${glOutsideSqlDaoName} _outsideSqlDao;
+
+        /** Table db name. (NotNull) */
+        protected String _tableDbName;
+
+        /** Is it dynamic binding? */
+        protected bool _dynamicBinding;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glOutsideSqlBasicExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, String tableDbName) {
+            this._outsideSqlDao = outsideSqlDao;
+            this._tableDbName = tableDbName;
+        }
+
+        // ===============================================================================
+        //                                                                          Select
+        //                                                                          ======
+        public IList<ENTITY> SelectList<ENTITY>(String path, Object pmb, Type entityType) {
+            return _outsideSqlDao.SelectList<ENTITY>(path, pmb, CreateOutsideSqlOption(), entityType);
+        }
+
+        // ===============================================================================
+        //                                                                         Execute
+        //                                                                         =======
+        public int Execute(String path, Object pmb) {
+            return _outsideSqlDao.Execute(path, pmb, CreateOutsideSqlOption());
+        }
+
+        // Implements at the future!
+        //    public int BatchExecute(String path, Object pmb) {
+        //        throw new UnsupportedOperationException("Sorry! The method of batchExecute() has not been implemented yet.");
+        //        // return _outsideSqlDao.batchExecute(path, pmb, CreateOutsideSqlOption());
+        //    }
+
+        // ===============================================================================
+        //                                                                          Option
+        //                                                                          ======
+        public ${glOutsideSqlCursorExecutorName}<Object> CursorHandling() {
+            return new ${glOutsideSqlCursorExecutorName}<Object>(_outsideSqlDao, CreateOutsideSqlOption());
+        }
+
+        public ${glOutsideSqlEntityExecutorName}<Object> EntityHandling() {
+            return new ${glOutsideSqlEntityExecutorName}<Object>(_outsideSqlDao, CreateOutsideSqlOption());
+        }
+
+        public ${glOutsideSqlPagingExecutorName} AutoPaging() {
+            ${glOutsideSqlOptionName} option = CreateOutsideSqlOption();
+            option.AutoPaging();
+            return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
+        }
+
+        public ${glOutsideSqlPagingExecutorName} ManualPaging() {
+            ${glOutsideSqlOptionName} option = CreateOutsideSqlOption();
+            option.ManualPaging();
+            return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
+        }
+
+        public ${glOutsideSqlBasicExecutorName} DynamicBinding() {
+            _dynamicBinding = true;
+            return this;
+        }
+
+        // -------------------------------------------------
+        //                                            Helper
+        //                                            ------
+        protected ${glOutsideSqlOptionName} CreateOutsideSqlOption() {
+            ${glOutsideSqlOptionName} option = new ${glOutsideSqlOptionName}();
+            if (_dynamicBinding) {
+                option.DynamicBinding();
+            }
+            return option;
+        }
+    }
+}

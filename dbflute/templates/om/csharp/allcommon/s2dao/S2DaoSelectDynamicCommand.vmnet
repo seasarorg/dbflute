@@ -6,7 +6,10 @@ using System.Text;
 
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
+using Seasar.Framework.Util;
 using Seasar.Dao;
+using Seasar.Dao.Node;
+using Seasar.Dao.Parser;
 
 using ${glPackageBaseCommonCBean};
 
@@ -32,10 +35,10 @@ namespace ${glPackageBaseCommonS2Dao} {
         private IDataReaderHandler dataReaderHandler;
         private IDataReaderFactory dataReaderFactory;
 
-        /** Cache of select clause command. */
+        /// <summary>The cache of select clause command.</summary>
         protected ${glSelectDynamicCommand} _selectClauseCommand;
 
-        /** Cache of select clause PK-only command. */
+        /// <summary>The cache of select clause PK-only command.</summary>
         protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
 
         // ===============================================================================
@@ -48,34 +51,25 @@ namespace ${glPackageBaseCommonS2Dao} {
                 this.dataReaderFactory = dataReaderFactory;
         }
 
-        /**
-         * Do apply. {for delegating to apply()}
-         * 
-         * @param args Arguments. (NotNull)
-         * @return Command context. (NotNull)
-         */
-        public ICommandContext DoApply(Object[] args) {
-            return Apply(args);
+        // ===============================================================================
+        //                                                        Very Important Extension
+        //                                                        ========================
+        // -------------------------------------------------
+        //                                          Override
+        //                                          --------
+        protected override ISqlParser CreateSqlParser(string sqlString) {
+            return new InternalSqlParserImpl(sqlString);
         }
 
-        /**
-         * Set select clause.
-         * 
-         * @param value Select clause.
-         * @return this. (NotNull)
-         */
+        // -------------------------------------------------
+        //                                         Extension
+        //                                         ---------
         public ${glSelectDynamicCommand} SetSelectClause(String value) {
             _selectClauseCommand = CreateMySelectDynamicCommand();
             _selectClauseCommand.Sql = value;
             return this;
         }
 
-        /**
-         * Set select clause PK only.
-         * 
-         * @param value Select clause PK only.
-         * @return this. (NotNull)
-         */
         public ${glSelectDynamicCommand} SetSelectClausePKOnly(String value) {
             _selectClausePKOnlyCommand = CreateMySelectDynamicCommand();
             _selectClausePKOnlyCommand.Sql = value;
@@ -108,6 +102,16 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
+        // -------------------------------------------------
+        //                                        For Public
+        //                                        ----------
+        public ICommandContext DoApply(Object[] args) {
+            return Apply(args);
+        }
+
+        // ===============================================================================
+        //                                                                         Execute
+        //                                                                         =======
         public override object Execute(object[] args) {
             if (!${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {
                 return doDefaultExecute(args);
@@ -259,6 +263,365 @@ namespace ${glPackageBaseCommonS2Dao} {
             public object Handle(System.Data.IDataReader dr) {
                 return _cursorHandler.Handle(dr);
             }
+        }
+    }
+
+    public class InternalSqlParserImpl : ISqlParser {
+        private readonly ISqlTokenizer _tokenizer;
+        private readonly System.Collections.Stack _nodeStack = new System.Collections.Stack();
+        private String _specifiedSql;// Extension!
+
+        public InternalSqlParserImpl(String sql) {
+            sql = sql.Trim();
+            if (sql.EndsWith(";")) {
+                sql = sql.Substring(0, sql.Length - 1);
+            }
+            _specifiedSql = sql;
+            _tokenizer = new SqlTokenizerImpl(sql);
+        }
+
+        public INode Parse() {
+            Push(new ContainerNode());
+            while (TokenType.EOF != _tokenizer.Next()) {
+                ParseToken();
+            }
+            return Pop();
+        }
+
+        protected void ParseToken() {
+            switch (_tokenizer.TokenType) {
+                case TokenType.SQL:
+                    ParseSql();
+                    break;
+                case TokenType.COMMENT:
+                    ParseComment();
+                    break;
+                case TokenType.ELSE:
+                    ParseElse();
+                    break;
+                case TokenType.BIND_VARIABLE:
+                    ParseBindVariable();
+                    break;
+            }
+        }
+
+        protected void ParseSql() {
+            string sql = _tokenizer.Token;
+            if (IsElseMode()) {
+                sql = sql.Replace("--", string.Empty);
+            }
+            INode node = Peek();
+
+            if ((node is IfNode || node is ElseNode) && node.ChildSize == 0) {
+                ISqlTokenizer st = new SqlTokenizerImpl(sql);
+                st.SkipWhitespace();
+                string token = st.SkipToken();
+                st.SkipWhitespace();
+                if ("AND".Equals(token.ToUpper()) || "OR".Equals(token.ToUpper()))
+                {
+                    node.AddChild(new PrefixSqlNode(st.Before, st.After));
+                }
+                else
+                {
+                    node.AddChild(new SqlNode(sql));
+                }
+            }
+            else
+            {
+                node.AddChild(new SqlNode(sql));
+            }
+        }
+
+        protected void ParseComment() {
+            string comment = _tokenizer.Token;
+            if (IsTargetComment(comment)) {
+                if (IsIfComment(comment)) {
+                    ParseIf();
+                } else if (IsBeginComment(comment)) {
+                    ParseBegin();
+                } else if (IsEndComment(comment)) {
+                    return;
+                } else {
+                    ParseCommentBindVariable();
+                }
+            }
+        }
+
+        protected void ParseIf()
+        {
+            string condition = _tokenizer.Token.Substring(2).Trim();
+            if (StringUtil.IsEmpty(condition)) {
+                throw new IfConditionNotFoundRuntimeException();
+            }
+            IfNode ifNode = new IfNode(condition);
+            Peek().AddChild(ifNode);
+            Push(ifNode);
+            ParseEnd();
+        }
+
+        protected void ParseBegin()
+        {
+            BeginNode beginNode = new BeginNode();
+            Peek().AddChild(beginNode);
+            Push(beginNode);
+            ParseEnd();
+        }
+
+        protected void ParseEnd()
+        {
+            while (TokenType.EOF != _tokenizer.Next()) {
+                if (_tokenizer.TokenType == TokenType.COMMENT
+                    && IsEndComment(_tokenizer.Token)) {
+                    Pop();
+                    return;
+                }
+                ParseToken();
+            }
+            throw new EndCommentNotFoundRuntimeException();
+        }
+
+        protected void ParseElse()
+        {
+            INode parent = Peek();
+            if (!(parent is IfNode))
+            {
+                return;
+            }
+            IfNode ifNode = (IfNode) Pop();
+            ElseNode elseNode = new ElseNode();
+            ifNode.ElseNode = elseNode;
+            Push(elseNode);
+            _tokenizer.SkipWhitespace();
+        }
+
+        protected void ParseCommentBindVariable()
+        {
+            string expr = _tokenizer.Token;
+            string s = _tokenizer.SkipToken();
+            if (s.StartsWith("(") && s.EndsWith(")"))
+            {
+                Peek().AddChild(CreateParenBindVariableNode(expr));
+            }
+            else if (expr.StartsWith("$"))
+            {
+                Peek().AddChild(CreateEmbeddedValueNode(expr.Substring(1)));
+            }
+            else
+            {
+                Peek().AddChild(CreateBindVariableNode(expr));
+            }
+        }
+
+        protected void ParseBindVariable()
+        {
+            string expr = _tokenizer.Token;
+            Peek().AddChild(CreateBindVariableNode(expr));
+        }
+
+        protected ParenBindVariableNode CreateParenBindVariableNode(string expr) {
+            return new ParenBindVariableNode(expr);
+        }
+
+        protected AbstractNode CreateEmbeddedValueNode(string expr) {
+            return new InternalEmbeddedValueNode(expr, _specifiedSql);
+        }
+
+        protected AbstractNode CreateBindVariableNode(string expr) {
+            return new InternalBindVariableNode(expr, _specifiedSql);
+        }
+
+        protected INode Pop()
+        {
+            return (INode) _nodeStack.Pop();
+        }
+
+        protected INode Peek()
+        {
+            return (INode) _nodeStack.Peek();
+        }
+
+        protected void Push(INode node)
+        {
+            _nodeStack.Push(node);
+        }
+
+        protected bool IsElseMode() {
+            for (int i = 0; i < _nodeStack.Count; ++i) {
+                if (_nodeStack.ToArray()[i] is ElseNode) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool IsTargetComment(string comment) {
+            return comment != null && comment.Length > 0
+                && IsCSharpIdentifierStart(comment.ToCharArray()[0]);
+        }
+
+        private static bool IsCSharpIdentifierStart(Char c) {
+            return Char.IsLetterOrDigit(c) || c == '_' || c == '\\' || c == '$' || c == '@';
+        }
+
+        private static bool IsIfComment(string comment) {
+            return comment.StartsWith("IF");
+        }
+
+        private static bool IsBeginComment(string content) {
+            return content != null && "BEGIN".Equals(content);
+        }
+
+        private static bool IsEndComment(string content) {
+            return content != null && "END".Equals(content);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      BindVariableNode
+    //                                      ----------------
+    public class InternalBindVariableNode : AbstractNode {
+        private String _expression;
+        private String[] _names;
+        private String _specifiedSql;
+
+        public InternalBindVariableNode(String expression, String specifiedSql) : base () {
+            _expression = expression;
+            _names = expression.Split('.');
+            _specifiedSql = specifiedSql;
+        }
+
+        public override void Accept(ICommandContext ctx) {
+            object value = ctx.GetArg(_names[0]);
+            Type type = (value != null ? value.GetType() : null);
+            InternalValueAndType valueAndType = new InternalValueAndType();
+            valueAndType.TargetValue = value;
+            valueAndType.TargetType = type;
+            SetupValueAndType(valueAndType);
+            ctx.AddSql(valueAndType.TargetValue, valueAndType.TargetType, _expression.Replace('.', '_'));
+        }
+
+        protected void SetupValueAndType(InternalValueAndType valueAndType) {
+            InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql);
+            setupper.SetupValueAndType(valueAndType);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                     EmbeddedValueNode
+    //                                     -----------------
+    public class InternalEmbeddedValueNode : AbstractNode {
+        private String _expression;
+        private String[] _names;
+        private String _specifiedSql;
+
+        public InternalEmbeddedValueNode(String expression, String specifiedSql) : base () {
+            _expression = expression;
+            _names = expression.Split('.');
+            _specifiedSql = specifiedSql;
+        }
+
+        public override void Accept(ICommandContext ctx) {
+            Object value = ctx.GetArg(_names[0]);
+            Type type = (value != null ? value.GetType() : null);
+            InternalValueAndType valueAndType = new InternalValueAndType();
+            valueAndType.TargetValue = value;
+            valueAndType.TargetType = type;
+            SetupValueAndType(valueAndType);
+            ctx.AddSql(valueAndType.TargetValue != null ? valueAndType.TargetValue.ToString() : (String)null);
+        }
+
+        protected void SetupValueAndType(InternalValueAndType valueAndType) {
+            InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql);
+            setupper.SetupValueAndType(valueAndType);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                        Value and Type
+    //                                        --------------
+    public class InternalValueAndType {
+        public Object _value;
+        public Type _type;
+        public Object TargetValue {
+            get { return _value; }
+            set { _value = value; }
+        }
+        public Type TargetType {
+            get { return _type; }
+            set { _type = value; }
+        }
+    }
+
+
+    public class InternalValueAndTypeSetuper {
+        protected String _expression;
+        protected String[] _names;
+        protected String _specifiedSql;
+        public InternalValueAndTypeSetuper(String expression, String[] names, String specifiedSql) {
+            this._expression = expression;
+            this._names = names;
+            this._specifiedSql = specifiedSql;
+        }
+
+        public void SetupValueAndType(InternalValueAndType valueAndType) {
+            Object value = valueAndType.TargetValue;
+            Type type = valueAndType.TargetType;
+            for (int pos = 1; pos < _names.Length; ++pos) {
+                if (value == null) {
+                    break;
+                }
+                // {Unsupported}
+                // if (value is IDictionary<>) {
+                //     IDictionary map = (IDictionary) value;
+                //     value = map[_names[pos]];
+                //     if (value == null) {
+                //         break;
+                //     }
+                //     type = value.GetType();
+                //     continue;
+                // }
+                String currentName = _names[pos];
+                PropertyInfo pi = type.GetProperty(currentName);
+                if (pi != null) {
+                    value = pi.GetValue(value, null);
+                    type = (value != null ? value.GetType() : pi.PropertyType);
+                    continue;
+                }
+                if (pos == 1 && typeof(${glMapParameterBeanInterfaceName}).IsAssignableFrom(type)) {
+                    ${glMapParameterBeanInterfaceName} pmb = (${glMapParameterBeanInterfaceName})value;
+                    IDictionary<String, Object> map = pmb.ParameterMap;
+                    Object elementValue = (map != null && map.ContainsKey(currentName) ? map[currentName] : null);
+                    if (elementValue != null) {
+                        value = elementValue;
+                        type = elementValue.GetType();
+                        continue;
+                    }
+                }
+                ThrowNotFoundPropertyException(_expression, type, currentName, _specifiedSql);
+            }
+            valueAndType.TargetValue = value;
+            valueAndType.TargetType = type;
+        }
+
+        public void ThrowNotFoundPropertyException(String expression, Type targetType, String notFoundProperty, String specifiedSql) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The property on the SQL comment was Not Found!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm the existence of your property on your arguments." + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[SQL Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[NotFound Property]" + GetLineSeparator() + (targetType != null ? targetType.Name + "#" : "") + notFoundProperty + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            throw new SystemException(msg);
+        }
+
+        protected String GetLineSeparator() {
+            return Environment.NewLine;
         }
     }
 }

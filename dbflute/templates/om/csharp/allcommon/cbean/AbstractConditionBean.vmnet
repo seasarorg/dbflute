@@ -16,317 +16,150 @@ namespace ${glPackageBaseCommonCBean} {
     [System.Serializable]
     public abstract class $myClassName : ${glConditionBeanInterfaceName} {
 
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
-        /** SQL clause instance. */
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        /// <summary>SQL clause. (NotNull)</summary>
         protected readonly ${glSqlClauseName} _sqlClause;
 
-        /// <summary>Argument-bean. (for SqlComment)</summary>
-        protected Object _argumentBean;
+        /// <summary>Safety max result size.</summary>
+        protected int _safetyMaxResultSize;
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
-        /**
-         * Constructor.
-         */
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
         public ${myClassName}() {
             _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(TableDbName);
         }
 
-        // =====================================================================================
-        //                                                                            Table Name
-        //                                                                            ==========
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
         /// <summary>
         /// ${database.ImplementComment}
         /// </summary>
         public abstract String TableDbName { get; }
 
-        // =====================================================================================
-        //                                                                             SqlClause
-        //                                                                             =========
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Sql clause. (NotNull)
-         */
-        public ${glSqlClauseName} SqlClause {
-            get {
-                return _sqlClause;
-            }
-        }
+        // ===============================================================================
+        //                                                                       SqlClause
+        //                                                                       =========
+        public ${glSqlClauseName} SqlClause { get { return _sqlClause; } }
+        public String GetClause() { return this.SqlClause.GetClause(); }
 
-        /**
-         * Get clause string.
-         * 
-         * @return Sql clause string. (NotNUll)
-         */
-        public String GetClause() {
-            return this.SqlClause.GetClause();
-        }
-
-        // =====================================================================================
-        //                                                                                 Query
-        //                                                                                 =====
+        // ===============================================================================
+        //                                                                           Query
+        //                                                                           =====
         /// <summary>
         /// The property of condition-query as inteface.
         /// </summary>
         /// <returns>Instance of condition-query. (NotNull)</returns>
-        abstract public ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
+        public abstract ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
 
-        // =====================================================================================
-        //                                                                        FetchNarrowing
-        //                                                                        ==============
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Fetch-narrowing start-index.
-         */
-        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.FetchNarrowingSkipStartIndex; } }
+        // ===============================================================================
+        //                                                    Implementation of PagingBean
+        //                                                    ============================
+        // -------------------------------------------------
+        //                              Paging Determination
+        //                              --------------------
+        // * * * * * * * *
+        // For SQL Comment
+        // * * * * * * * *
+        public bool Paging { get { throw new SystemException("This method is unsupported on ConditionBean!"); } }
+        public void XSetPaging(bool paging) {
+            throw new SystemException("This method is unsupported on ConditionBean!");
+        }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Fetch-narrowing size.
-         */
-        public int FetchNarrowingLoopCount { get { return this.SqlClause.FetchNarrowingLoopCount; } }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determination.
-         */
-        public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.IsFetchStartIndexSupported; } }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determination.
-         */
-        public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.IsFetchSizeSupported; } }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determiantion.
-         */
-        public bool IsFetchNarrowingEffective { get { return this.SqlClause.IsFetchNarrowingEffective; } }
-
-        // =====================================================================================
-        //                                                                                Paging
-        //                                                                                ======
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param fetchSize Fetch-size. (NotMinus & NotZero)
-         * @return this. (NotNUll)
-         */
+        // -------------------------------------------------
+        //                                     Fetch Setting
+        //                                     -------------
         public ${glPagingBeanInterfaceName} FetchFirst(int fetchSize) {
             this.SqlClause.FetchFirst(fetchSize);
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
-         * @param fetchSize Fetch-size. (NotMinus & NotZero)
-         * @return this. (NotNUll)
-         */
         public ${glPagingBeanInterfaceName} FetchScope(int fetchStartIndex, int fetchSize) {
             this.SqlClause.FetchScope(fetchStartIndex, fetchSize);
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero)
-         * @return this. (NotNull)
-         */
         public ${glPagingBeanInterfaceName} FetchPage(int fetchPageNumber) {
             this.SqlClause.FetchPage(fetchPageNumber);
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNUll)
-         */
-        public ${glConditionBeanInterfaceName} LockForUpdate() {
-            this.SqlClause.LockForUpdate();
-            return this;
-        }
+        // -------------------------------------------------
+        //                                    Fetch Property
+        //                                    --------------
+        public int FetchStartIndex { get { return this.SqlClause.FetchStartIndex; } }
+        public int FetchSize { get { return this.SqlClause.FetchSize; } }
+        public int FetchPageNumber { get { return this.SqlClause.FetchPageNumber; } }
+        public int PageStartIndex { get { return this.SqlClause.PageStartIndex; } }
+        public int PageEndIndex { get { return this.SqlClause.PageEndIndex; } }
+        public bool IsFetchScopeEffective { get { return this.SqlClause.IsFetchScopeEffective; } }
+        public int SafetyMaxResultSize { get { return _safetyMaxResultSize; } }
 
-        public int FetchStartIndex {
-            get { return this.SqlClause.FetchStartIndex; }
-        }
+        // -------------------------------------------------
+        //                                     Hint Property
+        //                                     -------------
+        public String SelectHint { get { return this.SqlClause.GetSelectHint(); } }
+        public String FromBaseTableHint { get { return this.SqlClause.GetFromBaseTableHint(); } }
+        public String FromHint { get { return this.SqlClause.GetFromHint(); } }
+        public String WhereClause { get { return this.SqlClause.GetWhereClause(); } }
+        public String OrderByClause { get { return this.SqlClause.GetOrderByClause(); } }
+        public String SqlSuffix { get { return this.SqlClause.GetSqlSuffix(); } }
 
-        public int FetchSize {
-            get { return this.SqlClause.FetchSize; }
-        }
+        // ===============================================================================
+        //                                            Implementation of FetchNarrowingBean
+        //                                            ====================================
+        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.FetchNarrowingSkipStartIndex; } }
+        public int FetchNarrowingLoopCount { get { return this.SqlClause.FetchNarrowingLoopCount; } }
+        public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.IsFetchStartIndexSupported; } }
+        public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.IsFetchSizeSupported; } }
+        public bool IsFetchNarrowingEffective { get { return this.SqlClause.IsFetchNarrowingEffective; } }
+        public void IgnoreFetchNarrowing() { throw new SystemException("This method is unsupported on ConditionBean!"); }
+        public void RestoreIgnoredFetchNarrowing() {}
 
-        public int FetchPageNumber {
-            get { return this.SqlClause.FetchPageNumber; }
-        }
-
-        /**
-         * Get page start index.
-         * 
-         * @return Page start index. 0 origin. (NotMinus)
-         */
-        public int PageStartIndex {
-            get { return this.SqlClause.PageStartIndex; }
-        }
-
-        /**
-         * Get page end index.
-         * 
-         * @return Page end index. 0 origin. (NotMinus)
-         */
-        public int PageEndIndex {
-            get { return this.SqlClause.PageEndIndex; }
-        }
-
-        /**
-         * Is fetch scope effective?
-         * 
-         * @return Determination.
-         */
-        public bool IsFetchScopeEffective {
-            get { return this.SqlClause.IsFetchScopeEffective; }
-        }
-
-        // =====================================================================================
-        //                                                                          Limit Select
-        //                                                                          ============
-        /** Is limit-select PK only? */
-        protected bool _isLimitSelectPKOnly;
-
-        /**
-         * Is limit-select PK only?
-         * 
-         * @return Determination.
-         */
-        public bool IsLimitSelect_PKOnly() {
-            return _isLimitSelectPKOnly;
-        }
-
-        /**
-         * Limit select PK only.
-         *
-         * @return this. (NotNull)
-         */
-        public ${glConditionBeanInterfaceName} LimitSelect_PKOnly() {
-            _isLimitSelectPKOnly = true;
-            return this;
-        }
-
-        /**
-         * Limit select off.
-         *
-         * @return this. (NotNull)
-         */
-        public ${glConditionBeanInterfaceName} LimitSelect_Off() {
-            _isLimitSelectPKOnly = false;
-            return this;
-        }
-
-        // =====================================================================================
-        //                                                                               OrderBy
-        //                                                                               =======
-        /// <summary>
-        /// The property of sql component of order-by clause.
-        /// </summary>
+        // ===============================================================================
+        //                                                   Implementation of OrderByBean
+        //                                                   =============================
         public ${glOrderByClauseName} SqlComponentOfOrderByClause {
             get { return this.SqlClause.GetSqlComponentOfOrderByClause(); }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
         public ${glOrderByBeanInterfaceName} ClearOrderBy() {
             this.SqlClause.ClearOrderBy();
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
         public ${glOrderByBeanInterfaceName} IgnoreOrderBy() {
             this.SqlClause.IgnoreOrderBy();
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
         public $glOrderByBeanInterfaceName MakeOrderByEffective() {
             this.SqlClause.MakeOrderByEffective();
             return this;
         }
 
-        /**
-         * Setup order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
-         * 
-         * @return this. (NotNUll)
-         */
-        abstract public ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc();
+        public abstract ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc();
 
-        /**
-         * Setup order-by PrimaryKey desc. {order by primaryKey1 desc, primaryKey2 desc...}
-         * 
-         * @return this. (NotNUll)
-         */
-        abstract public ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc();
+        public abstract ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc();
 
-        /**
-         * Register order-by-asc.
-         * 
-         * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-         * @return this. (NotNull)
-         */
         public ${glOrderByBeanInterfaceName} RegisterOrderByAsc(String orderByProperty) {
             this.SqlClause.RegisterOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, true);
             return this;
         }
 
-        /**
-         * Register order-by-desc.
-         * 
-         * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-         * @return this. (NotNull)
-         */
         public ${glOrderByBeanInterfaceName} RegisterOrderByDesc(String orderByProperty) {
             this.SqlClause.RegisterOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, false);
             return this;
         }
 
-        /**
-         * Reverse order-by or Override order-by asc.
-         * 
-         * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-         * @return this. (NotNull)
-         */
         public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByAsc(String orderByProperty) {
             this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, true);
             return this;
         }
 
-        /**
-         * Reverse order-by or Override order-by desc.
-         * 
-         * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-         * @return this. (NotNull)
-         */
         public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByDesc(String orderByProperty) {
             this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, false);
             return this;
@@ -373,81 +206,44 @@ namespace ${glPackageBaseCommonCBean} {
             return sb.ToString();
         }
 
-        // =====================================================================================
-        //                                                               'for SqlComment' Method
-        //                                                               =======================
-        /**
-         * Get select-hint. {select [select-hint] * from table...}
-         * 
-         * @return Select-hint. (NotNull)
-         */
-        public String SelectHint {
-            get { return this.SqlClause.GetSelectHint(); }
+        // ===============================================================================
+        //                                                Implementation of SelectResource
+        //                                                ================================
+        public void CheckSafetyResult(int safetyMaxResultSize) {
+            this._safetyMaxResultSize = safetyMaxResultSize;
         }
 
-        /**
-         * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
-         * 
-         * @return From-base-table-hint. (NotNull)
-         */
-        public String FromBaseTableHint {
-            get { return this.SqlClause.GetFromBaseTableHint(); }
+        // ===============================================================================
+        //                                                                    Limit Select
+        //                                                                    ============
+        protected bool _isLimitSelectPKOnly;
+
+        public bool IsLimitSelect_PKOnly() {
+            return _isLimitSelectPKOnly;
         }
 
-        /**
-         * Get from-hint. {select * from table [from-hint] where ...}
-         * 
-         * @return From-hint. (NotNull)
-         */
-        public String FromHint {
-            get { return this.SqlClause.GetFromHint(); }
+        public ${glConditionBeanInterfaceName} LimitSelect_PKOnly() {
+            _isLimitSelectPKOnly = true;
+            return this;
         }
 
-        /**
-         * Get where clause. {order by [base-table].[column] asc, [fk-alias].[column] desc}
-         * 
-         * @return Where clause. (NotNull)
-         */
-        public String WhereClause {
-            get { return this.SqlClause.GetWhereClause(); }
+        public ${glConditionBeanInterfaceName} LimitSelect_Off() {
+            _isLimitSelectPKOnly = false;
+            return this;
         }
 
-        /**
-         * Get order-by clause. {order by [base-table].[column] asc, [fk-alias].[column] desc}
-         * 
-         * @return Order-by clause. (NotNull)
-         */
-        public String OrderByClause {
-            get { return this.SqlClause.GetOrderByClause(); }
+        // ===============================================================================
+        //                                                                    Lock Setting
+        //                                                                    ============
+        public ${glConditionBeanInterfaceName} LockForUpdate() {
+            this.SqlClause.LockForUpdate();
+            return this;
         }
 
-        /**
-         * Get Sql-suffix. {select * from table where ... order by ... [sql-suffix]}
-         * 
-         * @return Sql-suffix. (NotNull)
-         */
-        public String SqlSuffix {
-            get { return this.SqlClause.GetSqlSuffix(); }
-        }
-
-        /// <summary>
-        /// The property of argumentBean. (for SqlComment)
-        /// </summary>
-        public Object ArgumentBean {
-            get { return _argumentBean; }
-            set { _argumentBean = value; }
-        }
-
-        // ------------------------------
-        //                   for Internal
-        //                   ------------
-        /**
-         * Set up various things for select-count-ignore-fetch-scope.
-         * This method is for INTERNAL. Don't invoke this!
-         * 
-         * @return this. (NotNull)
-         */
-        public ${glConditionBeanInterfaceName} SetupSelectCountIgnoreFetchScope() {
+        // ===============================================================================
+        //                                                                    Select Count
+        //                                                                    ============
+        public ${glConditionBeanInterfaceName} XSetupSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = true;
             this.SqlClause.IgnoreIncludedSelectColumn();
             this.SqlClause.IgnoreOrderBy();
@@ -455,13 +251,7 @@ namespace ${glPackageBaseCommonCBean} {
             return this;
         }
 
-        /**
-         * Do after-care for select-count-ignore-fetch-scope.
-         * This method is for INTERNAL. Don't invoke this!
-         * 
-         * @return this. (NotNull)
-         */
-        public ${glConditionBeanInterfaceName} AfterCareSelectCountIgnoreFetchScope() {
+        public ${glConditionBeanInterfaceName} XAfterCareSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = false;
             this.SqlClause.MakeIncludedSelectColumnEffective();
             this.SqlClause.MakeOrderByEffective();
@@ -469,15 +259,8 @@ namespace ${glPackageBaseCommonCBean} {
             return this;
         }
 
-        /** Is set up various things for select-count-ignore-fetch-scope? */
         protected bool _isSelectCountIgnoreFetchScope;
 
-        /**
-         * Is set up various things for select-count-ignore-fetch-scope?
-         * This method is for INTERNAL. Don't invoke this!
-         * 
-         * @return Determination.
-         */
         public bool IsSelectCountIgnoreFetchScope() {
             return _isSelectCountIgnoreFetchScope;
         }

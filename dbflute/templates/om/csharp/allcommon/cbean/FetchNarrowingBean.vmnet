@@ -6,44 +6,27 @@ using ${glPackageBaseCommonSqlClause};
 namespace ${glPackageBaseCommonCBean} {
 
     /// <summary>
-    /// The condition-bean as interface.
+    /// The bean of fetch narrowing.
     /// Author: ${database.ClassAuthor}
     /// </summary>
     public interface ${glFetchNarrowingBeanInterfaceName} {
 
-        /**
-         * Get fetch-narrowing start-index.
-         * 
-         * @return Fetch-narrowing start-index.
-         */
         int FetchNarrowingSkipStartIndex { get; }
-
-        /**
-         * Get fetch-narrowing size.
-         * 
-         * @return Fetch-narrowing size.
-         */
         int FetchNarrowingLoopCount { get; }
-
-	    /**
-	     * Is fetch start index supported?
-	     * 
-	     * @return Determination.
-	     */
         bool IsFetchNarrowingSkipStartIndexEffective { get; }
-
-	    /**
-	     * Is fetch size supported?
-	     * 
-	     * @return Determination.
-	     */
         bool IsFetchNarrowingLoopCountEffective { get; }
-
-	    /**
-	     * Is fetch-narrowing effective?
-	     * 
-	     * @return Determiantion.
-	     */
         bool IsFetchNarrowingEffective { get; }
+
+        /// <summary>
+        /// Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+        /// </summary>
+        void IgnoreFetchNarrowing();
+
+        /// <summary>
+        /// Restore ignored fetch narrowing. {INTERNAL METHOD}
+        /// </summary>
+        void RestoreIgnoredFetchNarrowing();
+
+        int SafetyMaxResultSize { get; }
     }
 }

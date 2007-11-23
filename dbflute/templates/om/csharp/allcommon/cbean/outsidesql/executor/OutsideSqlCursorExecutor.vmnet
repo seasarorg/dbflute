@@ -1,0 +1,40 @@
+
+using System;
+using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonCBeanOutsidesql};
+
+namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
+
+    public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glOutsideSqlDaoName} _outsideSqlDao;
+
+        protected ${glOutsideSqlOptionName} _outsideSqlOption;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glOutsideSqlCursorExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption) {
+            this._outsideSqlDao = outsideSqlDao;
+            this._outsideSqlOption = outsideSqlOption;
+        }
+
+        // ===============================================================================
+        //                                                                          Select
+        //                                                                          ======
+        public Object SelectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
+            return _outsideSqlDao.SelectCursor(path, pmb, _outsideSqlOption, handler);
+        }
+
+        // ===============================================================================
+        //                                                                          Option
+        //                                                                          ======
+        public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> DynamicBinding() {
+            _outsideSqlOption.DynamicBinding();
+            return this;
+        }
+    }
+}

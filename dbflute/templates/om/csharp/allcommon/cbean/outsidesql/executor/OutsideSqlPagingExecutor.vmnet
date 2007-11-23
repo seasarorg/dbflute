@@ -1,0 +1,83 @@
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
+
+namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
+
+    public class ${glOutsideSqlPagingExecutorName} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glOutsideSqlDaoName} _outsideSqlDao;
+        protected ${glOutsideSqlOptionName} _outsideSqlOption;
+        protected String _tableDbName;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glOutsideSqlPagingExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption, String tableDbName) {
+            this._outsideSqlDao = outsideSqlDao;
+            this._outsideSqlOption = outsideSqlOption;
+            this._tableDbName = tableDbName;
+        }
+
+        // ===============================================================================
+        //                                                                          Select
+        //                                                                          ======
+        public IList<ENTITY> SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb, Type entityType) {
+            return _outsideSqlDao.SelectList<ENTITY>(path, pmb, _outsideSqlOption, entityType);
+        }
+
+        public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path
+                                                                   , ${glPagingBeanInterfaceName} pmb
+                                                                   , Type entityType) {
+            ${glOutsideSqlOptionName} countOption = _outsideSqlOption.CopyOptionWithoutPaging();
+            ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor = new ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, countOption);
+            DefaultPagingHandler<ENTITY> handler = new DefaultPagingHandler<ENTITY>(path, pmb, entityType, countExecutor, this);
+            ${glPagingInvokerName}<ENTITY>  invoker = new ${glPagingInvokerName}<ENTITY>(_tableDbName);
+            return invoker.InvokePaging(handler);
+        }
+
+        protected class DefaultPagingHandler<ENTITY> : ${glPagingHandlerName}<ENTITY> {
+            protected String _path;
+            protected ${glPagingBeanInterfaceName} _pmb;
+            protected Type _entityType;
+            protected ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> _countExecutor;
+            protected ${glOutsideSqlPagingExecutorName} _pagingExecutor;
+            public DefaultPagingHandler(String path, ${glPagingBeanInterfaceName} pmb, Type entityType, ${glOutsideSqlEntityExecutorName}<${glPagingBeanInterfaceName}> countExecutor, ${glOutsideSqlPagingExecutorName} pagingExecutor) {
+                this._path = path;
+                this._pmb = pmb;
+                this._entityType = entityType;
+                this._countExecutor = countExecutor;
+                this._pagingExecutor = pagingExecutor;
+            }
+            public ${glPagingBeanInterfaceName} PagingBean {
+                get { return _pmb; }
+            }
+            public int Count() {
+                _pmb.XSetPaging(false);
+                return _countExecutor.SelectEntityWithDeletedCheck<int>(_path, _pmb, typeof(int));
+            }
+            public IList<ENTITY> Paging() {
+                _pmb.XSetPaging(true);
+                return _pagingExecutor.SelectList<ENTITY>(_path, _pmb, _entityType);
+            }
+        }
+
+        // ===============================================================================
+        //                                                                          Option
+        //                                                                          ======
+        public ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}> CursorHandling() {
+            return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
+        }
+
+        public ${glOutsideSqlPagingExecutorName} DynamicBinding() {
+            _outsideSqlOption.DynamicBinding();
+            return this;
+        }
+    }
+}

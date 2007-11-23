@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 import java.util.List;
-import java.io.Serializable;
 
 /**
  * The list-result-bean for ${myClassName}.
@@ -33,7 +32,7 @@ public class ${glResultBeanBuilderName}<ENTITY> {
      * @param selectedList Selected list. (NotNull)
      * @return The result bean of list. (NotNull)
      */
-    public ${glListResultBeanName}<ENTITY> buildListResultBean(${glOrderByBeanInterfaceName} ob, List<ENTITY> selectedList) {
+    public ${glListResultBeanName}<ENTITY> buildListResultBean(${glConditionBeanInterfaceName} ob, List<ENTITY> selectedList) {
         ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
         rb.setTableDbName(_tableDbName);
         rb.setAllRecordCount(selectedList.size());
@@ -55,9 +54,9 @@ public class ${glResultBeanBuilderName}<ENTITY> {
         rb.setTableDbName(_tableDbName);
         rb.setAllRecordCount(allRecordCount);
         rb.setSelectedList(selectedList);
+        rb.setOrderByClause(pb.getSqlComponentOfOrderByClause());
         rb.setPageSize(pb.getFetchSize());
         rb.setCurrentPageNumber(pb.getFetchPageNumber());
-        rb.setOrderByClause(pb.getSqlComponentOfOrderByClause());
         return rb;
     }
 }

@@ -1,0 +1,64 @@
+
+using System;
+using System.Collections.Generic;
+
+namespace ${glPackageBaseCommonCBeanOutsidesql} {
+
+    public class ${glOutsideSqlOptionName} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected String _pagingRequestType = "non";
+
+        protected bool _dynamicBinding;
+
+        // ===============================================================================
+        //                                                                     Easy-to-Use
+        //                                                                     ===========
+        public void AutoPaging() {
+            _pagingRequestType = "auto";
+        }
+
+        public void ManualPaging() {
+            _pagingRequestType = "manual";
+        }
+
+        public void DynamicBinding() {
+            _dynamicBinding = true;
+        }
+
+        // ===============================================================================
+        //                                                                      Unique Key
+        //                                                                      ==========
+        public String GenerateUniqueKey() {
+            return "{" + _pagingRequestType + "/" + _dynamicBinding + "}";
+        }
+
+        // ===============================================================================
+        //                                                                            Copy
+        //                                                                            ====
+        public ${glOutsideSqlOptionName} CopyOptionWithoutPaging() {
+            ${glOutsideSqlOptionName} copyOption = new ${glOutsideSqlOptionName}();
+            if (IsDynamicBinding) {
+                copyOption.DynamicBinding();
+            }
+            return copyOption;
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public bool IsAutoPaging {
+            get { return "auto".Equals(_pagingRequestType); }
+        }
+
+        public bool IsManualPaging {
+            get { return "manual".Equals(_pagingRequestType); }
+        }
+
+        public bool IsDynamicBinding {
+            get { return _dynamicBinding; }
+        }
+    }
+}

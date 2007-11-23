@@ -2,6 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 #set ($myClassName = "${glBehaviorReadableAbstractName}")
 
+import java.util.List;
+
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
@@ -10,6 +12,8 @@ import ${glPackageBaseCommonBhvSetup}.${glValueLabelBoxName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
+import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
@@ -162,7 +166,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glListResultBeanName}<${glEntityInterfaceName}> readList(${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
-        return new ResultBeanBuilder<${glEntityInterfaceName}>(this).buildListResultBean(cb, callReadList(cb));
+        return new ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<${glEntityInterfaceName}>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
     }
 
     /**
@@ -173,8 +177,15 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      */
     public ${glPagingResultBeanName}<${glEntityInterfaceName}> readPage(final ${glConditionBeanInterfaceName} cb) {
         assertConditionBeanNotNull(cb);
-        return readPage(cb, new SelectPageSimpleInvoker<${glEntityInterfaceName}>(this));
+        final ${glPagingInvokerName}<${glEntityInterfaceName}> invoker = new ${glPagingInvokerName}<${glEntityInterfaceName}>(getTableDbName());
+        final ${glPagingHandlerName}<${glEntityInterfaceName}> handler = new ${glPagingHandlerName}<${glEntityInterfaceName}>() {
+            public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
+            public int count() { return readCount(cb); }
+            public List<${glEntityInterfaceName}> paging() { return readList(cb); }
+        };
+        return invoker.invokePaging(handler);
     }
+#if ($database.isMakeRecentlyDeprecated())
 
     /**
      * ${database.ImplementComment}
@@ -182,6 +193,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param cb Condition-bean. (NotNull)
      * @param invoker Select-page-invoker (NotNull)
      * @return Read page. (NotNull)
+     * @deprecated
      */
     public ${glPagingResultBeanName}<${glEntityInterfaceName}> readPage(final ${glConditionBeanInterfaceName} cb, SelectPageInvoker<${glEntityInterfaceName}> invoker) {
         assertConditionBeanNotNull(cb);
@@ -196,6 +208,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         };
         return invoker.invokeSelectPage(pageCallback);
     }
+#end
 
     /**
      * Assert that record has not been deleted.

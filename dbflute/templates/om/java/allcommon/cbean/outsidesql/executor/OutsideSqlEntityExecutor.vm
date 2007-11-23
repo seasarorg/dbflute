@@ -9,10 +9,10 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 /**
  * The cursor executor of outside-sql.
  * 
- * @param <PARAMETER_BEAN_TYPE> The type of parameter-bean.
+ * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN_TYPE> {
+public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -35,7 +35,7 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN_TYPE> {
     /**
      * Select entity.
      * 
-     * @param <ENTITY_TYPE> The type of entity.
+     * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The type of entity. (NotNull)
@@ -43,8 +43,8 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN_TYPE> {
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      */
-    public <ENTITY_TYPE> ENTITY_TYPE selectEntity(String path, PARAMETER_BEAN_TYPE pmb, Class<ENTITY_TYPE> entityType) {
-        final List<ENTITY_TYPE> ls = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
+    public <ENTITY> ENTITY selectEntity(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+        final List<ENTITY> ls = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
         if (ls.isEmpty()) {
             return null;
         }
@@ -58,7 +58,7 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN_TYPE> {
     /**
      * Select entity with deleted check.
      * 
-     * @param <ENTITY_TYPE> The type of entity.
+     * @param <ENTITY> The type of entity.
      * @param path The path of SQL file. (NotNull)
      * @param pmb The parameter-bean. Allowed types are Bean object and Map object. (Nullable)
      * @param entityType The type of entity. (NotNull)
@@ -67,8 +67,8 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN_TYPE> {
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted(not found).
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity is duplicated.
      */
-    public <ENTITY_TYPE> ENTITY_TYPE selectEntityWithDeletedCheck(String path, PARAMETER_BEAN_TYPE pmb, Class<ENTITY_TYPE> entityType) {
-        final List<ENTITY_TYPE> ls = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
+    public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+        final List<ENTITY> ls = _outsideSqlDao.selectList(path, pmb, _outsideSqlOption, entityType);
         if (ls == null || ls.isEmpty()) {
             String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
             throwEntityAlreadyDeletedException(searchKey4Log);
@@ -94,7 +94,7 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN_TYPE> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN_TYPE> dynamicBinding() {
+    public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
     }

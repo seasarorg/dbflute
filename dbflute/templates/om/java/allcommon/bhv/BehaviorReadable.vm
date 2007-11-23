@@ -150,6 +150,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Read page. (NotNull)
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
+#if ($database.isMakeRecentlyDeprecated())
 
     /**
      * Read page as result-bean.
@@ -157,8 +158,10 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @param ${glAttachedCBArgsVariableName} Condition-bean. (NotNull)
      * @param invoker Select-page-invoker (NotNull)
      * @return Read page. (NotNull)
+     * @deprecated
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}, SelectPageInvoker${database.filterGenericsString(${glEntityInterfaceName})} invoker);
+#end
 
     // ===================================================================================
     //                                                                            Sequence

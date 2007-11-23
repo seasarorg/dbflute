@@ -126,6 +126,7 @@ targetdatabase = $targetDatabase
     #set ($glPagingBeanInterfaceName = "${glProjectPrefix}PagingBean")
     #set ($glSelectResourceInterfaceName = "${glProjectPrefix}SelectResource")
     #set ($glFetchNarrowingBeanContextName = "${glProjectPrefix}FetchNarrowingBeanContext")
+    #set ($glMapParameterBeanInterfaceName = "${glProjectPrefix}MapParameterBean")
     #set ($glPagingHandlerName = "${glProjectPrefix}PagingHandler")
     #set ($glPagingInvokerName = "${glProjectPrefix}PagingInvoker")
     #set ($glPagingResultBeanName = "${glProjectPrefix}PagingResultBean")
@@ -620,7 +621,7 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimplePagingBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SimplePagingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
+    #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
       $database.debug("    parse('PagingHandler')")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glPagingHandlerName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/PagingHandler.${glTemplateFileExtension}",$path ,"", "")
@@ -638,7 +639,7 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glListResultBeanName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ListResultBean.${glTemplateFileExtension}",$path ,"", "")
 
-    #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
+    #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
       $database.debug("    parse('ResultBeanBuilder');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glResultBeanBuilderName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ResultBeanBuilder.${glTemplateFileExtension}",$path ,"", "")
@@ -656,13 +657,21 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glConditionQueryInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/ConditionQuery.${glTemplateFileExtension}",$path ,"", "")
 
+    #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
+      $database.debug("    parse('MapParameterBean');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glMapParameterBeanInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/MapParameterBean.${glTemplateFileExtension}",$path ,"", "")
+    #end
+
     $database.debug("    parsePagingBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glPagingBeanInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/PagingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    parseOrderByBean()")
-    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glOrderByBeanInterfaceName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/OrderByBean.${glTemplateFileExtension}",$path ,"", "")
+    #if (!$database.isTargetLanguageCSharp())
+      $database.debug("    parseOrderByBean()")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glOrderByBeanInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/OrderByBean.${glTemplateFileExtension}",$path ,"", "")
+    #end
 
     $database.debug("    parseSelectResource()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSelectResourceInterfaceName}.${glClassFileExtension}" )
@@ -825,26 +834,26 @@ targetdatabase = $targetDatabase
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping}))
       $database.makeDirectory($path)
 
-      $database.debug("    parseGroupingOption();")
+      $database.debug("    parse('GroupingOption');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingOptionName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parseGroupingRowEndDeterminer();")
+      $database.debug("    parse('GroupingRowEndDeterminer');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowEndDeterminerName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowEndDeterminer.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parseGroupingRowResource();")
+      $database.debug("    parse('GroupingRowResource');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowResourceName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowResource.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parseGroupingRowSetupper();")
+      $database.debug("    parse('GroupingRowSetupper');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping})}${glGroupingRowSetupperName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/grouping/GroupingRowSetupper.${glTemplateFileExtension}",$path ,"", "")
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanMapping}))
       $database.makeDirectory($path)
 
-      $database.debug("    parseEntityDtoMapper();")
+      $database.debug("    parse('EntityDtoMapper');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanMapping})}${glEntityDtoMapperName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/mapping/EntityDtoMapper.${glTemplateFileExtension}",$path ,"", "")
     #end
@@ -852,38 +861,38 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                  allcommon condition-bean outside-sql
     ##                  ------------------------------------
-    #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
+    #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql}))
       $database.makeDirectory($path)
 
-      $database.debug("    parse('OutsideSqlContext')")
+      $database.debug("    parse('OutsideSqlContext');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlContextName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlContext.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parse('OutsideSqlDao')")
+      $database.debug("    parse('OutsideSqlDao');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlDaoName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlDao.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parse('OutsideSqlOption')")
+      $database.debug("    parse('OutsideSqlOption');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlOptionName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlOption.${glTemplateFileExtension}",$path ,"", "")
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor}))
       $database.makeDirectory($path)
 
-      $database.debug("    parse('OutsideSqlBasicExecutor')")
+      $database.debug("    parse('OutsideSqlBasicExecutor');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlBasicExecutorName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlBasicExecutor.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parse('OutsideSqlCursorExecutor')")
+      $database.debug("    parse('OutsideSqlCursorExecutor');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlCursorExecutorName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlCursorExecutor.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parse('OutsideSqlPagingExecutor')")
+      $database.debug("    parse('OutsideSqlPagingExecutor');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlPagingExecutorName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlPagingExecutor.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parse('OutsideSqlEntityExecutor')")
+      $database.debug("    parse('OutsideSqlEntityExecutor');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesqlExecutor})}${glOutsideSqlEntityExecutorName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/executor/OutsideSqlEntityExecutor.${glTemplateFileExtension}",$path ,"", "")
     #end
@@ -895,12 +904,12 @@ targetdatabase = $targetDatabase
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi}))
       $database.makeDirectory($path)
 
-      $database.debug("    parse('PageNumberLink')")
+      $database.debug("    parse('PageNumberLink');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi})}${glPageNumberLinkName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/PageNumberLink.${glTemplateFileExtension}",$path ,"", "")
 
       #if ($database.isAvailableGenerics())
-        $database.debug("    parse('PageNumberLinkSetupper')")
+        $database.debug("    parse('PageNumberLinkSetupper');")
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenavi})}${glPageNumberLinkSetupperName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/PageNumberLinkSetupper.${glTemplateFileExtension}",$path ,"", "")
       #end
@@ -908,22 +917,22 @@ targetdatabase = $targetDatabase
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup}))
       $database.makeDirectory($path)
 
-      $database.debug("    parse('PageGroupBean')")
+      $database.debug("    parse('PageGroupBean');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup})}${glPageGroupBeanName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/group/PageGroupBean.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parse('PageGroupOption')")
+      $database.debug("    parse('PageGroupOption');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviGroup})}${glPageGroupOptionName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/group/PageGroupOption.${glTemplateFileExtension}",$path ,"", "")
 
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange}))
       $database.makeDirectory($path)
 
-      $database.debug("    parse('PageRangeBean')")
+      $database.debug("    parse('PageRangeBean');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange})}${glPageRangeBeanName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/range/PageRangeBean.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parse('PageRangeOption')")
+      $database.debug("    parse('PageRangeOption');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBeanPagenaviRange})}${glPageRangeOptionName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/pagenavi/range/PageRangeOption.${glTemplateFileExtension}",$path ,"", "")
     #end
@@ -947,7 +956,7 @@ targetdatabase = $targetDatabase
 
     #if ($database.isTargetLanguageJava())
 
-      $database.debug("    parse('WhereClauseSimpleFilter')")
+      $database.debug("    parse('WhereClauseSimpleFilter');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glWhereClauseSimpleFilterInterfaceName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/WhereClauseSimpleFilter.${glTemplateFileExtension}",$path ,"" ,"")
 

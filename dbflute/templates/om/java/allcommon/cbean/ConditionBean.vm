@@ -30,9 +30,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     /** Map-string equal. */
     public static final String MAP_STRING_EQUAL = "${database.extractAcceptEqual}";
 
-    // =====================================================================================
-    //                                                                            Table Name
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
     /**
      * Get table db-name.
      * 
@@ -47,9 +47,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public String getTableSqlName();
 
-    // =====================================================================================
-    //                                                                            Sql-Clause
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
     /**
      * Get sql-clause instance.
      * 
@@ -57,9 +57,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public ${glSqlClauseName} getSqlClause();
 
-    // =====================================================================================
-    //                                                                           Primary-Key
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                      PrimaryKey Map
+    //                                                                      ==============
     /**
      * Accept primary-key map-string.
      * 
@@ -74,9 +74,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public void acceptPrimaryKeyMapString(String primaryKeyMapString);
 
-    // =====================================================================================
-    //                                                                              Order-By
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                     OrderBy Setting
+    //                                                                     ===============
     /**
      * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
      * 
@@ -91,9 +91,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Desc();
 
-    // =====================================================================================
-    //                                                                                 Query
-    //                                                                                 =====
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
     /**
      * Get condition-query as interface.
      * 
@@ -101,9 +101,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public ${glConditionQueryInterfaceName} getConditionQueryAsInterface();
 
-    // =====================================================================================
-    //                                                                           Union-Query
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Union Query
+    //                                                                         ===========
     /**
      * Has union query or union all query?
      * 
@@ -111,9 +111,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public boolean hasUnionQueryOrUnionAllQuery();
 
-    // =====================================================================================
-    //                                                                          Limit-Select
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Limit Select
+    //                                                                        ============
     /**
      * Limit select PK only.
      *
@@ -136,8 +136,8 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     public boolean isLimitSelect_PKOnly();
 
     // =====================================================================================
-    //                                                                               Advance
-    //                                                                               =======
+    //                                                                          Lock Setting
+    //                                                                          ============
     /**
      * Lock for update.
      * 
@@ -148,9 +148,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      */
     public ${glConditionBeanInterfaceName} lockForUpdate();
 
-    // ------------------------------
-    //                   for Internal
-    //                   ------------
+    // =====================================================================================
+    //                                                                          Select Count
+    //                                                                          ============
     /**
      * Set up various things for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!

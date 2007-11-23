@@ -28,7 +28,7 @@ public class ${glPagingInvokerName}<ENTITY> {
      * @param handler The handler of paging. (NotNull)
      * @return The result bean of paging. (NotNull)
      */
-    public ${glPagingResultBeanName}<ENTITY> invokePaging(${glPagingHandlerName} handler) {
+    public ${glPagingResultBeanName}<ENTITY> invokePaging(${glPagingHandlerName}<ENTITY> handler) {
         assertObjectNotNull("handler", handler);
         final ${glPagingBeanInterfaceName} pagingBean = handler.getPagingBean();
         assertObjectNotNull("handler.getPagingBean()", pagingBean);

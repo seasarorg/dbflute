@@ -135,7 +135,7 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>The result-bean of selected list. (NotNull)</returns>
         public ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            return new ResultBeanBuilder<${myExtendedObjectClassName}>(this).BuildListResultBean(cb, this.DelegateSelectList(cb));
+            return new ResultBeanBuilder<${myExtendedObjectClassName}>(TableDbName).BuildListResultBean(cb, this.DelegateSelectList(cb));
         }
 
         /// <summary>
@@ -145,18 +145,16 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>The result-bean of selected page. (NotNull)</returns>
         public ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            return this.SelectPage(cb, new SelectPageSimpleInvoker<${myExtendedObjectClassName}>(this));
+            PagingInvoker<${myExtendedObjectClassName}> invoker = new PagingInvoker<${myExtendedObjectClassName}>(TableDbName);
+            return invoker.InvokePaging(new InternalSelectPagingHandler(this, cb));
         }
 
-        /// <summary>
-        /// Select the page.
-        /// </summary>
-        /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
-        /// <param name="invoker">The invoker of select-page. (NotNull)</param>
-        /// <returns>The result-bean of selected page. (NotNull)</returns>
-        public ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb, SelectPageInvoker<${myExtendedObjectClassName}> invoker) {
-            AssertConditionBeanNotNull(cb);
-            return invoker.InvokeSelectPage(new SelectPageSimpleCallback<${myExtendedObjectClassName}>(cb, this));
+        private class InternalSelectPagingHandler : ${glPagingHandlerName}<${myExtendedObjectClassName}> {
+            protected ${myClassName} _bhv; protected ${myConditionBeanClassName} _cb;
+            public InternalSelectPagingHandler(${myClassName} bhv, ${myConditionBeanClassName} cb) { _bhv = bhv; _cb = cb; }
+            public ${glPagingBeanInterfaceName} PagingBean { get { return _cb; } }
+            public int Count() { return _bhv.SelectCount(_cb); }
+            public IList<${myExtendedObjectClassName}> Paging() { return _bhv.SelectList(_cb); }
         }
         #endregion
 

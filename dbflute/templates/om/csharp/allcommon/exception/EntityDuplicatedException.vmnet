@@ -16,5 +16,8 @@ namespace ${glPackageBaseCommonException} {
         /// <param="msg">Exception message.</param>
         public ${glEntityDuplicatedException}(String msg)
         : base(msg) {}
+
+        public ${glEntityDuplicatedException}(String msg, Exception e)
+        : base(msg, e) {}
     }
 }

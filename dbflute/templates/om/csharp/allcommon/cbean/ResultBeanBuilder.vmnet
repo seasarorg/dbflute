@@ -1,0 +1,44 @@
+
+using System;
+using System.Collections.Generic;
+
+namespace ${glPackageBaseCommonCBean} {
+
+    public class ${glResultBeanBuilderName}<ENTITY> {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected String _tableDbName;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glResultBeanBuilderName}(String tableDbName) {
+            _tableDbName = tableDbName;
+        }
+
+        // ===============================================================================
+        //                                                                         Builder
+        //                                                                         =======
+        public ${glListResultBeanName}<ENTITY> BuildListResultBean(${glConditionBeanInterfaceName} ob, IList<ENTITY> selectedList) {
+            ${glListResultBeanName}<ENTITY> rb = new ${glListResultBeanName}<ENTITY>();
+            rb.TableDbName = _tableDbName;
+            rb.AllRecordCount = selectedList.Count;
+            rb.SelectedList = selectedList;
+            rb.OrderByClause = ob.SqlComponentOfOrderByClause;
+            return rb;
+        }
+
+        public ${glPagingResultBeanName}<ENTITY> BuildPagingResultBean(${glPagingBeanInterfaceName} pb, int allRecordCount, IList<ENTITY> selectedList) {
+            ${glPagingResultBeanName}<ENTITY> rb = new ${glPagingResultBeanName}<ENTITY>();
+            rb.TableDbName = _tableDbName;
+            rb.AllRecordCount = selectedList.Count;
+            rb.SelectedList = selectedList;
+            rb.OrderByClause = pb.SqlComponentOfOrderByClause;
+            rb.CurrentPageNumber = pb.FetchPageNumber;
+            rb.PageSize = pb.FetchSize;
+            return rb;
+        }
+    }
+}

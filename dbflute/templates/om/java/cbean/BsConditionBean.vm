@@ -61,8 +61,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                  Accept Primary-Key
-    //                                                                  ==================
+    //                                                                      PrimaryKey Map
+    //                                                                      ==============
     /**
      * ${database.ImplementComment}
      * 
@@ -142,8 +142,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                            Order-By
-    //                                                                            ========
+    //                                                                     OrderBy Setting
+    //                                                                     ===============
     /**
      * ${database.ImplementComment}
      * 
@@ -226,8 +226,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                               Union
-    //                                                                               =====
+    //                                                                         Union Query
+    //                                                                         ===========
     /**
      * Union. <br />
      * Add union query to condition bean. <br />
@@ -258,7 +258,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
 
     // ===================================================================================
-    //                                                                        Setup-Select
+    //                                                                        Setup Select
     //                                                                        ============
 #foreach ($foreignKeys in $table.foreignKeys)
   #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")

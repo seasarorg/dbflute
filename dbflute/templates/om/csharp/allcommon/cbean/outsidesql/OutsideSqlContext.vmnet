@@ -1,0 +1,187 @@
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+
+using Seasar.Framework.Util;
+
+namespace ${glPackageBaseCommonCBeanOutsidesql} {
+
+    public class ${glOutsideSqlContextName} {
+
+        // ===============================================================================
+        //                                                                    Thread Local
+        //                                                                    ============
+        private static readonly LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
+
+        public static ${glOutsideSqlContextName} GetOutsideSqlContextOnThread() {
+            return (${glOutsideSqlContextName})Thread.GetData(_slot);
+        }
+
+        public static void SetOutsideSqlContextOnThread(${glOutsideSqlContextName} outsideSqlContext) {
+            if (outsideSqlContext == null) {
+                String msg = "The argument[outsideSqlContext] must not be null.";
+                throw new SystemException(msg);
+            }
+            Thread.SetData(_slot, outsideSqlContext);
+        }
+
+        public static bool IsExistOutsideSqlContextOnThread() {
+            return (Thread.GetData(_slot) != null);
+        }
+
+        public static void ClearOutsideSqlContextOnThread() {
+            Thread.SetData(_slot, null);
+        }
+
+        // ===============================================================================
+        //                                                                      Unique Key
+        //                                                                      ==========
+        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
+            return methodName + "():" + path + ":" + option.GenerateUniqueKey() + (resultTypeSpecification != null ? ":" + resultTypeSpecification : "");
+        }
+
+        // ===============================================================================
+        //                                                              Exception Handling
+        //                                                              ==================
+        public static void ThrowOutsideSqlNotFoundException(String path) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The outside-sql was Not Found!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm the existence of your target file of outside-sql on your classpath." + GetLineSeparator();
+            msg = msg + "And please confirm the file name and the file path STRICTLY!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Specified OutsideSql Path]" + GetLineSeparator() + path + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            throw new ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException}(msg);
+        }
+
+        protected static String GetLineSeparator() {
+            return Environment.NewLine;
+        }
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        // -------------------------------------------------
+        //                              Common of OutsideSql
+        //                              --------------------
+        protected bool _dynamicBinding;
+
+        protected bool _offsetByCursorForcedly;
+
+        protected bool _limitByCursorForcedly;
+
+        // -------------------------------------------------
+        //                              Specified OutsideSql
+        //                              --------------------
+        /// <summary>The path of outside-sql. (The mark of Specified-OutsideSql)</summary>
+        protected String _outsideSqlPath;
+
+        protected Object _parameterBean;
+
+        protected Object _resultTypeSpecification;
+
+        protected String _methodName;
+
+        // ===============================================================================
+        //                                                                        Read SQL
+        //                                                                        ========
+        public String ReadOutsideSqlPath(String sqlFileEncoding, String dbmsSuffix) {
+            String standardPath = _outsideSqlPath;
+            String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
+            Assembly asm = GetType().Assembly;// in same assembly!
+            if (IsExistResource(dbmsPath, asm)) {
+                return ReadText(dbmsPath, sqlFileEncoding, asm);
+            } else if (IsExistResource(standardPath, asm)) {
+                return ReadText(standardPath, sqlFileEncoding, asm);
+            } else {
+                ThrowOutsideSqlNotFoundException(standardPath);
+                return null;// Non Reachable.
+            }
+        }
+
+        protected String BuildDbmsPath(String standardPath, String dbmsSuffix) {
+            String dbmsPath;
+            int lastIndexOfDot = standardPath.LastIndexOf(".");
+            if (lastIndexOfDot >= 0 && !standardPath.Substring(lastIndexOfDot).Contains("/")) {
+                String basePath = standardPath.Substring(0, lastIndexOfDot);
+                dbmsPath = basePath + dbmsSuffix + standardPath.Substring(lastIndexOfDot);
+            } else {
+                dbmsPath = standardPath + dbmsSuffix;
+            }
+            return dbmsPath;
+        }
+
+        // ===============================================================================
+        //                                                                   Determination
+        //                                                                   =============
+        public bool IsSpecifiedOutsideSql {
+            get { return _outsideSqlPath != null; }
+        }
+
+        // ===============================================================================
+        //                                                                          Helper
+        //                                                                          ======
+        protected virtual bool IsExistResource(String path, Assembly asm) {
+            return ResourceUtil.IsExist(path, asm);
+        }
+
+        protected virtual String ReadText(String path, String sqlFileEncoding, Assembly asm) {
+            using (Stream stream = ResourceUtil.GetResourceAsStream(path, asm)) {
+                using (TextReader reader = new StreamReader(stream, Encoding.GetEncoding(sqlFileEncoding))) {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        // -------------------------------------------------
+        //                              Common of OutsideSql
+        //                              --------------------
+        public bool DynamicBinding {
+            get { return _dynamicBinding; }
+            set { this._dynamicBinding = value; }
+        }
+
+        public bool OffsetByCursorForcedly {
+            get { return _offsetByCursorForcedly; }
+            set { this._offsetByCursorForcedly = value; }
+        }
+        
+        public bool LimitByCursorForcedly {
+            get { return _limitByCursorForcedly; }
+            set { this._limitByCursorForcedly = value; }
+        }
+
+        // -------------------------------------------------
+        //                              Specified OutsideSql
+        //                              --------------------
+        public String OutsideSqlPath {
+            get { return _outsideSqlPath; }
+            set { this._outsideSqlPath = value; }
+        }
+
+        public Object ParameterBean {
+            get { return _parameterBean; }
+            set { this._parameterBean = value; }
+        }
+
+        public Object ResultTypeSpecification {
+            get { return _resultTypeSpecification; }
+            set { this._resultTypeSpecification = value; }
+        }
+
+        public String MethodName {
+            get { return _methodName; }
+            set { this._methodName = value; }
+        }
+    }
+}

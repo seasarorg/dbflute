@@ -124,8 +124,11 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // ===================================================================================
-    //                                                                Paging Determination
-    //                                                                ====================
+    //                                                        Implementation of PagingBean
+    //                                                        ============================
+    // -----------------------------------------------------
+    //                                  Paging Determination
+    //                                  --------------------
     // * * * * * * * *
     // For SQL Comment
     // * * * * * * * *
@@ -149,9 +152,9 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         throw new UnsupportedOperationException(msg);
     }
 
-    // ===================================================================================
-    //                                                                       Fetch Setting
-    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Fetch Setting
+    //                                         -------------
     /**
      * ${database.ImplementComment}
      * 
@@ -187,62 +190,8 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // -----------------------------------------------------
-    //                                     for conditionBean
-    //                                     -----------------
-    /**
-     * Set up various things for select-count-ignore-fetch-scope. {Internal}
-     * This method is for INTERNAL. Don't invoke this!
-     * 
-     * @return this. (NotNull)
-     */
-    public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
-        _isSelectCountIgnoreFetchScope = true;
-
-        // If the query uses union query, it needs included-select-column.
-        if (!hasUnionQueryOrUnionAllQuery()) {
-            getSqlClause().ignoreIncludedSelectColumn();
-        }
-
-        getSqlClause().ignoreOrderBy();
-        getSqlClause().ignoreFetchScope();
-        return this;
-    }
-
-    /**
-     * Do after-care for select-count-ignore-fetch-scope. {Internal}
-     * This method is for INTERNAL. Don't invoke this!
-     * 
-     * @return this. (NotNull)
-     */
-    public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope() {
-        _isSelectCountIgnoreFetchScope = false;
-
-        // If the query uses union query, it needs included-select-column.
-        if (!hasUnionQueryOrUnionAllQuery()) {
-            getSqlClause().makeIncludedSelectColumnEffective();
-        }
-
-        getSqlClause().makeOrderByEffective();
-        getSqlClause().makeFetchScopeEffective();
-        return this;
-    }
-
-    /** Is set up various things for select-count-ignore-fetch-scope? */
-    protected boolean _isSelectCountIgnoreFetchScope;
-
-    /**
-     * Is set up various things for select-count-ignore-fetch-scope?
-     * This method is for INTERNAL. Don't invoke this!
-     * 
-     * @return Determination.
-     */
-    public boolean isSelectCountIgnoreFetchScope() {
-        return _isSelectCountIgnoreFetchScope;
-    }
-
-    // ===================================================================================
-    //                                                                     Paging Property
-    //                                                                     ===============
+    //                                        Fetch Property
+    //                                        --------------
     /**
      * ${database.ImplementComment}
      * 
@@ -297,9 +246,138 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
         return getSqlClause().isFetchScopeEffective();
     }
 
+    // -----------------------------------------------------
+    //                                         Hint Property
+    //                                         -------------
+    /**
+     * Get select-hint. {select [select-hint] * from table...}
+     * 
+     * @return select-hint. (NotNull)
+     */
+    public String getSelectHint() {
+        return getSqlClause().getSelectHint();
+    }
+
+    /**
+     * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
+     * 
+     * @return from-base-table-hint. (NotNull)
+     */
+    public String getFromBaseTableHint() {
+        return getSqlClause().getFromBaseTableHint();
+    }
+
+    /**
+     * Get from-hint. {select * from table left outer join ... on ... [from-hint] where ...}
+     * 
+     * @return from-hint. (NotNull)
+     */
+    public String getFromHint() {
+        return getSqlClause().getFromHint();
+    }
+
+    /**
+     * Get where clause.
+     * 
+     * @return Where clause. (NotNull)
+     */
+    public String getWhereClause() {
+        return getSqlClause().getWhereClause();
+    }
+
+    /**
+     * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
+     * 
+     * @return Sql-suffix.  (NotNull)
+     */
+    public String getSqlSuffix() {
+        return getSqlClause().getSqlSuffix();
+    }
+
     // ===================================================================================
-    //                                                                    OrderBy Property
-    //                                                                    ================
+    //                                                Implementation of FetchNarrowingBean
+    //                                                ====================================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch start index.
+     */
+    public int getFetchNarrowingSkipStartIndex() {
+        return getSqlClause().getFetchNarrowingSkipStartIndex();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Fetch size.
+     */
+    public int getFetchNarrowingLoopCount() {
+        return getSqlClause().getFetchNarrowingLoopCount();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchNarrowingSkipStartIndexEffective() {
+        return !getSqlClause().isFetchStartIndexSupported();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determination.
+     */
+    public boolean isFetchNarrowingLoopCountEffective() {
+        return !getSqlClause().isFetchSizeSupported();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Determiantion.
+     */
+    public boolean isFetchNarrowingEffective() {
+        return getSqlClause().isFetchNarrowingEffective();
+    }
+
+    /**
+     * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+     */
+    public void ignoreFetchNarrowing() {
+        String msg = "This method is unsupported on ConditionBean!";
+        throw new UnsupportedOperationException(msg);
+    }
+
+    /**
+     * Restore ignored fetch narrowing. {INTERNAL METHOD}
+     */
+    public void restoreIgnoredFetchNarrowing() {
+        // Do nothing!
+    }
+
+    /**
+     * Get safety max result size.
+     * 
+     * @return Safety max result size.
+     */
+    public int getSafetyMaxResultSize() {
+        return _safetyMaxResultSize;
+    }
+
+    /**
+     * Check safety result.
+     * 
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        this._safetyMaxResultSize = safetyMaxResultSize;
+    }
+
+    // ===================================================================================
+    //                                                       Implementation of OrderByBean
+    //                                                       =============================
     /**
      * ${database.ImplementComment}
      * 
@@ -448,87 +526,6 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // ===================================================================================
-    //                                                                     Fetch Narrowing
-    //                                                                     ===============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch start index.
-     */
-    public int getFetchNarrowingSkipStartIndex() {
-        return getSqlClause().getFetchNarrowingSkipStartIndex();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch size.
-     */
-    public int getFetchNarrowingLoopCount() {
-        return getSqlClause().getFetchNarrowingLoopCount();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determination.
-     */
-    public boolean isFetchNarrowingSkipStartIndexEffective() {
-        return !getSqlClause().isFetchStartIndexSupported();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determination.
-     */
-    public boolean isFetchNarrowingLoopCountEffective() {
-        return !getSqlClause().isFetchSizeSupported();
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determiantion.
-     */
-    public boolean isFetchNarrowingEffective() {
-        return getSqlClause().isFetchNarrowingEffective();
-    }
-
-    /**
-     * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
-     */
-    public void ignoreFetchNarrowing() {
-        String msg = "This method is unsupported on ConditionBean!";
-        throw new UnsupportedOperationException(msg);
-    }
-
-    /**
-     * Restore ignored fetch narrowing. {INTERNAL METHOD}
-     */
-    public void restoreIgnoredFetchNarrowing() {
-        // Do nothing!
-    }
-
-    /**
-     * Get safety max result size.
-     * 
-     * @return Safety max result size.
-     */
-    public int getSafetyMaxResultSize() {
-        return _safetyMaxResultSize;
-    }
-
-    /**
-     * Check safety result.
-     * 
-     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
-     */
-    public void checkSafetyResult(int safetyMaxResultSize) {
-        this._safetyMaxResultSize = safetyMaxResultSize;
-    }
-
-    // ===================================================================================
     //                                                                        Limit Select
     //                                                                        ============
     /** Is limit-select PK only? */
@@ -577,50 +574,56 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     }
 
     // ===================================================================================
-    //                                                                       Hint Property
-    //                                                                       =============
+    //                                                                        Select Count
+    //                                                                        ============
     /**
-     * Get select-hint. {select [select-hint] * from table...}
+     * Set up various things for select-count-ignore-fetch-scope. {Internal}
+     * This method is for INTERNAL. Don't invoke this!
      * 
-     * @return select-hint. (NotNull)
+     * @return this. (NotNull)
      */
-    public String getSelectHint() {
-        return getSqlClause().getSelectHint();
+    public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
+        _isSelectCountIgnoreFetchScope = true;
+
+        // If the query uses union query, it needs included-select-column.
+        if (!hasUnionQueryOrUnionAllQuery()) {
+            getSqlClause().ignoreIncludedSelectColumn();
+        }
+
+        getSqlClause().ignoreOrderBy();
+        getSqlClause().ignoreFetchScope();
+        return this;
     }
 
     /**
-     * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
+     * Do after-care for select-count-ignore-fetch-scope. {Internal}
+     * This method is for INTERNAL. Don't invoke this!
      * 
-     * @return from-base-table-hint. (NotNull)
+     * @return this. (NotNull)
      */
-    public String getFromBaseTableHint() {
-        return getSqlClause().getFromBaseTableHint();
+    public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope() {
+        _isSelectCountIgnoreFetchScope = false;
+
+        // If the query uses union query, it needs included-select-column.
+        if (!hasUnionQueryOrUnionAllQuery()) {
+            getSqlClause().makeIncludedSelectColumnEffective();
+        }
+
+        getSqlClause().makeOrderByEffective();
+        getSqlClause().makeFetchScopeEffective();
+        return this;
     }
 
-    /**
-     * Get from-hint. {select * from table left outer join ... on ... [from-hint] where ...}
-     * 
-     * @return from-hint. (NotNull)
-     */
-    public String getFromHint() {
-        return getSqlClause().getFromHint();
-    }
+    /** Is set up various things for select-count-ignore-fetch-scope? */
+    protected boolean _isSelectCountIgnoreFetchScope;
 
     /**
-     * Get where clause.
+     * Is set up various things for select-count-ignore-fetch-scope?
+     * This method is for INTERNAL. Don't invoke this!
      * 
-     * @return Where clause. (NotNull)
+     * @return Determination.
      */
-    public String getWhereClause() {
-        return getSqlClause().getWhereClause();
-    }
-
-    /**
-     * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
-     * 
-     * @return Sql-suffix.  (NotNull)
-     */
-    public String getSqlSuffix() {
-        return getSqlClause().getSqlSuffix();
+    public boolean isSelectCountIgnoreFetchScope() {
+        return _isSelectCountIgnoreFetchScope;
     }
 }

@@ -3,10 +3,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
-/// <summary>
-/// The order-by-bean as simple implemetation.
-/// Author: ${database.ClassAuthor}
-/// </summary>
+/**
+ * @deprecated
+ */
 public class ${glSimpleOrderByBeanName} implements ${glOrderByBeanInterfaceName} {
 
     // ===================================================================================

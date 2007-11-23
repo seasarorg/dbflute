@@ -15,9 +15,9 @@ public interface ${glOutsideSqlDaoName} extends ${glDaoReadableInterfaceName} {
     // ===================================================================================
     //                                                                              Select
     //                                                                              ======
-    <ENTITY_TYPE> List<ENTITY_TYPE> selectList(String path, Object pmb, ${glOutsideSqlOptionName} option, Class<ENTITY_TYPE> entityType);
+    <ENTITY> List<ENTITY> selectList(String path, Object pmb, ${glOutsideSqlOptionName} option, Class<ENTITY> entityType);
 
-    <ENTITY_TYPE> Object selectCursor(String path, Object pmb, ${glOutsideSqlOptionName} option, ${glCursorHandlerName} handler);
+    <ENTITY> Object selectCursor(String path, Object pmb, ${glOutsideSqlOptionName} option, ${glCursorHandlerName} handler);
 
     int execute(String path, Object pmb, ${glOutsideSqlOptionName} option);
 

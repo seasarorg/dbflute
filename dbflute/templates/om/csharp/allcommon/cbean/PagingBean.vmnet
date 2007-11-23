@@ -1,120 +1,76 @@
 
 using System;
-using System.Collections;
 using ${glPackageBaseCommonSqlClause};
 
 namespace ${glPackageBaseCommonCBean} {
 
     /// <summary>
-    /// The condition-bean as interface.
+    /// The bean of paging.
     /// Author: ${database.ClassAuthor}
     /// </summary>
     public interface ${glPagingBeanInterfaceName} : ${glFetchNarrowingBeanInterfaceName}, ${glOrderByBeanInterfaceName} {
 
-        // =====================================================================================
-        //                                                                               Advance
-        //                                                                               =======
+        // ===============================================================================
+        //                                                            Paging Determination
+        //                                                            ====================
+        // * * * * * * * *
+        // For SQL Comment
+        // * * * * * * * *
+        bool Paging { get; }
+        void XSetPaging(bool paging);
+
+        // ===============================================================================
+        //                                                                   Fetch Setting
+        //                                                                   =============
         /// <summary>
         /// Fetch first.
-        /// If you invoke this, your SQL returns [fetch-size] records from first.
         /// </summary>
-        /// <param name="fetchSize">Fetch-size. (NotMinus & NotZero)</param>
+        /// <remarks>
+        /// If you invoke this, your SQL returns [fetch-size] records from first.
+        /// </remarks>
+        /// <param name="fetchSize">The size of fetch. (NotMinus & NotZero)</param>
         /// <returns>this. (NotNull)</returns>
         $glPagingBeanInterfaceName FetchFirst(int fetchSize);
 
         /// <summary>
         /// Fetch scope.
-        /// If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
         /// </summary>
-        /// <param name="fetchStartIndex">Fetch-start-index. 0 origin. (NotMinus)</param>
-        /// <param name="fetchSize">Fetch-size. (NotMinus & NotZero)</param>
+        /// <remarks>
+        /// If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
+        /// </remarks>
+        /// <param name="fetchStartIndex">The start index of fetch. 0 origin. (NotMinus)</param>
+        /// <param name="fetchSize">The size of fetch. (NotMinus & NotZero)</param>
         /// <returns>this. (NotNull)</returns>
         $glPagingBeanInterfaceName FetchScope(int fetchStartIndex, int fetchSize);
 
         /// <summary>
         /// Fetch page.
+        /// </summary>
+        /// <remarks>
         /// When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
         /// But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
         /// If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
-        /// </summary>
-        /// <param name="fetchPageNumber">Fetch-page-number. 1 origin. (NotMinus & NotZero)</param>
+        /// </remarks>
+        /// <param name="fetchPageNumber">The page number of fetch. 1 origin. (NotMinus & NotZero)</param>
         /// <returns>this. (NotNull)</returns>
         ${glPagingBeanInterfaceName} FetchPage(int fetchPageNumber);
 
-        // =====================================================================================
-        //                                                                              Property
-        //                                                                              ========
-        /**
-         * Get fetch start index.
-         * 
-         * @return Fetch start index.
-         */
+        // ===============================================================================
+        //                                                                 Paging Property
+        //                                                                 ===============
         int FetchStartIndex { get; }
-
-        /**
-         * Get fetch size.
-         * 
-         * @return Fetch size.
-         */
         int FetchSize { get; }
-
-        /**
-         * Get fetch page number.
-         * 
-         * @return Fetch page number.
-         */
         int FetchPageNumber { get; }
-
-        /**
-         * Get page start index.
-         * 
-         * @return Page start index. 0 origin. (NotMinus)
-         */
         int PageStartIndex { get; }
-
-        /**
-         * Get page end index.
-         * 
-         * @return Page end index. 0 origin. (NotMinus)
-         */
         int PageEndIndex { get; }
-
-        /**
-         * Is fetch scope effective?
-         * 
-         * @return Determination.
-         */
         bool IsFetchScopeEffective { get; }
 
-        // =====================================================================================
-        //                                                                                Clause
-        //                                                                                ======
-	    /**
-	     * Get select-hint.
-	     * 
-	     * @return Select-hint. (NotNull)
-	     */
-	    String SelectHint { get; }
-
-	    /**
-	     * Get from-hint.
-	     * 
-	     * @return From-hint. (NotNull)
-	     */
-	    String FromHint { get; }
-
-	    /**
-	     * Get sql-suffix.
-	     * 
-	     * @return Sql-suffix. (NotNull)
-	     */
-	    String SqlSuffix { get; }
-
-	    /**
-	     * Get order-by clause.
-	     * 
-	     * @return Order-by clause. (NotNull)
-	     */
-	    new String OrderByClause { get; }
+        // ===============================================================================
+        //                                                                   Hint Property
+        //                                                                   =============
+        String SelectHint { get; }
+        String FromHint { get; }
+        String SqlSuffix { get; }
+        new String OrderByClause { get; }
     }
 }

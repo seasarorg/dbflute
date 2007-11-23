@@ -31,41 +31,38 @@ public interface ${glPagingBeanInterfaceName} extends ${glFetchNarrowingBeanInte
     //                                                                       Fetch Setting
     //                                                                       =============
     /**
-     * Fetch first.
+     * Fetch first. <br />
+     * If you invoke this, your SQL returns [fetch-size] records from first. <br />
      * 
-     * If you invoke this, your SQL returns [fetch-size] records from first.
-     * 
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)
+     * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
     public ${glPagingBeanInterfaceName} fetchFirst(int fetchSize);
 
     /**
-     * Fetch scope.
+     * Fetch scope. <br />
+     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index]. <br />
      * 
-     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index].
-     * 
-     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)
+     * @param fetchStartIndex The start index of fetch. 0 origin. (NotMinus)
+     * @param fetchSize The size of fetch. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
     public ${glPagingBeanInterfaceName} fetchScope(int fetchStartIndex, int fetchSize);
 
     /**
-     * Fetch page.
+     * Fetch page. <br />
+     * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. <br />
+     * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'. <br />
+     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number]. <br />
      * 
-     * When you invoke this, it is normally necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that.
-     * But you also can use default-fetch-size without invoking 'fetchFirst()' or 'fetchScope()'.
-     * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
-     * 
-     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
+     * @param fetchPageNumber The page number of fetch. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
     public ${glPagingBeanInterfaceName} fetchPage(int fetchPageNumber);
 
     // ===================================================================================
-    //                                                                     Paging Property
-    //                                                                     ===============
+    //                                                                      Fetch Property
+    //                                                                      ==============
     /**
      * Get fetch-start-index.
      * 

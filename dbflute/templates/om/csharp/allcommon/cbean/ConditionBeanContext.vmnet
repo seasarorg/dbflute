@@ -7,60 +7,30 @@ using System.Threading;
 
 namespace ${glPackageBaseCommonCBean} {
 
-/**
- * Condition-bean context. (referring to s2pager)
- * 
- * @author ${database.ClassAuthor}
- */
     public static class ${glConditionBeanContextName} {
 
-        /** The thread-local for this. */
-        private static LocalDataStoreSlot _conditionBeanBeanSlot = Thread.AllocateDataSlot();
+        private static LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
 
-        /**
-         * Get fetch-narrowing-bean context on thread.
-         * 
-         * @return FetchNarrowing-bean. (Nullable)
-         */
         public static ${glConditionBeanInterfaceName} GetConditionBeanOnThread() {
-            return (${glConditionBeanInterfaceName})Thread.GetData(_conditionBeanBeanSlot);
+            return (${glConditionBeanInterfaceName})Thread.GetData(_slot);
         }
 
-        /**
-         * Set fetch-narrowing-bean context on thread.
-         * 
-         * @param ${glAttachedCBArgsVariableName} FetchNarrowing-bean. (NotNull)
-         */
         public static void SetConditionBeanOnThread(${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName}) {
             if (${glAttachedCBArgsVariableName} == null) {
                 String msg = "The argument[${glAttachedCBArgsVariableName}] must not be null.";
                 throw new ArgumentNullException(msg);
             }
-            Thread.SetData(_conditionBeanBeanSlot, ${glAttachedCBArgsVariableName});
+            Thread.SetData(_slot, ${glAttachedCBArgsVariableName});
         }
 
-        /**
-         * Clear fetch-narrowing-bean context on thread.
-         */
         public static void ClearConditionBeanOnThread() {
-            Thread.SetData(_conditionBeanBeanSlot, null);
+            Thread.SetData(_slot, null);
         }
 
-        /**
-         * Is existing fetch-narrowing-bean context on thread?
-         * 
-         * @return Determination.
-         */
         public static bool IsExistConditionBeanOnThread() {
-            return (Thread.GetData(_conditionBeanBeanSlot) != null);
+            return (Thread.GetData(_slot) != null);
         }
 
-        /**
-         * Is the argument condition-bean?
-         * 
-         * @param dtoInstance Dto instance.
-         * @return Determination.
-         */
         public static bool IsTheArgumentConditionBean(Object dtoInstance) {
             if (dtoInstance is ${glConditionBeanInterfaceName}) {
                 return true;
@@ -69,18 +39,94 @@ namespace ${glPackageBaseCommonCBean} {
             }
         }
 
-        /**
-         * Is the type condition-bean?
-         * 
-         * @param dtoClass DtoClass.
-         * @return Determination.
-         */
         public static bool IsTheTypeConditionBean(Type dtoType) {
             if (typeof(${glConditionBeanInterfaceName}).IsAssignableFrom(dtoType)) {
                 return true;
             } else {
                 return false;
             }
+        }
+
+        // ===================================================================================
+        //                                                                  Exception Handling
+        //                                                                  ==================
+        public static void ThrowEntityAlreadyDeletedException(Object searchKey4log) {
+            ThrowEntityAlreadyDeletedException(searchKey4log, null, null);
+        }
+
+        public static void ThrowEntityAlreadyDeletedException(Object searchKey4log, Object latestSqlProvider, String tableDbName) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The entity was Not Found! it has already been deleted!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm the existence of your target record on your database." + GetLineSeparator();
+            msg = msg + "Does the target record really created before this operation?" + GetLineSeparator();
+            msg = msg + "Has the target record been deleted by other thread?" + GetLineSeparator();
+            msg = msg + "It is precondition that the record exists on your database." + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Search Condition]" + GetLineSeparator() + searchKey4log + GetLineSeparator();
+            String dispalySql = GetDisplaySqlForExceptionMessage(latestSqlProvider, tableDbName);
+            if (dispalySql != null) {
+                msg = msg + GetLineSeparator();
+                msg = msg + "[Executed SQL for Display]" + GetLineSeparator() + dispalySql + GetLineSeparator();
+            }
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+        }
+
+        public static void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {
+            ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause, null, null);
+        }
+
+        public static void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause, Object latestSqlProvider, String tableDbName) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The entity was Too Many! it has been duplicated. It should be the only one! But the resultCount=" + resultCountString + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm your search condition. Does it really select the only one?" + GetLineSeparator();
+            msg = msg + "Please confirm your database. Does it really exist the only one?" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Search Condition]" + GetLineSeparator() + searchKey4Log + GetLineSeparator();
+            String dispalySql = GetDisplaySqlForExceptionMessage(latestSqlProvider, tableDbName);
+            if (dispalySql != null) {
+                msg = msg + GetLineSeparator();
+                msg = msg + "[Executed SQL for Display]" + GetLineSeparator() + dispalySql + GetLineSeparator();
+            }
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            if (cause != null) {
+                throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg, cause);
+            } else {
+                throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+            }
+        }
+
+        private static String GetDisplaySqlForExceptionMessage(Object latestSqlProvider, String tableDbName) {
+            return null;
+            //if (latestSqlProvider == null) {
+            //    return null;
+            // }
+            // TODO: @jflute -- I expect that S2Dao supports latestSqlProvider.
+            // String displaySql = latestSqlProvider.GetDisplaySql();
+            // if (displaySql == null || displaySql.Trim().Length() == 0) {
+            //     return null;
+            // }
+            // if (displaySql.IndexOf(GetLineSeparator()) >= 0) {
+            //     return displaySql;
+            // }
+            // int basePointIndex = displaySql.IndexOf(" from " + tableDbName);
+            // if (basePointIndex < 0) {
+            //     return displaySql;
+            // }
+            // return displaySql.Substring(0, basePointIndex) + GetLineSeparator() + " " + displaySql.Substring(basePointIndex);
+        }
+
+        // ===================================================================================
+        //                                                                              Helper
+        //                                                                              ======
+        private static String GetLineSeparator() {
+            return Environment.NewLine;
         }
     }
 }

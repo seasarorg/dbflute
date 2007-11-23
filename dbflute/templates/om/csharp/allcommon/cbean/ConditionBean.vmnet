@@ -11,17 +11,17 @@ namespace ${glPackageBaseCommonCBean} {
     /// </summary>
     public interface ${glConditionBeanInterfaceName} : ${glPagingBeanInterfaceName} {
 
-        // =====================================================================================
-        //                                                                            Table Name
-        //                                                                            ==========
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
         /// <summary>
         /// Get the value of tableName. (readonly)
         /// </summary>
         String TableDbName { get; }
 
-        // =====================================================================================
-        //                                                                             SqlClause
-        //                                                                             =========
+        // ===============================================================================
+        //                                                                       SqlClause
+        //                                                                       =========
         /**
          * Get sql-clause instance.
          * 
@@ -36,42 +36,18 @@ namespace ${glPackageBaseCommonCBean} {
          */
         String GetClause();
 
-        // =====================================================================================
-        //                                                                                 Query
-        //                                                                                 =====
+        // ===============================================================================
+        //                                                                           Query
+        //                                                                           =====
         /// <summary>
         /// The property of condition-query as inteface.
         /// </summary>
         /// <returns>Instance of condition-query. (NotNull)</returns>
         ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
 
-	    // =====================================================================================
-	    //                                                                          Limit Select
-	    //                                                                          ============
-	    /**
-	     * Is limit-select PK only?
-	     * 
-	     * @return Determination.
-	     */
-	    bool IsLimitSelect_PKOnly();
-
-	    /**
-	     * Limit select PK only.
-	     *
-	     * @return this. (NotNull)
-	     */
-	    ${glConditionBeanInterfaceName} LimitSelect_PKOnly();
-
-	    /**
-	     * Limit select off.
-	     *
-	     * @return this. (NotNull)
-	     */
-	    ${glConditionBeanInterfaceName} LimitSelect_Off();
-
-        // =====================================================================================
-        //                                                                               OrderBy
-        //                                                                               =======
+        // ===============================================================================
+        //                                                                 OrderBy Setting
+        //                                                                 ===============
         /**
          * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
          * 
@@ -86,44 +62,40 @@ namespace ${glPackageBaseCommonCBean} {
          */
         ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc();
 
-        // =====================================================================================
-        //                                                                               Advance
-        //                                                                               =======
-	    /**
-	     * Lock for update.
-	     * <p>
-	     * If you invoke this, your SQL lock target records for update.
-	     * It depends whether this method supports this on the database type.
-	     * 
-	     * @return this. (NotNUll)
-	     */
+        // ===============================================================================
+        //                                                                    Limit Select
+        //                                                                    ============
+        /**
+         * Is limit-select PK only?
+         * 
+         * @return Determination.
+         */
+        bool IsLimitSelect_PKOnly();
+
+        /**
+         * Limit select PK only.
+         *
+         * @return this. (NotNull)
+         */
+        ${glConditionBeanInterfaceName} LimitSelect_PKOnly();
+
+        /**
+         * Limit select off.
+         *
+         * @return this. (NotNull)
+         */
+        ${glConditionBeanInterfaceName} LimitSelect_Off();
+
+        // ===============================================================================
+        //                                                                    Lock Setting
+        //                                                                    ============
         $glConditionBeanInterfaceName LockForUpdate();
 
-	    // ------------------------------
-	    //                   for Internal
-	    //                   ------------
-	    /**
-	     * Set up various things for select-count-ignore-fetch-scope.
-	     * This method is for INTERNAL. Don't invoke this!
-	     * 
-	     * @return this. (NotNull)
-	     */
-	    ${glConditionBeanInterfaceName} SetupSelectCountIgnoreFetchScope();
-
-	    /**
-	     * Do after-care for select-count-ignore-fetch-scope.
-	     * This method is for INTERNAL. Don't invoke this!
-	     * 
-	     * @return this. (NotNull)
-	     */
-	    ${glConditionBeanInterfaceName} AfterCareSelectCountIgnoreFetchScope();
-
-	    /**
-	     * Is set up various things for select-count-ignore-fetch-scope?
-	     * This method is for INTERNAL. Don't invoke this!
-	     * 
-	     * @return Determination.
-	     */
-	    bool IsSelectCountIgnoreFetchScope();
+        // ===============================================================================
+        //                                                                    Select Count
+        //                                                                    ============
+        ${glConditionBeanInterfaceName} XSetupSelectCountIgnoreFetchScope();
+        ${glConditionBeanInterfaceName} XAfterCareSelectCountIgnoreFetchScope();
+        bool IsSelectCountIgnoreFetchScope();
     }
 }

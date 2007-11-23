@@ -78,17 +78,25 @@ namespace ${glPackageBaseCommonBhv} {
 
         public ${glListResultBeanName}<${glEntityInterfaceName}> ReadList(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
-            return new ResultBeanBuilder<${glEntityInterfaceName}>(this).BuildListResultBean(cb, this.CallReadList(cb));
+            return new ResultBeanBuilder<${glEntityInterfaceName}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
         }
 
         public ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb) {
             AssertConditionBeanNotNull(cb);
-            return this.ReadPage(cb, new SelectPageSimpleInvoker<${glEntityInterfaceName}>(this));
+            PagingInvoker<${glEntityInterfaceName}> invoker = new PagingInvoker<${glEntityInterfaceName}>(TableDbName);
+            return invoker.InvokePaging(new InternalReadPagingHandler(this, cb));
         }
 
-        public ${glPagingResultBeanName}<${glEntityInterfaceName}> ReadPage(${glConditionBeanInterfaceName} cb, SelectPageInvoker<${glEntityInterfaceName}> invoker) {
-            AssertConditionBeanNotNull(cb);
-            return invoker.InvokeSelectPage(new SelectPageSimpleCallback<${glEntityInterfaceName}>(cb, this));
+        private class InternalReadPagingHandler : ${glPagingHandlerName}<${glEntityInterfaceName}> {
+            protected ${glBehaviorReadableInterfaceName} _bhv;
+            protected ${glConditionBeanInterfaceName} _cb;
+            public InternalReadPagingHandler(${glBehaviorReadableInterfaceName} bhv, ${glConditionBeanInterfaceName} cb) {
+                _bhv = bhv;
+                _cb = cb;
+            }
+            public ${glPagingBeanInterfaceName} PagingBean { get { return _cb; } }
+            public int Count() { return _bhv.ReadCount(_cb); }
+            public IList<${glEntityInterfaceName}> Paging() { return _bhv.ReadList(_cb); }
         }
 
         // -------------------------------------------------

@@ -1,0 +1,74 @@
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
+
+namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
+
+    public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected ${glOutsideSqlDaoName} _outsideSqlDao;
+
+        protected ${glOutsideSqlOptionName} _outsideSqlOption;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glOutsideSqlEntityExecutorName}(${glOutsideSqlDaoName} outsideSqlDao, ${glOutsideSqlOptionName} outsideSqlOption) {
+            this._outsideSqlDao = outsideSqlDao;
+            this._outsideSqlOption = outsideSqlOption;
+        }
+
+        // ===============================================================================
+        //                                                                          Select
+        //                                                                          ======
+        public ENTITY SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb, Type entityType) {
+            IList<ENTITY> ls = _outsideSqlDao.SelectList<ENTITY>(path, pmb, _outsideSqlOption, entityType);
+            if (ls.Count == 0) {
+                return default(ENTITY);
+            }
+            if (ls.Count > 1) {
+                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+                ThrowEntityDuplicatedException(ls.Count + "", searchKey4Log, null);
+            }
+            return ls[0];
+        }
+
+        public ENTITY SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb, Type entityType) {
+            IList<ENTITY> ls = _outsideSqlDao.SelectList<ENTITY>(path, pmb, _outsideSqlOption, entityType);
+            if (ls == null || ls.Count == 0) {
+                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+                ThrowEntityAlreadyDeletedException(searchKey4Log);
+            }
+            if (ls.Count > 1) {
+                String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
+                ThrowEntityDuplicatedException(ls.Count + "", searchKey4Log, null);
+            }
+            return ls[0];
+        }
+
+        // -------------------------------------------------
+        //                                            Helper
+        //                                            ------
+        protected void ThrowEntityAlreadyDeletedException(Object searchKey4Log) {
+            ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log);
+        }
+
+        protected void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {
+            ${glConditionBeanContextName}.ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+        }
+
+        // ===============================================================================
+        //                                                                          Option
+        //                                                                          ======
+        public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> DynamicBinding() {
+            _outsideSqlOption.DynamicBinding();
+            return this;
+        }
+    }
+}

@@ -1,19 +1,29 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 
 /**
- * The simple paging-bean.
+ * The simple pagingBean.
  * 
  * @author ${database.ClassAuthor}
  */
-public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implements ${glPagingBeanInterfaceName} {
+public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, ${glMapParameterBeanInterfaceName} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** SQL clause instance. */
+    protected final ${glSqlClauseName} _sqlClause;
+    {
+        _sqlClause = ${glConditionBeanContextName}.createSqlClause("Dummy");
+    }
+
+    /** The map of parameter. (Nullable) */
+    protected Map<String, Object> _parameterMap;
+
     /** Safety max result size. */
     protected int _safetyMaxResultSize;
 
@@ -27,8 +37,11 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
     protected Map<String, Object> _map;
 
     // ===================================================================================
-    //                                                                Paging Determination
-    //                                                                ====================
+    //                                                        Implementation of PagingBean
+    //                                                        ============================
+    // -----------------------------------------------------
+    //                                  Paging Determination
+    //                                  --------------------
     // * * * * * * * *
     // For SQL Comment
     // * * * * * * * *
@@ -55,9 +68,9 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
         this._paging = paging;
     }
 
-    // ===================================================================================
-    //                                                                       Fetch Setting
-    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Fetch Setting
+    //                                         -------------
     /**
      * Fetch first.
      * <pre>
@@ -100,9 +113,9 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
         return this;
     }
 
-    // ===================================================================================
-    //                                                                     Paging Property
-    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                        Fetch Property
+    //                                        --------------
     /**
      * ${database.ImplementComment}
      * 
@@ -157,9 +170,9 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
         return getSqlClause().isFetchScopeEffective();
     }
 
-    // ===================================================================================
-    //                                                                       Hint Property
-    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Hint Property
+    //                                         -------------
     /**
      * Get select-hint. {select [select-hint] * from table...}
      * 
@@ -197,8 +210,8 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
     }
 
     // ===================================================================================
-    //                                                                     Fetch Narrowing
-    //                                                                     ===============
+    //                                                Implementation of FetchNarrowingBean
+    //                                                ====================================
     /**
      * Get fetch-narrowing start-index.
      * 
@@ -268,8 +281,103 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
     }
 
     // ===================================================================================
-    //                                                                     Select Resource
-    //                                                                     ===============
+    //                                                       Implementation of OrderByBean
+    //                                                       =============================
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql component of order-by clause. (NotNull)
+     */
+    public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
+        return getSqlClause().getSqlComponentOfOrderByClause();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Order-by clause. (NotNull)
+     */
+    public String getOrderByClause() {
+        return getSqlClause().getOrderByClause();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} clearOrderBy() {
+        getSqlClause().clearOrderBy();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} ignoreOrderBy() {
+        getSqlClause().ignoreOrderBy();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} makeOrderByEffective() {
+        getSqlClause().makeOrderByEffective();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} registerOrderByAsc(String orderByProperty) {
+        getSqlClause().registerOrderBy(orderByProperty, orderByProperty, true);
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} registerOrderByDesc(String orderByProperty) {
+        getSqlClause().registerOrderBy(orderByProperty, orderByProperty, false);
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByAsc(String orderByProperty) {
+        getSqlClause().reverseOrderBy_Or_OverrideOrderBy(orderByProperty, orderByProperty, true);
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByDesc(String orderByProperty) {
+        getSqlClause().reverseOrderBy_Or_OverrideOrderBy(orderByProperty, orderByProperty, false);
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                    Implementation of SelectResource
+    //                                                    ================================
     /**
      * Check safety result.
      * 
@@ -280,20 +388,28 @@ public class ${glSimplePagingBeanName} extends ${glSimpleOrderByBeanName} implem
     }
 
     // ===================================================================================
-    //                                                                       Parameter Map
-    //                                                                       =============
-    public Map<String, Object> getMap() {
-        if (_map == null) {
-            _map = new HashMap<String, Object>();
-        }
-        return _map;
+    //                                                  Implementation of MapParameterBean
+    //                                                  ==================================
+    /**
+     * Get the map of parameter.
+     * 
+     * @return The map of parameter. (Nullable)
+     */
+    public Map<String, Object> getParameterMap() {
+        return _parameterMap;
     }
 
-    public void addToMap(String key, Object value) {
-        if (_map == null) {
-            _map = new HashMap<String, Object>();
+    /**
+     * Add the parameter to the map.
+     * 
+     * @param key The key of parameter. (NotNull)
+     * @param value The value of parameter. (Nullable)
+     */
+    public void addParameter(String key, Object value) {
+        if (_parameterMap == null) {
+            _parameterMap = new LinkedHashMap<String, Object>();
         }
-        _map.put(key, value);
+        _parameterMap.put(key, value);
     }
 
     // ===================================================================================

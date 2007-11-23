@@ -7,10 +7,10 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 /**
  * The cursor executor of outside-sql.
  * 
- * @param <PARAMETER_BEAN_TYPE> The type of parameter-bean.
+ * @param <PARAMETER_BEAN> The type of parameter-bean.
  * @author ${database.ClassAuthor}
  */
-public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN_TYPE> {
+public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -30,14 +30,14 @@ public class ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN_TYPE> {
     // ===================================================================================
     //                                                                              Select
     //                                                                              ======
-    public Object selectCursor(String path, PARAMETER_BEAN_TYPE pmb, ${glCursorHandlerName} handler) {
+    public Object selectCursor(String path, PARAMETER_BEAN pmb, ${glCursorHandlerName} handler) {
         return _outsideSqlDao.selectCursor(path, pmb, _outsideSqlOption, handler);
     }
 
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN_TYPE> dynamicBinding() {
+    public ${glOutsideSqlCursorExecutorName}<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
     }

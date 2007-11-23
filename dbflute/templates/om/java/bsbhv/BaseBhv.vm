@@ -14,6 +14,8 @@ import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
 #end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
+import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
+import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
@@ -274,7 +276,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${glListResultBeanName}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        return new ResultBeanBuilder<${myExtendedObjectClassName}>(this).buildListResultBean(cb, delegateSelectList(cb));
+        return new ${glPackageBaseCommonCBean}.${glResultBeanBuilderName}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
     }
 
     /**
@@ -285,18 +287,15 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      */
     public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
         assertConditionBeanNotNull(cb);
-        final SelectPageInvoker<${myExtendedObjectClassName}> invoker = createDefaultSelectPageInvoker();
-        final SelectPageCallback<${myExtendedObjectClassName}> callback = new SelectPageCallback<${myExtendedObjectClassName}>() {
+        final ${glPagingInvokerName}<${myExtendedObjectClassName}> invoker = new ${glPagingInvokerName}<${myExtendedObjectClassName}>(getTableDbName());
+        final ${glPagingHandlerName}<${myExtendedObjectClassName}> handler = new ${glPagingHandlerName}<${myExtendedObjectClassName}>() {
             public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
-            public int selectCountIgnoreFetchScope() { return selectCount(cb); }
-            public List<${myExtendedObjectClassName}> selectListWithFetchScope() { return selectList(cb); }
+            public int count() { return selectCount(cb); }
+            public List<${myExtendedObjectClassName}> paging() { return selectList(cb); }
         };
-        return invoker.invokeSelectPage(callback);
+        return invoker.invokePaging(handler);
     }
-
-    protected SelectPageInvoker<${myExtendedObjectClassName}> createDefaultSelectPageInvoker() {
-        return new SelectPageSimpleInvoker<${myExtendedObjectClassName}>(this);
-    }
+#if ($database.isMakeRecentlyDeprecated())
 
     /**
      * Select the page as result-bean.
@@ -315,6 +314,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         };
         return invoker.invokeSelectPage(pageCallback);
     }
+#end
 
     // ===================================================================================
     //                                                                      Various Select

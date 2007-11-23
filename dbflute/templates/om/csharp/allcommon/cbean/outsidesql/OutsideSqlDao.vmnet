@@ -1,0 +1,23 @@
+
+using System;
+using System.Collections.Generic;
+
+using ${glPackageBaseCommon};
+using ${glPackageBaseCommonJdbc};
+
+namespace ${glPackageBaseCommonCBeanOutsidesql} {
+
+    public interface ${glOutsideSqlDaoName} : ${glDaoReadableInterfaceName} {
+
+        // ===================================================================================
+        //                                                                              Select
+        //                                                                              ======
+        IList<ENTITY> SelectList<ENTITY>(String path, Object pmb, ${glOutsideSqlOptionName} option, Type entityType);
+
+        Object SelectCursor(String path, Object pmb, ${glOutsideSqlOptionName} option, ${glCursorHandlerName} handler);
+
+        int Execute(String path, Object pmb, ${glOutsideSqlOptionName} option);
+
+        // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOptionName} option);
+    }
+}
