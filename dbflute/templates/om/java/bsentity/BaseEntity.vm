@@ -332,11 +332,20 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
 
     /**
-     * Trace foreign entity (for read) of ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * Same as look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(). This method will be deprecated at the future.
      * 
-     * @return The entity of foreign table. (NotNull: If the object is nul, it returns new empty entity as read-only.)
+     * @return The entity of foreign table. (NotNull: If the object is null, it returns new empty entity as read-only.)
      */
     public ${glPackageExtendedEntity}.${foreignEntityClassName} trace${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+        return look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}();
+    }
+
+    /**
+     * Look the foreign entity (for read) of ${foreignKeys.foreignJavaBeansRulePropertyName}.
+     * 
+     * @return The entity of foreign table. (NotNull: If the object is null, it returns new empty entity as read-only.)
+     */
+    public ${glPackageExtendedEntity}.${foreignEntityClassName} look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName} != null ? ${foreignVariableName} : new ${glPackageExtendedEntity}.${foreignEntityClassName}();
     }
   #set ($foreignKeysIndex = $foreignKeysIndex + 1)
@@ -447,6 +456,24 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     }
 
     /**
+     * Same as look${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}(). This method will be deprecated at the future.
+     * 
+     * @return The entity of referer-as-one table. (NotNull: If the object is null, it returns new empty entity as read-only.)
+     */
+    public ${reffererEntityLongClassName} trace${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+        return look${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}();
+    }
+
+    /**
+     * Look the referer-as-one entity (for read) of ${refferer.refererJavaBeansRulePropertyNameAsOne}.
+     * 
+     * @return The entity of referer-as-one table. (NotNull: If the object is null, it returns new empty entity as read-only.)
+     */
+    public ${reffererEntityLongClassName} look${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+        return get${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() != null ? get${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() : new ${reffererEntityLongClassName}();
+    }
+
+    /**
      * Has foreign instance of ${refferer.reffererPropertyNameAsOne}.
      * 
      * @return Determination.
@@ -464,15 +491,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return hasForeignInstance${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}();
     }
 #end
-
-    /**
-     * Trace relation object (for read) of ${refferer.refererJavaBeansRulePropertyNameAsOne}.
-     * 
-     * @return The entity of referer-as-one table. (NotNull: If the object is nul, it returns new empty entity as read-only.)
-     */
-    public ${reffererEntityLongClassName} trace${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
-        return get${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() != null ? get${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}() : new ${reffererEntityLongClassName}();
-    }
 #end
 #end
 

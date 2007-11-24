@@ -330,12 +330,13 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
         getSqlClause().makeOrderByEffective();
         return this;
     }
-
+#if ($database.isMakeRecentlyDeprecated())
     /**
      * ${database.ImplementComment}
      * 
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @return this. (NotNull)
+     * @deprecated
      */
     public ${glOrderByBeanInterfaceName} registerOrderByAsc(String orderByProperty) {
         getSqlClause().registerOrderBy(orderByProperty, orderByProperty, true);
@@ -347,6 +348,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * 
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @return this. (NotNull)
+     * @deprecated
      */
     public ${glOrderByBeanInterfaceName} registerOrderByDesc(String orderByProperty) {
         getSqlClause().registerOrderBy(orderByProperty, orderByProperty, false);
@@ -358,6 +360,7 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * 
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @return this. (NotNull)
+     * @deprecated
      */
     public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByAsc(String orderByProperty) {
         getSqlClause().reverseOrderBy_Or_OverrideOrderBy(orderByProperty, orderByProperty, true);
@@ -369,12 +372,13 @@ public class ${glSimplePagingBeanName} implements ${glPagingBeanInterfaceName}, 
      * 
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @return this. (NotNull)
+     * @deprecated
      */
     public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByDesc(String orderByProperty) {
         getSqlClause().reverseOrderBy_Or_OverrideOrderBy(orderByProperty, orderByProperty, false);
         return this;
     }
-
+#end
     // ===================================================================================
     //                                                    Implementation of SelectResource
     //                                                    ================================

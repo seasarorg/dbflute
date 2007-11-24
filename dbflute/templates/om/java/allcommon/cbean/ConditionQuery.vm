@@ -23,15 +23,15 @@ public interface ${glConditionQueryInterfaceName} {
     /**
      * Get real alias name(that has nest level mark).
      * 
-     * @return Real alias name.
+     * @return Real alias name. (NotNull)
      */
     public String getRealAliasName();
 
     /**
      * Get real column name(with real alias name).
      * 
-     * @param columnName Column name without alias name.
-     * @return Real column name.
+     * @param columnName Column name without alias name. (NotNull)
+     * @return Real column name. (NotNull)
      */
     public String getRealColumnName(String columnName);
 
@@ -78,8 +78,28 @@ public interface ${glConditionQueryInterfaceName} {
      */
     public boolean isBaseQuery(${glConditionQueryInterfaceName} query);
 
+    /**
+     * Get the property name of foreign.
+     * 
+     * @return The property name of foreign. (NotNull)
+     */
     public String getForeignPropertyName();
 
+#if ($database.isMakeRecentlyDeprecated())
+    // ===================================================================================
+    //                                                                       Foregin Query
+    //                                                                       =============
+    /**
+     * Get the conditionQuery of foreign contains referer-as-one.
+     * 
+     * @param foreignPropertyName The property name of foreign. (NotNull and NotEmpty and Both OK -- InitCap or not)
+     * @return The conditionQuery of foreign. (NotNull)
+     * @deprecated
+     */
+    public ${glConditionQueryInterfaceName} getForeignConditionQuery(String foreignPropertyName);
+#end
+
+#if ($database.isMakeRecentlyDeprecated())
     // ===================================================================================
     //                                                                              Invoke
     //                                                                              ======
@@ -88,6 +108,7 @@ public interface ${glConditionQueryInterfaceName} {
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
      * @return Condition-value. (NotNull)
+     * @deprecated
      */
     public ${glConditionValueName} invokeGetter(String columnMultiName);
 
@@ -96,6 +117,7 @@ public interface ${glConditionQueryInterfaceName} {
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
      * @param value Value. (Nullable)
+     * @deprecated
      */
     public void invokeSetterEqual(String columnMultiName, Object value);
 
@@ -104,6 +126,7 @@ public interface ${glConditionQueryInterfaceName} {
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
      * @param value Value. (Nullable)
+     * @deprecated
      */
     public void invokeSetterNotEqual(String columnMultiName, Object value);
 
@@ -112,6 +135,7 @@ public interface ${glConditionQueryInterfaceName} {
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
      * @param value Value. (Nullable)
+     * @deprecated
      */
     public void invokeSetterGreaterThan(String columnMultiName, Object value);
 
@@ -120,6 +144,7 @@ public interface ${glConditionQueryInterfaceName} {
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
      * @param value Value. (Nullable)
+     * @deprecated
      */
     public void invokeSetterLessThan(String columnMultiName, Object value);
 
@@ -128,6 +153,7 @@ public interface ${glConditionQueryInterfaceName} {
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
      * @param value Value. (Nullable)
+     * @deprecated
      */
     public void invokeSetterGreaterEqual(String columnMultiName, Object value);
 
@@ -136,6 +162,7 @@ public interface ${glConditionQueryInterfaceName} {
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
      * @param value Value. (Nullable)
+     * @deprecated
      */
     public void invokeSetterLessEqual(String columnMultiName, Object value);
 
@@ -143,6 +170,7 @@ public interface ${glConditionQueryInterfaceName} {
      * Invoke add order-by asc.
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @deprecated
      */
     public void invokeAddOrderByAsc(String columnMultiName);
 
@@ -150,17 +178,8 @@ public interface ${glConditionQueryInterfaceName} {
      * Invoke add order-by desc.
      * 
      * @param columnMultiName Column multi name. (NotNull and NotEmpty)
+     * @deprecated
      */
     public void invokeAddOrderByDesc(String columnMultiName);
-
-    // ===================================================================================
-    //                                                                       Foregin Query
-    //                                                                       =============
-    /**
-     * Get foreign condition query contains referer-as-one.
-     * 
-     * @param foreignPropertyName Foreign property name. (NotNull and NotEmpty and Both OK -- InitCap or not)
-     * @return Foreign condition-query. (NotNull)
-     */
-    public ${glConditionQueryInterfaceName} getForeignConditionQuery(String foreignPropertyName);
+#end
 }

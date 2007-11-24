@@ -205,6 +205,10 @@ namespace ${myExtendedEntityPackageName} {
             set { ${foreignVariableName} = value; }
         }
 
+        public ${glPackageExtendedEntity}.${foreignEntityClassName} Look${foreignKeys.foreignPropertyNameInitCap}() {
+            return ${foreignVariableName} != null ? ${foreignVariableName} : new ${glPackageExtendedEntity}.${foreignEntityClassName}();
+        }
+
         public bool HasForeignInstance${foreignKeys.foreignPropertyNameInitCap} {
             get { return ${foreignVariableName} != null; }
         }
@@ -269,6 +273,10 @@ namespace ${myExtendedEntityPackageName} {
                 ls.Add(value);
                 ${reffererVariableName} = ls;
             }
+        }
+
+        public ${glPackageExtendedEntity}.${foreignEntityClassName} Look${refferer.reffererPropertyNameInitCapAsOne}() {
+            return ${refferer.reffererPropertyNameInitCapAsOne} != null ? ${refferer.reffererPropertyNameInitCapAsOne} : new ${reffererEntityClassName}();
         }
 
         public bool HasForeignInstance${refferer.reffererPropertyNameInitCapAsOne} {

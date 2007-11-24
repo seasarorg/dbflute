@@ -40,13 +40,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                                          Foreign Info
     //                                          ------------
-    /** Foreign property name. */
+    /** The property name of foreign. */
     protected String _foreignPropertyName;
 
-    /** Relation Path. */
+    /** The path of relation. */
     protected String _relationPath;
 
-    /** Child query. */
+    /** The query of child. */
     protected final ${glConditionQueryInterfaceName} _childQuery;
 
     // ===================================================================================
@@ -478,7 +478,37 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
         return fixedCondition;
     }
-
+#if ($database.isMakeRecentlyDeprecated())
+    // ===================================================================================
+    //                                                                       Foreign Query
+    //                                                                       =============
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param foreignPropertyName Foreign property name. (NotNull and NotEmpty and Both OK -- InitCap or not)
+     * @return The conditionQuery of foreign. (NotNull)
+     * @deprecated
+     */
+    public ${glConditionQueryInterfaceName} getForeignConditionQuery(String foreignPropertyName) {
+        final String methodName = "query" + foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glConditionQueryInterfaceName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+#end
+#if ($database.isMakeRecentlyDeprecated())
     // ===================================================================================
     //                                                                              Invoke
     //                                                                              ======
@@ -487,6 +517,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * 
      * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
      * @return Condition-value. (NotNull)
+     * @deprecated
      */
     public ${glConditionValueName} invokeGetter(String columnFlexibleName) {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
@@ -510,27 +541,56 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @param value Value.
+     * @deprecated
+     */
     public void invokeSetterEqual(String columnFlexibleName, Object value) {
         invokeSetter(columnFlexibleName, value, "equal");
     }
 
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @param value Value.
+     * @deprecated
+     */
     public void invokeSetterNotEqual(String columnFlexibleName, Object value) {
         invokeSetter(columnFlexibleName, value, "notEqual");
     }
 
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @param value Value.
+     * @deprecated
+     */
     public void invokeSetterGreaterThan(String columnFlexibleName, Object value) {
         invokeSetter(columnFlexibleName, value, "greaterThan");
     }
 
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @param value Value.
+     * @deprecated
+     */
     public void invokeSetterLessThan(String columnFlexibleName, Object value) {
         invokeSetter(columnFlexibleName, value, "lessThan");
     }
 
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @param value Value.
+     * @deprecated
+     */
     public void invokeSetterGreaterEqual(String columnFlexibleName, Object value) {
         invokeSetter(columnFlexibleName, value, "greaterEqual");
     }
 
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @param value Value.
+     * @deprecated
+     */
     public void invokeSetterLessEqual(String columnFlexibleName, Object value) {
         invokeSetter(columnFlexibleName, value, "lessEqual");
     }
@@ -583,10 +643,18 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @deprecated
+     */
     public void invokeAddOrderByAsc(String columnFlexibleName) {
         invokeOrderBy(columnFlexibleName, true);
     }
 
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @deprecated
+     */
     public void invokeAddOrderByDesc(String columnFlexibleName) {
         invokeOrderBy(columnFlexibleName, false);
     }
@@ -618,35 +686,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             throw new RuntimeException(e.getCause());
         }
     }
-
-    // ===================================================================================
-    //                                                                       Foreign Query
-    //                                                                       =============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param foreignPropertyName Foreign property name. (NotNull and NotEmpty and Both OK -- InitCap or not)
-     * @return Foreign condition-query. (NotNull)
-     */
-    public ${glConditionQueryInterfaceName} getForeignConditionQuery(String foreignPropertyName) {
-        final String methodName = "query" + foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            return (${glConditionQueryInterfaceName})method.invoke(this, new Object[]{});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
-    }
-
+#end
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======

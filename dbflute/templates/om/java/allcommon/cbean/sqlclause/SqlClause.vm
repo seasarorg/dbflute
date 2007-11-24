@@ -18,16 +18,6 @@ public interface ${myClassName} {
     public static final String INCLUDE_SELECT_CLAUSE_MARK = "/* df:includeSelectClause */";
 
     // =====================================================================================
-    //                                                        Select Clause Column Alias Map
-    //                                                        ==============================
-    public void setSelectClauseColumnAliasMap(java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap);
-
-    // =====================================================================================
-    //                                                            Where Clause Simple Filter
-    //                                                            ==========================
-    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
-
-    // =====================================================================================
     //                                                                                Clause
     //                                                                                ======
     /**
@@ -41,14 +31,14 @@ public interface ${myClassName} {
      * # for update
      * </pre>
      *
-     * @return Clause string. (NotNull)
+     * @return The clause of all resources. (NotNull)
      */
     public String getClause();
 
     /**
-     * Get clause string without included and orderby and sqlsuffix.
+     * Get the clause without includedSelectColumn and orderBy and sqlSuffix.
      * 
-     * @return Clause string. (NotNull)
+     * @return The clause without 'includedSelectColumn' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
     public String getClauseWithoutIncludedOrderBySqlSuffix();
 
@@ -58,35 +48,35 @@ public interface ${myClassName} {
     /**
      * Get select-hint. This is an internal method.
      * 
-     * @return select-hint. {select [select-hint] * from table...} (NotNull)
+     * @return The hint of select. {select [select-hint] * from table...} (NotNull)
      */
     public String getSelectHint();
 
     /**
      * Get included-select-column clause. This is an internal method.
      * 
-     * @return Included-select-column clause. {select ... , [included-select-column clause] from table...} (NotNull)
+     * @return The clause of includedSelectColumn. {select ... , [included-select-column clause] from table...} (NotNull)
      */
     public String getIncludedSelectColumnClause();
 
     /**
      * Get from clause. {from table left outer join foreign-table on ...}
      * 
-     * @return From clause. (NotNull)
+     * @return The clause of from. (NotNull)
      */
     public String getFromClause();
 
     /**
      * Get from-base-table-hint. This is an internal method.
      * 
-     * @return from-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+     * @return The hint of fromBaseTable. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     public String getFromBaseTableHint();
 
     /**
      * Get from-hint. This is an internal method.
      * 
-     * @return from-hint. {select * from table left outer join ... on ... [from-hint] where ...} (NotNull)
+     * @return The hint of from. {select * from table left outer join ... on ... [from-hint] where ...} (NotNull)
      */
     public String getFromHint();
 
@@ -107,13 +97,13 @@ public interface ${myClassName} {
     /**
      * Get sql-suffix. This is an internal method.
      * 
-     * @return sql-suffix. {select * from table where ... order by ... [sql-suffix]} (NotNull)
+     * @return The sql suffix. {select * from table where ... order by ... [sql-suffix]} (NotNull)
      */
     public String getSqlSuffix();
 
-    // =====================================================================================
-    //                                                                            Copy Parts
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Copy Parts
+    //                                                                          ==========
     /**
      * Copy included-select-column.
      * 
@@ -121,9 +111,9 @@ public interface ${myClassName} {
      */
     public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause);
 
-    // =====================================================================================
-    //                                                                  IncludedSelectColumn
-    //                                                                  ====================
+    // ===================================================================================
+    //                                                                IncludedSelectColumn
+    //                                                                ====================
     /**
      * Ignore included-select-column.
      */
@@ -142,9 +132,9 @@ public interface ${myClassName} {
      */
     public void registerIncludedSelectColumn(String aliasName, String realColumnName);
 
-    // =====================================================================================
-    //                                                                             OuterJoin
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           OuterJoin
+    //                                                                           =========
     /**
      * Register outer join.
      * 
@@ -152,11 +142,11 @@ public interface ${myClassName} {
      * @param aliasName Alias name of join table. (NotNull and Unique per invoking method.)
      * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
      */
-    public void registerOuterJoin(String joinTableName, String aliasName, Map${database.filterGenericsString('String, String')} joinOnMap);
+    public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
 
-    // =====================================================================================
-    //                                                                                 Where
-    //                                                                                 =====
+    // ===================================================================================
+    //                                                                               Where
+    //                                                                               =====
     /**
      * Register where clause.
      * 
@@ -188,9 +178,9 @@ public interface ${myClassName} {
      */
     public void exchangeFirstWhereClauseForLastOne();
 
-    // =====================================================================================
-    //                                                                           InlineWhere
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         InlineWhere
+    //                                                                         ===========
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
     public void registerBaseTableInlineWhereClause(String value);
@@ -198,15 +188,15 @@ public interface ${myClassName} {
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
     public void registerOuterJoinInlineWhereClause(String aliasName, String value);
 
-    // =====================================================================================
-    //                                                               AdditionalConditionAsOr
-    //                                                               =======================
+    // ===================================================================================
+    //                                                             AdditionalConditionAsOr
+    //                                                             =======================
     public void makeAdditionalConditionAsOrEffective();
     public void ignoreAdditionalConditionAsOr();
 
-    // =====================================================================================
-    //                                                                               OrderBy
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                             OrderBy
+    //                                                                             =======
     public ${glOrderByClauseName} getSqlComponentOfOrderByClause();
 
     /**
@@ -234,14 +224,14 @@ public interface ${myClassName} {
 
     public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
 
-    // =====================================================================================
-    //                                                                                Clause
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Clause
+    //                                                                              ======
     public void registerUnionQuery(String unionClause, boolean unionAll);
 
-    // =====================================================================================
-    //                                                                               Advance
-    //                                                                               =======
+    // ===================================================================================
+    //                                                                             Advance
+    //                                                                             =======
     /**
      * Fetch first.
      * <p>
@@ -416,4 +406,14 @@ public interface ${myClassName} {
      * @return Resolved relation no.
      */
     public int resolveRelationNo(String baseTableName, String foreignPropertyName);
+
+    // =====================================================================================
+    //                                                        Select Clause Column Alias Map
+    //                                                        ==============================
+    public void setSelectClauseColumnAliasMap(Map<String, String> selectClauseColumnAliasMap);
+
+    // =====================================================================================
+    //                                                            Where Clause Simple Filter
+    //                                                            ==========================
+    public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
 }
