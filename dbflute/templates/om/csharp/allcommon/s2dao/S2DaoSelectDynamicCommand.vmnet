@@ -181,9 +181,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             return selectHandler.Execute(ctx.BindVariables, ctx.BindVariableTypes);
         }
 
-        // -----------------------------------------------------
-        //                                    OutsideSql Execute
-        //                                    ------------------
+        // -------------------------------------------------
+        //                                OutsideSql Execute
+        //                                ------------------
         protected Object ExecuteOutsideSqlAsStatic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
             // - - - - - - - - - - - - - - - - -
             // Find specified resultSetHandler.
@@ -207,54 +207,61 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected Object ExecuteOutsideSqlAsDynamic(Object[] args, ${glOutsideSqlContextName} outsideSqlContext) {
-            throw new NotSupportedException("ExecuteOutsideSqlAsDynamic is unsupported!");
-//            Object firstArg = args[0];
-//            BeanDesc beanDesc = BeanDescFactory.getBeanDesc(firstArg.getClass());
-//            String filteredSql = this.Sql;
-//
-//            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//            // Resolve embedded comment for parsing bind variable comment in embedded comment.
-//            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-//            for (int i = 0; i < beanDesc.getPropertyDescSize(); i++) {
-//                PropertyDesc propertyDesc = beanDesc.getPropertyDesc(i);
-//                Class propertyType = propertyDesc.getPropertyType();
-//                if (!propertyType.equals(String.class)) {
-//                    continue;
-//                }
-//                String outsideSqlPiece = (String) propertyDesc.getValue(firstArg);
-//                if (outsideSqlPiece == null) {
-//                    continue;
-//                }
-//                String embeddedComment = "/*$pmb." + propertyDesc.getPropertyName() + "*/";
-//                filteredSql = InternalStringUtil.replace(filteredSql, embeddedComment, outsideSqlPiece);
-//            }
-//            ${glSelectDynamicCommand} outsideSqlCommand = createMySelectDynamicCommand();
-//            outsideSqlCommand.setArgNames(getArgNames());
-//            outsideSqlCommand.setArgTypes(getArgTypes());
-//            outsideSqlCommand.setSql(filteredSql);
-//
-//            // - - - - - - - - - - - - - - - - -
-//            // Find specified resultSetHandler.
-//            // - - - - - - - - - - - - - - - - -
-//            ResultSetHandler specifiedResultSetHandler = findSpecifiedResultSetHandler(args);
-//
-//            // - - - - - - - - -
-//            // Filter arguments.
-//            // - - - - - - - - -
-//            Object[] filteredArgs;
-//            if (outsideSqlContext.isSpecifiedOutsideSql()) {
-//                Object parameterBean = outsideSqlContext.getParameterBean();
-//                filteredArgs = new Object[] {parameterBean};
-//            } else {
-//                filteredArgs = filterArgumentsForResultSetHandler(args);
-//            }
-//
-//            org.seasar.dao.CommandContext ctx = outsideSqlCommand.doApply(filteredArgs);
-//            java.util.List<Object> bindVariableList = new java.util.ArrayList<Object>();
-//            java.util.List<Class> bindVariableTypeList = new java.util.ArrayList<Class>();
-//            addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
-//            BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
-//            return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
+            Object firstArg = args[0];
+            PropertyInfo[] properties = firstArg.GetType().GetProperties();
+            String filteredSql = this.Sql;
+
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // Resolve embedded comment for parsing bind variable comment in embedded comment.
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            for (int i = 0; i < properties.Length; i++) {
+                PropertyInfo propertyInfo = properties[i];
+                Type propertyType = propertyInfo.PropertyType;
+                if (!propertyType.Equals(typeof(String))) {
+                    continue;
+                }
+                String outsideSqlPiece = (String)propertyInfo.GetValue(firstArg, null);
+                if (outsideSqlPiece == null) {
+                    continue;
+                }
+                String embeddedComment = "/*$pmb." + propertyInfo.Name + "*/";
+                filteredSql = filteredSql.Replace(embeddedComment, outsideSqlPiece);
+            }
+
+            ${glSelectDynamicCommand} outsideSqlCommand = CreateMySelectDynamicCommand();
+            outsideSqlCommand.ArgNames = ArgNames;
+            outsideSqlCommand.ArgTypes = ArgTypes;
+            outsideSqlCommand.Sql = filteredSql;
+
+            // - - - - - - - - - - - - - - - - -
+            // Find specified resultSetHandler.
+            // - - - - - - - - - - - - - - - - -
+            IDataReaderHandler specifiedDataReaderHandler = FindSpecifiedDataReaderHandler(args);
+
+            // - - - - - - - - -
+            // Filter arguments.
+            // - - - - - - - - -
+            Object[] filteredArgs;
+            if (outsideSqlContext.IsSpecifiedOutsideSql) {
+                Object parameterBean = outsideSqlContext.ParameterBean;
+                filteredArgs = new Object[] {parameterBean};
+            } else {
+                filteredArgs = FilterArgumentsForDataReaderHandler(args);
+            }
+
+            ICommandContext ctx = outsideSqlCommand.DoApply(filteredArgs);
+            IList<Object> bindVariableList = new List<Object>();
+            IList<Type> bindVariableTypeList = new List<Type>();
+            IList<String> bindVariableNameList = new List<String>();
+            AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
+            BasicSelectHandler selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
+            Object[] bindVariableArray = new Object[bindVariableList.Count];
+            bindVariableList.CopyTo(bindVariableArray, 0);
+            Type[] bindVariableTypeArray = new Type[bindVariableTypeList.Count];
+            bindVariableTypeList.CopyTo(bindVariableTypeArray, 0);
+            String[] bindVariableNameArray = new String[bindVariableNameList.Count];
+            bindVariableNameList.CopyTo(bindVariableNameArray, 0);
+            return selectHandler.Execute(bindVariableArray, bindVariableTypeArray, bindVariableNameArray);
         }
 
         protected virtual object[] FilterArgumentsForDataReaderHandler(object[] args) {
@@ -287,7 +294,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
                 msg = msg + "The size of arg types have not been same as the size of arg objects:";
                 msg = msg + " argTypes=" + ArgTypes.Length + " args=" + args.Length + lineSeparator;
-                msg = msg + "If the arguments contain ResultSetHandler, the argument value should not be null!" + lineSeparator;
+                msg = msg + "If the arguments contain DataReaderHandler, the argument value should not be null!" + lineSeparator;
                 for (int i=0; i < args.Length - 1; i++) {
                     msg = msg + "  args[" + i + "] -- " + args[i] + lineSeparator;
                 }
@@ -335,6 +342,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new BasicSelectHandler(DataSource, realSql, specifiedDataReaderHandler, CommandFactory, dataReaderFactory);
         }
 
+        // -------------------------------------------------
+        //                                      Setup Helper
+        //                                      ------------
         protected void AddBindVariableInfo(ICommandContext ctx, IList<Object> bindVariableList, IList<Type> bindVariableTypeList, IList<String> bindVariableNameList) {
             Object[] bindVariables = ctx.BindVariables;
             AddBindVariableList(bindVariableList, bindVariables);

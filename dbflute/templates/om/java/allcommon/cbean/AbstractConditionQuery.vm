@@ -286,6 +286,30 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
+    protected void invokeSetterLikeSearch(String columnFlexibleName, Object value, ${glConditionOptionLikeSearchName} option) {
+        if (value == null) {
+            return;
+        }
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
+        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
+        String methodName = "set" + columnCapPropName + "_" + "likeSearch".substring(0, 1).toUpperCase() + "likeSearch".substring(1);
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{value.getClass(), ${glConditionOptionLikeSearchName}.class});
+        } catch (NoSuchMethodException e) {
+            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            method.invoke(this, new Object[]{value, option});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
     // ----------------------------------------
     //                                  InScope
     //                                  -------
@@ -612,30 +636,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         try {
             method.invoke(this, new Object[]{value});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
-    }
-
-    protected void invokeSetterLikeSearch(String columnFlexibleName, Object value, ${glConditionOptionLikeSearchName} option) {
-        if (value == null) {
-            return;
-        }
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
-        String methodName = "set" + columnCapPropName + "_" + "likeSearch".substring(0, 1).toUpperCase() + "likeSearch".substring(1);
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{value.getClass(), ${glConditionOptionLikeSearchName}.class});
-        } catch (NoSuchMethodException e) {
-            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            method.invoke(this, new Object[]{value, option});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {

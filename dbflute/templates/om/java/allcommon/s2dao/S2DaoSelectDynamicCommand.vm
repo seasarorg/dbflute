@@ -266,8 +266,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         // Execute conditionBean.
         // - - - - - - - - - - - -
         assertSelectClauseCommand();
-        final List${database.filterGenericsString('Object')} bindVariableList = new ArrayList${database.filterGenericsString('Object')}();
-        final List${database.filterGenericsString('Class')} bindVariableTypeList = new ArrayList${database.filterGenericsString('Class')}();
+        final List<Object> bindVariableList = new ArrayList<Object>();
+        final List<Class> bindVariableTypeList = new ArrayList<Class>();
 
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String finalClause;
@@ -452,7 +452,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     // -----------------------------------------------------
     //                                          Setup Clause
     //                                          ------------
-    protected String setupRealSelectClause(Object[] args, List${database.filterGenericsString('Object')} bindVariableList, List${database.filterGenericsString('Class')} bindVariableTypeList) {
+    protected String setupRealSelectClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realSelectClause;
         {
@@ -468,7 +468,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return realSelectClause;
     }
 
-    protected String setupRealFromWhereClause(Object[] args, java.util.List${database.filterGenericsString('Object')} bindVariableList, List${database.filterGenericsString('Class')} bindVariableTypeList) {
+    protected String setupRealFromWhereClause(Object[] args, java.util.List<Object> bindVariableList, List<Class> bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realFromWhereClause;
         {
@@ -527,7 +527,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     // -----------------------------------------------------
     //                                          Setup Helper
     //                                          ------------
-    protected Class[] toClassArray(List${database.filterGenericsString('Class')} bindVariableTypeList) {
+    protected Class[] toClassArray(List<Class> bindVariableTypeList) {
         final Class[] bindVariableTypesArray = new Class[bindVariableTypeList.size()];
         for (int i = 0; i < bindVariableTypeList.size(); i++) {
             final Class bindVariableType = (Class) bindVariableTypeList.get(i);
@@ -536,20 +536,20 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return bindVariableTypesArray;
     }
 
-    protected void addBindVariableInfo(CommandContext ctx, List${database.filterGenericsString('Object')} bindVariableList, List${database.filterGenericsString('Class')} bindVariableTypeList) {
+    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
         final Object[] bindVariables = ctx.getBindVariables();
         addBindVariableList(bindVariableList, bindVariables);
         final Class[] bindVariableTypes = ctx.getBindVariableTypes();
         addBindVariableTypeList(bindVariableTypeList, bindVariableTypes);
     }
 
-    protected void addBindVariableList(List${database.filterGenericsString('Object')} bindVariableList, Object[] bindVariables) {
+    protected void addBindVariableList(List<Object> bindVariableList, Object[] bindVariables) {
         for (int i=0; i < bindVariables.length; i++) {
             bindVariableList.add(bindVariables[i]);
         }
     }
 
-    protected void addBindVariableTypeList(List${database.filterGenericsString('Class')} bindVariableTypeList, Class[] bindVariableTypes) {
+    protected void addBindVariableTypeList(List<Class> bindVariableTypeList, Class[] bindVariableTypes) {
         for (int i=0; i < bindVariableTypes.length; i++) {
             bindVariableTypeList.add(bindVariableTypes[i]);
         }
