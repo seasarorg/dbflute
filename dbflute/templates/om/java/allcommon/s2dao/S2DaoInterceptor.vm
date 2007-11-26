@@ -91,8 +91,14 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             before = System.currentTimeMillis();
         }
 
+        // - - - - - - - - - - -
+        // Preprocess outsideSql
+        // - - - - - - - - - - -
         preprocessOutsideSql(invocation);
 
+        // - - - - - - - - -
+        // Set up sqlCommand
+        // - - - - - - - - -
         final SqlCommand cmd;
         {
             long beforeCmd = 0;
@@ -108,25 +114,35 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             }
         }
 
+        // - - - - - - - - - - - - -
+        // Preprocess conditionBean
+        // - - - - - - - - - - - - -
         final ${glConditionBeanInterfaceName} cb = preprocessConditionBean(invocation, cmd);
 
+        // - - - - - - - - - -
+        // Execute sqlCommand!
+        // - - - - - - - - - -
         Object ret = null;
         try {
-            try {
-                ret = cmd.execute(invocation.getArguments());
-            } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException notSingleRow) {
-                throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(notSingleRow);
-            }
+            ret = cmd.execute(invocation.getArguments());
+        } catch (org.seasar.dao.NotSingleRowUpdatedRuntimeException notSingleRow) {
+            throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(notSingleRow);
         } catch (Exception e) {
-            final Class targetClass = getTargetClass(invocation);
-            _log.debug(targetClass.getSimpleName() + " threw the exception: " + e.getClass());
-            _log.debug("    method   --> " + invocation.getMethod());
-            _log.debug("    argument --> " + ${glTraceViewUtilName}.convertObjectArrayToStringView(invocation.getArguments()));
+            if (_log.isDebugEnabled()) {
+                final Class<?> targetType = getTargetClass(invocation);
+                final StringBuilder sb = new StringBuilder();
+                sb.append(targetType.getSimpleName() + " was interrupted by " + e.getClass().getSimpleName()).append(getLineSeparator());
+                sb.append("[Interrupted Target]").append(getLineSeparator());
+                sb.append("  dao    = " + targetType.getSimpleName()).append(getLineSeparator());
+                sb.append("  method = " + invocation.getMethod()).append(getLineSeparator());
+                sb.append("  args   = " + ${glTraceViewUtilName}.convertObjectArrayToStringView(invocation.getArguments()));
+                _log.debug(sb);
+            }
             throw e;
         } finally {
             postprocessConditionBean(invocation, cb);
         }
-        final Class retType = method.getReturnType();
+        final Class<?> retType = method.getReturnType();
         assertRetType(retType, ret);
 
         if (_log.isDebugEnabled()) {
@@ -134,6 +150,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
             traceReturn(invocation, retType, ret, before, after);
         }
 
+        // - - - - - - - - - -
+        // Convert and Return!
+        // - - - - - - - - - -
         if (retType.isPrimitive()) {
             return org.seasar.framework.util.NumberConversionUtil.convertPrimitiveWrapper(retType, ret);
         } else if (Number.class.isAssignableFrom(retType)) {
@@ -148,9 +167,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                          ==========
     protected SqlCommand findSqlCommand(MethodInvocation invocation) {
         final SqlCommand cmd;
-        final Class targetClass = getTargetClass(invocation);
-        final DaoMetaData dmd = daoMetaDataFactory_.getDaoMetaData(targetClass);
-        if (${glOutsideSqlDaoName}.class.isAssignableFrom(targetClass)) {
+        final Class<?> targetType = getTargetClass(invocation);
+        final DaoMetaData dmd = daoMetaDataFactory_.getDaoMetaData(targetType);
+        if (${glOutsideSqlDaoName}.class.isAssignableFrom(targetType)) {
             cmd = dmd.getSqlCommand(generateSpecifiedOutsideSqlUniqueKey(invocation));
         } else {
             cmd = dmd.getSqlCommand(invocation.getMethod().getName());
@@ -709,5 +728,17 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected boolean isSelectCountIgnoreFetchScopeMethod(org.aopalliance.intercept.MethodInvocation invocation) {
         final String name = invocation.getMethod().getName();
         return name.startsWith("readCount") || name.startsWith("selectCount");
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 }

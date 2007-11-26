@@ -62,8 +62,14 @@ namespace ${glPackageBaseCommonS2Dao} {
                 before = DateTime.Now; // for performance view
             }
 
+            // - - - - - - - - - - -
+            // Preprocess outsideSql
+            // - - - - - - - - - - -
             PreprocessOutsideSql(invocation);
 
+            // - - - - - - - - -
+            // Set up sqlCommand
+            // - - - - - - - - -
             ISqlCommand cmd = null;
             {
                 DateTime? beforeCmd = null;
@@ -71,19 +77,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                     beforeCmd = DateTime.Now;
                 }
                 Type targetType = GetComponentDef(invocation).ComponentType;
-                IDaoMetaData dmd = null;
-                try {
-                    dmd = daoMetaDataFactory_.GetDaoMetaData(targetType);
-                } catch (Exception e) {
-                    _log.Warn("IDaoMetaDataFactory#GetDaoMetaData() threw the exception: targetType=" + targetType, e);
-                    throw;
-                }
-                try {
-                    cmd = dmd.GetSqlCommand(method.Name);
-                } catch (Exception e) {
-                    _log.Warn("IDaoMetaData#GetSqlCommand() threw the exception: dmd=" + dmd + " methodName=" + method.Name, e);
-                    throw;
-                }
+                IDaoMetaData dmd = daoMetaDataFactory_.GetDaoMetaData(targetType);
+                cmd = dmd.GetSqlCommand(method.Name);
                 if (_log.IsDebugEnabled && beforeCmd != null) {
                     DateTime afterCmd = DateTime.Now;
                     if (!afterCmd.Equals(beforeCmd.Value)) {
@@ -92,37 +87,38 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
             }
 
-            ${glConditionBeanInterfaceName} cb = null;
-            try {
-                cb = PreprocessConditionBean(invocation, cmd);
-            } catch (Exception e) {
-                _log.Warn("${glDaoInterceptor}#PreprocessConditionBean() threw the exception: ", e);
-                throw;
-            }
+            // - - - - - - - - - - - - -
+            // Preprocess conditionBean
+            // - - - - - - - - - - - - -
+            ${glConditionBeanInterfaceName} cb = PreprocessConditionBean(invocation, cmd);
 
+            // - - - - - - - - - -
+            // Execute sqlCommand!
+            // - - - - - - - - - -
             object ret = null;
             try {
                 ret = cmd.Execute(invocation.Arguments);
+            } catch (NotSingleRowUpdatedRuntimeException e) {
+                throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(e);
             } catch (Exception e) {
-                if (e is NotSingleRowUpdatedRuntimeException) {
-                    throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}((NotSingleRowUpdatedRuntimeException)e);
+                if (_log.IsDebugEnabled) {
+                    Type targetType = GetComponentDef(invocation).ComponentType;
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(targetType.Name + " was interrupted by " + e.GetType().Name).Append(GetLineSeparator());
+                    sb.Append("[Interrupted Target]").Append(GetLineSeparator());
+                    sb.Append("  dao    = " + targetType.Name).Append(GetLineSeparator());
+                    sb.Append("  method = " + invocation.Method).Append(GetLineSeparator());
+                    sb.Append("  args   = " + ${glTraceViewUtilName}.ConvertObjectArrayToStringView(invocation.Arguments));
+                    _log.Debug(sb);
                 }
-                _log.Debug(" ");
-                _log.Debug("/ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @");
-                _log.Debug("Dao threw the exception: " + e.GetType() + " msg=" + e.Message);
-                _log.Debug("    method   --> " + invocation.Method);
-                _log.Debug("    argument --> " + ${glTraceViewUtilName}.ConvertObjectArrayToStringView(invocation.Arguments));
-                if (e is Seasar.Framework.Exceptions.SQLRuntimeException) {
-                    String sql = ((Seasar.Framework.Exceptions.SQLRuntimeException)e).Sql;
-                    _log.Debug("    sql      --> " + sql);
-                }
-                _log.Debug("@ @ @ @ @ @ @ @ @ @ @ /");
-                _log.Debug(" ");
-                throw;
+                throw e;
             } finally {
                 PostprocessConditionBean(invocation, cb);
             }
 
+            // - - - - - - - - - -
+            // Convert and Return!
+            // - - - - - - - - - -
             Type retType = ((MethodInfo) method).ReturnType;
             ret = Seasar.Framework.Util.ConversionUtil.ConvertTargetType(ret, retType);
 
@@ -407,6 +403,13 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected bool IsSelectCountIgnoreFetchScopeMethod(IMethodInvocation invocation) {
             String name = invocation.Method.Name;
             return name.StartsWith("ReadCount") || name.StartsWith("SelectCount");
+        }
+
+        // ===============================================================================
+        //                                                                          Helper
+        //                                                                          ======
+        protected virtual String GetLineSeparator() {
+            return Environment.NewLine;
         }
     }
 }
