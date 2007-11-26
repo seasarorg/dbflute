@@ -585,21 +585,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Comparing result.
      */
     public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        }
-        if (!(other instanceof $myClassName)) {
-            return false;
-        }
+        if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
-
-#foreach ($col in $table.PrimaryKey)
+#foreach ($col in $table.primaryKey)
+#if ($database.isCompatibleNullEqualFalse())
         if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
             return false;
         }
+#else
+        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
 #end
-
+#end
         return true;
+    }
+
+    protected boolean helpComparingValue(Object value1, Object value2) {
+        if (value1 == null && value2 == null) { return true; }
+        return value1 != null && value2 != null && value1.equals(value2);
     }
 
     /**
@@ -610,13 +612,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public int hashCode() {
         int result = 0;
-
-#foreach ($col in $table.PrimaryKey)
-        if (this.get${col.JavaName}() != null) {
-            result = result + get${col.JavaName}().hashCode();
-        }
+#foreach ($col in $table.primaryKey)
+        if (this.get${col.JavaName}() != null) { result = result + get${col.JavaName}().hashCode(); }
 #end
-
         return result;
     }
 #else
@@ -629,21 +627,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return Comparing result. If other is null, returns false.
      */
     public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        }
-        if (!(other instanceof $myClassName)) {
-            return false;
-        }
+        if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
-
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
+#if ($database.isCompatibleNullEqualFalse())
         if (get${col.JavaName}() == null || !get${col.JavaName}().equals(otherEntity.get${col.JavaName}())) {
             return false;
         }
+#else
+        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
 #end
-
+#end
         return true;
+    }
+
+    protected boolean helpComparingValue(Object value1, Object value2) {
+        if (value1 == null && value2 == null) { return true; }
+        return value1 != null && value2 != null && value1.equals(value2);
     }
 
     /**
@@ -654,13 +654,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      */
     public int hashCode() {
         int result = 0;
-
-#foreach ($col in $table.Columns)
-        if (this.get${col.JavaName}() != null) {
-            result = result + this.get${col.JavaName}().hashCode();
-        }
+#foreach ($col in $table.columns)
+        if (this.get${col.JavaName}() != null) { result = result + this.get${col.JavaName}().hashCode(); }
 #end
-
         return result;
     }
 #end

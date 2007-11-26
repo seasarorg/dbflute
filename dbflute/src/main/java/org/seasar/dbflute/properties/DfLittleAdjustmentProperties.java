@@ -65,6 +65,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isOneToManyReturnNullIfNonSelect() {
         return booleanProp("torque.isOneToManyReturnNullIfNonSelect", false);
     }
+    
+    // ===============================================================================
+    //                                                                      Compatible
+    //                                                                      ==========
+    public boolean isCompatibleNullEqualFalse() {
+        return booleanProp("torque.isCompatibleNullEqualFalse", false);
+    }
 
     // ===============================================================================
     //                                                         Disable As-One-Relation

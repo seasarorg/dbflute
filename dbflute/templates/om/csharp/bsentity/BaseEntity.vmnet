@@ -275,7 +275,7 @@ namespace ${myExtendedEntityPackageName} {
             }
         }
 
-        public ${glPackageExtendedEntity}.${foreignEntityClassName} Look${refferer.reffererPropertyNameInitCapAsOne}() {
+        public ${glPackageExtendedEntity}.${reffererEntityClassName} Look${refferer.reffererPropertyNameInitCapAsOne}() {
             return ${refferer.reffererPropertyNameInitCapAsOne} != null ? ${refferer.reffererPropertyNameInitCapAsOne} : new ${reffererEntityClassName}();
         }
 
@@ -317,12 +317,7 @@ namespace ${myExtendedEntityPackageName} {
         #region Basic Override
 #if ($table.hasPrimaryKey())
         public override bool Equals(Object other) {
-            if (other == null) {
-                return false;
-            }
-            if (!(other is $myClassName)) {
-                return false;
-            }
+            if (other == null || !(other is $myClassName)) { return false; }
             $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.primaryKey)
             if (this.${col.javaName} == null || !this.${col.javaName}.Equals(otherEntity.${col.javaName})) { return false; }
@@ -344,12 +339,7 @@ namespace ${myExtendedEntityPackageName} {
 #else
 
         public override bool Equals(Object other) {
-            if (other == null) {
-                return false;
-            }
-            if (!(other is $myClassName)) {
-                return false;
-            }
+            if (other == null || !(other is $myClassName)) { return false; }
             $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.columns)
             if (this.${col.javaName} == null || !this.${col.javaName}.Equals(otherEntity.${col.javaName})) { return false; }

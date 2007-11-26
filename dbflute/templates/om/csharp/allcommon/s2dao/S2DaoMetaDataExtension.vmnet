@@ -16,6 +16,7 @@ using Seasar.Framework.Beans;
 using Seasar.Framework.Util;
 
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonAnnotation};
 using ${glPackageBaseCommonJdbc};
 
@@ -33,8 +34,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                         Initialization Override
         //                                                         =======================
-        public override void Initialize()
-        {
+        public override void Initialize() {
             _daoInterface = GetDaoInterface(_daoType);
             _annotationReader = AnnotationReaderFactory.CreateDaoAnnotationReader(_daoType);
             _beanType = _annotationReader.GetBeanType();
@@ -68,48 +68,46 @@ namespace ${glPackageBaseCommonS2Dao} {
 //            return cmd;
 //        }
 
-//        protected ISqlCommand InitializeSqlCommand(String methodName) {
-//            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
-//                final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
-//                if (outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql) {
-//                    return InitializeSpecifiedOutsideSqlCommand(methodName, outsideSqlContext);
-//                }
-//            }
-//            MethodInfo[] methods = daoBeanDesc.GetMethods(methodName);
-//            if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
-//                setupMethod(methods[0]);
-//            }
-//            final SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
-//            if (cmd != null) {
-//                return cmd;
-//            }
-//            throw new MethodNotFoundRuntimeException(daoClass, methodName, null);
-//        }
+        protected ISqlCommand InitializeSqlCommand(String methodName) {
+            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+                if (outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql) {
+                    return InitializeSpecifiedOutsideSqlCommand(methodName, outsideSqlContext);
+                }
+            }
+            MethodInfo method = _daoInterface.GetMethod(methodName);
+            if (method != null && method.IsAbstract) {
+                SetupMethod(method);
+            }
+            ISqlCommand cmd = (ISqlCommand) _sqlCommands[methodName];
+            if (cmd != null) {
+                return cmd;
+            }
+            throw new MethodNotFoundRuntimeException(_daoType, methodName, null);
+        }
 
+        protected ISqlCommand InitializeSpecifiedOutsideSqlCommand(String sqlCommandKey, OutsideSqlContext outsideSqlContext) {
+            MethodInfo method = _daoInterface.GetMethod(sqlCommandKey);// By real method name.
+            if (method != null && method.IsAbstract) {
+                if (IsOutsideSqlDaoMethodSelect(method)) {
+                    SetupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, method, outsideSqlContext);
+                } else {
+                    SetupSpecifiedOutsideSqlExecuteCommand(sqlCommandKey, method, outsideSqlContext);
+                }
+            }
+            ISqlCommand cmd = (ISqlCommand) _sqlCommands[sqlCommandKey];
+            if (cmd != null) {
+                return cmd;
+            }
+            String msg = "Internal Error! The methodName is not found:";
+            msg = msg + " sqlCommandKey=" + sqlCommandKey;
+            msg = msg + " sqlCommands=" + _sqlCommands;
+            throw new SystemException(msg);
+        }
 
-//    protected SqlCommand initializeSpecifiedOutsideSqlCommand(String sqlCommandKey, ${glOutsideSqlContextName} outsideSqlContext) throws MethodNotFoundRuntimeException {
-//        final Method[] methods = daoBeanDesc.getMethods(outsideSqlContext.getMethodName());// By real method name.
-//        if (methods.length == 1 && org.seasar.framework.util.MethodUtil.isAbstract(methods[0])) {
-//            final Method method = methods[0];
-//            if (isOutsideSqlDaoMethodSelect(method)) {
-//                setupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, method, outsideSqlContext);
-//            } else {
-//                setupSpecifiedOutsideSqlExecuteCommand(sqlCommandKey, method, outsideSqlContext);
-//            }
-//        }
-//        final SqlCommand cmd = (SqlCommand) sqlCommands.get(sqlCommandKey);
-//        if (cmd != null) {
-//            return cmd;
-//        }
-//        String msg = "Internal Error! The methodName is not found:";
-//        msg = msg + " sqlCommandKey=" + sqlCommandKey;
-//        msg = msg + " sqlCommands=" + sqlCommands;
-//        throw new IllegalStateException(msg);
-//    }
-
-//    protected boolean isOutsideSqlDaoMethodSelect(Method method) {
-//        return method.getName().startsWith("select");
-//    }
+        protected bool IsOutsideSqlDaoMethodSelect(MethodInfo method) {
+            return method.Name.StartsWith("Select");
+        }
 
         // ===============================================================================
         //                                                      Outside Sql Check Override
@@ -303,16 +301,13 @@ namespace ${glPackageBaseCommonS2Dao} {
                 filteredParameterNames = parameterNames;
                 filteredParameterTypes = parameterTypes;
             }
-            IBeanMetaData myMetaData = BuildBeanMetaData(mi, _dbMetaData, _dbms);
+            IBeanMetaData myMetaData = GetOutsideSqlBeanMetaData(mi, _dbMetaData, _dbms);
             SelectDynamicCommand cmd = CreateSelectDynamicCommand(CreateDataReaderHandler4SelectMethodByManual(mi, myMetaData));
-            cmd.Sql = sql;
-            cmd.ArgNames = filteredParameterNames;
-            cmd.ArgTypes = filteredParameterTypes;
-            _sqlCommands[mi.Name] = cmd;
+            RegisterSqlCommand(mi.Name, mi, sql, filteredParameterNames, filteredParameterTypes, cmd);
         }
 
-        protected IBeanMetaData BuildBeanMetaData(MethodInfo mi, IDatabaseMetaData databaseMetaData, Seasar.Dao.IDbms dbInfo) {
-            Type beanClass4SelectMethodByManual = GetBeanClass4SelectMethodByManual(mi);
+        protected IBeanMetaData GetOutsideSqlBeanMetaData(MethodInfo mi, IDatabaseMetaData databaseMetaData, Seasar.Dao.IDbms dbInfo) {
+            Type beanClass4SelectMethodByManual = GetOutsideSqlDefaultBeanClass(mi);
             if (beanClass4SelectMethodByManual.Equals(_beanType)) {
                 return _beanMetaData;
             }
@@ -321,23 +316,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return bmdExt;
         }
 
-        protected Type GetBeanClass4SelectMethodByManual(MethodInfo mi) {
-            Type retType = mi.ReturnType;
-            if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
-                return retType.GetGenericArguments()[0];
-            } else if (!retType.IsGenericType && typeof(System.Collections.IList).IsAssignableFrom(retType)) {
-                return _beanType;
-            } else if (retType.IsArray) {
-                return retType.GetElementType();
-            } else if (ValueTypes.GetValueType(retType) != ValueTypes.OBJECT) {
-                return _beanType;
-            } else {
-                return retType;
-            }
-        }
-
-        protected IDataReaderHandler CreateDataReaderHandler4SelectMethodByManual(MethodInfo mi, IBeanMetaData bmd)
-        {
+        protected IDataReaderHandler CreateDataReaderHandler4SelectMethodByManual(MethodInfo mi, IBeanMetaData bmd) {
             Type retType = mi.ReturnType;
 
             if (retType.IsArray) {
@@ -360,6 +339,177 @@ namespace ${glPackageBaseCommonS2Dao} {
             return bmd.BeanType.IsAssignableFrom(type) || type.IsAssignableFrom(bmd.BeanType);
         }
 
+        // -------------------------------------------------
+        //                              Specified OutsideSql
+        //                              --------------------
+        // - - - - - - - - - -
+        //              Select
+        //               - - -
+        protected void SetupSpecifiedOutsideSqlSelectCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContextName} outsideSqlContext) {
+            // - - - - - - - - - - - - - - - - - - - - - - -
+            // The attribute of Specified-OutsideSqlContext.
+            // - - - - - - - - - - - - - - - - - - - - - - -
+            String sql = outsideSqlContext.ReadOutsideSqlPath(this.SqlFileEncoding, _dbms.Suffix);
+            Object pmb = outsideSqlContext.ParameterBean;
+            Object resultTypeSpecification = outsideSqlContext.ResultTypeSpecification;
+
+            // - - - - - - - - - - - - - - -
+            // The attribute of SqlCommand.
+            // - - - - - - - - - - - - - - -
+            String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
+            Type[] argTypes = (pmb != null ? new Type[] {pmb.GetType()} : new Type[]{});
+
+            // - - - - - - - - - - - - - - - -
+            // Create customized BeanMetaData.
+            // - - - - - - - - - - - - - - - -
+            Type lastestArguementType = method.GetParameters()[method.GetParameters().Length - 1].ParameterType;
+            IDataReaderHandler myDataReaderHandler;
+            if (typeof(Type).IsAssignableFrom(lastestArguementType)) {
+                // - - - - - - - -
+                // EntityHandling
+                // - - - - - - - -
+                Type customizeEntityType = (Type)resultTypeSpecification;
+                IBeanMetaData myBeanMetaData = CreateSpecifiedOutsideSqlCustomizeBeanMetaData(customizeEntityType);
+                Type retType = method.ReturnType;
+                if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
+                    myDataReaderHandler = CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(myBeanMetaData, customizeEntityType);
+                } else {
+                    throw new NotSupportedException("The return type of method is unsupported: method.ReturnType=" + method.ReturnType);
+                }
+            } else if (typeof(${glCursorHandlerName}).IsAssignableFrom(lastestArguementType)) {
+                // - - - - - - - -
+                // CursorHandling
+                // - - - - - - - -
+                IBeanMetaData myBeanMetaData = CreateSpecifiedOutsideSqlCursorBeanMetaData(method);
+                myDataReaderHandler = CreateSpecifiedOutsideSqlCursorResultSetHandler(myBeanMetaData);
+            } else {
+                String msg = "The lastestArguementType is unsupported:";
+                msg = msg + " lastestArguementType=" + lastestArguementType;
+                msg = msg + " method=" + method;
+                throw new SystemException(msg);
+            }
+
+            // - - - - - - - - - - -
+            // Register Sql-Command.
+            // - - - - - - - - - - -
+            RegisterSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, myDataReaderHandler);
+        }
+
+        protected IBeanMetaData CreateSpecifiedOutsideSqlCustomizeBeanMetaData(Type clazz) {
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(clazz, this.AnnotationReaderFactory, false);
+            bmdExt.Initialize(_dbMetaData, _dbms);
+            return bmdExt;
+        }
+
+        protected IDataReaderHandler CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(IBeanMetaData specifiedBeanMetaData, Type customizeEntityType) {
+            IValueType valueType = ValueTypes.GetValueType(customizeEntityType);
+            if (valueType == null || !valueType.Equals(ValueTypes.OBJECT)) {
+                return new InternalObjectGenericListResultSetHandler(customizeEntityType, valueType);
+            }
+            return CreateBeanGenericListMetaDataDataReaderHandler(specifiedBeanMetaData);
+        }
+
+        public class InternalObjectGenericListResultSetHandler : IDataReaderHandler {
+            private Type _beanType;
+            private IValueType _valueType;
+            public InternalObjectGenericListResultSetHandler(Type beanType, IValueType valueType) {
+                this._beanType = beanType;
+                this._valueType = valueType;
+            }
+            public object Handle(IDataReader dataReader) {
+                Type generic = typeof(System.Collections.Generic.List<>);
+                Type constructed = generic.MakeGenericType(_beanType);
+                System.Collections.IList resultList = (System.Collections.IList) Activator.CreateInstance(constructed);
+                int count = 1;
+                while (dataReader.Read()) {
+                    resultList.Add(_valueType.GetValue(dataReader, count));
+                    ++count;
+                }
+                return null;
+            }
+        }
+
+        protected IBeanMetaData CreateSpecifiedOutsideSqlCursorBeanMetaData(MethodInfo method) {
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(GetOutsideSqlDefaultBeanClass(method), this.AnnotationReaderFactory, false);
+            bmdExt.Initialize(_dbMetaData, _dbms);
+            return bmdExt;
+        }
+
+        protected IDataReaderHandler CreateSpecifiedOutsideSqlCursorResultSetHandler(IBeanMetaData specifiedBeanMetaData) {
+            return new ObjectDataReaderHandler();
+        }
+
+        // - - - - - - - - - -
+        //             Execute
+        //             - - - -
+        protected void SetupSpecifiedOutsideSqlExecuteCommand(String sqlCommandKey, MethodInfo method, ${glOutsideSqlContextName} outsideSqlContext) {
+            // - - - - - - - - - - - - - - - - - - - - - - -
+            // The attribute of Specified-OutsideSqlContext.
+            // - - - - - - - - - - - - - - - - - - - - - - -
+            String sql = outsideSqlContext.ReadOutsideSqlPath(this.SqlFileEncoding, _dbms.Suffix);
+            Object pmb = outsideSqlContext.ParameterBean;
+
+            // - - - - - - - - - - - - - - -
+            // The attribute of SqlCommand.
+            // - - - - - - - - - - - - - - -
+            String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
+            Type[] argTypes = (pmb != null ? new Type[] {pmb.GetType()} : new Type[]{});
+
+            InternalSpecifiedOusideSqlUpdateDynamicCommand cmd = new InternalSpecifiedOusideSqlUpdateDynamicCommand(_dataSource, _commandFactory);
+            RegisterSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
+        }
+
+        protected class InternalSpecifiedOusideSqlUpdateDynamicCommand : UpdateDynamicCommand {
+            public InternalSpecifiedOusideSqlUpdateDynamicCommand(IDataSource dataSource, ICommandFactory factory)
+                : base(dataSource, factory) {
+            }
+            public override Object Execute(Object[] args) {
+                if (args.Length != 3) {
+                    String msg = "Internal Error! OutsideSqlDao.execute() should have 3 arguements: args.length=" + args.Length;
+                    throw new SystemException(msg);
+                }
+                Object arg = args[1];
+                return base.Execute(new Object[] { arg });
+            }
+        }
+
+        // -------------------------------------------------
+        //                              Common of OutsideSql
+        //                              --------------------
+        protected Type GetOutsideSqlDefaultBeanClass(MethodInfo mi) {
+            Type retType = mi.ReturnType;
+            if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
+                return retType.GetGenericArguments()[0];
+            } else if (!retType.IsGenericType && typeof(System.Collections.IList).IsAssignableFrom(retType)) {
+                return _beanType;
+            } else if (retType.IsArray) {
+                return retType.GetElementType();
+            } else if (ValueTypes.GetValueType(retType) != ValueTypes.OBJECT) {
+                return _beanType;
+            } else {
+                return retType;
+            }
+        }
+
+        protected void RegisterSqlCommand(String sqlCommandKey, MethodInfo method, String sql, String[] argNames, Type[] argTypes, IDataReaderHandler myDataReaderHandler) {
+            SelectDynamicCommand cmd = CreateSelectDynamicCommand(myDataReaderHandler);
+            RegisterSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
+        }
+
+        protected void RegisterSqlCommand(String sqlCommandKey, MethodInfo method, String sql, String[] argNames, Type[] argTypes, SelectDynamicCommand cmd) {
+            cmd.Sql = sql;
+            cmd.ArgNames = argNames;
+            cmd.ArgTypes = argTypes;
+            _sqlCommands.Add(sqlCommandKey, cmd);
+        }
+
+        protected void RegisterSqlCommand(String sqlCommandKey, MethodInfo method, String sql, String[] argNames, Type[] argTypes, UpdateDynamicCommand cmd) {
+            cmd.Sql = sql;
+            cmd.ArgNames = argNames;
+            cmd.ArgTypes = argTypes;
+            _sqlCommands.Add(sqlCommandKey, cmd);
+        }
+
         // ===============================================================================
         //                                                              Extension Override
         //                                                              ==================
@@ -380,9 +530,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-    // ===================================================================================
-    //                                                                     Extension Class
-    //                                                                     ===============
     public class BeanMetaDataExtension : BeanMetaDataImpl {
         public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {

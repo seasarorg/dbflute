@@ -46,6 +46,14 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             return copyOption;
         }
 
+
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+        public override String ToString() {
+            return "{paging=" + _pagingRequestType + ", dynamic=" + _dynamicBinding + "}";
+        }
+
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========

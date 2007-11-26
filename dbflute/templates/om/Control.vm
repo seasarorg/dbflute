@@ -215,11 +215,15 @@ targetdatabase = $targetDatabase
     #set ($glColumnInfoName = "${glProjectPrefix}ColumnInfo")
 
     ## [Allcommon-Exception]
+    #set ($glBindVariableCommentNotFoundPropertyException = "${glProjectPrefix}BindVariableCommentNotFoundPropertyException")
     #set ($glDangerousResultSizeExceptionName = "${glProjectPrefix}DangerousResultSizeException")
     #set ($glDangerousResultSizeException = "${glProjectPrefix}DangerousResultSizeException")
+    #set ($glEmbeddedValueCommentNotFoundPropertyException = "${glProjectPrefix}EmbeddedValueCommentNotFoundPropertyException")
     #set ($glEntityAlreadyUpdatedException = "${glProjectPrefix}EntityAlreadyUpdatedException")
     #set ($glEntityAlreadyDeletedException = "${glProjectPrefix}EntityAlreadyDeletedException")
     #set ($glEntityDuplicatedException = "${glProjectPrefix}EntityDuplicatedException")
+    #set ($glIfCommentNotBooleanResultException = "${glProjectPrefix}IfCommentNotBooleanResultException")
+    #set ($glIfCommentWrongExpressionException = "${glProjectPrefix}IfCommentWrongExpressionException")
     #set ($glOutsideSqlNotFoundException = "${glProjectPrefix}OutsideSqlNotFoundException")
     #set ($glRecordHasOverlappedException = "${glProjectPrefix}RecordHasOverlappedException")
     #set ($glRecordHasAlreadyBeenDeletedException = "${glProjectPrefix}RecordHasAlreadyBeenDeletedException")
@@ -1160,6 +1164,24 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
 
     $database.debug("public void parseExceptionClass() {")
+
+    #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
+      $database.debug("    parse('BindVariableCommentNotFoundPropertyException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glBindVariableCommentNotFoundPropertyException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/BindVariableCommentNotFoundPropertyException.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('EmbeddedValueCommentNotFoundPropertyException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEmbeddedValueCommentNotFoundPropertyException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/EmbeddedValueCommentNotFoundPropertyException.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('IfCommentNotBooleanResultException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glIfCommentNotBooleanResultException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/IfCommentNotBooleanResultException.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('IfCommentWrongExpressionException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glIfCommentWrongExpressionException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/IfCommentWrongExpressionException.${glTemplateFileExtension}",$path,"", "")
+    #end
 
     #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
       $database.debug("    parse('DangerousResultSizeException');")

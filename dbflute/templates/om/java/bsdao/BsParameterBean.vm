@@ -29,6 +29,45 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     }
 
     // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * @param value Query value. (Nullable)
+     * @return Converted value. (Nullable)
+     */
+    protected String convertEmptyToNullIfString(String value) {
+        return filterRemoveEmptyString(value);
+    }
+
+    /**
+     * @param value Query value string. (Nullable)
+     * @return Removed-empty value. (Nullable)
+     */
+    protected String filterRemoveEmptyString(String value) {
+        return ((value != null && !"".equals(value)) ? value : null);
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return The view of properties. (NotNull)
+     */
+    @Override
+    public String toString() {
+        final String delimiter = ",";
+        final StringBuffer sb = new StringBuffer();
+#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+        sb.append(delimiter).append(_${propertyName});
+#end
+        sb.delete(0, delimiter.length());
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
@@ -56,41 +95,4 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
         _${propertyName} = ${propertyName};
     }
 #end
-
-    // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    /**
-     * @param value Query value. (Nullable)
-     * @return Converted value. (Nullable)
-     */
-    protected String convertEmptyToNullIfString(String value) {
-        return filterRemoveEmptyString(value);
-    }
-
-    /**
-     * @param value Query value string. (Nullable)
-     * @return Removed-empty value. (Nullable)
-     */
-    protected String filterRemoveEmptyString(String value) {
-        return ((value != null && !"".equals(value)) ? value : null);
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    /**
-     * ${database.OverrideComment}
-     * 
-     * @return Property-string. (NotNull)
-     */
-    public String toString() {
-        final StringBuffer sb = new StringBuffer();
-#foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-
-        sb.append(" ${propertyName}=").append(_${propertyName});
-#end
-
-        return sb.toString();
-    }
 }

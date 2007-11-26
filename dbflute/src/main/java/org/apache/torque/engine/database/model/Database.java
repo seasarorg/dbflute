@@ -1303,6 +1303,10 @@ public class Database {
     public boolean isUseBuri() {
         return getProperties().getLittleAdjustmentProperties().isUseBuri();
     }
+    
+    public boolean isCompatibleNullEqualFalse() {
+        return getProperties().getLittleAdjustmentProperties().isCompatibleNullEqualFalse();
+    }
 
     // -----------------------------------------------------
     //                                                 Other

@@ -22,7 +22,6 @@ import org.seasar.dao.node.ParenBindVariableNode;
 import org.seasar.dao.node.PrefixSqlNode;
 import org.seasar.dao.node.SqlNode;
 import org.seasar.dao.parser.SqlTokenizerImpl;
-import org.seasar.dao.IllegalBoolExpressionRuntimeException;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
@@ -40,6 +39,10 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glMapParameterBeanInterfaceName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
+import ${glPackageBaseCommonException}.${glBindVariableCommentNotFoundPropertyException};
+import ${glPackageBaseCommonException}.${glEmbeddedValueCommentNotFoundPropertyException};
+import ${glPackageBaseCommonException}.${glIfCommentNotBooleanResultException};
+import ${glPackageBaseCommonException}.${glIfCommentWrongExpressionException};
 
 /**
  * SelectDynamicCommand for DBFlute.
@@ -670,7 +673,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             if (InternalStringUtil.isEmpty(condition)) {
                 throw new IfConditionNotFoundRuntimeException();
             }
-            final InternalIfNode ifNode = new InternalIfNode(condition, specifiedSql);
+            final ContainerNode ifNode = createIfNode(condition);
             peek().addChild(ifNode);
             push(ifNode);
             parseEnd();
@@ -799,7 +802,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
 
         protected void setupValueAndType(InternalValueAndType valueAndType) {
-            final InternalValueAndTypeSetuper valueAndTypeSetuper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql);
+            final InternalValueAndTypeSetuper valueAndTypeSetuper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, true);
             valueAndTypeSetuper.setupValueAndType(valueAndType);
         }
     }
@@ -832,7 +835,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
 
         protected void setupValueAndType(InternalValueAndType valueAndType) {
-            final InternalValueAndTypeSetuper valueAndTypeSetuper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql);
+            final InternalValueAndTypeSetuper valueAndTypeSetuper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, false);
             valueAndTypeSetuper.setupValueAndType(valueAndType);
         }
     }
@@ -862,11 +865,13 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         protected String _expression;
         protected String[] _names;
         protected String _specifiedSql;
+        protected boolean _bind;
 
-        public InternalValueAndTypeSetuper(String expression, String[] names, String specifiedSql) {
+        public InternalValueAndTypeSetuper(String expression, String[] names, String specifiedSql, boolean bind) {
             this._expression = expression;
             this._names = names;
             this._specifiedSql = specifiedSql;
+            this._bind = bind;
         }
 
         protected void setupValueAndType(InternalValueAndType valueAndType) {
@@ -910,7 +915,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                         continue;
                     }
                 }
-                throwNotFoundPropertyException(_expression, clazz, currentName, _specifiedSql);
+                throwBindOrEmbeddedCommentNotFoundPropertyException(_expression, clazz, currentName, _specifiedSql, _bind);
             }
             valueAndType.setTargetValue(value);
             valueAndType.setTargetType(clazz);
@@ -932,10 +937,10 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             }
         }
 
-        protected void throwNotFoundPropertyException(String expression, Class targetType, String notFoundProperty, String specifiedSql) {
+        protected void throwBindOrEmbeddedCommentNotFoundPropertyException(String expression, Class targetType, String notFoundProperty, String specifiedSql, boolean bind) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The property on the SQL comment was Not Found!" + getLineSeparator();
+            msg = msg + "The property on the " + (bind ? "bind variable" : "embedded value") + " comment was Not Found!" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
@@ -946,7 +951,11 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             msg = msg + getLineSeparator();
             msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
-            throw new IllegalStateException(msg);
+            if (bind) {
+                throw new ${glBindVariableCommentNotFoundPropertyException}(msg);
+            } else {
+                throw new ${glEmbeddedValueCommentNotFoundPropertyException}(msg);
+            }
         }
 
         protected String getLineSeparator() {
@@ -987,17 +996,17 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                 result = OgnlUtil.getValue(_parsedExpression, ctx);
             } catch (RuntimeException e) {
                 if (!_expression.contains("pmb.")) {
-                    throwWrongIfCommentException(_expression, e, _specifiedSql);
+                    throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
                 }
                 final String replaced = InternalStringUtil.replace(_expression, "pmb.", "pmb.parameterMap.");
                 final Object secondParsedExpression = OgnlUtil.parseExpression(replaced);
                 try {
                     result = OgnlUtil.getValue(secondParsedExpression, ctx);
                 } catch (RuntimeException ignored) {
-                    throwWrongIfCommentException(_expression, e, _specifiedSql);
+                    throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
                 }
                 if (result == null) {
-                    throwWrongIfCommentException(_expression, e, _specifiedSql);
+                    throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
                 }
                 _parsedExpression = secondParsedExpression;
             }
@@ -1010,11 +1019,11 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                     ctx.setEnabled(true);
                 }
             } else {
-                throw new IllegalBoolExpressionRuntimeException(_expression);
+                throwIfCommentNotBooleanResultException(_expression, result, _specifiedSql);
             }
         }
 
-        protected void throwWrongIfCommentException(String expression, RuntimeException cause, String specifiedSql) {
+        protected void throwIfCommentWrongExpressionException(String expression, RuntimeException cause, String specifiedSql) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "The IF comment of your specified SQL was Wrong!" + getLineSeparator();
@@ -1023,13 +1032,31 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
             msg = msg + "And confirm the IF comment of your specified SQL." + getLineSeparator();
             msg = msg + getLineSeparator();
-            msg = msg + "[SQL Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
+            msg = msg + "[IF Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Cause Message]" + getLineSeparator() + cause.getMessage() + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
-            throw new IllegalStateException(msg);
+            throw new ${glIfCommentWrongExpressionException}(msg, cause);
+        }
+
+        protected void throwIfCommentNotBooleanResultException(String expression, Object result, String specifiedSql) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The boolean expression on IF comment of your specified SQL was Wrong!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm the grammar of your IF comment. Does it really express boolean?" + getLineSeparator();
+            msg = msg + "And confirm the existence of your property on your arguments if you use parameterMap." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[IF Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[IF Comment Result Value]" + getLineSeparator() + result + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new ${glIfCommentNotBooleanResultException}(msg);
         }
 
         protected String getLineSeparator() {

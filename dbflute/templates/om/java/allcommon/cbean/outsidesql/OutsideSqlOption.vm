@@ -48,6 +48,14 @@ public class ${glOutsideSqlOptionName} {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{paging=" + _pagingRequestType + ", dynamic=" + _dynamicBinding + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public boolean isAutoPaging() {

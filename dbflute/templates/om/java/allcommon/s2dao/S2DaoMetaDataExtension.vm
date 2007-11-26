@@ -894,9 +894,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 return super.execute(new Object[] {arg});
             }
         };
-        cmd.setSql(sql);
-        cmd.setArgNames(argNames);
-        cmd.setArgTypes(argTypes);
         cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
         registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
     }

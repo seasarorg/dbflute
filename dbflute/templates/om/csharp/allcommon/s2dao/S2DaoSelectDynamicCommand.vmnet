@@ -13,6 +13,7 @@ using Seasar.Dao.Parser;
 
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonException};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -425,7 +426,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             INode node = Peek();
 
-            if ((node is IfNode || node is ElseNode) && node.ChildSize == 0) {
+            if ((node is InternalIfNode || node is ElseNode) && node.ChildSize == 0) {
                 ISqlTokenizer st = new SqlTokenizerImpl(sql);
                 st.SkipWhitespace();
                 string token = st.SkipToken();
@@ -460,28 +461,25 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-        protected void ParseIf()
-        {
+        protected void ParseIf() {
             string condition = _tokenizer.Token.Substring(2).Trim();
             if (StringUtil.IsEmpty(condition)) {
                 throw new IfConditionNotFoundRuntimeException();
             }
-            IfNode ifNode = new IfNode(condition);
+            ContainerNode ifNode = CreateIfNode(condition);
             Peek().AddChild(ifNode);
             Push(ifNode);
             ParseEnd();
         }
 
-        protected void ParseBegin()
-        {
+        protected void ParseBegin() {
             BeginNode beginNode = new BeginNode();
             Peek().AddChild(beginNode);
             Push(beginNode);
             ParseEnd();
         }
 
-        protected void ParseEnd()
-        {
+        protected void ParseEnd() {
             while (TokenType.EOF != _tokenizer.Next()) {
                 if (_tokenizer.TokenType == TokenType.COMMENT
                     && IsEndComment(_tokenizer.Token)) {
@@ -493,40 +491,31 @@ namespace ${glPackageBaseCommonS2Dao} {
             throw new EndCommentNotFoundRuntimeException();
         }
 
-        protected void ParseElse()
-        {
+        protected void ParseElse() {
             INode parent = Peek();
-            if (!(parent is IfNode))
-            {
+            if (!(parent is InternalIfNode)) {
                 return;
             }
-            IfNode ifNode = (IfNode) Pop();
+            InternalIfNode ifNode = (InternalIfNode) Pop();
             ElseNode elseNode = new ElseNode();
             ifNode.ElseNode = elseNode;
             Push(elseNode);
             _tokenizer.SkipWhitespace();
         }
 
-        protected void ParseCommentBindVariable()
-        {
+        protected void ParseCommentBindVariable() {
             string expr = _tokenizer.Token;
             string s = _tokenizer.SkipToken();
-            if (s.StartsWith("(") && s.EndsWith(")"))
-            {
+            if (s.StartsWith("(") && s.EndsWith(")")) {
                 Peek().AddChild(CreateParenBindVariableNode(expr));
-            }
-            else if (expr.StartsWith("$"))
-            {
+            } else if (expr.StartsWith("$")) {
                 Peek().AddChild(CreateEmbeddedValueNode(expr.Substring(1)));
-            }
-            else
-            {
+            } else {
                 Peek().AddChild(CreateBindVariableNode(expr));
             }
         }
 
-        protected void ParseBindVariable()
-        {
+        protected void ParseBindVariable() {
             string expr = _tokenizer.Token;
             Peek().AddChild(CreateBindVariableNode(expr));
         }
@@ -543,18 +532,19 @@ namespace ${glPackageBaseCommonS2Dao} {
             return new InternalBindVariableNode(expr, _specifiedSql);
         }
 
-        protected INode Pop()
-        {
+        protected ContainerNode CreateIfNode(string expr) {
+            return new InternalIfNode(expr, _specifiedSql);
+        }
+
+        protected INode Pop() {
             return (INode) _nodeStack.Pop();
         }
 
-        protected INode Peek()
-        {
+        protected INode Peek() {
             return (INode) _nodeStack.Peek();
         }
 
-        protected void Push(INode node)
-        {
+        protected void Push(INode node) {
             _nodeStack.Push(node);
         }
 
@@ -614,7 +604,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected void SetupValueAndType(InternalValueAndType valueAndType) {
-            InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql);
+            InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, true);
             setupper.SetupValueAndType(valueAndType);
         }
     }
@@ -644,7 +634,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected void SetupValueAndType(InternalValueAndType valueAndType) {
-            InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql);
+            InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, false);
             setupper.SetupValueAndType(valueAndType);
         }
     }
@@ -665,15 +655,16 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-
     public class InternalValueAndTypeSetuper {
         protected String _expression;
         protected String[] _names;
         protected String _specifiedSql;
-        public InternalValueAndTypeSetuper(String expression, String[] names, String specifiedSql) {
+        protected bool _bind;
+        public InternalValueAndTypeSetuper(String expression, String[] names, String specifiedSql, bool bind) {
             this._expression = expression;
             this._names = names;
             this._specifiedSql = specifiedSql;
+            this._bind = bind;
         }
 
         public void SetupValueAndType(InternalValueAndType valueAndType) {
@@ -710,16 +701,16 @@ namespace ${glPackageBaseCommonS2Dao} {
                         continue;
                     }
                 }
-                ThrowNotFoundPropertyException(_expression, type, currentName, _specifiedSql);
+                ThrowBindOrEmbeddedCommentNotFoundPropertyException(_expression, type, currentName, _specifiedSql, _bind);
             }
             valueAndType.TargetValue = value;
             valueAndType.TargetType = type;
         }
 
-        public void ThrowNotFoundPropertyException(String expression, Type targetType, String notFoundProperty, String specifiedSql) {
+        protected virtual void ThrowBindOrEmbeddedCommentNotFoundPropertyException(String expression, Type targetType, String notFoundProperty, String specifiedSql, bool bind) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
-            msg = msg + "The property on the SQL comment was Not Found!" + GetLineSeparator();
+            msg = msg + "The property on the " + (bind ? "bind variable" : "embedded value") + " comment was Not Found!" + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + GetLineSeparator();
@@ -730,10 +721,114 @@ namespace ${glPackageBaseCommonS2Dao} {
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
             msg = msg + "* * * * * * * * * */" + GetLineSeparator();
-            throw new SystemException(msg);
+            if (bind) {
+                throw new ${glBindVariableCommentNotFoundPropertyException}(msg);
+            } else {
+                throw new ${glEmbeddedValueCommentNotFoundPropertyException}(msg);
+            }
         }
 
         protected String GetLineSeparator() {
+            return Environment.NewLine;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                IfNode
+    //                                                ------
+    public class InternalIfNode : ContainerNode {
+        private String _expression;
+        private ElseNode _elseNode;
+        private readonly ExpressionUtil _expressionUtil;
+        private String _specifiedSql;
+
+        public InternalIfNode(String expression, String specifiedSql) {
+            _expressionUtil = new ExpressionUtil();
+            _expression = _expressionUtil.parseExpression(expression);
+            if (_expression == null)
+                throw new ApplicationException("IllegalBoolExpression=[" + _expression + "]");
+            this._specifiedSql = specifiedSql;
+        }
+
+        public string Expression {
+            get { return _expression; }
+        }
+
+        public ElseNode ElseNode {
+            get { return _elseNode; }
+            set { _elseNode = value; }
+        }
+
+        public override void Accept(ICommandContext ctx) {
+            Object result = null;
+            try {
+                result = InvokeExpression(_expression, ctx);
+            } catch (Exception e) {
+                if (!_expression.Contains("pmb.")) {
+                    ThrowIfCommentWrongExpressionException(_expression, e, _specifiedSql);
+                }
+                String replaced = _expression.Replace("pmb.", "pmb.ParameterMap.");
+                String secondParsedExpression = _expressionUtil.parseExpression(replaced);
+                try {
+                    result = InvokeExpression(secondParsedExpression, ctx);
+                } catch (Exception) {
+                    ThrowIfCommentWrongExpressionException(_expression, e, _specifiedSql);
+                }
+                if (result == null) {
+                    ThrowIfCommentWrongExpressionException(_expression, e, _specifiedSql);
+                }
+                _expression = secondParsedExpression;
+            }
+            if (result != null) {
+                if (Convert.ToBoolean(result)) {
+                    base.Accept(ctx);
+                    ctx.IsEnabled = true;
+                } else if (_elseNode != null) {
+                    _elseNode.Accept(ctx);
+                    ctx.IsEnabled = true;
+                }
+            } else {
+                ThrowIfCommentNotBooleanResultException(_expression, result, _specifiedSql);
+            }
+        }
+
+        protected virtual void ThrowIfCommentWrongExpressionException(String expression, Exception cause, String specifiedSql) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The IF comment of your specified SQL was Wrong!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm the existence of your property on your arguments." + GetLineSeparator();
+            msg = msg + "And confirm the IF comment of your specified SQL." + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[IF Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Cause Message]" + GetLineSeparator() + cause.Message + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            throw new ${glIfCommentWrongExpressionException}(msg, cause);
+        }
+
+        protected virtual void ThrowIfCommentNotBooleanResultException(String expression, Object result, String specifiedSql) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The boolean expression on IF comment of your specified SQL was Wrong!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm the grammar of your IF comment. Does it really express boolean?" + GetLineSeparator();
+            msg = msg + "And confirm the existence of your property on your arguments if you use parameterMap." + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[IF Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[IF Comment Result Value]" + GetLineSeparator() + result + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            throw new ${glIfCommentNotBooleanResultException}(msg);
+        }
+
+        protected virtual String GetLineSeparator() {
             return Environment.NewLine;
         }
     }
