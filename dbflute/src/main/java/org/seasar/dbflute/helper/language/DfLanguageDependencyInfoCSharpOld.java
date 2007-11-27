@@ -10,8 +10,6 @@ import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefa
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultCSharpOld;
 
 /**
- * The language depndency info of CSharpOld.
- * 
  * @author jflute
  */
 public class DfLanguageDependencyInfoCSharpOld implements DfLanguageDependencyInfo {
@@ -41,5 +39,9 @@ public class DfLanguageDependencyInfoCSharpOld implements DfLanguageDependencyIn
     
     public String getIntegerConvertExpression(String value) {
         return "new Nullable<int>(" + value + ")";
+    }
+    
+    public String getConditionBeanPackageName() {
+        return "cbean";
     }
 }

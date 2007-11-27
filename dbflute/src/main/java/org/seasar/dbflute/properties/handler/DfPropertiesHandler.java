@@ -18,6 +18,7 @@ import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
+import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
  * Build properties for Torque.
@@ -26,15 +27,27 @@ import org.seasar.dbflute.properties.DfSql2EntityProperties;
  */
 public final class DfPropertiesHandler {
 
-    public static final DfPropertiesHandler _insntace = new DfPropertiesHandler();
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final DfPropertiesHandler _insntace = new DfPropertiesHandler();
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfPropertiesHandler() {
     }
 
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
     public static DfPropertiesHandler getInstance() {
         return _insntace;
     }
 
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
@@ -155,6 +168,9 @@ public final class DfPropertiesHandler {
         return _otherProperties;
     }
 
+    // -----------------------------------------------------
+    //                                      Source Reduction
+    //                                      ----------------
     protected DfSourceReductionProperties _sourceReductionProperties;
 
     public DfSourceReductionProperties getSourceReductionProperties(Properties prop) {
@@ -164,6 +180,9 @@ public final class DfPropertiesHandler {
         return _sourceReductionProperties;
     }
 
+    // -----------------------------------------------------
+    //                                         Include Query
+    //                                         -------------
     protected DfIncludeQueryProperties _includeQueryProperties;
 
     public DfIncludeQueryProperties getIncludeQueryProperties(Properties prop) {
@@ -173,6 +192,9 @@ public final class DfPropertiesHandler {
         return _includeQueryProperties;
     }
 
+    // -----------------------------------------------------
+    //                                            Sql2Entity
+    //                                            ----------
     protected DfSql2EntityProperties _sql2EntityProperties;
 
     public DfSql2EntityProperties getSql2EntityProperties(Properties prop) {
@@ -182,6 +204,9 @@ public final class DfPropertiesHandler {
         return _sql2EntityProperties;
     }
 
+    // -----------------------------------------------------
+    //                                         ReplaceSchema
+    //                                         -------------
     protected DfReplaceSchemaProperties _replaceSchemaPropertiess;
 
     public DfReplaceSchemaProperties getReplaceSchemaProperties(Properties prop) {
@@ -191,6 +216,9 @@ public final class DfPropertiesHandler {
         return _replaceSchemaPropertiess;
     }
 
+    // -----------------------------------------------------
+    //                                  Invoke Sql Directory
+    //                                  --------------------
     protected DfInvokeSqlDirectoryProperties _invokeSqlDirectoryProperties;
 
     public DfInvokeSqlDirectoryProperties getInvokeSqlDirectoryProperties(Properties prop) {
@@ -198,5 +226,17 @@ public final class DfPropertiesHandler {
             _invokeSqlDirectoryProperties = new DfInvokeSqlDirectoryProperties(prop);
         }
         return _invokeSqlDirectoryProperties;
+    }
+    
+    // -----------------------------------------------------
+    //                                          Type Mapping
+    //                                          ------------
+    protected DfTypeMappingProperties _typeMappingProperties;
+
+    public DfTypeMappingProperties getTypeMappingProperties(Properties prop) {
+        if (_typeMappingProperties == null) {
+            _typeMappingProperties = new DfTypeMappingProperties(prop);
+        }
+        return _typeMappingProperties;
     }
 }

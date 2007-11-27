@@ -2,7 +2,7 @@
 <!DOCTYPE components PUBLIC "-//SEASAR2.1//DTD S2Container//EN"
 "http://www.seasar.org/dtd/components21.dtd">
 
-<components namespace="${glDaoDiconNamespace}">
+<components namespace="${glDBFluteDiconNamespace}">
 #foreach ($includePath in $database.DBFluteDiconBeforeJ2eeIncludePathList)
     <include path="${includePath}"/>
 #end
@@ -17,9 +17,14 @@
     <component class="${database.extendedDaoMetaDataFactoryImplClassName}"/>
     <component name="interceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}"/>
 
-    <!-- Selector. -->
+    <!-- The selector of dao. -->
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}"/>
     <component name="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}"/>
+
+    <!-- The dao of outsideSql. -->
+    <component class="${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName}">
+        <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
+    </component>
 
     <!-- Original behavior aspect. -->
 #foreach ($componentName in $database.getOriginalBehaviorAspectComponentNameList())
@@ -48,7 +53,7 @@
 
     <!-- ${table.Name} -->
     <component name="${table.daoComponentName}" class="${glPackageExtendedDao}.${glProjectPrefix}${table.JavaName}Dao">
-        <aspect>${glDaoDiconNamespace}.interceptor</aspect>
+        <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>
 #end
 

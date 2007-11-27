@@ -173,7 +173,7 @@ namespace ${glPackageBaseCQ} {
       /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
           String code = ${glClassificationDefinition}.CODE_${col.ClassificationName}_${classificationMap.get('name')};
-            Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${col.JavaNative}.Parse(code));
+            Register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
         }
       #end
     #end

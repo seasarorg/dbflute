@@ -102,7 +102,7 @@ public class ForeignKey {
     /**
      * Imports foreign key from an XML specification
      *
-     * @param attrib the xml attributes
+     * @param attrib the XML attributes
      */
     public void loadFromXML(Attributes attrib) {
         _foreignTableName = attrib.getValue("foreignTable");
@@ -121,7 +121,7 @@ public class ForeignKey {
     public boolean isForeignColumnsSameAsForeignTablePrimaryKeys() {
         final List<String> foreginTablePrimaryKeyNameList = new ArrayList<String>();
         {
-            final Table fkTable = _baseTable.getDatabase().getTable(_foreignTableName);
+            final Table fkTable = _baseTable.getDatabase().getTableByFlexibleName(_foreignTableName);
             final List<Column> foreignTablePrimaryKeyList = fkTable.getPrimaryKey();
             for (Column column : foreignTablePrimaryKeyList) {
                 foreginTablePrimaryKeyNameList.add(column.getName());
@@ -400,14 +400,14 @@ public class ForeignKey {
      * @return the foreign objects
      */
     public List<Column> getForeignColumnObjectList() {
-        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
+        final Table foreignTable = getTable().getDatabase().getTableByFlexibleName(getForeignTableName());
         final List<String> columnList = getForeignColumns();
         if (columnList == null || columnList.isEmpty()) {
             String msg = "The getForeignColumns() is null or empty." + columnList;
             throw new IllegalStateException(msg);
         }
         final List<Column> resultList = new ArrayList<Column>();
-        for (Iterator ite = columnList.iterator(); ite.hasNext();) {
+        for (Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
             final String name = (String) ite.next();
             final Column foreignCol = foreignTable.getColumn(name);
             resultList.add(foreignCol);
@@ -421,7 +421,7 @@ public class ForeignKey {
      * @return Foreign table.
      */
     public Table getForeignTable() {
-        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
+        final Table foreignTable = getTable().getDatabase().getTableByFlexibleName(getForeignTableName());
         if (foreignTable == null) {
             String msg = "The database does not contain the foreign table name: " + getForeignTableName();
             throw new IllegalStateException(msg);

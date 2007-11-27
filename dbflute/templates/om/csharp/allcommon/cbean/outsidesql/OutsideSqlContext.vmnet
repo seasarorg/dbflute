@@ -50,10 +50,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         public static void ThrowOutsideSqlNotFoundException(String path) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
-            msg = msg + "The outside-sql was Not Found!" + GetLineSeparator();
+            msg = msg + "The outsideSql was Not Found!" + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Advice]" + GetLineSeparator();
-            msg = msg + "Please confirm the existence of your target file of outside-sql on your classpath." + GetLineSeparator();
+            msg = msg + "Please confirm the existence of your target file of outsideSql on your classpath." + GetLineSeparator();
             msg = msg + "And please confirm the file name and the file path STRICTLY!" + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[Specified OutsideSql Path]" + GetLineSeparator() + path + GetLineSeparator();
@@ -93,9 +93,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         //                                                                        Read SQL
         //                                                                        ========
         public String ReadOutsideSqlPath(String sqlFileEncoding, String dbmsSuffix) {
-            String standardPath = _outsideSqlPath;
+            String standardPath = _outsideSqlPath.Replace("/", ".");// Replacing is required for csharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
-            Assembly asm = GetType().Assembly;// in same assembly!
+            Assembly asm = GetType().Assembly;// In same assembly!
             if (IsExistResource(dbmsPath, asm)) {
                 return ReadText(dbmsPath, sqlFileEncoding, asm);
             } else if (IsExistResource(standardPath, asm)) {

@@ -68,10 +68,10 @@ public class ${glOutsideSqlContextName} {
     public static void throwOutsideSqlNotFoundException(String path) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The outside-sql was Not Found!" + getLineSeparator();
+        msg = msg + "The outsideSql was Not Found!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the existence of your target file of outside-sql on your classpath." + getLineSeparator();
+        msg = msg + "Please confirm the existence of your target file of outsideSql on your classpath." + getLineSeparator();
         msg = msg + "And please confirm the file name and the file path STRICTLY!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Specified OutsideSql Path]" + getLineSeparator() + path + getLineSeparator();

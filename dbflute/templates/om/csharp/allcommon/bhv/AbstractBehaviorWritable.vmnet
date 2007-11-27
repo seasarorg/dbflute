@@ -19,6 +19,50 @@ namespace ${glPackageBaseCommonBhv} {
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         // ===============================================================================
+        //                                                             Basic Entity Update
+        //                                                             ===================
+        public void Create(${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            CallCreate(entity);
+        }
+
+        public void Modify(${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            int modifiedCount = CallModify(entity);
+            AssertUpdatedEntity(entity, modifiedCount);
+        }
+
+        protected static void AssertUpdatedEntity(${glEntityInterfaceName} entity, int updatedCount) {
+            if (updatedCount == 0) {
+                String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            }
+            if (updatedCount > 1) {
+                String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+                msg = msg + ": entity=" + entity;
+                throw new ${glEntityDuplicatedException}(msg);
+            }
+        }
+
+        public void Remove(${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);
+            int removedCount = CallRemove(entity);
+            AssertDeletedEntity(entity, removedCount);
+        }
+
+        protected static void AssertDeletedEntity(${glEntityInterfaceName} entity, int deletedCount) {
+            if (deletedCount == 0) {
+                String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
+                throw new ${glEntityAlreadyDeletedException}(msg);
+            }
+            if (deletedCount > 1) {
+                String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+                msg = msg + ": entity=" + entity;
+                throw new ${glEntityDuplicatedException}(msg);
+            }
+        }
+
+        // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
         #region Delegate Method
@@ -26,10 +70,15 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                            Create
         //                                            ------
-        protected virtual int CallCreate(${glEntityInterfaceName} entity) {
-            AssertEntityNotNull(entity);
+        protected virtual bool ProcessBeforeInsert(${glEntityInterfaceName} entity) {
+            AssertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
             FilterEntityOfInsert(entity);
             AssertEntityOfInsert(entity);
+            return true;
+        }
+
+        protected virtual int CallCreate(${glEntityInterfaceName} entity) {
+            if (!ProcessBeforeInsert(entity)) { return 1; }
             return DoCallCreate(entity);
         }
 
@@ -79,10 +128,15 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                            Modify
         //                                            ------
-        protected virtual int CallModify(${glEntityInterfaceName} entity) {
-            AssertEntityNotNull(entity);
+        protected virtual bool ProcessBeforeUpdate(${glEntityInterfaceName} entity) {
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             FilterEntityOfUpdate(entity);
             AssertEntityOfUpdate(entity);
+            return true;
+        }
+
+        protected virtual int CallModify(${glEntityInterfaceName} entity) {
+            if (!ProcessBeforeUpdate(entity)) { return 1; }
             return DoCallModify(entity);
         }
 
@@ -132,10 +186,15 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                            Remove
         //                                            ------
-        protected virtual int CallRemove(${glEntityInterfaceName} entity) {
-            AssertEntityNotNull(entity);
+        protected virtual bool ProcessBeforeDelete(${glEntityInterfaceName} entity) {
+            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
             FilterEntityOfDelete(entity);
             AssertEntityOfDelete(entity);
+            return true;
+        }
+
+        protected virtual int CallRemove(${glEntityInterfaceName} entity) {
+            if (!ProcessBeforeDelete(entity)) { return 1; }
             return DoCallRemove(entity);
         }
 
@@ -196,49 +255,5 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
         #endregion
-
-        // ===============================================================================
-        //                                                             Basic Entity Update
-        //                                                             ===================
-        public void Create(${glEntityInterfaceName} entity) {
-            AssertEntityNotNull(entity);
-            CallCreate(entity);
-        }
-
-        public void Modify(${glEntityInterfaceName} entity) {
-            AssertEntityNotNull(entity);
-            int modifiedCount = CallModify(entity);
-            AssertUpdatedEntity(entity, modifiedCount);
-        }
-
-        protected static void AssertUpdatedEntity(${glEntityInterfaceName} entity, int updatedCount) {
-            if (updatedCount == 0) {
-                String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
-                throw new ${glEntityAlreadyDeletedException}(msg);
-            }
-            if (updatedCount > 1) {
-                String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
-                msg = msg + ": entity=" + entity;
-                throw new ${glEntityDuplicatedException}(msg);
-            }
-        }
-
-        public void Remove(${glEntityInterfaceName} entity) {
-            AssertEntityNotNull(entity);
-            int removedCount = CallRemove(entity);
-            AssertDeletedEntity(entity, removedCount);
-        }
-
-        protected static void AssertDeletedEntity(${glEntityInterfaceName} entity, int deletedCount) {
-            if (deletedCount == 0) {
-                String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
-                throw new ${glEntityAlreadyDeletedException}(msg);
-            }
-            if (deletedCount > 1) {
-                String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the deletedCount=" + deletedCount;
-                msg = msg + ": entity=" + entity;
-                throw new ${glEntityDuplicatedException}(msg);
-            }
-        }
     }
 }

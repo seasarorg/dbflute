@@ -10,23 +10,23 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
     /// The executor of outside-sql.
     /// <![CDATA[
     /// {Basic}
-    ///   o selectList()
+    ///   o SelectList()
     /// 
     /// {Entity}
-    ///   o entityHandling().selectEntity()
-    ///   o entityHandling().selectEntityWithDeletedCheck()
+    ///   o EntityHandling().SelectEntity()
+    ///   o EntityHandling().SelectEntityWithDeletedCheck()
     /// 
     /// {Cursor}
-    ///   o cursorHandling().selectCursor()
+    ///   o CursorHandling().SelectCursor()
     /// 
     /// {Paging}
-    ///   o autoPaging().selectList()
-    ///   o autoPaging().selectPage()
-    ///   o manualPaging().selectList()
-    ///   o manualPaging().selectPage()
+    ///   o AutoPaging().SelectList()
+    ///   o AutoPaging().SelectPage()
+    ///   o ManualPaging().SelectList()
+    ///   o ManualPaging().SelectPage()
     /// 
     /// {Option -- Dynamic}
-    ///   o dynamicBinding().selectList()
+    ///   o DynamicBinding().SelectList()
     /// ]]>
     /// Author: ${database.classAuthor}
     /// </summary>

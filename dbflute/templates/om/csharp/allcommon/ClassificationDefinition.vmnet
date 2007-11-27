@@ -47,7 +47,7 @@ namespace ${glPackageBaseCommon} {
 #foreach ($classificationName in $database.ClassificationNameListValidNameOnly)
 #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
             {
-                IDictionary<String, String> map = new System.Collections.Hashtable();
+                IDictionary<String, String> map = new Dictionary<String, String>();
 #foreach ($classificationMap in $classificationMapList)
                 map.Add(CODE_${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('name')}");
 #end
@@ -57,7 +57,7 @@ namespace ${glPackageBaseCommon} {
 #foreach ($classificationName in $database.ClassificationNameListValidAliasOnly)
 #set ($classificationMapList = $database.ClassificationDefinitionMap.get($classificationName))
             {
-                IDictionary<String, String> map = new System.Collections.Hashtable();
+                IDictionary<String, String> map = new Dictionary<String, String>();
 #foreach ($classificationMap in $classificationMapList)
                 map.Add(CODE_${classificationName}_${classificationMap.get('name')}, "${classificationMap.get('alias')}");
 #end

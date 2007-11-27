@@ -16,10 +16,10 @@ namespace ${myExtendedDaoCursorPackageName} {
         }
 
         public virtual Object Handle(IDataReader reader) {
-            return FetchCursor();
+            return FetchCursor(reader);
         }
 
-        protected virtual Object FetchCursor() {
+        protected virtual Object FetchCursor(IDataReader reader) {
             return _cursorFetcher.Invoke(CreateTypeSafeCursor(reader));
         }
 

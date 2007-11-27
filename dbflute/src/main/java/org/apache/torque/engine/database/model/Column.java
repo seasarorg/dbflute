@@ -552,10 +552,39 @@ public class Column {
     }
 
     /**
-     * Set the size of the column
+     * Set the size of the column.
+     * 
+     * @param size The size of the column. (NotNull)
      */
-    public void setSize(String newSize) {
-        _size = newSize;
+    public void setSize(String size) {
+        _size = size;
+    }
+
+    protected Integer getColumnSize() {
+        if (_size == null) {
+            return null;
+        }
+        final String realSize;
+        if (_size.contains(",")) {
+            realSize = _size.split(",")[0];
+        } else {
+            realSize = _size;
+        }
+        try {
+            return Integer.parseInt(realSize);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    protected Integer getDecimalDigits() {
+        if (_size == null) {
+            return null;
+        }
+        if (!_size.contains(",")) {
+            return 0;
+        }
+        return Integer.parseInt(_size.split(",")[1].trim());
     }
 
     /**
@@ -570,14 +599,13 @@ public class Column {
         if (_size == null) {
             return "null";
         }
-        try {
-            Integer.parseInt(_size);
-            DfBasicProperties prop = getTable().getProperties().getBasicProperties();
-            DfLanguageDependencyInfo languageDependencyInfo = prop.getLanguageDependencyInfo();
-            return languageDependencyInfo.getIntegerConvertExpression(_size);
-        } catch (NumberFormatException e) {
+        final Integer columnSize = getColumnSize();
+        if (columnSize == null) {
             return "null";
         }
+        DfBasicProperties prop = getTable().getProperties().getBasicProperties();
+        DfLanguageDependencyInfo languageDependencyInfo = prop.getLanguageDependencyInfo();
+        return languageDependencyInfo.getIntegerConvertExpression(String.valueOf(columnSize));
     }
 
     // -------------------------------------------
@@ -916,26 +944,28 @@ public class Column {
         }
     }
 
-    /**
-     * Return a string representation of the primitive java type which
-     * corresponds to the JDBC type of this column.
-     *
-     * @return string representation of the primitive java type
-     */
-    public String getJavaPrimitive() {
-        return TypeMap.getJavaType(_torqueType);
-    }
-
+    // ===================================================================================
+    //                                                                         Java Native
+    //                                                                         ===========
     /**
      * Return a string representation of the native java type which corresponds
      * to the JDBC type of this column. Use in the generation of Base objects.
      * This method is used by torque, so it returns Key types for primaryKey and
      * foreignKey columns
      *
-     * @return java datatype used by torque
+     * @return Java native type used by torque. (NotNull)
      */
     public String getJavaNative() {
-        return TypeMap.getJavaType(_torqueType);
+        return TypeMap.findJavaNativeTypeString(_torqueType, getColumnSize(), getDecimalDigits());
+    }
+
+    // for CSharp
+    public String getJavaNativeRemovedCSharpNullable() {
+        final String javaNative = getJavaNative();
+        if (javaNative.endsWith("?")) {
+            return javaNative.substring(0, javaNative.length() - "?".length());
+        }
+        return javaNative;
     }
 
     // ===================================================================================
@@ -1016,7 +1046,7 @@ public class Column {
     public boolean isJavaNativeCSharpNullable() {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
-    
+
     // ===================================================================================
     //                                                                       Include Query
     //                                                                       =============
@@ -1024,7 +1054,7 @@ public class Column {
         final DfSourceReductionProperties prop = getTable().getProperties().getSourceReductionProperties();
         return !prop.isMakeConditionQueryClassificationRestriction() && hasClassification();
     }
-    
+
     protected boolean hasQueryRestrictionByFlgClassification() {
         return hasQueryRestrictionByClassification() && getClassificationMapList().size() <= 2;
     }

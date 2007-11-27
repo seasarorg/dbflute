@@ -59,6 +59,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 final Integer jdbcTypeCode = new Integer(columnResultSet.getString(5));
                 final String dbTypeName = columnResultSet.getString(6);
                 final Integer columnSize = new Integer(columnResultSet.getInt(7));
+                final Integer decimalDigits = columnResultSet.getInt(9);
                 final Integer nullType = new Integer(columnResultSet.getInt(11));
                 final String defaultValue = columnResultSet.getString(13);
 
@@ -67,6 +68,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 columnMetaInfo.setJdbcTypeCode(jdbcTypeCode);
                 columnMetaInfo.setDbTypeName(dbTypeName);
                 columnMetaInfo.setColumnSize(columnSize);
+                columnMetaInfo.setDecimalDigits(decimalDigits);
                 columnMetaInfo.setRequired(nullType == 0);
                 columnMetaInfo.setDefaultValue(defaultValue);
                 columns.add(columnMetaInfo);
@@ -87,6 +89,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         protected int jdbcTypeCode;
         protected String dbTypeName;
         protected int columnSize;
+        protected int decimalDigits;
         protected boolean required;
         protected String defaultValue;
 
@@ -105,7 +108,15 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         public void setColumnSize(int columnSize) {
             this.columnSize = columnSize;
         }
+        
+        public int getDecimalDigits() {
+            return decimalDigits;
+        }
 
+        public void setDecimalDigits(int decimalDigits) {
+            this.decimalDigits = decimalDigits;
+        }
+        
         public String getDefaultValue() {
             return defaultValue;
         }

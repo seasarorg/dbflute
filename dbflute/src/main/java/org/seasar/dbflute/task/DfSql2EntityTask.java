@@ -42,6 +42,8 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.SQLRuntimeException;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
@@ -149,19 +151,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     /**
-     * Collent sql files into the list.
+     * Collect SQL files into the list.
      * 
-     * @return The list of sql files. (NotNull)
+     * @return The list of SQL files. (NotNull)
      */
     protected List<File> collectSqlFileIntoList() {
         final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
-        final List<File> sqlFileList = new DfSqlFileGetter().getSqlFileList(sqlDirectory);
+        final List<File> sqlFileList = collectSqlFile(sqlDirectory);
         if (!sqlDirectory.contains("src/main/java")) {
             return sqlFileList;
         }
         final String srcMainResources = StringUtil.replace(sqlDirectory, "src/main/java", "src/main/resources");
         try {
-            final List<File> resourcesSqlFileList = new DfSqlFileGetter().getSqlFileList(srcMainResources);
+            final List<File> resourcesSqlFileList = collectSqlFile(srcMainResources);
             sqlFileList.addAll(resourcesSqlFileList);
         } catch (Exception e) {
             _log.debug("Not found sql directory on resources: " + srcMainResources);
@@ -169,11 +171,29 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return sqlFileList;
     }
 
+    protected List<File> collectSqlFile(String dir) {
+        return createSqlFileGetter().getSqlFileList(dir);
+    }
+
+    protected DfSqlFileGetter createSqlFileGetter() {
+        final boolean csharp = getBasicProperties().isTargetLanguageCSharp();
+        final boolean csharpOld = getBasicProperties().isTargetLanguageCSharpOld();
+        return new DfSqlFileGetter() {
+            @Override
+            protected boolean acceptSqlFile(File file) {
+                if ((csharp || csharpOld) && file.getAbsolutePath().contains("Debug")) {
+                    return false;
+                }
+                return super.acceptSqlFile(file);
+            }
+        };
+    }
+
     /**
-     * Create sql file runner.
+     * Create SQL file runner.
      * 
-     * @param runInfo Run informantion. (NotNull)
-     * @return Sql file runner. (NotNull)
+     * @param runInfo Run information. (NotNull)
+     * @return SQL file runner. (NotNull)
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
         final Log log4inner = _log;
@@ -345,7 +365,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             .getGeneratedClassPackageProperties();
                     final String baseCommonPackage = pkgProp.getBaseCommonPackage();
                     final String projectPrefix = getBasicProperties().getProjectPrefix();
-                    pmbMetaData.setSuperClassName(baseCommonPackage + ".cbean." + projectPrefix + "SimplePagingBean");
+                    final DfBasicProperties basicProperties = getProperties().getBasicProperties();
+                    final DfLanguageDependencyInfo languageDependencyInfo = basicProperties.getLanguageDependencyInfo();
+                    final String cbeanPackageName = languageDependencyInfo.getConditionBeanPackageName();
+                    final String spbName = "SimplePagingBean";
+                    pmbMetaData.setSuperClassName(baseCommonPackage + "." + cbeanPackageName + "." + projectPrefix
+                            + spbName);
                 }
             }
 
@@ -385,7 +410,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected boolean isCursor(final String sql) {
         final String targetString = getTargetString(sql, "+");
-        
+
         return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
     }
 

@@ -22,4 +22,6 @@ public interface DfLanguageDependencyInfo {
     public String getDefaultSourceDirectory();
     
     public String getIntegerConvertExpression(String value);
+    
+    public String getConditionBeanPackageName();
 }

@@ -5,33 +5,27 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Build properties for Torque.
- * 
- * @author mkubo
+ * @author jflute
  */
 public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
 
-    //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
-
-    /**
-     * Constructor.
-     */
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfSql2EntityProperties(Properties prop) {
         super(prop);
     }
 
-    // ===============================================================================
-    //                                            Properties - sql2EntityDefinitionMap
-    //                                            ====================================
+    // ===================================================================================
+    //                                                             sql2EntityDefinitionMap
+    //                                                             =======================
     public static final String KEY_sql2EntityDefinitionMap = "sql2EntityDefinitionMap";
     protected Map<String, Object> _sql2EntityDefinitionMap;
 
     public Map<String, Object> getSql2EntityDefinitionMap() {
         if (_sql2EntityDefinitionMap == null) {
             final Map<String, Object> sql2EntityDefaultMap = new LinkedHashMap<String, Object>();
-            getBasicProperties().getJavaLocation_for_main();
-            final String defaultSqlDirectory = getDefaultSqlDirectory();
-            sql2EntityDefaultMap.put("sqlDirectory", defaultSqlDirectory);
+            sql2EntityDefaultMap.put("sqlDirectory", getDefaultSqlDirectory());
             sql2EntityDefaultMap.put("isPlainEntity", "" + isDefaultPlainEntity());
             _sql2EntityDefinitionMap = mapProp("torque." + KEY_sql2EntityDefinitionMap, sql2EntityDefaultMap);
         }
@@ -46,6 +40,9 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         return false;
     }
 
+    // ===================================================================================
+    //                                                                        SqlDirectory
+    //                                                                        ============
     public String getSqlDirectory() {
         final String value = (String) getSql2EntityDefinitionMap().get("sqlDirectory");
         if (value == null || value.trim().length() == 0) {
@@ -55,6 +52,9 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         }
     }
 
+    // ===================================================================================
+    //                                                                       isPlainEntity
+    //                                                                       =============
     public boolean isPlainEntity() {
         final String value = (String) getSql2EntityDefinitionMap().get("isPlainEntity");
         if (value == null || value.trim().length() == 0) {
@@ -64,6 +64,9 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         }
     }
 
+    // ===================================================================================
+    //                                                                     OutputDirectory
+    //                                                                     ===============
     public String getOutputDirectory() {
         final String value = (String) getSql2EntityDefinitionMap().get("outputDirectory");
         if (value == null || value.trim().length() == 0) {
@@ -73,6 +76,9 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         }
     }
 
+    // ===================================================================================
+    //                                                                       PackageString
+    //                                                                       =============
     protected String getPackageString() {
         final String value = (String) getSql2EntityDefinitionMap().get("packageString");
         if (value == null || value.trim().length() == 0) {
@@ -82,6 +88,9 @@ public final class DfSql2EntityProperties extends DfAbstractHelperProperties {
         }
     }
 
+    // ===================================================================================
+    //                                                                 PmbeanPackageString
+    //                                                                 ===================
     protected String getPmbeanPackageString() {
         final String value = (String) getSql2EntityDefinitionMap().get("pmbeanPackageString");
         if (value == null || value.trim().length() == 0) {

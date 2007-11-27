@@ -70,6 +70,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
+import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.transform.DTDResolver;
 import org.apache.xerces.dom.DocumentImpl;
@@ -225,7 +226,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             String msg = "Not found tables: url=" + _url + " schema=" + _schema;
             throw new IllegalStateException(msg);
         }
-        
+
         _databaseNode = _doc.createElement("database");
         _databaseNode.setAttribute("name", _schema);
 
@@ -386,8 +387,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final String javaType = TypeMap.getJavaType(getColumnTorqueType(columnMetaInfo, columnElement));
-        columnElement.setAttribute("javaType", javaType);
+        final String jdbcType = getColumnTorqueType(columnMetaInfo, columnElement);
+        final int columnSize = columnMetaInfo.getColumnSize();
+        final int decimalDigits = columnMetaInfo.getDecimalDigits();
+        final String javaNative = TypeMap.findJavaNativeTypeString(jdbcType, columnSize > 0 ? columnSize : null,
+                decimalDigits > 0 ? decimalDigits : null);
+        columnElement.setAttribute("javaType", javaNative);
     }
 
     protected void setupColumnDbType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
@@ -397,11 +402,19 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
         final int columnSize = columnMetaInfo.getColumnSize();
-        if (columnSize > 0
-                && (sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
-                        || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC)) {
-            columnElement.setAttribute("size", String.valueOf(columnSize));
+        final int decimalDigits = columnMetaInfo.getDecimalDigits();
+        if (columnSize > 0 && isColumnSizeValidSqlType(sqlTypeCode)) {
+            if (decimalDigits > 0) {
+                columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
+            } else {
+                columnElement.setAttribute("size", String.valueOf(columnSize));
+            }
         }
+    }
+
+    protected boolean isColumnSizeValidSqlType(int sqlTypeCode) {
+        return sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
+                || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC;
     }
 
     /**

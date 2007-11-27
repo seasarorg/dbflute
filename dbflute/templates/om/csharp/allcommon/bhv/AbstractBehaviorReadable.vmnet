@@ -6,6 +6,8 @@ using Seasar.Quill.Attrs;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonCBeanOutsidesql};
+using ${glPackageBaseCommonCBeanOutsidesqlExecutor};
 using ${glPackageBaseCommonDBMeta};
 
 namespace ${glPackageBaseCommonBhv} {
@@ -129,6 +131,33 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         // ===============================================================================
+        //                                                                  Various Select
+        //                                                                  ==============
+        public virtual ${glOutsideSqlBasicExecutorName} OutsideSql() {
+            AssertDaoSelectorNotNull("OutsideSql");
+            ${glOutsideSqlDaoName} outsideSqlDao = _daoSelector.Select<${glOutsideSqlDaoName}>(typeof(${glOutsideSqlDaoName}));
+            return new ${glOutsideSqlBasicExecutorName}(outsideSqlDao, this.TableDbName);
+        }
+
+        private void AssertDaoSelectorNotNull(String methodName) {
+            if (_daoSelector == null) {
+                String msg = "Look! Read the message below." + GetLineSeparator();
+                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+                msg = msg + "Not found the selector of dao as behavior's attributed!" + GetLineSeparator();
+                msg = msg + GetLineSeparator();
+                msg = msg + "[Advice]" + GetLineSeparator();
+                msg = msg + "Please confirm the definition of the selector at your 'dbflute.dicon'." + GetLineSeparator();
+                msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + GetLineSeparator();
+                msg = msg + GetLineSeparator();
+                msg = msg + "[Your Behavior's Attributes]" + GetLineSeparator();
+                msg = msg + "  _behaviorSelector  : " + _behaviorSelector + GetLineSeparator();
+                msg = msg + "  _daoSelector       : " + _daoSelector + GetLineSeparator();
+                msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+                throw new SystemException(msg);
+            }
+        }
+
+        // ===============================================================================
         //                                                                 Delegate Method
         //                                                                 ===============
         protected int CallGetCountAll() { return DoCallGetCountAll(); }
@@ -146,6 +175,9 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                          Helper
         //                                                                          ======
         #region Helper
+        protected virtual String GetLineSeparator() {
+            return Environment.NewLine;
+        }
         // -------------------------------------------------
         //                                     Assert Object
         //                                     -------------

@@ -112,7 +112,7 @@ namespace ${myExtendedEntityPackageName} {
             ${col.javaName} = code;
         }
 #else
-            ${col.javaName} = new ${col.javaNative}(code);
+            ${col.javaName} = ${col.javaNativeRemovedCSharpNullable}.Parse(code);
         }
 #end
     #end

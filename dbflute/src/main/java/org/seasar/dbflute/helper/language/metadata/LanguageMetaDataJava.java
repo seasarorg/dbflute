@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class LanguageMetaDataJava implements LanguageMetaData {
 
-    public static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
+    protected static final Map<String, Object> DEFAULT_EMPTY_MAP = new LinkedHashMap<String, Object>();
 
     public Map<String, Object> getJdbcToJavaNativeMap() {
         return DEFAULT_EMPTY_MAP;

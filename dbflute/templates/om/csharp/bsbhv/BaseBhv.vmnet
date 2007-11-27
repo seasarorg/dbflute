@@ -253,7 +253,17 @@ namespace ${glPackageExtendedBhv} {
         }
 
 #if ($table.hasOptimisticLock())
-        // public void UpdateNonstrict(${myExtendedObjectClassName} entity) {
+        /// <summary>
+        /// Update the entity non-strictly modified-only.
+        /// </summary>
+        /// <param name="entity">The entity of update target. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
+        public void UpdateNonstrict(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            int updatedCount = this.DelegateUpdateNonstrict(entity);
+            AssertUpdatedEntity(entity, updatedCount);
+        }
 #end
 
         /// <summary>
@@ -292,9 +302,18 @@ namespace ${glPackageExtendedBhv} {
         }
 
 #if ($table.hasOptimisticLock())
-        // public void DeleteNonstrict(${myExtendedObjectClassName} entity) {
+        /// <summary>
+        /// Delete the entity non-strictly.
+        /// </summary>
+        /// <param name="entity">The entity of delete target. (NotNull)</param>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
+        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
+        public void DeleteNonstrict(${myExtendedObjectClassName} entity) {
+            AssertEntityNotNull(entity);
+            int deletedCount = this.DelegateDeleteNonstrict(entity);
+            AssertUpdatedEntity(entity, deletedCount);
+        }
 #end
-
         #endregion
 #end
 
@@ -321,27 +340,15 @@ namespace ${glPackageExtendedBhv} {
 #end
 
 #if ($table.isWritable())
-        protected int DelegateInsert(${myExtendedObjectClassName} entity) {
-            AssertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
-            FilterEntityOfInsert(entity);
-            AssertEntityOfInsert(entity);
-            return this.Dao.Insert(entity);
-        }
-
-        protected int DelegateUpdate(${myExtendedObjectClassName} entity) {
-            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            FilterEntityOfUpdate(entity);
-            AssertEntityOfUpdate(entity);
-            return this.Dao.UpdateModifiedOnly(entity);
-        }
-
-        protected int DelegateDelete(${myExtendedObjectClassName} entity) {
-            AssertEntityNotNullAndHasPrimaryKeyValue(entity);
-            FilterEntityOfDelete(entity);
-            AssertEntityOfDelete(entity);
-            return this.Dao.Delete(entity);
-        }
-
+        protected int DelegateInsert(${myExtendedObjectClassName} entity) { if (!ProcessBeforeInsert(entity)) { return 1; } return this.Dao.Insert(entity); }
+        protected int DelegateUpdate(${myExtendedObjectClassName} entity) { if (!ProcessBeforeUpdate(entity)) { return 1; } return this.Dao.UpdateModifiedOnly(entity); }
+#if ($table.hasOptimisticLock())
+        protected int DelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { if (!ProcessBeforeUpdate(entity)) { return 1; } return this.Dao.UpdateNonstrictModifiedOnly(entity); }
+#end
+        protected int DelegateDelete(${myExtendedObjectClassName} entity) { if (!ProcessBeforeDelete(entity)) { return 1; } return this.Dao.Delete(entity); }
+#if ($table.hasOptimisticLock())
+        protected int DelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { if (!ProcessBeforeDelete(entity)) { return 1; } return this.Dao.DeleteNonstrict(entity); }
+#end
         protected override int DoCallCreate(${glEntityInterfaceName} entity) { return this.DelegateInsert((${myExtendedObjectClassName})entity); }
         protected override int DoCallModify(${glEntityInterfaceName} entity) { return this.DelegateUpdate((${myExtendedObjectClassName})entity); }
         protected override int DoCallRemove(${glEntityInterfaceName} entity) { return this.DelegateDelete((${myExtendedObjectClassName})entity); }

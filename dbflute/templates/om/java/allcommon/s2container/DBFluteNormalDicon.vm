@@ -65,12 +65,12 @@
         <destroyMethod name="destroy"/>
     </component>
 
-    <!-- Dao selector. -->
+    <!-- The selector of dao. -->
     <component name="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}">
         <destroyMethod name="destroy"/>
     </component>
 
-    <!-- The dao of outside-sql. -->
+    <!-- The dao of outsideSql. -->
     <component class="${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName}">
         <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>

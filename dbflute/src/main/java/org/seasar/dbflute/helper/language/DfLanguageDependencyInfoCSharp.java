@@ -42,4 +42,8 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
     public String getIntegerConvertExpression(String value) {
         return "new Nullable<int>(" + value + ")";
     }
+    
+    public String getConditionBeanPackageName() {
+        return "CBean";
+    }
 }

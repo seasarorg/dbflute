@@ -42,31 +42,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(_beanType, _annotationReaderFactory, false);
             bmdExt.Initialize(_dbMetaData, _dbms);
             _beanMetaData = bmdExt;
-            SetupSqlCommand();
+
+            // For lazy initializing methods!
+            // SetupSqlCommand();
         }
 
-//        protected override void SetupSqlCommand() {
-//            MethodInfo[] allMethods = _daoInterface.GetMethods();
-//            Hashtable names = new Hashtable();
-//            foreach (MethodInfo mi in allMethods) {
-//                names[mi.Name] = mi;
-//            }
-//            IDictionaryEnumerator enu = names.GetEnumerator();
-//            while (enu.MoveNext()) {
-//                try {
-//                    MethodInfo method = _daoType.GetMethod((string) enu.Key);
-//                    if (method.IsAbstract) SetupMethod(method);
-//                }
-//                catch (AmbiguousMatchException) { }
-//            }
-//        }
-
-//        public override ISqlCommand GetSqlCommand(String methodName) {
-//            ISqlCommand cmd = (ISqlCommand) _sqlCommands[methodName];
-//            if (cmd == null)
-//                throw new MethodNotFoundRuntimeException(_daoType, methodName, null);
-//            return cmd;
-//        }
+        public override ISqlCommand GetSqlCommand(String methodName) {
+            ISqlCommand cmd = (ISqlCommand)_sqlCommands[methodName];
+            if (cmd != null) {
+                return cmd;
+            }
+            return InitializeSqlCommand(methodName);
+        }
 
         protected ISqlCommand InitializeSqlCommand(String methodName) {
             if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
@@ -268,18 +255,31 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                              Update and Delete By Auto Override
         //                                              ==================================
-// TODO: @jflute -- Must modify S2Dao.
-//        protected virtual AbstractSqlCommand CreateUpdateModifiedOnlyCommand(IDataSource _dataSource, ICommandFactory _commandFactory, IBeanMetaData _beanMetaData, string[] propertyNames) {
-//            return new UpdateModifiedOnlyCommand(_dataSource, _commandFactory, _beanMetaData, propertyNames);
-//        }
-//
-//        protected IBeanMetaData CreateBeanMetaData4UpdateDeleteByAuto(Method method) {
-//            if (method.getName().contains("Nonstrict")) {
-//                return createNonConcurrencyBmdFactory().createBeanMetaData(getBeanClass());
-//            } else {
-//                return getBeanMetaData();
-//            }
-//        }
+        protected override AbstractSqlCommand CreateUpdateAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
+            return new UpdateAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+        }
+
+        protected override AbstractSqlCommand CreateUpdateModifiedOnlyCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
+            return new UpdateModifiedOnlyCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+        }
+
+        protected override AbstractSqlCommand CreateUpdateAutoDynamicCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
+            return new UpdateAutoDynamicCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+        }
+
+        protected override AbstractSqlCommand CreateDeleteAutoStaticCommand(MethodInfo method, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
+            return new DeleteAutoStaticCommand(dataSource, commandFactory, CreateBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+        }
+
+        protected IBeanMetaData CreateBeanMetaData4UpdateDeleteByAuto(MethodInfo method) {
+            if (method.Name.Contains("Nonstrict")) {
+                BeanMetaDataNonConcurrency bmdNonConcurrency = new BeanMetaDataNonConcurrency(_beanType, _annotationReaderFactory, false);
+                bmdNonConcurrency.Initialize(_dbMetaData, _dbms);
+                return bmdNonConcurrency;
+            } else {
+                return this.BeanMetaData;
+            }
+        }
 
         // ===============================================================================
         //                                                             OutsideSql Override
@@ -551,6 +551,22 @@ namespace ${glPackageBaseCommonS2Dao} {
             bmdExt.NestNo = this.NestNo + 1;
             bmdExt.Initialize(dbMetaData, dbms);
             return bmdExt;
+        }
+    }
+
+    public class BeanMetaDataNonConcurrency : BeanMetaDataImpl {
+        public BeanMetaDataNonConcurrency(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
+            : base() {
+            this.BeanType = beanType;
+            this._relation = relation;
+            this.AnnotationReaderFactory = annotationReaderFactory;
+        }
+        public override bool HasVersionNoPropertyType {
+            get { return false; }
+        }
+
+        public override bool HasTimestampPropertyType {
+            get { return false; }
         }
     }
 

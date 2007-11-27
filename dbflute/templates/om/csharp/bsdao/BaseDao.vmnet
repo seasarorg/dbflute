@@ -99,7 +99,7 @@ namespace ${myExtendedDaoPackageName} {
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Updated count.</returns>
         int UpdateModifiedOnly(${myExtendedObjectClassName} entity);
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+#if ($table.hasOptimisticLock())
 
         /// <summary>
         /// Update entity non-strictly modified-only.
@@ -115,7 +115,7 @@ namespace ${myExtendedDaoPackageName} {
         /// <param name="entity">Entity. (NotNull)</param>
         /// <returns>Deleted count.</returns>
         int Delete(${myExtendedObjectClassName} entity);
-#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+#if ($table.hasOptimisticLock())
 
         /// <summary>
         /// Delete entity non-strictly.

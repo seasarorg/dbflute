@@ -1339,33 +1339,33 @@ public class Database {
         return getProperties().getOtherProperties().getExtractAcceptEqual();
     }
 
-    // ===============================================================================
-    //                                        Properties - jdbcToJavaNative (Internal)
-    //                                        ===============-========================
-    public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
-        return getProperties().getJdbcToJavaNativeAsStringRemovedLineSeparator();
-    }
-
+    // ===================================================================================
+    //                                                                        Type Mapping
+    //                                                                        ============
     public List<Object> getJavaNativeStringList() {
-        return getProperties().getJavaNativeStringList();
+        return getProperties().getTypeMappingProperties().getJavaNativeStringList();
     }
 
     public List<Object> getJavaNativeBooleanList() {
-        return getProperties().getJavaNativeBooleanList();
+        return getProperties().getTypeMappingProperties().getJavaNativeBooleanList();
     }
 
     public List<Object> getJavaNativeNumberList() {
-        return getProperties().getJavaNativeNumberList();
+        return getProperties().getTypeMappingProperties().getJavaNativeNumberList();
     }
 
     public List<Object> getJavaNativeDateList() {
-        return getProperties().getJavaNativeDateList();
+        return getProperties().getTypeMappingProperties().getJavaNativeDateList();
     }
 
     public List<Object> getJavaNativeBinaryList() {
-        return getProperties().getJavaNativeBinaryList();
+        return getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
     }
 
+    public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
+        return getProperties().getTypeMappingProperties().getJdbcToJavaNativeAsStringRemovedLineSeparator();
+    }
+    
     // ===============================================================================
     //                      Properties - ToLowerInGeneratorUnderscoreMethod (Internal)
     //                      ==========================================================
@@ -1641,9 +1641,9 @@ public class Database {
     //                                                                         =======
     public String convertJavaNativeByJdbcType(String jdbcType) {
         try {
-            return TypeMap.getJavaType(jdbcType);
+            return TypeMap.findJavaNativeTypeString(jdbcType, null, null);
         } catch (RuntimeException e) {
-            _log.warn("TypeMap.getJavaNative(jdbcType) threw the exception: jdbcType=" + jdbcType, e);
+            _log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType=" + jdbcType, e);
             throw e;
         }
     }

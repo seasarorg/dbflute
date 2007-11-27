@@ -617,9 +617,11 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glFetchNarrowingBeanInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/FetchNarrowingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    $database.debug("    parseSimpleOrderByBean()")
-    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimpleOrderByBeanName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SimpleOrderByBean.${glTemplateFileExtension}",$path ,"", "")
+    #if (!$database.isTargetLanguageCSharp())
+      $database.debug("    parseSimpleOrderByBean()")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimpleOrderByBeanName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SimpleOrderByBean.${glTemplateFileExtension}",$path ,"", "")
+    #end
 
     $database.debug("    parseSimplePagingBean()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSimplePagingBeanName}.${glClassFileExtension}" )

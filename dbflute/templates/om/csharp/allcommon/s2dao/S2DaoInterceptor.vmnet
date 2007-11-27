@@ -111,7 +111,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     sb.Append("  args   = " + ${glTraceViewUtilName}.ConvertObjectArrayToStringView(invocation.Arguments));
                     _log.Debug(sb);
                 }
-                throw e;
+                throw;
             } finally {
                 PostprocessConditionBean(invocation, cb);
             }

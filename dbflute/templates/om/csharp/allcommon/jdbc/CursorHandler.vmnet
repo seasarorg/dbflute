@@ -24,5 +24,5 @@ namespace ${glPackageBaseCommonJdbc} {
     /// <typeparam name="CURSOR">The type of cursor.</typeparam>
     /// <param name="cursor">The cursor of fetch target. (NotNull)</param>
     /// <returns>the result of fetching. (Nullable)</returns>
-    public delegate void ${glCursorFetcherName}<CURSOR>(CURSOR cursor);
+    public delegate Object ${glCursorFetcherName}<CURSOR>(CURSOR cursor);
 }

@@ -10,8 +10,6 @@ import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefa
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultJava;
 
 /**
- * The language depndency info of Java.
- * 
  * @author jflute
  */
 public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
@@ -42,5 +40,9 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
     
     public String getIntegerConvertExpression(String value) {
         return "Integer.valueOf(\"" + value + "\")";
+    }
+    
+    public String getConditionBeanPackageName() {
+        return "cbean";
     }
 }
