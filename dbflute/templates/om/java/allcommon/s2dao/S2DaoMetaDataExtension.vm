@@ -864,7 +864,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      * @return The handler of result set. (NotNull)
      */
     protected ResultSetHandler createSpecifiedOutsideSqlCursorResultSetHandler(BeanMetaData specifiedBeanMetaData) {
-        return new org.seasar.extension.jdbc.impl.ObjectResultSetHandler();
+        return new org.seasar.extension.jdbc.impl.ObjectResultSetHandler();// This is dummy for cursor handling!
     }
 
     // - - - - - - - - - - - -

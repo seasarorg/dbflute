@@ -420,12 +420,12 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Type generic = typeof(System.Collections.Generic.List<>);
                 Type constructed = generic.MakeGenericType(_beanType);
                 System.Collections.IList resultList = (System.Collections.IList) Activator.CreateInstance(constructed);
-                int count = 1;
+                int count = 0;// Because it's zero origin.
                 while (dataReader.Read()) {
                     resultList.Add(_valueType.GetValue(dataReader, count));
                     ++count;
                 }
-                return null;
+                return resultList;
             }
         }
 
@@ -436,7 +436,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected IDataReaderHandler CreateSpecifiedOutsideSqlCursorResultSetHandler(IBeanMetaData specifiedBeanMetaData) {
-            return new ObjectDataReaderHandler();
+            return new ObjectDataReaderHandler();// This is dummy for cursor handling!
         }
 
         // - - - - - - - - - -
