@@ -127,7 +127,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     argNames = new String[] { "dto" };
                     // /----------------------------------------------------- [MyExtension]
                     if (${glConditionBeanContextName}.IsTheTypeConditionBean(argTypes[0])) {
-                        ${glSelectDynamicCommand} dynamicCommand = NewMySelectDynamicCommand(handler);
+                        ${glSelectDynamicCommand} dynamicCommand = CreateCustomizeSelectDynamicCommand(handler);
                         String sqlNormal = GetSelectClause();
                         String sqlPKOnly = GetSelectClausePKOnly();
                         sql = sqlNormal;
@@ -513,12 +513,13 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                              Extension Override
         //                                                              ==================
-        protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler handler) {// for all except condition-bean
-            return NewMySelectDynamicCommand(handler);
+        protected override SelectDynamicCommand CreateSelectDynamicCommand(IDataReaderHandler handler) {
+            return CreateCustomizeSelectDynamicCommand(handler);
         }
 
-        protected virtual ${glSelectDynamicCommand} NewMySelectDynamicCommand(IDataReaderHandler handler) {// for condition-bean
-            return new ${glSelectDynamicCommand}(_dataSource, _commandFactory, handler, _dataReaderFactory);
+        protected virtual ${glSelectDynamicCommand} CreateCustomizeSelectDynamicCommand(IDataReaderHandler handler) {
+            ${glFetchNarrowingResultSetFactory} customizeResultSetFactory = new ${glFetchNarrowingResultSetFactory}();
+            return new ${glSelectDynamicCommand}(_dataSource, _commandFactory, handler, customizeResultSetFactory);
         }
 
         protected override Seasar.Dao.IRowCreator CreateRowCreator() {
