@@ -1,5 +1,7 @@
 package org.seasar.dbflute.helper.language;
 
+import java.io.File;
+
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoJava;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
@@ -8,12 +10,16 @@ import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDiconJava;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultJava;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
  */
 public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
 
+    public static final String PATH_MAVEN_SRC_MAIN_JAVA = "src/main/java";
+    public static final String PATH_MAVEN_SRC_MAIN_RESOURCES = "src/main/resources";
+    
     public DfGrammarInfo getGrammarInfo() {
         return new DfGrammarInfoJava();
     }
@@ -35,7 +41,7 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
     }
 
     public String getDefaultSourceDirectory() {
-        return "../src/main/java";
+        return "../" + PATH_MAVEN_SRC_MAIN_JAVA;
     }
     
     public String getIntegerConvertExpression(String value) {
@@ -44,5 +50,24 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
     
     public String getConditionBeanPackageName() {
         return "cbean";
+    }
+    
+    public boolean isCompileTargetFile(File file) {
+        return true;
+    }
+    
+    public static boolean containsSrcMainJava(String path) {
+        return path.contains(PATH_MAVEN_SRC_MAIN_JAVA);
+    }
+    
+    /**
+     * @param path The path of target. (NotNull)
+     * @return Replaced maven path for 'src/main/resources' if it has 'src/main/java'. (NotNull)
+     */
+    public static String replaceSrcMainJavaToSrcMainResources(String path) {
+        if (!path.contains(PATH_MAVEN_SRC_MAIN_JAVA)) {
+            return path;
+        }
+        return DfStringUtil.replace(path, PATH_MAVEN_SRC_MAIN_JAVA, PATH_MAVEN_SRC_MAIN_RESOURCES);
     }
 }

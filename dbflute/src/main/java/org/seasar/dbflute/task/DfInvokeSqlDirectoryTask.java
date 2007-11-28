@@ -27,21 +27,24 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.properties.DfInvokeSqlDirectoryProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
+/**
+ * @author jflute
+ */
 public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
 
-    // =========================================================================================
-    //                                                                                DataSource
-    //                                                                                ==========
+    // ===================================================================================
+    //                                                                          DataSource
+    //                                                                          ==========
     @Override
     protected boolean isUseDataSource() {
         return true;
     }
 
-    // =========================================================================================
-    //                                                                                   Execute
-    //                                                                                   =======
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     /**
-     * Load the sql file and then execute it.
+     * Load the SQL files and then execute them.
      *
      * @throws BuildException
      */
@@ -64,6 +67,9 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
         return runInfo;
     }
 
+    // ===================================================================================
+    //                                                                        For Override
+    //                                                                        ============
     protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource());
     }

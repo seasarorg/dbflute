@@ -20,9 +20,9 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
 
     protected java.util.List${database.filterGenericsString('LikeAsOrCallback')} _likeAsOrCallbackList = new java.util.ArrayList${database.filterGenericsString('LikeAsOrCallback')}();
 
-    // =====================================================================================
-    //                                                                           Rear Option
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Rear Option
+    //                                                                         ===========
     public String getRearOption() {
         if (_escape == null || _escape.trim().length() == 0) {
             return "";
@@ -30,9 +30,9 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return " escape '" + _escape + "'";
     }
 
-    // =====================================================================================
-    //                                                                                  AsOr
-    //                                                                                  ====
+    // ===================================================================================
+    //                                                                                AsOr
+    //                                                                                ====
     public static interface LikeAsOrCallback {
         public String getAdditionalTargetPropertyName();
         public String filterValue(String currentValue);
@@ -60,9 +60,9 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         _likeAsOrCallbackList.clear();
     }
 
-    // =====================================================================================
-    //                                                                                  Like
-    //                                                                                  ====
+    // ===================================================================================
+    //                                                                                Like
+    //                                                                                ====
     public ${myClassName} likePrefix() {
         _like = LIKE_PREFIX;
         return this;
@@ -76,9 +76,9 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return this;
     }
 
-    // =====================================================================================
-    //                                                                                Escape
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                              Escape
+    //                                                                              ======
     public ${myClassName} escapeByPipeLine() {
         _escape = "|";
         return this;
@@ -99,9 +99,9 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return this;
     }
 
-    // =====================================================================================
-    //                                                                                 Split
-    //                                                                                 =====
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
     public ${myClassName} splitBySpace() {
         return (${myClassName})doSplitBySpace();
     }
@@ -126,9 +126,9 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return (${myClassName})doSplitByPipeLine(splitLimitCount);
     }
 
-    // =====================================================================================
-    //                                                                   To Upper/Lower Case
-    //                                                                   ===================
+    // ===================================================================================
+    //                                                                 To Upper/Lower Case
+    //                                                                 ===================
     public ${myClassName} toUpperCase() {
         return (${myClassName})doToUpperCase();
     }
@@ -137,9 +137,9 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return (${myClassName})doToLowerCase();
     }
 
-    // =====================================================================================
-    //                                                                        To Single Byte
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      To Single Byte
+    //                                                                      ==============
     public ${myClassName} toSingleByteSpace() {
         return (${myClassName})doToSingleByteSpace();
     }
@@ -152,20 +152,20 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         return (${myClassName})doToSingleByteAlphabetNumberMark();
     }
 
-    // =====================================================================================
-    //                                                                        To Double Byte
-    //                                                                        ==============
+    // ===================================================================================
+    //                                                                      To Double Byte
+    //                                                                      ==============
 
-    // =====================================================================================
-    //                                                                              Japanese
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Japanese
+    //                                                                            ========
     public ${glConditionOptionPartsAgentJapaneseName} localJapanese() {
         return doLocalJapanese();
     }
 
-    // =====================================================================================
-    //                                                                            Real Value
-    //                                                                            ==========
+    // ===================================================================================
+    //                                                                          Real Value
+    //                                                                          ==========
     public String generateRealValue(String value) {
         value = super.generateRealValue(value);
 
@@ -191,9 +191,9 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         }
     }
 
-    // =====================================================================================
-    //                                                                              DeepCopy
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            DeepCopy
+    //                                                                            ========
     public Object createDeepCopy() {
         final ${myClassName} deepCopy = (${myClassName})super.createDeepCopy();
         deepCopy._like = _like;

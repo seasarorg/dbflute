@@ -43,12 +43,12 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.SQLRuntimeException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfGeneratedClassPackageProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.framework.util.StringUtil;
 
 /**
  * 
@@ -158,10 +158,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected List<File> collectSqlFileIntoList() {
         final String sqlDirectory = getProperties().getSql2EntityProperties().getSqlDirectory();
         final List<File> sqlFileList = collectSqlFile(sqlDirectory);
-        if (!sqlDirectory.contains("src/main/java")) {
+        if (!DfLanguageDependencyInfoJava.containsSrcMainJava(sqlDirectory)) {
             return sqlFileList;
         }
-        final String srcMainResources = StringUtil.replace(sqlDirectory, "src/main/java", "src/main/resources");
+        final String srcMainResources = DfLanguageDependencyInfoJava.replaceSrcMainJavaToSrcMainResources(sqlDirectory);
         try {
             final List<File> resourcesSqlFileList = collectSqlFile(srcMainResources);
             sqlFileList.addAll(resourcesSqlFileList);
@@ -171,17 +171,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return sqlFileList;
     }
 
-    protected List<File> collectSqlFile(String dir) {
-        return createSqlFileGetter().getSqlFileList(dir);
+    protected List<File> collectSqlFile(String sqlDirectory) {
+        return createSqlFileGetter().getSqlFileList(sqlDirectory);
     }
 
     protected DfSqlFileGetter createSqlFileGetter() {
-        final boolean csharp = getBasicProperties().isTargetLanguageCSharp();
-        final boolean csharpOld = getBasicProperties().isTargetLanguageCSharpOld();
+        final DfLanguageDependencyInfo dependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         return new DfSqlFileGetter() {
             @Override
             protected boolean acceptSqlFile(File file) {
-                if ((csharp || csharpOld) && file.getAbsolutePath().contains("Debug")) {
+                if (!dependencyInfo.isCompileTargetFile(file)) {
                     return false;
                 }
                 return super.acceptSqlFile(file);

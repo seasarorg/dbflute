@@ -744,6 +744,9 @@
 <node CREATED="1192784963046" ID="Freemind_Link_1601373096" MODIFIED="1192784964312" TEXT="http://msdn2.microsoft.com/ja-jp/library/xte2hh6a(VS.80).aspx"/>
 </node>
 </node>
+<node CREATED="1196217340921" ID="Freemind_Link_174086138" MODIFIED="1196217348671" TEXT="*ReSharper">
+<node CREATED="1196217349500" ID="Freemind_Link_18574600" MODIFIED="1196217350265" TEXT="http://blog.inomata.lolipop.jp/?eid=622557"/>
+</node>
 </node>
 <node CREATED="1187675031796" ID="Freemind_Link_1705235015" MODIFIED="1187675037140" TEXT="ASP.NET">
 <node CREATED="1187675112531" ID="Freemind_Link_1454560398" MODIFIED="1187675336640" TEXT="v2008">
@@ -763,6 +766,13 @@
 <node CREATED="1187845001640" ID="Freemind_Link_1360882810" MODIFIED="1187845004453" TEXT="memo">
 <node CREATED="1187844996875" ID="Freemind_Link_1940361756" MODIFIED="1187844997453" TEXT="http://d.hatena.ne.jp/NyaRuRu/20070728/p1"/>
 <node CREATED="1187844896671" ID="Freemind_Link_1090439413" MODIFIED="1187844897312" TEXT="http://d.hatena.ne.jp/Kazzz/20070728/p1"/>
+</node>
+</node>
+<node CREATED="1196233460500" ID="Freemind_Link_123317885" MODIFIED="1196233462156" TEXT="Report">
+<node CREATED="1196233462828" ID="Freemind_Link_418999068" MODIFIED="1196233467250" TEXT="Grapecity">
+<node CREATED="1196233468312" ID="Freemind_Link_1523386108" MODIFIED="1196233471656" TEXT="ActiveReport"/>
+<node CREATED="1196233477781" ID="Freemind_Link_160601466" MODIFIED="1196233480062" TEXT="TrueReport"/>
+<node CREATED="1196233484375" ID="Freemind_Link_615612621" MODIFIED="1196233484906" TEXT="http://www.grapecity.com/japan/products/compcharts/dotnet/report/"/>
 </node>
 </node>
 </node>

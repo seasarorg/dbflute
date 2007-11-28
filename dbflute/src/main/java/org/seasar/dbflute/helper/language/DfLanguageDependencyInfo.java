@@ -1,5 +1,7 @@
 package org.seasar.dbflute.helper.language;
 
+import java.io.File;
+
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
@@ -24,4 +26,6 @@ public interface DfLanguageDependencyInfo {
     public String getIntegerConvertExpression(String value);
     
     public String getConditionBeanPackageName();
+    
+    public boolean isCompileTargetFile(File file);
 }
