@@ -53,11 +53,20 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
     //                                                                      ConditionQuery
     //                                                                      ==============
     /**
-     * Get condition query as interface.
+     * Get condition query as interface. At the future, change public to protected.
      * 
      * @return Instance of query as interface. (NotNull)
      */
     abstract public ${glConditionQueryInterfaceName} getConditionQueryAsInterface();
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return The conditionQuery of the local table as interface. (NotNull)
+     */
+    public ${glConditionQueryInterfaceName} localCQ() {
+        return getConditionQueryAsInterface();
+    }
 
     // ===================================================================================
     //                                                                   Accept PrimaryKey

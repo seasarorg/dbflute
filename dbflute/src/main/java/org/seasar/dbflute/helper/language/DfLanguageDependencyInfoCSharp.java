@@ -53,7 +53,6 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
     public boolean isCompileTargetFile(File file) {
         String absolutePath = file.getAbsolutePath();
         absolutePath = DfStringUtil.replace(absolutePath, "\\", "/");
-        absolutePath = DfStringUtil.replace(absolutePath, ".", "/");
         if (absolutePath.contains("/bin/") || absolutePath.contains("/obj/")) {
             return false;
         }

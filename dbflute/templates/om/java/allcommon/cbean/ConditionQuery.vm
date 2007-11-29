@@ -11,8 +11,8 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 public interface ${glConditionQueryInterfaceName} {
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
+    //                                                                  Important Accessor
+    //                                                                  ==================
     /**
      * Get table db-name.
      * 
@@ -85,6 +85,42 @@ public interface ${glConditionQueryInterfaceName} {
      */
     public String getForeignPropertyName();
 
+    // ===================================================================================
+    //                                                                              Invoke
+    //                                                                              ======
+    /**
+     * Invoke getting value.
+     * 
+     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
+     * @return The conditionValue. (NotNull)
+     */
+    public ${glConditionValueName} invokeValue(String columnFlexibleName);
+
+    /**
+     * Invoke setting query.
+     * 
+     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
+     * @param conditionKeyName The name of the conditionKey. (NotNull)
+     * @param value The value of the condition. (NotNull)
+     */
+    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
+
+    /**
+     * Invoke adding orderBy.
+     * 
+     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
+     * @param isAsc Is it ascend?
+     */
+    public void invokeOrderBy(String columnFlexibleName, boolean isAsc);
+
+    /**
+     * Invoke getting foreign conditionQuery.
+     * 
+     * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
+     * @return The conditionQuery of the foreign relation as interface. (NotNull)
+     */
+    public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName);
+
 #if ($database.isMakeRecentlyDeprecated())
     // ===================================================================================
     //                                                                       Foregin Query
@@ -100,9 +136,6 @@ public interface ${glConditionQueryInterfaceName} {
 #end
 
 #if ($database.isMakeRecentlyDeprecated())
-    // ===================================================================================
-    //                                                                              Invoke
-    //                                                                              ======
     /**
      * Invoke getter.
      * 

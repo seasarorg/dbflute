@@ -68,6 +68,117 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // ===================================================================================
+    //                                                                  Important Accessor
+    //                                                                  ==================
+    /**
+     * Get child query.
+     * 
+     * @return Child query. (Nullable)
+     */
+    public ${glConditionQueryInterfaceName} getChildQuery() {
+        return _childQuery;
+    }
+
+    /**
+     * Get sql clause.
+     * 
+     * @return Sql clause. (NotNull)
+     */
+    public ${glSqlClauseName} getSqlClause() {
+        return _sqlClause;
+    }
+
+    /**
+     * Get alias name.
+     * 
+     * @return Alias name. (NotNull)
+     */
+    public String getAliasName() {
+        return _aliasName;
+    }
+
+    /**
+     * Get nest level.
+     * 
+     * @return Nest level.
+     */
+    public int getNestLevel() {
+        return _nestLevel;
+    }
+
+    /**
+     * Get next nest level.
+     * 
+     * @return Next nest level.
+     */
+    public int getNextNestLevel() {
+        return _nestLevel+1;
+    }
+
+    /**
+     * Is base query?
+     * 
+     * @param query Condition query. (NotNull)
+     * @return Determination.
+     */
+    public boolean isBaseQuery(${glConditionQueryInterfaceName} query) {
+        return (query.getChildQuery() == null);
+    }
+
+    // -----------------------------------------------------
+    //                                             Real Name
+    //                                             ---------
+    /**
+     * Get real alias name(that has nest level mark).
+     * 
+     * @return Real alias name.
+     */
+    public String getRealAliasName() {
+        return getAliasName();
+    }
+
+    /**
+     * Get real column name(with real alias name).
+     * 
+     * @param columnName Column name without alias name. This should not contain comma. (NotNull)
+     * @return Real column name.
+     */
+    public String getRealColumnName(String columnName) {
+        assertColumnName(columnName);
+        return buildRealColumnName(getRealAliasName(), columnName);
+    }
+
+    /**
+     * Build real column name.
+     * 
+     * @param aliasName Alias name. (NotNull)
+     * @param columnName Column name. (NotNull)
+     * @return Real column name. (NotNull)
+     */
+    protected String buildRealColumnName(String aliasName, String columnName) {
+        return aliasName + "." + columnName;
+    }
+
+    // -----------------------------------------------------
+    //                                          Foreign Info
+    //                                          ------------
+    public String getForeignPropertyName() {
+        return _foreignPropertyName;
+    }
+
+    public void setForeignPropertyName(String foreignPropertyName) {
+        this._foreignPropertyName = foreignPropertyName;
+    }
+
+    public String getRelationPath() {
+        return _relationPath;
+    }
+
+    public void setRelationPath(String relationPath) {
+        this._relationPath = relationPath;
+    }
+
+    // ===================================================================================
     //                                                                            Location
     //                                                                            ========
     /**
@@ -502,6 +613,128 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
         return fixedCondition;
     }
+
+    // ===================================================================================
+    //                                                                              Invoke
+    //                                                                              ======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
+     * @return The conditionValue. (NotNull)
+     */
+    public ${glConditionValueName} invokeValue(String columnFlexibleName) {
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
+        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
+        String methodName = "get" + columnCapPropName;
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            final Object result = method.invoke(this, new Object[]{});
+            return (${glConditionValueName})result;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    /**
+     * Invoke setting query.
+     * 
+     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
+     * @param conditionKeyName The name of the conditionKey. (NotNull)
+     * @param value The value of the condition. (NotNull)
+     */
+    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {
+        if (value == null) {
+            return;
+        }
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
+        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
+        String methodName = "set" + columnCapPropName + "_" + conditionKeyName.substring(0, 1).toUpperCase() + conditionKeyName.substring(1);
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{value.getClass()});
+        } catch (NoSuchMethodException e) {
+            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            method.invoke(this, new Object[]{value});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param columnFlexibleName The flexible name of a column. (NotNull and NotEmpty)
+     * @param isAsc Is it ascend?
+     */
+    public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
+        String ascDesc = null;
+        if (isAsc) {
+            ascDesc = "Asc";
+        } else {
+            ascDesc = "Desc";
+        }
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
+        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
+        final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
+
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @param foreignPropertyName The property name of foreign. (NotNull and NotEmpty)
+     * @return The conditionQuery of foreign as interface. (NotNull)
+     */
+    public ${glConditionQueryInterfaceName} invokeForeignCQ(String foreignPropertyName) {
+        final String methodName = "query" + foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
+        java.lang.reflect.Method method = null;
+        try {
+            method = this.getClass().getMethod(methodName, new Class[]{});
+        } catch (NoSuchMethodException e) {
+            String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;
+            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
+            throw new RuntimeException(msg, e);
+        }
+        try {
+            return (${glConditionQueryInterfaceName})method.invoke(this, new Object[]{});
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
 #if ($database.isMakeRecentlyDeprecated())
     // ===================================================================================
     //                                                                       Foreign Query
@@ -619,28 +852,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         invokeSetter(columnFlexibleName, value, "lessEqual");
     }
 
+    /**
+     * @param columnFlexibleName Column flexiblename. (NotNull and NotEmpty)
+     * @param value Value.
+     * @param conditionKeyName The name of conditionKey. (NotNull)
+     * @deprecated
+     */
     protected void invokeSetter(String columnFlexibleName, Object value, String conditionKeyName) {
-        if (value == null) {
-            return;
-        }
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
-        String methodName = "set" + columnCapPropName + "_" + conditionKeyName.substring(0, 1).toUpperCase() + conditionKeyName.substring(1);
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{value.getClass()});
-        } catch (NoSuchMethodException e) {
-            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            method.invoke(this, new Object[]{value});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
+        invokeQuery(columnFlexibleName, conditionKeyName, value);
     }
 
     /**
@@ -658,35 +877,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     public void invokeAddOrderByDesc(String columnFlexibleName) {
         invokeOrderBy(columnFlexibleName, false);
     }
-
-    protected void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
-        String ascDesc = null;
-        if (isAsc) {
-            ascDesc = "Asc";
-        } else {
-            ascDesc = "Desc";
-        }
-        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
-        final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
-
-        java.lang.reflect.Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
-        } catch (NoSuchMethodException e) {
-            String msg = "The columnFlexibleName is not existing in this table: columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
-        }
-        try {
-            method.invoke(this, new Object[]{});
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
-        }
-    }
 #end
+
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
@@ -853,117 +1045,5 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
-    }
-
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    /**
-     * Get child query.
-     * 
-     * @return Child query. (Nullable)
-     */
-    public ${glConditionQueryInterfaceName} getChildQuery() {
-        return _childQuery;
-    }
-
-    /**
-     * Get sql clause.
-     * 
-     * @return Sql clause. (NotNull)
-     */
-    public ${glSqlClauseName} getSqlClause() {
-        return _sqlClause;
-    }
-
-    /**
-     * Get alias name.
-     * 
-     * @return Alias name. (NotNull)
-     */
-    public String getAliasName() {
-        return _aliasName;
-    }
-
-    /**
-     * Get nest level.
-     * 
-     * @return Nest level.
-     */
-    public int getNestLevel() {
-        return _nestLevel;
-    }
-
-    /**
-     * Get next nest level.
-     * 
-     * @return Next nest level.
-     */
-    public int getNextNestLevel() {
-        return _nestLevel+1;
-    }
-
-    /**
-     * Is base query?
-     * 
-     * @param query Condition query. (NotNull)
-     * @return Determination.
-     */
-    public boolean isBaseQuery(${glConditionQueryInterfaceName} query) {
-        return (query.getChildQuery() == null);
-    }
-
-    // -----------------------------------------------------
-    //                                             Real Name
-    //                                             ---------
-    /**
-     * Get real alias name(that has nest level mark).
-     * 
-     * @return Real alias name.
-     */
-    public String getRealAliasName() {
-        return getAliasName();
-    }
-
-    /**
-     * Get real column name(with real alias name).
-     * 
-     * @param columnName Column name without alias name. This should not contain comma. (NotNull)
-     * @return Real column name.
-     */
-    public String getRealColumnName(String columnName) {
-        assertColumnName(columnName);
-        return buildRealColumnName(getRealAliasName(), columnName);
-    }
-
-    /**
-     * Build real column name.
-     * 
-     * @param aliasName Alias name. (NotNull)
-     * @param columnName Column name. (NotNull)
-     * @return Real column name. (NotNull)
-     */
-    protected String buildRealColumnName(String aliasName, String columnName) {
-        return aliasName + "." + columnName;
-    }
-
-    // -----------------------------------------------------
-    //                                          Foreign Info
-    //                                          ------------
-    public String getForeignPropertyName() {
-        return _foreignPropertyName;
-    }
-
-    public void setForeignPropertyName(String foreignPropertyName) {
-        this._foreignPropertyName = foreignPropertyName;
-    }
-
-    public String getRelationPath() {
-        return _relationPath;
-    }
-
-    public void setRelationPath(String relationPath) {
-        this._relationPath = relationPath;
     }
 }
