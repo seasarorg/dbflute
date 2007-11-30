@@ -7,9 +7,6 @@ import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
-#if ($database.isMakeRecentlyDeprecated())
-import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
-#end
 import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
@@ -83,7 +80,7 @@ public interface ${myClassName} {
     /**
      * Has object of flexible name? {Target objects are TABLE and COLUMN}
      * 
-     * @param flexibleName Flexible name. (NotNull and NotEmpty)
+     * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return Determination.
      */
     public boolean hasFlexibleName(String flexibleName);
@@ -91,7 +88,7 @@ public interface ${myClassName} {
     /**
      * Find db name by flexible name. {Target objects are TABLE and COLUMN}
      * 
-     * @param flexibleName Flexible ame. (NotNull and NotEmpty)
+     * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return Db name. (NotNull and NotEmpty)
      */
     public String findDbName(String flexibleName);
@@ -99,7 +96,7 @@ public interface ${myClassName} {
     /**
      * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
      * 
-     * @param flexibleName Flexible name. (NotNull and NotEmpty)
+     * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return Db name. (NotNull and NotEmpty)
      */
     public String findPropertyName(String flexibleName);
@@ -108,9 +105,9 @@ public interface ${myClassName} {
     //                                                                            Name Map
     //                                                                            ========
     /**
-     * Get the key-to-lower map of db name(lower) and property name.
+     * Get the key-to-lower map of DB name(lower) and property name.
      * 
-     * @return The key-to-lower map of db name(lower) and property name. (NotNull)
+     * @return The key-to-lower map of DB name(lower) and property name. (NotNull)
      */
     public java.util.Map<String, String> getDbNamePropertyNameKeyToLowerMap();
 
@@ -160,7 +157,7 @@ public interface ${myClassName} {
      * 
      * @return The type of entity. (NotNull)
      */ 
-    public Class getEntityType();
+    public Class<? extends ${glEntityInterfaceName}> getEntityType();
 
     // ===================================================================================
     //                                                                     Object Instance
@@ -178,27 +175,27 @@ public interface ${myClassName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The list of column db-name. (NotNull and NotEmpty)
+     * @return The list of DB name of column. (NotNull and NotEmpty)
      */
     public java.util.List<${glColumnInfoName}> getColumnInfoList();
 
     /**
      * Has column?
      * 
-     * @param columnFlexibleName Column flexible name. (NotNull)
+     * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return Determination.
      */
     public boolean hasColumn(String columnFlexibleName);
 
     /**
-     * Find column info by column flexible name.
+     * Find the information of the column by the flexible name of the column.
      * <pre>
      * If the table name is 'BOOK_ID', you can find the dbmeta by ...(as follows)
      *     'BOOK_ID', 'BOok_iD', 'book_id'
      *     , 'BookId', 'bookid', 'bOoKiD'
      * </pre>
-     * @param columnFlexibleName Column flexible name. (NotNull)
-     * @return Column info. (NotNull)
+     * @param columnFlexibleName The flexible name of the column. (NotNull)
+     * @return The information of the column. (NotNull)
      */ 
     public ${glColumnInfoName} findColumnInfo(String columnFlexibleName);
 

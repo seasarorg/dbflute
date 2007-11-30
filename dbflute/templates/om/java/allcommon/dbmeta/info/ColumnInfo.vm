@@ -5,7 +5,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
- * The class of column info.
+ * The information of column.
  * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
@@ -17,24 +17,30 @@ public class ${myClassName} {
     protected ${glDBMetaInterfaceName} dbmeta;
     protected String columnDbName;
     protected String propertyName;
-    protected Class propertyType;
+    protected Class<?> propertyType;
     protected boolean primary;
     protected Integer columnSize;
+    protected Integer columnDecimalDigits;
 
     // ===================================================================================
-    //                                                                         Easy-to-Use
+    //                                                                         Constructor
     //                                                                         ===========
     public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName) {
-        this.dbmeta = dbmeta;
-        this.columnDbName = columnDbName;
+        this(dbmeta, columnDbName, null, null, false, null, null);
     }
 
-    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Class propertyType, boolean primary, Integer columnSize) {
-        this(dbmeta, columnDbName);
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Class<?> propertyType, boolean primary, Integer columnSize) {
+        this(dbmeta, columnDbName, propertyName, propertyType, primary, columnSize, null);
+    }
+
+    public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits) {
+        this.dbmeta = dbmeta;
+        this.columnDbName = columnDbName;
         this.propertyName = propertyName;
         this.propertyType = propertyType;
         this.primary = primary;
         this.columnSize = columnSize;
+        this.columnDecimalDigits = columnDecimalDigits;
     }
 
     // ===================================================================================
@@ -48,11 +54,58 @@ public class ${myClassName} {
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
-        return findMethod(dbmeta.getEntityType(), "set" + buildInitCapPropertyName(), new Class[] { this.propertyType });
+        return findMethod(dbmeta.getEntityType(), "set" + buildInitCapPropertyName(), new Class<?>[] { this.propertyType });
     }
 
     public java.lang.reflect.Method findGetter() {
-        return findMethod(dbmeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class[] {});
+        return findMethod(dbmeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class<?>[] {});
+    }
+
+    // ===================================================================================
+    //                                                                     Internal Helper
+    //                                                                     ===============
+    protected String initCap(final String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
+    protected java.lang.reflect.Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        try {
+            return clazz.getMethod(methodName, argTypes);
+        } catch (NoSuchMethodException ex) {
+            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
+            throw new RuntimeException(msg, ex);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public int hashCode() {
+        return dbmeta.hashCode() + columnDbName.hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ${myClassName})) {
+            return false;
+        }
+        final ${myClassName} target = (${myClassName})obj;
+        if (this.dbmeta == null || target.getDBMeta() == null) {
+            return false;
+        }
+        if (!this.dbmeta.equals(target.getDBMeta())) {
+            return false;
+        }
+        if (this.columnDbName == null || target.getColumnDbName() == null) {
+            return false;
+        }
+        if (!this.columnDbName.equals(target.getColumnDbName())) {
+            return false;
+        }
+        return true;
+    }
+
+    public String toString() {
+        return dbmeta.getTableDbName() + "." + columnDbName;
     }
 
     // ===================================================================================
@@ -98,50 +151,11 @@ public class ${myClassName} {
         this.columnSize = columnSize;
     }
 
-    // ===================================================================================
-    //                                                                     Internal Helper
-    //                                                                     ===============
-    protected String initCap(final String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    public Integer getColumnDecimalDigits() {
+        return this.columnDecimalDigits;
     }
 
-    protected java.lang.reflect.Method findMethod(Class clazz, String methodName, Class[] argTypes) {
-        try {
-            return clazz.getMethod(methodName, argTypes);
-        } catch (NoSuchMethodException ex) {
-            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
-            throw new RuntimeException(msg, ex);
-        }
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    public int hashCode() {
-        return dbmeta.hashCode() + columnDbName.hashCode();
-    }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ${myClassName})) {
-            return false;
-        }
-        final ${myClassName} target = (${myClassName})obj;
-        if (this.dbmeta == null || target.getDBMeta() == null) {
-            return false;
-        }
-        if (!this.dbmeta.equals(target.getDBMeta())) {
-            return false;
-        }
-        if (this.columnDbName == null || target.getColumnDbName() == null) {
-            return false;
-        }
-        if (!this.columnDbName.equals(target.getColumnDbName())) {
-            return false;
-        }
-        return true;
-    }
-
-    public String toString() {
-        return dbmeta.getTableDbName() + "." + columnDbName;
+    public void setColumnDecimalDigits(Integer columnDecimalDigits) {
+        this.columnDecimalDigits = columnDecimalDigits;
     }
 }

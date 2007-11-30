@@ -8,77 +8,50 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
     public class ${myClassName} {
 
-        // ===================================================================================
-        //                                                                           Attribute
-        //                                                                           =========
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
         protected ${glDBMetaInterfaceName} dbmeta;
         protected String columnDbName;
         protected String propertyName;
         protected Type propertyType;
         protected bool primary;
-        protected Nullable<int> columnSize;
+        protected int? columnSize;
+        protected int? columnDecimalDigits;
 
-        // ===================================================================================
-        //                                                                         Easy-to-Use
-        //                                                                         ===========
-        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName) {
-            this.dbmeta = dbmeta;
-            this.columnDbName = columnDbName;
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName) : this (dbmeta, columnDbName, null, null, false, null, null) {
         }
 
-        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, Nullable<int> columnSize)
-            :this(dbmeta, columnDbName) {
+        public ${myClassName}(${glDBMetaInterfaceName} dbmeta, String columnDbName, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits) {
+            this.dbmeta = dbmeta;
+            this.columnDbName = columnDbName;
             this.propertyName = propertyName;
             this.propertyType = propertyType;
             this.primary = primary;
             this.columnSize = columnSize;
+            this.columnDecimalDigits = columnDecimalDigits;
         }
 
-        // ================================================================================
-        //                                                                           Finder
-        //                                                                           ======
+        // ===============================================================================
+        //                                                                          Finder
+        //                                                                          ======
         public PropertyInfo FindProperty() {
             return FindProperty(dbmeta.EntityType, propertyName, new Type[] { propertyType });
         }
 
-        // ================================================================================
-        //                                                                         Accessor
-        //                                                                         ========
-        public ${glDBMetaInterfaceName} DBMeta {
-            get { return dbmeta; }
-            set { dbmeta = value; }
-        }
-
-        public String ColumnDbName {
-            get { return columnDbName; }
-            set { columnDbName = value; }
-        }
-
-        public String PropertyName {
-            get { return propertyName; }
-            set { propertyName = value; }
-        }
-
-        public bool IsPrimary {
-            get { return primary; }
-            set { primary = value; }
-        }
-
-        public Nullable<int> ColumnSize {
-            get { return columnSize; }
-            set { columnSize = value; }
-        }
-
-        // ===================================================================================
-        //                                                                     Internal Helper
-        //                                                                     ===============
+        // ===============================================================================
+        //                                                                 Internal Helper
+        //                                                                 ===============
         protected virtual PropertyInfo FindProperty(Type clazz, String methodName, Type[] argTypes) {
             return clazz.GetProperty(methodName, argTypes);
         }
 
-        // ===================================================================================
-        //                                                                      Basic Override
-        //                                                                      ==============
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
         public override int GetHashCode() {
             return dbmeta.GetHashCode() + columnDbName.GetHashCode();
         }
@@ -106,5 +79,38 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public override String ToString() {
             return dbmeta.TableDbName + "." + columnDbName;
         }
-     }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public ${glDBMetaInterfaceName} DBMeta {
+            get { return dbmeta; }
+            set { dbmeta = value; }
+        }
+
+        public String ColumnDbName {
+            get { return columnDbName; }
+            set { columnDbName = value; }
+        }
+
+        public String PropertyName {
+            get { return propertyName; }
+            set { propertyName = value; }
+        }
+
+        public bool IsPrimary {
+            get { return primary; }
+            set { primary = value; }
+        }
+
+        public Nullable<int> ColumnSize {
+            get { return columnSize; }
+            set { columnSize = value; }
+        }
+
+        public Nullable<int> ColumnDecimalDigits {
+            get { return columnDecimalDigits; }
+            set { columnDecimalDigits = value; }
+        }
+    }
 }

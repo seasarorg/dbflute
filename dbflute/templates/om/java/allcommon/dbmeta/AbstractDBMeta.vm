@@ -9,9 +9,6 @@ import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
-#if ($database.isMakeRecentlyDeprecated())
-import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
-#end
 import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 
@@ -46,7 +43,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * ${database.ImplementComment}
      * 
      * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return Db-name. (NotNull and NotEmpty)
+     * @return DB name. (NotNull and NotEmpty)
      */
     public String findDbName(String flexibleName) {
         final String key = flexibleName.toLowerCase();
@@ -67,7 +64,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * ${database.ImplementComment}
      * 
      * @param flexibleName Flexible-name(IgnoreCase). (NotNull and NotEmpty)
-     * @return Db-name. (NotNull and NotEmpty)
+     * @return DB name. (NotNull and NotEmpty)
      */
     public String findPropertyName(String flexibleName) {
         final String key = flexibleName.toLowerCase();
@@ -90,7 +87,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param columnFlexibleName Column flexible name. (NotNull)
+     * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return Determination.
      */
     public boolean hasColumn(String columnFlexibleName) {
@@ -104,8 +101,8 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @param columnFlexibleName Column flexible name. (NotNull and NotEmpty)
-     * @return Column info. (NotNull)
+     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
+     * @return The information of the column. (NotNull)
      */ 
     public ${glColumnInfoName} findColumnInfo(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
@@ -140,7 +137,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * ${database.ImplementComment}
      * 
      * @param relationPropertyName Relation property name. (Both OK - InitCap or not). (NotNull)
-     * @return Relation information. (NotNull)
+     * @return The information of relation. (NotNull)
      */ 
     public ${glRelationInfoName} findRelationInfo(String relationPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);

@@ -173,7 +173,7 @@ public class Column {
     // ==============================================================================
     //                                                                        Loading
     //                                                                        =======
-    public static String makeList(List columns) {
+    public static String makeList(List<String> columns) {
         Object obj = columns.get(0);
         boolean isColumnList = (obj instanceof Column);
         if (isColumnList) {
@@ -541,9 +541,9 @@ public class Column {
         _isNotNull = status;
     }
 
-    // -------------------------------------------
-    //                                        Size
-    //                                        ----
+    // -----------------------------------------------------
+    //                                           Column Size
+    //                                           -----------
     /**
      * Returns the size of the column
      */
@@ -587,30 +587,32 @@ public class Column {
         return Integer.parseInt(_size.split(",")[1].trim());
     }
 
-    /**
-     * Return the size in brackets for use in an sql
-     * schema if the type is String.  Otherwise return an empty string
-     */
     public String printSize() {
         return (_size == null ? "" : '(' + _size + ')');
     }
 
     public String getColumnSizeSettingExpression() {
-        if (_size == null) {
-            return "null";
-        }
         final Integer columnSize = getColumnSize();
         if (columnSize == null) {
             return "null";
         }
-        DfBasicProperties prop = getTable().getProperties().getBasicProperties();
-        DfLanguageDependencyInfo languageDependencyInfo = prop.getLanguageDependencyInfo();
-        return languageDependencyInfo.getIntegerConvertExpression(String.valueOf(columnSize));
+        return helper().getLanguageDependencyInfo().getIntegerConvertExpression(String.valueOf(columnSize));
     }
 
-    // -------------------------------------------
-    //                                 Foreign Key
-    //                                 -----------
+    // -----------------------------------------------------
+    //                                        Decimal Digits
+    //                                        --------------
+    public String getColumnDecimalDigitsSettingExpression() {
+        final Integer decimalDigits = getDecimalDigits();
+        if (decimalDigits == null) {
+            return "null";
+        }
+        return helper().getLanguageDependencyInfo().getIntegerConvertExpression(String.valueOf(decimalDigits));
+    }
+
+    // -----------------------------------------------------
+    //                                           Foreign Key
+    //                                           -----------
     /**
      * Utility method to determine if this column is a foreign key.
      */
@@ -937,7 +939,7 @@ public class Column {
             _columnType = new Timestamp(System.currentTimeMillis());
         } else if (tn.indexOf("BINARY") != -1) {
             _torqueType = "LONGVARBINARY";
-            _columnType = new Hashtable();
+            _columnType = new Hashtable<Object, Object>();
         } else {
             _torqueType = "VARCHAR";
             _columnType = "";
@@ -1358,9 +1360,10 @@ public class Column {
         }
     }
 
-    // ===============================================================================
-    //                                                           Properties - Identity
-    //                                                           =====================
+    // ===================================================================================
+    //                                                                            Identity
+    //                                                                            ========
+
     public boolean isIdentity() {
         if (_isAutoIncrement) {
             // It gives priority to auto-increment information of JDBC.
@@ -1370,4 +1373,27 @@ public class Column {
                     && getUncapitalisedJavaName().equals(getTable().getIdentityPropertyName());
         }
     }
+
+    // ===================================================================================
+    //                                                                       Column Helper
+    //                                                                       =============
+    protected ColumnHelper _columnHelper;
+
+    protected ColumnHelper helper() {
+        if (_columnHelper == null) {
+            _columnHelper = new ColumnHelper();
+        }
+        return _columnHelper;
+    }
+
+    protected class ColumnHelper {
+        public DfBasicProperties getBasicProperties() {
+            return getTable().getProperties().getBasicProperties();
+        }
+
+        public DfLanguageDependencyInfo getLanguageDependencyInfo() {
+            return getBasicProperties().getLanguageDependencyInfo();
+        }
+    }
+
 }
