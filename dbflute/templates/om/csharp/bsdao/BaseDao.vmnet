@@ -24,7 +24,7 @@ namespace ${myExtendedDaoPackageName} {
     /// [foreign-table]
     ///     ${table.ForeignPropertyNameCommaString}
     /// 
-    /// [refferer-table]
+    /// [referrer-table]
     ///     ${table.ReferrerPropertyNameCommaString}
     /// 
     /// [sequence]

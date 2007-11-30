@@ -9,7 +9,10 @@ import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderImplName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
+#if ($database.isMakeRecentlyDeprecated())
 import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
+#end
+import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 
 /**
@@ -141,7 +144,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      */ 
     public ${glRelationInfoName} findRelationInfo(String relationPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-        return hasForeign(relationPropertyName) ? (${glRelationInfoName})findForeignInfo(relationPropertyName) : (${glRelationInfoName})findRefererInfo(relationPropertyName);
+        return hasForeign(relationPropertyName) ? (${glRelationInfoName})findForeignInfo(relationPropertyName) : (${glRelationInfoName})findReferrerInfo(relationPropertyName);
     }
 
     // -----------------------------------------------------
@@ -196,50 +199,79 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     }
 
     // -----------------------------------------------------
-    //                                       Referer Element
-    //                                       ---------------
+    //                                      Referrer Element
+    //                                      ----------------
+#if ($database.isMakeRecentlyDeprecated())
+    /**
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Determination. (NotNull)
+     * @deprecated Please use hasReferrer().
+     */ 
+    public boolean hasReferer(String referrerPropertyName) {
+        return hasReferrer(referrerPropertyName);
+    }
+
+    /**
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Referrer DBMeta. (NotNull)
+     * @deprecated Please use findReferrerDBMeta().
+     */ 
+    public ${glDBMetaInterfaceName} findRefererDBMeta(String referrerPropertyName) {
+        return findReferrerDBMeta(referrerPropertyName);
+    }
+
+    /**
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Referrer information. (NotNull)
+     * @deprecated Please use findReferrerInfo().
+     */ 
+    public ${glReferrerInfoName} findRefererInfo(String referrerPropertyName) {
+        return findReferrerInfo(referrerPropertyName);
+    }
+#end
+
     /**
      * ${database.ImplementComment}
      * 
-     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
      */ 
-    public boolean hasReferer(String refererPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-        final String methodName = buildRelationInfoGetterMethodNameInitCap("referer", refererPropertyName);
+    public boolean hasReferrer(String referrerPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
         return hasMethod(methodName);
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
-     * @return Referer DBMeta. (NotNull)
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Referrer DBMeta. (NotNull)
      */ 
-    public ${glDBMetaInterfaceName} findRefererDBMeta(String refererPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-        return findRefererInfo(refererPropertyName).getRefererDBMeta();
+    public ${glDBMetaInterfaceName} findReferrerDBMeta(String referrerPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
+        return findReferrerInfo(referrerPropertyName).getReferrerDBMeta();
     }
 
     /**
      * ${database.ImplementComment}
      * 
-     * @param refererPropertyName The property name of referer. (Both OK - InitCap or not). (NotNull)
-     * @return Referer information. (NotNull)
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Referrer information. (NotNull)
      */ 
-    public ${glRefererInfoName} findRefererInfo(String refererPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-        final String methodName = buildRelationInfoGetterMethodNameInitCap("referer", refererPropertyName);
+    public ${glReferrerInfoName} findReferrerInfo(String referrerPropertyName) {
+        assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
+        final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
         java.lang.reflect.Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[]{});
         } catch (NoSuchMethodException e) {
-            String msg = "Not found referer by refererPropertyName: refererPropertyName=" + refererPropertyName;
+            String msg = "Not found referrer by referrerPropertyName: referrerPropertyName=" + referrerPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (${glRefererInfoName})method.invoke(this, new Object[]{});
+            return (${glReferrerInfoName})method.invoke(this, new Object[]{});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -260,13 +292,13 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     protected static abstract class AbstractRelationTrace implements RelationTrace {
 
         /** The list of relation. */
-        protected java.util.List${database.filterGenericsString($glRelationInfoName)} _relationList;
+        protected java.util.List<${glRelationInfoName}> _relationList;
 
         /** The list of relation trace. */
-        protected java.util.List${database.filterGenericsString('AbstractRelationTrace')} _relationTraceList;
+        protected java.util.List<AbstractRelationTrace> _relationTraceList;
 
         /** The list of relation info as trace. */
-        protected java.util.List${database.filterGenericsString($glRelationInfoName)} _traceRelationInfoList;
+        protected java.util.List<${glRelationInfoName}> _traceRelationInfoList;
 
         /** The column info as trace. */
         protected ${glColumnInfoName} _traceColumnInfo;
@@ -280,7 +312,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
          */
         public AbstractRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
-            this(new java.util.ArrayList${database.filterGenericsString($glRelationInfoName)}(), new java.util.ArrayList${database.filterGenericsString('AbstractRelationTrace')}());
+            this(new java.util.ArrayList<${glRelationInfoName}>(), new java.util.ArrayList<AbstractRelationTrace>());
             this._relationTraceFixHandler = relationTraceFixHandler;
         }
 
@@ -290,7 +322,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * @param relationList The list of relation. (NotNull)
          * @param relationTraceList The list of relation trace. (NotNull)
          */
-        public AbstractRelationTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} relationList, java.util.List${database.filterGenericsString('AbstractRelationTrace')} relationTraceList) {
+        public AbstractRelationTrace(java.util.List<${glRelationInfoName}> relationList, java.util.List<AbstractRelationTrace> relationTraceList) {
             this._relationList = relationList;
             this._relationTraceList = relationTraceList;
             this._relationTraceList.add(this);
@@ -301,7 +333,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * 
          * @return The trace of relation as the list of relation info. (NotNull)
          */
-        public java.util.List${database.filterGenericsString($glRelationInfoName)} getTraceRelation() {
+        public java.util.List<${glRelationInfoName}> getTraceRelation() {
             return _traceRelationInfoList;
         }
 
@@ -321,7 +353,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * @param traceColumnInfo The trace of column as column info. (Nullable)
          * @return Relation trace(result). (NotNull)
          */
-        protected RelationTrace fixTrace(java.util.List${database.filterGenericsString($glRelationInfoName)} traceRelationInfoList, ${glColumnInfoName} traceColumnInfo) {
+        protected RelationTrace fixTrace(java.util.List<${glRelationInfoName}> traceRelationInfoList, ${glColumnInfoName} traceColumnInfo) {
             final AbstractRelationTrace localRelationTrace = (AbstractRelationTrace)_relationTraceList.get(0);
             localRelationTrace.setTraceRelation(traceRelationInfoList);
             localRelationTrace.setTraceColumn(traceColumnInfo);
@@ -330,7 +362,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             return localRelationTrace;
         }
 
-        protected void setTraceRelation(java.util.List${database.filterGenericsString($glRelationInfoName)} traceRelationInfoList) {
+        protected void setTraceRelation(java.util.List<${glRelationInfoName}> traceRelationInfoList) {
             this._traceRelationInfoList = traceRelationInfoList;
         }
 
@@ -342,8 +374,8 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * ${database.ImplementComment}
          */
         protected void recycle() {
-            this._relationList = new java.util.ArrayList${database.filterGenericsString($glRelationInfoName)}();
-            this._relationTraceList = new java.util.ArrayList${database.filterGenericsString('AbstractRelationTrace')}();
+            this._relationList = new java.util.ArrayList<${glRelationInfoName}>();
+            this._relationTraceList = new java.util.ArrayList<AbstractRelationTrace>();
             this._relationTraceList.add(this);
         }
 

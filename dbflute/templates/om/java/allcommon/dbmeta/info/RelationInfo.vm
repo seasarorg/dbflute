@@ -17,10 +17,9 @@ public interface ${myClassName} {
 
     public ${glDBMetaInterfaceName} getTargetDBMeta();
 
-#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
-    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalTargetColumnInfoMap();
+    public java.util.Map<${glColumnInfoName}, ${glColumnInfoName}> getLocalTargetColumnInfoMap();
 
     public boolean isOneToOne();
 
-    public boolean isReferer();
+    public boolean isReferrer();
 }

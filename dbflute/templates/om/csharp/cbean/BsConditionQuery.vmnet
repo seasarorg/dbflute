@@ -221,8 +221,8 @@ namespace ${glPackageCQ} {
     #if (${refferer.isOneToOne()})
 
         // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-        //   RefererTable    = [${refferer.table.name}]
-        //   RefererProperty = [${refferer.reffererPropertyNameInitCapAsOne}]
+        //   ReferrerTable    = [${refferer.table.name}]
+        //   ReferrerProperty = [${refferer.reffererPropertyNameInitCapAsOne}]
         // * * * * * * * * */
 
         public ${relatedCQClassName} Query${refferer.reffererPropertyNameInitCapAsOne}() { return this.ConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}; }

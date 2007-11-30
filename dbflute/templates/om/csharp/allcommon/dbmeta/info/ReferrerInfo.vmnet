@@ -1,4 +1,4 @@
-#set ($myClassName = "${glRefererInfoName}")
+#set ($myClassName = "${glReferrerInfoName}")
 
 using System;
 using System.Reflection;
@@ -12,33 +12,33 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        protected String refererPropertyName;
+        protected String referrerPropertyName;
         protected ${glDBMetaInterfaceName} localDBMeta;
-        protected ${glDBMetaInterfaceName} refererDBMeta;
-        protected IDictionary<${glColumnInfoName}, ${glColumnInfoName}> localRefererColumnInfoMap;
-        protected IDictionary<${glColumnInfoName}, ${glColumnInfoName}> refererLocalColumnInfoMap;
+        protected ${glDBMetaInterfaceName} referrerDBMeta;
+        protected IDictionary<${glColumnInfoName}, ${glColumnInfoName}> localReferrerColumnInfoMap;
+        protected IDictionary<${glColumnInfoName}, ${glColumnInfoName}> referrerLocalColumnInfoMap;
         protected bool oneToOne;
 
         // ===============================================================================
         //                                                                          Finder
         //                                                                          ======
-        public ${glColumnInfoName} FindLocalByReferer(String refererColumnDbName) {
-            ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(refererDBMeta, refererColumnDbName);
-            ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})refererLocalColumnInfoMap[keyColumnInfo];
+        public ${glColumnInfoName} FindLocalByReferrer(String referrerColumnDbName) {
+            ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(referrerDBMeta, referrerColumnDbName);
+            ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})referrerLocalColumnInfoMap[keyColumnInfo];
             if (resultColumnInfo == null) {
-                String msg = "Not found by refererColumnDbName in refererLocalColumnInfoMap:";
-                msg = msg + " refererColumnDbName=" + refererColumnDbName + " refererLocalColumnInfoMap=" + refererLocalColumnInfoMap;
+                String msg = "Not found by referrerColumnDbName in referrerLocalColumnInfoMap:";
+                msg = msg + " referrerColumnDbName=" + referrerColumnDbName + " referrerLocalColumnInfoMap=" + referrerLocalColumnInfoMap;
                 throw new ArgumentException(msg);
             }
             return resultColumnInfo;
         }
 
-        public ${glColumnInfoName} FindRefererByLocal(String localColumnDbName) {
+        public ${glColumnInfoName} FindReferrerByLocal(String localColumnDbName) {
             ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(localDBMeta, localColumnDbName);
-            ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})localRefererColumnInfoMap[keyColumnInfo];
+            ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})localReferrerColumnInfoMap[keyColumnInfo];
             if (resultColumnInfo == null) {
-                String msg = "Not found by localColumnDbName in localRefererColumnInfoMap:";
-                msg = msg + " localColumnDbName=" + localColumnDbName + " localRefererColumnInfoMap=" + localRefererColumnInfoMap;
+                String msg = "Not found by localColumnDbName in localReferrerColumnInfoMap:";
+                msg = msg + " localColumnDbName=" + localColumnDbName + " localReferrerColumnInfoMap=" + localReferrerColumnInfoMap;
                 throw new ArgumentException(msg);
             }
             return resultColumnInfo;
@@ -52,34 +52,34 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                         Builder
         //                                                                         =======
         public String BuildInitCapPropertyName() {
-            return InitCap(this.refererPropertyName);
+            return InitCap(this.referrerPropertyName);
         }
 
         // ===============================================================================
         //                                                                       Implement
         //                                                                       =========
         public String RelationPropertyName {
-            get { return RefererPropertyName; }
+            get { return ReferrerPropertyName; }
         }
 
         public ${glDBMetaInterfaceName} TargetDBMeta {
-            get { return RefererDBMeta; }
+            get { return ReferrerDBMeta; }
         }
 
         public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> LocalTargetColumnInfoMap {
-            get { return LocalRefererColumnInfoMap; }
+            get { return LocalReferrerColumnInfoMap; }
         }
 
-        public bool IsReferer {
+        public bool IsReferrer {
             get { return true; }
         }
 
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-        public String RefererPropertyName {
-			get { return refererPropertyName; }
-            set { this.refererPropertyName = value; }
+        public String ReferrerPropertyName {
+			get { return referrerPropertyName; }
+            set { this.referrerPropertyName = value; }
         }
 
         public ${glDBMetaInterfaceName} LocalDBMeta {
@@ -87,26 +87,26 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             set { this.localDBMeta = value; }
         }
 
-        public ${glDBMetaInterfaceName} RefererDBMeta {
-			get { return refererDBMeta; }
-            set { this.refererDBMeta = value; }
+        public ${glDBMetaInterfaceName} ReferrerDBMeta {
+			get { return referrerDBMeta; }
+            set { this.referrerDBMeta = value; }
         }
 
-        public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> LocalRefererColumnInfoMap {
-            get { return localRefererColumnInfoMap; }
+        public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> LocalReferrerColumnInfoMap {
+            get { return localReferrerColumnInfoMap; }
             set {            
-                    this.localRefererColumnInfoMap = value;
-                    ICollection<${glColumnInfoName}> keys = localRefererColumnInfoMap.Keys;
-                    refererLocalColumnInfoMap = new Dictionary<${glColumnInfoName}, ${glColumnInfoName}>();
+                    this.localReferrerColumnInfoMap = value;
+                    ICollection<${glColumnInfoName}> keys = localReferrerColumnInfoMap.Keys;
+                    referrerLocalColumnInfoMap = new Dictionary<${glColumnInfoName}, ${glColumnInfoName}>();
                     foreach (${glColumnInfoName} key in keys) {
-                        ${glColumnInfoName} val = (${glColumnInfoName})localRefererColumnInfoMap[key];
-                        refererLocalColumnInfoMap.Add(val, key);
+                        ${glColumnInfoName} val = (${glColumnInfoName})localReferrerColumnInfoMap[key];
+                        referrerLocalColumnInfoMap.Add(val, key);
                     }
              }
         }
 
-        public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> RefererLocalColumnInfoMap {
-            get { return refererLocalColumnInfoMap; }
+        public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> ReferrerLocalColumnInfoMap {
+            get { return referrerLocalColumnInfoMap; }
         }
 
         public bool IsOneToOne {

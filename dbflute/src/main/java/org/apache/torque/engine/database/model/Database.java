@@ -1307,6 +1307,10 @@ public class Database {
     public boolean isCompatibleNullEqualFalse() {
         return getProperties().getLittleAdjustmentProperties().isCompatibleNullEqualFalse();
     }
+    
+    public boolean isCompatibleOldReferrerNotDeprecated() {
+        return getProperties().getLittleAdjustmentProperties().isCompatibleOldReferrerNotDeprecated();
+    }
 
     // -----------------------------------------------------
     //                                                 Other

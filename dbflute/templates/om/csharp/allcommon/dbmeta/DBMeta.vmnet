@@ -83,11 +83,11 @@ namespace ${glPackageBaseCommonDBMeta} {
         ${glForeignInfoName} FindForeignInfo(String foreignPropName);
 
         // -------------------------------------------------
-        //                                   Referer Element
-        //                                   ---------------
-        bool HasReferer(String refererPropertyName);
-        ${myClassName} FindRefererDBMeta(String refererPropertyName);
-        ${glRefererInfoName} FindRefererInfo(String refererPropertyName);
+        //                                  Referrer Element
+        //                                  ----------------
+        bool HasReferrer(String referrerPropertyName);
+        ${myClassName} FindReferrerDBMeta(String referrerPropertyName);
+        ${glReferrerInfoName} FindReferrerInfo(String referrerPropertyName);
 
         // ===============================================================================
         //                                                                   Sequence Info

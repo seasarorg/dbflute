@@ -13,7 +13,7 @@ import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
-import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
+import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 
 /**
@@ -23,13 +23,13 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  * 
  * LIBRARY
  *  |1
- *  |--* NEXT_LIBRARY (Referer)
+ *  |--* NEXT_LIBRARY (Referrer)
  *  |       |*
  *  |       |--1 LIBRARY (Foreign)
  *  |
- *  |--* COLLECTION (Referer)
+ *  |--* COLLECTION (Referrer)
  *  |       |1 
- *  |       |--1 COLLECTION_STATUS (Referer)
+ *  |       |--1 COLLECTION_STATUS (Referrer)
  *  |       |       |*
  *  |       |       |--1 COLLECTION_STATUS_LOOKUP (Foreign)
  *  |       |
@@ -41,20 +41,20 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  *  |       |           |*
  *  |       |           |--1 GENRE (Foreign)
  *  |       |
- *  |       |--* LENDING_COLLECTION (Referer)
+ *  |       |--* LENDING_COLLECTION (Referrer)
  *  |       |
  *  |
- *  |--* LIBRARY_USER (Referer)
+ *  |--* LIBRARY_USER (Referrer)
  *         |*  |1
- *         |   |--* LENDING (Referer)
+ *         |   |--* LENDING (Referrer)
  *         |         |1
- *         |         |--* LENDING_COLLECTION (Referer)
+ *         |         |--* LENDING_COLLECTION (Referrer)
  *         |
  *         |--1 LB_USER (Foreign)
  *                 |1
- *                 |--* BLACK_LIST (Referer)
+ *                 |--* BLACK_LIST (Referrer)
  *                         |1
- *                         |--* BLACK_ACTION (Referer)
+ *                         |--* BLACK_ACTION (Referrer)
  *                                 |*
  *                                 |--1 BLACK_ACTION_LOOKUP (Foreign)
  *          
@@ -138,70 +138,70 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  *     request.mapping(sourceDbm.columnRTimestamp(), trace.columnRTimestamp());
  *
  *     // Register column [baseLibraryId]
- *     request.mapping(sourceDbm.columnBaseLibraryId(), trace.refererNextLibraryByBaseIdList().columnLibraryId());
+ *     request.mapping(sourceDbm.columnBaseLibraryId(), trace.referrerNextLibraryByBaseIdList().columnLibraryId());
  *
  *     // Register column [nextLibraryId]
- *     request.mapping(sourceDbm.columnNextLibraryId(), trace.refererNextLibraryByBaseIdList().columnNextLibraryId());
+ *     request.mapping(sourceDbm.columnNextLibraryId(), trace.referrerNextLibraryByBaseIdList().columnNextLibraryId());
  *
  *     // Register column [nextLibraryNextLibraryId]
- *     request.mapping(sourceDbm.columnNextLibraryNextLibraryId(), trace.refererNextLibraryByBaseIdList().foreignLibraryByNextId().columnLibraryId());
+ *     request.mapping(sourceDbm.columnNextLibraryNextLibraryId(), trace.referrerNextLibraryByBaseIdList().foreignLibraryByNextId().columnLibraryId());
  *
  *     // Register column [nextLibraryNextLibraryName]
- *     request.mapping(sourceDbm.columnNextLibraryNextLibraryName(), trace.refererNextLibraryByBaseIdList().foreignLibraryByNextId().columnLibraryName());
+ *     request.mapping(sourceDbm.columnNextLibraryNextLibraryName(), trace.referrerNextLibraryByBaseIdList().foreignLibraryByNextId().columnLibraryName());
  *
  *     // Register column [collectionId]
- *     request.mapping(sourceDbm.columnCollectionId(), trace.refererCollectionList().columnCollectionId());
+ *     request.mapping(sourceDbm.columnCollectionId(), trace.referrerCollectionList().columnCollectionId());
  *
  *     // Register column [arrivalDate]
- *     request.mapping(sourceDbm.columnCollectionArrivalDate(), trace.refererCollectionList().columnArrivalDate());
+ *     request.mapping(sourceDbm.columnCollectionArrivalDate(), trace.referrerCollectionList().columnArrivalDate());
  *
  *     // Register column [collectionStatusId]
- *     request.mapping(sourceDbm.columnCollectionStatusId(), trace.refererCollectionList().foreignCollectionStatusAsOne().columnCollectionId());
+ *     request.mapping(sourceDbm.columnCollectionStatusId(), trace.referrerCollectionList().foreignCollectionStatusAsOne().columnCollectionId());
  *
  *     // Register column [collectionStatusCode]
- *     request.mapping(sourceDbm.columnCollectionStatusCode(), trace.refererCollectionList().foreignCollectionStatusAsOne().foreignCollectionStatusLookup().columnCollectionStatusCode());
+ *     request.mapping(sourceDbm.columnCollectionStatusCode(), trace.referrerCollectionList().foreignCollectionStatusAsOne().foreignCollectionStatusLookup().columnCollectionStatusCode());
  *
  *     // Register column [collectionStatusName]
- *     request.mapping(sourceDbm.columnCollectionStatusName(), trace.refererCollectionList().foreignCollectionStatusAsOne().foreignCollectionStatusLookup().columnCollectionStatusName());
+ *     request.mapping(sourceDbm.columnCollectionStatusName(), trace.referrerCollectionList().foreignCollectionStatusAsOne().foreignCollectionStatusLookup().columnCollectionStatusName());
  *
  *     // Register column [collectionBookId]
- *     request.mapping(sourceDbm.columnCollectionBookId(), trace.refererCollectionList().foreignBook().columnBookId());
+ *     request.mapping(sourceDbm.columnCollectionBookId(), trace.referrerCollectionList().foreignBook().columnBookId());
  *
  *     // Register column [collectionBookName]
- *     request.mapping(sourceDbm.columnCollectionBookName(), trace.refererCollectionList().foreignBook().columnBookName());
+ *     request.mapping(sourceDbm.columnCollectionBookName(), trace.referrerCollectionList().foreignBook().columnBookName());
  *
  *     // Register column [collectionBookAuthorId]
- *     request.mapping(sourceDbm.columnCollectionBookAuthorId(), trace.refererCollectionList().foreignBook().foreignAuthor().columnAuthorId());
+ *     request.mapping(sourceDbm.columnCollectionBookAuthorId(), trace.referrerCollectionList().foreignBook().foreignAuthor().columnAuthorId());
  *
  *     // Register column [collectionBookAuthorName]
- *     request.mapping(sourceDbm.columnCollectionBookAuthorName(), trace.refererCollectionList().foreignBook().foreignAuthor().columnAuthorName());
+ *     request.mapping(sourceDbm.columnCollectionBookAuthorName(), trace.referrerCollectionList().foreignBook().foreignAuthor().columnAuthorName());
  *
  *     // Register column [libraryUserLibraryId]
- *     request.mapping(sourceDbm.columnLibraryUserLibraryId(), trace.refererLibraryUserList().columnLibraryId());
+ *     request.mapping(sourceDbm.columnLibraryUserLibraryId(), trace.referrerLibraryUserList().columnLibraryId());
  *
  *     // Register column [libraryUserLbUserId]
- *     request.mapping(sourceDbm.columnLibraryUserLbUserId(), trace.refererLibraryUserList().columnLbUserId());
+ *     request.mapping(sourceDbm.columnLibraryUserLbUserId(), trace.referrerLibraryUserList().columnLbUserId());
  *
  *     // Register column [lendingLibraryId]
- *     request.mapping(sourceDbm.columnLendingLibraryId(), trace.refererLibraryUserList().refererLendingList().columnLibraryId());
+ *     request.mapping(sourceDbm.columnLendingLibraryId(), trace.referrerLibraryUserList().referrerLendingList().columnLibraryId());
  *
  *     // Register column [lendingLbUserId]
- *     request.mapping(sourceDbm.columnLendingLbUserId(), trace.refererLibraryUserList().refererLendingList().columnLbUserId());
+ *     request.mapping(sourceDbm.columnLendingLbUserId(), trace.referrerLibraryUserList().referrerLendingList().columnLbUserId());
  *
  *     // Register column [lendingDate]
- *     request.mapping(sourceDbm.columnLendingDate(), trace.refererLibraryUserList().refererLendingList().columnLendingDate());
+ *     request.mapping(sourceDbm.columnLendingDate(), trace.referrerLibraryUserList().referrerLendingList().columnLendingDate());
  *
  *     // Register column [lendingUUser]
- *     request.mapping(sourceDbm.columnLendingUUser(), trace.refererLibraryUserList().refererLendingList().columnUUser());
+ *     request.mapping(sourceDbm.columnLendingUUser(), trace.referrerLibraryUserList().referrerLendingList().columnUUser());
  *
  *     // Register column [lendingUModule]
- *     request.mapping(sourceDbm.columnLendingUModule(), trace.refererLibraryUserList().refererLendingList().columnUModule());
+ *     request.mapping(sourceDbm.columnLendingUModule(), trace.referrerLibraryUserList().referrerLendingList().columnUModule());
  *
  *     // Register column [lbUserId]
- *     request.mapping(sourceDbm.columnLbUserId(), trace.refererLibraryUserList().foreignLbUser().columnLbUserId());
+ *     request.mapping(sourceDbm.columnLbUserId(), trace.referrerLibraryUserList().foreignLbUser().columnLbUserId());
  *
  *     // Register column [lbUserName]
- *     request.mapping(sourceDbm.columnLbUserName(), trace.refererLibraryUserList().foreignLbUser().columnLbUserName());
+ *     request.mapping(sourceDbm.columnLbUserName(), trace.referrerLibraryUserList().foreignLbUser().columnLbUserName());
  *
  *     return request;
  * }
@@ -215,7 +215,7 @@ import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
  * === Relation Trace Tips ===
  * 
  *   RelationTrace.f + [Code Assist] -- go to Foreign
- *   RelationTrace.r + [Code Assist] -- go to Referer
+ *   RelationTrace.r + [Code Assist] -- go to Referrer
  *   RelationTrace.c + [Code Assist] -- end relation by Column
  *
  * 
@@ -352,7 +352,7 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
 
             final Map<String, Object> targetPrimaryKeyMap;
             final String alreadyRegisteredEntityKey;
-            if (!relationInfo.isReferer()) {
+            if (!relationInfo.isReferrer()) {
                 // =======
                 // Foreign
                 // =======
@@ -398,22 +398,22 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 }
             } else {
                 // =======
-                // Referer
+                // Referrer
                 // =======
-                final ${glRefererInfoName} refererInfo = localDBMeta.findRefererInfo(relationPropName);
+                final ${glReferrerInfoName} referrerInfo = localDBMeta.findReferrerInfo(relationPropName);
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                // Extract referer list from current local entity and initialize it if needs.
+                // Extract referrer list from current local entity and initialize it if needs.
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                List<${glEntityInterfaceName}> refererList = extractRefererList(localEntity, refererInfo);
-                if (refererList == null) {
+                List<${glEntityInterfaceName}> referrerList = extractReferrerList(localEntity, referrerInfo);
+                if (referrerList == null) {
 #if (!$database.isOneToManyReturnNullIfNonSelect())
-                    String msg = "The referer list should not be null: localEntity=" + localEntity + " refererInfo=" + refererInfo;
+                    String msg = "The referrer list should not be null: localEntity=" + localEntity + " referrerInfo=" + referrerInfo;
                     throw new IllegalStateException(msg);
 #else
-                    // Initialize the list of referer and inject it.
-                    refererList = new ArrayList<${glEntityInterfaceName}>();
-                    injectRefererList(localEntity, refererInfo, refererList);
+                    // Initialize the list of referrer and inject it.
+                    referrerList = new ArrayList<${glEntityInterfaceName}>();
+                    injectReferrerList(localEntity, referrerInfo, referrerList);
 #end
                 }
 
@@ -428,25 +428,25 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
                 alreadyRegisteredEntityKey = targetRelationPath + ":" + targetPrimaryKeyMap.toString();
                 if (!alreadyRegisteredEntityMap.containsKey(alreadyRegisteredEntityKey)) {
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    // Initialize referer entity and register it to the list of referer with primary key value.
+                    // Initialize referrer entity and register it to the list of referrer with primary key value.
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    final ${glEntityInterfaceName} refererEntity = relationInfo.getTargetDBMeta().newEntity();
-                    refererList.add(refererEntity);
+                    final ${glEntityInterfaceName} referrerEntity = relationInfo.getTargetDBMeta().newEntity();
+                    referrerList.add(referrerEntity);
 
                     // - - - - - - - - - - - - - - - - - -
-                    // Initialize primary key of referer.
+                    // Initialize primary key of referrer.
                     // - - - - - - - - - - - - - - - - - -
-                    injectRefererPrimaryKey(refererEntity, targetPrimaryKeyMap);
+                    injectReferrerPrimaryKey(referrerEntity, targetPrimaryKeyMap);
 
                     // - - - - - - - - - - - - - - - - - -
-                    // Initialize foreign key of referer.
+                    // Initialize foreign key of referrer.
                     // - - - - - - - - - - - - - - - - - -
-                    injectRefererForeignKey(topInfo, refererEntity, refererInfo, localRelationPath);
+                    injectReferrerForeignKey(topInfo, referrerEntity, referrerInfo, localRelationPath);
 
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    // Put referer entity to the map of already-registered-entity.
+                    // Put referrer entity to the map of already-registered-entity.
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    alreadyRegisteredEntityMap.put(alreadyRegisteredEntityKey.toString(), refererEntity);
+                    alreadyRegisteredEntityMap.put(alreadyRegisteredEntityKey.toString(), referrerEntity);
                 }
             }
 
@@ -533,8 +533,8 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     }
 
     @SuppressWarnings("unchecked")
-    protected java.util.List<${glEntityInterfaceName}> extractRefererList(${glEntityInterfaceName} entity, ${glRefererInfoName} refererInfo) {
-        return (java.util.List<${glEntityInterfaceName}>) invoke(refererInfo.findGetter(), entity, new Object[] {});
+    protected java.util.List<${glEntityInterfaceName}> extractReferrerList(${glEntityInterfaceName} entity, ${glReferrerInfoName} referrerInfo) {
+        return (java.util.List<${glEntityInterfaceName}>) invoke(referrerInfo.findGetter(), entity, new Object[] {});
     }
 
     // ===================================================================================
@@ -569,21 +569,21 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     }
 
     protected void injectForeignEntity(${glEntityInterfaceName} entity, String foreignPropName, ${glEntityInterfaceName} foreignEntity) {
-        final String capPropRefererName = initCap(foreignPropName);
-        final Method method = findMethod(entity.getClass(), "set" + capPropRefererName, new Class[] { foreignEntity.getDBMeta().getEntityType() });
+        final String capPropReferrerName = initCap(foreignPropName);
+        final Method method = findMethod(entity.getClass(), "set" + capPropReferrerName, new Class[] { foreignEntity.getDBMeta().getEntityType() });
         invoke(method, entity, new Object[] { foreignEntity });
     }
 
-    protected void injectRefererList(${glEntityInterfaceName} entity, ${glRefererInfoName} refererInfo, java.util.List<${glEntityInterfaceName}> refererList) {
-        invoke(refererInfo.findSetter(), entity, new Object[] { refererList });
+    protected void injectReferrerList(${glEntityInterfaceName} entity, ${glReferrerInfoName} referrerInfo, java.util.List<${glEntityInterfaceName}> referrerList) {
+        invoke(referrerInfo.findSetter(), entity, new Object[] { referrerList });
     }
 
     protected void injectForeignPrimaryKey(${glEntityInterfaceName} foreignEntity, Map<String, Object> foreigPrimaryKeyMap) {
         injectColumnValueMapToDestination(foreignEntity, foreigPrimaryKeyMap);
     }
 
-    protected void injectRefererPrimaryKey(${glEntityInterfaceName} refererEntity, Map<String, Object> refererPrimaryKeyMap) {
-        injectColumnValueMapToDestination(refererEntity, refererPrimaryKeyMap);
+    protected void injectReferrerPrimaryKey(${glEntityInterfaceName} referrerEntity, Map<String, Object> referrerPrimaryKeyMap) {
+        injectColumnValueMapToDestination(referrerEntity, referrerPrimaryKeyMap);
     }
 
     protected void injectLocalForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntityInterfaceName} localEntity, ${glForeignInfoName} foreignInfo, String foreignRelationPath) {
@@ -600,19 +600,19 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
         injectColumnValueMapToDestination(localEntity, localForeignKeyMap);
     }
 
-    protected void injectRefererForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntityInterfaceName} refererEntity,
-            ${glRefererInfoName} refererInfo, String localRelationPath) {
+    protected void injectReferrerForeignKey(TopInfo<LOCAL_ENTITY> topInfo, ${glEntityInterfaceName} referrerEntity,
+            ${glReferrerInfoName} referrerInfo, String localRelationPath) {
         final ${glHierarchyRequestName}<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Object> localPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, localRelationPath);
         final List<${glHierarchyRequestElementName}> primaryKeyElementList = request.findPrimaryKeyElement(localRelationPath);
-        final Map<String, Object> refererForeignKeyMap = new HashMap<String, Object>();
+        final Map<String, Object> referrerForeignKeyMap = new HashMap<String, Object>();
         for (${glHierarchyRequestElementName} localElement : primaryKeyElementList) {
             final String localPrimaryKeyName = localElement.getDestinationColumnInfo().getColumnDbName();
-            final ${glColumnInfoName} refererForeignKeyInfo = refererInfo.findRefererByLocal(localPrimaryKeyName);
-            final Object refererForeignKeyValue = localPrimaryKeyMap.get(localPrimaryKeyName);
-            refererForeignKeyMap.put(refererForeignKeyInfo.getColumnDbName(), refererForeignKeyValue);
+            final ${glColumnInfoName} referrerForeignKeyInfo = referrerInfo.findReferrerByLocal(localPrimaryKeyName);
+            final Object referrerForeignKeyValue = localPrimaryKeyMap.get(localPrimaryKeyName);
+            referrerForeignKeyMap.put(referrerForeignKeyInfo.getColumnDbName(), referrerForeignKeyValue);
         }
-        injectColumnValueMapToDestination(refererEntity, refererForeignKeyMap);
+        injectColumnValueMapToDestination(referrerEntity, referrerForeignKeyMap);
     }
 
     // ===================================================================================
@@ -635,8 +635,8 @@ public class ${myClassName}<LOCAL_ENTITY extends ${glEntityInterfaceName}> {
     //                                                                              Helper
     //                                                                              ======
     protected String initCap(final String name) {
-        final String capPropRefererName = name.substring(0, 1).toUpperCase() + name.substring(1);
-        return capPropRefererName;
+        final String capPropReferrerName = name.substring(0, 1).toUpperCase() + name.substring(1);
+        return capPropReferrerName;
     }
 
     private java.lang.reflect.Method findMethod(Class clazz, String methodName, Class[] argTypes) {

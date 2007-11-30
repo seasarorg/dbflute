@@ -52,8 +52,8 @@ import ${glPackageCB}.*;
  * [foreign-property]
  *     ${table.ForeignPropertyNameCommaString}
  * 
- * [referer-property]
- *     ${table.ReferrerPropertyNameCommaString}
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
  * 
  * [sequence]
  *     ${table.DefinedSequenceName}
@@ -346,8 +346,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
 #if (${table.hasOnlyOnePrimaryKey()})
     // ===================================================================================
-    //                                                                        Load Referer
-    //                                                                        ============
+    //                                                                       Load Referrer
+    //                                                                       =============
   #foreach ($refferer in $table.refererList)
     #set ($reffererTable = $refferer.Table)
     #set ($reffererEntityClassName = "${refferer.refererTableExtendedEntityClassName}")
@@ -359,14 +359,14 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List${database.filterGenericsString(${reffererEntityClassName})}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   RefererTable    = [${refferer.table.name}]
-    //   RefererProperty = [${refferer.reffererPropertyName}]
+    //   ReferrerTable    = [${refferer.table.name}]
+    //   ReferrerProperty = [${refferer.reffererPropertyName}]
     // * * * * * * * * */
 
     /**
-     * Load referer of ${refferer.ReffererPropertyName}.
+     * Load referrer of ${refferer.ReffererPropertyName}.
      * <pre>
-     *   You can load referer.
+     *   You can load referrer.
      * 
      *   ex) {Client Example}
      *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
@@ -387,11 +387,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Load referer of ${refferer.refererJavaBeansRulePropertyName}.
+     * Load referrer of ${refferer.refererJavaBeansRulePropertyName}.
      * <pre>
-     *   You can load referer with your original condition.
+     *   You can load referrer with your original condition.
      * 
-     *   ex) {Client Example}: Referer conditions are 'Xxx' is not null and order-by 'Yyy' desc
+     *   ex) {Client Example}: Referrer conditions are 'Xxx' is not null and order-by 'Yyy' desc
      *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
      *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
@@ -415,21 +415,21 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * </pre>
      * 
      * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param conditionBeanSetupper Referer condition setupper instance for registering referer condition. (NotNull)
+     * @param conditionBeanSetupper Referrer condition setupper instance for registering referrer condition. (NotNull)
      */
     public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
         assertObjectNotNull("conditionBeanSetupper<${reffererCBClassName}>", conditionBeanSetupper);
         if (${myEntityListVariableName}.isEmpty()) { return; }
-        load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
+        load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
     }
 
     /**
-     * Load referer of ${refferer.refererJavaBeansRulePropertyName}.
+     * Load referrer of ${refferer.refererJavaBeansRulePropertyName}.
      * <pre>
-     *   You can load referer with your original condition.
+     *   You can load referrer with your original condition.
      * 
-     *   ex) {Client Example}: Referer conditions are 'Xxx' is not null and order-by 'Yyy' desc
+     *   ex) {Client Example}: Referrer conditions are 'Xxx' is not null and order-by 'Yyy' desc
      *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
      *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      *     cb.query().setXxx_Equal("xxx");
@@ -440,7 +440,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      *             cb.query().addOrderBy_Yyy_Desc();
      *         }
      *     };
-     *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(cbSetupper));
+     *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(cbSetupper));
      *     - - - - - - - - - -/
      * 
      *   The conditionBean that the setupper provides have settings before you touch it. It is as follows:
@@ -453,22 +453,22 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * </pre>
      * 
      * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadRefererOption Load-referer option. (NotNull)
+     * @param loadReferrerOption Load-referrer option. (NotNull)
      */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadRefererOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadRefererOption) {
+    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadReferrerOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
-        assertObjectNotNull("loadRefererOption<${reffererEntityClassName}, ${reffererCBClassName}>", loadRefererOption);
+        assertObjectNotNull("loadReferrerOption<${reffererEntityClassName}, ${reffererCBClassName}>", loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }
-        final ${reffererBhvClassName} refererBhv = getBehaviorSelector().select(${reffererBhvClassName}.class);
-        helpLoadRefererInternally(${myEntityListVariableName}, loadRefererOption, new InternalLoadRefererCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${reffererCBClassName}, ${reffererEntityClassName}>() {
+        final ${reffererBhvClassName} referrerBhv = getBehaviorSelector().select(${reffererBhvClassName}.class);
+        helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${reffererCBClassName}, ${reffererEntityClassName}>() {
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity) { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
-            public void callbackBase_setRefererList(${myExtendedObjectClassName} entity, List<${reffererEntityClassName}> refererList) { entity.set${refferer.ReffererPropertyNameInitCap}(refererList); }
-            public ${reffererCBClassName} callbackReferer_newMyConditionBean() { return refererBhv.newMyConditionBean(); }
-            public void callbackReferer_queryForeignKeyInScope(${reffererCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
-            public void callbackReferer_queryAddOrderByForeignKeyAsc(${reffererCBClassName} cb) { cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc(); }
-            public List<${reffererEntityClassName}> callbackReferer_selectList(${reffererCBClassName} cb) { return refererBhv.selectList(cb); }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferer_getForeignKeyValue(${reffererEntityClassName} entity) { return entity.get${refferer.getLocalColumnJavaNameAsOne()}(); }
-            public void callbackReferer_setForeignEntity(${reffererEntityClassName} refererEntity, ${myExtendedObjectClassName} baseEntity) { refererEntity.set${refferer.foreignPropertyNameInitCap}(baseEntity); }
+            public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, List<${reffererEntityClassName}> referrerList) { entity.set${refferer.ReffererPropertyNameInitCap}(referrerList); }
+            public ${reffererCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.newMyConditionBean(); }
+            public void callbackReferrer_queryForeignKeyInScope(${reffererCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
+            public void callbackReferrer_queryAddOrderByForeignKeyAsc(${reffererCBClassName} cb) { cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc(); }
+            public List<${reffererEntityClassName}> callbackReferrer_selectList(${reffererCBClassName} cb) { return referrerBhv.selectList(cb); }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${reffererEntityClassName} entity) { return entity.get${refferer.getLocalColumnJavaNameAsOne()}(); }
+            public void callbackReferrer_setForeignEntity(${reffererEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity) { referrerEntity.set${refferer.foreignPropertyNameInitCap}(baseEntity); }
         } );
     }
   #end
@@ -497,10 +497,10 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
   #if (${refferer.isOneToOne()})
 
     /**
-     * Pull out the list of referer-as-one table '${reffererEntityClassName}'.
+     * Pull out the list of referrer-as-one table '${reffererEntityClassName}'.
      * 
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
-     * @return The list of referer-as-one table. (NotNull)
+     * @return The list of referrer-as-one table. (NotNull)
      */
     public List<${reffererEntityClassName}> pullout${refferer.reffererPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${reffererEntityClassName}>() {

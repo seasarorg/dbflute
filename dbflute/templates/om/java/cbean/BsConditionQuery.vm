@@ -408,8 +408,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if (${referer.isOneToOne()})
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   RefererTable    = [${referer.table.basicInfoDispString}]
-    //   RefererProperty = [${referer.refererJavaBeansRulePropertyNameAsOne}]
+    //   ReferrerTable    = [${referer.table.basicInfoDispString}]
+    //   ReferrerProperty = [${referer.refererJavaBeansRulePropertyNameAsOne}]
     // * * * * * * * * */
 
     /**

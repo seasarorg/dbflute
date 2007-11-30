@@ -73,6 +73,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return booleanProp("torque.isCompatibleNullEqualFalse", false);
     }
 
+    public boolean isCompatibleOldReferrerNotDeprecated() {
+        return booleanProp("torque.isCompatibleOldReferrerNotDeprecated", false);
+    }
+    
     // ===============================================================================
     //                                                         Disable As-One-Relation
     //                                                         =======================

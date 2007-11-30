@@ -148,8 +148,8 @@ namespace ${glPackageBaseCB} {
     #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${refferer.table.javaName}Nss")
 
         // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-        //   RefererTable    = [${refferer.Table.Name}]
-        //   RefererProperty = [${tmpPropertyName}]
+        //   ReferrerTable    = [${refferer.Table.Name}]
+        //   ReferrerProperty = [${tmpPropertyName}]
         // * * * * * * * * */
 
         /// <summary> Is select for ${tmpPropertyName}?</summary>

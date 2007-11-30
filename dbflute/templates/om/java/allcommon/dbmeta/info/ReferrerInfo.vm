@@ -1,11 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMetaInfo};
 
-#set ($myClassName = "${glForeignInfoName}")
+#set ($myClassName = "${glReferrerInfoName}")
 
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
- * The class of foreign information.
+ * The class of referrer information.
  * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
@@ -15,23 +15,33 @@ public class ${myClassName} implements ${glRelationInfoName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String foreignPropertyName;
+    protected String referrerPropertyName;
     protected ${glDBMetaInterfaceName} localDBMeta;
-    protected ${glDBMetaInterfaceName} foreignDBMeta;
-    protected java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} localForeignColumnInfoMap;
-    protected java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} foreignLocalColumnInfoMap;
-    protected int relationNo;
+    protected ${glDBMetaInterfaceName} referrerDBMeta;
+    protected java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} localReferrerColumnInfoMap;
+    protected java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} referrerLocalColumnInfoMap;
     protected boolean oneToOne;
 
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
-    public ${glColumnInfoName} findLocalByForeign(String foreignColumnDbName) {
-        final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(foreignDBMeta, foreignColumnDbName);
-        final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})foreignLocalColumnInfoMap.get(keyColumnInfo);
+    public ${glColumnInfoName} findLocalByReferrer(String referrerColumnDbName) {
+        final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(referrerDBMeta, referrerColumnDbName);
+        final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})referrerLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
-            String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
-            msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap=" + foreignLocalColumnInfoMap;
+            String msg = "Not found by referrerColumnDbName in referrerLocalColumnInfoMap:";
+            msg = msg + " referrerColumnDbName=" + referrerColumnDbName + " referrerLocalColumnInfoMap=" + referrerLocalColumnInfoMap;
+            throw new IllegalArgumentException(msg);
+        }
+        return resultColumnInfo;
+    }
+
+    public ${glColumnInfoName} findReferrerByLocal(String localColumnDbName) {
+        final ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(localDBMeta, localColumnDbName);
+        final ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})localReferrerColumnInfoMap.get(keyColumnInfo);
+        if (resultColumnInfo == null) {
+            String msg = "Not found by localColumnDbName in localReferrerColumnInfoMap:";
+            msg = msg + " localColumnDbName=" + localColumnDbName + " localReferrerColumnInfoMap=" + localReferrerColumnInfoMap;
             throw new IllegalArgumentException(msg);
         }
         return resultColumnInfo;
@@ -41,7 +51,7 @@ public class ${myClassName} implements ${glRelationInfoName} {
     //                                                                             Builder
     //                                                                             =======
     public String buildInitCapPropertyName() {
-        return initCap(this.foreignPropertyName);
+        return initCap(this.referrerPropertyName);
     }
 
     // ===================================================================================
@@ -59,30 +69,30 @@ public class ${myClassName} implements ${glRelationInfoName} {
     //                                                                           Implement
     //                                                                           =========
     public String getRelationPropertyName() {
-        return getForeignPropertyName();
+        return getReferrerPropertyName();
     }
 
     public ${glDBMetaInterfaceName} getTargetDBMeta() {
-        return getForeignDBMeta();
+        return getReferrerDBMeta();
     }
 
-    public java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} getLocalTargetColumnInfoMap() {
-        return getLocalForeignColumnInfoMap();
+    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalTargetColumnInfoMap() {
+        return getLocalReferrerColumnInfoMap();
     }
 
     public boolean isReferrer() {
-        return false;
+        return true;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getForeignPropertyName() {
-        return foreignPropertyName;
+    public String getReferrerPropertyName() {
+        return referrerPropertyName;
     }
 
-    public void setForeignPropertyName(String foreignPropertyName) {
-        this.foreignPropertyName = foreignPropertyName;
+    public void setReferrerPropertyName(String referrerPropertyName) {
+        this.referrerPropertyName = referrerPropertyName;
     }
 
     public ${glDBMetaInterfaceName} getLocalDBMeta() {
@@ -93,39 +103,31 @@ public class ${myClassName} implements ${glRelationInfoName} {
         this.localDBMeta = localDBMeta;
     }
 
-    public ${glDBMetaInterfaceName} getForeignDBMeta() {
-        return foreignDBMeta;
+    public ${glDBMetaInterfaceName} getReferrerDBMeta() {
+        return referrerDBMeta;
     }
 
-    public void setForeignDBMeta(${glDBMetaInterfaceName} foreignDBMeta) {
-        this.foreignDBMeta = foreignDBMeta;
+    public void setReferrerDBMeta(${glDBMetaInterfaceName} referrerDBMeta) {
+        this.referrerDBMeta = referrerDBMeta;
     }
 
-    public java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} getLocalForeignColumnInfoMap() {
-        return localForeignColumnInfoMap;
+    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getLocalReferrerColumnInfoMap() {
+        return localReferrerColumnInfoMap;
     }
 
-    public void setLocalForeignColumnInfoMap(java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} localForeignColumnInfoMap) {
-        this.localForeignColumnInfoMap = localForeignColumnInfoMap;
-        final java.util.Set keySet = localForeignColumnInfoMap.keySet();
-        foreignLocalColumnInfoMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericsColumnInfoMap})}();
+    public void setLocalReferrerColumnInfoMap(java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} localReferrerColumnInfoMap) {
+        this.localReferrerColumnInfoMap = localReferrerColumnInfoMap;
+        final java.util.Set keySet = localReferrerColumnInfoMap.keySet();
+        referrerLocalColumnInfoMap = new java.util.LinkedHashMap${database.filterGenericsString(${genericsColumnInfoMap})}();
         for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
             final ${glColumnInfoName} key = (${glColumnInfoName})ite.next();
-            final ${glColumnInfoName} value = (${glColumnInfoName})localForeignColumnInfoMap.get(key);
-            foreignLocalColumnInfoMap.put(value, key);
+            final ${glColumnInfoName} value = (${glColumnInfoName})localReferrerColumnInfoMap.get(key);
+            referrerLocalColumnInfoMap.put(value, key);
         }
     }
 
-    public java.util.Map${database.filterGenericsString(${genericsColumnInfoMap})} getForeignLocalColumnInfoMap() {
-        return foreignLocalColumnInfoMap;
-    }
-
-    public int getRelationNo() {
-        return relationNo;
-    }
-
-    public void setRelationNo(int relationNo) {
-        this.relationNo = relationNo;
+    public java.util.Map${database.filterGenericsString($genericsColumnInfoMap)} getReferrerLocalColumnInfoMap() {
+        return referrerLocalColumnInfoMap;
     }
 
     public boolean isOneToOne() {

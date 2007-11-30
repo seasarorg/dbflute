@@ -7,7 +7,10 @@ import ${glPackageBaseCommonHelper}.${glMapListStringName};
 import ${glPackageBaseCommonHelper}.${glMapStringBuilderName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
+#if ($database.isMakeRecentlyDeprecated())
 import ${glPackageBaseCommonDBMetaInfo}.${glRefererInfoName};
+#end
+import ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
 
@@ -265,31 +268,57 @@ public interface ${myClassName} {
     public ${glForeignInfoName} findForeignInfo(String foreignPropName);
 
     // -----------------------------------------------------
-    //                                       Referer Element
-    //                                       ---------------
+    //                                      Referrer Element
+    //                                      ----------------
+#if ($database.isMakeRecentlyDeprecated())
     /**
-     * Has referer?
+     * Has referrer?
      * 
-     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
+     * @param referrerPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
      */ 
-    public boolean hasReferer(String refererPropertyName);
+    public boolean hasReferer(String referrerPropertyName);
 
     /**
-     * Find referer dbmeta.
+     * Find referrer dbmeta.
      * 
-     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
-     * @return Referer DBMeta. (NotNull)
+     * @param referrerPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
+     * @return Referrer DBMeta. (NotNull)
      */ 
-    public ${myClassName} findRefererDBMeta(String refererPropertyName);
+    public ${myClassName} findRefererDBMeta(String referrerPropertyName);
 
     /**
-     * Find referer information.
+     * Find referrer information.
      * 
-     * @param refererPropertyName Referer property name. (Both OK - InitCap or not). (NotNull)
-     * @return Referer information. (NotNull)
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Referrer information. (NotNull)
      */ 
-    public ${glRefererInfoName} findRefererInfo(String refererPropertyName);
+    public ${glReferrerInfoName} findRefererInfo(String referrerPropertyName);
+#end
+
+    /**
+     * Has referrer?
+     * 
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Determination. (NotNull)
+     */ 
+    public boolean hasReferrer(String referrerPropertyName);
+
+    /**
+     * Find referrer dbmeta.
+     * 
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Referrer DBMeta. (NotNull)
+     */ 
+    public ${myClassName} findReferrerDBMeta(String referrerPropertyName);
+
+    /**
+     * Find referrer information.
+     * 
+     * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
+     * @return Referrer information. (NotNull)
+     */ 
+    public ${glReferrerInfoName} findReferrerInfo(String referrerPropertyName);
 
     // -----------------------------------------------------
     //                                        Relation Trace

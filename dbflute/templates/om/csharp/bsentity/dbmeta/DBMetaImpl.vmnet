@@ -32,7 +32,7 @@ namespace ${myDBMetaPackageName} {
     /// [foreign-table]
     ///     ${table.ForeignPropertyNameCommaString}
     /// 
-    /// [refferer-table]
+    /// [referrer-table]
     ///     ${table.ReferrerPropertyNameCommaString}
     /// 
     /// [sequence]
@@ -94,10 +94,10 @@ namespace ${myDBMetaPackageName} {
 #end
 
         // -------------------------------------------------
-        //                                      Referer Name
-        //                                      ------------
+        //                                     Referrer Name
+        //                                     -------------
 #foreach ($children in $table.refererList)
-        public static readonly String REFERER_PROPERTY_NAME_${children.refererPropertyNameInitCap} = "$children.refererPropertyNameInitCap";
+        public static readonly String REFERRER_PROPERTY_NAME_${children.refererPropertyNameInitCap} = "$children.refererPropertyNameInitCap";
 #end
 
         // -------------------------------------------------
@@ -243,8 +243,8 @@ namespace ${myDBMetaPackageName} {
 #end
 
         // -------------------------------------------------
-        //                                   Referer Element
-        //                                   ---------------
+        //                                  Referrer Element
+        //                                  ----------------
         // -------------------------------------------------
         //                                    Relation Trace
         //                                    --------------

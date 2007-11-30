@@ -160,9 +160,9 @@ namespace ${glPackageExtendedBhv} {
 
 #if (${table.hasOnlyOnePrimaryKey()})
         // ===============================================================================
-        //                                                                    Load Referer
-        //                                                                    ============
-        #region Load Referer
+        //                                                                   Load Referrer
+        //                                                                   =============
+        #region Load Referrer
   #foreach ($referer in $table.refererList)
     #set ($refererTable = $referer.Table)
     #set ($refererEntityClassName = "${glProjectPrefix}${refererTable.JavaName}")
@@ -176,8 +176,8 @@ namespace ${glPackageExtendedBhv} {
     #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${refererEntityClassName}>")
 
         // /* * * * * * * * * * * * * * * * * * * * * * *
-        //   RefererTable    = [${referer.table.name}]
-        //   RefererProperty = [${referer.reffererPropertyNameInitCap}]
+        //   ReferrerTable    = [${referer.table.name}]
+        //   ReferrerProperty = [${referer.reffererPropertyNameInitCap}]
         // * * * * * * * * */
 
         public void Load${referer.reffererPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper) {
@@ -192,19 +192,19 @@ namespace ${glPackageExtendedBhv} {
                     pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
                 }
             }
-            ${refererBhvClassName} refererBhv = this.BehaviorSelector.Select<${refererBhvClassName}>(typeof(${refererBhvClassName}));
-            ${refererCBClassName} cb = refererBhv.NewMyConditionBean();
+            ${refererBhvClassName} referrerBhv = this.BehaviorSelector.Select<${refererBhvClassName}>(typeof(${refererBhvClassName}));
+            ${refererCBClassName} cb = referrerBhv.NewMyConditionBean();
             cb.Query().Set${referer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
             cb.Query().AddOrderBy_${referer.getLocalColumnJavaNameAsOne()}_Asc();
             conditionBeanSetupper.Invoke(cb);
-            IList<${refererEntityClassName}> refererList = refererBhv.SelectList(cb);
+            IList<${refererEntityClassName}> refererList = referrerBhv.SelectList(cb);
 
-            IDictionary<${genericPKChildListMap}> pkRefererListMap = new Dictionary<${genericPKChildListMap}>();
+            IDictionary<${genericPKChildListMap}> pkReferrerListMap = new Dictionary<${genericPKChildListMap}>();
             foreach (${refererEntityClassName} reffererEntity in refererList) {
-                if (!pkRefererListMap.ContainsKey(reffererEntity.${referer.getLocalColumnJavaNameAsOne()})) {
-                    pkRefererListMap.Add(reffererEntity.${referer.getLocalColumnJavaNameAsOne()}, new List<${refererEntityClassName}>());
+                if (!pkReferrerListMap.ContainsKey(reffererEntity.${referer.getLocalColumnJavaNameAsOne()})) {
+                    pkReferrerListMap.Add(reffererEntity.${referer.getLocalColumnJavaNameAsOne()}, new List<${refererEntityClassName}>());
                 }
-                pkRefererListMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}].Add(reffererEntity);
+                pkReferrerListMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}].Add(reffererEntity);
 
                 // for Reverse Reference.
                 ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}];
@@ -212,8 +212,8 @@ namespace ${glPackageExtendedBhv} {
             }
 
             foreach (${myExtendedObjectClassName} entity in ls) {
-                if (pkRefererListMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
-                    entity.${referer.ReffererPropertyNameInitCap} = pkRefererListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
+                if (pkReferrerListMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
+                    entity.${referer.ReffererPropertyNameInitCap} = pkReferrerListMap[entity.${table.getPrimaryKeyJavaNameAsOne()}];
                 } else {
                     entity.${referer.ReffererPropertyNameInitCap} = new List<${refererEntityClassName}>();
                 }

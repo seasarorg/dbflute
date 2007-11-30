@@ -33,7 +33,7 @@ namespace ${myExtendedEntityPackageName} {
     /// [foreign-table]
     ///     ${table.ForeignPropertyNameCommaString}
     /// 
-    /// [refferer-table]
+    /// [referrer-table]
     ///     ${table.ReferrerPropertyNameCommaString}
     /// 
     /// [sequence]
@@ -218,9 +218,9 @@ namespace ${myExtendedEntityPackageName} {
         #endregion
 
         // ===============================================================================
-        //                                                                   Referer Table
-        //                                                                   =============
-        #region Referer Table
+        //                                                                  Referrer Table
+        //                                                                  ==============
+        #region Referrer Table
 #foreach ($refferer in $table.refererList)
   #set ($reffererTable = $refferer.Table)
   #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
@@ -232,14 +232,14 @@ namespace ${myExtendedEntityPackageName} {
   #if (${refferer.isOneToOne()})
 
         // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
-        //   RefererTable    = [${refferer.table.basicInfoDispString}]
-        //   RefererProperty = [${refferer.reffererPropertyNameInitCapAsOne}]
+        //   ReferrerTable    = [${refferer.table.basicInfoDispString}]
+        //   ReferrerProperty = [${refferer.reffererPropertyNameInitCapAsOne}]
         // * * * * * * * * */
   #else
 
         // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        //   RefererTable    = [${refferer.table.basicInfoDispString}]
-        //   RefererProperty = [${refferer.reffererPropertyNameInitCap}]
+        //   ReferrerTable    = [${refferer.table.basicInfoDispString}]
+        //   ReferrerProperty = [${refferer.reffererPropertyNameInitCap}]
         // * * * * * * * * */
   #end
 
@@ -250,7 +250,7 @@ namespace ${myExtendedEntityPackageName} {
             set { ${reffererVariableName} = value; }
         }
 
-        public bool HasRefererElements${refferer.reffererPropertyNameInitCap} {
+        public bool HasReferrerElements${refferer.reffererPropertyNameInitCap} {
             get { return ${reffererVariableName} != null && ${reffererVariableName}.Count > 0; }
         }
   #if (${refferer.isOneToOne()})

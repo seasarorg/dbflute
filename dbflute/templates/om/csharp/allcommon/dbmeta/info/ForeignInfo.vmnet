@@ -60,7 +60,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             get { return LocalForeignColumnInfoMap; }
         }
 
-        public bool IsReferer {
+        public bool IsReferrer {
             get { return false; }
         }
 

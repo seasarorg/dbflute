@@ -135,7 +135,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                   =============
         public ${glRelationInfoName} FindRelationInfo(String relationPropertyName) {
             AssertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-            return HasForeign(relationPropertyName) ? (${glRelationInfoName})FindForeignInfo(relationPropertyName) : (${glRelationInfoName})FindRefererInfo(relationPropertyName);
+            return HasForeign(relationPropertyName) ? (${glRelationInfoName})FindForeignInfo(relationPropertyName) : (${glRelationInfoName})FindReferrerInfo(relationPropertyName);
         }
 
         // -------------------------------------------------
@@ -160,25 +160,25 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // -------------------------------------------------
-        //                                   Referer Element
-        //                                   ---------------
-        public bool HasReferer(String refererPropertyName) {
-            AssertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-            String propertyName = BuildRelationInfoGetterMethodNameInitCap("Referer", refererPropertyName);
+        //                                  Referrer Element
+        //                                  ----------------
+        public bool HasReferrer(String referrerPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
+            String propertyName = BuildRelationInfoGetterMethodNameInitCap("Referrer", referrerPropertyName);
             return HasProperty(propertyName);
         }
 
-        public ${glDBMetaInterfaceName} FindRefererDBMeta(String refererPropertyName) {
-            AssertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-            return FindRefererInfo(refererPropertyName).RefererDBMeta;
+        public ${glDBMetaInterfaceName} FindReferrerDBMeta(String referrerPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
+            return FindReferrerInfo(referrerPropertyName).ReferrerDBMeta;
         }
 
-        public ${glRefererInfoName} FindRefererInfo(String refererPropertyName) {
-            AssertStringNotNullAndNotTrimmedEmpty("refererPropertyName", refererPropertyName);
-            String propertyName = BuildRelationInfoGetterMethodNameInitCap("Referer", refererPropertyName);
+        public ${glReferrerInfoName} FindReferrerInfo(String referrerPropertyName) {
+            AssertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
+            String propertyName = BuildRelationInfoGetterMethodNameInitCap("Referrer", referrerPropertyName);
             PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
             // TODO: @jflute -- Null Check
-            return (${glRefererInfoName})propertyInfo.GetValue(propertyInfo, null);
+            return (${glReferrerInfoName})propertyInfo.GetValue(propertyInfo, null);
         }
 
         // -------------------------------------------------

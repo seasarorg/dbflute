@@ -126,7 +126,7 @@ public interface ${glConditionQueryInterfaceName} {
     //                                                                       Foregin Query
     //                                                                       =============
     /**
-     * Get the conditionQuery of foreign contains referer-as-one.
+     * Get the conditionQuery of foreign contains referrer-as-one.
      * 
      * @param foreignPropertyName The property name of foreign. (NotNull and NotEmpty and Both OK -- InitCap or not)
      * @return The conditionQuery of foreign. (NotNull)

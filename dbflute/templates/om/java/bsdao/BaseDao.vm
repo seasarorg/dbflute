@@ -23,7 +23,7 @@ import ${glPackageExtendedEntity}.${myExtendedObjectClassName};
  * [foreign-property]
  *     ${table.foreignPropertyNameCommaString}
  * 
- * [referer-property]
+ * [referrer-property]
  *     ${table.referrerPropertyNameCommaString}
  * 
  * [sequence]
