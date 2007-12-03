@@ -24,6 +24,11 @@ namespace ${glPackageBaseCommonBhv} {
         protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
 
         // ===============================================================================
+        //                                                                Initialized Mark
+        //                                                                ================
+        public abstract bool IsInitialized { get; }
+
+        // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
         /// <summary>

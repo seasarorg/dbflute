@@ -11,6 +11,11 @@ namespace ${glPackageBaseCommonBhv} {
     public interface ${glBehaviorReadableInterfaceName} {
 
         // ===============================================================================
+        //                                                                Initialized Mark
+        //                                                                ================
+        bool IsInitialized { get; }
+
+        // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
         /// <summary>

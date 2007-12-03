@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 
+using Seasar.Quill;
 using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonDBMeta};
 
@@ -10,15 +11,16 @@ namespace ${glPackageBaseCommon} {
     public class ${glCacheBehaviorSelectorName} : ${glBehaviorSelectorInterfaceName} {
 
         // ===============================================================================
-        //                                                                       Attribute
-        //                                                                       =========
-        protected Seasar.Framework.Container.IS2Container _container;
-
-        // ===============================================================================
         //                                                                        Selector
         //                                                                        ========
         public virtual BEHAVIOR_TYPE Select<BEHAVIOR_TYPE>(Type behaviorType) where BEHAVIOR_TYPE : ${glBehaviorReadableInterfaceName} {
-            return (BEHAVIOR_TYPE)_container.GetComponent(behaviorType);
+            QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(behaviorType);
+            BEHAVIOR_TYPE bhv = (BEHAVIOR_TYPE)component.GetComponentObject(behaviorType);
+            if (bhv.IsInitialized) {
+                return bhv;
+            }
+            QuillInjector.GetInstance().Inject(bhv);
+            return bhv;
         }
 
         public virtual ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName) {
@@ -80,14 +82,6 @@ namespace ${glPackageBaseCommon} {
                 String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
                 throw new SystemException(msg);
             }
-        }
-
-        // ===============================================================================
-        //                                                                        Accessor
-        //                                                                        ========
-        public Seasar.Framework.Container.IS2Container Container {
-            get { return _container; }
-            set { _container = value; }
         }
     }
 }

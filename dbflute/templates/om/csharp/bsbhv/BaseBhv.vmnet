@@ -39,6 +39,13 @@ namespace ${glPackageExtendedBhv} {
         #endregion
 
         // ===============================================================================
+        //                                                                Initialized Mark
+        //                                                                ================
+        #region Initialized Mark
+        public override bool IsInitialized { get { return _dao != null; } }
+        #endregion
+
+        // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
         #region Table Name
@@ -188,7 +195,7 @@ namespace ${glPackageExtendedBhv} {
             IList<${table.getPrimaryKeyJavaNativeAsOne()}> pkList = new List<${table.getPrimaryKeyJavaNativeAsOne()}>();
             foreach (${myExtendedObjectClassName} entity in ls) {
                 pkList.Add(entity.${table.getPrimaryKeyJavaNameAsOne()});
-                if (pkMyEntityMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
+                if (!pkMyEntityMap.ContainsKey(entity.${table.getPrimaryKeyJavaNameAsOne()})) {
                     pkMyEntityMap.Add(entity.${table.getPrimaryKeyJavaNameAsOne()}, entity);
                 }
             }
@@ -197,18 +204,18 @@ namespace ${glPackageExtendedBhv} {
             cb.Query().Set${referer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
             cb.Query().AddOrderBy_${referer.getLocalColumnJavaNameAsOne()}_Asc();
             conditionBeanSetupper.Invoke(cb);
-            IList<${refererEntityClassName}> refererList = referrerBhv.SelectList(cb);
+            IList<${refererEntityClassName}> referrerList = referrerBhv.SelectList(cb);
 
             IDictionary<${genericPKChildListMap}> pkReferrerListMap = new Dictionary<${genericPKChildListMap}>();
-            foreach (${refererEntityClassName} reffererEntity in refererList) {
-                if (!pkReferrerListMap.ContainsKey(reffererEntity.${referer.getLocalColumnJavaNameAsOne()})) {
-                    pkReferrerListMap.Add(reffererEntity.${referer.getLocalColumnJavaNameAsOne()}, new List<${refererEntityClassName}>());
+            foreach (${refererEntityClassName} referrerEntity in referrerList) {
+                if (!pkReferrerListMap.ContainsKey(referrerEntity.${referer.getLocalColumnJavaNameAsOne()})) {
+                    pkReferrerListMap.Add(referrerEntity.${referer.getLocalColumnJavaNameAsOne()}, new List<${refererEntityClassName}>());
                 }
-                pkReferrerListMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}].Add(reffererEntity);
+                pkReferrerListMap[referrerEntity.${referer.getLocalColumnJavaNameAsOne()}].Add(referrerEntity);
 
                 // for Reverse Reference.
-                ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap[reffererEntity.${referer.getLocalColumnJavaNameAsOne()}];
-                reffererEntity.${referer.ForeignPropertyNameInitCap} = myEntity;
+                ${myExtendedObjectClassName} myEntity = (${myExtendedObjectClassName})pkMyEntityMap[referrerEntity.${referer.getLocalColumnJavaNameAsOne()}];
+                referrerEntity.${referer.ForeignPropertyNameInitCap} = myEntity;
             }
 
             foreach (${myExtendedObjectClassName} entity in ls) {
