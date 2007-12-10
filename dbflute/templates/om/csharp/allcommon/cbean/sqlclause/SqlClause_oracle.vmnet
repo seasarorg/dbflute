@@ -72,6 +72,17 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @return this. (NotNull)
          */
         public override ${glSqlClauseInterfaceName} LockForUpdate() {
+            // TODO: @jflute -- To use 'for update of xxx.xxx'.
+
+            // ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
+            // if (dbmeta.HasPrimaryKey) {
+            //     String primaryKeyColumnName = dbmeta.GetPrimaryUniqueInfo().FirstColumn.ColumnDbName;
+            //     _lockSqlSuffix = " for update of " + _tableName + "." + primaryKeyColumnName;
+            // } else {
+            //     String randomColumnName = ((${glColumnInfoName})dbmeta.GetColumnInfoList()[0]).ColumnDbName;
+            //     _lockSqlSuffix = " for update of " + _tableName + "." + randomColumnName;
+            // }
+
             _lockSqlSuffix = " for update";
             return this;
         }
