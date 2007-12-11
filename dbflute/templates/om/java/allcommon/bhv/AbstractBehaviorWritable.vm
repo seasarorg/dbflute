@@ -211,6 +211,8 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
                 }
             } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
                 exception = e;
+            } catch (IllegalStateException e) {
+                exception = e;
             }
             if (exception != null) {
                 final CB_TYPE cb = callback.callbackNewMyConditionBean();
