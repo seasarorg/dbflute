@@ -9,6 +9,9 @@
 </node>
 </node>
 <node CREATED="1175069900828" ID="Freemind_Link_574509044" MODIFIED="1175069905421" TEXT="*Skype"/>
+<node CREATED="1197356991078" ID="Freemind_Link_1246659690" MODIFIED="1197356993250" TEXT="*Wiki">
+<node CREATED="1197356994421" ID="Freemind_Link_1469183805" MODIFIED="1197356995171" TEXT="http://pukiwiki.sourceforge.jp/?FrontPage"/>
+</node>
 </node>
 <node CREATED="1176036707406" ID="Freemind_Link_1825640084" MODIFIED="1176036717203" POSITION="left" TEXT="{BusinessPolicy}">
 <node CREATED="1190355533671" ID="Freemind_Link_407623268" MODIFIED="1190355538156" TEXT="{Management}">
@@ -742,6 +745,15 @@
 <node CREATED="1192784966781" ID="Freemind_Link_591355396" MODIFIED="1192784968140" TEXT="*ref">
 <node CREATED="1192784971500" ID="Freemind_Link_849906551" MODIFIED="1192784976156" TEXT="Shoftcut">
 <node CREATED="1192784963046" ID="Freemind_Link_1601373096" MODIFIED="1192784964312" TEXT="http://msdn2.microsoft.com/ja-jp/library/xte2hh6a(VS.80).aspx"/>
+</node>
+<node CREATED="1197356588125" ID="Freemind_Link_1747152548" MODIFIED="1197356594453" TEXT="Snippets">
+<node CREATED="1197356595765" ID="Freemind_Link_205195249" MODIFIED="1197356596578" TEXT="http://www.gotcodesnippets.net/"/>
+</node>
+<node CREATED="1197357233968" ID="Freemind_Link_825271330" MODIFIED="1197357240937" TEXT="Explore">
+<node CREATED="1197357241468" ID="Freemind_Link_567000005" MODIFIED="1197357241843" TEXT="http://www.csharper.net/blog/_explore_in_windows__add_in_for_visual_studio_2005.aspx"/>
+</node>
+<node CREATED="1197357274781" ID="Freemind_Link_1941513675" MODIFIED="1197357275500" TEXT="DPack(Eclipse&#x306e;GotoFile&#x76f8;&#x5f53;)">
+<node CREATED="1197357283593" ID="Freemind_Link_1693179420" MODIFIED="1197357284093" TEXT="http://www.usysware.com/DPack/Default.aspx"/>
 </node>
 </node>
 <node CREATED="1196217340921" ID="Freemind_Link_174086138" MODIFIED="1196217348671" TEXT="*ReSharper">
