@@ -679,11 +679,9 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glPagingBeanInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/PagingBean.${glTemplateFileExtension}",$path ,"", "")
 
-    #if (!$database.isTargetLanguageCSharp())
-      $database.debug("    parseOrderByBean()")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glOrderByBeanInterfaceName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/OrderByBean.${glTemplateFileExtension}",$path ,"", "")
-    #end
+    $database.debug("    parseOrderByBean()")
+    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glOrderByBeanInterfaceName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/allcommon/cbean/OrderByBean.${glTemplateFileExtension}",$path ,"", "")
 
     $database.debug("    parseSelectResource()")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSelectResourceInterfaceName}.${glClassFileExtension}" )
