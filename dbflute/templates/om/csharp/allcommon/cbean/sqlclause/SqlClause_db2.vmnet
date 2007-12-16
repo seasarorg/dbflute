@@ -53,7 +53,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          * ${database.ImplementComment}
          */
         protected override void DoClearFetchPageClause() {
-            _fetchFirstSelectHint = "";
+            _fetchFirstSqlSuffix = "";
         }
 
         /**

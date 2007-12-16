@@ -1114,9 +1114,11 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/RefererInfo.${glTemplateFileExtension}",$path,"", "")
 #end
 
-      $database.debug("    parse('ReferrerInfo');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glReferrerInfoName}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ReferrerInfo.${glTemplateFileExtension}",$path,"", "")
+      #if ($database.isJavaVersionGreaterEqualTiger())
+        $database.debug("    parse('ReferrerInfo');")
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glReferrerInfoName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ReferrerInfo.${glTemplateFileExtension}",$path,"", "")
+      #end
 
       $database.debug("    parse('RelationInfo');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glRelationInfoName}.${glClassFileExtension}" )

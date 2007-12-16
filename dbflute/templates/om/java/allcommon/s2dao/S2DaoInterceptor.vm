@@ -685,8 +685,8 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                    Clear Thread Local
     //                                    ------------------
     protected void clearThreadLocal() {
-        if (${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-            ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName}.clearOutsideSqlContextOnThread();
+        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            ${glOutsideSqlContextName}.clearOutsideSqlContextOnThread();
         }
         if (${glFetchNarrowingBeanContextName}.isExistFetchNarrowingBeanOnThread()) {
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

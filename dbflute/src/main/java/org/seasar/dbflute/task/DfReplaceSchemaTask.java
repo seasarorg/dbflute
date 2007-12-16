@@ -30,7 +30,6 @@ import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
-import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
 import org.seasar.dbflute.helper.datahandler.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.helper.datahandler.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
@@ -350,9 +349,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         if (notFoundColumnMap.isEmpty()) {
             return;
         }
-        _log.warn("* * * * * * * * * * * * *");
-        _log.warn("Not Found Columns in " + typeName);
-        _log.warn("* * * * * * * * * * * * *");
+        _log.warn("* * * * * * * * * * * * * * *");
+        _log.warn("Not Persistent Columns in " + typeName);
+        _log.warn("* * * * * * * * * * * * * * *");
         final Set<String> notFoundColumnSet = notFoundColumnMap.keySet();
         for (String tableName : notFoundColumnSet) {
             _log.warn("[" + tableName + "]");

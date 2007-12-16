@@ -257,9 +257,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         final DfFlexibleNameMap<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
         final DfFlexibleNameMap<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
         final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap);
-        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
-        _log.info("tableNameMap     = " + tableNameMap);
-        _log.info("- - - - - - - - - -/");
+        if (tableNameMap != null && !tableNameMap.isEmpty()) {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
+            _log.info("tableNameMap = " + tableNameMap);
+            _log.info("- - - - - - - - - -/");
+        }
         return xlsReader;
     }
 

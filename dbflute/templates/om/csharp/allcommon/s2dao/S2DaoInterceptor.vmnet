@@ -371,7 +371,15 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                Clear Thread Local
         //                                ------------------
         protected void ClearThreadLocal() {
+            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContextName}.ClearOutsideSqlContextOnThread();
+            }
             if (${glFetchNarrowingBeanContextName}.IsExistFetchNarrowingBeanOnThread()) {
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // Because there is possible that fetch narrowing has been ignored for manualPaging of outsideSql.
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                ${glFetchNarrowingBeanContextName}.GetFetchNarrowingBeanOnThread().RestoreIgnoredFetchNarrowing();
+
                 ${glFetchNarrowingBeanContextName}.ClearFetchNarrowingBeanOnThread();
             }
             if (${glConditionBeanContextName}.IsExistConditionBeanOnThread()) {

@@ -7,16 +7,128 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author jflute
+ */
 public class DfInternalSqlBuilder {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _tableName;
     protected Map _columnMap;
     protected List<String> _columnNameList;
     protected List<String> _valueList;
     protected Map<String, Set<String>> _notFoundColumnMap;
-    protected List<String> _appendDefaultColumnNameList;
+    protected Map<String, String> _addtionalDefaultColumnNameToLowerMap;
     protected Map<String, String> _defaultValueMap;
 
+    // ===================================================================================
+    //                                                                           Build SQL
+    //                                                                           =========
+    public DfInternalSqlBuildingResult buildSql() {
+        final DfInternalSqlBuildingResult sqlBuildingResult = new DfInternalSqlBuildingResult();
+        final Map<String, Object> columnValueMap = setupColumnValueMap();
+        final StringBuilder sb = new StringBuilder();
+        final Set<String> columnNameSet = columnValueMap.keySet();
+        for (String columnName : columnNameSet) {
+            sb.append(", ").append(columnName);
+        }
+        sb.delete(0, ", ".length()).insert(0, "insert into " + _tableName + " (").append(")");
+        sb.append(setupValuesStringAndParameter(columnNameSet, columnValueMap, sqlBuildingResult));
+        sqlBuildingResult.setSql(sb.toString());
+        return sqlBuildingResult;
+    }
+
+    // ===================================================================================
+    //                                                                    Set up SQL Parts
+    //                                                                    ================
+    protected Map<String, Object> setupColumnValueMap() {
+        final Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
+        int columnCount = -1;
+        for (String columnName : _columnNameList) {
+            columnCount++;
+            if (!_columnMap.isEmpty() && !_columnMap.containsKey(columnName)) {
+                if (hasDefaultValue(columnName)) {
+                    continue;
+                }
+                Set<String> notFoundColumnSet = _notFoundColumnMap.get(_tableName);
+                if (notFoundColumnSet == null) {
+                    notFoundColumnSet = new LinkedHashSet<String>();
+                    _notFoundColumnMap.put(_tableName, notFoundColumnSet);
+                }
+                notFoundColumnSet.add(columnName);
+                continue;
+            }
+            final String value;
+            try {
+                if (columnCount < _valueList.size()) {
+                    value = _valueList.get(columnCount);
+                } else {
+                    value = null;
+                }
+            } catch (java.lang.RuntimeException e) {
+                throw new RuntimeException("valueList.get(columnCount) threw the exception: valueList=" + _valueList
+                        + " columnCount=" + columnCount, e);
+            }
+            columnValueMap.put(columnName, value);
+        }
+        return columnValueMap;
+    }
+
+    protected String setupValuesStringAndParameter(final Set<String> columnNameSet, Map<String, Object> columnValueMap,
+            DfInternalSqlBuildingResult sqlBuildingResult) {
+        final StringBuilder sbValues = new StringBuilder();
+        for (String columnName : columnNameSet) {
+            if (_addtionalDefaultColumnNameToLowerMap.containsKey(columnName.toLowerCase())) {
+                sbValues.append(", ").append("?");
+                final String defaultValue = getDefaultValue(columnName.toLowerCase());
+                if (defaultValue.equalsIgnoreCase("sysdate")) {
+                    sqlBuildingResult.addBindParameters(new Timestamp(System.currentTimeMillis()));
+                } else {
+                    sqlBuildingResult.addBindParameters(defaultValue);
+                }
+            } else {
+                final Object value = columnValueMap.get(columnName);
+                if (value == null || (value instanceof String && ((String) value).trim().length() == 0)) {
+                    sbValues.append(", ").append("null");
+                } else {
+                    sbValues.append(", ?");
+                    sqlBuildingResult.addBindParameters(value);
+                }
+            }
+        }
+        sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
+        return sbValues.toString();
+    }
+
+    // ===================================================================================
+    //                                                                       Default Value
+    //                                                                       =============
+    private boolean hasDefaultValue(String columnName) {
+        final Set<String> keySet = _defaultValueMap.keySet();
+        for (String key : keySet) {
+            if (key.toLowerCase().equals(columnName.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String getDefaultValue(String columnName) {
+        final Set<String> keySet = _defaultValueMap.keySet();
+        for (String key : keySet) {
+            if (key.toLowerCase().equals(columnName.toLowerCase())) {
+                return _defaultValueMap.get(key);
+            }
+        }
+        String msg = "defaultValueMap.get(columnName) returned null: ";
+        throw new IllegalStateException(msg + "columnName=" + columnName + " defaultValueMap=" + _defaultValueMap);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public Map getColumnMap() {
         return _columnMap;
     }
@@ -57,8 +169,8 @@ public class DfInternalSqlBuilder {
         this._valueList = valueList;
     }
 
-    public List<String> getAppendDefaultSysdateList() {
-        return _appendDefaultColumnNameList;
+    public Map<String, String> getAddtionalDefaultColumnNameToLowerMap() {
+        return _addtionalDefaultColumnNameToLowerMap;
     }
 
     public Map<String, String> getDefaultValueMap() {
@@ -69,89 +181,7 @@ public class DfInternalSqlBuilder {
         this._defaultValueMap = defaultValueMap;
     }
 
-    public void setAppendDefaultSysdateList(List<String> appendDefaultSysdateList) {
-        this._appendDefaultColumnNameList = appendDefaultSysdateList;
+    public void setAddtionalDefaultColumnNameToLowerMap(Map<String, String> addtionalDefaultColumnNameToLowerMap) {
+        this._addtionalDefaultColumnNameToLowerMap = addtionalDefaultColumnNameToLowerMap;
     }
-
-    public DfInternalSqlBuildingResult buildSql() {
-        final DfInternalSqlBuildingResult sqlBuildingResult = new DfInternalSqlBuildingResult();
-        final Map<String, Object> columnValueMap = getColumnValueMap();
-        final StringBuilder sb = new StringBuilder();
-        final Set<String> columnNameSet = columnValueMap.keySet();
-        for (String columnName : columnNameSet) {
-            sb.append(", ").append(columnName);
-        }
-        sb.delete(0, ", ".length()).insert(0, "insert into " + _tableName + " (").append(")");
-        sb.append(getValuesString(columnNameSet, columnValueMap, sqlBuildingResult));
-        sqlBuildingResult.setSql(sb.toString());
-        return sqlBuildingResult;
-    }
-
-    protected Map<String, Object> getColumnValueMap() {
-        final Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
-        int columnCount = -1;
-        for (String columnName : _columnNameList) {
-            columnCount++;
-            if (!_columnMap.isEmpty() && !_columnMap.containsKey(columnName)) {
-                Set<String> notFoundColumnSet = _notFoundColumnMap.get(_tableName);
-                if (notFoundColumnSet == null) {
-                    notFoundColumnSet = new LinkedHashSet<String>();
-                    _notFoundColumnMap.put(_tableName, notFoundColumnSet);
-                }
-                notFoundColumnSet.add(columnName);
-                continue;
-            }
-            final String value;
-            try {
-                if (columnCount < _valueList.size()) {
-                    value = _valueList.get(columnCount);
-                } else {
-                    value = null;
-                }
-            } catch (java.lang.RuntimeException e) {
-                throw new RuntimeException("valueList.get(columnCount) threw the exception: valueList=" + _valueList
-                        + " columnCount=" + columnCount, e);
-            }
-            columnValueMap.put(columnName, value);
-        }
-        return columnValueMap;
-    }
-
-    protected String getValuesString(final Set<String> columnNameSet, Map<String, Object> columnValueMap,
-            DfInternalSqlBuildingResult sqlBuildingResult) {
-        final StringBuilder sbValues = new StringBuilder();
-        for (String columnName : columnNameSet) {
-            if (_appendDefaultColumnNameList.contains(columnName)) {
-                sbValues.append(", ").append("?");
-                final String defaultValue = getDefaultValue(columnName);
-                if (defaultValue.equalsIgnoreCase("sysdate")) {
-                    sqlBuildingResult.addBindParameters(new Timestamp(System.currentTimeMillis()));
-                } else {
-                    sqlBuildingResult.addBindParameters(defaultValue);
-                }
-            } else {
-                final Object value = columnValueMap.get(columnName);
-                if (value == null || (value instanceof String && ((String) value).trim().length() == 0)) {
-                    sbValues.append(", ").append("null");
-                } else {
-                    sbValues.append(", ?");
-                    sqlBuildingResult.addBindParameters(value);
-                }
-            }
-        }
-        sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
-        return sbValues.toString();
-    }
-
-    private String getDefaultValue(String columnName) {
-        final Set<String> keySet = _defaultValueMap.keySet();
-        for (String key : keySet) {
-            if (key.toLowerCase().equals(columnName.toLowerCase())) {
-                return _defaultValueMap.get(key);
-            }
-        }
-        String msg = "defaultValueMap.get(columnName) returned null: ";
-        throw new IllegalStateException(msg + "columnName=" + columnName + " defaultValueMap=" + _defaultValueMap);
-    }
-
 }

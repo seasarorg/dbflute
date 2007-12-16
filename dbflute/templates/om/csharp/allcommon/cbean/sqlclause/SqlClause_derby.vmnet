@@ -80,7 +80,7 @@ namespace ${glPackageBaseCommonSqlClause} {
          * @return Select-hint. (NotNull)
          */
         protected override String CreateSelectHint() {
-            return _fetchFirstSelectHint;
+            return "";
         }
 
         /**
