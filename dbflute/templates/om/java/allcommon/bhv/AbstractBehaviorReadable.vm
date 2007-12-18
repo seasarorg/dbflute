@@ -360,7 +360,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             if (sequenceObject instanceof ${database.sequenceReturnType}) {
                 return (${database.sequenceReturnType})sequenceObject;
             }
-            return (${database.sequenceReturnType})newInstanceSequence(${database.sequenceReturnType}.class, sequenceObject);
+            return (${database.sequenceReturnType})helpConvertingSequenceObject(${database.sequenceReturnType}.class, sequenceObject);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("The table does not have sequence: " + getTableDbName(), e);
         } catch (Exception e) {
@@ -368,22 +368,23 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         }
     }
 
-    private Object newInstanceSequence(Class resultClass, Object sequenceObject) {
+    protected Object helpConvertingSequenceObject(Class resultClass, Object sequenceObject) {
         try {
-            final java.lang.reflect.Method method = resultClass.getMethod("valueOf", new Class[]{String.class});
-            return method.invoke(null, new Object[]{sequenceObject.toString()});
+            final java.lang.reflect.Constructor constructor = resultClass.getConstructor(new Class[]{String.class});
+            return constructor.newInstance(new Object[]{sequenceObject.toString()});
         } catch (NoSuchMethodException e) {
         } catch (Exception e) {
             throw new RuntimeException("The readNextVal() of the table threw the exception: " + getTableDbName(), e);
         }
         try {
-            final java.lang.reflect.Method method = resultClass.getMethod("valueOf", new Class[]{Long.class});
+            final java.lang.reflect.Method method = resultClass.getMethod("valueOf", new Class[]{long.class});
             return method.invoke(null, new Object[]{Long.valueOf(sequenceObject.toString())});
         } catch (NoSuchMethodException e) {
         } catch (Exception e) {
             throw new RuntimeException("The readNextVal() of the table threw the exception: " + getTableDbName(), e);
         }
-        String msg = "The result type of selectNextVal() is unsupported: type=" + resultClass;
+        String msg = "Cannot convert sequenceObject to resultClass:";
+        msg = msg + " resultClass=" + resultClass + " sequenceObjectType=" + sequenceObject.getClass();
         throw new IllegalStateException(msg);
     }
 
