@@ -72,12 +72,21 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
     }
 
     protected boolean isUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {
-        if (cb.getSafetyMaxResultSize() <= 0 && !cb.isFetchNarrowingEffective()) {
+        if (cb.getSafetyMaxResultSize() > 0) {
+            return true;
+        }
+        if (!cb.isFetchNarrowingEffective()) {
             return false;// It is not necessary to control.
         }
-        if (cb.getSafetyMaxResultSize() <= 0 && !cb.isFetchNarrowingSkipStartIndexEffective() && !cb.isFetchNarrowingLoopCountEffective()) {
-            return false;// It is not necessary to control. The sql already have been controlled.
+        if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+            final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+            if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
+                return true;
+            }
         }
-        return true;
+        if (cb.isFetchNarrowingSkipStartIndexEffective() || cb.isFetchNarrowingLoopCountEffective()) {
+            return true;// It is not necessary to control. The sql already have been controlled.
+        }
+        return false;
     }
 }
