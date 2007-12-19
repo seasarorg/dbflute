@@ -980,11 +980,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
      * @return Fetch-narrowing start-index.
      */
     public int getFetchNarrowingSkipStartIndex() {
-        if (isFetchStartIndexSupported()) {
-            return 0;
-        } else {
-            return getPageStartIndex();
-        }
+        return getPageStartIndex();
     }
 
     /**

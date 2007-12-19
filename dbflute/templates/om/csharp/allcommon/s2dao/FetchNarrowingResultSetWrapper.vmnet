@@ -29,9 +29,12 @@ namespace ${glPackageBaseCommonS2Dao} {
          * @param dataReader Original data-reader. (NotNull)
          * @param ${glAttachedCBArgsVariableName} FetchNarrowing-bean. (NotNull)
          */
-        public ${glFetchNarrowingResultSetWrapper}(System.Data.IDataReader dataReader, ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean) {
+        public ${glFetchNarrowingResultSetWrapper}(System.Data.IDataReader dataReader, ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean
+                                                 , bool offsetByCursorForcedly, bool limitByCursorForcedly) {
             _dataReader = dataReader;
             _fetchNarrowingBean = fetchNarrowingBean;
+            _offsetByCursorForcedly = offsetByCursorForcedly;
+            _limitByCursorForcedly = limitByCursorForcedly;
 
             skip();
         }
@@ -43,16 +46,17 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (!IsAvailableSkipRecord()) {
                 return;
             }
+            int skipStartIndex = GetFetchNarrowingSkipStartIndex();
             if (IsCursorUsed()) {
-//                if (0 == GetFetchNarrowingSkipStartIndex()) {
+//                if (0 == skipStartIndex) {
 //                    _dataReader.beforeFirst();
 //                } else {
-//                    _dataReader.absolute(GetFetchNarrowingSkipStartIndex());
+//                    _dataReader.absolute(skipStartIndex);
 //                }
 //                _fetchCounter = _dataReader.getRow();
                 throw new NotSupportedException("Cursor is unsupported!!!");
             } else {
-                while (_fetchCounter < GetFetchNarrowingSkipStartIndex() && _dataReader.Read()) {
+                while (_fetchCounter < skipStartIndex && _dataReader.Read()) {
                     ++_fetchCounter;
                 }
             }
@@ -162,12 +166,10 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         public bool IsOffsetByCursorForcedly {
             get { return _offsetByCursorForcedly; }
-            set { _offsetByCursorForcedly = value; }
         }
 
         public bool IsLimitByCursorForcedly {
             get { return _limitByCursorForcedly; }
-            set { _limitByCursorForcedly = value; }
         }
 
         // ===============================================================================

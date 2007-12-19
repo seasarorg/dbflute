@@ -62,11 +62,12 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
         if (!isUseFetchNarrowingResultSetWrapper(cb)) {
             return resultSet;
         }
-        final ${glFetchNarrowingResultSetWrapper} wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName});
+        final ${glFetchNarrowingResultSetWrapper} wrapper;
         if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
             final ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-            wrapper.setOffsetByCursorForcedly(outsideSqlContext.isOffsetByCursorForcedly());
-            wrapper.setLimitByCursorForcedly(outsideSqlContext.isLimitByCursorForcedly());
+            wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, outsideSqlContext.isOffsetByCursorForcedly(), outsideSqlContext.isLimitByCursorForcedly());
+        } else {
+            wrapper = new ${glFetchNarrowingResultSetWrapper}(resultSet, ${glAttachedCBArgsVariableName}, false, false);
         }
         return wrapper;
     }
@@ -85,7 +86,7 @@ public class ${glFetchNarrowingResultSetFactory} implements ResultSetFactory {
             }
         }
         if (cb.isFetchNarrowingSkipStartIndexEffective() || cb.isFetchNarrowingLoopCountEffective()) {
-            return true;// It is not necessary to control. The sql already have been controlled.
+            return true;
         }
         return false;
     }

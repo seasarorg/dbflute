@@ -37,21 +37,33 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (!IsUseFetchNarrowingResultSetWrapper(cb)) {
                 return dataReader;
             }
-            ${glFetchNarrowingResultSetWrapper} wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, cb);
-            ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
-            wrapper.IsOffsetByCursorForcedly = outsideSqlContext.IsOffsetByCursorForcedly;
-            wrapper.IsLimitByCursorForcedly = outsideSqlContext.IsLimitByCursorForcedly;
-            return new ${glFetchNarrowingResultSetWrapper}(dataReader, cb);
+            ${glFetchNarrowingResultSetWrapper} wrapper = null;
+            if (OutsideSqlContext.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+                wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, cb, outsideSqlContext.IsOffsetByCursorForcedly, outsideSqlContext.IsLimitByCursorForcedly);
+            } else {
+                wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, cb, false, false);
+            }
+            return wrapper;
         }
 
         protected bool IsUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBeanInterfaceName} cb) {
-            if (cb.SafetyMaxResultSize <= 0 && !cb.IsFetchNarrowingEffective) {
+            if (cb.SafetyMaxResultSize > 0) {
+                return true;
+            }
+            if (!cb.IsFetchNarrowingEffective) {
                 return false;// It is not necessary to control.
             }
-            if (cb.SafetyMaxResultSize <= 0 && !cb.IsFetchNarrowingSkipStartIndexEffective && !cb.IsFetchNarrowingLoopCountEffective) {
-                return false;// It is not necessary to control. The sql already have been controlled.
+            if (${glOutsideSqlContextName}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContextName} outsideSqlContext = ${glOutsideSqlContextName}.GetOutsideSqlContextOnThread();
+                if (outsideSqlContext.IsOffsetByCursorForcedly || outsideSqlContext.IsLimitByCursorForcedly) {
+                    return true;
+                }
             }
-            return true;
+            if (cb.IsFetchNarrowingSkipStartIndexEffective || cb.IsFetchNarrowingLoopCountEffective) {
+                return true;
+            }
+            return false;
         }
     }
 }

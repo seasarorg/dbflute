@@ -44,12 +44,17 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
      * 
      * @param resultSet Original result set. (NotNull)
      * @param fetchNarrowingBean FetchNarrowing-bean. (NotNull)
+     * @param offsetByCursorForcedly Offset by cursor forcedly.
+     * @param limitByCursorForcedly Limit by cursor forcedly.
      */
-    public ${glFetchNarrowingResultSetWrapper}(ResultSet resultSet, ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean) {
+    public ${glFetchNarrowingResultSetWrapper}(ResultSet resultSet, ${glFetchNarrowingBeanInterfaceName} fetchNarrowingBean
+                                             , boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
         super(resultSet);
 
         _resultSet = resultSet;
         _fetchNarrowingBean = fetchNarrowingBean;
+        _offsetByCursorForcedly = offsetByCursorForcedly;
+        _limitByCursorForcedly = limitByCursorForcedly;
 
         skip();
     }
@@ -64,12 +69,13 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
         if (!isAvailableSkipRecord()) {
             return;
         }
+        final int skipStartIndex = getFetchNarrowingSkipStartIndex();
         if (isCursorUsed()) {
             try {
-                if (0 == getFetchNarrowingSkipStartIndex()) {
+                if (0 == skipStartIndex) {
                     _resultSet.beforeFirst();
                 } else {
-                    _resultSet.absolute(getFetchNarrowingSkipStartIndex());
+                    _resultSet.absolute(skipStartIndex);
                 }
                 _fetchCounter = _resultSet.getRow();
             } catch (SQLException e) {
@@ -77,7 +83,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
             }
         } else {
             try {
-                while (_resultSet.getRow() < getFetchNarrowingSkipStartIndex() && _resultSet.next()) {
+                while (_resultSet.getRow() < skipStartIndex && _resultSet.next()) {
                     ++_fetchCounter;
                 }
             } catch (SQLException e) {
@@ -208,15 +214,7 @@ public class ${glFetchNarrowingResultSetWrapper} extends ResultSetWrapper {
         return _offsetByCursorForcedly;
     }
 
-    public void setOffsetByCursorForcedly(boolean offsetByCursorForcedly) {
-        this._offsetByCursorForcedly = offsetByCursorForcedly;
-    }
-
     public boolean isLimitByCursorForcedly() {
         return _limitByCursorForcedly;
-    }
-
-    public void setLimitByCursorForcedly(boolean limitByCursorForcedly) {
-        this._limitByCursorForcedly = limitByCursorForcedly;
     }
 }
