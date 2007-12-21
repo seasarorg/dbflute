@@ -738,5 +738,9 @@
 </node>
 </node>
 </node>
+<node CREATED="1198138773218" ID="Freemind_Link_1487253838" MODIFIED="1198138775593" POSITION="left" TEXT="Tool">
+<node CREATED="1198138776187" ID="Freemind_Link_1040002769" MODIFIED="1198138776781" TEXT="http://www.launchy.net/"/>
+<node CREATED="1198138783046" ID="Freemind_Link_1813622856" MODIFIED="1198138783562" TEXT="http://webos-goodies.jp/archives/50752356.html"/>
+</node>
 </node>
 </map>

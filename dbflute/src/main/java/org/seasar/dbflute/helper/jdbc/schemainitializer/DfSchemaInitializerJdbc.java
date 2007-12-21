@@ -34,8 +34,64 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     public void initializeSchema() {
+        truncateTableIfPossible();
         dropForeignKey();
         dropTable();
+    }
+
+    protected void truncateTableIfPossible() {
+        final DfTruncateTableByJdbcCallback callback = new DfTruncateTableByJdbcCallback() {
+            public String buildTruncateTableSql(DfTableMetaInfo metaInfo) {
+                final StringBuilder sb = new StringBuilder();
+                sb.append("TRUNCATE TABLE ").append(metaInfo.getTableName());
+                return sb.toString();
+            }
+        };
+        callbackTruncateTableByJdbc(_dataSource, callback);
+    }
+
+    protected static interface DfTruncateTableByJdbcCallback {
+        public String buildTruncateTableSql(DfTableMetaInfo metaInfo);
+    }
+
+    protected void callbackTruncateTableByJdbc(DataSource dataSource, DfTruncateTableByJdbcCallback callback) {
+        Connection conn = null;
+        Statement statement = null;
+        try {
+            conn = dataSource.getConnection();
+            statement = conn.createStatement();
+            final DatabaseMetaData dbMeta = conn.getMetaData();
+            final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
+
+            final DfTableNameHandler tableNameHandler = new DfTableNameHandler();
+            final List<DfTableMetaInfo> tableNameList = tableNameHandler.getTableNameList(dbMeta, schema);
+            for (DfTableMetaInfo metaInfo : tableNameList) {
+                final String truncateTableSql = callback.buildTruncateTableSql(metaInfo);
+                try {
+                    statement.execute(truncateTableSql);
+                    _log.info(truncateTableSql);
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                    _log.info("conn.close() threw the exception!", ignored);
+                }
+            }
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                    _log.info("statement.close() threw the exception!", ignored);
+                }
+            }
+        }
     }
 
     protected void dropForeignKey() {

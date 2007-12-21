@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,6 +29,8 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataHandler;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
@@ -35,14 +38,14 @@ import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 
 public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
-    // /** Log instance. */
-    // private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _loggingInsertSql;
-    
+
     protected DataSource _dataSource;
 
     // ===================================================================================
@@ -53,7 +56,11 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
         final Map<String, Set<String>> notFoundColumnMap = new LinkedHashMap<String, Set<String>>();
         resultInfo.setNotFoundColumnMap(notFoundColumnMap);
         final File baseDir = new File(info.getBasePath());
-        final String[] dataDirectoryElements = baseDir.list();
+        final String[] dataDirectoryElements = baseDir.list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return !name.startsWith(".");
+            }
+        });
         if (dataDirectoryElements == null) {
             return resultInfo;
         }
@@ -61,6 +68,11 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
         try {
             for (String elementName : dataDirectoryElements) {
+                if (isUnsupportedEncodingDirectory(elementName)) {
+                    _log.warn("The encoding(directory name) is unsupported: encoding=" + elementName);
+                    continue;
+                }
+
                 final File encodingNameDirectory = new File(info.getBasePath() + "/" + elementName);
                 final String[] fileNameList = encodingNameDirectory.list(filter);
 
@@ -74,6 +86,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                     sortedFileNameSet.add(fileName);
                 }
 
+                final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(info, elementName);
                 final Map<String, String> defaultValueMap = getDefaultValueMap(info, elementName);
                 for (String fileName : sortedFileNameSet) {
                     final String fileNamePath = info.getBasePath() + "/" + elementName + "/" + fileName;
@@ -84,6 +97,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                     writerImpl.setEncoding(elementName);
                     writerImpl.setDelimiter(info.getDelimter());
                     writerImpl.setErrorContinue(true);
+                    writerImpl.setConvertValueMap(convertValueMap);
                     writerImpl.setDefaultValueMap(defaultValueMap);
                     writerImpl.writeData(notFoundColumnMap);
                 }
@@ -94,6 +108,20 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
             throw new RuntimeException(e);
         }
         return resultInfo;
+    }
+
+    protected boolean isUnsupportedEncodingDirectory(String encoding) {
+        try {
+            new String(new byte[0], 0, 0, encoding);
+            return false;
+        } catch (UnsupportedEncodingException e) {
+            return true;
+        }
+    }
+
+    private Map<String, Map<String, String>> getConvertValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
+        final String path = info.getBasePath() + "/" + encoding + "/convert-value.txt";
+        return DfMapStringFileReader.readMapAsMapValue(path, encoding);
     }
 
     private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
@@ -116,11 +144,11 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     public boolean isLoggingInsertSql() {
         return _loggingInsertSql;
     }
-    
+
     public void setLoggingInsertSql(boolean loggingInsertSql) {
         this._loggingInsertSql = loggingInsertSql;
     }
-    
+
     public DataSource getDataSource() {
         return _dataSource;
     }

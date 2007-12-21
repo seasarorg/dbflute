@@ -23,6 +23,12 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
     }
 
     public void execute(String sql, String aliasName) {
+        final DfGeneratedSqlExecuteOption option = new DfGeneratedSqlExecuteOption();
+        option.setErrorContinue(false);
+        execute(sql, aliasName, option);
+    }
+
+    public void execute(String sql, String aliasName, DfGeneratedSqlExecuteOption option) {
         final String lineSeparator = System.getProperty("line.separator");
         Connection connection = null;
         Statement statement = null;
@@ -31,7 +37,7 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
         try {
             connection = _dataSource.getConnection();
             statement = connection.createStatement();
-            _log.debug("...Generating SQL: " + lineSeparator + sql);
+            _log.info("...Generating SQL: " + lineSeparator + sql);
             rs = statement.executeQuery(sql);
             final List<String> generatedSqlList = new ArrayList<String>();
             while (rs.next()) {
@@ -39,9 +45,23 @@ public class DfGeneratedSqlExecutorImpl implements DfGeneratedSqlExecutor {
                 generatedSqlList.add(generatedSql);
             }
             for (String generatedSql : generatedSqlList) {
-                _log.debug(generatedSql);
                 currentGeneratedSql = generatedSql;
-                statement.execute(generatedSql);
+                try {
+                    statement.execute(generatedSql);
+                    _log.info(generatedSql);
+                } catch (RuntimeException e) {
+                    if (option.isErrorContinue()) {
+                        continue;
+                    }
+                    _log.warn(generatedSql);
+                    throw e;
+                } catch (SQLException e) {
+                    if (option.isErrorContinue()) {
+                        continue;
+                    }
+                    _log.warn(generatedSql);
+                    throw e;
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("DfGeneratedSqlExecutorImpl.execute() threw the exception: baseSql=" + sql

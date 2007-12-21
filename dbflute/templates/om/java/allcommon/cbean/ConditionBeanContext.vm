@@ -66,65 +66,65 @@ public class ${glConditionBeanContextName} {
     public static void initialize() {
         boolean debugEnabled = _log.isDebugEnabled();
         // Against the ClassLoader Headache!
-        if (debugEnabled) {
-            _log.debug("/---------------------------------------- Initialize against the ClassLoader Headache!");
+        final StringBuilder sb = new StringBuilder();
+        {
+            final Class<?> clazz = ${glPackageBaseCommonCBean}.${glSimplePagingBeanName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCBean}.${glSimplePagingBeanName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
         {
-            final Class clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
-        }
-        {
-            final Class clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
 #if ($database.isVersionAfter1047())
         {
-            final Class clazz = ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class;
-            if (debugEnabled) { _log.debug("...Loading class of " + clazz.getName() + ": " + clazz.getClassLoader()); }
+            final Class<?> clazz = ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class;
+            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()); }
         }
 #end
-        _log.debug("----------/");
+        if (debugEnabled) { 
+            _log.debug("{Initialize against the ClassLoader Headache}" + getLineSeparator() + sb);
+        }
     }
 
     // ===================================================================================
-    //                                                                      Type Judgement
-    //                                                                      ==============
+    //                                                                  Type Determination
+    //                                                                  ==================
     /**
      * Is the argument condition-bean?
      * 
-     * @param dtoInstance Dto instance.
+     * @param dtoInstance DTO instance.
      * @return Determination.
      */
     public static boolean isTheArgumentConditionBean(final Object dtoInstance) {
@@ -141,7 +141,7 @@ public class ${glConditionBeanContextName} {
      * @param dtoClass DtoClass.
      * @return Determination.
      */
-    public static boolean isTheTypeConditionBean(final Class dtoClass) {
+    public static boolean isTheTypeConditionBean(final Class<?> dtoClass) {
         if (${glConditionBeanInterfaceName}.class.isAssignableFrom(dtoClass)) {
             return true;
         } else {
@@ -149,25 +149,24 @@ public class ${glConditionBeanContextName} {
         }
     }
 
-#set ($columnAliasGeneric = "Class, java.util.Map<String, String>")
     // ===================================================================================
     //                                                                        Column Alias
     //                                                                        ============
-    public static final java.util.Map${database.filterGenericsString('Class, java.util.Map<String, String>')} _selectClauseColumnAliasContainerMap = new java.util.HashMap${database.filterGenericsString('Class, java.util.Map<String, String>')}();
+    public static final java.util.Map<Class<?>, java.util.Map<String, String>> _selectClauseColumnAliasContainerMap = new java.util.HashMap<Class<?>, java.util.Map<String, String>>();
 
-    public static void addColumnAliasInfo(Class conditionBeanClass, String columnFullName, String columnAliasName) {
+    public static void addColumnAliasInfo(Class<?> conditionBeanClass, String columnFullName, String columnAliasName) {
         if (_selectClauseColumnAliasContainerMap.containsKey(conditionBeanClass)) {
-            final java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap = (java.util.Map${database.filterGenericsString('String, String')})_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
+            final java.util.Map<String, String> selectClauseColumnAliasMap = (java.util.Map<String, String>)_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
             selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
         } else {
-            final java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap = new java.util.HashMap${database.filterGenericsString('String, String')}();
+            final java.util.Map<String, String> selectClauseColumnAliasMap = new java.util.HashMap<String, String>();
             _selectClauseColumnAliasContainerMap.put(conditionBeanClass, selectClauseColumnAliasMap);
             selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
         }
     }
 
-    public static java.util.Map${database.filterGenericsString('String, String')} getSelectClauseColumnAliasMap(Class conditionBeanClass) {
-        return (java.util.Map${database.filterGenericsString('String, String')})_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
+    public static java.util.Map<String, String> getSelectClauseColumnAliasMap(Class<?> conditionBeanClass) {
+        return (java.util.Map<String, String>)_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
     }
 
     // ===================================================================================
@@ -183,10 +182,10 @@ public class ${glConditionBeanContextName} {
     public static final String DB_NAME_SYBASE = "sybase";
     public static final String DB_NAME_DB2 = "db2";
 
-    protected static final java.util.Map${database.filterGenericsString('String, String')} _driverHintDatabaseProductNameMap;
-    protected static final java.util.List${database.filterGenericsString('String')} _targetDatabaseProductNameList = new java.util.ArrayList${database.filterGenericsString('String')}();
+    protected static final java.util.Map<String, String> _driverHintDatabaseProductNameMap;
+    protected static final java.util.List<String> _targetDatabaseProductNameList = new java.util.ArrayList<String>();
     static {
-        final java.util.Map${database.filterGenericsString('String, String')} tmpMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        final java.util.Map<String, String> tmpMap = new java.util.LinkedHashMap<String, String>();
         tmpMap.put("org.apache.derby", DB_NAME_DERBY);
         tmpMap.put("org.h2", DB_NAME_H2);
         tmpMap.put("oracle", DB_NAME_ORACLE);
@@ -200,8 +199,8 @@ public class ${glConditionBeanContextName} {
     }
 
     public static boolean setupDatabaseProductNameByDriverClassName(String driverClassName) {
-        final java.util.Set${database.filterGenericsString('String')} keySet = _driverHintDatabaseProductNameMap.keySet();
-        for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
+        final java.util.Set<String> keySet = _driverHintDatabaseProductNameMap.keySet();
+        for (final java.util.Iterator<String> ite = keySet.iterator(); ite.hasNext(); ) {
             final String driverHint = (String)ite.next();
             if (driverClassName.indexOf(driverHint) >= 0) {
                 final String databaseProductName = (String)_driverHintDatabaseProductNameMap.get(driverHint);

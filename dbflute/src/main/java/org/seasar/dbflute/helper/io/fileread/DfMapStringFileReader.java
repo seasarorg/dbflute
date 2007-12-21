@@ -76,4 +76,14 @@ public class DfMapStringFileReader {
         }
         return resultMap;
     }
+
+    public static Map<String, java.util.Map<String, String>> readMapAsMapValue(String path, String encoding) {
+        final Map<String, java.util.Map<String, String>> resultMap = new LinkedHashMap<String, java.util.Map<String, String>>();
+        final Map<String, Object> map = readMap(path, encoding);
+        final Set<String> keySet = map.keySet();
+        for (String key : keySet) {
+            resultMap.put(key, (java.util.Map<String, String>) map.get(key));
+        }
+        return resultMap;
+    }
 }

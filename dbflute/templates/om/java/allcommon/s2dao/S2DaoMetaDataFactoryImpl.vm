@@ -29,6 +29,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     /** Log-instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoInterceptor}.class);
 
+    /** The binding annotation for xaDataSource. {bindingType=may} */
+    public static final String xaDataSource_BINDING = "bindingType=may";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -73,7 +76,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             javax.sql.XADataSource xaDataSource) {
         super(dataSource, statementFactory, resultSetFactory, readerFactory);
 
-        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
+        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
         showInformation(dataSource, xaDataSource);
 
         // Stop the LinkageError!
@@ -85,18 +88,25 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     }
 
     protected void showInformation(javax.sql.DataSource dataSource, javax.sql.XADataSource xaDataSource) {
+        final StringBuilder sb = new StringBuilder();
         if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
             final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
             final String driverClassName = xaDataSourceImpl.getDriverClassName();
             final String url = xaDataSourceImpl.getURL();
             final String user = xaDataSourceImpl.getUser();
-            _log.info("[XADataSource]: " + xaDataSourceImpl);
-            _log.info("    driver = " + driverClassName);
-            _log.info("    url    = " + url);
-            _log.info("    user   = " + user);
+            sb.append("  [XADataSource]:").append(getLineSeparator());
+            sb.append("    driver = " + driverClassName).append(getLineSeparator());
+            sb.append("    url    = " + url).append(getLineSeparator());
+            sb.append("    user   = " + user).append(getLineSeparator());
         }
-        _log.info("[StatementFactory]: " + statementFactory);
-        _log.info("[ResultSetFactory]: " + resultSetFactory);
+        final String statementFactoryExpression = statementFactory != null ? statementFactory.getClass().getSimpleName(): "null";
+        final String resultSetFactoryExpression = resultSetFactory != null ? resultSetFactory.getClass().getSimpleName(): "null";
+        sb.append("  [StatementFactory]:").append(getLineSeparator());
+        sb.append("    Injected statementFactory is " + statementFactoryExpression + ". But DBFlute uses original statementFactory.").append(getLineSeparator());
+        sb.append("    If the injected statementFactory is ConfigurableStatementFactory, the config is inherited to the original statementFactory.").append(getLineSeparator());
+        sb.append("  [ResultSetFactory]:").append(getLineSeparator());
+        sb.append("    Injected resultSetFactory is " + resultSetFactoryExpression + ". But DBFlute uses original resultSetFactory.");
+        _log.info("{Injection Information}" + getLineSeparator() + sb);
     }
 
     // -----------------------------------------------------
@@ -261,4 +271,16 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         this.tableNaming = tableNaming;
     }
 #end
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected static String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
 }

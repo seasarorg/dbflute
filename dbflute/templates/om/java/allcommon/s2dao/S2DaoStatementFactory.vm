@@ -22,6 +22,7 @@ import org.seasar.extension.jdbc.util.ConnectionUtil;
  * Statement factory.
  * 
  * @author ${database.ClassAuthor}
+ * @deprecated Please don't use this because this class is not used in DBFlute.
  */
 public class ${glDaoStatementFactory} extends BasicStatementFactory {
 #if (${database.isStatementResultSetTypeValid()})

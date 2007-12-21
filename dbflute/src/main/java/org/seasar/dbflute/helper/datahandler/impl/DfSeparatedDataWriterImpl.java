@@ -55,6 +55,8 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
 
     protected boolean _errorContinue;
 
+    protected Map<String, Map<String, String>> _convertValueMap;
+
     protected Map<String, String> _defaultValueMap;
 
     // ===================================================================================
@@ -89,6 +91,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         String preContinueString = "";
         final List<String> valueList = new ArrayList<String>();
         Map<String, String> additionalDefaultColumnNameToLowerKeyMap = null;
+        Map<String, String> targetConvertColumnNameKeyToLowerMap = null;
         List<String> columnNameList = null;
 
         try {
@@ -111,6 +114,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     // - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     firstLineInfo = getColumnNameList(_delimiter, lineString);
                     additionalDefaultColumnNameToLowerKeyMap = getAdditionalDefaultColumnNameToLowerKeyMap(firstLineInfo);
+                    targetConvertColumnNameKeyToLowerMap = getTargetConvertColumnNameKeyToLowerMap(firstLineInfo);
                     columnNameList = firstLineInfo.getColumnNameList();
                     columnNameList.addAll(additionalDefaultColumnNameToLowerKeyMap.values());
                     continue;
@@ -148,7 +152,9 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     sqlBuilder.setColumnNameList(columnNameList);
                     sqlBuilder.setValueList(valueList);
                     sqlBuilder.setNotFoundColumnMap(notFoundColumnMap);
-                    sqlBuilder.setAddtionalDefaultColumnNameToLowerMap(additionalDefaultColumnNameToLowerKeyMap);
+                    sqlBuilder.setTargetConvertColumnNameKeyToLowerMap(targetConvertColumnNameKeyToLowerMap);
+                    sqlBuilder.setAdditionalDefaultColumnNameToLowerMap(additionalDefaultColumnNameToLowerKeyMap);
+                    sqlBuilder.setConvertValueMap(_convertValueMap);
                     sqlBuilder.setDefaultValueMap(_defaultValueMap);
                     final DfInternalSqlBuildingResult sqlBuildingResult = sqlBuilder.buildSql();
                     PreparedStatement statement = null;
@@ -156,7 +162,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                         final String sql = sqlBuildingResult.getSql();
                         final List<Object> bindParameters = sqlBuildingResult.getBindParameters();
                         if (_loggingInsertSql) {
-                            _log.info(getSql4Log(tableName, columnNameList, bindParameters));
+                            _log.info(buildSql4Log(tableName, columnNameList, bindParameters));
                         }
                         statement = _dataSource.getConnection().prepareStatement(sql);
                         int bindCount = 1;
@@ -167,7 +173,14 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                         statement.execute();
                     } catch (SQLException e) {
                         if (_errorContinue) {
-                            _log.warn("Statement.execute(sql) threw the exception!", e);
+                            final String simpleName = e.getClass().getSimpleName();
+                            final StringBuilder sb = new StringBuilder();
+                            sb.append("The statement threw ").append(simpleName).append("! The detail is as follows:");
+                            sb.append(getLineSeparator()).append("  Message    = ");
+                            sb.append(e.getMessage());
+                            sb.append(getLineSeparator()).append("  Parameters = ");
+                            sb.append(sqlBuildingResult.getColumnValueMap());
+                            _log.warn(sb);
                             continue;
                         } else {
                             throw e;
@@ -193,12 +206,12 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         } catch (SQLException e) {
             String msg = "SQLException: filename=" + _filename + " encoding=" + _encoding;
             msg = msg + " columnSet=" + columnMap.keySet() + " columnNameList=" + columnNameList + " lineString="
-                    + lineString + " defaultSysdateList=" + _defaultValueMap;
+                    + lineString + " defaultValueMap=" + _defaultValueMap;
             throw new RuntimeException(msg, e);
         } catch (RuntimeException e) {
             String msg = "RuntimeException: filename=" + _filename + " encoding=" + _encoding;
             msg = msg + " columnSet=" + columnMap.keySet() + " columnNameList=" + columnNameList + " lineString="
-                    + lineString + " defaultSysdateList=" + _defaultValueMap;
+                    + lineString + " defaultValueMap=" + _defaultValueMap;
             throw new RuntimeException(msg, e);
         } finally {
             try {
@@ -217,12 +230,25 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         }
     }
 
-    private String getSql4Log(String tableName, List<String> columnNameList, final List<Object> bindParameters) {
+    private String buildSql4Log(String tableName, List<String> columnNameList, final List<Object> bindParameters) {
         String columnNameString = columnNameList.toString();
         columnNameString = columnNameString.substring(1, columnNameString.length() - 1);
         String bindParameterString = bindParameters.toString();
         bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
         return "insert into " + tableName + " (" + columnNameString + ") values(" + bindParameterString + ")";
+    }
+
+    protected Map<String, String> getTargetConvertColumnNameKeyToLowerMap(FirstLineInfo firstLineInfo) {
+        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
+        final Set<String> keySet = _convertValueMap.keySet();
+        final List<String> ls = firstLineInfo.getColumnNameToLowerList();
+        for (String columnName : keySet) {
+            final String toLowerColumnName = columnName.toLowerCase();
+            if (!ls.contains(toLowerColumnName)) {
+                resultMap.put(toLowerColumnName, columnName);
+            }
+        }
+        return resultMap;
     }
 
     /**
@@ -471,6 +497,18 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     }
 
     // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public boolean isLoggingInsertSql() {
@@ -479,14 +517,6 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
 
     public void setLoggingInsertSql(boolean loggingInsertSql) {
         this._loggingInsertSql = loggingInsertSql;
-    }
-
-    public Map<String, String> getDefaultValueMap() {
-        return _defaultValueMap;
-    }
-
-    public void setDefaultValueMap(Map<String, String> defaultValueMap) {
-        this._defaultValueMap = defaultValueMap;
     }
 
     public boolean isErrorContinue() {
@@ -529,4 +559,19 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         this._dataSource = dataSource;
     }
 
+    public Map<String, Map<String, String>> getConvertValueMap() {
+        return _convertValueMap;
+    }
+
+    public void setConvertValueMap(Map<String, Map<String, String>> convertValueMap) {
+        this._convertValueMap = convertValueMap;
+    }
+
+    public Map<String, String> getDefaultValueMap() {
+        return _defaultValueMap;
+    }
+
+    public void setDefaultValueMap(Map<String, String> defaultValueMap) {
+        this._defaultValueMap = defaultValueMap;
+    }
 }

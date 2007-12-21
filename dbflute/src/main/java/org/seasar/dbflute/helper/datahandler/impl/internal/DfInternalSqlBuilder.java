@@ -20,7 +20,9 @@ public class DfInternalSqlBuilder {
     protected List<String> _columnNameList;
     protected List<String> _valueList;
     protected Map<String, Set<String>> _notFoundColumnMap;
-    protected Map<String, String> _addtionalDefaultColumnNameToLowerMap;
+    protected Map<String, String> _targetConvertColumnNameKeyToLowerMap;
+    protected Map<String, String> _additionalDefaultColumnNameToLowerMap;
+    protected Map<String, Map<String, String>> _convertValueMap;
     protected Map<String, String> _defaultValueMap;
 
     // ===================================================================================
@@ -80,21 +82,37 @@ public class DfInternalSqlBuilder {
             DfInternalSqlBuildingResult sqlBuildingResult) {
         final StringBuilder sbValues = new StringBuilder();
         for (String columnName : columnNameSet) {
-            if (_addtionalDefaultColumnNameToLowerMap.containsKey(columnName.toLowerCase())) {
+            if (hasDefaultValue(columnName)) {
+                final String defaultValue = findDefaultValue(columnName);
                 sbValues.append(", ").append("?");
-                final String defaultValue = getDefaultValue(columnName.toLowerCase());
                 if (defaultValue.equalsIgnoreCase("sysdate")) {
-                    sqlBuildingResult.addBindParameters(new Timestamp(System.currentTimeMillis()));
+                    final Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+                    sqlBuildingResult.addBindParameters(currentTimestamp);
+                    sqlBuildingResult.addColumnValue(columnName, currentTimestamp);
                 } else {
                     sqlBuildingResult.addBindParameters(defaultValue);
+                    sqlBuildingResult.addColumnValue(columnName, defaultValue);
                 }
             } else {
-                final Object value = columnValueMap.get(columnName);
-                if (value == null || (value instanceof String && ((String) value).trim().length() == 0)) {
+                Object value = columnValueMap.get(columnName);
+                if (hasConvertValue(columnName)) {
+                    // Convertのキー値はTrimしたものを前提とする。
+                    // (MapString側のキー値がTrimされるため)
+                    final Map<String, String> convertValueMapping = findConvertValueMapping(columnName);
+                    value = (value != null && (value instanceof String)) ? ((String) value).trim() : value;
+                    if (convertValueMapping.containsKey(value)) {
+                        value = convertValueMapping.get(value);
+                    }
+                }
+                // nullだったり空文字だったらnullとして登録する。
+                // (空白文字のみの場合はそれ自体を値として扱う)
+                if (value == null || (value instanceof String && ((String) value).length() == 0)) {
                     sbValues.append(", ").append("null");
+                    sqlBuildingResult.addColumnValue(columnName, null);
                 } else {
                     sbValues.append(", ?");
                     sqlBuildingResult.addBindParameters(value);
+                    sqlBuildingResult.addColumnValue(columnName, value);
                 }
             }
         }
@@ -103,27 +121,43 @@ public class DfInternalSqlBuilder {
     }
 
     // ===================================================================================
+    //                                                                       Convert Value
+    //                                                                       =============
+    private boolean hasConvertValue(String columnName) {
+        return findConvertValueMapping(columnName) != null;
+    }
+
+    private Map<String, String> findConvertValueMapping(String columnName) {
+        if (!_convertValueMap.containsKey(columnName)) {
+            if (_targetConvertColumnNameKeyToLowerMap.containsKey(columnName.toLowerCase())) {
+                final String realColumnName = _targetConvertColumnNameKeyToLowerMap.get(columnName.toLowerCase());
+                if (_convertValueMap.containsKey(realColumnName)) {
+                    return _convertValueMap.get(realColumnName);
+                }
+            }
+            return null;
+        }
+        return _convertValueMap.get(columnName);
+    }
+
+    // ===================================================================================
     //                                                                       Default Value
     //                                                                       =============
     private boolean hasDefaultValue(String columnName) {
-        final Set<String> keySet = _defaultValueMap.keySet();
-        for (String key : keySet) {
-            if (key.toLowerCase().equals(columnName.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
+        return findDefaultValue(columnName) != null;
     }
 
-    private String getDefaultValue(String columnName) {
-        final Set<String> keySet = _defaultValueMap.keySet();
-        for (String key : keySet) {
-            if (key.toLowerCase().equals(columnName.toLowerCase())) {
-                return _defaultValueMap.get(key);
+    private String findDefaultValue(String columnName) {
+        if (!_defaultValueMap.containsKey(columnName)) {
+            if (_additionalDefaultColumnNameToLowerMap.containsKey(columnName.toLowerCase())) {
+                final String realColumnName = _additionalDefaultColumnNameToLowerMap.get(columnName.toLowerCase());
+                if (_defaultValueMap.containsKey(realColumnName)) {
+                    return _defaultValueMap.get(realColumnName);
+                }
             }
+            return null;
         }
-        String msg = "defaultValueMap.get(columnName) returned null: ";
-        throw new IllegalStateException(msg + "columnName=" + columnName + " defaultValueMap=" + _defaultValueMap);
+        return _defaultValueMap.get(columnName);
     }
 
     // ===================================================================================
@@ -169,8 +203,28 @@ public class DfInternalSqlBuilder {
         this._valueList = valueList;
     }
 
-    public Map<String, String> getAddtionalDefaultColumnNameToLowerMap() {
-        return _addtionalDefaultColumnNameToLowerMap;
+    public Map<String, String> getTargetConvertColumnNameKeyToLowerMap() {
+        return _targetConvertColumnNameKeyToLowerMap;
+    }
+
+    public void setTargetConvertColumnNameKeyToLowerMap(Map<String, String> targetConvertColumnNameKeyToLowerMap) {
+        this._targetConvertColumnNameKeyToLowerMap = targetConvertColumnNameKeyToLowerMap;
+    }
+
+    public Map<String, String> getAdditionalDefaultColumnNameToLowerMap() {
+        return _additionalDefaultColumnNameToLowerMap;
+    }
+
+    public void setAdditionalDefaultColumnNameToLowerMap(Map<String, String> additionalDefaultColumnNameToLowerMap) {
+        this._additionalDefaultColumnNameToLowerMap = additionalDefaultColumnNameToLowerMap;
+    }
+
+    public Map<String, Map<String, String>> getConvertValueMap() {
+        return _convertValueMap;
+    }
+
+    public void setConvertValueMap(Map<String, Map<String, String>> convertValueMap) {
+        this._convertValueMap = convertValueMap;
     }
 
     public Map<String, String> getDefaultValueMap() {
@@ -179,9 +233,5 @@ public class DfInternalSqlBuilder {
 
     public void setDefaultValueMap(Map<String, String> defaultValueMap) {
         this._defaultValueMap = defaultValueMap;
-    }
-
-    public void setAddtionalDefaultColumnNameToLowerMap(Map<String, String> addtionalDefaultColumnNameToLowerMap) {
-        this._addtionalDefaultColumnNameToLowerMap = addtionalDefaultColumnNameToLowerMap;
     }
 }
