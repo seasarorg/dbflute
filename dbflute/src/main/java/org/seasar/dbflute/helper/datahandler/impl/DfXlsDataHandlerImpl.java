@@ -163,6 +163,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     }
                     statement.executeBatch();
                 } catch (SQLException e) {
+                    final SQLException nextException = e.getNextException();
+                    if (nextException != null) {
+                        _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+                        _log.warn("SQLException was thrown! getNextException()=" + nextException.getClass(), e);
+                        _log.warn("* * * * * * * * * */");
+                    }
                     throw new RuntimeException(e);
                 } finally {
                     if (statement != null) {

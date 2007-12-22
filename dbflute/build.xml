@@ -4,8 +4,8 @@
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
   <property name="version" value="0.5.9"/>
-  <property name="deploy.base" value="/pj/java"/>
-  <property name="workspace.base" value="/pj/oss/ws"/>
+  <property name="deploy.base" value="/app"/>
+  <property name="workspace.base" value=".."/>
 
   <property name="dbflute.jar.file" value="dbflute.jar"/>
   <property name="dbflute.jar.dirfile" value="dist/${dbflute.jar.file}"/>
