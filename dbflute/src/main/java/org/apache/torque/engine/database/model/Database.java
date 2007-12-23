@@ -482,15 +482,7 @@ public class Database {
 
     public String getPmbMetaDataSuperClassDefinition(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
-            String msg = "The pmbMetaDataMap should not be null or empty: className=" + className;
-            throw new IllegalStateException(msg);
-        }
-        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
-        if (metaData == null) {
-            String msg = "The className has no meta data: className=" + className;
-            throw new IllegalStateException(msg);
-        }
+        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
         final String superClassName = metaData.getSuperClassName();
         if (superClassName == null || superClassName.trim().length() == 0) {
             return "";
@@ -501,6 +493,17 @@ public class Database {
 
     public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
+        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        return metaData.getPropertyNameTypeMap();
+    }
+
+    public Map<String, String> getPmbMetaDataPropertyNameOptionMap(String className) {
+        assertArgumentPmbMetaDataClassName(className);
+        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        return metaData.getPropertyNameOptionMap();
+    }
+    
+    private DfParameterBeanMetaData findPmbMetaData(String className) {
         if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
             String msg = "The pmbMetaDataMap should not be null or empty: className=" + className;
             throw new IllegalStateException(msg);
@@ -510,7 +513,7 @@ public class Database {
             String msg = "The className has no meta data: className=" + className;
             throw new IllegalStateException(msg);
         }
-        return metaData.getPropertyNameTypeMap();
+        return metaData;
     }
 
     public Set<String> getPmbMetaDataPropertySet(String className) {
@@ -522,6 +525,12 @@ public class Database {
         assertArgumentPmbMetaDataClassName(className);
         assertArgumentPmbMetaDataPropertyName(propertyName);
         return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
+    }
+    
+    public String getPmbMetaDataPropertyOption(String className, String propertyName) {
+        assertArgumentPmbMetaDataClassName(className);
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        return getPmbMetaDataPropertyNameOptionMap(className).get(propertyName);
     }
 
     protected void assertArgumentPmbMetaDataClassName(String className) {

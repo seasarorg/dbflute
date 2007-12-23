@@ -266,7 +266,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     }
                     if (isTargetParameterBeanMakingSql(sql)) {
                         // for Parameter Bean
-                        final DfParameterBeanMetaData parameterBeanMetaData = getParameterBeanMetaData(sql);
+                        final DfParameterBeanMetaData parameterBeanMetaData = extractParameterBeanMetaData(sql);
                         if (parameterBeanMetaData != null) {
                             final String parameterBeanMetaDataKey = parameterBeanMetaData.getClassName();
                             if (_pmbMetaDataMap.containsKey(parameterBeanMetaDataKey)) {
@@ -317,7 +317,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 return parameterBeanClassDefinition != null;
             }
 
-            protected DfParameterBeanMetaData getParameterBeanMetaData(String sql) {
+            /**
+             * Extract the meta data of parameter bean.
+             * 
+             * @param sql Target SQL. (NotNull and NotEmpty)
+             * @return the meta data of parameter bean. (Nullable: If it returns null, it means 'Not Found'.)
+             */
+            protected DfParameterBeanMetaData extractParameterBeanMetaData(String sql) {
                 final String classDefinition = getParameterBeanClassDefinition(sql);
                 if (classDefinition == null) {
                     return null;
@@ -338,21 +344,39 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 }
 
                 final LinkedHashMap<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
+                final LinkedHashMap<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
                 pmbMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
                 final List<String> parameterBeanElement = getParameterBeanProperties(sql);
                 for (String element : parameterBeanElement) {
-                    final String delimiter = " ";
+                    final String nameDelimiter = " ";
+                    final int nameDelimiterLength = nameDelimiter.length();
+                    final String optionDelimiter = ":";
+                    final int optionDelimiterLength = optionDelimiter.length();
                     element = element.trim();
-                    final int idx = element.lastIndexOf(delimiter);
-                    if (idx > 0) {
-                        final String typeName = element.substring(0, idx).trim();
-                        final String propertyName = element.substring(idx + delimiter.length()).trim();
-                        propertyNameTypeMap.put(propertyName, typeName);
-                    } else {
+                    final int nameIndex = element.indexOf(nameDelimiter);
+                    if (nameIndex <= 0) {
                         String msg = "The parameter bean element should be [typeName propertyName].";
                         msg = msg + " But: element=" + element;
                         msg = msg + " srcFile=" + _srcFile;
                         throw new IllegalStateException(msg);
+                    }
+                    final String typeName = element.substring(0, nameIndex).trim();
+                    final String rearString = element.substring(nameIndex + nameDelimiterLength).trim();
+                    final int optionIndex = rearString.indexOf(":");
+                    if (optionIndex == 0) {
+                        String msg = "The parameter bean element should be [typeName propertyName:option].";
+                        msg = msg + " But: element=" + element;
+                        msg = msg + " srcFile=" + _srcFile;
+                        throw new IllegalStateException(msg);
+                    }
+                    if (optionIndex > 0) {
+                        final String propertyName = rearString.substring(0, optionIndex).trim();
+                        propertyNameTypeMap.put(propertyName, typeName);
+                        final String optionName = rearString.substring(optionIndex + optionDelimiterLength).trim();
+                        propertyNameOptionMap.put(propertyName, optionName);
+                    } else {
+                        final String propertyName = rearString;
+                        propertyNameTypeMap.put(propertyName, typeName);
                     }
                 }
                 return pmbMetaData;
@@ -409,7 +433,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected boolean isCursor(final String sql) {
         final String targetString = getTargetString(sql, "+");
-
         return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
     }
 
@@ -476,6 +499,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         protected String className;
         protected String superClassName;
         protected Map<String, String> propertyNameTypeMap;
+        protected Map<String, String> propertyNameOptionMap;
+        
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(className);
+            sb.append(", ").append(superClassName);
+            sb.append(", ").append(propertyNameTypeMap);
+            sb.append(", ").append(propertyNameOptionMap);
+            return sb.toString();
+        }
 
         public String getClassName() {
             return className;
@@ -501,13 +535,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             this.propertyNameTypeMap = propertyNameTypeMap;
         }
 
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(className);
-            sb.append(", ").append(superClassName);
-            sb.append(", ").append(propertyNameTypeMap);
-            return sb.toString();
+        public Map<String, String> getPropertyNameOptionMap() {
+            return propertyNameOptionMap;
+        }
+
+        public void setPropertyNameOptionMap(Map<String, String> propertyNameOptionMap) {
+            this.propertyNameOptionMap = propertyNameOptionMap;
         }
     }
 
