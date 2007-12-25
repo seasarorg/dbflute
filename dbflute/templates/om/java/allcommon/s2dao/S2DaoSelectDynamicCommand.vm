@@ -37,6 +37,7 @@ import org.seasar.framework.util.OgnlUtil;
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glMapParameterBeanInterfaceName};
+import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
 import ${glPackageBaseCommonException}.${glBindVariableCommentNotFoundPropertyException};
@@ -799,6 +800,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             valueAndType.setTargetType(clazz);
             setupValueAndType(valueAndType);
             ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
+            if (valueAndType.isValidRearOption()) {
+                ctx.addSql(valueAndType.buildRearOptionOnSql());
+            }
         }
 
         protected void setupValueAndType(InternalValueAndType valueAndType) {
@@ -832,6 +836,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                 throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
             }
             ctx.addSql(valueAndType.getTargetValue() != null ? valueAndType.getTargetValue().toString() : null);
+            if (valueAndType.isValidRearOption()) {
+                ctx.addSql(valueAndType.buildRearOptionOnSql());
+            }
         }
 
         protected void setupValueAndType(InternalValueAndType valueAndType) {
@@ -846,6 +853,15 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     protected static class InternalValueAndType {
         public Object _targetValue;
         public Class _targetType;
+        protected String _rearOption;
+
+        public boolean isValidRearOption() {
+            return _targetValue != null && _rearOption != null && _rearOption.trim().length() > 0;
+        }
+
+        public String buildRearOptionOnSql() {
+            return " " + _rearOption.trim() + " ";
+        }
 
         public Object getTargetValue() {
             return _targetValue;
@@ -858,6 +874,12 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
         public void setTargetType(Class targetType) {
             this._targetType = targetType;
+        }
+        public String getRearOption() {
+            return _rearOption;
+        }
+        public void setRearOption(String rearOption) {
+            this._rearOption = rearOption;
         }
     }
 
@@ -877,6 +899,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         protected void setupValueAndType(InternalValueAndType valueAndType) {
             Object value = valueAndType.getTargetValue();
             Class clazz = valueAndType.getTargetType();
+            String rearOption = null;
             for (int pos = 1; pos < _names.length; ++pos) {
                 if (value == null) {
                     break;
@@ -894,7 +917,16 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
                 final String currentName = _names[pos];
                 if (beanDesc.hasPropertyDesc(currentName)) {
                     final PropertyDesc pd = beanDesc.getPropertyDesc(currentName);
-                    value = pd.getValue(value);
+                    if (_names.length == (pos + 1) && hasLikeSearchOption(beanDesc, currentName)) {
+                        final ${glConditionOptionLikeSearchName} option = getLikeSearchOption(beanDesc, currentName, value);
+                        value = pd.getValue(value);
+                        if (value != null && value instanceof String && ((String)value).length() != 0) {
+                            value = option.generateRealValue((String) value);
+                            rearOption = option.getRearOption();
+                        }
+                    } else {
+                        value = pd.getValue(value);
+                    }
                     clazz = (value != null ? value.getClass() : pd.getPropertyType());
                     continue;
                 }
@@ -919,8 +951,18 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             }
             valueAndType.setTargetValue(value);
             valueAndType.setTargetType(clazz);
+            valueAndType.setRearOption(rearOption);
         }
-        
+
+        protected boolean hasLikeSearchOption(BeanDesc beanDesc, String currentName) {
+            return beanDesc.hasPropertyDesc(currentName + "InternalLikeSearchOption");
+        }
+
+        protected ${glConditionOptionLikeSearchName} getLikeSearchOption(BeanDesc beanDesc, String currentName, Object resourceBean) {
+            final PropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
+            return (${glConditionOptionLikeSearchName}) pb.getValue(resourceBean);
+        }
+
         protected String initCap(String name) {
             return name.substring(0, 1).toUpperCase() + name.substring(1);
         }

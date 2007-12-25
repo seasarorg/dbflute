@@ -15,6 +15,7 @@
   <property name="dbflute.example.dir" value="${workspace.base}/dbflute-example"/>
   <property name="dbflute.ncsharp.dir" value="${workspace.base}/dfncsharp"/>
   <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
+  <property name="dbflute.oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
   <property name="dbflute.teeda.example.dir" value="${workspace.base}/dbflute-teeda-example"/>
   <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
 
@@ -71,6 +72,9 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">

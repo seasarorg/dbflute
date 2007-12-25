@@ -13,10 +13,15 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-  #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 
     /** The value of ${propertyName}. */
     protected ${propertyType} _${propertyName};
+#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
+
+    /** The value of likeSearchOption for ${propertyName}. */
+    protected ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} _${propertyName}InternalLikeSearchOption;
+#end
 #end
 
     // ===================================================================================
@@ -76,7 +81,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     /**
      * Get the value of ${propertyName}. (Converted empty to null)
      * 
-     * @return The value of ${propertyName}. (NotEmptyString: if the value is empty string, returns null)
+     * @return The value of ${propertyName}. (Nullable & NotEmptyString: if the value is empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
 #if ($propertyType.endsWith("String"))
@@ -89,10 +94,32 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     /**
      * Set the value of ${propertyName}.
      * 
-     * @param ${propertyName} The value of ${propertyName}.
+     * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
         _${propertyName} = ${propertyName};
     }
+#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
+
+    /**
+     * Set the value of ${propertyName}.
+     * 
+     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     * @param ${propertyName}Option The option of likeSearch for ${propertyName}. (Nullable)
+     */
+    public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} ${propertyName}Option) {
+        _${propertyName} = ${propertyName};
+        _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
+    }
+
+    /**
+     * Get the internal option of likeSearch for ${propertyName}. {Internal Method: Don't Invoke This!}
+     * 
+     * @return The internal option of likeSearch for ${propertyName}. (Nullable)
+     */
+    public ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} get${database.initCap($propertyName)}InternalLikeSearchOption() {
+        return _${propertyName}InternalLikeSearchOption;
+    }
+#end
 #end
 }

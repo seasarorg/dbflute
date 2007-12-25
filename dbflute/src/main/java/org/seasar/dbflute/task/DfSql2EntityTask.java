@@ -343,9 +343,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     }
                 }
 
-                final LinkedHashMap<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
-                final LinkedHashMap<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
+                final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
+                final Map<String, String> propertyNameOptionMap = new LinkedHashMap<String, String>();
                 pmbMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
+                pmbMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
                 final List<String> parameterBeanElement = getParameterBeanProperties(sql);
                 for (String element : parameterBeanElement) {
                     final String nameDelimiter = " ";
@@ -353,7 +354,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final String optionDelimiter = ":";
                     final int optionDelimiterLength = optionDelimiter.length();
                     element = element.trim();
-                    final int nameIndex = element.indexOf(nameDelimiter);
+                    final int nameIndex;
+                    if (optionDelimiterLength >= 0) {
+                        nameIndex = element.lastIndexOf(nameDelimiter.substring(0, optionDelimiterLength));
+                    } else {
+                        nameIndex = element.lastIndexOf(nameDelimiter);
+                    }
                     if (nameIndex <= 0) {
                         String msg = "The parameter bean element should be [typeName propertyName].";
                         msg = msg + " But: element=" + element;
@@ -500,7 +506,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         protected String superClassName;
         protected Map<String, String> propertyNameTypeMap;
         protected Map<String, String> propertyNameOptionMap;
-        
+
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();

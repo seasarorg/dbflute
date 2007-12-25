@@ -502,7 +502,7 @@ public class Database {
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
         return metaData.getPropertyNameOptionMap();
     }
-    
+
     private DfParameterBeanMetaData findPmbMetaData(String className) {
         if (_pmbMetaDataMap == null || _pmbMetaDataMap.isEmpty()) {
             String msg = "The pmbMetaDataMap should not be null or empty: className=" + className;
@@ -526,11 +526,17 @@ public class Database {
         assertArgumentPmbMetaDataPropertyName(propertyName);
         return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
     }
-    
-    public String getPmbMetaDataPropertyOption(String className, String propertyName) {
+
+    public boolean isPmbMetaDataPropertyOptionLikeSearch(String className, String propertyName) {
+        final String pmbMetaDataPropertyOption = getPmbMetaDataPropertyOption(className, propertyName);
+        return pmbMetaDataPropertyOption != null && pmbMetaDataPropertyOption.trim().equalsIgnoreCase("like");
+    }
+
+    protected String getPmbMetaDataPropertyOption(String className, String propertyName) {
         assertArgumentPmbMetaDataClassName(className);
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        return getPmbMetaDataPropertyNameOptionMap(className).get(propertyName);
+        final Map<String, String> map = getPmbMetaDataPropertyNameOptionMap(className);
+        return map != null ? map.get(propertyName) : null;
     }
 
     protected void assertArgumentPmbMetaDataClassName(String className) {
@@ -670,7 +676,7 @@ public class Database {
     public boolean isJavaVersionGreaterEqualTiger() {
         return getBasicProperties().isJavaVersionGreaterEqualTiger();
     }
-    
+
     public boolean isJavaVersionGreaterEqualMustang() {
         return getBasicProperties().isJavaVersionGreaterEqualMustang();
     }
@@ -1262,11 +1268,11 @@ public class Database {
     public boolean isAvailableDaoMethodMetaDataInitializing() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodMetaDataInitializing();
     }
-    
+
     public boolean isAvailableOtherConnectionDaoInitialization() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableOtherConnectionDaoInitialization();
     }
-    
+
     public boolean isAvailableChildNoAnnotationGenerating() {
         return getProperties().getS2DaoAdjustmentProperties().isAvailableChildNoAnnotationGenerating();
     }
@@ -1286,7 +1292,7 @@ public class Database {
     public String getDaoSqlFileEncoding() {
         return getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding();
     }
-    
+
     // -----------------------------------------------------
     //                                     Little Adjustment
     //                                     -----------------
@@ -1312,11 +1318,11 @@ public class Database {
     public boolean isUseBuri() {
         return getProperties().getLittleAdjustmentProperties().isUseBuri();
     }
-    
+
     public boolean isCompatibleNullEqualFalse() {
         return getProperties().getLittleAdjustmentProperties().isCompatibleNullEqualFalse();
     }
-    
+
     public boolean isCompatibleOldReferrerNotDeprecated() {
         return getProperties().getLittleAdjustmentProperties().isCompatibleOldReferrerNotDeprecated();
     }
@@ -1378,7 +1384,7 @@ public class Database {
     public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {
         return getProperties().getTypeMappingProperties().getJdbcToJavaNativeAsStringRemovedLineSeparator();
     }
-    
+
     // ===============================================================================
     //                      Properties - ToLowerInGeneratorUnderscoreMethod (Internal)
     //                      ==========================================================
@@ -1433,11 +1439,11 @@ public class Database {
     public String getDaoSelectorComponentName() {
         return filterProjectSuffixForComponentName("daoSelector");
     }
-    
+
     public String getBehaviorSelectorComponentName() {
         return filterProjectSuffixForComponentName("behaviorSelector");
     }
-    
+
     // ==================================================================
     //                                         databaseInfoMap (Internal)
     //                                         ==========================
@@ -1656,7 +1662,8 @@ public class Database {
         try {
             return TypeMap.findJavaNativeTypeString(jdbcType, null, null);
         } catch (RuntimeException e) {
-            _log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType=" + jdbcType, e);
+            _log.warn("TypeMap.findJavaNativeTypeString(jdbcType, null, null) threw the exception: jdbcType="
+                    + jdbcType, e);
             throw e;
         }
     }

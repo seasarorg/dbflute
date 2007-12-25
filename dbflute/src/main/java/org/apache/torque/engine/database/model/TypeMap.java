@@ -435,7 +435,7 @@ public class TypeMap {
     //                                                                         ===========
     public static String findJavaNativeTypeString(String jdbcType, Integer columnSize, Integer decimalDigits) {
         final String javaType = TypeMap.getJavaType(jdbcType);
-        if (TypeMap.NUMERIC.equals(jdbcType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {
+        if (isAutoMappingTargetType(jdbcType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {
             if (decimalDigits != null && decimalDigits > 0) {
                 return TypeMap.getDefaultNumericJavaType();
             } else {
@@ -452,4 +452,7 @@ public class TypeMap {
         return javaType;
     }
 
+    protected static boolean isAutoMappingTargetType(String jdbcType) {
+        return TypeMap.NUMERIC.equals(jdbcType) || TypeMap.DECIMAL.equals(jdbcType);
+    }
 }

@@ -45,6 +45,9 @@ targetdatabase = $targetDatabase
     ## [ConditionBean]
     #set ($glConditionBeanInterfaceName = "${glProjectPrefix}ConditionBean")
 
+    ## [Allcommon-ConditionBean-Option]
+    #set ($glConditionOptionLikeSearchName = "${glProjectPrefix}LikeSearchOption")
+
     ## [DBMeta]
     #set ($glDBMetaInterfaceName = "${glProjectPrefix}DBMeta")
     #set ($glDBMetaAbstractName = "${glProjectPrefix}AbstractDBMeta")
@@ -74,6 +77,7 @@ targetdatabase = $targetDatabase
     ## [Package]
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
+    #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
     #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
     #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.dbmeta.info")
     #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
@@ -87,6 +91,7 @@ targetdatabase = $targetDatabase
     #if ($database.isTargetLanguageCSharp())
       #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
       #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.CBean")
+      #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.CBean.COption")
       #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.Dbm")
       #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.Dbm.Info")
       #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
