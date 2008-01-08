@@ -1,6 +1,6 @@
 cd %~p0
 
-call mvn generate-sources
+call ant -f build.xml dist
 
 call ant -f build.xml reflect
 

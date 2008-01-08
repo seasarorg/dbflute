@@ -1,5 +1,5 @@
 cd %~p0
 
-call mvn generate-sources
+call ant -f build.xml dist
 
 pause
