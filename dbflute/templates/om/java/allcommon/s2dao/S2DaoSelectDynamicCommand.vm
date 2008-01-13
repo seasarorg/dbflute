@@ -58,17 +58,11 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     /** Root node. */
     protected Node rootNode;// Override!
 
-    /** Result-set handler. */
+    /** The handler of resultSet. */
     protected ResultSetHandler resultSetHandler;
 
-    /** Result-set factory. */
+    /** The factory of resultSet. */
     protected ResultSetFactory resultSetFactory;
-
-    /** Cache of select clause command. */
-    protected ${glSelectDynamicCommand} _selectClauseCommand;
-
-    /** Cache of select clause PK-only command. */
-    protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
 
 #if ($database.isVersionAfter1046())
     /** DBFlute does not use this class! */
@@ -82,9 +76,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      * Constructor.
      * 
      * @param dataSource Data source.
-     * @param statementFactory Statement factory.
-     * @param resultSetHandler Result-set handler.
-     * @param resultSetFactory Result-set factory.
+     * @param statementFactory The factory of statement.
+     * @param resultSetHandler The handler of resultSet.
+     * @param resultSetFactory The factory of resultSet.
      */
     public ${glSelectDynamicCommand}(DataSource dataSource,
             StatementFactory statementFactory,
@@ -103,9 +97,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      * Constructor.
      * 
      * @param dataSource Data source.
-     * @param statementFactory Statement factory.
-     * @param resultSetHandler Result-set handler.
-     * @param resultSetFactory Result-set factory.
+     * @param statementFactory The factory of statement.
+     * @param resultSetHandler The handler of resultSet.
+     * @param resultSetFactory The factory of resultSet.
      * @param pagingSqlRewriter Paging sql rewriter.
      */
     public ${glSelectDynamicCommand}(DataSource dataSource,
@@ -147,38 +141,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         return ctx;
     }
 
-    /**
-     * The override for extension.
-     * 
-     * @param argNames The array of argument name. (NotNull)
-     */
-    @Override
-    public void setArgNames(String[] argNames) {
-        if (_selectClauseCommand != null) {
-            _selectClauseCommand.setArgNames(argNames);
-        }
-        if (_selectClausePKOnlyCommand != null) {
-            _selectClausePKOnlyCommand.setArgNames(argNames);
-        }
-        super.setArgNames(argNames);
-    }
-
-    /**
-     * The override for extension.
-     * 
-     * @param argTypes The array of argument type. (NotNull)
-     */
-    @Override
-    public void setArgTypes(Class[] argTypes) {
-        if (_selectClauseCommand != null) {
-            _selectClauseCommand.setArgTypes(argTypes);
-        }
-        if (_selectClausePKOnlyCommand != null) {
-            _selectClausePKOnlyCommand.setArgTypes(argTypes);
-        }
-        super.setArgTypes(argTypes);
-    }
-
     // -----------------------------------------------------
     //                                            For Public
     //                                            ----------
@@ -190,33 +152,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      */
     public CommandContext doApply(Object[] args) {
         return apply(args);
-    }
-
-    // -----------------------------------------------------
-    //                                         Select Clause
-    //                                         -------------
-    /**
-     * Set select clause.
-     * 
-     * @param value Select clause. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ${glSelectDynamicCommand} setSelectClause(String value) {
-        _selectClauseCommand = createMySelectDynamicCommand();
-        _selectClauseCommand.setSql(value);
-        return this;
-    }
-
-    /**
-     * Set select clause PK only.
-     * 
-     * @param value Select clause PK only. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ${glSelectDynamicCommand} setSelectClausePKOnly(String value) {
-        _selectClausePKOnlyCommand = createMySelectDynamicCommand();
-        _selectClausePKOnlyCommand.setSql(value);
-        return this;
     }
 
     // -----------------------------------------------------
@@ -266,31 +201,35 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         // - - - - - - - - - - - -
         // Execute conditionBean.
         // - - - - - - - - - - - -
-        assertSelectClauseCommand();
-        final List<Object> bindVariableList = new ArrayList<Object>();
-        final List<Class> bindVariableTypeList = new ArrayList<Class>();
+        final List<Object> bindVariableList = new ArrayList<Object>(4);
+        final List<Class> bindVariableTypeList = new ArrayList<Class>(4);
 
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String finalClause;
         if (cb.hasUnionQueryOrUnionAllQuery()) {
-            final String selectClause = setupRealSelectClause(args, bindVariableList, bindVariableTypeList);
-            final String fromWhereClause = setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList);
+            final String realClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
             if (cb.isSelectCountIgnoreFetchScope()) {
                 // If the query uses union and it selects count, the way of select-count is as follows.
-                // (Then it needs included-select-column)
-                finalClause = "select count(*) from (" + InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause) + ") base";
+				finalClause = "select count(*) from (" + realClause + ") dfmain";
+				
+				// This is an old style logic.
+                // finalClause = "select count(*) from (" + InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause) + ") dfmain";
             } else {
-                finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
+			    finalClause = realClause;
+				
+				// This is an old style logic.
+                // finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
             }
         } else {
-            final String selectClause;
             if (cb.isSelectCountIgnoreFetchScope()) {
-                selectClause = "select count(*)";
+                final String fromWhereClause = setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList);
+                finalClause = "select count(*) " + fromWhereClause;
             } else {
-                selectClause = setupRealSelectClause(args, bindVariableList, bindVariableTypeList);
+                finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
             }
-            final String fromWhereClause = setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList);
-            finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
+			
+			// This is an old style logic.
+            // finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
         }
 
         final BasicSelectHandler selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
@@ -453,22 +392,42 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     // -----------------------------------------------------
     //                                          Setup Clause
     //                                          ------------
-    protected String setupRealSelectClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+	// This is an old style logic.
+    // protected String setupRealSelectClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+    //     final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+    //     final String realSelectClause;
+    //     {
+    //         final CommandContext ctx;
+    //         if (cb.isLimitSelect_PKOnly()) {
+    //             ctx = _selectClausePKOnlyCommand.doApply(args);
+    //         } else {
+    //             ctx = _selectClauseCommand.doApply(args);
+    //         }
+    //         realSelectClause = ctx.getSql();
+    //         addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
+    //     }
+    //     return realSelectClause;
+    // }
+
+	protected String setupRealClause(Object[] args, java.util.List<Object> bindVariableList, List<Class> bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        final String realSelectClause;
+        final String realClause;
         {
-            final CommandContext ctx;
-            if (cb.isLimitSelect_PKOnly()) {
-                ctx = _selectClausePKOnlyCommand.doApply(args);
-            } else {
-                ctx = _selectClauseCommand.doApply(args);
-            }
-            realSelectClause = ctx.getSql();
+            final ${glSelectDynamicCommand} dynamicCommand = createMySelectDynamicCommand();
+            dynamicCommand.setArgNames(getArgNames());
+            dynamicCommand.setArgTypes(getArgTypes());
+			if (cb.isLimitSelect_PKOnly()) {
+                dynamicCommand.setSql(cb.getSqlClause().getClausePKOnly());
+			} else {
+			    dynamicCommand.setSql(cb.getSqlClause().getClause());
+			}
+            final CommandContext ctx = dynamicCommand.doApply(args);
+            realClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         }
-        return realSelectClause;
+        return realClause;
     }
-
+	
     protected String setupRealFromWhereClause(Object[] args, java.util.List<Object> bindVariableList, List<Class> bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realFromWhereClause;
@@ -476,11 +435,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             final ${glSelectDynamicCommand} fromWhereCommand = createMySelectDynamicCommand();
             fromWhereCommand.setArgNames(getArgNames());
             fromWhereCommand.setArgTypes(getArgTypes());
-
-            // for Union
-            cb.getSqlClause().setSelectClauseColumnAliasMap(${glConditionBeanContextName}.getSelectClauseColumnAliasMap(cb.getClass()));
-
-            fromWhereCommand.setSql(cb.getSqlClause().getClause());
+            fromWhereCommand.setSql(cb.getSqlClause().getClauseFromWhere());
+		
             final CommandContext ctx = fromWhereCommand.doApply(args);
             realFromWhereClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
@@ -553,13 +509,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     protected void addBindVariableTypeList(List<Class> bindVariableTypeList, Class[] bindVariableTypes) {
         for (int i=0; i < bindVariableTypes.length; i++) {
             bindVariableTypeList.add(bindVariableTypes[i]);
-        }
-    }
-
-    protected void assertSelectClauseCommand() {
-        if (_selectClauseCommand == null) {
-            String msg = "Select clause command should not be null.";
-            throw new IllegalStateException(msg);
         }
     }
 

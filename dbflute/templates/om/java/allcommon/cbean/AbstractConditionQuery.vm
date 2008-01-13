@@ -34,8 +34,11 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     /** My alias name. */
     protected final String _aliasName;
 
-    /** Nest level. */
+    /** The level of nest. */
     protected final int _nestLevel;
+	
+	/** The level of subQuery. */
+	protected int _subQueryLevel;
 
     // -----------------------------------------------------
     //                                          Foreign Info
@@ -125,6 +128,15 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return (query.getChildQuery() == null);
     }
 
+	/**
+	 * Get the level of subQuery.
+	 * 
+	 * @return The level of subQuery.
+	 */
+	public int getSubQueryLevel() {
+	    return _subQueryLevel;
+	}
+	
     // -----------------------------------------------------
     //                                             Real Name
     //                                             ---------
@@ -429,7 +441,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             if (value != null && option.isSplit()) {
                 final String[] strArray = option.generateSplitValueArray(value);
-                final java.util.List${database.filterGenericsString('String')} realValueList = new java.util.ArrayList${database.filterGenericsString('String')}();
+                final java.util.List<String> realValueList = new java.util.ArrayList<String>();
                 for (int i=0; i < strArray.length; i++) {
                     final String currentValue = strArray[i];
                     realValueList.add(currentValue);
@@ -496,10 +508,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
-        final String selectClause = "select " + subQuery.getTableDbName() + "." + relatedColumnName;
-        String clause = subQuery.getSqlClause().getClauseWithoutIncludedOrderBySqlSuffix();
-        clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
-        return replaceString(clause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
+        final String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
+        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhere();
+        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+        return selectClause + " " + fromWhereClause;
     }
 
     // -----------------------------------------------------
@@ -522,19 +534,26 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
-        final String selectClause = "select " + subQuery.getTableDbName() + "." + relatedColumnName;
-        String clause = subQuery.getSqlClause().getClauseWithoutIncludedOrderBySqlSuffix();
-        clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
-        final String joinCondition = relatedColumnName + " = " + realColumnName;
-        final String finalClause;
-        final int whereIndex = clause.indexOf(" where ");
-        final int whereEndIndex = whereIndex + " where ".length();
-        if (whereIndex >= 0) {
-            finalClause = clause.substring(0, whereEndIndex) + joinCondition + " and " + clause.substring(whereEndIndex);
-        } else {
-            finalClause = clause + " where " + joinCondition;
-        }
-        return replaceString(finalClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
+		final int subQueryLevel = subQuery.getSubQueryLevel();
+		if (_subQueryLevel <= subQueryLevel) {
+			_subQueryLevel = subQueryLevel + 1;
+		}
+		final String tableAliasName = "dfsublocal_" + subQueryLevel;
+        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
+        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereAsTemplate();
+		fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);// Very Important!
+        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+		
+        final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
+		
+		// Replace template marks. These are very important!
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + " and ");
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + " and ");
+		
+		return selectClause + " " + fromWhereClause;
     }
 
     protected void registerWhereClause(String whereClause) {
@@ -574,16 +593,30 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                               ----------
     public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, String unionQueryPropertyName) {
         final String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
+		
+		// At the future, building SQL will be moved to sqlClause.
         getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
     }
 
     protected String getUnionQuerySql(${glConditionQueryInterfaceName} unionQuery, String unionQueryPropertyName) {
-        final String selectClause = unionQuery.getSqlClause().getIncludedSelectColumnClause();
-        final String queryClause = unionQuery.getSqlClause().getFromClause() + " " + unionQuery.getSqlClause().getWhereClause();
+	    final String fromClause = unionQuery.getSqlClause().getFromClause();
+		final String whereClause = unionQuery.getSqlClause().getWhereClause();
+		final String unionQueryClause;
+		if (whereClause.trim().length() <= 0) {
+		    unionQueryClause = fromClause + " " + getSqlClause().getUnionWhereClauseMark();
+		} else {
+		    final int whereIndex = whereClause.indexOf("where ");
+		    if (whereIndex < 0) {
+				String msg = "The whereClause should have 'where' string: " + whereClause;
+			    throw new IllegalStateException(msg);
+			}
+			final int clauseIndex = whereIndex + "where ".length();
+			final String mark = getSqlClause().getUnionWhereFirstConditionMark();
+			unionQueryClause = fromClause + " " + whereClause.substring(0, clauseIndex) + mark + whereClause.substring(clauseIndex);
+		}
         final String oldStr = ".conditionQuery.";
         final String newStr = ".conditionQuery." + unionQueryPropertyName + ".";
-        final String replacedClause = replaceString(queryClause, oldStr, newStr);// Very Important!
-        return selectClause + " " + replacedClause;
+        return replaceString(unionQueryClause, oldStr, newStr);// Very Important!
     }
 
     // ===================================================================================
@@ -604,6 +637,15 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return getSqlClause().resolveNestLevelExpression(name, getNestLevel());
     }
 
+	protected String resolveNextRelationPath(String tableName, String relationPropertyName) {
+	    final int relationNo = getSqlClause().resolveRelationNo(tableName, relationPropertyName);
+        String nextRelationPath = "_" + relationNo;
+        if (_relationPath != null) {
+            nextRelationPath = _relationPath + nextRelationPath;
+        }
+		return nextRelationPath;
+	}
+	
     // ===================================================================================
     //                                                                     Fixed Condition
     //                                                                     ===============

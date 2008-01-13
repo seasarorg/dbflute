@@ -138,16 +138,16 @@ public class ${myClassName} implements java.io.Serializable {
         return sb.toString();
     }
 
-    public String getElementClause(java.util.Map${database.filterGenericsString('String, String')} selectClauseColumnAliasMap) {
+    public String getElementClause(java.util.Map<String, String> selectClauseRealColumnAliasMap) {
         if (_ascDesc == null) {
             String msg = "The attribute[ascDesc] should not be null.";
             throw new IllegalStateException(msg);
         }
         final StringBuffer sb = new StringBuffer();
-        final String columnAlias = (String)selectClauseColumnAliasMap.get(getColumnFullName());
+        final String columnAlias = selectClauseRealColumnAliasMap.get(getColumnFullName());
         if (columnAlias == null || columnAlias.trim().length() == 0) {
-            String msg = "The selectClauseColumnAliasMap should have the value of the key: " + getColumnFullName();
-            throw new IllegalStateException(msg + " But the map is " + selectClauseColumnAliasMap);
+            String msg = "The selectClauseRealColumnAliasMap should have the value of the key: " + getColumnFullName();
+            throw new IllegalStateException(msg + " But the map is " + selectClauseRealColumnAliasMap);
         }
         sb.append(columnAlias).append(" ").append(_ascDesc);
         return sb.toString();

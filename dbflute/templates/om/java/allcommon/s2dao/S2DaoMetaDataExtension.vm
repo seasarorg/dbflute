@@ -387,136 +387,20 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                              ConditionBean Override
     //                                                              ======================
-
+    @Override
     protected SelectDynamicCommand setupNonQuerySelectMethodByDto(Method method, ResultSetHandler handler, String[] argNames, String query) {
         Class[] types = method.getParameterTypes();
         Class clazz = types[0];
+        // /----------------------------------------------------- [MyExtension]
         if (!${glConditionBeanContextName}.isTheTypeConditionBean(clazz)) {
             return super.setupNonQuerySelectMethodByDto(method, handler, argNames, query);
         }
-        // /----------------------------------------------------- [MyExtension]
         argNames = new String[] { "dto" };
-        final String sqlNormal = getSelectClause(getBeanMetaData(), clazz);
-        final String sqlPKOnly = getSelectClausePKOnly(getBeanMetaData());
-        final ${glSelectDynamicCommand} dynamicCommand = createCustomizeSelectDynamicCommand(handler);
-        String sql = sqlNormal;
-        final SelectDynamicCommand cmd = dynamicCommand;
-        dynamicCommand.setSelectClause(sqlNormal);
-        dynamicCommand.setSelectClausePKOnly(sqlPKOnly);
-        // -----------/
-        if (query != null) {
-            sql = sql + " " + query;
-        }
-        cmd.setSql(sql);
+        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(types);
+        // -----------/
         return cmd;
-    }
-
-    /**
-     * Get select clause.
-     * 
-     * @param beanMetaData BeanMetaData. (NotNull)
-     * @param conditionBeanClass Condition-bean class. (NotNull)
-     * @return Select clause. (NotNull)
-     */
-    protected String getSelectClause(BeanMetaData beanMetaData, Class conditionBeanClass) {
-        final StringBuffer sb = new StringBuffer(100);
-        sb.append("select/*$dto.selectHint*/ ");
-
-        final StringBuffer sbMySelectList = new StringBuffer(100);
-        for (int i = 0; i < beanMetaData.getPropertyTypeSize(); ++i) {
-            final PropertyType pt = beanMetaData.getPropertyType(i);
-            if (pt.isPersistent()) {
-                if (sbMySelectList.length() != 0) {
-                    sbMySelectList.append(", ");
-                }
-                final String columnFullName = beanMetaData.getTableName() + "." + pt.getColumnName();
-                sbMySelectList.append(columnFullName);
-
-                ${glConditionBeanContextName}.addColumnAliasInfo(conditionBeanClass, columnFullName, pt.getColumnName());
-            }
-        }
-        sb.append(sbMySelectList);
-
-        setupRelationSelectClause(sb, beanMetaData, "", "", 1, conditionBeanClass);
-        return sb.toString();
-    }
-
-    protected void setupRelationSelectClause(StringBuffer sb, BeanMetaData baseBmd, String judgeProp, String preNoSuffix, int cqNestNo, Class conditionBeanClass) {
-        for (int i = 0; i < baseBmd.getRelationPropertyTypeSize(); ++i) {
-            final StringBuffer sbYourSelectList = new StringBuffer(100);
-            final RelationPropertyType rpt = baseBmd.getRelationPropertyType(i);
-            if (rpt == null) {
-                continue;
-                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                // Comment out because it is possible that s2dao make relation property type as null.
-                //   Ref: org.seasar.dao.impl.BeanMetaDataImpl#addRelationPropertyType();
-                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                // String msg = "The baseBmd.getRelationPropertyType(" + i + ") returned null";
-                // msg = msg + ": baseBmd.getTableName()=" + baseBmd.getTableName();
-                // msg = msg + ": baseBmd.getRelationPropertyTypeSize()=" + baseBmd.getRelationPropertyTypeSize();
-                // throw new IllegalStateException(msg);
-            }
-
-            final BeanMetaData relationBmd = rpt.getBeanMetaData();
-            final String initCapPropertyName = StringUtil.capitalize(rpt.getPropertyName());
-            final String ifComment = "/*IF dto." + judgeProp + "isSelect" + initCapPropertyName + "()*/";
-            final String endComment = "/*END*/";
-            for (int j = 0; j < relationBmd.getPropertyTypeSize(); ++j) {
-                final PropertyType pt = relationBmd.getPropertyType(j);
-                final String relationPath = preNoSuffix + "_" + rpt.getRelationNo();
-                final String tableAliasName = resolveJoinAliasName(relationPath, cqNestNo);
-                if (pt.isPersistent()) {
-                    final String columnName = pt.getColumnName();
-                    final String columnFullName = tableAliasName + "." + columnName;
-                    final String columnAliasName = pt.getColumnName() + relationPath;
-                    sbYourSelectList.append(", ");
-                    sbYourSelectList.append(columnFullName).append(" AS ").append(columnAliasName);
-
-                    ${glConditionBeanContextName}.addColumnAliasInfo(conditionBeanClass, columnFullName, columnAliasName);
-                }
-            }
-            if (relationBmd.getRelationPropertyTypeSize() > 0) {
-                final String nssString = "nss" + initCapPropertyName + ".";
-                final String nextPreNoSuffix = preNoSuffix + "_" + rpt.getRelationNo();
-                final int nextCQNestNo = cqNestNo + 1;
-                setupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo, conditionBeanClass);
-            }
-            sb.append(ifComment).append(sbYourSelectList).append(endComment);
-        }
-    }
-
-    protected String resolveJoinAliasName(String relationPath, int cqNestNo) {
-        final ${glSqlClauseInterfaceName} sqlClause = ${glConditionBeanContextName}.createSqlClause("dummy");
-        return sqlClause.resolveJoinAliasName(relationPath, cqNestNo);
-    }
-
-    /**
-     * Get select clause PK only.
-     * 
-     * @param beanMetaData BeanMetaData. (NotNull)
-     * @return Select clause PK only. (NotNull)
-     */
-    protected String getSelectClausePKOnly(BeanMetaData beanMetaData) {
-        final StringBuffer sb = new StringBuffer(100);
-        sb.append("select/*$dto.selectHint*/ ");
-
-        final StringBuffer sbMySelectList = new StringBuffer(100);
-        for (int i = 0; i < beanMetaData.getPropertyTypeSize(); ++i) {
-            final PropertyType pt = beanMetaData.getPropertyType(i);
-            if (pt.isPersistent() && pt.isPrimaryKey()) {
-                if (sbMySelectList.length() != 0) {
-                    sbMySelectList.append(", ");
-                }
-                sbMySelectList.append(beanMetaData.getTableName());
-                sbMySelectList.append(".");
-                sbMySelectList.append(pt.getColumnName());
-            }
-        }
-        sb.append(sbMySelectList);
-
-        return sb.toString();
     }
 
     // ===================================================================================

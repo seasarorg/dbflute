@@ -21,7 +21,7 @@ public interface ${myClassName} {
     //                                                                                Clause
     //                                                                                ======
     /**
-     * Get clause string.
+     * Get clause.
      * <p>
      * <pre>
      * ex)
@@ -36,24 +36,54 @@ public interface ${myClassName} {
     public String getClause();
 
     /**
-     * Get the clause without includedSelectColumn and orderBy and sqlSuffix.
+     * Get clause PK-only.
      * 
-     * @return The clause without 'includedSelectColumn' and 'orderBy' and 'sqlSuffix'. (NotNull)
+     * @return The clause of all resources but PK-Only. (NotNull)
      */
-    public String getClauseWithoutIncludedOrderBySqlSuffix();
+	public String getClausePKOnly();
+
+    /**
+     * Get from-where clause without select and orderBy and sqlSuffix. <br />
+	 * For subQuery and selectCount without union.
+     * 
+     * @return The from-where clause without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
+     */
+    public String getClauseFromWhere();
+	
+    /**
+     * Get from-where clause without select and orderBy and sqlSuffix as template. <br />
+	 * For subQuery and selectCount without union.
+     * 
+     * @return The from-where clause without 'select' and 'orderBy' and 'sqlSuffix' as template. (NotNull)
+     */
+    public String getClauseFromWhereAsTemplate();
 
     // =====================================================================================
     //                                                                          Clause Parts
     //                                                                          ============
+	/**
+     * Get select select column clause. This is an internal method.
+     * 
+     * @return The clause of select. {[select ...] from table...} (NotNull)
+     */
+	public String getSelectClause();
+	
+	/**
+     * Get select select column clause pk-only. This is an internal method.
+     * 
+     * @return The clause of select pk-only. {[select ...] from table...} (NotNull)
+     */
+	public String getSelectClausePKOnly();
+	
     /**
-     * Get select-hint. This is an internal method.
+     * Get select hint. This is an internal method.
      * 
      * @return The hint of select. {select [select-hint] * from table...} (NotNull)
      */
     public String getSelectHint();
 
     /**
-     * Get included-select-column clause. This is an internal method.
+     * Get included select column clause. This is an internal method.
      * 
      * @return The clause of includedSelectColumn. {select ... , [included-select-column clause] from table...} (NotNull)
      */
@@ -67,14 +97,14 @@ public interface ${myClassName} {
     public String getFromClause();
 
     /**
-     * Get from-base-table-hint. This is an internal method.
+     * Get from-base-table hint. This is an internal method.
      * 
      * @return The hint of fromBaseTable. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     public String getFromBaseTableHint();
 
     /**
-     * Get from-hint. This is an internal method.
+     * Get from hint. This is an internal method.
      * 
      * @return The hint of from. {select * from table left outer join ... on ... [from-hint] where ...} (NotNull)
      */
@@ -111,6 +141,22 @@ public interface ${myClassName} {
      */
     public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause);
 
+	// ===================================================================================
+    //                                                                SelectedSelectColumn
+    //                                                                ====================
+    /**
+     * Register selected select column.
+     * 
+     * @param foreignTableAliasName The alias name of foreign table. (NotNull)
+	 * @param localTableName The table name of local. (NotNull)
+	 * @param foreignPropertyName The property name of foreign table. (NotNull)
+     * @param localRelationPath The path of local relation. (Nullable)
+     */
+    public void registerSelectedSelectColumn(String foreignTableAliasName
+			                               , String localTableName
+										   , String foreignPropertyName
+										   , String localRelationPath);
+	
     // ===================================================================================
     //                                                                IncludedSelectColumn
     //                                                                ====================
@@ -375,8 +421,8 @@ public interface ${myClassName} {
     public ${myClassName} lockForUpdate();
 
     // ===================================================================================
-    //                                                                       Name Resolver
-    //                                                                       =============
+    //                                                                            Resolver
+    //                                                                            ========
     /**
      * Resolve join alias name.
      * 
@@ -395,9 +441,6 @@ public interface ${myClassName} {
      */
     public String resolveNestLevelExpression(String name, int cqNestNo);
 
-    // ===================================================================================
-    //                                                                              Facade
-    //                                                                              ======
     /**
      * Resolve relation no.
      * 
@@ -407,11 +450,22 @@ public interface ${myClassName} {
      */
     public int resolveRelationNo(String baseTableName, String foreignPropertyName);
 
-    // =====================================================================================
-    //                                                        Select Clause Column Alias Map
-    //                                                        ==============================
-    public void setSelectClauseColumnAliasMap(Map<String, String> selectClauseColumnAliasMap);
+	// ===================================================================================
+    //                                                                    Table Alias Info
+    //                                                                    ================
+	public String getLocalTableAliasName();
+	
+	public String getForeignTableAliasPrefix();
 
+	// ===================================================================================
+    //                                                                       Template Mark
+    //                                                                       =============
+	public String getWhereClauseMark();
+	public String getWhereFirstConditionMark();
+	public String getUnionSelectClauseMark();
+	public String getUnionWhereClauseMark();
+	public String getUnionWhereFirstConditionMark();
+	
     // =====================================================================================
     //                                                            Where Clause Simple Filter
     //                                                            ==========================

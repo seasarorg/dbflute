@@ -175,21 +175,16 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      */
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Desc() {
 #if ($table.hasPrimaryKey())
-  #foreach ($col in $table.PrimaryKey)
-
+#foreach ($col in $table.PrimaryKey)
         query().addOrderBy_${col.JavaName}_Desc();
-  #end
-
+#end
         return this;
 #else
-  #foreach ($col in $table.Columns)
-
+#foreach ($col in $table.Columns)
         query().addOrderBy_${col.JavaName}_Desc();
-  #end
-
+#end
         return this;
 #end
-
     }
 
     // ===================================================================================
@@ -211,7 +206,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      */
     public ${myConditionQueryClassName} getConditionQuery() {
         if (_conditionQuery == null) {
-            _conditionQuery = new ${myConditionQueryClassName}(null, getSqlClause(), getTableDbName(), 0);
+            _conditionQuery = new ${myConditionQueryClassName}(null, getSqlClause(), "dflocal", 0);
         }
         return _conditionQuery;
     }
@@ -300,7 +295,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
      */
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-        query().query${tmpPropertyNameInitCap}();// For setting outer join.
+        final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
+		final String localRelationPath = query().getRelationPath();
+		getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
             _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
         }
@@ -316,8 +313,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     #set ($nestSelectSetuppperClassName = "${referer.refererTableNestSelectSetupperClassName}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   RefferTable    = [${referer.table.name}]
-    //   RefferProperty = [${tmpPropertyName}]
+    //   ReferrerTable    = [${referer.table.name}]
+    //   ReferrerProperty = [${tmpPropertyName}]
     // * * * * * * * * */
 
     /** Is select for ${tmpPropertyName}? */
@@ -350,7 +347,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
      */
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
-        query().query${tmpPropertyNameInitCap}();// For setting outer join.
+        final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
+		final String localRelationPath = query().getRelationPath();
+		getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
             _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
         }

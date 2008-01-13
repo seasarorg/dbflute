@@ -78,6 +78,13 @@ public interface ${glConditionQueryInterfaceName} {
      */
     public boolean isBaseQuery(${glConditionQueryInterfaceName} query);
 
+	/**
+	 * Get the level of subQuery.
+	 * 
+	 * @return The level of subQuery.
+	 */
+	public int getSubQueryLevel();
+	
     /**
      * Get the property name of foreign.
      * 

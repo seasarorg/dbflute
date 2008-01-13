@@ -268,10 +268,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #if (!$refferer.isSelfReference())
-            #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
-            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.reffererPropertyNameInitCap}")
-            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.reffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     /**
      * Set the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
@@ -289,7 +288,6 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
 
     abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
-          #end
         #end
       #end
     #end
@@ -522,10 +520,9 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
-          #if (!$refferer.isSelfReference())
-            #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
-            #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-            #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($relatedCQClassName = "${refferer.refererTableExtendedConditionQueryClassName}")
+          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
     /**
      * Set the sub-query of ${subQueryPropertyNameInitCap} using existsSubQuery.
@@ -543,7 +540,6 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     }
 
     abstract public String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
-          #end
         #end
       #end
     #end
