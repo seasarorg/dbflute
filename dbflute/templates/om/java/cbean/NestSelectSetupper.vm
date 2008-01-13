@@ -1,12 +1,11 @@
 ${database.allClassCopyright}package ${glPackageNss};
 
 #set ($myClassName = "${myNestSelectSetupperClassName}")
-
+#set ($myNestSelectSetupperTerminalClassName = "${myNestSelectSetupperClassName}t")
 import ${glPackageCQ}.${myConditionQueryClassName};
 
-
 /**
- * The nest select setupper of ${table.name}.
+ * The nest-select-setupper of ${table.name}.
  * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
@@ -15,7 +14,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Base query. */
+    /** The query of local. (NotNull)*/
     protected ${myConditionQueryClassName} _query;
 
     // ===================================================================================
@@ -24,7 +23,7 @@ public class ${myClassName} {
     /**
      * Constructor.
      * 
-     * @param query Base query. (NotNull)
+     * @param query The query of local. (NotNull)
      */
     public ${myClassName}(${myConditionQueryClassName} query) {
         _query = query;
@@ -34,7 +33,7 @@ public class ${myClassName} {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Has condition query?
+     * Has conditionQuery?
      * 
      * @return Determination.
      */
@@ -46,64 +45,58 @@ public class ${myClassName} {
     //                                                           With Nested Foreign Table
     //                                                           =========================
 #foreach ($foreignKeys in $table.foreignKeys)
-  #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
-  #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-
-    /** Is select ${tmpPropertyName}? */
-    protected boolean _isSelect${tmpPropertyNameInitCap};
-
-    /**
-     * Is select ${tmpPropertyName}?
-     * 
-     * @return Determination.
-     */
-    public boolean isSelect${tmpPropertyNameInitCap}() {
-        return _isSelect${tmpPropertyNameInitCap};
-    }
+#set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
+#set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
 
     /**
      * Set up select with ${tmpPropertyName}.
+	 * 
+	 * @return The nest-select-setupper-terminal of foreign. (NotNull)
      */
+#if ($database.isVersionAfter1047())
+    public ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName} with${tmpPropertyNameInitCap}() {
+#else
     public void with${tmpPropertyNameInitCap}() {
+#end
         assertConditionQuery();
 		final String foreignTableAliasName = _query.query${tmpPropertyNameInitCap}().getRealAliasName();
 		final String localRelationPath = _query.getRelationPath();
 		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-        _isSelect${tmpPropertyNameInitCap} = true;
+		_query.getSqlClause().registerSelectedForeignInfo(_query.query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+#if ($database.isVersionAfter1047())
+		return new ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName}(_query.query${tmpPropertyNameInitCap}());
+#end
     }
 #end
 
     // ===================================================================================
     //                                                          With Nested Referrer Table
     //                                                          ==========================
-#foreach ($refferer in $table.referrers)
-  #if (${refferer.isOneToOne()})
-    #set ($tmpPropertyName = "${refferer.reffererPropertyNameAsOne}")
-    #set ($tmpPropertyNameInitCap = "${refferer.reffererPropertyNameInitCapAsOne}")
-
-    /** Is select ${tmpPropertyName}? */
-    protected boolean _isSelect${tmpPropertyNameInitCap};
-
-    /**
-     * Is select ${tmpPropertyName}?
-     * 
-     * @return Determination.
-     */
-    public boolean isSelect${tmpPropertyNameInitCap}() {
-        return _isSelect${tmpPropertyNameInitCap};
-    }
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.reffererPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
 
     /**
      * Set up select with ${tmpPropertyName}.
+	 * 
+	 * @return The nest-select-setupper-terminal of referrer-as-one. (NotNull)
      */
-    public void with${tmpPropertyNameInitCap}() {
+#if ($database.isVersionAfter1047())
+    public ${referrer.referrerTableNestSelectSetupperTerminalClassName} with${tmpPropertyNameInitCap}() {
+#else
+	public void with${tmpPropertyNameInitCap}() {
+#end
         assertConditionQuery();
 		final String foreignTableAliasName = _query.query${tmpPropertyNameInitCap}().getRealAliasName();
 		final String localRelationPath = _query.getRelationPath();
 		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-        _isSelect${tmpPropertyNameInitCap} = true;
+		_query.getSqlClause().registerSelectedForeignInfo(_query.query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+#if ($database.isVersionAfter1047())
+		return new ${referrer.referrerTableNestSelectSetupperTerminalClassName}(_query.query${tmpPropertyNameInitCap}());
+#end
     }
-  #end
+#end
 #end
 
     // ===================================================================================

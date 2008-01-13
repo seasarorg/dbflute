@@ -613,6 +613,10 @@ public class Table implements IDMethod {
     public String getNestSelectSetupperClassName() {
         return getExtendedEntityClassName() + "Nss";
     }
+    
+    public String getNestSelectSetupperTerminalClassName() {
+        return getExtendedEntityClassName() + "Nsst";
+    }
 
     protected String getSchemaPrefix() {
         if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {

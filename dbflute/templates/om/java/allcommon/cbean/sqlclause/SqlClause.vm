@@ -9,13 +9,11 @@ import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
- * The interface of SqlClause.
+ * The interface of SQL-clause.
  * 
  * @author ${database.ClassAuthor}
  */
 public interface ${myClassName} {
-
-    public static final String INCLUDE_SELECT_CLAUSE_MARK = "/* df:includeSelectClause */";
 
     // =====================================================================================
     //                                                                                Clause
@@ -454,7 +452,6 @@ public interface ${myClassName} {
     //                                                                    Table Alias Info
     //                                                                    ================
 	public String getLocalTableAliasName();
-	
 	public String getForeignTableAliasPrefix();
 
 	// ===================================================================================
@@ -470,4 +467,10 @@ public interface ${myClassName} {
     //                                                            Where Clause Simple Filter
     //                                                            ==========================
     public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
+	
+    // =====================================================================================
+    //                                                                 Selected Foreign Info
+    //                                                                 =====================
+	public boolean hasSelectedForeignInfo(String relationPath);
+	public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 }

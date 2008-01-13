@@ -1,0 +1,75 @@
+${database.allClassCopyright}package ${glPackageNss};
+
+#set ($myClassName = "${myNestSelectSetupperTerminalClassName}")
+import ${glPackageCQ}.${myConditionQueryClassName};
+
+/**
+ * The nest-select-setupper-terminal of ${table.name}.
+ * 
+ * @author ${database.ClassAuthor}
+ */${database.outputSuppressWarningsAfterLineSeparator()}
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Nest-select-setupper as helper. */
+    protected ${myNestSelectSetupperClassName} _nss;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * 
+     * @param query The query of local. (NotNull)
+     */
+    public ${myNestSelectSetupperTerminalClassName}(${myConditionQueryClassName} query) {
+        _nss = new ${myNestSelectSetupperClassName}(query);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Has conditionQuery?
+     * 
+     * @return Determination.
+     */
+    public boolean hasConditionQuery() {
+        return _nss.hasConditionQuery();
+    }
+
+    // ===================================================================================
+    //                                                           With Nested Foreign Table
+    //                                                           =========================
+#foreach ($foreignKeys in $table.foreignKeys)
+  #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
+  #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
+
+    /**
+     * Set up select with ${tmpPropertyName}.
+     */
+    public void with${tmpPropertyNameInitCap}() {
+	    _nss.with${tmpPropertyNameInitCap}();
+    }
+#end
+
+    // ===================================================================================
+    //                                                          With Nested Referrer Table
+    //                                                          ==========================
+#foreach ($referrer in $table.referrers)
+  #if (${referrer.isOneToOne()})
+    #set ($tmpPropertyName = "${referrer.reffererPropertyNameAsOne}")
+    #set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
+
+    /**
+     * Set up select with ${tmpPropertyName}.
+     */
+    public void with${tmpPropertyNameInitCap}() {
+	    _nss.with${tmpPropertyNameInitCap}();
+    }
+  #end
+#end
+    
+}

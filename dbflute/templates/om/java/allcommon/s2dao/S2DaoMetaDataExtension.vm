@@ -12,6 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 #if ($database.isAvailableOtherConnectionDaoInitialization())
 
@@ -41,6 +44,7 @@ import org.seasar.dao.impl.UpdateModifiedOnlyCommand;
 import org.seasar.dao.impl.UpdateBatchAutoStaticCommand;
 import org.seasar.dao.impl.DeleteAutoStaticCommand;
 import org.seasar.dao.impl.DeleteBatchAutoStaticCommand;
+import org.seasar.dao.impl.RelationRowCreationResource;
 
 #if ($database.isVersionAfter1047())
 import org.seasar.dao.BeanAnnotationReader;
@@ -63,12 +67,11 @@ import org.seasar.extension.jdbc.ValueType;
 #if (!$database.isVersionAfter1047())
 import org.seasar.framework.beans.BeanDesc;
 #end
-import org.seasar.framework.util.StringUtil;
 
 import ${glPackageBaseCommonAnnotation}.${glOutsideSqlAnnotation};
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 
 /**
@@ -984,6 +987,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             super(beanMetaData);
         }
 #end
+        @Override
         protected RelationRowCreator createRelationRowCreator() {
             return new RelationRowCreatorExtension();
         }
@@ -994,7 +998,48 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                    RelationRowCreatorImpl Extension
     //                                                    ================================
-    public static class RelationRowCreatorExtension extends org.seasar.dao.impl.RelationRowCreatorImpl {
+    protected static class RelationRowCreatorExtension extends org.seasar.dao.impl.RelationRowCreatorImpl {
+
+	    @Override
+    	protected void setupPropertyCache(RelationRowCreationResource res) throws SQLException {
+            // - - - - - - - - - - - 
+            // Recursive Call Point!
+            // - - - - - - - - - - -
+            res.initializePropertyCacheElement();
+    
+			// Do only selected foreign property for performance.
+			if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+			    final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+				if (!cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
+				    return;
+				}
+			}
+			
+			// Set up property cache about current beanMetaData.
+            final BeanMetaData nextBmd = res.getRelationBeanMetaData();
+            for (int i = 0; i < nextBmd.getPropertyTypeSize(); ++i) {
+                final PropertyType pt = nextBmd.getPropertyType(i);
+                res.setCurrentPropertyType(pt);
+                if (!isTargetProperty(res)) {
+                    continue;
+                }
+                setupPropertyCacheElement(res);
+            }
+			
+			// Set up next relation.
+            if (res.hasNextRelationProperty() && res.hasNextRelationLevel()) {
+                res.backupRelationPropertyType();
+                res.incrementCurrentRelationNestLevel();
+                try {
+                    setupNextPropertyCache(res, nextBmd);
+                } finally {
+                    res.restoreRelationPropertyType();
+                    res.decrementCurrentRelationNestLevel();
+                }
+            }
+        }
+	
+		@Override
         protected boolean isTargetProperty(org.seasar.dao.impl.RelationRowCreationResource res) throws java.sql.SQLException {
             final PropertyType pt = res.getCurrentPropertyType();
             if (!pt.getPropertyDesc().hasWriteMethod()) {
@@ -1006,12 +1051,75 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return true;
         }
 
+		@Override
         protected boolean isCreateDeadLink() {
             return false;
         }
 
+		@Override
         protected int getLimitRelationNestLevel() {
-            return 2;
+            return 3;
+        }
+		
+        @Override
+        protected RelationRowCreationResource createResourceForPropertyCache(RelationPropertyType rpt, Set columnNames,
+                Map relationPropertyCache, String baseSuffix, String relationNoSuffix, int limitRelationNestLevel)
+                throws SQLException {
+            final RelationRowCreationResource res = new RelationRowCreationResourceExtension();
+            res.setRelationPropertyType(rpt);
+            res.setColumnNames(columnNames);
+            res.setRelationPropertyCache(relationPropertyCache);
+            res.setBaseSuffix(baseSuffix);
+            res.setRelationNoSuffix(relationNoSuffix);
+            res.setLimitRelationNestLevel(limitRelationNestLevel);
+            res.setCurrentRelationNestLevel(1);// as Default
+            return res;
+        }
+    }
+	
+	protected static class RelationRowCreationResourceExtension extends RelationRowCreationResource {
+        protected Stack<RelationPropertyType> backupRelationPropertyType = new Stack<RelationPropertyType>();
+        protected Stack<String> backupBaseSuffix = new Stack<String>();
+        protected Stack<String> backupRelationSuffix = new Stack<String>();
+        
+        @Override
+        public void backupRelationPropertyType() {
+            backupRelationPropertyType.push(getRelationPropertyType());
+        }
+        
+        @Override
+        public void restoreRelationPropertyType() {
+            setRelationPropertyType(backupRelationPropertyType.pop());
+        }
+        
+        @Override
+        public void backupSuffixAndPrepare(String baseSuffix, String additionalRelationNoSuffix) {
+            backupBaseSuffixExtension();
+            backupRelationNoSuffixExtension();
+            setBaseSuffix(baseSuffix);
+            addRelationNoSuffix(additionalRelationNoSuffix);
+        }
+        
+        @Override
+        public void restoreSuffix() {
+            restoreBaseSuffixExtension();
+            restoreRelationNoSuffixExtension();
+        }
+        
+        protected void backupBaseSuffixExtension() {
+            backupBaseSuffix.push(getBaseSuffix());
+        }
+
+        protected void restoreBaseSuffixExtension() {
+            setBaseSuffix(backupBaseSuffix.pop());
+        }
+        
+        protected void backupRelationNoSuffixExtension() {
+            backupRelationSuffix.push(getRelationNoSuffix());
+        }
+        
+        protected void restoreRelationNoSuffixExtension() {
+            setRelationNoSuffix(backupRelationSuffix.pop());
         }
     }
 #else

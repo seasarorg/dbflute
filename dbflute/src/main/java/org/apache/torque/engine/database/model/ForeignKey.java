@@ -221,10 +221,42 @@ public class ForeignKey {
     public String getForeignTableNestSelectSetupperClassName() {
         return getForeignTable().getNestSelectSetupperClassName();
     }
+    
+    public String getForeignTableNestSelectSetupperTerminalClassName() {
+        return getForeignTable().getNestSelectSetupperTerminalClassName();
+    }
 
     // -----------------------------------------------------
-    //                                    Referer Class Name
-    //                                    ------------------
+    //                                   Referrer Class Name
+    //                                   -------------------
+    public String getReferrerTableExtendedEntityClassName() {
+        return getTable().getExtendedEntityClassName();
+    }
+
+    public String getReferrerTableExtendedBehaviorClassName() {
+        return getTable().getExtendedBehaviorClassName();
+    }
+
+    public String getReferrerTableDBMetaClassName() {
+        return getTable().getDBMetaClassName();
+    }
+
+    public String getReferrerTableExtendedConditionBeanClassName() {
+        return getTable().getExtendedConditionBeanClassName();
+    }
+
+    public String getReferrerTableExtendedConditionQueryClassName() {
+        return getTable().getExtendedConditionQueryClassName();
+    }
+
+    public String getReferrerTableNestSelectSetupperClassName() {
+        return getTable().getNestSelectSetupperClassName();
+    }
+    
+    public String getReferrerTableNestSelectSetupperTerminalClassName() {
+        return getTable().getNestSelectSetupperTerminalClassName();
+    }
+    
     public String getRefererTableExtendedEntityClassName() {
         return getTable().getExtendedEntityClassName();
     }
@@ -344,7 +376,7 @@ public class ForeignKey {
             throw new IllegalStateException(msg);
         }
         final List<Column> resultList = new ArrayList<Column>();
-        for (final Iterator ite = columnList.iterator(); ite.hasNext();) {
+        for (final Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
             final String name = (String) ite.next();
             final Column col = getTable().getColumn(name);
             if (col == null) {
@@ -584,13 +616,13 @@ public class ForeignKey {
      */
     protected String getForeignPropertyName(boolean isJavaBeansRule) {
         try {
-            final List localColumnList = getLocalColumnObjectList();
+            final List<Column> localColumnList = getLocalColumnObjectList();
             final List<String> columnNameList = new ArrayList<String>();
             String result = "";
             if (hasFixedSuffix()) {
                 result = getFixedSuffix();
             } else {
-                for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+                for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
                     final Column col = (Column) ite.next();
 
                     if (col.isMultipleFK()) {
@@ -696,7 +728,7 @@ public class ForeignKey {
      * @return Generated string. (NotNull)
      */
     public String getRefererPropertyName(boolean isJavaBeansRule) {
-        final List localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnObjectList();
 
         final List<String> columnNameList = new ArrayList<String>();
 
@@ -704,7 +736,7 @@ public class ForeignKey {
         if (hasFixedSuffix()) {
             result = getFixedSuffix();
         } else {
-            for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+            for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
                 final Column col = (Column) ite.next();
 
                 if (col.isMultipleFK()) {
@@ -789,10 +821,10 @@ public class ForeignKey {
      * @return Generated string.
      */
     protected String getReffererPropertyNameAsOne(boolean isJavaBeansRule) {
-        final List localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnObjectList();
 
         String result = "";
-        for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column col = (Column) ite.next();
 
             if (col.isMultipleFK()) {
@@ -876,9 +908,9 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getLocalColumnGetterCommaString() {
-        final List localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnObjectList();
         String result = "";
-        for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column col = (Column) ite.next();
             final String getterString = "get" + col.getJavaName() + "()";
             if ("".equals(result)) {
@@ -902,9 +934,9 @@ public class ForeignKey {
     }
 
     public String getForeignTableBeanSetupString(String setterSuffix, String setterPrefix) {
-        final List localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnObjectList();
         String result = "";
-        for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column localCol = (Column) ite.next();
             final Column foreignCol = (Column) getLocalForeignColumnObjectMapping().get(localCol);
             final String setterName = setterPrefix + foreignCol.getJavaName() + setterSuffix;
@@ -932,10 +964,10 @@ public class ForeignKey {
     }
 
     public String getChildrenTableBeanSetupString(String setterSuffix, String setterPrefix) {
-        List localColumnList = getLocalColumnObjectList();
+        List<Column> localColumnList = getLocalColumnObjectList();
         String result = "";
 
-        for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column localCol = (Column) ite.next();
             final Column foreignCol = (Column) getLocalForeignColumnObjectMapping().get(localCol);
             final String setterName = setterPrefix + localCol.getJavaName() + setterSuffix;
@@ -956,9 +988,9 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getRelationKeysCommaString() {
-        final List localColumnList = getLocalColumnObjectList();
+        final List<Column> localColumnList = getLocalColumnObjectList();
         String result = "";
-        for (final Iterator ite = localColumnList.iterator(); ite.hasNext();) {
+        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column localCol = (Column) ite.next();
             final Column foreignCol = (Column) getLocalForeignColumnObjectMapping().get(localCol);
             final String localName = localCol.getName();
@@ -979,9 +1011,9 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getRelationKeysCommaStringForOneToOneRefferer() {
-        final List foreignColumnList = getForeignColumnObjectList();
+        final List<Column> foreignColumnList = getForeignColumnObjectList();
         String result = "";
-        for (final Iterator ite = foreignColumnList.iterator(); ite.hasNext();) {
+        for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {
             final Column foreignCol = (Column) ite.next();
             final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
             final String foreignName = foreignCol.getName();
@@ -1003,9 +1035,9 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getChildKeysCommaString() {
-        final List foreignColumnList = getForeignColumnObjectList();
+        final List<Column> foreignColumnList = getForeignColumnObjectList();
         String result = "";
-        for (final Iterator ite = foreignColumnList.iterator(); ite.hasNext();) {
+        for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {
             final Column foreignCol = (Column) ite.next();
             final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
             final String foreignName = foreignCol.getName();

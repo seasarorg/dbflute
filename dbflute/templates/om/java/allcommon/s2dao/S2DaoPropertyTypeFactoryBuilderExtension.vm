@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
+import java.util.List;
+import java.util.ArrayList;
 import java.sql.DatabaseMetaData;
 
 import org.seasar.dao.BeanAnnotationReader;
@@ -11,6 +13,7 @@ import org.seasar.dao.ValueTypeFactory;
 import org.seasar.dao.impl.FastPropertyTypeFactory;
 import org.seasar.dao.impl.FastPropertyTypeFactoryBuilder;
 import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
@@ -20,7 +23,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
  * The factory builder of property type for S2Dao. {Since S2Dao-1.0.47} <br />
  * 
  * @author ${database.ClassAuthor}
- */
+ */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glDaoPropertyTypeFactoryBuilderExtension} extends FastPropertyTypeFactoryBuilder {
 
     @Override
@@ -79,6 +82,29 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} extends FastPropertyTyp
         }
 
         @Override
+        public PropertyType[] createBeanPropertyTypes(String tableName) {
+            final List<PropertyType> list = new ArrayList<PropertyType>();
+            final BeanDesc beanDesc = getBeanDesc();
+            for (int i = 0; i < beanDesc.getPropertyDescSize(); ++i) {
+                final PropertyDesc pd = beanDesc.getPropertyDesc(i);
+                
+                // Read-only property is unnecessary! {Extension of S2Dao}
+                if (!pd.hasWriteMethod()) {
+                    continue;
+                }
+                
+                if (isRelation(pd)) {
+                    continue;
+                }
+                final PropertyType pt = createPropertyType(pd);
+                pt.setPrimaryKey(isPrimaryKey(pd));
+                pt.setPersistent(isPersistent(pt));
+                list.add(pt);
+            }
+            return list.toArray(new PropertyType[list.size()]);
+        }
+		
+        @Override
         protected boolean isPersistent(PropertyType propertyType) {
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // The columns that has column annotation are persistent.
@@ -86,6 +112,7 @@ public class ${glDaoPropertyTypeFactoryBuilderExtension} extends FastPropertyTyp
             if (beanAnnotationReader.getColumnAnnotation(propertyType.getPropertyDesc()) == null) {
                 return false;
             }
+			
             return super.isPersistent(propertyType);
         }
     }

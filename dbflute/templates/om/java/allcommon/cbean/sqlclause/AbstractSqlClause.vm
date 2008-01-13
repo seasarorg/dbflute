@@ -93,8 +93,14 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                               WhereClauseSimpleFilter
     //                               -----------------------
     /** The filter for where clause. */
-    protected List${database.filterGenericsString(${glWhereClauseSimpleFilterInterfaceName})} _whereClauseSimpleFilterList = new java.util.ArrayList${database.filterGenericsString(${glWhereClauseSimpleFilterInterfaceName})}();
+    protected List<${glWhereClauseSimpleFilterInterfaceName}> _whereClauseSimpleFilterList;
 
+    // -----------------------------------------------------
+    //                                 Selected Foreign Info
+    //                                 ---------------------
+    /** The information of selected foreign table. */
+    protected Map<String, String> _selectedForeignInfo;
+	
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -149,7 +155,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 	protected String buildClauseWithoutMainSelect(boolean pkonly) {
 	    final StringBuffer sb = new StringBuffer(512);
         sb.append(getFromClause());
-        sb.append(" ");
         sb.append(getFromHint());
         sb.append(" ");
         sb.append(getWhereClause());
@@ -190,7 +195,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     protected String buildClauseFromWhereAsTemplate(boolean template) {
         final StringBuffer sb = new StringBuffer(512);
         sb.append(getFromClause());
-        sb.append(" ");
         sb.append(getFromHint());
         sb.append(" ");
         sb.append(buildWhereClause(template));
@@ -1265,7 +1269,10 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                            Where Clause Simple Filter
     //                                                            ==========================
     public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter) {
-        this._whereClauseSimpleFilterList.add(whereClauseSimpleFilter);
+		if (_whereClauseSimpleFilterList == null) {
+		    _whereClauseSimpleFilterList = new ArrayList<${glWhereClauseSimpleFilterInterfaceName}>();
+		}
+        _whereClauseSimpleFilterList.add(whereClauseSimpleFilter);
     }
 
     protected String filterWhereClauseSimply(String clauseElement) {
@@ -1282,7 +1289,24 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         }
         return clauseElement;
     }
+	
+    // =====================================================================================
+    //                                                                 Selected Foreign Info
+    //                                                                 =====================
+	public boolean hasSelectedForeignInfo(String relationPath) {
+		if (_selectedForeignInfo == null) {
+		    return false;
+		}
+	    return _selectedForeignInfo.containsKey(relationPath);
+	}
 
+	public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName) {
+		if (_selectedForeignInfo == null) {
+		    _selectedForeignInfo = new HashMap<String, String>();
+		}
+		_selectedForeignInfo.put(relationPath, foreignPropertyName);
+	}
+	
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======

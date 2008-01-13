@@ -13,6 +13,10 @@ public class ${glBeanMetaDataFactoryImpl} extends org.seasar.dao.impl.BeanMetaDa
      * @return The limit nest level of relation.
      */
     protected int getLimitRelationNestLevel() {
-        return 2;// Extension for DBFlute
+#if ($database.isVersionAfter1047())
+        return 3;// Extension for DBFlute
+#else
+	    return 2;// Extension for DBFlute
+#end
     }
 }

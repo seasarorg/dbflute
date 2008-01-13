@@ -265,18 +265,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //   ForeignProperty = [${tmpPropertyName}]
     // * * * * * * * * */
 
-    /** Is select for ${tmpPropertyName}? */
-    protected boolean _isSelect${tmpPropertyNameInitCap};
     /** Nest select setupper for ${tmpPropertyName}. */
     protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-    /**
-     * Is select for ${tmpPropertyName}? {For Internal}
-     * 
-     * @return Determination.
-     */
-    public boolean isSelect${tmpPropertyNameInitCap}() {
-        return _isSelect${tmpPropertyNameInitCap};
-    }
+
     /**
      * Get nest select setupper for ${tmpPropertyName}. {For Internal}
      * 
@@ -298,10 +289,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
 		final String localRelationPath = query().getRelationPath();
 		getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+		getSqlClause().registerSelectedForeignInfo(query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
             _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
         }
-        _isSelect${tmpPropertyNameInitCap} = true;
         limitSelect_Off();
         return _nss${tmpPropertyNameInitCap};
     }
@@ -317,18 +308,8 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //   ReferrerProperty = [${tmpPropertyName}]
     // * * * * * * * * */
 
-    /** Is select for ${tmpPropertyName}? */
-    protected boolean _isSelect${tmpPropertyNameInitCap};
     /** Nest select setupper for ${tmpPropertyName}. */
     protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-    /**
-     * Is select for ${tmpPropertyName}? {For Internal}
-     * 
-     * @return Determination.
-     */
-    public boolean isSelect${tmpPropertyNameInitCap}() {
-        return _isSelect${tmpPropertyNameInitCap};
-    }
     /**
      * Get nest select setupper for ${tmpPropertyName}. {For Internal}
      * 
@@ -350,10 +331,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
 		final String localRelationPath = query().getRelationPath();
 		getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+		getSqlClause().registerSelectedForeignInfo(query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
             _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
         }
-        _isSelect${tmpPropertyNameInitCap} = true;
         limitSelect_Off();
         return _nss${tmpPropertyNameInitCap};
     }

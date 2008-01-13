@@ -9,7 +9,7 @@ namespace ${glPackageBaseCommon} {
 
         private static LocalDataStoreSlot _internalMapSlot = Thread.AllocateDataSlot();
 
-        public static void Initialize() {
+        protected static void Initialize() {
             if (Thread.GetData(_internalMapSlot) != null) {
                 return;
             }

@@ -9,6 +9,7 @@ import org.seasar.dao.DaoMetaDataFactory;
 import org.seasar.dao.SqlCommand;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
+import ${glPackageBaseCommon}.${glInternalMapContextName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBean}.${glFetchNarrowingBeanContextName};
@@ -698,6 +699,9 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         }
         if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
             ${glConditionBeanContextName}.clearConditionBeanOnThread();
+        }
+		if (${glInternalMapContextName}.isExistInternalMapContextOnThread()) {
+            ${glInternalMapContextName}.clearInternalMapContextOnThread();
         }
     }
 

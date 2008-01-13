@@ -20,7 +20,7 @@ public class ${glConditionBeanContextName} {
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})} _threadLocal = new ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})}();
+    private static final ThreadLocal<${glConditionBeanInterfaceName}> _threadLocal = new ThreadLocal${database.filterGenericsString(${glConditionBeanInterfaceName})}();
 
     /**
      * Get condition-bean on thread.

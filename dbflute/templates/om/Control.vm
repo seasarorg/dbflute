@@ -1535,11 +1535,11 @@ targetdatabase = $targetDatabase
     ## Setup java directory for genMetaData.
     $database.setupJavaDir_for_genMetaData()
 
-    #if ($database.isTargetLanguageCSharp())
+    #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
       $database.makeDirectory($path)
 
-      $database.debug("parseInternalMapContext();")
+      $database.debug("parse('InternalMapContext');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glInternalMapContextName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/InternalMapContext.${glTemplateFileExtension}",$path ,"" ,"")
     #end
@@ -1776,6 +1776,7 @@ targetdatabase = $targetDatabase
         #set ($myConditionQueryClassName = "${table.extendedConditionQueryClassName}")
         #set ($myConditionInlineQueryClassName = "${table.extendedConditionInlineQueryClassName}")
         #set ($myNestSelectSetupperClassName = "${table.nestSelectSetupperClassName}")
+		#set ($myNestSelectSetupperTerminalClassName = "${table.nestSelectSetupperTerminalClassName}")
 
         #set ($myDBMetaClassName = "${table.DBMetaClassName}")
         #set ($myDBMetaPackageName = "${glPackageBaseDBMeta}")
@@ -1900,6 +1901,11 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
 
+		#if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger() && $database.isVersionAfter1047())
+		  #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperTerminalClassName}.${glClassFileExtension}" )
+          $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupperTerminal.${glTemplateFileExtension}", $path, "table", $table)
+		#end
+		
         ## Setup java directory for extended-cbean.
         $database.setupJavaDir_for_extended_cbean()
 
