@@ -4,6 +4,7 @@ ${database.allClassCopyright}package ${myDBMetaPackageName};
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
@@ -972,6 +973,51 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         }
         return "insert into ${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
     }
+
+	// ===================================================================================
+    //                                                               Entity Property Setup
+    //                                                               =====================
+	// It's very INTERNAL!
+	/** The map of setupper of entity property. map:{propertyName : setupper} (NotNull) */
+	protected Map<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new HashMap<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
+	{
+#foreach ($column in $table.columns)
+	    registerEntityPropertySetupper("$column.name", "$column.javaBeansRulePropertyName", new EntityProperty${column.javaName}Setupper(), _entityPropertySetupperMap);
+#end
+	}
+	
+	/**
+	 * ${database.ImplementComment}
+	 * 
+	 * @param propertyName The name of the property. (NotNull)
+	 * @return Determination.
+	 */
+	public boolean hasEntityPropertySetupper(String propertyName) {
+	    return _entityPropertySetupperMap.containsKey(propertyName);
+	}
+
+    /**
+     * ${database.ImplementComment}
+     * 
+	 * @param propertyName The name of the property. (NotNull)
+	 * @param entity The entity for the property. (NotNull)
+	 * @param value The value of the property. (Nullable)
+     */
+	public void setupEntityProperty(String propertyName, Object entity, Object value) {
+        final EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap.get(propertyName);
+		if (callback == null) {
+		    String msg = "The propertyName was Not Found in the map of setupper of entity property:";
+			msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()=" + _entityPropertySetupperMap.keySet();
+		    throw new IllegalStateException(msg);
+		}
+        callback.setup((${myExtendedObjectClassName})entity, value);
+	}
+	
+#foreach ($column in $table.columns)
+    public class EntityProperty${column.javaName}Setupper implements EntityPropertySetupper<${myExtendedObjectClassName}> {
+        public void setup(${myExtendedObjectClassName} entity, Object value) { entity.set${column.javaName}((${column.javaNative})value); }
+    }
+#end
 
     // ===================================================================================
     //                                                                              Helper

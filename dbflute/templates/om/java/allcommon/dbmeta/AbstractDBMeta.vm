@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaAbstractName}")
+import java.util.Map;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
@@ -462,6 +463,21 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return MapStringUtil.createMapStringBuilder(columnDbNameList);
     }
 
+	// ===================================================================================
+    //                                                               Entity Property Setup
+    //                                                               =====================
+	// It's very INTERNAL!
+	protected <ENTITY extends ${glEntityInterfaceName}> void registerEntityPropertySetupper(
+		                                          String columnName
+												, String propertyName
+	                                            , EntityPropertySetupper<ENTITY> setupper
+											    , Map<String, EntityPropertySetupper<ENTITY>> entityPropertySetupperMap) {
+		entityPropertySetupperMap.put(columnName, setupper);
+		entityPropertySetupperMap.put(propertyName, setupper);
+		entityPropertySetupperMap.put(columnName.toLowerCase(), setupper);
+		entityPropertySetupperMap.put(propertyName.toLowerCase(), setupper);
+	}
+	
     // ===================================================================================
     //                                                                          Util Class
     //                                                                          ==========

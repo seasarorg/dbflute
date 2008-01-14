@@ -108,10 +108,11 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                           Entity Property Setup
         //                                                           =====================
-        bool SetupEntityProperty(String propertyName, Object entity, Object value);
+		bool HasEntityPropertySetupper(String propertyName);
+        void SetupEntityProperty(String propertyName, Object entity, Object value);
     }
 
-    public interface EntityPropertySetupper<ENTITY_TYPE> {
+    public interface EntityPropertySetupper<ENTITY> where ENTITY : ${glEntityInterfaceName} {
         void setup(ENTITY_TYPE entity, Object value);
     }
 }

@@ -15,9 +15,10 @@ using Seasar.Extension.ADO.Types;
 using Seasar.Framework.Beans;
 using Seasar.Framework.Util;
 
+using ${glPackageBaseCommonAnnotation};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
-using ${glPackageBaseCommonAnnotation};
+using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonS2Dao} {
@@ -573,37 +574,40 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class RowCreatorExtension : Seasar.Dao.Impl.RowCreatorImpl {
 
+		/** The key of DBMeta cache. */
+	    protected static readonly String DBMETA_CACHE_KEY = "df:DBMetaCache";
+		
         public override object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
             object row = NewBean(beanType);
-            ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} dbmeta = findDBMeta(row);
+            ${glDBMetaInterfaceName} dbmeta = FindDBMeta(row);
             foreach (IColumnMetaData column in columns) {
                 object value = column.ValueType.GetValue(reader, column.ColumnName);
-                if (dbmeta != null && dbmeta.SetupEntityProperty(column.PropertyInfo.Name, row, value)) {
-                    continue;
+				if (dbmeta != null && dbmeta.HasEntityPropertySetupper(column.PropertyInfo.Name)) {
+				    dbmeta.SetupEntityProperty(column.PropertyInfo.Name, row, value);
+					continue;
                 }
                 column.PropertyInfo.SetValue(row, value, null);
             }
             return row;
         }
 
-        protected ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} findDBMeta(Object row) {
-            ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName} dbmeta = (${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName})${glInternalMapContextName}.GetObject("CreateRow-DBMeta");
+		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
+		    if (!(row is ${glEntityInterfaceName})) {
+			    return null;
+			}
+			final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})row;
+            IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = (IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
+			if (dbmetaCache != null) {
+			    dbmetaCache = new Dictionary<Type, ${glDBMetaInterfaceName}>();
+				${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
+			}
+			${glDBMetaInterfaceName} dbmeta = dbmetaCache.[entity.GetType()];
             if (dbmeta != null) {
                 return dbmeta;
             }
-            if (${glInternalMapContextName}.GetObject("CreateRow-NotFound") != null) {
-                return null;
-            }
-            PropertyInfo propertyOfDBMeta = row.GetType().GetProperty("DBMeta");
-            if (propertyOfDBMeta != null) {
-                dbmeta = (${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName})propertyOfDBMeta.GetValue(row, null);
-                if (dbmeta != null) {
-                    ${glInternalMapContextName}.SetObject("CreateRow-DBMeta", dbmeta);
-                    return dbmeta;
-                }
-            }
-            ${glInternalMapContextName}.SetObject("CreateRow-NotFound", "dummy");
-            return null;
+		    dbmeta = entity.DBMeta;
+			dbmetaCache.set(entity.GetType(), dbmeta);
+		    return dbmeta;
         }
     }
 

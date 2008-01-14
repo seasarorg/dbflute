@@ -617,4 +617,39 @@ public interface ${myClassName} {
      * @return Map string builder that is prepared. (NotNull)
      */
     public ${glMapStringBuilderName} createMapStringBuilder();
+	
+	// ===================================================================================
+    //                                                               Entity Property Setup
+    //                                                               =====================
+	// It's very INTERNAL!
+	
+	/**
+	 * Has the setupper of entity property by the name of property? <br />
+	 * Comparing is so flexible. {Ignore cases and underscore}
+	 * 
+	 * @param propertyName The name of the property. (NotNull)
+	 * @return Determination.
+	 */
+	 public boolean hasEntityPropertySetupper(String propertyName);
+	 
+    /**
+     * Set up entity property. (for INTERNAL)
+     * 
+	 * @param propertyName The name of the property. (NotNull)
+	 * @param entity The entity for the property. (NotNull)
+	 * @param value The value of the property. (Nullable)
+     */
+	public void setupEntityProperty(String propertyName, Object entity, Object value);
+	
+    /**
+     * The setupper of entity property. <br />
+	 * This class is for Internal. Don't use this!
+     */
+    public interface EntityPropertySetupper<ENTITY_TYPE extends ${glEntityInterfaceName}> {
+		
+		/**
+		 * @param entity Entity. (NotNull)
+		 */
+        void setup(ENTITY_TYPE entity, Object value);
+    }
 }
