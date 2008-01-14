@@ -85,4 +85,27 @@
     </copy>
   </target>
 
+  <target name="reflectbasic" description="==> reflect to test application">
+    <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
+
+  <target name="reflectvarious" description="==> reflect to test application">
+    <copy todir="${dbflute.ncsharp.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
 </project>
