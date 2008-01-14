@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Reflection;
@@ -574,9 +575,6 @@ namespace ${glPackageBaseCommonS2Dao} {
 
     public class RowCreatorExtension : Seasar.Dao.Impl.RowCreatorImpl {
 
-		/** The key of DBMeta cache. */
-	    protected static readonly String DBMETA_CACHE_KEY = "df:DBMetaCache";
-		
         public override object CreateRow(IDataReader reader, IColumnMetaData[] columns, Type beanType) {
             object row = NewBean(beanType);
             ${glDBMetaInterfaceName} dbmeta = FindDBMeta(row);
@@ -592,26 +590,64 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
 		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
-		    if (!(row is ${glEntityInterfaceName})) {
-			    return null;
-			}
-			final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})row;
-            IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = (IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
-			if (dbmetaCache != null) {
-			    dbmetaCache = new Dictionary<Type, ${glDBMetaInterfaceName}>();
-				${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
-			}
-			${glDBMetaInterfaceName} dbmeta = dbmetaCache.[entity.GetType()];
-            if (dbmeta != null) {
-                return dbmeta;
-            }
-		    dbmeta = entity.DBMeta;
-			dbmetaCache.set(entity.GetType(), dbmeta);
-		    return dbmeta;
+		    return EntityPropertySetupperHandler.FindCachedDBMeta(row);
         }
     }
 
+	public class EntityPropertySetupperHandler {
+	    protected static readonly String DBMETA_CACHE_KEY = "df:DBMetaCache";
+		
+		public static ${glDBMetaInterfaceName} FindCachedDBMeta(Object row) {
+		    if (!(row is ${glEntityInterfaceName})) {
+			    return null;
+			}
+			${glEntityInterfaceName} entity = (${glEntityInterfaceName})row;
+            IDictionary<Type, ${glDBMetaInterfaceName}> dbmetaCache = (IDictionary<Type, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.GetObject(DBMETA_CACHE_KEY);
+			if (dbmetaCache == null) {
+			    dbmetaCache = new Dictionary<Type, ${glDBMetaInterfaceName}>();
+				${glInternalMapContextName}.SetObject(DBMETA_CACHE_KEY, dbmetaCache);
+			}
+            ${glDBMetaInterfaceName} dbmeta = null;
+            if (dbmetaCache.ContainsKey(entity.GetType())) {
+                dbmeta = dbmetaCache[entity.GetType()];
+				if (dbmeta != null) {
+				    return dbmeta;
+				}
+            }
+            dbmeta = entity.DBMeta;
+            dbmetaCache.Add(entity.GetType(), dbmeta);
+		    return dbmeta;
+        }
+	}
+	
     public class RelationRowCreatorExtension : Seasar.Dao.Impl.RelationRowCreatorImpl {
+	
+        protected override void RegisterRelationValue(RelationRowCreationResource res, String columnName) {
+            IPropertyType pt = res.CurrentPropertyType;
+            Object value = null;
+            if (res.ContainsRelKeyValueIfExists(columnName)) {
+                value = res.ExtractRelKeyValue(columnName);
+            } else {
+                IValueType valueType = pt.ValueType;
+                value = valueType.GetValue(res.DataReader, columnName);
+            }
+            if (value != null) {
+                res.IncrementValidValueCount();
+				${glDBMetaInterfaceName} dbmeta = FindDBMeta(res.Row);
+				String propertyName = pt.PropertyName;
+				if (dbmeta != null && dbmeta.HasEntityPropertySetupper(propertyName)) {
+				    dbmeta.SetupEntityProperty(propertyName, res.Row, value);
+			    } else {
+                    PropertyInfo pd = pt.PropertyInfo;
+                    pd.SetValue(res.Row, value, null);
+				}
+            }
+        }
+		
+		protected ${glDBMetaInterfaceName} FindDBMeta(Object row) {
+		    return EntityPropertySetupperHandler.FindCachedDBMeta(row);
+        }
+		
         protected override bool IsTargetProperty(RelationRowCreationResource res) {
             IPropertyType pt = res.CurrentPropertyType;
             if (!pt.PropertyInfo.CanWrite) {
