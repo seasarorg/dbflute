@@ -76,10 +76,10 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
         if (dbmeta.hasPrimaryKey()) {
             final String primaryKeyColumnName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
-            _lockSqlSuffix = " for update of " + _tableName + "." + primaryKeyColumnName;
+            _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + primaryKeyColumnName;
         } else {
             final String randomColumnName = ((${glColumnInfoName})dbmeta.getColumnInfoList().get(0)).getColumnDbName();
-            _lockSqlSuffix = " for update of " + _tableName + "." + randomColumnName;
+            _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + randomColumnName;
         }
         return this;
     }
