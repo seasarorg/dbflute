@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace ${glPackageBaseCommon} {
 
-    public static class ${glInternalMapContextName} {
+    public class ${glInternalMapContextName} {
 
         private static LocalDataStoreSlot _internalMapSlot = Thread.AllocateDataSlot();
 

@@ -113,6 +113,6 @@ namespace ${glPackageBaseCommonDBMeta} {
     }
 
     public interface EntityPropertySetupper<ENTITY> where ENTITY : ${glEntityInterfaceName} {
-        void setup(ENTITY_TYPE entity, Object value);
+        void Setup(ENTITY entity, Object value);
     }
 }
