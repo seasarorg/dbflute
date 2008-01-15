@@ -41,12 +41,8 @@ import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.AbstractSqlCommand;
 import org.seasar.dao.impl.SelectDynamicCommand;
-import org.seasar.dao.impl.InsertBatchAutoStaticCommand;
-import org.seasar.dao.impl.UpdateAutoDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoStaticCommand;
 import org.seasar.dao.impl.UpdateDynamicCommand;
-import org.seasar.dao.impl.UpdateBatchAutoStaticCommand;
-import org.seasar.dao.impl.DeleteBatchAutoStaticCommand;
 
 #if ($database.isVersionAfter1047())
 import org.seasar.dao.BeanAnnotationReader;
@@ -83,7 +79,11 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertBatchAutoDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateAutoDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 
 /**
@@ -443,7 +443,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             if (int[].class.isAssignableFrom(method.getReturnType())) {
                 returningRows = true;
             }
-            final InsertBatchAutoStaticCommand cmd = new InsertBatchAutoStaticCommand(
+            final ${glInternalInsertBatchAutoStaticCommand} cmd = new ${glInternalInsertBatchAutoStaticCommand}(
                     dataSource, statementFactory, getBeanMetaData(),
                     propertyNames, returningRows);
             command = cmd;
@@ -472,7 +472,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             if (int[].class.isAssignableFrom(method.getReturnType())) {
                 returningRows = true;
             }
-            cmd = createUpdateBatchAutoStaticCommand(method, propertyNames, returningRows);
+            cmd = createInternalUpdateBatchAutoStaticCommand(method, propertyNames, returningRows);
         }
         putSqlCommand(method.getName(), cmd);
     }
@@ -485,9 +485,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return cmd;
     }
 	
-    protected AbstractSqlCommand createInternalUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
+    protected ${glInternalUpdateAutoDynamicCommand} createInternalUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
         AbstractSqlCommand cmd;
-        final UpdateAutoDynamicCommand uac = newUpdateAutoDynamicCommand(dataSource, statementFactory);
+        final ${glInternalUpdateAutoDynamicCommand} uac = newUpdateAutoDynamicCommand(dataSource, statementFactory);
         uac.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         uac.setPropertyNames(propertyNames);
         uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
@@ -495,8 +495,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return cmd;
     }
 
-    protected UpdateAutoDynamicCommand newUpdateAutoDynamicCommand(javax.sql.DataSource ds, org.seasar.extension.jdbc.StatementFactory sf) {
-        return new UpdateAutoDynamicCommand(ds, sf);
+    protected ${glInternalUpdateAutoDynamicCommand} newUpdateAutoDynamicCommand(javax.sql.DataSource ds, org.seasar.extension.jdbc.StatementFactory sf) {
+        return new ${glInternalUpdateAutoDynamicCommand}(ds, sf);
     }
 
     protected ${glInternalUpdateModifiedOnlyCommand} createInternalUpdateModifiedOnlyCommand(final Method method, final String[] propertyNames) {
@@ -511,8 +511,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return new ${glInternalUpdateModifiedOnlyCommand}(ds, sf);
     }
 
-    protected UpdateBatchAutoStaticCommand createUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
-        return new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows) {
+    protected ${glInternalUpdateBatchAutoStaticCommand} createInternalUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
+        return new ${glInternalUpdateBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows) {
+		    @Override
             public Object execute(Object[] args) {
                 final Object result = super.execute(args);
                 handleBatchUpdateResultWithOptimisticLock(args, result);
@@ -563,8 +564,8 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
     }
 
-    protected DeleteBatchAutoStaticCommand createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
-        return new DeleteBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
+    protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
+        return new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
     }
 
     // -----------------------------------------------------

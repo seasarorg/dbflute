@@ -1,0 +1,48 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.impl.AbstractAutoHandler;
+import org.seasar.dao.impl.AbstractBatchAutoHandler;
+
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalInsertBatchAutoHandler};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalInsertBatchAutoStaticCommand} extends ${glInternalAbstractBatchAutoStaticCommand} {
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalInsertBatchAutoStaticCommand}(DataSource dataSource,
+            StatementFactory statementFactory, BeanMetaData beanMetaData,
+            String[] propertyNames, boolean returningRows) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames, returningRows);
+    }
+
+	// ===================================================================================
+    //                                                                            Override
+    //                                                                            ========
+	@Override
+    protected AbstractAutoHandler createAutoHandler() {
+        return createBatchAutoHandler();
+    }
+
+	@Override
+    protected AbstractBatchAutoHandler createBatchAutoHandler() {
+        return new ${glInternalInsertBatchAutoHandler}(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+    }
+
+	@Override
+    protected void setupSql() {
+        setupInsertSql();
+    }
+
+	@Override
+    protected void setupPropertyTypes(String[] propertyNames) {
+        setupInsertPropertyTypes(propertyNames);
+    }
+}

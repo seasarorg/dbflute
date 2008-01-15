@@ -1,0 +1,32 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.impl.AbstractBatchAutoHandler;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalDeleteBatchAutoHandler} extends AbstractBatchAutoHandler {
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalDeleteBatchAutoHandler}(DataSource dataSource,
+            StatementFactory statementFactory, BeanMetaData beanMetaData,
+            PropertyType[] propertyTypes) {
+
+        super(dataSource, statementFactory, beanMetaData, propertyTypes);
+    }
+
+    // ===================================================================================
+    //                                                                            Override
+    //                                                                            ========
+	@Override
+    protected void setupBindVariables(Object bean) {
+        setupDeleteBindVariables(bean);
+    }
+}
