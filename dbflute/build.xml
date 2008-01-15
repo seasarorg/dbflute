@@ -66,6 +66,7 @@
     </zip>
     <delete dir="${dbflute.deploy.dir}"/>
     <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
   <target name="reflect" description="==> reflect to test application">
@@ -93,6 +94,7 @@
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
+  	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
   <target name="reflectvarious" description="==> reflect to test application">
