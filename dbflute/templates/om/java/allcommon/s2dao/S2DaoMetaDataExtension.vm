@@ -33,7 +33,9 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 
 import org.seasar.dao.Dbms;
+#if ($database.isVersionAfter1045())
 import org.seasar.dao.InjectDaoClassSupport;
+#end
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.SqlCommand;
@@ -957,11 +959,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 	@Override
 #end
 	protected void putSqlCommand(String methodName, SqlCommand cmd) {
+#if ($database.isVersionAfter1045())
         if (useDaoClassForLog) {
             if (cmd instanceof InjectDaoClassSupport) {
                 ((InjectDaoClassSupport) cmd).setDaoClass(daoClass);
             }
         }
+#end
         sqlCommands.put(methodName, cmd);
     }
 	
