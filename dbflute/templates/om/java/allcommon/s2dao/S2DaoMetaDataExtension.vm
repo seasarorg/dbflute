@@ -33,6 +33,7 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 
 import org.seasar.dao.Dbms;
+import org.seasar.dao.InjectDaoClassSupport;
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.SqlCommand;
@@ -42,6 +43,7 @@ import org.seasar.dao.impl.AbstractSqlCommand;
 import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.dao.impl.InsertBatchAutoStaticCommand;
 import org.seasar.dao.impl.UpdateAutoDynamicCommand;
+import org.seasar.dao.impl.UpdateAutoStaticCommand;
 import org.seasar.dao.impl.UpdateDynamicCommand;
 import org.seasar.dao.impl.UpdateBatchAutoStaticCommand;
 import org.seasar.dao.impl.DeleteBatchAutoStaticCommand;
@@ -463,7 +465,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             } else if (isModifiedOnly(method.getName())) {
                 cmd = createInternalUpdateModifiedOnlyCommand(method, propertyNames);
             } else {
-                cmd = createUpdateAutoStaticCommand(method, propertyNames);
+                cmd = createInternalUpdateAutoStaticCommand(method, propertyNames);
             }
         } else {
             boolean returningRows = false;
@@ -473,6 +475,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             cmd = createUpdateBatchAutoStaticCommand(method, propertyNames, returningRows);
         }
         putSqlCommand(method.getName(), cmd);
+    }
+
+    protected UpdateAutoStaticCommand createInternalUpdateAutoStaticCommand(final Method method, final String[] propertyNames) {
+        UpdateAutoStaticCommand cmd = new UpdateAutoStaticCommand(dataSource, statementFactory, beanMetaData, propertyNames);
+#if ($database.isVersionAfter1047())
+        cmd.setCheckSingleRowUpdate(isCheckSingleRowUpdate(method));
+#end
+        return cmd;
     }
 	
     protected AbstractSqlCommand createInternalUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
@@ -941,6 +951,29 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         this.sqlCommands.put(sqlCommandKey, cmd);
     }
 
+    // ===================================================================================
+    //                                                                     Common Handlnig
+    //                                                                     ===============
+#if ($database.isVersionAfter1047())
+	@Override
+#end
+	protected void putSqlCommand(String methodName, SqlCommand cmd) {
+        if (useDaoClassForLog) {
+            if (cmd instanceof InjectDaoClassSupport) {
+                ((InjectDaoClassSupport) cmd).setDaoClass(daoClass);
+            }
+        }
+        sqlCommands.put(methodName, cmd);
+    }
+	
+    protected boolean isCheckSingleRowUpdate(Method method) {
+#if ($database.isVersionAfter1047())
+        return checkSingleRowUpdateForAll & daoAnnotationReader.isCheckSingleRowUpdate(method);
+#else
+	    return false;
+#end
+    }
+	
     // ===================================================================================
     //                                                                       Vert Internal
     //                                                                       =============

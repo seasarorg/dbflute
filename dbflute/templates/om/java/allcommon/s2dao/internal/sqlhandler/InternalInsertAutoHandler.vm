@@ -32,23 +32,37 @@ public class ${glInternalInsertAutoHandler} extends ${glInternalAbstractAutoHand
 	@Override
     protected void preUpdateBean(Object bean) {
         BeanMetaData bmd = getBeanMetaData();
+#if ($database.isVersionAfter1047())
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
             IdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (generator.isSelfGenerate()) {
                 generator.setIdentifier(bean, getDataSource());
             }
         }
+#else
+	    final IdentifierGenerator generator = bmd.getIdentifierGenerator();
+        if (generator.isSelfGenerate()) {
+            generator.setIdentifier(bean, getDataSource());
+        }
+#end
     }
 	
 	@Override
     protected void postUpdateBean(Object bean) {
         BeanMetaData bmd = getBeanMetaData();
+#if ($database.isVersionAfter1047())
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
             IdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (!generator.isSelfGenerate()) {
                 generator.setIdentifier(bean, getDataSource());
             }
         }
+#else
+	    final IdentifierGenerator generator = bmd.getIdentifierGenerator();
+        if (!generator.isSelfGenerate()) {
+            generator.setIdentifier(bean, getDataSource());
+        }
+#end
         updateVersionNoIfNeed(bean);
         updateTimestampIfNeed(bean);
     }

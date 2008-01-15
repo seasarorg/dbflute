@@ -1,0 +1,162 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.impl.AbstractSqlCommand;
+import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.NoUpdatePropertyTypeRuntimeException;
+import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
+
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateAutoHandler};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
+
+	// ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private BeanMetaData beanMetaData;
+    private String[] propertyNames;
+    private boolean checkSingleRowUpdate = true;
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalUpdateAutoDynamicCommand}(DataSource dataSource, StatementFactory statementFactory) {
+        super(dataSource, statementFactory);
+    }
+
+	// ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public Object execute(Object[] args) {
+        final Object bean = args[0];
+        final BeanMetaData bmd = getBeanMetaData();
+        final PropertyType[] propertyTypes = createUpdatePropertyTypes(bmd,
+                bean, getPropertyNames());
+
+        ${glInternalUpdateAutoHandler} handler = new ${glInternalUpdateAutoHandler}(getDataSource(), getStatementFactory(), bmd, propertyTypes);
+        
+		// It is unnecessary!
+		// injectDaoClass(handler);
+		
+        handler.setSql(createUpdateSql(bmd, propertyTypes));
+        int i = handler.execute(args);
+        if (isCheckSingleRowUpdate() && i < 1) {
+            throw createNotSingleRowUpdatedRuntimeException(args[0], i);
+        }
+        return new Integer(i);
+    }
+
+    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(
+            Object bean, int rows) {
+        return new NotSingleRowUpdatedRuntimeException(bean, rows);
+    }
+
+    protected PropertyType[] createUpdatePropertyTypes(BeanMetaData bmd,
+            Object bean, String[] propertyNames) {
+        List types = new ArrayList();
+        final String timestampPropertyName = bmd.getTimestampPropertyName();
+        final String versionNoPropertyName = bmd.getVersionNoPropertyName();
+        for (int i = 0; i < propertyNames.length; ++i) {
+            PropertyType pt = bmd.getPropertyType(propertyNames[i]);
+            if (pt.isPrimaryKey() == false) {
+                String propertyName = pt.getPropertyName();
+                if (propertyName.equalsIgnoreCase(timestampPropertyName)
+                        || propertyName.equalsIgnoreCase(versionNoPropertyName)
+                        || pt.getPropertyDesc().getValue(bean) != null) {
+                    types.add(pt);
+                }
+            }
+        }
+        if (types.isEmpty()) {
+            throw new NoUpdatePropertyTypeRuntimeException();
+        }
+        PropertyType[] propertyTypes = (PropertyType[]) types
+                .toArray(new PropertyType[types.size()]);
+        return propertyTypes;
+    }
+
+    protected String createUpdateSql(BeanMetaData bmd,
+            PropertyType[] propertyTypes) {
+        StringBuffer buf = new StringBuffer(100);
+        buf.append("UPDATE ");
+        buf.append(bmd.getTableName());
+        buf.append(" SET ");
+        for (int i = 0; i < propertyTypes.length; ++i) {
+            PropertyType pt = propertyTypes[i];
+            final String columnName = pt.getColumnName();
+            if (i > 0) {
+                buf.append(", ");
+            }
+            buf.append(columnName);
+            buf.append(" = ?");
+        }
+
+        buf.append(" WHERE ");
+        for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
+            buf.append(bmd.getPrimaryKey(i));
+            buf.append(" = ? AND ");
+        }
+        buf.setLength(buf.length() - 5);
+        if (bmd.hasVersionNoPropertyType()) {
+            PropertyType pt = bmd.getVersionNoPropertyType();
+            buf.append(" AND ");
+            buf.append(pt.getColumnName());
+            buf.append(" = ?");
+        }
+        if (bmd.hasTimestampPropertyType()) {
+            PropertyType pt = bmd.getTimestampPropertyType();
+            buf.append(" AND ");
+            buf.append(pt.getColumnName());
+            buf.append(" = ?");
+        }
+
+        return buf.toString();
+    }
+
+    /**
+     * @return Returns the beanMetaData.
+     */
+    public BeanMetaData getBeanMetaData() {
+        return beanMetaData;
+    }
+
+    /**
+     * @param beanMetaData
+     *            The beanMetaData to set.
+     */
+    public void setBeanMetaData(BeanMetaData beanMetaData) {
+        this.beanMetaData = beanMetaData;
+    }
+
+    /**
+     * @return Returns the propertyNames.
+     */
+    public String[] getPropertyNames() {
+        return propertyNames;
+    }
+
+    /**
+     * @param propertyNames
+     *            The propertyNames to set.
+     */
+    public void setPropertyNames(String[] propertyNames) {
+        this.propertyNames = propertyNames;
+    }
+
+    public boolean isCheckSingleRowUpdate() {
+        return checkSingleRowUpdate;
+    }
+
+    public void setCheckSingleRowUpdate(boolean resultCheck) {
+        this.checkSingleRowUpdate = resultCheck;
+    }
+}

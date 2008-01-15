@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 
 import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
-import org.seasar.dao.impl.UpdateAutoDynamicCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 
@@ -17,7 +16,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalUpdateAutoHandl
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInternalUpdateModifiedOnlyCommand} extends UpdateAutoDynamicCommand {
+public class ${glInternalUpdateModifiedOnlyCommand} extends ${glInternalUpdateAutoDynamicCommand} {
 
 	// ===================================================================================
     //                                                                          Definition

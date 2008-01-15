@@ -1,0 +1,211 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.IdentifierGenerator;
+import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
+import org.seasar.dao.PrimaryKeyNotFoundRuntimeException;
+import org.seasar.dao.impl.AbstractStaticCommand;
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.framework.exception.SRuntimeException;
+
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractAutoHandler};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${glInternalAbstractAutoStaticCommand} extends AbstractStaticCommand {
+
+	// ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private PropertyType[] propertyTypes;
+
+    private boolean checkSingleRowUpdate = true;
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalAbstractAutoStaticCommand}(DataSource dataSource,
+            StatementFactory statementFactory, BeanMetaData beanMetaData,
+            String[] propertyNames) {
+        super(dataSource, statementFactory, beanMetaData);
+        setupPropertyTypes(propertyNames);
+        setupSql();
+    }
+
+	// ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public Object execute(Object[] args) {
+        ${glInternalAbstractAutoHandler} handler = createAutoHandler();
+        handler.setSql(getSql());
+		
+		// It is unnecessary!
+        // injectDaoClass(handler);
+		
+        int rows = handler.execute(args);
+        if (isCheckSingleRowUpdate() && rows != 1) {
+            throw createNotSingleRowUpdatedRuntimeException(args[0], rows);
+        }
+        return new Integer(rows);
+    }
+
+    public boolean isCheckSingleRowUpdate() {
+        return checkSingleRowUpdate;
+    }
+
+    public void setCheckSingleRowUpdate(boolean checkSingleRowUpdate) {
+        this.checkSingleRowUpdate = checkSingleRowUpdate;
+    }
+
+    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(
+            Object bean, int rows) {
+        return new NotSingleRowUpdatedRuntimeException(bean, rows);
+    }
+
+    protected PropertyType[] getPropertyTypes() {
+        return propertyTypes;
+    }
+
+    protected void setPropertyTypes(PropertyType[] propertyTypes) {
+        this.propertyTypes = propertyTypes;
+    }
+
+    protected abstract ${glInternalAbstractAutoHandler} createAutoHandler();
+
+    protected abstract void setupPropertyTypes(String[] propertyNames);
+
+    protected void setupInsertPropertyTypes(String[] propertyNames) {
+        List types = new ArrayList();
+        for (int i = 0; i < propertyNames.length; ++i) {
+            PropertyType pt = getBeanMetaData().getPropertyType(
+                    propertyNames[i]);
+            if (isInsertTarget(pt)) {
+                types.add(pt);
+            }
+        }
+        propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types
+                .size()]);
+    }
+
+    protected boolean isInsertTarget(PropertyType propertyType) {
+        if (propertyType.isPrimaryKey()) {
+#if ($database.isVersionAfter1047())
+            String name = propertyType.getPropertyName();
+            final IdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator(name);
+#else
+	        final IdentifierGenerator generator = getBeanMetaData().getIdentifierGenerator();
+#end
+            return generator.isSelfGenerate();
+        }
+        return true;
+    }
+
+    protected void setupUpdatePropertyTypes(String[] propertyNames) {
+        List types = new ArrayList();
+        for (int i = 0; i < propertyNames.length; ++i) {
+            PropertyType pt = getBeanMetaData().getPropertyType(
+                    propertyNames[i]);
+            if (pt.isPrimaryKey()) {
+                continue;
+            }
+            types.add(pt);
+        }
+        if (types.size() == 0) {
+            throw new SRuntimeException("EDAO0020");
+        }
+        propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types
+                .size()]);
+    }
+
+    protected void setupDeletePropertyTypes(String[] propertyNames) {
+    }
+
+    protected abstract void setupSql();
+
+    protected void setupInsertSql() {
+        BeanMetaData bmd = getBeanMetaData();
+        StringBuffer buf = new StringBuffer(100);
+        buf.append("INSERT INTO ");
+        buf.append(bmd.getTableName());
+        buf.append(" (");
+        for (int i = 0; i < propertyTypes.length; ++i) {
+            PropertyType pt = propertyTypes[i];
+            if (isInsertTarget(pt)) {
+                buf.append(pt.getColumnName());
+                buf.append(", ");
+            }
+        }
+        buf.setLength(buf.length() - 2);
+        buf.append(") VALUES (");
+        for (int i = 0; i < propertyTypes.length; ++i) {
+            PropertyType pt = propertyTypes[i];
+            if (isInsertTarget(pt)) {
+                buf.append("?, ");
+            }
+        }
+        buf.setLength(buf.length() - 2);
+        buf.append(")");
+        setSql(buf.toString());
+    }
+
+    protected void setupUpdateSql() {
+        checkPrimaryKey();
+        StringBuffer buf = new StringBuffer(100);
+        buf.append("UPDATE ");
+        buf.append(getBeanMetaData().getTableName());
+        buf.append(" SET ");
+        for (int i = 0; i < propertyTypes.length; ++i) {
+            PropertyType pt = propertyTypes[i];
+            buf.append(pt.getColumnName());
+            buf.append(" = ?, ");
+        }
+        buf.setLength(buf.length() - 2);
+        setupUpdateWhere(buf);
+        setSql(buf.toString());
+    }
+
+    protected void setupDeleteSql() {
+        checkPrimaryKey();
+        StringBuffer buf = new StringBuffer(100);
+        buf.append("DELETE FROM ");
+        buf.append(getBeanMetaData().getTableName());
+        setupUpdateWhere(buf);
+        setSql(buf.toString());
+    }
+
+    protected void checkPrimaryKey() {
+        BeanMetaData bmd = getBeanMetaData();
+        if (bmd.getPrimaryKeySize() == 0) {
+            throw new PrimaryKeyNotFoundRuntimeException(bmd.getBeanClass());
+        }
+    }
+
+    protected void setupUpdateWhere(StringBuffer buf) {
+        BeanMetaData bmd = getBeanMetaData();
+        buf.append(" WHERE ");
+        for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
+            buf.append(bmd.getPrimaryKey(i));
+            buf.append(" = ? AND ");
+        }
+        buf.setLength(buf.length() - 5);
+        if (bmd.hasVersionNoPropertyType()) {
+            PropertyType pt = bmd.getVersionNoPropertyType();
+            buf.append(" AND ");
+            buf.append(pt.getColumnName());
+            buf.append(" = ?");
+        }
+        if (bmd.hasTimestampPropertyType()) {
+            PropertyType pt = bmd.getTimestampPropertyType();
+            buf.append(" AND ");
+            buf.append(pt.getColumnName());
+            buf.append(" = ?");
+        }
+    }
+}
