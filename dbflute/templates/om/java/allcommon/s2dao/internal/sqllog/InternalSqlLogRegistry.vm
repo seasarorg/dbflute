@@ -1,0 +1,59 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlLog};
+
+import java.util.LinkedList;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalSqlLogRegistry} {
+
+	// ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final int DEFAULT_LIMIT_SIZE = 3;
+    protected static final ThreadLocal<LinkedList<${glInternalSqlLog}>> _threadLocal = new ThreadLocal<LinkedList<${glInternalSqlLog}>>();
+
+	// ===================================================================================
+    //                                                                 Thread Local Helper
+    //                                                                 ===================
+	protected static void initialize() {
+	    if (_threadLocal.get() == null) {
+		    _threadLocal.set(new LinkedList<${glInternalSqlLog}>());
+		}
+	}
+	
+    protected static LinkedList<${glInternalSqlLog}> getSqlLogList() {
+        return _threadLocal.get();
+    }
+	
+	// ===================================================================================
+    //                                                                     Public Handling
+    //                                                                     ===============
+    public static void push(${glInternalSqlLog} sqlLog) {
+	    initialize();
+        if (DEFAULT_LIMIT_SIZE <= 0) {
+            return;
+        }
+        LinkedList<${glInternalSqlLog}> list = getSqlLogList();
+        list.add(sqlLog);
+        if (list.size() > DEFAULT_LIMIT_SIZE) {
+            list.removeFirst();
+        }
+    }
+
+    public static ${glInternalSqlLog} pop() {
+	    return hasSqlLog() ? getSqlLogList().removeLast() : null;
+    }
+	
+    public static ${glInternalSqlLog} peek() {
+	    return hasSqlLog() ? getSqlLogList().getLast() : null;
+    }
+	
+	public static boolean hasSqlLog() {
+	    return _threadLocal.get() != null && !_threadLocal.get().isEmpty();
+	}
+	
+    public static void clear() {
+        _threadLocal.set(null);
+    }
+}

@@ -12,5 +12,10 @@ public interface ${glLatestSqlProviderName} {
      * 
      * @return Display SQL. (Nullable: If it was not found, returns null.)
      */
-    String getDisplaySql();
+    public String getDisplaySql();
+	
+	/**
+	 * Clear the cache of SQL.
+	 */
+	public void clearSqlCache();
 }

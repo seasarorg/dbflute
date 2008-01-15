@@ -1,0 +1,137 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.extension.jdbc.ValueType;
+import org.seasar.extension.jdbc.types.ValueTypes;
+import org.seasar.extension.jdbc.util.DataSourceUtil;
+import org.seasar.framework.exception.EmptyRuntimeException;
+import org.seasar.framework.exception.SQLRuntimeException;
+
+import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLog};
+import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
+import ${glPackageBaseCommonS2DaoInternalUtil}.${glInternalBindVariableUtil};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalBasicHandler} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalBasicHandler}.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private DataSource dataSource;
+    private String sql;
+    private StatementFactory statementFactory;
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalBasicHandler}(DataSource ds, StatementFactory statementFactory) {
+        setDataSource(ds);
+        setStatementFactory(statementFactory);
+    }
+
+	// ===================================================================================
+    //                                                           Basic Method for SubClass
+    //                                                           =========================
+    protected void bindArgs(PreparedStatement ps, Object[] args, Class[] argTypes) {
+        if (args == null) {
+            return;
+        }
+        for (int i = 0; i < args.length; ++i) {
+            ValueType valueType = getValueType(argTypes[i]);
+            try {
+                valueType.bindValue(ps, i + 1, args[i]);
+            } catch (SQLException ex) {
+                throw new SQLRuntimeException(ex);
+            }
+        }
+    }
+
+    protected Class[] getArgTypes(Object[] args) {
+        if (args == null) {
+            return null;
+        }
+        Class[] argTypes = new Class[args.length];
+        for (int i = 0; i < args.length; ++i) {
+            Object arg = args[i];
+            if (arg != null) {
+                argTypes[i] = arg.getClass();
+            }
+        }
+        return argTypes;
+    }
+
+    protected String getCompleteSql(Object[] args) {
+        return ${glInternalBindVariableUtil}.getCompleteSql(sql, args);
+    }
+
+    protected String getBindVariableText(Object bindVariable) {
+        return ${glInternalBindVariableUtil}.getBindVariableText(bindVariable);
+    }
+
+    protected ValueType getValueType(Class clazz) {
+        return ValueTypes.getValueType(clazz);
+    }
+
+    protected void logSql(Object[] args, Class[] argTypes) {
+        final String completeSql = getCompleteSql(args);
+        if (_log.isDebugEnabled()) {
+            _log.debug(completeSql);
+        }
+        ${glInternalSqlLogRegistry}.push(new ${glInternalSqlLog}(getSql(), completeSql, args, argTypes));
+    }
+	
+	// ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    public StatementFactory getStatementFactory() {
+        return statementFactory;
+    }
+
+    public void setStatementFactory(StatementFactory statementFactory) {
+        this.statementFactory = statementFactory;
+    }
+
+    protected Connection getConnection() {
+        if (dataSource == null) {
+            throw new EmptyRuntimeException("dataSource");
+        }
+        return DataSourceUtil.getConnection(dataSource);
+    }
+
+    protected PreparedStatement prepareStatement(Connection connection) {
+        if (sql == null) {
+            throw new EmptyRuntimeException("sql");
+        }
+        return statementFactory.createPreparedStatement(connection, sql);
+    }
+}

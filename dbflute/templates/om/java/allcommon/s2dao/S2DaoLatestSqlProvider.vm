@@ -1,10 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import org.seasar.extension.jdbc.SqlLog;
-import org.seasar.extension.jdbc.SqlLogRegistry;
-import org.seasar.extension.jdbc.SqlLogRegistryLocator;
-
 import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
+import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLog};
+import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
  * The provider of latest SQL as S2Dao. <br />
@@ -23,13 +21,9 @@ public class ${glDaoLatestSqlProvider} implements ${glLatestSqlProviderName} {
         return getLastCompleteSql();
     }
 
-    private String getLastCompleteSql() {
+    protected String getLastCompleteSql() {
         try {
-            final SqlLogRegistry registry = SqlLogRegistryLocator.getInstance();
-            if (registry == null) {
-                return null;
-            }
-            final SqlLog lastSqlLog = registry.getLast();
+            final ${glInternalSqlLog} lastSqlLog = ${glInternalSqlLogRegistry}.peek();
             if (lastSqlLog == null) {
                 return null;
             }
@@ -42,4 +36,7 @@ public class ${glDaoLatestSqlProvider} implements ${glLatestSqlProviderName} {
             return null;
         }
     }
+	
+	public void clearSqlCache() {
+	}
 }

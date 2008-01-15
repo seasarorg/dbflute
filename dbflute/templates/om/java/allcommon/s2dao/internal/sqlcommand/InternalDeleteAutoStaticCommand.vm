@@ -1,0 +1,63 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.impl.AbstractAutoHandler;
+import org.seasar.dao.impl.AbstractAutoStaticCommand;
+
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractAutoHandler};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalDeleteAutoHandler};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalDeleteAutoStaticCommand} extends AbstractAutoStaticCommand {
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalDeleteAutoStaticCommand}(DataSource dataSource,
+            StatementFactory statementFactory, BeanMetaData beanMetaData,
+            String[] propertyNames) {
+        super(dataSource, statementFactory, beanMetaData, propertyNames);
+    }
+
+	// ===================================================================================
+    //                                                                            Override
+    //                                                                            ========
+	@Override
+    public Object execute(Object[] args) {
+        final ${glInternalAbstractAutoHandler} handler = createDeleteAutoHandler();
+        handler.setSql(getSql());
+		
+		// It is unnecessary!
+        // injectDaoClass(handler);
+		
+        int rows = handler.execute(args);
+        if (isCheckSingleRowUpdate() && rows != 1) {
+            throw createNotSingleRowUpdatedRuntimeException(args[0], rows);
+        }
+        return new Integer(rows);
+    }
+	
+    protected ${glInternalAbstractAutoHandler} createDeleteAutoHandler() {
+        return new ${glInternalDeleteAutoHandler}(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+    }
+
+	@Override
+    protected void setupSql() {
+        setupDeleteSql();
+    }
+
+	@Override
+    protected void setupPropertyTypes(String[] propertyNames) {
+        setupDeletePropertyTypes(propertyNames);
+    }
+	
+    @Override
+    protected AbstractAutoHandler createAutoHandler() {
+        throw new UnsupportedOperationException("createAutoHandler() should not be called!");
+    }
+}

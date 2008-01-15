@@ -40,11 +40,10 @@ import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.dao.impl.AbstractSqlCommand;
 import org.seasar.dao.impl.SelectDynamicCommand;
+import org.seasar.dao.impl.InsertBatchAutoStaticCommand;
 import org.seasar.dao.impl.UpdateAutoDynamicCommand;
 import org.seasar.dao.impl.UpdateDynamicCommand;
-import org.seasar.dao.impl.UpdateModifiedOnlyCommand;
 import org.seasar.dao.impl.UpdateBatchAutoStaticCommand;
-import org.seasar.dao.impl.DeleteAutoStaticCommand;
 import org.seasar.dao.impl.DeleteBatchAutoStaticCommand;
 
 #if ($database.isVersionAfter1047())
@@ -81,6 +80,9 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 
 /**
  * DaoMetaDataImpl for DBFlute.
@@ -415,38 +417,65 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     // ===================================================================================
-    //                                                  Update and Delete By Auto Override
-    //                                                  ==================================
-#if (!$database.isVersionAfter1047())
-    ${database.outputOverrideAnnotation()}
-    protected void setupUpdateMethodByAuto(Method method) {
+    //                                       Insert and Update and Delete By Auto Override
+    //                                       =============================================
+	// -----------------------------------------------------
+    //                                                Insert
+    //                                                ------
+    @Override
+    protected void setupInsertMethodByAuto(final Method method) {
         checkAutoUpdateMethod(method);
-        String[] propertyNames = getPersistentPropertyNames(method);
+        final String[] propertyNames = getPersistentPropertyNames(method);
+        final SqlCommand command;
+        if (isUpdateSignatureForBean(method)) {
+            final ${glInternalInsertAutoDynamicCommand} cmd = new ${glInternalInsertAutoDynamicCommand}();
+            cmd.setBeanMetaData(getBeanMetaData());
+            cmd.setDataSource(dataSource);
+            cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+            cmd.setPropertyNames(propertyNames);
+            cmd.setStatementFactory(statementFactory);
+            cmd.setCheckSingleRowUpdate(isCheckSingleRowUpdate(method));
+            command = cmd;
+        } else {
+            boolean returningRows = false;
+            if (int[].class.isAssignableFrom(method.getReturnType())) {
+                returningRows = true;
+            }
+            final InsertBatchAutoStaticCommand cmd = new InsertBatchAutoStaticCommand(
+                    dataSource, statementFactory, getBeanMetaData(),
+                    propertyNames, returningRows);
+            command = cmd;
+        }
+        putSqlCommand(method.getName(), command);
+    }
+
+	// -----------------------------------------------------
+    //                                                Update
+    //                                                ------
+	@Override
+	protected void setupUpdateMethodByAuto(final Method method) {
+        checkAutoUpdateMethod(method);
+        final String[] propertyNames = getPersistentPropertyNames(method);
         AbstractSqlCommand cmd;
         if (isUpdateSignatureForBean(method)) {
             if (isUnlessNull(method.getName())) {
-                cmd = createUpdateAutoDynamicCommand(method, propertyNames);
+                cmd = createInternalUpdateAutoDynamicCommand(method, propertyNames);
             } else if (isModifiedOnly(method.getName())) {
-                cmd = createUpdateModifiedOnlyCommand(method, propertyNames);
+                cmd = createInternalUpdateModifiedOnlyCommand(method, propertyNames);
             } else {
-                cmd = new org.seasar.dao.impl.UpdateAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);// Extension Point!
+                cmd = createUpdateAutoStaticCommand(method, propertyNames);
             }
         } else {
-            cmd = new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames) {
-                public Object execute(Object[] args) {
-                    final Object result = super.execute(args);
-                    handleBatchUpdateResultWithOptimisticLock(args, result);
-                    return result;
-                }
-            };// Extension Point!
+            boolean returningRows = false;
+            if (int[].class.isAssignableFrom(method.getReturnType())) {
+                returningRows = true;
+            }
+            cmd = createUpdateBatchAutoStaticCommand(method, propertyNames, returningRows);
         }
-        sqlCommands.put(method.getName(), cmd);
+        putSqlCommand(method.getName(), cmd);
     }
-#end
-#if ($database.isVersionAfter1047())
-    ${database.outputOverrideAnnotation()}
-#end
-    protected AbstractSqlCommand createUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
+	
+    protected AbstractSqlCommand createInternalUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
         AbstractSqlCommand cmd;
         final UpdateAutoDynamicCommand uac = newUpdateAutoDynamicCommand(dataSource, statementFactory);
         uac.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
@@ -460,23 +489,18 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return new UpdateAutoDynamicCommand(ds, sf);
     }
 
-#if ($database.isVersionAfter1047())
-    ${database.outputOverrideAnnotation()}
-#end
-    protected AbstractSqlCommand createUpdateModifiedOnlyCommand(final Method method, final String[] propertyNames) {
-        UpdateModifiedOnlyCommand uac = newUpdateModifiedOnlyCommand(dataSource, statementFactory);
+    protected ${glInternalUpdateModifiedOnlyCommand} createInternalUpdateModifiedOnlyCommand(final Method method, final String[] propertyNames) {
+        final ${glInternalUpdateModifiedOnlyCommand} uac = newInternalUpdateModifiedOnlyCommand(dataSource, statementFactory);
         uac.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         uac.setPropertyNames(propertyNames);
         uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
         return uac;
     }
 
-    protected UpdateModifiedOnlyCommand newUpdateModifiedOnlyCommand(javax.sql.DataSource ds, org.seasar.extension.jdbc.StatementFactory sf) {
-        return new UpdateModifiedOnlyCommand(ds, sf);
+    protected ${glInternalUpdateModifiedOnlyCommand} newInternalUpdateModifiedOnlyCommand(javax.sql.DataSource ds, org.seasar.extension.jdbc.StatementFactory sf) {
+        return new ${glInternalUpdateModifiedOnlyCommand}(ds, sf);
     }
 
-#if ($database.isVersionAfter1047())
-    ${database.outputOverrideAnnotation()}
     protected UpdateBatchAutoStaticCommand createUpdateBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
         return new UpdateBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows) {
             public Object execute(Object[] args) {
@@ -486,7 +510,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         };
     }
-#end
 
     protected void handleBatchUpdateResultWithOptimisticLock(Object[] args, Object result) {
         if (args.length == 0) {
@@ -506,33 +529,38 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
     }
 
-#if (!$database.isVersionAfter1047())
-    ${database.outputOverrideAnnotation()}
-    protected void setupDeleteMethodByAuto(Method method) {
+	// -----------------------------------------------------
+    //                                                Delete
+    //                                                ------
+	@Override
+    protected void setupDeleteMethodByAuto(final Method method) {
         checkAutoUpdateMethod(method);
-        String[] propertyNames = getPersistentPropertyNames(method);
-        org.seasar.dao.SqlCommand cmd = null;
+        final String[] propertyNames = getPersistentPropertyNames(method);
+        SqlCommand cmd = null;
         if (isUpdateSignatureForBean(method)) {
-            cmd = new DeleteAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            cmd = createInternalDeleteAutoStaticCommand(method, propertyNames);
         } else {
-            cmd = new DeleteBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+            boolean returningRows = false;
+            if (int[].class.isAssignableFrom(method.getReturnType())) {
+                returningRows = true;
+            }
+            cmd = createInternalDeleteBatchAutoStaticCommand(method, propertyNames, returningRows);
         }
-        sqlCommands.put(method.getName(), cmd);
-    }
-#end
-
-#if ($database.isVersionAfter1047())
-    ${database.outputOverrideAnnotation()}
-    protected DeleteAutoStaticCommand createDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
-        return new DeleteAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+        putSqlCommand(method.getName(), cmd);
     }
 
-    ${database.outputOverrideAnnotation()}
-    protected DeleteBatchAutoStaticCommand createDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
+    protected ${glInternalDeleteAutoStaticCommand} createInternalDeleteAutoStaticCommand(final Method method, final String[] propertyNames) {
+        return new ${glInternalDeleteAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames);
+    }
+
+    protected DeleteBatchAutoStaticCommand createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
         return new DeleteBatchAutoStaticCommand(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
     }
-#end
 
+    // -----------------------------------------------------
+    //                                         Common Helper
+    //                                         -------------
+	
 #if ($database.isAvailableOtherConnectionDaoInitialization())
 
     protected BeanMetaData createBeanMetaData4UpdateDeleteByAuto(Method method) {
