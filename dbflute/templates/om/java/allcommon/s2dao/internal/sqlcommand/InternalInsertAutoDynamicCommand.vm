@@ -12,7 +12,6 @@ import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
 import org.seasar.dao.SqlCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
-import org.seasar.extension.jdbc.impl.BasicHandler;
 import org.seasar.framework.exception.SRuntimeException;
 
 import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalInsertAutoHandler};

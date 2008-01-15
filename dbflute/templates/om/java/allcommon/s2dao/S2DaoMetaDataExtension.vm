@@ -81,9 +81,9 @@ import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
-import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertBatchAutoDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateAutoDynamicCommand};
-import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAutoDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 
 /**
@@ -486,12 +486,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 	
     protected ${glInternalUpdateAutoDynamicCommand} createInternalUpdateAutoDynamicCommand(Method method, String[] propertyNames) {
-        AbstractSqlCommand cmd;
-        final ${glInternalUpdateAutoDynamicCommand} uac = newUpdateAutoDynamicCommand(dataSource, statementFactory);
-        uac.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
-        uac.setPropertyNames(propertyNames);
-        uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-        cmd = uac;
+        final ${glInternalUpdateAutoDynamicCommand} cmd = newUpdateAutoDynamicCommand(dataSource, statementFactory);
+        cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
+        cmd.setPropertyNames(propertyNames);
+        cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
         return cmd;
     }
 
