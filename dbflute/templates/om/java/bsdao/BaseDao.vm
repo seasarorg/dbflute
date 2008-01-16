@@ -122,17 +122,6 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @return The count of insert.
      */
     public int insert(${myExtendedObjectClassName} entity);
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Update the entity.
-     * 
-     * @param entity The entity of update target. (NotNull)
-     * @return The count of update.
-     * @deprecated Please use updateModifiedOnly()
-     */
-    public int update(${myExtendedObjectClassName} entity);
-#end
 
     /**
      * Update the entity modified-only.

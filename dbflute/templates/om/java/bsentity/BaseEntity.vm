@@ -123,7 +123,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return "${table.javaBeansRulePropertyName}";
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * ${database.ImplementComment}
      * 
@@ -321,7 +321,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return ${foreignVariableName} != null;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @return Determination.
      * @deprecated Sorry! Please use hasForeignInstance${foreignKeys.foreignPropertyNameInitCap}().
@@ -482,7 +482,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return get${refferer.reffererPropertyNameInitCapAsOne}() != null;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @return Determination.
      * @deprecated Sorry! Please use hasForeignInstance${refferer.refererJavaBeansRulePropertyNameAsOneInitCap}().

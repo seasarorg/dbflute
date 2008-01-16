@@ -180,7 +180,7 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
         };
         return invoker.invokePaging(handler);
     }
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * ${database.ImplementComment}

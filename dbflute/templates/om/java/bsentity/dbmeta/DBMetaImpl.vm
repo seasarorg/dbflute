@@ -90,7 +90,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /** Table prop name(JavaBeansRule). */
     public static final String TABLE_PROPERTY_NAME = "$table.javaBeansRulePropertyName";
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Table cap prop name.
      * 
@@ -123,7 +123,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     public static final String PROPERTY_NAME_${col.javaBeansRulePropertyName} = "$col.javaBeansRulePropertyName";
 
 #end
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     // -----------------------------------------------------
     //                                  Column Cap Prop Name
     //                                  --------------------
@@ -153,7 +153,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                         Referrer Name
     //                                         -------------
 #foreach ($children in $table.referrers)
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /** @deprecated */
     public static final String REFERER_PROPERTY_NAME_${children.refererJavaBeansRulePropertyName} = "$children.refererJavaBeansRulePropertyName";
 #end

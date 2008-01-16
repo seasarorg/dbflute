@@ -150,7 +150,7 @@ public interface ${glBehaviorReadableInterfaceName} {
      * @return Read page. (NotNull)
      */
     public ${glPagingResultBeanName}${database.filterGenericsString(${glEntityInterfaceName})} readPage(final ${glConditionBeanInterfaceName} ${glAttachedCBArgsVariableName});
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * Read page as result-bean.

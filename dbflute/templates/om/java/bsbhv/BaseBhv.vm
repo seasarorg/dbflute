@@ -295,7 +295,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         };
         return invoker.invokePaging(handler);
     }
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
 
     /**
      * Select the page as result-bean.
@@ -574,32 +574,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
     }
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Update after select. {modified only}
-     * <pre>
-     * The merit of this method is only Deleted-Check before updating!
-     * If you don't want the merit, please use update().
-     * And the demerit of this method is as follows:
-     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
-     *   : it does not throw optimistic lock exception. It can updates.
-     * </pre>
-     * @param ${myEntityVariableName} The entity of update target. This must contain primary-key value at least. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
-     * @deprecated Thie method is old style and has wrong performance. Please use update().
-     */
-    public void updateAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
-        final ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
-        mergeEntity(${myEntityVariableName}, currentEntity);
-        update(currentEntity);
-    }
-#end
-
     /**
      * Insert or update the entity modified-only.
      * 
@@ -623,18 +597,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
 #if ($table.hasOptimisticLock())
-#if ($database.isMakeDeprecated())
-    /**
-     * Insert or update the entity non-strictly modified-only.
-     * 
-     * @param ${myEntityVariableName} The entity of insert of update target. This should contain primary-key value at least(Except use identity). (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
-     * @deprecated Sorry! Please use insertOrUpdateNonstrict(). This method name is wrong name.
-     */
-    public void insertOrUpdateNonStrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        insertOrUpdateNonstrict(${myEntityVariableName});
-    }
-#end
 
     /**
      * Insert or update the entity non-strictly modified-only.
@@ -660,64 +622,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
     }
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Insert or update after select. {update: modified properties only}
-     * <pre>
-     * The merit of this method is only Deleted-Check before updating!
-     * If you don't want the merit, please use update().
-     * And the demerit of this method is as follows:
-     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
-     *   : it does not throw optimistic lock exception. It can updates.
-     * </pre>
-     * @param ${myEntityVariableName} Entity. This should contain primary-key value at least(Except use identity). (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}
-     * @deprecated Thie method is old style and has wrong performance. Please use insertOrUpdate().
-     */
-    public void insertOrUpdateAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNull(${myEntityVariableName});
-        if (!${myEntityVariableName}.hasPrimaryKeyValue()) {
-            insert(${myEntityVariableName});
-            return;
-        }
-        ${myExtendedObjectClassName} currentEntity = null;
-        try {
-            final ${myConditionBeanClassName} cb = newMyConditionBean();
-            cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
-            currentEntity = selectEntityWithDeletedCheck(cb);
-        } catch (${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} e) {
-            insert(${myEntityVariableName});
-            return;
-        }
-        assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        mergeEntity(${myEntityVariableName}, currentEntity);
-        update(currentEntity);
-    }
-#end
-
-#if ($database.isMakeDeprecated())
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param sourceEntity Source entity. (NotNull)
-     * @param destinationEntity Destination entity. (NotNull)
-     * @deprecated Thie method is old style and has wrong performance.
-     */
-    protected void mergeEntity(${glEntityInterfaceName} sourceEntity, ${glEntityInterfaceName} destinationEntity) {
-        assertEntityNotNull(sourceEntity);
-        assertEntityNotNull(destinationEntity);
-        final ${myExtendedObjectClassName} sourceMyEntity = (${myExtendedObjectClassName})sourceEntity;
-        final ${myExtendedObjectClassName} destinationMyEntity = (${myExtendedObjectClassName})destinationEntity;
-        destinationMyEntity.clearModifiedPropertyNames();
-        final java.util.Set${database.filterGenericsString('String')} names = sourceMyEntity.getModifiedPropertyNames();
-
-#foreach ($col in $table.Columns)
-        if (names.contains("${col.UncapitalisedJavaName}")) { destinationMyEntity.set${col.JavaName}(sourceMyEntity.get${col.JavaName}()); }
-#end
-
-    }
-#end
-
     /**
      * Delete the entity.
      * 
@@ -735,30 +639,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doRemove(${glEntityInterfaceName} ${myEntityVariableName}) {
         delete((${myExtendedObjectClassName})${myEntityVariableName});
     }
-
-#if ($database.isMakeDeprecated())
-    /**
-     * Delete after select.
-     * <pre>
-     * The merit of this method is only Deleted-Check before deleting!
-     * If you don't want the merit, please use update().
-     * And the demerit of this method is as follows:
-     *   : If the entity does not have the optimistic lock value, for example version-no and timestamp,
-     *   : it does not throw optimistic lock exception. It can updates.
-     * </pre>
-     * @param ${myEntityVariableName} Entity. This must contain primary-key value at least. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
-     * @deprecated Thie method is old style and has wrong performance. Please use delete().
-     */
-    public void deleteAfterSelect(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(${myEntityVariableName}));
-        selectEntityWithDeletedCheck(cb);
-        delete(${myEntityVariableName});
-    }
-#end
 
 #if ($table.hasOptimisticLock())
     /**
