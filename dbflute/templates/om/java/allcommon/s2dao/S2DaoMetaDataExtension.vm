@@ -409,8 +409,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 	@Override
     protected void setupSelectMethodByAuto(final Method method) {
         final ResultSetHandler handler = createResultSetHandler(method);
+#if ($database.isVersionAfter1046())
         final String[] argNames = daoAnnotationReader.getArgNames(method);
         final String query = daoAnnotationReader.getQuery(method);
+#else
+	    final org.seasar.dao.DaoAnnotationReader daoAnnotationReader = annotationReaderFactory.createDaoAnnotationReader(daoBeanDesc);
+        final String[] argNames = daoAnnotationReader.getArgNames(method);
+        final String query = daoAnnotationReader.getQuery(method);
+#end
         final SqlCommand cmd;
         if (query != null && !startsWithOrderBy(query)) {
             cmd = setupInternalQuerySelectMethodByAuto(method, handler, argNames, query);
