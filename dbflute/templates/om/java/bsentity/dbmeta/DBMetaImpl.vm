@@ -219,7 +219,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return TABLE_PROPERTY_NAME;
     }
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * ${database.ImplementComment}
      * 
