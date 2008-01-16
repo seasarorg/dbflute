@@ -56,7 +56,7 @@ public interface ${myClassName} {
      */
     public String getTablePropertyName();
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Get table cap-prop-name. (Not JavaBeansRule)
      * 
@@ -267,7 +267,7 @@ public interface ${myClassName} {
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * Has referrer?
      * 

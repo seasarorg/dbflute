@@ -199,7 +199,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     // -----------------------------------------------------
     //                                      Referrer Element
     //                                      ----------------
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
     /**
      * @param referrerPropertyName The property name of referrer. (Both OK - InitCap or not). (NotNull)
      * @return Determination. (NotNull)
