@@ -620,7 +620,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected ${glInternalDeleteBatchAutoStaticCommand} createInternalDeleteBatchAutoStaticCommand(final Method method, final String[] propertyNames, boolean returningRows) {
-        return new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows);
+        return new ${glInternalDeleteBatchAutoStaticCommand}(dataSource, statementFactory, createBeanMetaData4UpdateDeleteByAuto(method), propertyNames, returningRows) {
+		    @Override
+            public Object execute(Object[] args) {
+                final Object result = super.execute(args);
+                handleBatchUpdateResultWithOptimisticLock(args, result);
+                return result;
+            }
+		};
     }
 
     // -----------------------------------------------------
