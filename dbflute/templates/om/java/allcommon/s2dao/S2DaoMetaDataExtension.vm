@@ -41,7 +41,6 @@ import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.SqlCommand;
 import org.seasar.dao.impl.BeanMetaDataImpl;
 import org.seasar.dao.impl.DaoMetaDataImpl;
-import org.seasar.dao.impl.AbstractSqlCommand;
 import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoStaticCommand;
 import org.seasar.dao.impl.UpdateDynamicCommand;
@@ -244,6 +243,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                           ResultSetHandler Override
     //                                                           =========================
+	@Override
     protected ResultSetHandler createResultSetHandler(Method method) {
         return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, beanMetaData, method);
     }
@@ -256,6 +256,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                    ResultSetHandlerFactory Override
     //                                                    ================================
+	@Override
     protected org.seasar.dao.ResultSetHandlerFactory createResultSetHandlerFactory() {
         return new ResultSetHandlerFactoryExtension(beanMetaData, annotationReader, dtoMetaDataFactory);
     }
@@ -264,6 +265,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                    ResultSetHandlerFactory Override
     //                                                    ================================
+	@Override
     protected org.seasar.dao.ResultSetHandlerFactory createResultSetHandlerFactory(final BeanMetaData beanMetaData) {
         return new ResultSetHandlerFactoryExtension(beanMetaData);
     }
@@ -404,8 +406,46 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                              ConditionBean Override
     //                                                              ======================
-    @Override
-    protected SelectDynamicCommand setupNonQuerySelectMethodByDto(Method method, ResultSetHandler handler, String[] argNames, String query) {
+	@Override
+    protected void setupSelectMethodByAuto(final Method method) {
+        final ResultSetHandler handler = createResultSetHandler(method);
+        final String[] argNames = daoAnnotationReader.getArgNames(method);
+        final String query = daoAnnotationReader.getQuery(method);
+        final SqlCommand cmd;
+        if (query != null && !startsWithOrderBy(query)) {
+            cmd = setupInternalQuerySelectMethodByAuto(method, handler, argNames, query);
+        } else {
+            cmd = setupInternalNonQuerySelectMethodByAuto(method, handler, argNames, query);
+        }
+        putSqlCommand(method.getName(), cmd);
+    }
+
+    protected SelectDynamicCommand setupInternalQuerySelectMethodByAuto(final Method method
+	                                                                  , final ResultSetHandler handler
+															          , final String[] argNames
+															          , final String query) {
+        final Class[] types = method.getParameterTypes();
+        final SelectDynamicCommand cmd = createSelectDynamicCommand(handler, query);
+        cmd.setArgNames(argNames);
+        cmd.setArgTypes(types);
+        return cmd;
+    }
+
+    protected SqlCommand setupInternalNonQuerySelectMethodByAuto(final Method method
+	                                                           , final ResultSetHandler handler
+														       , final String[] argNames
+															   , final String query) {
+        if (isAutoSelectSqlByDto(method, argNames)) {
+            return setupInternalNonQuerySelectMethodByDto(method, handler, argNames, query);
+        } else {
+            return setupNonQuerySelectMethodByArgs(method, handler, argNames, query);
+        }
+    }
+	
+    protected SqlCommand setupInternalNonQuerySelectMethodByDto(Method method
+	                                                          , ResultSetHandler handler
+															  , String[] argNames
+															  , String query) {
         Class[] types = method.getParameterTypes();
         Class clazz = types[0];
         // /----------------------------------------------------- [MyExtension]
@@ -413,7 +453,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return super.setupNonQuerySelectMethodByDto(method, handler, argNames, query);
         }
         argNames = new String[] { "dto" };
-        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(handler);
+        final ${glSelectDynamicCommand} cmd = createCustomizeSelectDynamicCommand(handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(types);
         // -----------/
@@ -435,7 +475,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             final ${glInternalInsertAutoDynamicCommand} cmd = new ${glInternalInsertAutoDynamicCommand}();
             cmd.setBeanMetaData(getBeanMetaData());
             cmd.setDataSource(dataSource);
-            cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+			
+			// It is unnecessary for DBFlute!
+            // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+			
             cmd.setPropertyNames(propertyNames);
             cmd.setStatementFactory(statementFactory);
             cmd.setCheckSingleRowUpdate(isCheckSingleRowUpdate(method));
@@ -460,7 +503,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 	protected void setupUpdateMethodByAuto(final Method method) {
         checkAutoUpdateMethod(method);
         final String[] propertyNames = getPersistentPropertyNames(method);
-        AbstractSqlCommand cmd;
+        SqlCommand cmd;
         if (isUpdateSignatureForBean(method)) {
             if (isUnlessNull(method.getName())) {
                 cmd = createInternalUpdateAutoDynamicCommand(method, propertyNames);
@@ -491,8 +534,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final ${glInternalUpdateAutoDynamicCommand} cmd = newUpdateAutoDynamicCommand(dataSource, statementFactory);
         cmd.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         cmd.setPropertyNames(propertyNames);
-        cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-        return cmd;
+        
+		// It is unnecessary for DBFlute!
+		// cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+        
+		return cmd;
     }
 
     protected ${glInternalUpdateAutoDynamicCommand} newUpdateAutoDynamicCommand(javax.sql.DataSource ds, org.seasar.extension.jdbc.StatementFactory sf) {
@@ -503,8 +549,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         final ${glInternalUpdateModifiedOnlyCommand} uac = newInternalUpdateModifiedOnlyCommand(dataSource, statementFactory);
         uac.setBeanMetaData(createBeanMetaData4UpdateDeleteByAuto(method));// Extension Point!
         uac.setPropertyNames(propertyNames);
-        uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-        return uac;
+        
+		// It is unnecessary for DBFlute!
+		// uac.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+        
+		return uac;
     }
 
     protected ${glInternalUpdateModifiedOnlyCommand} newInternalUpdateModifiedOnlyCommand(javax.sql.DataSource ds, org.seasar.extension.jdbc.StatementFactory sf) {
@@ -534,7 +583,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                     if (args.length <= index) {
                         return;// for Safety!
                     }
-                    throw new org.seasar.dao.NotSingleRowUpdatedRuntimeException(args[index], updatedCount);
+                    throw new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(args[index], updatedCount);
                 }
             }
         }
@@ -828,8 +877,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 return super.execute(new Object[] {arg});
             }
         };
-        cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
-        registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
+		
+		// It is unnecessary for DBFlute!
+        // cmd.setNotSingleRowUpdatedExceptionClass(getNotSingleRowUpdatedExceptionClass(method));
+        
+		registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
     }
 
     // -----------------------------------------------------
@@ -934,11 +986,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, ResultSetHandler myResultSetHandler) {
-        final SelectDynamicCommand cmd = createCustomizeSelectDynamicCommand(myResultSetHandler);
+        final ${glSelectDynamicCommand} cmd = createCustomizeSelectDynamicCommand(myResultSetHandler);
         registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, cmd);
     }
 
-    protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, SelectDynamicCommand cmd) {
+    protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, ${glSelectDynamicCommand} cmd) {
         cmd.setSql(sql);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
@@ -959,13 +1011,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 	@Override
 #end
 	protected void putSqlCommand(String methodName, SqlCommand cmd) {
-#if ($database.isVersionAfter1045())
-        if (useDaoClassForLog) {
-            if (cmd instanceof InjectDaoClassSupport) {
-                ((InjectDaoClassSupport) cmd).setDaoClass(daoClass);
-            }
-        }
-#end
         sqlCommands.put(methodName, cmd);
     }
 	

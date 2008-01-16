@@ -64,7 +64,7 @@ public class ${glInternalUpdateModifiedOnlyCommand} extends ${glInternalUpdateAu
     }
 
     protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
-        return new NotSingleRowUpdatedRuntimeException(bean, rows);
+	    return new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(bean, rows);
     }
 
     protected String createNoUpdateLogMessage(final Object bean,

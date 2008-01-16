@@ -40,6 +40,10 @@ public class ${glInternalSqlLogRegistry} {
             list.removeFirst();
         }
     }
+	
+	protected static void reflectContainerSqlLogRegistry(${glInternalSqlLog} sqlLog) {
+	    
+	}
 
     public static ${glInternalSqlLog} pop() {
 	    return hasSqlLog() ? getSqlLogList().removeLast() : null;

@@ -1,0 +1,31 @@
+${database.allClassCopyright}package ${glPackageBaseCommonException};
+
+/**
+ * The exception of when the required option is not found.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glRequiredOptionNotFoundException} extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     */
+    public ${glRequiredOptionNotFoundException}(String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param msg Exception message.
+     * @param cause Throwable.
+     */
+    public ${glRequiredOptionNotFoundException}(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+}

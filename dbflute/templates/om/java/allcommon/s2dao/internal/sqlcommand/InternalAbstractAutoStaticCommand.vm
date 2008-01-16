@@ -9,7 +9,6 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.IdentifierGenerator;
 import org.seasar.dao.NotSingleRowUpdatedRuntimeException;
 import org.seasar.dao.PrimaryKeyNotFoundRuntimeException;
-import org.seasar.dao.impl.AbstractStaticCommand;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.framework.exception.SRuntimeException;
@@ -19,7 +18,7 @@ import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalAbstractAutoHan
 /**
  * @author ${database.ClassAuthor}
  */
-public abstract class ${glInternalAbstractAutoStaticCommand} extends AbstractStaticCommand {
+public abstract class ${glInternalAbstractAutoStaticCommand} extends ${glInternalAbstractStaticCommand} {
 
 	// ===================================================================================
     //                                                                           Attribute
@@ -46,7 +45,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends AbstractSta
         ${glInternalAbstractAutoHandler} handler = createAutoHandler();
         handler.setSql(getSql());
 		
-		// It is unnecessary!
+		// It is unnecessary for DBFlute!
         // injectDaoClass(handler);
 		
         int rows = handler.execute(args);
@@ -64,9 +63,8 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends AbstractSta
         this.checkSingleRowUpdate = checkSingleRowUpdate;
     }
 
-    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(
-            Object bean, int rows) {
-        return new NotSingleRowUpdatedRuntimeException(bean, rows);
+    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
+        return new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(bean, rows);
     }
 
     protected PropertyType[] getPropertyTypes() {
@@ -84,8 +82,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends AbstractSta
     protected void setupInsertPropertyTypes(String[] propertyNames) {
         List types = new ArrayList();
         for (int i = 0; i < propertyNames.length; ++i) {
-            PropertyType pt = getBeanMetaData().getPropertyType(
-                    propertyNames[i]);
+            PropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
             if (isInsertTarget(pt)) {
                 types.add(pt);
             }
@@ -110,8 +107,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends AbstractSta
     protected void setupUpdatePropertyTypes(String[] propertyNames) {
         List types = new ArrayList();
         for (int i = 0; i < propertyNames.length; ++i) {
-            PropertyType pt = getBeanMetaData().getPropertyType(
-                    propertyNames[i]);
+            PropertyType pt = getBeanMetaData().getPropertyType(propertyNames[i]);
             if (pt.isPrimaryKey()) {
                 continue;
             }
@@ -120,8 +116,7 @@ public abstract class ${glInternalAbstractAutoStaticCommand} extends AbstractSta
         if (types.size() == 0) {
             throw new SRuntimeException("EDAO0020");
         }
-        propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types
-                .size()]);
+        propertyTypes = (PropertyType[]) types.toArray(new PropertyType[types.size()]);
     }
 
     protected void setupDeletePropertyTypes(String[] propertyNames) {

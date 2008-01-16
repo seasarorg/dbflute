@@ -1,73 +1,41 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 import javax.sql.DataSource;
 
 import org.seasar.dao.CommandContext;
-import org.seasar.dao.EndCommentNotFoundRuntimeException;
-import org.seasar.dao.IfConditionNotFoundRuntimeException;
-import org.seasar.dao.Node;
-import org.seasar.dao.SqlParser;
-import org.seasar.dao.SqlTokenizer;
-import org.seasar.dao.impl.SelectDynamicCommand;
-import org.seasar.dao.node.AbstractNode;
-import org.seasar.dao.node.BeginNode;
-import org.seasar.dao.node.ContainerNode;
-import org.seasar.dao.node.ElseNode;
-import org.seasar.dao.node.ParenBindVariableNode;
-import org.seasar.dao.node.PrefixSqlNode;
-import org.seasar.dao.node.SqlNode;
-import org.seasar.dao.parser.SqlTokenizerImpl;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.impl.BasicSelectHandler;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
 import org.seasar.framework.exception.SQLRuntimeException;
-import org.seasar.framework.util.OgnlUtil;
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
-import ${glPackageBaseCommonCBean}.${glMapParameterBeanInterfaceName};
-import ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseInterfaceName};
-import ${glPackageBaseCommonException}.${glBindVariableCommentNotFoundPropertyException};
-import ${glPackageBaseCommonException}.${glEmbeddedValueCommentNotFoundPropertyException};
-import ${glPackageBaseCommonException}.${glIfCommentNotBooleanResultException};
-import ${glPackageBaseCommonException}.${glIfCommentWrongExpressionException};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalAbstractDynamicCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalBasicSelectHandler};
 
 /**
  * SelectDynamicCommand for DBFlute.
  * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
-public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
+public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicCommand} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Root node. */
-    protected Node rootNode;// Override!
-
     /** The handler of resultSet. */
     protected ResultSetHandler resultSetHandler;
 
     /** The factory of resultSet. */
     protected ResultSetFactory resultSetFactory;
-
-#if ($database.isVersionAfter1046())
-    /** DBFlute does not use this class! */
-    protected org.seasar.dao.pager.PagingSqlRewriter pagingSqlRewriter;
-#end
 
     // ===================================================================================
     //                                                                         Constructor
@@ -83,77 +51,14 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
     public ${glSelectDynamicCommand}(DataSource dataSource,
             StatementFactory statementFactory,
             ResultSetHandler resultSetHandler, ResultSetFactory resultSetFactory) {
-#if ($database.isVersionAfter1046())
-        this(dataSource, statementFactory, resultSetHandler, resultSetFactory, null);
-#else
-        super(dataSource, statementFactory, resultSetHandler, resultSetFactory);
+        super(dataSource, statementFactory);
         this.resultSetHandler = resultSetHandler;
         this.resultSetFactory = resultSetFactory;
-#end
     }
-
-#if ($database.isVersionAfter1046())
-    /**
-     * Constructor.
-     * 
-     * @param dataSource Data source.
-     * @param statementFactory The factory of statement.
-     * @param resultSetHandler The handler of resultSet.
-     * @param resultSetFactory The factory of resultSet.
-     * @param pagingSqlRewriter Paging sql rewriter.
-     */
-    public ${glSelectDynamicCommand}(DataSource dataSource,
-            StatementFactory statementFactory,
-            ResultSetHandler resultSetHandler, ResultSetFactory resultSetFactory, org.seasar.dao.pager.PagingSqlRewriter pagingSqlRewriter) {
-        super(dataSource, statementFactory, resultSetHandler, resultSetFactory, pagingSqlRewriter);
-        this.resultSetHandler = resultSetHandler;
-        this.resultSetFactory = resultSetFactory;
-        this.pagingSqlRewriter = pagingSqlRewriter;
-    }
-#end
 
     // ===================================================================================
     //                                                            Very Important Extension
     //                                                            ========================
-    // -----------------------------------------------------
-    //                                              Override
-    //                                              --------
-    /**
-     * The override for extension.
-     * 
-     * @param sql SQL. (NotNull)
-     */
-    @Override
-    public void setSql(String sql) {// Override!
-        super.setSql(sql);
-        this.rootNode = new InternalSqlParserImpl(sql).parse();// Use internal sql parser.
-    }
-
-    /**
-     * The override for extension.
-     * 
-     * @param args The array of argument. (NotNull)
-     */
-    @Override
-    protected CommandContext apply(Object[] args) {// Override!
-        CommandContext ctx = createCommandContext(args);
-        rootNode.accept(ctx);
-        return ctx;
-    }
-
-    // -----------------------------------------------------
-    //                                            For Public
-    //                                            ----------
-    /**
-     * Do apply as public. {for delegating to apply()}
-     * 
-     * @param args Arguments. (NotNull)
-     * @return Command context. (NotNull)
-     */
-    public CommandContext doApply(Object[] args) {
-        return apply(args);
-    }
-
     // -----------------------------------------------------
     //                         SelectDynamicCommand Creation
     //                         -----------------------------
@@ -173,7 +78,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      * @param args The array of argument. (Nullable)
      * @return Result. (Nullable)
      */
-    @Override
     public Object execute(Object[] args) {
         // - - - - - - - - - - - -
         // This is top execution.
@@ -211,14 +115,8 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             if (cb.isSelectCountIgnoreFetchScope()) {
                 // If the query uses union and it selects count, the way of select-count is as follows.
 				finalClause = "select count(*) from (" + realClause + ") dfmain";
-				
-				// This is an old style logic.
-                // finalClause = "select count(*) from (" + InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause) + ") dfmain";
             } else {
 			    finalClause = realClause;
-				
-				// This is an old style logic.
-                // finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
             }
         } else {
             if (cb.isSelectCountIgnoreFetchScope()) {
@@ -227,12 +125,9 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             } else {
                 finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
             }
-			
-			// This is an old style logic.
-            // finalClause = InternalStringUtil.replace(fromWhereClause, ${glSqlClauseInterfaceName}.INCLUDE_SELECT_CLAUSE_MARK, selectClause);
         }
 
-        final BasicSelectHandler selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
+        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
 
@@ -257,7 +152,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         final Object[] filteredArgs = filterArgumentsForResultSetHandler(args);
 
         final org.seasar.dao.CommandContext ctx = apply(filteredArgs);
-        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
+        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
         return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
     }
 
@@ -289,7 +184,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
         }
 
         final org.seasar.dao.CommandContext ctx = apply(filteredArgs);
-        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
+        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
         return selectHandler.execute(ctx.getBindVariables(), ctx.getBindVariableTypes());
     }
 
@@ -342,11 +237,11 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             filteredArgs = filterArgumentsForResultSetHandler(args);
         }
 
-        final org.seasar.dao.CommandContext ctx = outsideSqlCommand.doApply(filteredArgs);
+        final org.seasar.dao.CommandContext ctx = outsideSqlCommand.apply(filteredArgs);
         final java.util.List<Object> bindVariableList = new java.util.ArrayList<Object>();
         final java.util.List<Class> bindVariableTypeList = new java.util.ArrayList<Class>();
         addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
-        final BasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
+        final ${glInternalBasicSelectHandler} selectHandler = createBasicSelectHandler(ctx.getSql(), specifiedResultSetHandler);
         return selectHandler.execute(bindVariableList.toArray(), toClassArray(bindVariableTypeList));
     }
 
@@ -421,7 +316,7 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
 			} else {
 			    dynamicCommand.setSql(cb.getSqlClause().getClause());
 			}
-            final CommandContext ctx = dynamicCommand.doApply(args);
+            final CommandContext ctx = dynamicCommand.apply(args);
             realClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         }
@@ -437,21 +332,21 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
             fromWhereCommand.setArgTypes(getArgTypes());
             fromWhereCommand.setSql(cb.getSqlClause().getClauseFromWhere());
 		
-            final CommandContext ctx = fromWhereCommand.doApply(args);
+            final CommandContext ctx = fromWhereCommand.apply(args);
             realFromWhereClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         }
         return realFromWhereClause;
     }
 
-    protected BasicSelectHandler createBasicSelectHandler(String realSql, ResultSetHandler specifiedResultSetHandler) {
-        final BasicSelectHandler selectHandler = newBasicSelectHandler(realSql, specifiedResultSetHandler, getStatementFactory(), resultSetFactory);
+    protected ${glInternalBasicSelectHandler} createBasicSelectHandler(String realSql, ResultSetHandler specifiedResultSetHandler) {
+        final ${glInternalBasicSelectHandler} selectHandler = newBasicSelectHandler(realSql, specifiedResultSetHandler, getStatementFactory(), resultSetFactory);
         selectHandler.setFetchSize(-1);
         return selectHandler;
     }
 
-    protected BasicSelectHandler newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory, ResultSetFactory resultSetFactory) {
-        return new BasicSelectHandler(getDataSource(), sql, resultSetHandler, statementFactory, resultSetFactory) {
+    protected ${glInternalBasicSelectHandler} newBasicSelectHandler(String sql, ResultSetHandler resultSetHandler, StatementFactory statementFactory, ResultSetFactory resultSetFactory) {
+        return new ${glInternalBasicSelectHandler}(getDataSource(), sql, resultSetHandler, statementFactory, resultSetFactory) {
             @Override
             protected void bindArgs(java.sql.PreparedStatement ps, Object[] args, Class[] argTypes) {
                 if (args == null) {
@@ -522,547 +417,6 @@ public class ${glSelectDynamicCommand} extends SelectDynamicCommand {
      */
     protected String getLineSeparator() {
         return System.getProperty("line.separator");
-    }
-
-    // ===================================================================================
-    //                                                               Internal Static Class
-    //                                                               =====================
-    // -----------------------------------------------------
-    //                                             SqlParser
-    //                                             ---------
-    protected static class InternalSqlParserImpl implements SqlParser {
-
-        private SqlTokenizer tokenizer;
-
-        private Stack nodeStack = new Stack();
-
-        private String specifiedSql;// Extension!
-
-        public InternalSqlParserImpl(String sql) {
-            sql = sql.trim();
-            if (sql.endsWith(";")) {
-                sql = sql.substring(0, sql.length() - 1);
-            }
-            specifiedSql = sql;// Extension!
-            tokenizer = new SqlTokenizerImpl(sql);
-        }
-
-        public Node parse() {
-            push(new ContainerNode());
-            while (SqlTokenizer.EOF != tokenizer.next()) {
-                parseToken();
-            }
-            return pop();
-        }
-
-        protected void parseToken() {
-            switch (tokenizer.getTokenType()) {
-            case SqlTokenizer.SQL:
-                parseSql();
-                break;
-            case SqlTokenizer.COMMENT:
-                parseComment();
-                break;
-            case SqlTokenizer.ELSE:
-                parseElse();
-                break;
-            case SqlTokenizer.BIND_VARIABLE:
-                parseBindVariable();
-                break;
-            }
-        }
-
-        protected void parseSql() {
-            String sql = tokenizer.getToken();
-            if (isElseMode()) {
-                sql = InternalStringUtil.replace(sql, "--", "");
-            }
-            Node node = peek();
-            if ((node instanceof InternalIfNode || node instanceof ElseNode) && node.getChildSize() == 0) {
-
-                SqlTokenizer st = new SqlTokenizerImpl(sql);
-                st.skipWhitespace();
-                String token = st.skipToken();
-                st.skipWhitespace();
-                if (sql.startsWith(",")) {
-                    if (sql.startsWith(", ")) {
-                        node.addChild(new PrefixSqlNode(", ", sql.substring(2)));
-                    } else {
-                        node.addChild(new PrefixSqlNode(",", sql.substring(1)));
-                    }
-                } else if ("AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token)) {
-                    node.addChild(new PrefixSqlNode(st.getBefore(), st.getAfter()));
-                } else {
-                    node.addChild(new SqlNode(sql));
-                }
-            } else {
-                node.addChild(new SqlNode(sql));
-            }
-        }
-
-        protected void parseComment() {
-            String comment = tokenizer.getToken();
-            if (isTargetComment(comment)) {
-                if (isIfComment(comment)) {
-                    parseIf();
-                } else if (isBeginComment(comment)) {
-                    parseBegin();
-                } else if (isEndComment(comment)) {
-                    return;
-                } else {
-                    parseCommentBindVariable();
-                }
-            } else if (comment != null && 0 < comment.length()) {
-                String before = tokenizer.getBefore();
-                peek().addChild(new SqlNode(before.substring(before.lastIndexOf("/*"))));
-            }
-        }
-
-        protected void parseIf() {
-            String condition = tokenizer.getToken().substring(2).trim();
-            if (InternalStringUtil.isEmpty(condition)) {
-                throw new IfConditionNotFoundRuntimeException();
-            }
-            final ContainerNode ifNode = createIfNode(condition);
-            peek().addChild(ifNode);
-            push(ifNode);
-            parseEnd();
-        }
-
-        protected void parseBegin() {
-            BeginNode beginNode = new BeginNode();
-            peek().addChild(beginNode);
-            push(beginNode);
-            parseEnd();
-        }
-
-        protected void parseEnd() {
-            while (SqlTokenizer.EOF != tokenizer.next()) {
-                if (tokenizer.getTokenType() == SqlTokenizer.COMMENT && isEndComment(tokenizer.getToken())) {
-
-                    pop();
-                    return;
-                }
-                parseToken();
-            }
-            throw new EndCommentNotFoundRuntimeException();
-        }
-
-        protected void parseElse() {
-            final Node parent = peek();
-            if (!(parent instanceof InternalIfNode)) {
-                return;
-            }
-            final InternalIfNode ifNode = (InternalIfNode) pop();
-            final InternalElseNode elseNode = new InternalElseNode();
-            ifNode.setElseNode(elseNode);
-            push(elseNode);
-            tokenizer.skipWhitespace();
-        }
-
-        protected void parseCommentBindVariable() {
-            final String expr = tokenizer.getToken();
-            final String s = tokenizer.skipToken();
-            if (s.startsWith("(") && s.endsWith(")")) {
-                peek().addChild(new ParenBindVariableNode(expr));
-            } else if (expr.startsWith("$")) {
-                peek().addChild(createEmbeddedValueNode(expr.substring(1)));// Extension!
-            } else {
-                peek().addChild(createBindVariableNode(expr));// Extension!
-            }
-        }
-
-        protected void parseBindVariable() {
-            final String expr = tokenizer.getToken();
-            peek().addChild(createBindVariableNode(expr));// Extension!
-        }
-
-        protected Node pop() {
-            return (Node) nodeStack.pop();
-        }
-
-        protected Node peek() {
-            return (Node) nodeStack.peek();
-        }
-
-        protected void push(Node node) {
-            nodeStack.push(node);
-        }
-
-        protected boolean isElseMode() {
-            for (int i = 0; i < nodeStack.size(); ++i) {
-                if (nodeStack.get(i) instanceof InternalElseNode) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static boolean isTargetComment(String comment) {
-            return comment != null && comment.length() > 0 && Character.isJavaIdentifierStart(comment.charAt(0));
-        }
-
-        private static boolean isIfComment(String comment) {
-            return comment.startsWith("IF");
-        }
-
-        private static boolean isBeginComment(String content) {
-            return content != null && "BEGIN".equals(content);
-        }
-
-        private static boolean isEndComment(String content) {
-            return content != null && "END".equals(content);
-        }
-
-        protected AbstractNode createBindVariableNode(String expr) {// Extension!
-            return new InternalBindVariableNode(expr, specifiedSql);
-        }
-
-        protected AbstractNode createEmbeddedValueNode(String expr) {// Extension!
-            return new InternalEmbeddedValueNode(expr, specifiedSql);
-        }
-
-        protected ContainerNode createIfNode(String expr) {// Extension!
-            return new InternalIfNode(expr, specifiedSql);
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                      BindVariableNode
-    //                                      ----------------
-    protected static class InternalBindVariableNode extends AbstractNode {
-        protected String _expression;
-        protected String[] _names;
-        protected String _specifiedSql;
-
-        public InternalBindVariableNode(String expression, String specifiedSql) {
-            this._expression = expression;
-            this._names = InternalStringUtil.split(expression, ".");
-            this._specifiedSql = specifiedSql;
-        }
-
-        public void accept(CommandContext ctx) {
-            final Object value = ctx.getArg(_names[0]);
-            final Class clazz = ctx.getArgType(_names[0]);
-            final InternalValueAndType valueAndType = new InternalValueAndType();
-            valueAndType.setTargetValue(value);
-            valueAndType.setTargetType(clazz);
-            setupValueAndType(valueAndType);
-            ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
-            if (valueAndType.isValidRearOption()) {
-                ctx.addSql(valueAndType.buildRearOptionOnSql());
-            }
-        }
-
-        protected void setupValueAndType(InternalValueAndType valueAndType) {
-            final InternalValueAndTypeSetuper valueAndTypeSetuper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, true);
-            valueAndTypeSetuper.setupValueAndType(valueAndType);
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                     EmbeddedValueNode
-    //                                     -----------------
-    protected static class InternalEmbeddedValueNode extends AbstractNode {
-        protected String _expression;
-        protected String[] _names;
-        protected String _specifiedSql;
-
-        public InternalEmbeddedValueNode(String expression, String specifiedSql) {
-            this._expression = expression;
-            this._names = InternalStringUtil.split(expression, ".");
-            this._specifiedSql = specifiedSql;
-        }
-
-        public void accept(CommandContext ctx) {
-            final Object value = ctx.getArg(_names[0]);
-            final Class clazz = ctx.getArgType(_names[0]);
-            final InternalValueAndType valueAndType = new InternalValueAndType();
-            valueAndType.setTargetValue(value);
-            valueAndType.setTargetType(clazz);
-            setupValueAndType(valueAndType);
-            if (valueAndType.getTargetValue() != null && valueAndType.getTargetValue().toString().indexOf("?") > -1) {
-                throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
-            }
-            ctx.addSql(valueAndType.getTargetValue() != null ? valueAndType.getTargetValue().toString() : null);
-            if (valueAndType.isValidRearOption()) {
-                ctx.addSql(valueAndType.buildRearOptionOnSql());
-            }
-        }
-
-        protected void setupValueAndType(InternalValueAndType valueAndType) {
-            final InternalValueAndTypeSetuper valueAndTypeSetuper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, false);
-            valueAndTypeSetuper.setupValueAndType(valueAndType);
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                        Value and Type
-    //                                        --------------
-    protected static class InternalValueAndType {
-        public Object _targetValue;
-        public Class _targetType;
-        protected String _rearOption;
-
-        public boolean isValidRearOption() {
-            return _targetValue != null && _rearOption != null && _rearOption.trim().length() > 0;
-        }
-
-        public String buildRearOptionOnSql() {
-            return " " + _rearOption.trim() + " ";
-        }
-
-        public Object getTargetValue() {
-            return _targetValue;
-        }
-        public void setTargetValue(Object targetValue) {
-            this._targetValue = targetValue;
-        }
-        public Class getTargetType() {
-            return _targetType;
-        }
-        public void setTargetType(Class targetType) {
-            this._targetType = targetType;
-        }
-        public String getRearOption() {
-            return _rearOption;
-        }
-        public void setRearOption(String rearOption) {
-            this._rearOption = rearOption;
-        }
-    }
-
-    protected static class InternalValueAndTypeSetuper {
-        protected String _expression;
-        protected String[] _names;
-        protected String _specifiedSql;
-        protected boolean _bind;
-
-        public InternalValueAndTypeSetuper(String expression, String[] names, String specifiedSql, boolean bind) {
-            this._expression = expression;
-            this._names = names;
-            this._specifiedSql = specifiedSql;
-            this._bind = bind;
-        }
-
-        protected void setupValueAndType(InternalValueAndType valueAndType) {
-            Object value = valueAndType.getTargetValue();
-            Class clazz = valueAndType.getTargetType();
-            String rearOption = null;
-            for (int pos = 1; pos < _names.length; ++pos) {
-                if (value == null) {
-                    break;
-                }
-                if (Map.class.isInstance(value)) {
-                    final Map map = (Map) value;
-                    value = map.get(_names[pos]);
-                    if (value == null) {
-                        break;
-                    }
-                    clazz = value.getClass();
-                    continue;
-                }
-                final BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
-                final String currentName = _names[pos];
-                if (beanDesc.hasPropertyDesc(currentName)) {
-                    final PropertyDesc pd = beanDesc.getPropertyDesc(currentName);
-                    if (_names.length == (pos + 1) && hasLikeSearchOption(beanDesc, currentName)) {
-                        final ${glConditionOptionLikeSearchName} option = getLikeSearchOption(beanDesc, currentName, value);
-                        value = pd.getValue(value);
-                        if (value != null && value instanceof String && ((String)value).length() != 0) {
-                            value = option.generateRealValue((String) value);
-                            rearOption = option.getRearOption();
-                        }
-                    } else {
-                        value = pd.getValue(value);
-                    }
-                    clazz = (value != null ? value.getClass() : pd.getPropertyType());
-                    continue;
-                }
-                final String methodName = "get" + initCap(currentName);
-                if (beanDesc.hasMethod(methodName)) {
-                    final Method method = beanDesc.getMethod(methodName);
-                    value = invokeGetter(method, value);
-                    clazz = method.getReturnType();
-                    continue;
-                }
-                if (pos == 1 && ${glMapParameterBeanInterfaceName}.class.isAssignableFrom(clazz)) {
-                    final ${glMapParameterBeanInterfaceName} pmb = (${glMapParameterBeanInterfaceName})value;
-                    final Map<String, Object> map = pmb.getParameterMap();
-                    final Object elementValue = (map != null ? map.get(_names[pos]) : null);
-                    if (elementValue != null) {
-                        value = elementValue;
-                        clazz = elementValue.getClass();
-                        continue;
-                    }
-                }
-                throwBindOrEmbeddedCommentNotFoundPropertyException(_expression, clazz, currentName, _specifiedSql, _bind);
-            }
-            valueAndType.setTargetValue(value);
-            valueAndType.setTargetType(clazz);
-            valueAndType.setRearOption(rearOption);
-        }
-
-        protected boolean hasLikeSearchOption(BeanDesc beanDesc, String currentName) {
-            return beanDesc.hasPropertyDesc(currentName + "InternalLikeSearchOption");
-        }
-
-        protected ${glConditionOptionLikeSearchName} getLikeSearchOption(BeanDesc beanDesc, String currentName, Object resourceBean) {
-            final PropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
-            return (${glConditionOptionLikeSearchName}) pb.getValue(resourceBean);
-        }
-
-        protected String initCap(String name) {
-            return name.substring(0, 1).toUpperCase() + name.substring(1);
-        }
-
-        protected Object invokeGetter(Method method, Object target) {
-            try {
-                return method.invoke(target, (Object[]) null);
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (java.lang.reflect.InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        protected void throwBindOrEmbeddedCommentNotFoundPropertyException(String expression, Class targetType, String notFoundProperty, String specifiedSql, boolean bind) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The property on the " + (bind ? "bind variable" : "embedded value") + " comment was Not Found!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[SQL Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[NotFound Property]" + getLineSeparator() + (targetType != null ? targetType.getName() + "#" : "") + notFoundProperty + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
-            msg = msg + "* * * * * * * * * */" + getLineSeparator();
-            if (bind) {
-                throw new ${glBindVariableCommentNotFoundPropertyException}(msg);
-            } else {
-                throw new ${glEmbeddedValueCommentNotFoundPropertyException}(msg);
-            }
-        }
-
-        protected String getLineSeparator() {
-            return System.getProperty("line.separator");
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                                IfNode
-    //                                                ------
-    protected static class InternalIfNode extends ContainerNode {
-        private String _expression;
-        private Object _parsedExpression;
-        private InternalElseNode _elseNode;
-        private String _specifiedSql;
-
-        public InternalIfNode(String expression, String specifiedSql) {
-            this._expression = expression;
-            this._parsedExpression = OgnlUtil.parseExpression(expression);
-            this._specifiedSql = specifiedSql;
-        }
-
-        public String getExpression() {
-            return _expression;
-        }
-
-        public InternalElseNode getElseNode() {
-            return _elseNode;
-        }
-
-        public void setElseNode(InternalElseNode elseNode) {
-            this._elseNode = elseNode;
-        }
-
-        public void accept(CommandContext ctx) {
-            Object result = null;
-            try {
-                result = OgnlUtil.getValue(_parsedExpression, ctx);
-            } catch (RuntimeException e) {
-                if (!_expression.contains("pmb.")) {
-                    throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
-                }
-                final String replaced = InternalStringUtil.replace(_expression, "pmb.", "pmb.parameterMap.");
-                final Object secondParsedExpression = OgnlUtil.parseExpression(replaced);
-                try {
-                    result = OgnlUtil.getValue(secondParsedExpression, ctx);
-                } catch (RuntimeException ignored) {
-                    throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
-                }
-                if (result == null) {
-                    throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
-                }
-                _parsedExpression = secondParsedExpression;
-            }
-            if (result != null && result instanceof Boolean) {
-                if (((Boolean) result).booleanValue()) {
-                    super.accept(ctx);
-                    ctx.setEnabled(true);
-                } else if (_elseNode != null) {
-                    _elseNode.accept(ctx);
-                    ctx.setEnabled(true);
-                }
-            } else {
-                throwIfCommentNotBooleanResultException(_expression, result, _specifiedSql);
-            }
-        }
-
-        protected void throwIfCommentWrongExpressionException(String expression, RuntimeException cause, String specifiedSql) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The IF comment of your specified SQL was Wrong!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
-            msg = msg + "And confirm the IF comment of your specified SQL." + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[IF Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Cause Message]" + getLineSeparator() + cause.getMessage() + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
-            msg = msg + "* * * * * * * * * */" + getLineSeparator();
-            throw new ${glIfCommentWrongExpressionException}(msg, cause);
-        }
-
-        protected void throwIfCommentNotBooleanResultException(String expression, Object result, String specifiedSql) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The boolean expression on IF comment of your specified SQL was Wrong!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "Please confirm the grammar of your IF comment. Does it really express boolean?" + getLineSeparator();
-            msg = msg + "And confirm the existence of your property on your arguments if you use parameterMap." + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[IF Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[IF Comment Result Value]" + getLineSeparator() + result + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
-            msg = msg + "* * * * * * * * * */" + getLineSeparator();
-            throw new ${glIfCommentNotBooleanResultException}(msg);
-        }
-
-        protected String getLineSeparator() {
-            return System.getProperty("line.separator");
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                              ElseNode
-    //                                              --------
-    protected static class InternalElseNode extends ContainerNode {
-        public void accept(CommandContext ctx) {
-            super.accept(ctx);
-            ctx.setEnabled(true);
-        }
     }
 
     // -----------------------------------------------------

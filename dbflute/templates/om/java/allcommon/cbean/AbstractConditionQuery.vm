@@ -11,6 +11,7 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
 
 /**
  * The abstract class of condition-query.
@@ -381,6 +382,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected void registerLikeSearchQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
                                      , String colName, String capPropName, String uncapPropName, ${glConditionOptionLikeSearchName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+		    if (option == null) {
+			    throwLikeSearchOptionNotFoundException(capPropName, value);
+			}
             if (value != null && option.isSplit()) {
                 final String[] strArray = option.generateSplitValueArray(value);
                 for (int i=0; i < strArray.length; i++) {
@@ -391,7 +395,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                     final java.util.List<${glConditionOptionLikeSearchName}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
                     if (!callbackList.isEmpty()) {
                         getSqlClause().makeAdditionalConditionAsOrEffective();
-                        for (java.util.Iterator ite = callbackList.iterator(); ite.hasNext(); ) {
+                        for (java.util.Iterator<${glConditionOptionLikeSearchName}.LikeAsOrCallback> ite = callbackList.iterator(); ite.hasNext(); ) {
                             final ${glConditionOptionLikeSearchName}.LikeAsOrCallback likeAsOrCallback = (${glConditionOptionLikeSearchName}.LikeAsOrCallback)ite.next();
                             final String additionalTargetPropertyName = likeAsOrCallback.getAdditionalTargetPropertyName();
                             final String filteredValue = likeAsOrCallback.filterValue(currentValue);
@@ -409,6 +413,20 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
+    protected void throwLikeSearchOptionNotFoundException(String capPropName, String value) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm your method call:"  + getLineSeparator();
+		final String beanName = getClass().getSimpleName();
+		final String methodName = "set" + capPropName + "_LikeSearch('" + value + "', likeSearchOption);";
+        msg = msg + "    " + beanName + "." + methodName + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        throw new ${glRequiredOptionNotFoundException}(msg);
+    }
+		
     protected void invokeSetterLikeSearch(String columnFlexibleName, Object value, ${glConditionOptionLikeSearchName} option) {
         if (value == null) {
             return;
@@ -924,6 +942,10 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+		
     protected final String replaceString(String text, String fromText, String toText) {
         if(text == null || fromText == null || toText == null)
             return null;
@@ -987,7 +1009,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             return null;
         }
         java.util.List<String> newList = new java.util.ArrayList<String>();
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+        for (final java.util.Iterator<String> ite = ls.iterator(); ite.hasNext(); ) {
             final String str = (String)ite.next();
             if (str == null || "".equals(str)) {
                 continue;

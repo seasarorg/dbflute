@@ -55,9 +55,8 @@ public class ${glInternalUpdateAutoDynamicCommand} extends AbstractSqlCommand {
         return new Integer(i);
     }
 
-    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(
-            Object bean, int rows) {
-        return new NotSingleRowUpdatedRuntimeException(bean, rows);
+    protected NotSingleRowUpdatedRuntimeException createNotSingleRowUpdatedRuntimeException(Object bean, int rows) {
+        return new ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}(bean, rows);
     }
 
     protected PropertyType[] createUpdatePropertyTypes(BeanMetaData bmd,

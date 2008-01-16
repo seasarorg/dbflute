@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalUtil};
 
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -24,15 +26,6 @@ public class ${glInternalBindVariableUtil} {
     private ${glInternalBindVariableUtil}() {
     }
 
-    /**
-     * バインド変数をSQLの中にリテラルで埋め込んだ完全なSQLを返します。
-     * 
-     * @param sql
-     *            SQL
-     * @param args
-     *            引数
-     * @return バインド変数をSQLの中にリテラルで埋め込んだ完全なSQL
-     */
     public static String getCompleteSql(String sql, Object[] args) {
         if (args == null || args.length == 0) {
             return sql;
@@ -40,17 +33,6 @@ public class ${glInternalBindVariableUtil} {
         return getCompleteSql(sql, args, new ValueType[args.length]);
     }
 
-    /**
-     * バインド変数をSQLの中にリテラルで埋め込んだ完全なSQLを返します。
-     * 
-     * @param sql
-     *            SQL
-     * @param args
-     *            引数
-     * @param valueTypes
-     *            値タイプの配列
-     * @return バインド変数をSQLの中にリテラルで埋め込んだ完全なSQL
-     */
     public static String getCompleteSql(String sql, Object[] args,
             ValueType[] valueTypes) {
         if (args == null || args.length == 0) {
@@ -97,13 +79,6 @@ public class ${glInternalBindVariableUtil} {
         return buf.toString();
     }
 
-    /**
-     * バインド変数を文字列として返します。
-     * 
-     * @param bindVariable
-     *            バインド変数
-     * @return バインド変数の文字列表現
-     */
     public static String getBindVariableText(Object bindVariable) {
         if (bindVariable instanceof String) {
             return quote(bindVariable.toString());
@@ -124,39 +99,47 @@ public class ${glInternalBindVariableUtil} {
         }
     }
 
-    /**
-     * バインド変数を文字列として返します。
-     * 
-     * @param bindVariable
-     *            バインド変数
-     * @param valueType
-     *            値タイプ
-     * @return バインド変数の文字列表現
-     */
+	// For various seasar's version.
+	protected static final Class<?>[] TOTEXT_ARGUMENT_TYPES = new Class<?>[]{Object.class};
+	protected static final Method TOTEXT_METHOD;
+	static {
+	    Method method = null;
+	    try {
+	        method = ValueType.class.getMethod("toText", TOTEXT_ARGUMENT_TYPES);
+        } catch (SecurityException e) {
+        } catch (NoSuchMethodException e) {
+        }
+		TOTEXT_METHOD = method;
+	}
     public static String getBindVariableText(Object bindVariable, ValueType valueType) {
-	    // TODO: @jflute -- Handling Seasar's version!
-        // if (valueType != null) {
-        //     return valueType.toText(bindVariable);
-        // }
+        if (valueType != null && TOTEXT_METHOD != null ) {
+            try {
+                return (String)TOTEXT_METHOD.invoke(valueType, new Object[]{bindVariable});
+            } catch (IllegalArgumentException e) {
+                String msg = "ValueType.toText() threw the IllegalArgumentException:";
+                msg = msg + " valueType=" + valueType + " bindVariable=" + bindVariable;
+                throw new IllegalStateException(msg, e);
+            } catch (IllegalAccessException e) {
+                String msg = "ValueType.toText() threw the IllegalAccessException:";
+                msg = msg + " valueType=" + valueType + " bindVariable=" + bindVariable;
+                throw new IllegalStateException(msg, e);
+            } catch (InvocationTargetException e) {
+                if (e.getTargetException() instanceof RuntimeException) {
+                    throw (RuntimeException)e.getTargetException();
+                } else {
+                    String msg = "ValueType.toText() threw the exception:";
+                    msg = msg + " valueType=" + valueType + " bindVariable=" + bindVariable;
+                    throw new IllegalStateException(msg, e.getTargetException());
+                }
+            }
+        }
         return getBindVariableText(bindVariable);
     }
 	
-    /**
-     * <code>null</code>の文字列表現を返します。
-     * 
-     * @return
-     */
     public static String nullText() {
         return NULL;
     }
 
-    /**
-     * {@link Number}の文字列表現を返します。
-     * 
-     * @param value
-     *            値
-     * @return 文字列表現
-     */
     public static String toText(Number value) {
         if (value == null) {
             return NULL;
@@ -164,13 +147,6 @@ public class ${glInternalBindVariableUtil} {
         return value.toString();
     }
 
-    /**
-     * {@link Boolean}の文字列表現を返します。
-     * 
-     * @param value
-     *            値
-     * @return 文字列表現
-     */
     public static String toText(Boolean value) {
         if (value == null) {
             return NULL;
@@ -178,13 +154,6 @@ public class ${glInternalBindVariableUtil} {
         return quote(value.toString());
     }
 
-    /**
-     * {@link String}の文字列表現を返します。
-     * 
-     * @param value
-     *            値
-     * @return 文字列表現
-     */
     public static String toText(String value) {
         if (value == null) {
             return NULL;
@@ -192,13 +161,6 @@ public class ${glInternalBindVariableUtil} {
         return quote(value);
     }
 
-    /**
-     * {@link Date}の文字列表現を返します。
-     * 
-     * @param value
-     *            値
-     * @return 文字列表現
-     */
     public static String toText(Date value) {
         if (value == null) {
             return NULL;
@@ -210,13 +172,6 @@ public class ${glInternalBindVariableUtil} {
         return quote(buf.toString());
     }
 
-    /**
-     * {@link Time}の文字列表現を返します。
-     * 
-     * @param value
-     *            値
-     * @return 文字列表現
-     */
     public static String toText(Time value) {
         if (value == null) {
             return NULL;
@@ -229,13 +184,6 @@ public class ${glInternalBindVariableUtil} {
         return quote(buf.toString());
     }
 
-    /**
-     * {@link Timestamp}の文字列表現を返します。
-     * 
-     * @param value
-     *            値
-     * @return 文字列表現
-     */
     public static String toText(Timestamp value) {
         if (value == null) {
             return NULL;
@@ -249,19 +197,11 @@ public class ${glInternalBindVariableUtil} {
         return quote(buf.toString());
     }
 
-    /**
-     * <code>byte[]</code>の文字列表現を返します。
-     * 
-     * @param value
-     *            値
-     * @return 文字列表現
-     */
     public static String toText(byte[] value) {
         if (value == null) {
             return NULL;
         }
-        return quote(value.toString() + "(byteLength="
-                + Integer.toString(value.length) + ")");
+        return quote(value.toString() + "(byteLength=" + Integer.toString(value.length) + ")");
     }
 
     /**
@@ -278,14 +218,7 @@ public class ${glInternalBindVariableUtil} {
         return quote(value.toString());
     }
 
-    /**
-     * 文字列バッファに<code>yyyy-mm-dd</code>のフォーマットで日付を設定します。
-     * 
-     * @param buf
-     *            文字列バッファ
-     * @param calendar
-     *            カレンダ
-     */
+	// yyyy-mm-dd
     protected static void addDate(StringBuilder buf, Calendar calendar) {
         int year = calendar.get(Calendar.YEAR);
         buf.append(year);
@@ -303,14 +236,7 @@ public class ${glInternalBindVariableUtil} {
         buf.append(date);
     }
 
-    /**
-     * 文字列バッファに<code>hh:mm:ss</code>のフォーマットで値を設定します。
-     * 
-     * @param buf
-     *            文字列バッファ
-     * @param calendar
-     *            カレンダ
-     */
+	// hh:mm:ss
     protected static void addTime(StringBuilder buf, Calendar calendar) {
         if (buf.length() > 0) {
             buf.append(' ');
@@ -334,14 +260,7 @@ public class ${glInternalBindVariableUtil} {
         buf.append(second);
     }
 
-    /**
-     * 文字列バッファに時間の小数点以下の値を設定します。
-     * 
-     * @param buf
-     *            文字列バッファ
-     * @param decimalPart
-     *            小数点以下の値
-     */
+	// .000
     protected static void addTimeDecimalPart(StringBuilder buf, int decimalPart) {
         if (decimalPart == 0) {
             return;
@@ -352,13 +271,7 @@ public class ${glInternalBindVariableUtil} {
         buf.append(decimalPart);
     }
 
-    /**
-     * 文字列をシングルクォートで囲みます。
-     * 
-     * @param text
-     *            文字列
-     * @return
-     */
+	// 'text'
     protected static String quote(String text) {
         return "'" + text + "'";
     }
