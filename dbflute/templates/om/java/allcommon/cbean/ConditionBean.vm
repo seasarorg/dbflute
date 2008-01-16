@@ -182,4 +182,14 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * @return Determination.
      */
     public boolean isSelectCountIgnoreFetchScope();
+	
+    // ===================================================================================
+    //                                                                         Display SQL
+    //                                                                         ===========
+	/**
+	 * Convert this conditionBean to SQL for display.
+	 * 
+	 * @return SQL for display. (NotNull and NotEmpty)
+	 */
+	public String toDisplaySql();
 }

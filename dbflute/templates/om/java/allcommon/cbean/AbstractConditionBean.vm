@@ -16,7 +16,7 @@ import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName}
  * 
  * @author ${database.ClassAuthor}
  */
-public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
+public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -644,5 +644,33 @@ public abstract class $myClassName implements ${glConditionBeanInterfaceName} {
      */
     public boolean isSelectCountIgnoreFetchScope() {
         return _isSelectCountIgnoreFetchScope;
+    }
+	
+    // ===================================================================================
+    //                                                                         Display SQL
+    //                                                                         ===========
+	/**
+	 * Convert this conditionBean to SQL for display.
+	 * 
+	 * @return SQL for display. (NotNull and NotEmpty)
+	 */
+	public String toDisplaySql() {
+	    return ${glConditionBeanContextName}.convertConditionBean2DisplaySql(this);
+	}
+	
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * The override.
+     * 
+     * @return SQL for display. (NotNull)
+     */
+    public String toString() {
+	    try {
+            return toDisplaySql();
+	    } catch (RuntimeException e) {
+		    return getSqlClause().getClause();
+		}
     }
 }

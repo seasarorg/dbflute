@@ -17,7 +17,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                          Annotation
     //                                                                          ==========
-    /** TABLE-Annotation */
+    /** TABLE-Annotation. But now this is unnecessary... */
     public static final String TABLE = "$table.name";
 
     // ===================================================================================
@@ -25,19 +25,6 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //                                                                           =========
     /** Condition query. */
     protected ${myConditionQueryClassName} _conditionQuery;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    public ${myClassName}() {
-    }
-
-    // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   MyTable = [$table.name]
-    // * * * * * * * * */
 
     // ===================================================================================
     //                                                                          Table Name
@@ -151,21 +138,16 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
      */
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
-  #foreach ($col in $table.PrimaryKey)
-
+#foreach ($col in $table.PrimaryKey)
         query().addOrderBy_${col.JavaName}_Asc();
-  #end
-
+#end
         return this;
 #else
-  #foreach ($col in $table.Columns)
-
+#foreach ($col in $table.Columns)
         query().addOrderBy_${col.JavaName}_Asc();
-  #end
-
+#end
         return this;
 #end
-
     }
 
     /**
@@ -341,15 +323,4 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
   #end
 #end
 
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    /**
-     * This method overrides the method that is declared at super.
-     * 
-     * @return Clause string. (NotNull)
-     */
-    public String toString() {
-        return getSqlClause().getClause();
-    }
 }

@@ -29,8 +29,6 @@ import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingHeaderInfoName};
 import ${glPackageBaseCommonHelperTokenFile}.${glFileMakingSimpleFacadeName};
 import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileMakingSimpleFacadeImplName};
 
-import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
-
 /**
  * The abstract class of behavior-readable.
  * 
@@ -46,9 +44,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
 
     /** Dao-selector instance. It's basically referred at loadReferrer. (Required for OutsideSql) */
     protected ${glDaoSelectorInterfaceName} _daoSelector;
-
-    /** The provider of latest SQL. It's basically referred at error handling. (NotRequired) */
-    protected ${glLatestSqlProviderName} _latestSqlProvider;
 
     // =====================================================================================
     //                                                                         Basic Get All
@@ -289,11 +284,11 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     }
 
     private void throwEntityAlreadyDeletedException(Object searchKey4Log) {
-        ${glConditionBeanContextName}.throwEntityAlreadyDeletedException(searchKey4Log, _latestSqlProvider, getTableDbName());
+        ${glConditionBeanContextName}.throwEntityAlreadyDeletedException(searchKey4Log);
     }
 
     private void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause, _latestSqlProvider, getTableDbName());
+        ${glConditionBeanContextName}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
     }
 
     // ===================================================================================
@@ -318,7 +313,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
             msg = msg + "  _behaviorSelector  : " + _behaviorSelector + getLineSeparator();
             msg = msg + "  _daoSelector       : " + _daoSelector + getLineSeparator();
-            msg = msg + "  _latestSqlProvider : " + _latestSqlProvider + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
             throw new IllegalStateException(msg);
         }
@@ -608,7 +602,6 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
             msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
             msg = msg + "  _behaviorSelector  : " + _behaviorSelector + getLineSeparator();
             msg = msg + "  _daoSelector       : " + _daoSelector + getLineSeparator();
-            msg = msg + "  _latestSqlProvider : " + _latestSqlProvider + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
             throw new IllegalStateException(msg);
         }
@@ -964,23 +957,4 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
     public void setDaoSelector(${glDaoSelectorInterfaceName} daoSelector) {
         _daoSelector = daoSelector;
     }
-
-    /**
-     * Get the provider of latest SQL.
-     * 
-     * @return The provider of latest SQL. (Nullable: But normally NotNull)
-     */
-    protected ${glLatestSqlProviderName} getLatestSqlProvider() {
-        return _latestSqlProvider;
-    }
-
-    /**
-     * Set the provider of latest SQL.
-     * 
-     * @param latestSqlProvider The provider of latest SQL. (NotNull)
-     */
-    public void setLatestSqlProvider(${glLatestSqlProviderName} latestSqlProvider) {
-        _latestSqlProvider = latestSqlProvider;
-    }
-
 }

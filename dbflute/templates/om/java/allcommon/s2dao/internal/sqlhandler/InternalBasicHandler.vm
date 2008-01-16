@@ -13,7 +13,7 @@ import org.seasar.extension.jdbc.util.DataSourceUtil;
 import org.seasar.framework.exception.EmptyRuntimeException;
 import org.seasar.framework.exception.SQLRuntimeException;
 
-import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLog};
+import ${glPackageBaseCommon}.${glQLog};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonS2DaoInternalUtil}.${glInternalBindVariableUtil};
 
@@ -87,11 +87,16 @@ public class ${glInternalBasicHandler} {
     }
 
     protected void logSql(Object[] args, Class[] argTypes) {
-        final String completeSql = getCompleteSql(args);
-        if (_log.isDebugEnabled()) {
-            _log.debug(completeSql);
+        if (_log.isDebugEnabled() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
+            final String completeSql = getCompleteSql(args);
+            ${glQLog}.log(completeSql);
+		    if (${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
+			    final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+				if (sqlLogRegistry != null) {
+				    ${glInternalSqlLogRegistry}.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
+				}
+			}
         }
-        ${glInternalSqlLogRegistry}.push(new ${glInternalSqlLog}(getSql(), completeSql, args, argTypes));
     }
 	
 	// ===================================================================================

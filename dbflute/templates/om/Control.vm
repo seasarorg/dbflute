@@ -93,6 +93,9 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Base-ClassificationDefinition]
     #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
+	
+    ## [Allcommon-Base-QLog]
+    #set ($glQLog = "${glProjectPrefix}QLog")
 
     ## [Allcommon-Behavior]
     #set ($glBehaviorReadableAbstractName = "${glProjectPrefix}AbstractBehaviorReadable")
@@ -1585,6 +1588,18 @@ targetdatabase = $targetDatabase
       $database.debug("parse('InternalMapContext');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glInternalMapContextName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/InternalMapContext.${glTemplateFileExtension}",$path ,"" ,"")
+	#end
+	
+    ## -----------------------------------------------------------------------------------------------------
+    ##                                                                                            Parse qlog
+    ##                                                                                            ----------
+    ## Setup java directory for qlog.
+    $database.setupJavaDir_for_genMetaData()
+
+    #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
+      $database.debug("parse('QLog');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glQLog}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/QLog.${glTemplateFileExtension}",$path ,"" ,"")
     #end
 
     ## -----------------------------------------------------------------------------------------------------

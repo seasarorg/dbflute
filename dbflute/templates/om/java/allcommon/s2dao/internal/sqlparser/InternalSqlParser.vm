@@ -3,7 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlParser
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 import org.seasar.dao.CommandContext;
 import org.seasar.dao.EndCommentNotFoundRuntimeException;
@@ -13,11 +12,8 @@ import org.seasar.dao.SqlParser;
 import org.seasar.dao.SqlTokenizer;
 import org.seasar.dao.node.AbstractNode;
 import org.seasar.dao.node.BeginNode;
-import org.seasar.dao.node.BindVariableNode;
 import org.seasar.dao.node.ContainerNode;
 import org.seasar.dao.node.ElseNode;
-import org.seasar.dao.node.EmbeddedValueNode;
-import org.seasar.dao.node.IfNode;
 import org.seasar.dao.node.ParenBindVariableNode;
 import org.seasar.dao.node.PrefixSqlNode;
 import org.seasar.dao.node.SqlNode;
@@ -34,6 +30,8 @@ import ${glPackageBaseCommonException}.${glEmbeddedValueCommentNotFoundPropertyE
 import ${glPackageBaseCommonException}.${glIfCommentNotBooleanResultException};
 import ${glPackageBaseCommonException}.${glIfCommentWrongExpressionException};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
+
+import ${glPackageBaseCommonS2DaoInternalUtil}.${glInternalBindVariableUtil};
 
 /**
  * @author ${database.ClassAuthor}
@@ -648,4 +646,27 @@ public class ${glInternalSqlParser} implements SqlParser {
             return (String[]) list.toArray(new String[list.size()]);
         }
     }
+	
+	// ===================================================================================
+    //                                                                             Convert
+    //                                                                             =======
+	public static String convertTwoWaySql2DisplaySql(String twoWaySql, Object arg) {
+	    final String[] argNames = new String[]{"dto"};
+	    final Class<?>[] argTypes = new Class<?>[]{arg.getClass()};
+	    final Object[] args = new Object[]{arg};
+		return convertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args);
+	}
+	
+	public static String convertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
+        final CommandContext context;
+		{
+            final ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+            final Node node = parser.parse();
+            final ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
+            context = creator.createCommandContext(args);
+            node.accept(context);
+		}
+        final String preparedSql = context.getSql();
+		return ${glInternalBindVariableUtil}.getCompleteSql(preparedSql, context.getBindVariables());
+	}
 }

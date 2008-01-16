@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
 import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
-import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLog};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
@@ -23,15 +22,7 @@ public class ${glDaoLatestSqlProvider} implements ${glLatestSqlProviderName} {
 
     protected String getLastCompleteSql() {
         try {
-            final ${glInternalSqlLog} lastSqlLog = ${glInternalSqlLogRegistry}.peek();
-            if (lastSqlLog == null) {
-                return null;
-            }
-            final String completeSql = lastSqlLog.getCompleteSql();
-            if (completeSql == null || completeSql.trim().length() == 0) {
-                return null;
-            }
-            return completeSql;
+            return ${glInternalSqlLogRegistry}.peekCompleteSql();
         } catch (RuntimeException ignored) {
             return null;
         }

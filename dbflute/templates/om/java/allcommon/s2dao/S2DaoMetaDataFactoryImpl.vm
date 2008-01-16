@@ -15,6 +15,7 @@ import org.seasar.dao.ColumnNaming;
 #end
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
  * DaoMetaDataFactoryImpl for DBFlute.
@@ -84,6 +85,19 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
         initializeDatabaseProductNameOfContext(xaDataSource);
 
+		final StringBuilder sb = new StringBuilder();
+		sb.append("{SqlLog Information}").append(getLineSeparator());
+		sb.append("  [SqlLogRegistry]").append(getLineSeparator());
+		final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+		if (sqlLogRegistry != null) {
+		    ${glInternalSqlLogRegistry}.closeRegistration();
+			sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
+			sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
+		} else {
+			sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
+		}
+		_log.info(sb);
+		
         _log.info("* * * * */");
     }
 

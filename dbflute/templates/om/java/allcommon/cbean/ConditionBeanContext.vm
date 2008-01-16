@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ${glPackageBaseCommonSqlClause}.*;
 import ${glPackageBaseCommonJdbc}.${glLatestSqlProviderName};
+import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
 
 /**
  * Condition-Bean context. (referring to s2pager)
@@ -73,7 +74,7 @@ public class ${glConditionBeanContextName} {
         }
         {
             final Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
-            if (debugEnabled) { sb.append("  ...Loading class of ...and so on").append(getLineSeparator()); }
+            if (debugEnabled) { sb.append("  ...Loading class of ...and so on"); }
         }
         {
             final Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
@@ -265,11 +266,7 @@ public class ${glConditionBeanContextName} {
     // ===================================================================================
     //                                                                  Exception Handling
     //                                                                  ==================
-    public static void throwEntityAlreadyDeletedException(Object searchKey4log) {
-        throwEntityAlreadyDeletedException(searchKey4log, null, null);
-    }
-
-    public static void throwEntityAlreadyDeletedException(Object searchKey4log, ${glLatestSqlProviderName} latestSqlProvider, String tableDbName) {
+    public static void throwEntityAlreadyDeletedException(Object searchKey4Log) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The entity was Not Found! it has already been deleted!" + getLineSeparator();
@@ -280,21 +277,18 @@ public class ${glConditionBeanContextName} {
         msg = msg + "Has the target record been deleted by other thread?" + getLineSeparator();
         msg = msg + "It is precondition that the record exists on your database." + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4log + getLineSeparator();
-        final String dispalySql = getDisplaySqlForExceptionMessage(latestSqlProvider, tableDbName);
-        if (dispalySql != null) {
-            msg = msg + getLineSeparator();
-            msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
+		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
+		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
+			final String dispalySql = filterDisplaySql(cb.toDisplaySql(), cb.getTableDbName());
+			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
+		} else {
+            msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         }
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
         throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
     }
 
     public static void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
-        throwEntityDuplicatedException(resultCountString, searchKey4Log, cause, null, null);
-    }
-
-    public static void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause, ${glLatestSqlProviderName} latestSqlProvider, String tableDbName) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The entity was Too Many! it has been duplicated. It should be the only one! But the resultCount=" + resultCountString + getLineSeparator();
@@ -303,13 +297,14 @@ public class ${glConditionBeanContextName} {
         msg = msg + "Please confirm your search condition. Does it really select the only one?" + getLineSeparator();
         msg = msg + "Please confirm your database. Does it really exist the only one?" + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
-        final String dispalySql = getDisplaySqlForExceptionMessage(latestSqlProvider, tableDbName);
-        if (dispalySql != null) {
-            msg = msg + getLineSeparator();
-            msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
+		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
+		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
+			final String dispalySql = filterDisplaySql(cb.toDisplaySql(), cb.getTableDbName());
+			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
+		} else {
+            msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         }
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
         if (cause != null) {
             throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg, cause);
         } else {
@@ -317,11 +312,7 @@ public class ${glConditionBeanContextName} {
         }
     }
 
-    private static String getDisplaySqlForExceptionMessage(${glLatestSqlProviderName} latestSqlProvider, String tableDbName) {
-        if (latestSqlProvider == null) {
-            return null;
-        }
-        final String displaySql = latestSqlProvider.getDisplaySql();
+    protected static String filterDisplaySql(String displaySql, String tableDbName) {
         if (displaySql == null || displaySql.trim().length() == 0) {
             return null;
         }
@@ -335,6 +326,19 @@ public class ${glConditionBeanContextName} {
         return displaySql.substring(0, basePointIndex) + getLineSeparator() + " " + displaySql.substring(basePointIndex);
     }
 
+    // ===================================================================================
+    //                                                                         Display SQL
+    //                                                                         ===========
+	public static String convertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb) {
+	    final String twoWaySql;
+	    if (cb.isLimitSelect_PKOnly()) {
+		    twoWaySql = cb.getSqlClause().getClausePKOnly();
+		} else {
+		    twoWaySql = cb.getSqlClause().getClause();
+		}
+	    return ${glInternalSqlParser}.convertTwoWaySql2DisplaySql(twoWaySql, cb);
+	}
+	
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
