@@ -97,13 +97,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The determination of internal debug. */
-    private static final boolean _internalDebug = false;
-#if ($database.isSelectQueryTimeoutValid() || ${database.isStatementResultSetTypeValid()})
-
     /** Log instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoMetaDataExtension}.class);
-#end
+	
+    /** The determination of internal debug. */
+    private static final boolean _internalDebug = false;
 
     // ===================================================================================
     //                                                                           Attribute
@@ -1148,18 +1146,29 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             final Object row = newBean(beanClass);
             final ${glDBMetaInterfaceName} dbmeta = findDBMeta(row);
             final Set columnNameSet = propertyCache.keySet();
-            for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
-                final String columnName = (String) ite.next();
-                final PropertyType pt = (PropertyType) propertyCache.get(columnName);
-				final String propertyName = pt.getPropertyName();
-				if (dbmeta.hasEntityPropertySetupper(propertyName)) {
-				    final ValueType valueType = pt.getValueType();
-                    final Object value = valueType.getValue(rs, columnName);
-				    dbmeta.setupEntityProperty(propertyName, row, value);
-				} else {
-                    registerValue(rs, row, pt, columnName);
-				}
-            }
+			String columnName = null;
+		    PropertyType pt = null;
+			String propertyName = null;
+			try {
+                for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
+                    columnName = (String) ite.next();
+                    pt = (PropertyType) propertyCache.get(columnName);
+    				propertyName = pt.getPropertyName();
+    				if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
+    				    final ValueType valueType = pt.getValueType();
+                        final Object value = valueType.getValue(rs, columnName);
+    				    dbmeta.setupEntityProperty(propertyName, row, value);
+    				} else {
+                        registerValue(rs, row, pt, columnName);
+    				}
+                }
+			} catch (SQLException e) {
+			    if (_log.isWarnEnabled()) {
+				    String msg = SQLException.class.getSimpleName() " occurred in Handling ResultSet:";
+			        _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName);
+			    }
+			    throw e;
+			}
 			return row;
         }
         
