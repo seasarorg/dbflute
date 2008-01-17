@@ -1164,7 +1164,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 }
 			} catch (SQLException e) {
 			    if (_log.isWarnEnabled()) {
-				    String msg = SQLException.class.getSimpleName() " occurred in Handling ResultSet:";
+				    String msg = SQLException.class.getSimpleName() + " occurred while ResultSet Handling:";
 			        _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName);
 			    }
 			    throw e;
