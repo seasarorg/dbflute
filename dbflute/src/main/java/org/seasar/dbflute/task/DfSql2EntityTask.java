@@ -37,6 +37,7 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
@@ -62,7 +63,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                           Meta Info
     //                                                                           =========
-    protected final Map<String, Map<String, Integer>> _entityInfoMap = new LinkedHashMap<String, Map<String, Integer>>();
+    protected final Map<String, Map<String, DfColumnMetaInfo>> _entityInfoMap = new LinkedHashMap<String, Map<String, DfColumnMetaInfo>>();
     protected final Map<String, Object> _cursorInfoMap = new LinkedHashMap<String, Object>();
     protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = new LinkedHashMap<String, DfParameterBeanMetaData>();
     protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
@@ -232,7 +233,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         rs = statement.executeQuery(sql);
                         _goodSqlCount++;
 
-                        final Map<String, Integer> columnJdbcTypeMap = new LinkedHashMap<String, Integer>();
+                        final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = new LinkedHashMap<String, DfColumnMetaInfo>();
                         final ResultSetMetaData md = rs.getMetaData();
                         for (int i = 1; i <= md.getColumnCount(); i++) {
                             String columnName = null;
@@ -250,7 +251,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 throw new IllegalArgumentException(msg);
                             }
                             final int columnType = md.getColumnType(i);
-                            columnJdbcTypeMap.put(columnName, columnType);
+                            int columnSize = md.getPrecision(i);
+                            if (columnSize <= 0) {// Example: sum(COLUMN)
+                                columnSize = md.getColumnDisplaySize(i);
+                            }
+                            int scale = md.getScale(i);
+                            final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
+                            metaInfo.setColumnName(columnName);
+                            metaInfo.setJdbcTypeCode(columnType);
+                            metaInfo.setColumnSize(columnSize);
+                            metaInfo.setDecimalDigits(scale);
+                            columnJdbcTypeMap.put(columnName, metaInfo);
                         }
 
                         // for Customize Entity
@@ -549,7 +560,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             this.propertyNameOptionMap = propertyNameOptionMap;
         }
     }
-
+    
     // ===================================================================================
     //                                                                       Task Override
     //                                                                       =============
@@ -559,7 +570,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         final Set<String> entityNameSet = _entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
-            final Map<String, Integer> columnJdbcTypeMap = _entityInfoMap.get(entityName);
+            final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = _entityInfoMap.get(entityName);
 
             final Table tbl = new Table();
             tbl.setName(entityName);
@@ -573,8 +584,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             for (String columnName : columnNameSet) {
                 final Column col = new Column();
                 setupColumnName(columnName, col);
-                setupTorqueType(columnJdbcTypeMap, columnName, col);
                 setupPrimaryKey(entityName, columnName, col);
+                setupTorqueType(columnJdbcTypeMap, columnName, col);
+                setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, col);
 
                 tbl.addColumn(col);
                 _log.info("   " + (col.isPrimaryKey() ? "*" : " ") + columnName + " --> " + col.getName() + " : "
@@ -603,9 +615,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected void setupTorqueType(final Map<String, Integer> columnJdbcTypeMap, String columnName, final Column col) {
-        final Integer jdbcType = columnJdbcTypeMap.get(columnName);
+    protected void setupTorqueType(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, final Column col) {
+        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+        final Integer jdbcType = metaInfo.getJdbcTypeCode();
         col.setTorqueType(TypeMap.getTorqueType(jdbcType));
+    }
+    
+    protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, final Column col) {
+        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+        final int columnSize = metaInfo.getColumnSize();
+        final int decimalDigits = metaInfo.getDecimalDigits();
+        col.setSize(columnSize + "," + decimalDigits);
     }
 
     protected void setupPrimaryKey(String entityName, String columnName, final Column col) {

@@ -134,6 +134,14 @@ public class ${myClassName} {
     public void setPropertyName(String propertyName) {
         this.propertyName = propertyName;
     }
+	
+	public Class<?> getPropertyType() {
+        return this.propertyType;
+    }
+
+    public void setPropertyType(Class<?> propertyType) {
+        this.propertyType = propertyType;
+    }
 
     public boolean isPrimary() {
         return this.primary;

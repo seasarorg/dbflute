@@ -49,7 +49,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                              Inline
     //                                                                              ======
     /**
-     * Get inline query.
+     * Prepare inline query.
      * 
      * @return Inline query. (NotNull)
      */
@@ -57,8 +57,21 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         if (_inlineQuery == null) {
             _inlineQuery = new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
         }
+		_inlineQuery.xsetOnClauseInline(false);
         return _inlineQuery;
     }
+	
+    /**
+     * Prepare on-clause query.
+     * 
+     * @return On-clause query. (NotNull)
+     */
+	public ${myConditionInlineQueryClassName} on() {
+	    if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
+	    ${myConditionInlineQueryClassName} inlineQuery = inline();
+		inlineQuery.xsetOnClauseInline(true);
+		return inlineQuery;
+	}
 
     // ===================================================================================
     //                                                                       IncludeAsMine
@@ -380,8 +393,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 	    final String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
         final String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
         final ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
-        cq.setForeignPropertyName("${foreignKeys.foreignPropertyName}");
-        cq.setRelationPath(nextRelationPath);
+        cq.xsetForeignPropertyName("${foreignKeys.foreignPropertyName}");
+        cq.xsetRelationPath(nextRelationPath);
         return cq;
     }
 
@@ -458,8 +471,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         final String nextRelationPath = resolveNextRelationPath${referer.ReffererPropertyNameInitCapAsOne}();
         final String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
         final ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
-        cq.setForeignPropertyName("${referer.reffererPropertyNameAsOne}");
-        cq.setRelationPath(nextRelationPath);
+        cq.xsetForeignPropertyName("${referer.reffererPropertyNameAsOne}");
+        cq.xsetRelationPath(nextRelationPath);
         return cq;
     }
 	

@@ -808,6 +808,22 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 #end
 #end
+
+#if (${table.hasOnlyOnePrimaryKey()})
+    // ===================================================================================
+    //                                                                      Various Delete
+    //                                                                      ==============
+    /**
+     * Query delete the several entities.
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @return The deleted count.
+     */
+    public int queryDelete(${myConditionBeanClassName} cb) {
+	    assertConditionBeanNotNull(cb);
+	    return getMyDao().deleteByQuery(cb);
+	}
+#end
 #else
   #if ($table.isAvailableNonPrimaryKeyWritable())
 
@@ -865,31 +881,26 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
 
     ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateInsertList(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeInsertInternally(entityList); return getMyDao().insertList(entityList);
+        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().insertList(helpFilterBeforeInsertInternally(entityList));
     }
-
     ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateList(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeUpdateInternally(entityList); return getMyDao().updateList(entityList);
+        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().updateList(helpFilterBeforeUpdateInternally(entityList));
     }
 #if ($table.hasOptimisticLock())
-
     ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeUpdateInternally(entityList); return getMyDao().updateListNonstrict(entityList);
+        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().updateListNonstrict(helpFilterBeforeUpdateInternally(entityList));
     }
 #end
-
     ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteList(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeDeleteInternally(entityList); return getMyDao().deleteList(entityList);
+        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().deleteList(helpFilterBeforeDeleteInternally(entityList));
     }
 #if ($table.hasOptimisticLock())
-
     ${database.behaviorDelegateModifier} ${batchUpdateReturnType} delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> entityList) {
-        assertListNotNullAndNotEmpty(entityList); helpFilterBeforeDeleteInternally(entityList); return getMyDao().deleteListNonstrict(entityList);
+        assertObjectNotNull("${myEntityListVariableName}", entityList); return getMyDao().deleteListNonstrict(helpFilterBeforeDeleteInternally(entityList));
     }
 #end
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
-
     ${database.behaviorDelegateModifier} int delegateInsert(${myExtendedObjectClassName} entity) {
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         return getMyDao().insert(entity);

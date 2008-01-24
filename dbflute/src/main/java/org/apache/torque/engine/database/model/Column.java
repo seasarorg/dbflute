@@ -428,7 +428,7 @@ public class Column {
             sb.append("UQ");
         }
         plugDelimiterIfNeeds(sb);
-        sb.append(getDbType());
+        sb.append(getDbType() != null ? getDbType() : "UnknownType");
         if (getSize() != null) {
             sb.append("(" + getSize() + ")");
         }

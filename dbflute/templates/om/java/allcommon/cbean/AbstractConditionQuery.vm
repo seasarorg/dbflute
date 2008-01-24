@@ -53,6 +53,12 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     /** The query of child. */
     protected final ${glConditionQueryInterfaceName} _childQuery;
 
+    // -----------------------------------------------------
+    //                                                Inline
+    //                                                ------
+	/** Is it the inline for on-clause. (Property for Inline Only) */
+	protected boolean _onClauseInline;
+	
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -179,7 +185,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return _foreignPropertyName;
     }
 
-    public void setForeignPropertyName(String foreignPropertyName) {
+    public void xsetForeignPropertyName(String foreignPropertyName) {
         this._foreignPropertyName = foreignPropertyName;
     }
 
@@ -187,10 +193,17 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return _relationPath;
     }
 
-    public void setRelationPath(String relationPath) {
+    public void xsetRelationPath(String relationPath) {
         this._relationPath = relationPath;
     }
 
+    // -----------------------------------------------------
+    //                                                Inline
+    //                                                ------
+	public void xsetOnClauseInline(boolean onClauseInline) {
+	    _onClauseInline = onClauseInline;
+	}
+	
     // ===================================================================================
     //                                                                            Location
     //                                                                            ========
@@ -493,7 +506,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
             } else {
-                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue);
+                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
             }
         }
     }
@@ -505,7 +518,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
             } else {
-                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option);
+				getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option, _onClauseInline);
             }
         }
     }
@@ -582,29 +595,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         if (isBaseQuery(this)) {
             getSqlClause().registerBaseTableInlineWhereClause(whereClause);
         } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause);
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause, _onClauseInline);
         }
     }
-
-#if ($database.isMakeDeprecated())
-    /**
-     * @param subQuery Sub query. (NotNull)
-     * @param columName Column name. (NotNull)
-     * @param relatedColumnName Related column name. (NotNull)
-     * @param propertyName Property name. (NotNull)
-     * @deprecated This method is deprecated.
-     */
-    protected void registerInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
-                                 , String columnName, String relatedColumnName, String propertyName) {
-        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-        final String finalClause = columnName + " in (" + subQueryClause + ")";
-        if (isBaseQuery(this)) {
-            getSqlClause().registerBaseTableInlineWhereClause(finalClause);
-        } else {
-            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), finalClause);
-        }
-    }
-#end
 
     // ----------------------------------------
     //                               UnionQuery

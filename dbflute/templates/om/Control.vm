@@ -312,6 +312,7 @@ targetdatabase = $targetDatabase
 	#set ($glInternalAbstractStaticCommand = "${glProjectPrefix}InternalAbstractStaticCommand")
 	#set ($glInternalDeleteAutoStaticCommand = "${glProjectPrefix}InternalDeleteAutoStaticCommand")
 	#set ($glInternalDeleteBatchAutoStaticCommand = "${glProjectPrefix}InternalDeleteBatchAutoStaticCommand")
+	#set ($glInternalDeleteQueryAutoDynamicCommand = "${glProjectPrefix}InternalDeleteQueryAutoDynamicCommand")
 	#set ($glInternalInsertAutoDynamicCommand = "${glProjectPrefix}InternalInsertAutoDynamicCommand")
 	#set ($glInternalInsertBatchAutoStaticCommand = "${glProjectPrefix}InternalInsertBatchAutoStaticCommand")
 	#set ($glInternalUpdateAutoDynamicCommand = "${glProjectPrefix}InternalUpdateAutoDynamicCommand")
@@ -321,6 +322,7 @@ targetdatabase = $targetDatabase
 	#set ($glInternalAbstractBatchAutoHandler = "${glProjectPrefix}InternalAbstractBatchAutoHandler")
 	#set ($glInternalBasicHandler = "${glProjectPrefix}InternalBasicHandler")
 	#set ($glInternalBasicSelectHandler = "${glProjectPrefix}InternalBasicSelectHandler")
+	#set ($glInternalCommandContextHandler = "${glProjectPrefix}InternalCommandContextHandler")
 	#set ($glInternalDeleteAutoHandler = "${glProjectPrefix}InternalDeleteAutoHandler")
 	#set ($glInternalDeleteBatchAutoHandler = "${glProjectPrefix}InternalDeleteBatchAutoHandler")
 	#set ($glInternalInsertAutoHandler = "${glProjectPrefix}InternalInsertAutoHandler")
@@ -608,7 +610,7 @@ targetdatabase = $targetDatabase
     ## Setup java directory for allcommon.
     $database.setupJavaDir_for_allcommon()
 
-    #if ($database.isTargetLanguageJava())
+    #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
       $database.debug("    parseAccessContext()")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glAccessContextName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/AccessContext.${glTemplateFileExtension}",$path ,"", "")
@@ -1756,6 +1758,10 @@ targetdatabase = $targetDatabase
 	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalDeleteBatchAutoStaticCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalDeleteBatchAutoStaticCommand.${glTemplateFileExtension}",$path,"", "")
 	  
+	  $database.debug("    parse('InternalDeleteQueryAutoDynamicCommand');")	  
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalDeleteQueryAutoDynamicCommand}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalDeleteQueryAutoDynamicCommand.${glTemplateFileExtension}",$path,"", "")
+	  
       $database.debug("    parse('InternalInsertAutoDynamicCommand');")	  
 	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlCommand})}${glInternalInsertAutoDynamicCommand}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlcommand/InternalInsertAutoDynamicCommand.${glTemplateFileExtension}",$path,"", "")
@@ -1794,6 +1800,10 @@ targetdatabase = $targetDatabase
       $database.debug("    parse('InternalBasicSelectHandler');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalBasicSelectHandler}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalBasicSelectHandler.${glTemplateFileExtension}",$path,"", "")
+	  
+      $database.debug("    parse('InternalCommandContextHandler');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalCommandContextHandler}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlhandler/InternalCommandContextHandler.${glTemplateFileExtension}",$path,"", "")
 	  
       $database.debug("    parse('InternalDeleteAutoHandler');")	  
 	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlHandler})}${glInternalDeleteAutoHandler}.${glClassFileExtension}" )

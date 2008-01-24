@@ -1,0 +1,98 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.CommandContext;
+import org.seasar.dao.Node;
+import org.seasar.dao.SqlCommand;
+import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalCommandContextHandler};
+import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalCommandContextCreator};
+import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DataSource dataSource;
+    protected StatementFactory statementFactory;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalDeleteQueryAutoDynamicCommand}(DataSource dataSource, StatementFactory statementFactory) {
+        this.dataSource = dataSource;
+        this.statementFactory = statementFactory;
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public Object execute(Object[] args) {
+        final ${glConditionBeanInterfaceName} cb = extractConditionBeanWithCheck(args);
+        final String[] argNames = new String[]{"dto"};
+        final Class<?>[] argTypes = new Class<?>[]{cb.getClass()};
+        final String twoWaySql = buildQueryDeleteTwoWaySql(cb);
+        final CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
+        final ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        int rows = handler.execute(args);
+        return new Integer(rows);
+    }
+    
+    protected ${glConditionBeanInterfaceName} extractConditionBeanWithCheck(Object[] args) {
+        if (args == null || args.length == 0) {
+            String msg = "The arguments should have one argument! But:";
+            msg = msg + " args=" + (args != null ? args.length : null);
+            throw new IllegalArgumentException(msg);
+        }
+        final Object fisrtArg = args[0];
+        if (!(fisrtArg instanceof ${glConditionBeanInterfaceName})) {
+            String msg = "The type of argument should be " + ${glConditionBeanInterfaceName}.class + "! But:";
+            msg = msg + " type=" + fisrtArg.getClass();
+            throw new IllegalArgumentException(msg);
+        }
+        return (${glConditionBeanInterfaceName}) fisrtArg;
+    }
+    
+    protected ${glInternalCommandContextHandler} createCommandContextHandler(CommandContext context) {
+        return new ${glInternalCommandContextHandler}(dataSource, statementFactory, context);
+    }
+
+    protected String buildQueryDeleteTwoWaySql(${glConditionBeanInterfaceName} cb) {
+        final String fromWhereClause = cb.getSqlClause().getClauseFromWhere();
+        final String tableSqlName = cb.getTableSqlName();
+        final String aliasName = cb.getSqlClause().getLocalTableAliasName();
+        final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cb.getTableDbName());
+        if (dbmeta.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The target table of queryDelete() should have only one primary key:";
+            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            throw new IllegalStateException(msg);
+        }
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final StringBuilder sb = new StringBuilder();
+        sb.append("delete from ").append(tableSqlName);
+        sb.append(" where ").append(primaryKeyName);
+        sb.append(" in (select ").append(aliasName).append(".").append(primaryKeyName);
+        sb.append(" ").append(fromWhereClause).append(")");
+        return sb.toString();
+    }
+    
+    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
+        final CommandContext context;
+        {
+            final ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+            final Node node = parser.parse();
+            final ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
+            context = creator.createCommandContext(args);
+            node.accept(context);
+        }
+        return context;
+    }
+}

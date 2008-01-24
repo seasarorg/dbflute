@@ -1,8 +1,10 @@
 ${database.allClassCopyright}package ${myBaseDaoPackageName};
 
 #set ($myClassName = "${myBaseDaoClassName}")
+import java.util.List;
 
 import ${glPackageExtendedEntity}.${myExtendedObjectClassName};
+import ${glPackageCB}.${myConditionBeanClassName};
 #set ($InterfaceName = "")
 #if ($table.isWritable())
   #set ($InterfaceName = "${glPackageBaseCommon}.${glDaoWritableInterfaceName}")
@@ -85,7 +87,7 @@ public interface ${myClassName} extends ${InterfaceName} {
 
     public static final String getEntityByIds_ARGS = "ids";
     public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
-    java.util.List<${myExtendedObjectClassName}> getEntityByIds(java.util.List<${table.primaryKeyJavaNativeAsOne}> ids);
+    List<${myExtendedObjectClassName}> getEntityByIds(List<${table.primaryKeyJavaNativeAsOne}> ids);
 #end
 
     /**
@@ -96,7 +98,7 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @param cb Condition-bean. (NotNull)
      * @return Selected count. (NotNull)
      */
-    public int selectCount(${myAttachedCBArgsString});
+    public int selectCount(${myConditionBeanClassName} cb);
 
     /**
      * Select the entity '${myExtendedObjectClassName}' by condition-bean.
@@ -104,7 +106,7 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. If the select result is zero, it returns null. (Nullable)
      */
-    public ${myExtendedObjectClassName} selectEntity(${myAttachedCBArgsString});
+    public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb);
 
     /**
      * Select the list by condition-bean.
@@ -112,7 +114,7 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
      */
-    public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} selectList(${myAttachedCBArgsString});
+    public List<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb);
 #if ($table.isWritable())
 
     /**
@@ -172,7 +174,7 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @param entityList The list of entity. (NotNull)
      * @return The array of inserted count.
      */
-    public ${batchUpdateReturnType} insertList(java.util.List<${myExtendedObjectClassName}> entityList);
+    public ${batchUpdateReturnType} insertList(List<${myExtendedObjectClassName}> entityList);
 
     /**
      * Update the several entities.
@@ -180,7 +182,7 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @param entityList The list of entity. (NotNull)
      * @return The array of updated count.
      */
-    public ${batchUpdateReturnType} updateList(java.util.List<${myExtendedObjectClassName}> entityList);
+    public ${batchUpdateReturnType} updateList(List<${myExtendedObjectClassName}> entityList);
 
 #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
     /**
@@ -189,7 +191,7 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @param the entityList The list of entity. (NotNull)
      * @return The array of updated count.
      */
-    public ${batchUpdateReturnType} updateListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList);
+    public ${batchUpdateReturnType} updateListNonstrict(List<${myExtendedObjectClassName}> entityList);
 #end
 
     /**
@@ -198,18 +200,27 @@ public interface ${myClassName} extends ${InterfaceName} {
      * @param entityList The list of entity. (NotNull)
      * @return The array of deleted count.
      */
-    public ${batchUpdateReturnType} deleteList(java.util.List<${myExtendedObjectClassName}> entityList);
-
+    public ${batchUpdateReturnType} deleteList(List<${myExtendedObjectClassName}> entityList);
 #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
-    /**
+
+	/**
      * Delete the several entities non-strictly.
      * 
      * @param entityList The list of entity. (NotNull)
      * @return The array of deleted count.
      */
-    public ${batchUpdateReturnType} deleteListNonstrict(java.util.List<${myExtendedObjectClassName}> entityList);
+    public ${batchUpdateReturnType} deleteListNonstrict(List<${myExtendedObjectClassName}> entityList);
 #end
+#if (${table.hasOnlyOnePrimaryKey()})
 
+    /**
+     * Delete the several entities by the query.
+     * 
+     * @param cb Condition-bean. (NotNull)
+     * @return The deleted count.
+     */
+    public int deleteByQuery(${myConditionBeanClassName} cb);
+#end
 #else
   #if ($table.isAvailableNonPrimaryKeyWritable())
 

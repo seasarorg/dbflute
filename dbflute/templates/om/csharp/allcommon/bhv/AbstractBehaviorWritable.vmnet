@@ -21,12 +21,12 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                             Basic Entity Update
         //                                                             ===================
-        public void Create(${glEntityInterfaceName} entity) {
+        public virtual void Create(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             CallCreate(entity);
         }
 
-        public void Modify(${glEntityInterfaceName} entity) {
+        public virtual void Modify(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             int modifiedCount = CallModify(entity);
             AssertUpdatedEntity(entity, modifiedCount);
@@ -44,7 +44,7 @@ namespace ${glPackageBaseCommonBhv} {
             }
         }
 
-        public void Remove(${glEntityInterfaceName} entity) {
+        public virtual void Remove(${glEntityInterfaceName} entity) {
             AssertEntityNotNull(entity);
             int removedCount = CallRemove(entity);
             AssertDeletedEntity(entity, removedCount);

@@ -216,10 +216,18 @@ namespace ${glPackageBaseCommonDBMeta} {
     	                                            , EntityPropertySetupper<ENTITY> setupper
     											    , IDictionary<String, EntityPropertySetupper<ENTITY>> _entityPropertySetupperMap
 													) where ENTITY : ${glEntityInterfaceName} {
-    		_entityPropertySetupperMap.Add(columnName, setupper);
-    		_entityPropertySetupperMap.Add(propertyName, setupper);
-    		_entityPropertySetupperMap.Add(columnName.ToLower(), setupper);
-    		_entityPropertySetupperMap.Add(propertyName.ToLower(), setupper);
+			if (!_entityPropertySetupperMap.ContainsKey(columnName)) {
+    		    _entityPropertySetupperMap.Add(columnName, setupper);
+			}
+			if (!_entityPropertySetupperMap.ContainsKey(propertyName)) {
+    		    _entityPropertySetupperMap.Add(propertyName, setupper);
+			}
+			if (!_entityPropertySetupperMap.ContainsKey(columnName.ToLower())) {
+    		    _entityPropertySetupperMap.Add(columnName.ToLower(), setupper);
+			}
+			if (!_entityPropertySetupperMap.ContainsKey(propertyName.ToLower())) {
+    		    _entityPropertySetupperMap.Add(propertyName.ToLower(), setupper);
+			}
     	}
 		
         // ===============================================================================

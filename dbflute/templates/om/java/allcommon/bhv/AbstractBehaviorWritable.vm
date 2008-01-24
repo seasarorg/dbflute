@@ -1,6 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 #set ($myClassName = "${glBehaviorWritableAbstractName}")
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
@@ -872,7 +875,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Inserted count.
      */
     public ${batchUpdateReturnType} callCreateList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
+        assertObjectNotNull("entityList", entityList);
         helpFilterBeforeInsertInternally(entityList);
         return getDaoWritable().createList(entityList);
     }
@@ -884,7 +887,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Updated count.
      */
     public ${batchUpdateReturnType} callModifyList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
+        assertObjectNotNull("entityList", entityList);
         helpFilterBeforeUpdateInternally(entityList);
         return getDaoWritable().modifyList(entityList);
     }
@@ -896,7 +899,7 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
      * @return Deleted count.
      */
     public ${batchUpdateReturnType} callRemoveList(java.util.List${database.filterGenericsString(${glEntityInterfaceName})} entityList) {
-        assertListNotNullAndNotEmpty(entityList);
+        assertObjectNotNull("entityList", entityList);
         helpFilterBeforeDeleteInternally(entityList);
         return getDaoWritable().removeList(entityList);
     }
@@ -948,27 +951,33 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     // ===================================================================================
     //                                                     Delegate Method Internal Helper
     //                                                     ===============================
-    protected void helpFilterBeforeInsertInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            if (!determineExecuteInsert(entity)) { continue; }
-            processBeforeInsert(entity);
+    protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeInsertInternally(List<ENTITY> entityList) {
+	    final List<ENTITY> filteredList = new ArrayList<ENTITY>();
+        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
+            final ENTITY entity = ite.next();
+            if (!processBeforeInsert(entity)) { continue; }
+			filteredList.add(entity);
         }
+		return filteredList;
     }
 
-    protected void helpFilterBeforeUpdateInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            if (!determineExecuteUpdate(entity)) { continue; }
-            processBeforeUpdate(entity);
+    protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeUpdateInternally(List<ENTITY> entityList) {
+	    final List<ENTITY> filteredList = new ArrayList<ENTITY>();
+        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
+            final ENTITY entity = ite.next();
+            if (!processBeforeUpdate(entity)) { continue; }
+			filteredList.add(entity);
         }
+		return filteredList;
     }
 
-    protected void helpFilterBeforeDeleteInternally(java.util.List<? extends ${glEntityInterfaceName}> entityList) {
-        for (final java.util.Iterator ite = entityList.iterator(); ite.hasNext(); ) {
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName})ite.next();
-            if (!determineExecuteDelete(entity)) { continue; }
-            processBeforeDelete(entity);
+    protected <ENTITY extends ${glEntityInterfaceName}> List<ENTITY> helpFilterBeforeDeleteInternally(List<ENTITY> entityList) {
+		final List<ENTITY> filteredList = new ArrayList<ENTITY>();
+        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
+            final ENTITY entity = ite.next();
+            if (!processBeforeDelete(entity)) { continue; }
+			filteredList.add(entity);
         }
+		return filteredList;
     }
 }

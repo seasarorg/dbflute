@@ -22,6 +22,12 @@ import org.seasar.framework.util.StatementUtil;
 public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternalAbstractAutoHandler} {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glInternalAbstractBatchAutoHandler}.class);
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ${glInternalAbstractBatchAutoHandler}(DataSource dataSource,
@@ -38,10 +44,16 @@ public abstract class ${glInternalAbstractBatchAutoHandler} extends ${glInternal
         return execute(list);
     }
 
-    public int[] execute(List list) throws SQLRuntimeException {
+    public int[] execute(List<?> list) throws SQLRuntimeException {
         if (list == null) {
             throw new IllegalArgumentException("list");
         }
+		if (list.isEmpty()) {
+		    if (_log.isDebugEnabled()) {
+                _log.debug("Skip executeBatch() bacause of the empty list.");
+            }
+			return new int[0];
+		}
         Connection connection = getConnection();
         try {
             PreparedStatement ps = prepareStatement(connection);

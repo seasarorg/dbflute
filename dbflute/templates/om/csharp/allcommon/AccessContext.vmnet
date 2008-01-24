@@ -1,0 +1,103 @@
+
+using System;
+using System.Threading;
+
+namespace ${glPackageBaseCommon} {
+
+    public class ${glAccessContextName} {
+
+        private static LocalDataStoreSlot _accessContextSlot = Thread.AllocateDataSlot();
+
+        public static ${glAccessContextName} GetAccessContextOnThread() {
+            return (${glAccessContextName})Thread.GetData(_accessContextSlot);
+        }
+
+        public static void SetAccessContextOnThread(${glAccessContextName} context) {
+            if (context == null) {
+                String msg = "The argument[context] must not be null.";
+                throw new ArgumentNullException(msg);
+            }
+            Thread.SetData(_accessContextSlot, context);
+        }
+
+        public static void ClearAccessContextOnThread() {
+            Thread.SetData(_accessContextSlot, null);
+        }
+
+        public static bool IsExistAccessContextOnThread() {
+            return (Thread.GetData(_accessContextSlot) != null);
+        }
+		
+		public static String GetAccessUserOnThread() {
+            if (IsExistAccessContextOnThread()) {
+                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                String accessUser = userContextOnThread.AccessUser;
+                if (accessUser != null) {
+                    return accessUser;
+                }
+            }
+            return "Anonymous";// as Default
+		}
+		
+		public static String GetAccessProcessOnThread() {
+            if (IsExistAccessContextOnThread()) {
+                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                String accessProcess = userContextOnThread.AccessProcess;
+                if (accessProcess != null) {
+                    return accessProcess;
+                }
+            }
+            return "Anonymous";// as Default
+		}
+		
+		public static String GetAccessModuleOnThread() {
+            if (IsExistAccessContextOnThread()) {
+                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                String accessModule = userContextOnThread.AccessModule;
+                if (accessModule != null) {
+                    return accessModule;
+                }
+            }
+            return "Anonymous";// as Default
+		}
+		
+		public static DateTime? GetAccessTimestampOnThread() {
+            if (IsExistAccessContextOnThread()) {
+                ${glAccessContextName} userContextOnThread = GetAccessContextOnThread();
+                DateTime? accessTimestamp = userContextOnThread.AccessTimestamp;
+                if (accessTimestamp != null) {
+                    return accessTimestamp;
+                }
+            }
+            return DateTime.Now;// as Default
+		}
+		
+        protected String _accessUser;
+    
+        protected String _accessProcess;
+    
+        protected String _accessModule;
+    
+        protected DateTime? _accessTimestamp;
+		
+		public String AccessUser {
+		    get { return _accessUser; }
+			set { _accessUser = value; }
+		}
+		
+		public String AccessProcess {
+		    get { return _accessProcess; }
+			set { _accessProcess = value; }
+		}
+		
+		public String AccessModule {
+		    get { return _accessModule; }
+			set { _accessModule = value; }
+		}
+		
+		public DateTime? AccessTimestamp {
+		    get { return _accessTimestamp; }
+			set { _accessTimestamp = value; }
+		}
+    }
+}

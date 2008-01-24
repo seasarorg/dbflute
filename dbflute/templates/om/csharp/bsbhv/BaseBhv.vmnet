@@ -75,10 +75,10 @@ namespace ${glPackageExtendedBhv} {
         public override ${glConditionBeanInterfaceName} NewConditionBean() { return NewMyConditionBean(); }
 
         /// <summary>New my entity.</summary><returns>My conditionBean. (NotNull)</returns>
-        public ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
+        public virtual ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
 
         /// <summary>New my conditionBean.</summary><returns>My conditionBean. (NotNull)</returns>
-        public ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
+        public virtual ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
         #endregion
 
         // ===============================================================================
@@ -90,7 +90,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
         /// <returns>The selected count. (NotNull)</returns>
-        public int SelectCount(${myConditionBeanClassName} cb) {
+        public virtual int SelectCount(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.DelegateSelectCount(cb);
         }
@@ -101,7 +101,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
         /// <returns>The selected entity. (Nullalble)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        public ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
+        public virtual ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
             if (ls.Count == 0) { return null; }
@@ -116,7 +116,7 @@ namespace ${glPackageExtendedBhv} {
         /// <returns>The selected entity. (NotNull)</returns>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        public ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
+        public virtual ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
             AssertEntityNotDeleted(ls, cb);
@@ -140,7 +140,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
         /// <returns>The result-bean of selected list. (NotNull)</returns>
-        public ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
+        public virtual ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return new ResultBeanBuilder<${myExtendedObjectClassName}>(TableDbName).BuildListResultBean(cb, this.DelegateSelectList(cb));
         }
@@ -150,7 +150,7 @@ namespace ${glPackageExtendedBhv} {
         /// </summary>
         /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
         /// <returns>The result-bean of selected page. (NotNull)</returns>
-        public ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
+        public virtual ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             PagingInvoker<${myExtendedObjectClassName}> invoker = new PagingInvoker<${myExtendedObjectClassName}>(TableDbName);
             return invoker.InvokePaging(new InternalSelectPagingHandler(this, cb));
@@ -187,7 +187,7 @@ namespace ${glPackageExtendedBhv} {
         //   ReferrerProperty = [${referer.reffererPropertyNameInitCap}]
         // * * * * * * * * */
 
-        public void Load${referer.reffererPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper) {
+        public virtual void Load${referer.reffererPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ls, ${glConditionBeanSetupperName}<${refererCBClassName}> conditionBeanSetupper) {
             AssertObjectNotNull("ls", ls); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
             if (ls.Count == 0) { return; }
 
@@ -241,7 +241,7 @@ namespace ${glPackageExtendedBhv} {
         /// Insert the entity.
         /// </summary>
         /// <param name="entity">The entity of insert target. (NotNull)</param>
-        public void Insert(${myExtendedObjectClassName} entity) {
+        public virtual void Insert(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             this.DelegateInsert(entity);
         }
@@ -253,7 +253,7 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        public void Update(${myExtendedObjectClassName} entity) {
+        public virtual void Update(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int updatedCount = this.DelegateUpdate(entity);
             AssertUpdatedEntity(entity, updatedCount);
@@ -266,7 +266,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">The entity of update target. (NotNull)</param>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        public void UpdateNonstrict(${myExtendedObjectClassName} entity) {
+        public virtual void UpdateNonstrict(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int updatedCount = this.DelegateUpdateNonstrict(entity);
             AssertUpdatedEntity(entity, updatedCount);
@@ -281,7 +281,7 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
 // TODO: @jflute - In development
-//        public void InsertOrUpdate(${myExtendedObjectClassName} entity) {
+//        public virtual void InsertOrUpdate(${myExtendedObjectClassName} entity) {
 //            AssertEntityNotNull(entity);
 //            if (!entity.HasPrimaryKeyValue) {
 //                this.Insert(entity);
@@ -302,7 +302,7 @@ namespace ${glPackageExtendedBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        public void Delete(${myExtendedObjectClassName} entity) {
+        public virtual void Delete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int deletedCount = this.DelegateDelete(entity);
             AssertUpdatedEntity(entity, deletedCount);
@@ -315,7 +315,7 @@ namespace ${glPackageExtendedBhv} {
         /// <param name="entity">The entity of delete target. (NotNull)</param>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
-        public void DeleteNonstrict(${myExtendedObjectClassName} entity) {
+        public virtual void DeleteNonstrict(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int deletedCount = this.DelegateDeleteNonstrict(entity);
             AssertUpdatedEntity(entity, deletedCount);
@@ -366,7 +366,7 @@ namespace ${glPackageExtendedBhv} {
         //                                                                        Accessor
         //                                                                        ========
         #region Accessor
-        public ${myExtendedDaoClassName} Dao {
+        public virtual ${myExtendedDaoClassName} Dao {
             get { return _dao; }
             set { _dao = value; }
         }

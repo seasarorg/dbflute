@@ -53,10 +53,10 @@ namespace ${myExtendedEntityPackageName} {
     /// </summary>
     [Seasar.Dao.Attrs.Table("${table.AnnotationTableName}")]
 #if ($table.isUseUpdateDate())
-    [Seasar.Dao.Attrs.TimestampProperty("${table.UpdateDateUncapitalisedJavaName}")]
+    [Seasar.Dao.Attrs.TimestampProperty("${table.updateDateJavaName}")]
 #end
 #if ($table.isUseVersionNo())
-    [Seasar.Dao.Attrs.VersionNoProperty("${table.VersionNoUncapitalisedJavaName}")]
+    [Seasar.Dao.Attrs.VersionNoProperty("${table.versionNoJavaName}")]
 #end
     [System.Serializable]
     public partial class ${myClassName} : ${myEntityInterfaceName} {

@@ -81,6 +81,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteBatchAutoStaticCommand};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteQueryAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateAutoDynamicCommand};
@@ -598,9 +599,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     //                                                ------
 	@Override
     protected void setupDeleteMethodByAuto(final Method method) {
+        if (isFirstArgumentConditionBean(method)) {
+            final SqlCommand cmd = new ${glInternalDeleteQueryAutoDynamicCommand}(dataSource, statementFactory);
+            putSqlCommand(method.getName(), cmd);
+            return;
+        }
         checkAutoUpdateMethod(method);
         final String[] propertyNames = getPersistentPropertyNames(method);
-        SqlCommand cmd = null;
+        final SqlCommand cmd;
         if (isUpdateSignatureForBean(method)) {
             cmd = createInternalDeleteAutoStaticCommand(method, propertyNames);
         } else {
@@ -695,6 +701,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return nonConcurrencyBmdFactory;
     }
 
+    protected boolean isFirstArgumentConditionBean(final Method method) {
+        final Class<?>[] parameterTypes = method.getParameterTypes();
+        return parameterTypes.length > 0 && ${glConditionBeanInterfaceName}.class.isAssignableFrom(parameterTypes[0]);
+    }
+	
     // ===================================================================================
     //                                                                 OutsideSql Override
     //                                                                 ===================

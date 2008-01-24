@@ -70,7 +70,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     protected String getInScopeSubQueryRealColumnName(String columnName) {
-        return columnName;// No append alias name!
+	    if (_onClauseInline) {
+		    throw new UnsupportedOperationException("InScopeSubQuery of on-clause is unsupported");
+		}
+        return _onClauseInline ? getRealAliasName() + "." + columnName : columnName;
     }
 
     protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
@@ -81,17 +84,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                Override about Query
     //                                                                ====================
-    // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   MyTable = [$table.Name]
-    // * * * * * * * * */
-
   #foreach ($col in $table.Columns)
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
-    // /- - - - - - - - - - - - - - - - - - - - - - -
-    //   Column = [$col.Name]
-    // - - - - - - - - -/
     protected ${glConditionValueName} getCValue${tmpJavaName}() {
         return _myCQ.get${tmpJavaName}();
     }

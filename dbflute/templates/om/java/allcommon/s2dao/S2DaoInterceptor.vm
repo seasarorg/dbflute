@@ -487,6 +487,45 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
                     final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) ret;
                     _log.debug(daoResultPrefix + "Selected entity: " + entity + "]");
                 }
+            } else if (${glEntityInterfaceName}.class.isAssignableFrom(retType)) {
+                if (ret == null) {
+                    _log.debug(daoResultPrefix + "Selected entity: null" + "]");
+                } else {
+                    final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) ret;
+                    _log.debug(daoResultPrefix + "Selected entity: " + entity + "]");
+                }
+            } else if (int[].class.isAssignableFrom(retType)) {
+                if (ret == null) {
+                    _log.debug(daoResultPrefix + "Selected entity: null" + "]");
+                } else {
+                    final int[] resultArray = (int[]) ret;
+                    if (resultArray.length == 0) {
+                        _log.debug(daoResultPrefix + "All updated count: 0]");
+                    } else {
+                        final StringBuilder sb = new StringBuilder();
+                        boolean resultExpressionScope = true;
+                        int resultCount = 0;
+                        int loopCount = 0;
+                        for (int element : resultArray) {
+                            resultCount = resultCount + element;
+                            if (resultExpressionScope) {
+                                if (loopCount <= 10) {
+                                    if (sb.length() == 0) {
+                                        sb.append(element);
+                                    } else {
+                                        sb.append(",").append(element);
+                                    }
+                                } else {
+                                    sb.append(",").append("...");
+                                    resultExpressionScope = false;
+                                }
+                            }
+                            ++loopCount;
+                        }
+                        sb.insert(0, "{").append("}");
+                        _log.debug(daoResultPrefix + "All updated count: " + resultCount + " result=" + sb + "]");
+                    }
+                }
             } else {
                 if (isSelectCountIgnoreFetchScopeMethod(invocation)) {
                     _log.debug(daoResultPrefix + "Selected count: " + ret + "]");

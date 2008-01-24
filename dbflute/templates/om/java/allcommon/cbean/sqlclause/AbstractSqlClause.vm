@@ -326,12 +326,13 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     protected String getLeftOuterJoinClause() {
         final StringBuffer sb = new StringBuffer();
-        for (final java.util.Iterator ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
-            final String aliasName = (String)ite.next();
+        for (final java.util.Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
+            final String aliasName = ite.next();
             final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
             final String joinTableName = joinInfo.getJoinTableName();
-            final java.util.List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
-            final java.util.Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
+            final List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
+            final List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
+            final Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
             sb.append(" left outer join ");
@@ -355,6 +356,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
                 }
                 ++count;
             }
+			for (String additionalOnClause : additionalOnClauseList) {
+			    sb.append(" and ").append(additionalOnClause);
+			}
         }
         return sb.toString();
     }
@@ -363,8 +367,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         final StringBuffer sb = new StringBuffer();
         sb.append("(select * from ").append(joinTableName).append(" where ");
         int count = 0;
-        for (final java.util.Iterator ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
-            String clauseElement = (String)ite.next();
+        for (final java.util.Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
+            String clauseElement = ite.next();
             clauseElement = filterWhereClauseSimply(clauseElement);
             if (count > 0) {
                 sb.append(" and ");
@@ -580,7 +584,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         protected String _aliasName;
         protected String _joinTableName;
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
+        protected List<String> _additionalOnClauseList = new ArrayList<String>();
         protected java.util.Map<String, String> _joinOnMap;
+		protected boolean _onClauseInline;
         public String getAliasName() {
             return _aliasName;
         }
@@ -599,11 +605,23 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         public void addInlineWhereClause(String value) {
             _inlineWhereClauseList.add(value);
         }
+        public List<String> getAdditionalOnClauseList() {
+            return _additionalOnClauseList;
+        }
+        public void addAdditionalOnClause(String value) {
+            _additionalOnClauseList.add(value);
+        }
         public java.util.Map<String, String> getJoinOnMap() {
             return _joinOnMap;
         }
         public void setJoinOnMap(java.util.Map<String, String> value) {
             _joinOnMap = value;
+        }
+        public boolean isOnClauseInline() {
+            return _onClauseInline;
+        }
+        public void setOnClauseInline(boolean value) {
+            _onClauseInline = value;
         }
     }
 
@@ -706,27 +724,41 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         _baseTableInlineWhereList.add(value);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, boolean onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-        key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value);
+		if (onClauseInline) {
+            key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value);
+		} else {
+            key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value);
+		}
         arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-        key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value, option);
-        arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+		if (onClauseInline) {
+            key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value, option);
+            arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
+		} else {
+            key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value, option);
+            arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+		}
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String value) {
+    public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-        joinInfo.addInlineWhereClause(value);
-        arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+		if (onClauseInline) {
+            joinInfo.addAdditionalOnClause(value);
+            arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
+		} else {
+		    joinInfo.addInlineWhereClause(value);
+            arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+		}
     }
 
     /**
