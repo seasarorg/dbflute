@@ -1,5 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
 
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+
 /**
  * The option of outside-sql.
  * 
@@ -14,6 +16,9 @@ public class ${glOutsideSqlOptionName} {
 
     protected boolean _dynamicBinding;
 
+	/** The config of statement. (Nullable) */
+	protected ${glStatementConfig} _statementConfig;
+	
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
@@ -68,5 +73,13 @@ public class ${glOutsideSqlOptionName} {
 
     public boolean isDynamicBinding() {
         return _dynamicBinding;
+    }
+	
+    public ${glStatementConfig} getStatementConfig() {
+        return _statementConfig;
+    }
+
+    public void setStatementConfig(${glStatementConfig} statementConfig) {
+        this._statementConfig = statementConfig;
     }
 }

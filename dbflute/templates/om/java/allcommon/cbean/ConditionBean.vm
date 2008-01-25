@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The interface of condition-bean.
@@ -182,6 +183,19 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
      * @return Determination.
      */
     public boolean isSelectCountIgnoreFetchScope();
+	
+    // =====================================================================================
+    //                                                                      Statement Config
+    //                                                                      ================
+    /**
+     * @param statementConfig The config of statement. (Nullable)
+     */
+	public void configure(${glStatementConfig} statementConfig);
+	
+    /**
+     * @return The config of statement. (Nullable)
+     */
+	public ${glStatementConfig} getStatementConfig();
 	
     // ===================================================================================
     //                                                                         Display SQL

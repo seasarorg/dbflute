@@ -9,6 +9,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.Method;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
@@ -61,7 +62,10 @@ import org.seasar.dao.impl.RelationRowCreationResource;
 
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.extension.jdbc.impl.ConfigurableStatementFactory;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.extension.jdbc.ValueType;
 #if (!$database.isVersionAfter1047())
@@ -79,6 +83,7 @@ import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContextName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonJdbc}.${glCursorHandlerName};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteBatchAutoStaticCommand};
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteQueryAutoDynamicCommand};
@@ -343,51 +348,54 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
      * @return Customize select dynamic command. (NotNull)
      */
     protected ${glSelectDynamicCommand} createCustomizeSelectDynamicCommand(org.seasar.extension.jdbc.ResultSetHandler handler) {
-        final org.seasar.extension.jdbc.ResultSetFactory customizeResultSetFactory = new ${glPackageBaseCommonS2Dao}.${glFetchNarrowingResultSetFactory}();
-#if ($database.isSelectQueryTimeoutValid() || ${database.isStatementResultSetTypeValid()})
-        final org.seasar.extension.jdbc.impl.ConfigurableStatementFactory confSf;
-        if (statementFactory instanceof org.seasar.extension.jdbc.impl.ConfigurableStatementFactory) {
-            confSf = (org.seasar.extension.jdbc.impl.ConfigurableStatementFactory)statementFactory;
-        } else {
-            confSf = null;
-        }
-        final org.seasar.extension.jdbc.StatementFactory customizeStatementFactory = new org.seasar.extension.jdbc.StatementFactory() {
-            public java.sql.PreparedStatement createPreparedStatement(java.sql.Connection con, String sql) {
+        final ResultSetFactory customizeResultSetFactory = createCustomizeResultSetFactory();
+        final StatementFactory customizeStatementFactory = createCustomizeStatememtFactory();
+        return new ${glSelectDynamicCommand}(dataSource, customizeStatementFactory, handler, customizeResultSetFactory);
+    }
+	
+	protected ResultSetFactory createCustomizeResultSetFactory() {
+	    return new ${glPackageBaseCommonS2Dao}.${glFetchNarrowingResultSetFactory}();
+	}
+	
+	protected StatementFactory createCustomizeStatememtFactory() {
+        return new StatementFactory() {
+            public PreparedStatement createPreparedStatement(java.sql.Connection con, String sql) {
                 try {
-#if ($database.isStatementResultSetTypeValid())
-                    if (_internalDebug && _log.isDebugEnabled()) {
-                        _log.debug("...Invoking ps.prepareStatement(sql, ${database.statementResultSetType}, ${database.statementResultSetConcurrency})");
+					final ${glStatementConfig} config;
+					if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+					    final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+					    config = cb.getStatementConfig();
+					} else if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+					    final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+					    config = context.getStatementConfig();
+					} else {
+					    config = null;
+					}
+					final int resultSetType;
+					if (config != null && config.hasResultSetType()) {
+					    resultSetType = config.getResultSetType();
+					} else {
+					    resultSetType = ${database.statementResultSetType};
+					}
+					final int resultSetConcurrency = ${database.statementResultSetConcurrency};
+                    if (_internalDebug) {
+                        _log.debug("...Creating prepareStatement(sql, " + resultSetType + ", " + resultSetConcurrency + ")");
                     }
-                    final java.sql.PreparedStatement ps = con.prepareStatement(sql, ${database.statementResultSetType}, ${database.statementResultSetConcurrency});
-#else
-                    final java.sql.PreparedStatement ps = con.prepareStatement(sql);
-#end
-#if ($database.isSelectQueryTimeoutValid())
-                    final int timeout = ${database.SelectQueryTimeout};
-                    if (_internalDebug && _log.isDebugEnabled()) {
-                        _log.debug("...Invoking ps.setQueryTimeout(" + timeout + ")");
-                    }
-                    ps.setQueryTimeout(timeout);
-#end
-                    if (confSf == null) {
-                        return ps;
-                    }
-                    final Class confSfType = org.seasar.extension.jdbc.impl.ConfigurableStatementFactory.class;
-                    final String confMethodName = "configurePreparedStatement";
-                    final Class[] confMethodParameterType = new Class[]{java.sql.PreparedStatement.class};
-                    try {
-                        final Method confMethod = confSfType.getDeclaredMethod(confMethodName, confMethodParameterType);
-                        confMethod.setAccessible(true);// Because the method is protected!
-                        if (_internalDebug && _log.isDebugEnabled()) {
-                            _log.debug("...Invoking configurableStatementFactory." + confMethodName + "(ps)");
-                        }
-                        confMethod.invoke(confSf, new Object[]{ps});
-                        return ps;
-                    } catch (Exception e) {
-                        String msg = "The configuration of statement factory threw exception:";
-                        msg = msg + " class=" + confSfType + " method=" + confMethodName + " parameter=java.sql.PreparedStatement";
-                        throw new RuntimeException(msg, e);
-                    }
+                    final PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency);
+					if (config != null && config.hasStatementOptions()) {
+    					if (config.hasQueryTimeout()) {
+    					    ps.setQueryTimeout(config.getQueryTimeout());
+    					}
+    					if (config.hasFetchSize()) {
+    					    ps.setFetchSize(config.getFetchSize());
+    					}
+    					if (config.hasMaxRows()) {
+    					    ps.setMaxRows(config.getMaxRows());
+    					}
+					} else {
+					    reflectConfigurableStatementFactoryToPreparedStatementIfNeeds(ps);
+					}
+					return ps;
                 } catch (java.sql.SQLException e) {
                     throw new org.seasar.framework.exception.SQLRuntimeException(e);
                 }
@@ -396,11 +404,30 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                 return org.seasar.extension.jdbc.util.ConnectionUtil.prepareCall(con, sql);
             }
         };
-#else
-        final org.seasar.extension.jdbc.StatementFactory customizeStatementFactory = statementFactory;
-#end
-        return new ${glSelectDynamicCommand}(dataSource, customizeStatementFactory, handler, customizeResultSetFactory);
-    }
+	}
+	
+	protected void reflectConfigurableStatementFactoryToPreparedStatementIfNeeds(PreparedStatement ps) {
+        if (!(statementFactory instanceof ConfigurableStatementFactory)) {
+		    return;
+		}
+        final ConfigurableStatementFactory confSf = (ConfigurableStatementFactory)statementFactory;
+        final Class confSfType = ConfigurableStatementFactory.class;
+        final String confMethodName = "configurePreparedStatement";
+        final Class[] confMethodParameterType = new Class[]{PreparedStatement.class};
+        try {
+            final Method confMethod = confSfType.getDeclaredMethod(confMethodName, confMethodParameterType);
+            confMethod.setAccessible(true);// Because the method is protected!
+            if (_internalDebug && _log.isDebugEnabled()) {
+                _log.debug("...Invoking configurableStatementFactory." + confMethodName + "(ps)");
+            }
+            confMethod.invoke(confSf, new Object[]{ps});
+            return;
+        } catch (Exception e) {
+            String msg = "The configuration of statement factory threw exception:";
+            msg = msg + " class=" + confSfType + " method=" + confMethodName + " parameter=java.sql.PreparedStatement";
+            throw new RuntimeException(msg, e);
+        }
+	}
 
     // ===================================================================================
     //                                                              ConditionBean Override

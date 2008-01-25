@@ -21,10 +21,18 @@ public final class DfSelectParamProperties extends DfAbstractHelperProperties {
     // ===============================================================================
     //                                                       Properties - Select Param
     //                                                       =========================
+    /**
+     * @return Param
+     * @deprecated
+     */
     public String getSelectQueryTimeout() {
         return stringProp("torque.selectQueryTimeout", "-1");
     }
 
+    /**
+     * @return bool
+     * @deprecated
+     */
     public boolean isSelectQueryTimeoutValid() {
         return !getSelectQueryTimeout().startsWith("-");
     }

@@ -281,6 +281,7 @@ targetdatabase = $targetDatabase
     #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
     #set ($glCursorFetcherName = "${glProjectPrefix}CursorFetcher")
     #set ($glLatestSqlProviderName = "${glProjectPrefix}LatestSqlProvider")
+    #set ($glStatementConfig = "${glProjectPrefix}StatementConfig")
 
     ## [Allcommon-JDBC-History]
     #set ($glPreparedExecutionBeanName = "${glProjectPrefix}PreparedExecutionBean")
@@ -1648,7 +1649,13 @@ targetdatabase = $targetDatabase
       $database.debug("    parse('LatestSqlProvider');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glLatestSqlProviderName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/LatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
-    #end
+	  
+	#end
+    #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
+      $database.debug("    parse('StatementConfig');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glStatementConfig}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/StatementConfig.${glTemplateFileExtension}",$path,"", "")
+	#end
 
     #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
       #if ($database.isMakeTraceablePreparedStatement())

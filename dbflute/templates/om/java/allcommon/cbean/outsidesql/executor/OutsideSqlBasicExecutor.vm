@@ -4,6 +4,7 @@ import java.util.List;
 
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The executor of outside-sql. <br />
@@ -44,6 +45,9 @@ public class ${glOutsideSqlBasicExecutorName} {
 
     /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
+	
+	/** The config of statement. (Nullable) */
+	protected ${glStatementConfig} _statementConfig;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -166,6 +170,11 @@ public class ${glOutsideSqlBasicExecutorName} {
         return new ${glOutsideSqlPagingExecutorName}(_outsideSqlDao, option, _tableDbName);
     }
 
+    public ${glOutsideSqlBasicExecutorName} configure(${glStatementConfig} statementConfig) {
+        _statementConfig = statementConfig;
+        return this;
+    }
+	
     public ${glOutsideSqlBasicExecutorName} dynamicBinding() {
         _dynamicBinding = true;
         return this;
@@ -176,6 +185,7 @@ public class ${glOutsideSqlBasicExecutorName} {
     //                                                ------
     protected ${glOutsideSqlOptionName} createOutsideSqlOption() {
         final ${glOutsideSqlOptionName} option = new ${glOutsideSqlOptionName}();
+		option.setStatementConfig(_statementConfig);
         if (_dynamicBinding) {
             option.dynamicBinding();
         }

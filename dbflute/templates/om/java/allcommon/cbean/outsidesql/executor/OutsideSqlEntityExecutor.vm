@@ -5,6 +5,7 @@ import java.util.List;
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The cursor executor of outside-sql.
@@ -94,6 +95,11 @@ public class ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> configure(${glStatementConfig} statementConfig) {
+		_outsideSqlOption.setStatementConfig(statementConfig);
+        return this;
+    }
+	
     public ${glOutsideSqlEntityExecutorName}<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;

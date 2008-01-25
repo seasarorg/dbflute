@@ -10,6 +10,7 @@ import ${glPackageBaseCommonHelper}.${glMapListStringImplName};
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonSqlClause}.${glWhereClauseSimpleFilterInterfaceName};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The condition-bean as abstract.
@@ -29,6 +30,9 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /** Safety max result size. */
     protected int _safetyMaxResultSize;
+	
+    /** The config of statement. (Nullable) */
+	protected ${glStatementConfig} _statementConfig;
 
     // ===================================================================================
     //                                                                           SqlClause
@@ -645,6 +649,22 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     public boolean isSelectCountIgnoreFetchScope() {
         return _isSelectCountIgnoreFetchScope;
     }
+	
+    // =====================================================================================
+    //                                                                      Statement Config
+    //                                                                      ================
+    /**
+     * @param statementConfig The config of statement. (Nullable)
+     */
+	public void configure(${glStatementConfig} statementConfig) {
+	    _statementConfig = statementConfig;
+	}
+    /**
+     * @return The config of statement. (Nullable)
+     */
+	public ${glStatementConfig} getStatementConfig() {
+	    return _statementConfig;
+	}
 	
     // ===================================================================================
     //                                                                         Display SQL

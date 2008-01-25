@@ -4,6 +4,8 @@ import org.seasar.framework.util.InputStreamReaderUtil;
 import org.seasar.framework.util.ReaderUtil;
 import org.seasar.framework.util.ResourceUtil;
 
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+
 /**
  * The context of outside-sql.
  * 
@@ -102,6 +104,9 @@ public class ${glOutsideSqlContextName} {
     protected Object _resultTypeSpecification;
 
     protected String _methodName;
+	
+	/** The config of statement. (Nullable) */
+	protected ${glStatementConfig} _statementConfig;
 
     // ===================================================================================
     //                                                                            Read SQL
@@ -232,5 +237,13 @@ public class ${glOutsideSqlContextName} {
 
     public void setMethodName(String methodName) {
         this._methodName = methodName;
+    }
+	
+    public ${glStatementConfig} getStatementConfig() {
+        return _statementConfig;
+    }
+
+    public void setStatementConfig(${glStatementConfig} statementConfig) {
+        this._statementConfig = statementConfig;
     }
 }

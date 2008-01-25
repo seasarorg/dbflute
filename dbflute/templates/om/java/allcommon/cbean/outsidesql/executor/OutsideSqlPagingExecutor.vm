@@ -8,6 +8,7 @@ import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName};
 import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The paging executor of outsideSql.
@@ -128,6 +129,11 @@ public class ${glOutsideSqlPagingExecutorName} {
     //                                                                              ======
     public ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}> cursorHandling() {
         return new ${glOutsideSqlCursorExecutorName}<${glPagingBeanInterfaceName}>(_outsideSqlDao, _outsideSqlOption);
+    }
+	
+    public ${glOutsideSqlPagingExecutorName} configure(${glStatementConfig} statementConfig) {
+		_outsideSqlOption.setStatementConfig(statementConfig);
+        return this;
     }
 
     public ${glOutsideSqlPagingExecutorName} dynamicBinding() {

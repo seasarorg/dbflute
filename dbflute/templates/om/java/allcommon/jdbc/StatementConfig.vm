@@ -1,0 +1,94 @@
+${database.allClassCopyright}package ${glPackageBaseCommonJdbc};
+
+import java.sql.ResultSet;
+
+/**
+ * The config of statement.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${glStatementConfig} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Integer resultSetType;
+    protected Integer queryTimeout;
+    protected Integer fetchSize;
+    protected Integer maxRows;
+    
+    // ===================================================================================
+    //                                                                   Setting Interface
+    //                                                                   =================
+    public ${glStatementConfig} typeForwardOnly() {
+        resultSetType = ResultSet.TYPE_FORWARD_ONLY;
+        return this;
+    }
+    
+    public ${glStatementConfig} typeScrollInsensitive() {
+        resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
+        return this;
+    }
+    
+    public ${glStatementConfig} typeScrollSensitive() {
+        resultSetType = ResultSet.TYPE_SCROLL_SENSITIVE;
+        return this;
+    }
+    
+    public ${glStatementConfig} queryTimeout(int queryTimeout) {
+        this.queryTimeout = queryTimeout;
+        return this;
+    }
+	    
+    public ${glStatementConfig} fetchSize(int fetchSize) {
+        this.fetchSize = fetchSize;
+        return this;
+    }
+    
+    public ${glStatementConfig} maxRows(int maxRows) {
+        this.maxRows = maxRows;
+        return this;
+    }
+	
+	// ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+	public boolean hasResultSetType() {
+        return resultSetType != null;
+    }
+	
+	public boolean hasStatementOptions() {
+	    return hasQueryTimeout() || hasFetchSize() || hasMaxRows();
+	}
+	
+	public boolean hasQueryTimeout() {
+        return queryTimeout != null;
+    }
+	
+	public boolean hasFetchSize() {
+        return fetchSize != null;
+    }
+	
+	public boolean hasMaxRows() {
+        return maxRows != null;
+    }
+	
+	// ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public Integer getResultSetType() {
+        return resultSetType;
+    }
+    
+    public Integer getQueryTimeout() {
+        return queryTimeout;
+    }
+	
+    public Integer getFetchSize() {
+        return fetchSize;
+    }
+	
+    public Integer getMaxRows() {
+        return maxRows;
+    }
+}

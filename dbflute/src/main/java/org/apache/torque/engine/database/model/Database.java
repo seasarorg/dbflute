@@ -1160,10 +1160,18 @@ public class Database {
         return getProperties().getSelectParamProperties();
     }
 
+    /**
+     * @return bool
+     * @deprecated
+     */
     public String getSelectQueryTimeout() {
         return getSelectParamProperties().getSelectQueryTimeout();
     }
 
+    /**
+     * @return bool
+     * @deprecated
+     */
     public boolean isSelectQueryTimeoutValid() {
         return getSelectParamProperties().isSelectQueryTimeoutValid();
     }
@@ -1176,6 +1184,10 @@ public class Database {
         return getSelectParamProperties().getStatementResultSetConcurrency();
     }
 
+    /**
+     * @return bool
+     * @deprecated
+     */
     public boolean isStatementResultSetTypeValid() {
         return getSelectParamProperties().isStatementResultSetTypeValid();
     }
