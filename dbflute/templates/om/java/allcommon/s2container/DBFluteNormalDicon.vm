@@ -53,6 +53,8 @@
     <component class="${glPackageBaseCommonS2Dao}.${glDaoLatestSqlProvider}"/>
 #end
 
+	<component name="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType" />
+
 #if (!$database.isCommonColumnInterceptingOnBehaviorFilter())
     <!-- Common column setup interceptor. -->
     <component name="commonColumnSetupBeforeInsertInterceptor" class="${glPackageBaseCommonInterceptor}.${glCommonColumnSetupBeforeInsertInterceptor}"/>

@@ -686,7 +686,10 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
     /** Column Annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
     public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.Name}";
-
+#if ($col.isJavaNativeOracleStringClob())
+    /** ValueType Annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
+    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "dbfluteStringClobType";
+#end
     /**
      * Get the value of ${col.UncapitalisedJavaName}. <br />
      * {${col.columnDefinitionLineDisp}}

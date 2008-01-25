@@ -794,7 +794,7 @@ public class Column {
         this._dbType = dbType;
     }
 
-    public Object getDbType() {
+    public String getDbType() {
         return _dbType;
     }
 
@@ -969,6 +969,8 @@ public class Column {
         }
         return javaNative;
     }
+    
+    
 
     // ===================================================================================
     //                                                                  Type Determination
@@ -1047,6 +1049,19 @@ public class Column {
 
     public boolean isJavaNativeCSharpNullable() {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
+    }
+    
+    public boolean isJavaNativeOracleStringClob() {
+        if (!getTable().getDatabase().isDatabaseOracle()) {
+            return false;
+        }
+        if (!getJavaNative().equalsIgnoreCase("String")) {
+            return false;
+        }
+        if (getDbType() == null || !getDbType().equalsIgnoreCase("CLOB")) {
+            return false;
+        }
+        return true;
     }
 
     // ===================================================================================
