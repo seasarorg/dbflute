@@ -1,5 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonUtil};
 
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 /**
  * @author ${database.ClassAuthor}
  */
@@ -12,7 +16,7 @@ public class ${glValueLabelUtilName} {
      * @param value Value. (NotNull)
      * @return Label. (NotNull)
      */
-    public static String findLabel(java.util.List<java.util.Map<String, Object>> valueLabelList, Object value) {
+    public static String findLabel(List<Map<String, Object>> valueLabelList, Object value) {
         if (valueLabelList == null) {
             String msg = "The arguement[valueLabelList] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -25,13 +29,33 @@ public class ${glValueLabelUtilName} {
             String msg = "The arguement[value] should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        for (java.util.Map<String, Object> map : valueLabelList) {
-            final Object currentValue = map.get("value");
+        for (Map<String, Object> elementMap : valueLabelList) {
+            final Object currentValue = elementMap.get("value");
             if (value.equals(currentValue)) {
-                return (String) map.get("label");
+                return (String) elementMap.get("label");
             }
         }
         String msg = "Not found label by the value: value=" + value + " valueLabelList=" + valueLabelList;
         throw new IllegalStateException(msg);
     }
+	
+	public static Map<Object, String> createValueLabelMap(List<Map<String, Object>> valueLabelList) {
+		final Map<Object, String> resultMap = new LinkedHashMap();
+		for (Map<String, Object> elementMap : valueLabelList) {
+			final Object currentValue = elementMap.get("value");
+			final String currentLabel = (String) elementMap.get("label");
+			resultMap.put(currentValue, currentLabel);
+		}
+		return resultMap;
+	}
+	
+	public static Map<String, Object> createLabelValueMap(List<Map<String, Object>> valueLabelList) {
+		final Map<String, Object> resultMap = new LinkedHashMap();
+		for (Map<String, Object> elementMap : valueLabelList) {
+			final Object currentValue = elementMap.get("value");
+			final String currentLabel = (String) elementMap.get("label");
+			resultMap.put(currentLabel, currentValue);
+		}
+		return resultMap;
+	}
 }

@@ -4,6 +4,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommonBhv};
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import ${glPackageBaseCommon}.${glBehaviorSelectorInterfaceName};
 import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
@@ -327,11 +329,11 @@ public abstract class $myClassName implements ${glBehaviorReadableInterfaceName}
      * @param valueLabelSetupper Value-label-setupper. (NotNull)
      * @return Value-label list. (NotNull)
      */
-    protected <ENTITY extends ${glEntityInterfaceName}> List<java.util.Map<String, Object>> createValueLabelList(List<ENTITY> entityList, ${glValueLabelSetupperName}<ENTITY> valueLabelSetupper) {
-        final List<java.util.Map<String, Object>> valueLabelList = new ArrayList<java.util.Map<String, Object>>();
+    public <ENTITY extends ${glEntityInterfaceName}> List<java.util.Map<String, Object>> createValueLabelList(List<ENTITY> entityList, ${glValueLabelSetupperName}<ENTITY> valueLabelSetupper) {
+        final List<Map<String, Object>> valueLabelList = new ArrayList<Map<String, Object>>();
         final ${glValueLabelBoxName} box = new ${glValueLabelBoxName}();
         for (ENTITY entity : entityList) {
-            final java.util.Map<String, Object> valueLabel = new java.util.HashMap<String, Object>();
+            final Map<String, Object> valueLabel = new HashMap<String, Object>();
             valueLabelSetupper.setup(box, entity);
             valueLabel.put("value", box.getValue());
             valueLabel.put("label", box.getLabel());
