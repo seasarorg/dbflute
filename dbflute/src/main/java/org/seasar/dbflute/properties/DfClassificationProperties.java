@@ -15,6 +15,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
@@ -622,8 +623,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     public static final String MARK_classificationDeploymentAllTable = "$$ALL$$";
     protected Map<String, Map<String, String>> _classificationDeploymentMap;
 
-    // TODO: 列名の大文字小文字を区別しないようにする。CaseInsensitiveMapかな？
-
     public Map<String, Map<String, String>> getClassificationDeploymentMap() {
         if (_classificationDeploymentMap == null) {
             final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
@@ -677,11 +676,15 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public boolean hasClassification(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
+        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = new DfFlexibleNameMap<String, Map<String, String>>(
+                deploymentMap);
+        final Map<String, String> columnClassificationMap = flexibledeploymentMap.get(tableName);
         if (columnClassificationMap == null) {
             return false;
         }
-        final String classificationName = columnClassificationMap.get(columnName);
+        final DfFlexibleNameMap<String, String> flexibleColumnClassificationMap = new DfFlexibleNameMap<String, String>(
+                columnClassificationMap);
+        final String classificationName = flexibleColumnClassificationMap.get(columnName);
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
             for (String columnNameHint : columnClassificationMapKeySet) {
@@ -696,11 +699,15 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public String getClassificationName(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        if (!deploymentMap.containsKey(tableName)) {
+        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = new DfFlexibleNameMap<String, Map<String, String>>(
+                deploymentMap);
+        if (!flexibledeploymentMap.containsKey(tableName)) {
             return null;
         }
-        final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
-        final String classificationName = columnClassificationMap.get(columnName);
+        final Map<String, String> columnClassificationMap = flexibledeploymentMap.get(tableName);
+        final DfFlexibleNameMap<String, String> flexibleColumnClassificationMap = new DfFlexibleNameMap<String, String>(
+                columnClassificationMap);
+        final String classificationName = flexibleColumnClassificationMap.get(columnName);
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
             for (String columnNameHint : columnClassificationMapKeySet) {
