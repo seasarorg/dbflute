@@ -15,6 +15,25 @@ import org.junit.Test;
 public class DfClassificationPropertiesTest {
 
     @Test
+    public void test_hasClassification_SameCase() throws Exception {
+        // ## Arrange ##
+        final DfClassificationProperties prop = new DfClassificationProperties(new Properties());
+        final Map<String, Map<String, String>> deploymentMap = new LinkedHashMap<String, Map<String, String>>();
+        {
+            final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>();
+            columnClassificationMap.put("MEMBER_STATUS_CODE", "MemberStatus");
+            deploymentMap.put("MEMBER_STATUS", columnClassificationMap);
+        }
+        prop._classificationDeploymentMap = deploymentMap;
+        
+        // ## Act ##
+        final boolean actual = prop.hasClassification("MEMBER_STATUS", "MEMBER_STATUS_CODE");
+        
+        // ## Assert ##
+        Assert.assertTrue(actual);
+    }
+    
+    @Test
     public void test_hasClassification_IgnoreCase() throws Exception {
         // ## Arrange ##
         final DfClassificationProperties prop = new DfClassificationProperties(new Properties());
