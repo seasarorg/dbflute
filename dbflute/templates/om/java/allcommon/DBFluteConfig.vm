@@ -107,4 +107,12 @@ public class ${myClassName} {
 		String msg = "The config of dbflute is locked! Don't access at this timing!";
 		throw new IllegalStateException(msg);
 	}
+	
+    // ===================================================================================
+    //                                                                        Config Clear
+    //                                                                        ============
+	public void clear() {
+	    _defaultStatementConfig = null;
+		_internalDebug = false;
+	}
 }
