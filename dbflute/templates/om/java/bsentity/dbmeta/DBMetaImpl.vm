@@ -84,10 +84,10 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
-    /** Table db name. */
+    /** Table DB name. */
     public static final String TABLE_DB_NAME = "$table.name";
 
-    /** Table prop name(JavaBeansRule). */
+    /** Table property name(JavaBeansRule). */
     public static final String TABLE_PROPERTY_NAME = "$table.javaBeansRulePropertyName";
 
 #if ($database.isMakeDeprecated())
@@ -299,7 +299,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type name of dao. (NotNull)
+     * @return The type name of DAO. (NotNull)
      */ 
     public String getDaoTypeName() {
         return "${myExtendedDaoPackageName}.${myExtendedDaoClassName}";
@@ -309,7 +309,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The type name of dao. (Nullable: If the dao does not exist)
+     * @return The type name of DAO. (Nullable: If the DAO does not exist)
      */ 
     public String getDaoTypeName() {
         return null;
