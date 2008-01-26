@@ -475,7 +475,6 @@ public class Table implements IDMethod {
         _needsJavaNameConvert = false;
     }
 
-    // TODO: @jflute -- 不要のはず
     public boolean needsJavaNameConvert() {
         return _needsJavaNameConvert;
     }
@@ -485,7 +484,7 @@ public class Table implements IDMethod {
      */
     public String getJavaName() {
         if (_javaName == null) {
-            if (needsJavaNameConvert()) {
+            if (needsJavaNameConvert()) {// If sql2entity, true
                 _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
             } else {
                 _javaName = getName();
@@ -501,11 +500,25 @@ public class Table implements IDMethod {
         return StringUtils.uncapitalise(getJavaName());
     }
 
+    protected boolean _needsJavaBeansRulePropertyNameConvert = true;
+
+    public void setupNeedsJavaBeansRulePropertyNameConvertFalse() {
+        _needsJavaNameConvert = false;
+    }
+
+    public boolean needsJavaBeansRulePropertyNameConvert() {
+        return _needsJavaNameConvert;
+    }
+
     /**
      * Get variable name to use in Java sources (= uncapitalised java name)
      */
     public String getJavaBeansRulePropertyName() {
-        return getDatabase().decapitalizePropertyName(getDatabase().convertJavaNameByJdbcNameAsTable(getName()));
+        if (needsJavaBeansRulePropertyNameConvert()) {
+            return getDatabase().decapitalizePropertyName(getDatabase().convertJavaNameByJdbcNameAsTable(getName()));
+        } else {
+            return getJavaName();
+        }
     }
 
     /**
@@ -613,7 +626,7 @@ public class Table implements IDMethod {
     public String getNestSelectSetupperClassName() {
         return getExtendedEntityClassName() + "Nss";
     }
-    
+
     public String getNestSelectSetupperTerminalClassName() {
         return getExtendedEntityClassName() + "Nsst";
     }
@@ -796,7 +809,7 @@ public class Table implements IDMethod {
      * Returns a Collection of parameters relevant for the chosen
      * id generation method.
      */
-    public List getIdMethodParameters() {
+    public List<IdMethodParameter> getIdMethodParameters() {
         return _idMethodParameters;
     }
 
@@ -822,7 +835,7 @@ public class Table implements IDMethod {
         if (_inheritanceColumn == null || !_inheritanceColumn.isEnumeratedClasses()) {
             return null;
         }
-        List children = _inheritanceColumn.getChildren();
+        List<Inheritance> children = _inheritanceColumn.getChildren();
         List<String> names = new ArrayList<String>(children.size());
         for (int i = 0; i < children.size(); i++) {
             names.add(((Inheritance) children.get(i)).getClassName());
@@ -1040,7 +1053,7 @@ public class Table implements IDMethod {
      */
     public ForeignKey getForeignKey(String col) {
         ForeignKey firstFK = null;
-        for (Iterator iter = _foreignKeys.iterator(); iter.hasNext();) {
+        for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey key = (ForeignKey) iter.next();
             if (key.getLocalColumns().contains(col)) {
                 if (firstFK == null) {
@@ -1565,7 +1578,7 @@ public class Table implements IDMethod {
     public String getSequenceName() {// TODO: @jflute - Unnecessary?
         String result = null;
         if (getIdMethod().equals(NATIVE)) {
-            List idMethodParams = getIdMethodParameters();
+            List<IdMethodParameter> idMethodParams = getIdMethodParameters();
             if (idMethodParams == null) {
                 result = getName() + "_SEQ";
             } else {
@@ -1670,7 +1683,7 @@ public class Table implements IDMethod {
     public List<Column> getPrimaryKey() {
         final List<Column> pk = new ArrayList<Column>(_columnList.size());
 
-        final Iterator iter = _columnList.iterator();
+        final Iterator<Column> iter = _columnList.iterator();
         while (iter.hasNext()) {
             final Column col = (Column) iter.next();
             if (col.isPrimaryKey()) {
@@ -1916,7 +1929,7 @@ public class Table implements IDMethod {
     public String getAttachedPKArgsSetupString(String attachedPKVariableName) {
         final List<Column> pkList = this.getPrimaryKey();
         String result = "";
-        for (Iterator ite = pkList.iterator(); ite.hasNext();) {
+        for (Iterator<Column> ite = pkList.iterator(); ite.hasNext();) {
             Column pk = (Column) ite.next();
             String javaName = pk.getJavaName();
             String pkGetString = attachedPKVariableName + ".get" + javaName + "()";
@@ -1952,10 +1965,10 @@ public class Table implements IDMethod {
      * @param list a list of Columns
      * @return A CSV list.
      */
-    private String printList(List list) {
+    private String printList(List<Column> list) {
         StringBuffer result = new StringBuffer();
         boolean comma = false;
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
+        for (Iterator<Column> iter = list.iterator(); iter.hasNext();) {
             Column col = (Column) iter.next();
             if (col.isPrimaryKey()) {
                 if (comma) {
@@ -2483,19 +2496,19 @@ public class Table implements IDMethod {
         result.append(">\n");
 
         if (_columnList != null) {
-            for (Iterator iter = _columnList.iterator(); iter.hasNext();) {
+            for (Iterator<Column> iter = _columnList.iterator(); iter.hasNext();) {
                 result.append(iter.next());
             }
         }
 
         if (_foreignKeys != null) {
-            for (Iterator iter = _foreignKeys.iterator(); iter.hasNext();) {
+            for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
                 result.append(iter.next());
             }
         }
 
         if (_idMethodParameters != null) {
-            Iterator iter = _idMethodParameters.iterator();
+            Iterator<IdMethodParameter> iter = _idMethodParameters.iterator();
             while (iter.hasNext()) {
                 result.append(iter.next());
             }

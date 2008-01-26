@@ -409,7 +409,7 @@ public class Database {
                     }
 
                     // local column references
-                    Iterator localColumnNames = currFK.getLocalColumns().iterator();
+                    Iterator<String> localColumnNames = currFK.getLocalColumns().iterator();
                     while (localColumnNames.hasNext()) {
                         Column local = currTable.getColumn((String) localColumnNames.next());
                         // give notice of a schema inconsistency.
@@ -427,7 +427,7 @@ public class Database {
                     }
 
                     // foreign column references
-                    Iterator foreignColumnNames = currFK.getForeignColumns().iterator();
+                    Iterator<String> foreignColumnNames = currFK.getForeignColumns().iterator();
                     while (foreignColumnNames.hasNext()) {
                         String foreignColumnName = (String) foreignColumnNames.next();
                         Column foreign = foreignTable.getColumn(foreignColumnName);
@@ -457,7 +457,7 @@ public class Database {
         result.append("<database name=\"").append(getName()).append('"').append(" package=\"").append(getPackage())
                 .append('"').append(" defaultIdMethod=\"").append(getDefaultIdMethod()).append('"').append(">\n");
 
-        for (Iterator i = _tableList.iterator(); i.hasNext();) {
+        for (Iterator<Table> i = _tableList.iterator(); i.hasNext();) {
             result.append(i.next());
         }
 
@@ -1485,7 +1485,7 @@ public class Database {
     }
 
     public String getDaoGenDbName() {
-        final Map databaseInfoMap = getDatabaseInfoMap();
+        final Map<String, String> databaseInfoMap = getDatabaseInfoMap();
         final String daoGenDbName = (String) databaseInfoMap.get("daoGenDbName");
         if (daoGenDbName == null || daoGenDbName.trim().length() == 0) {
             String msg = "The database doesn't have daoGenDbName in the property[databaseInfoMap]: ";
@@ -1495,7 +1495,7 @@ public class Database {
     }
 
     public String getWildCard() {
-        final Map databaseInfoMap = getDatabaseInfoMap();
+        final Map<String, String> databaseInfoMap = getDatabaseInfoMap();
         final String wildCard = (String) databaseInfoMap.get("wildCard");
         if (wildCard == null || wildCard.trim().length() == 0) {
             String msg = "The database doesn't have wildCard in the property[databaseInfoMap]: ";
@@ -1505,7 +1505,7 @@ public class Database {
     }
 
     public String getSequenceNextSql() {
-        final Map databaseInfoMap = getDatabaseInfoMap();
+        final Map<String, String> databaseInfoMap = getDatabaseInfoMap();
         final String sequenceNextSql = (String) databaseInfoMap.get("sequenceNextSql");
         if (sequenceNextSql == null || sequenceNextSql.trim().length() == 0) {
             String msg = "The database doesn't have sequenceNextSql in the property[databaseInfoMap]: ";
@@ -1644,7 +1644,7 @@ public class Database {
     // ===============================================================================
     //                                                                             Map
     //                                                                             ===
-    public String getMapValue(Map map, String key) {
+    public String getMapValue(Map<?, ?> map, String key) {
         final Object value = map.get(key);
         return value != null ? (String) value : "";
     }
@@ -1715,7 +1715,7 @@ public class Database {
      * @param inputs Inputs.
      * @return Generated name.
      */
-    protected String generateName(String algorithmName, List inputs) {
+    protected String generateName(String algorithmName, List<?> inputs) {
         String javaName = null;
         try {
             javaName = NameFactory.generateName(NameFactory.JAVA_GENERATOR, inputs);
