@@ -12,83 +12,116 @@ public class ${glStatementConfig} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Integer resultSetType;
-    protected Integer queryTimeout;
-    protected Integer fetchSize;
-    protected Integer maxRows;
+	// -----------------------------------------------------
+    //                                        ResultSet TYPE
+    //                                        --------------
+    protected Integer _resultSetType;
+	
+	// -----------------------------------------------------
+    //                                      Statement Option
+    //                                      ----------------
+    protected Integer _queryTimeout;
+    protected Integer _fetchSize;
+    protected Integer _maxRows;
     
     // ===================================================================================
     //                                                                   Setting Interface
     //                                                                   =================
+	// -----------------------------------------------------
+    //                                        ResultSet TYPE
+    //                                        --------------
     public ${glStatementConfig} typeForwardOnly() {
-        resultSetType = ResultSet.TYPE_FORWARD_ONLY;
+        _resultSetType = ResultSet.TYPE_FORWARD_ONLY;
         return this;
     }
     
     public ${glStatementConfig} typeScrollInsensitive() {
-        resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
+        _resultSetType = ResultSet.TYPE_SCROLL_INSENSITIVE;
         return this;
     }
     
     public ${glStatementConfig} typeScrollSensitive() {
-        resultSetType = ResultSet.TYPE_SCROLL_SENSITIVE;
+        _resultSetType = ResultSet.TYPE_SCROLL_SENSITIVE;
         return this;
     }
     
+	// -----------------------------------------------------
+    //                                      Statement Option
+    //                                      ----------------
     public ${glStatementConfig} queryTimeout(int queryTimeout) {
-        this.queryTimeout = queryTimeout;
+        this._queryTimeout = queryTimeout;
         return this;
     }
 	    
     public ${glStatementConfig} fetchSize(int fetchSize) {
-        this.fetchSize = fetchSize;
+        this._fetchSize = fetchSize;
         return this;
     }
     
     public ${glStatementConfig} maxRows(int maxRows) {
-        this.maxRows = maxRows;
+        this._maxRows = maxRows;
         return this;
     }
 	
 	// ===================================================================================
     //                                                                       Determination
     //                                                                       =============
+	// -----------------------------------------------------
+    //                                        ResultSet TYPE
+    //                                        --------------
 	public boolean hasResultSetType() {
-        return resultSetType != null;
+        return _resultSetType != null;
     }
 	
+	// -----------------------------------------------------
+    //                                      Statement Option
+    //                                      ----------------
 	public boolean hasStatementOptions() {
 	    return hasQueryTimeout() || hasFetchSize() || hasMaxRows();
 	}
 	
 	public boolean hasQueryTimeout() {
-        return queryTimeout != null;
+        return _queryTimeout != null;
     }
 	
 	public boolean hasFetchSize() {
-        return fetchSize != null;
+        return _fetchSize != null;
     }
 	
 	public boolean hasMaxRows() {
-        return maxRows != null;
+        return _maxRows != null;
     }
+	
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+	@Override
+	public String toString() {
+	    return "{" + _resultSetType + ", " + _queryTimeout + ", " + _fetchSize + ", " + _maxRows + "}";
+	}
 	
 	// ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+	// -----------------------------------------------------
+    //                                        ResultSet TYPE
+    //                                        --------------
     public Integer getResultSetType() {
-        return resultSetType;
+        return _resultSetType;
     }
     
+	// -----------------------------------------------------
+    //                                      Statement Option
+    //                                      ----------------
     public Integer getQueryTimeout() {
-        return queryTimeout;
+        return _queryTimeout;
     }
 	
     public Integer getFetchSize() {
-        return fetchSize;
+        return _fetchSize;
     }
 	
     public Integer getMaxRows() {
-        return maxRows;
+        return _maxRows;
     }
 }

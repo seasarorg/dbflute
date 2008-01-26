@@ -1,0 +1,100 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+#set ($myClassName = "${glDBFluteConfig}")
+import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+
+/**
+ * The sigleton class that has generate-meta-data(GenMetaData).
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log-instance. */
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
+	
+    /** Singleton instance. */
+    private static final ${myClassName} _instance = new ${myClassName}();
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+	protected ${glStatementConfig} _defaultStatementConfig;
+	
+	protected boolean _internalDebug;
+	
+	protected boolean _locked;
+	
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     */
+    private ${myClassName}() {
+    }
+
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
+    /**
+     * Get instance.
+     *
+     * @return Singleton instance.
+     */
+    public static ${myClassName} getInstance() {
+        return _instance;
+    }
+
+    // ===================================================================================
+    //                                                            Default Statement Config
+    //                                                            ========================
+    public ${glStatementConfig} getDefaultStatementConfig() {
+        return _defaultStatementConfig;
+    }
+	
+    public void setDefaultStatementConfig(${glStatementConfig} defaultStatementConfig) {
+	    assertNotLocked();
+	    if (_log.isInfoEnabled()) {
+		    _log.info("...Setting default statement config: " + defaultStatementConfig);
+		}
+        _defaultStatementConfig = defaultStatementConfig;
+    }
+	
+    // ===================================================================================
+    //                                                                      Internal Debug
+    //                                                                      ==============
+	public boolean isInternalDebug() {
+	    return _internalDebug;
+	}
+	
+	public void setInternalDebug(boolean internalDebug) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting internal debug: " + internalDebug);
+		}
+	    _internalDebug = internalDebug;
+	}
+	
+    // ===================================================================================
+    //                                                                         Config Lock
+    //                                                                         ===========
+	public boolean isLocked() {
+	    return _locked;
+	}
+	
+	public void lock() {
+	    _locked = true;
+	}
+	
+	protected void assertNotLocked() {
+	    if (!isLocked()) {
+		    return;
+		}
+		String msg = "The config of dbflute is locked! Don't access at this timing!";
+		throw new IllegalStateException(msg);
+	}
+}

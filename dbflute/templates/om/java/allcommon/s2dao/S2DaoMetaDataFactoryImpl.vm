@@ -14,6 +14,7 @@ import org.seasar.dao.TableNaming;
 import org.seasar.dao.ColumnNaming;
 #end
 
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
@@ -97,7 +98,8 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 			sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
 		}
 		_log.info(sb);
-		
+		_log.info("...Locking the config of DBFlute.");
+		${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
     }
 
@@ -194,6 +196,8 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
         dmdExtension.setTableNaming(tableNaming);
 #end
+        dmdExtension.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
+        dmdExtension.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return dmdExtension;
     }
 
@@ -223,6 +227,8 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
         dmdExtension.setTableNaming(tableNaming);
 #end
+        dmdExtension.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
+		dmdExtension.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return dmdExtension;
     }
 #end

@@ -106,9 +106,6 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     /** Log instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoMetaDataExtension}.class);
 	
-    /** The determination of internal debug. */
-    private static final boolean _internalDebug = false;
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -137,6 +134,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 #if ($database.isAvailableOtherConnectionDaoInitialization())
     protected TransactionManager transactionManager;
 #end
+
+    /** The config of dbflute. {Since DBFlute-0.6.2} */
+	protected ${glStatementConfig} _defaultStatementConfig;
+	
+    /** The determination of internal debug. {Since DBFlute-0.6.2} */
+	protected boolean _internalDebug;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -361,19 +364,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return new StatementFactory() {
             public PreparedStatement createPreparedStatement(java.sql.Connection con, String sql) {
                 try {
-					final ${glStatementConfig} config;
-					if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-					    final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-					    config = cb.getStatementConfig();
-					} else if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
-					    final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
-					    config = context.getStatementConfig();
-					} else {
-					    config = null;
-					}
+					final ${glStatementConfig} config = findStatementConfigOnThread();;
 					final int resultSetType;
 					if (config != null && config.hasResultSetType()) {
 					    resultSetType = config.getResultSetType();
+					} else if (_defaultStatementConfig != null && _defaultStatementConfig.hasResultSetType()) {
+					    resultSetType = _defaultStatementConfig.getResultSetType();
 					} else {
 					    resultSetType = ${database.statementResultSetType};
 					}
@@ -383,17 +379,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
                     }
                     final PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency);
 					if (config != null && config.hasStatementOptions()) {
-    					if (config.hasQueryTimeout()) {
-    					    ps.setQueryTimeout(config.getQueryTimeout());
-    					}
-    					if (config.hasFetchSize()) {
-    					    ps.setFetchSize(config.getFetchSize());
-    					}
-    					if (config.hasMaxRows()) {
-    					    ps.setMaxRows(config.getMaxRows());
-    					}
+                        if (_internalDebug) {
+                            _log.debug("...Setting statement config as request:" + config);
+                        }
+					    reflectStatementOptions(config, ps);
 					} else {
-					    reflectConfigurableStatementFactoryToPreparedStatementIfNeeds(ps);
+					    reflectDefaultOptionsToStatementIfNeeds(ps);
 					}
 					return ps;
                 } catch (java.sql.SQLException e) {
@@ -403,31 +394,66 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             public java.sql.CallableStatement createCallableStatement(java.sql.Connection con, String sql) {
                 return org.seasar.extension.jdbc.util.ConnectionUtil.prepareCall(con, sql);
             }
+			protected ${glStatementConfig} findStatementConfigOnThread() {
+				final ${glStatementConfig} config;
+				if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+				    final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+				    config = cb.getStatementConfig();
+				} else if (${glOutsideSqlContextName}.isExistOutsideSqlContextOnThread()) {
+				    final ${glOutsideSqlContextName} context = ${glOutsideSqlContextName}.getOutsideSqlContextOnThread();
+				    config = context.getStatementConfig();
+				} else {
+				    config = null;
+				}
+				return config;
+			}
+        	protected void reflectDefaultOptionsToStatementIfNeeds(PreparedStatement ps) {
+        	    if (_defaultStatementConfig != null && _defaultStatementConfig.hasStatementOptions()) {
+                    if (_internalDebug) {
+                        _log.debug("...Setting statement config as default:" + _defaultStatementConfig);
+                    }
+				    reflectStatementOptions(_defaultStatementConfig, ps);
+        			return;
+        		}
+                if (!(statementFactory instanceof ConfigurableStatementFactory)) {
+        		    return;
+        		}
+                final ConfigurableStatementFactory confSf = (ConfigurableStatementFactory)statementFactory;
+                final Class confSfType = ConfigurableStatementFactory.class;
+                final String confMethodName = "configurePreparedStatement";
+                final Class[] confMethodParameterType = new Class[]{PreparedStatement.class};
+                try {
+                    final Method confMethod = confSfType.getDeclaredMethod(confMethodName, confMethodParameterType);
+                    confMethod.setAccessible(true);// Because the method is protected!
+                    if (_internalDebug) {
+                        _log.debug("...Invoking configurableStatementFactory." + confMethodName + "(ps)");
+                    }
+                    confMethod.invoke(confSf, new Object[]{ps});
+                    return;
+                } catch (Exception e) {
+                    String msg = "The configuration of statement factory threw exception:";
+                    msg = msg + " class=" + confSfType + " method=" + confMethodName + " parameter=java.sql.PreparedStatement";
+                    throw new RuntimeException(msg, e);
+                }
+        	}
+			protected void reflectStatementOptions(${glStatementConfig} config, PreparedStatement ps) {
+			    try {
+    				if (config.hasQueryTimeout()) {
+    				    ps.setQueryTimeout(config.getQueryTimeout());
+    				}
+    				if (config.hasFetchSize()) {
+    				    ps.setFetchSize(config.getFetchSize());
+    				}
+    				if (config.hasMaxRows()) {
+    				    ps.setMaxRows(config.getMaxRows());
+    				}
+				} catch (SQLException e) {
+				    throw new org.seasar.framework.exception.SQLRuntimeException(e);
+				}
+			}
         };
 	}
 	
-	protected void reflectConfigurableStatementFactoryToPreparedStatementIfNeeds(PreparedStatement ps) {
-        if (!(statementFactory instanceof ConfigurableStatementFactory)) {
-		    return;
-		}
-        final ConfigurableStatementFactory confSf = (ConfigurableStatementFactory)statementFactory;
-        final Class confSfType = ConfigurableStatementFactory.class;
-        final String confMethodName = "configurePreparedStatement";
-        final Class[] confMethodParameterType = new Class[]{PreparedStatement.class};
-        try {
-            final Method confMethod = confSfType.getDeclaredMethod(confMethodName, confMethodParameterType);
-            confMethod.setAccessible(true);// Because the method is protected!
-            if (_internalDebug && _log.isDebugEnabled()) {
-                _log.debug("...Invoking configurableStatementFactory." + confMethodName + "(ps)");
-            }
-            confMethod.invoke(confSf, new Object[]{ps});
-            return;
-        } catch (Exception e) {
-            String msg = "The configuration of statement factory threw exception:";
-            msg = msg + " class=" + confSfType + " method=" + confMethodName + " parameter=java.sql.PreparedStatement";
-            throw new RuntimeException(msg, e);
-        }
-	}
 
     // ===================================================================================
     //                                                              ConditionBean Override
@@ -1566,4 +1592,19 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 #end
 
+    public ${glStatementConfig} getDefaultStatementConfig() {
+        return _defaultStatementConfig;
+    }
+
+    public void setDefaultStatementConfig(final ${glStatementConfig} defaultStatementConfig) {
+        this._defaultStatementConfig = defaultStatementConfig;
+    }
+	
+    public boolean isInternalDebug() {
+        return _internalDebug;
+    }
+
+    public void setInternalDebug(final boolean internalDebug) {
+        this._internalDebug = internalDebug;
+    }
 }

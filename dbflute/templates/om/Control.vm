@@ -96,6 +96,9 @@ targetdatabase = $targetDatabase
 	
     ## [Allcommon-Base-QLog]
     #set ($glQLog = "${glProjectPrefix}QLog")
+	
+    ## [Allcommon-Base-DBFluteConfig]
+    #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
 
     ## [Allcommon-Behavior]
     #set ($glBehaviorReadableAbstractName = "${glProjectPrefix}AbstractBehaviorReadable")
@@ -1603,6 +1606,10 @@ targetdatabase = $targetDatabase
       $database.debug("parse('QLog');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glQLog}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/QLog.${glTemplateFileExtension}",$path ,"" ,"")
+	  
+      $database.debug("parse('DBFluteConfig');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteConfig}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/DBFluteConfig.${glTemplateFileExtension}",$path ,"" ,"")
     #end
 
     ## -----------------------------------------------------------------------------------------------------
