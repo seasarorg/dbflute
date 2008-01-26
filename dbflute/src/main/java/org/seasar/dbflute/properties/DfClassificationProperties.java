@@ -650,23 +650,25 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     public void initializeClassificationDeploymentMap(List<Table> tableList) {
-        final Map<String, Map<String, String>> map = getClassificationDeploymentMap();
+        final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
+        final DfFlexibleNameMap<String, Map<String, String>> flexibledeploymentMap = new DfFlexibleNameMap<String, Map<String, String>>(
+                deploymentMap);
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
         if (allColumnClassificationMap == null) {
             return;
         }
         for (Table table : tableList) {
-            Map<String, String> columnClassificationMap = (Map<String, String>) map.get(table.getName());
+            Map<String, String> columnClassificationMap = (Map<String, String>) flexibledeploymentMap.get(table.getName());
             if (columnClassificationMap == null) {
                 columnClassificationMap = new LinkedHashMap<String, String>();
-                map.put(table.getName(), columnClassificationMap);
+                deploymentMap.put(table.getName(), columnClassificationMap);
             }
             final Set<String> columnNameKeySet = allColumnClassificationMap.keySet();
             for (String columnName : columnNameKeySet) {
                 columnClassificationMap.put(columnName, allColumnClassificationMap.get(columnName));
             }
         }
-        _classificationDeploymentMap = map;
+        _classificationDeploymentMap = deploymentMap;
     }
 
     public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
