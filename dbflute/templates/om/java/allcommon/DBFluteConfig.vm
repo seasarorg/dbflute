@@ -26,7 +26,7 @@ public class ${myClassName} {
 	
 	protected boolean _internalDebug;
 	
-	protected boolean _locked;
+	protected boolean _locked = true;
 	
     // ===================================================================================
     //                                                                         Constructor
@@ -87,7 +87,17 @@ public class ${myClassName} {
 	}
 	
 	public void lock() {
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Locking the config of dbflute!");
+		}
 	    _locked = true;
+	}
+	
+	public void unlock() {
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Unlocking the config of dbflute!");
+		}
+	    _locked = false;
 	}
 	
 	protected void assertNotLocked() {

@@ -98,7 +98,6 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 			sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
 		}
 		_log.info(sb);
-		_log.info("...Locking the config of DBFlute.");
 		${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
     }
