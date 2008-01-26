@@ -484,10 +484,10 @@ public class Table implements IDMethod {
      */
     public String getJavaName() {
         if (_javaName == null) {
-            if (needsJavaNameConvert()) {// If sql2entity, true
+            if (needsJavaNameConvert()) {
                 _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
             } else {
-                _javaName = getName();
+                _javaName = getName();// for sql2entity
             }
         }
         return _javaName;
@@ -517,7 +517,7 @@ public class Table implements IDMethod {
         if (needsJavaBeansRulePropertyNameConvert()) {
             return getDatabase().decapitalizePropertyName(getDatabase().convertJavaNameByJdbcNameAsTable(getName()));
         } else {
-            return getJavaName();
+            return getDatabase().decapitalizePropertyName(getJavaName());// for sql2entity
         }
     }
 
