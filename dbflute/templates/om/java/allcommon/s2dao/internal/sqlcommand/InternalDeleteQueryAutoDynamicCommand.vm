@@ -66,7 +66,6 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
     }
 
     protected String buildQueryDeleteTwoWaySql(${glConditionBeanInterfaceName} cb) {
-        final String fromWhereClause = cb.getSqlClause().getClauseFromWhere();
         final String tableSqlName = cb.getTableSqlName();
         final String aliasName = cb.getSqlClause().getLocalTableAliasName();
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(cb.getTableDbName());
@@ -76,11 +75,18 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
             throw new IllegalStateException(msg);
         }
         final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+		final String selectClause = "select " + aliasName + "." + primaryKeyName;
+        String fromWhereClause = cb.getSqlClause().getClauseFromWhereWithUnionTemplate();
+		
+		// Replace template marks. These are very important!
+		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionSelectClauseMark(), selectClause);
+		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereClauseMark(), "");
+		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereFirstConditionMark(), "");
+		
         final StringBuilder sb = new StringBuilder();
         sb.append("delete from ").append(tableSqlName);
         sb.append(" where ").append(primaryKeyName);
-        sb.append(" in (select ").append(aliasName).append(".").append(primaryKeyName);
-        sb.append(" ").append(fromWhereClause).append(")");
+        sb.append(" in (").append(selectClause).append(" ").append(fromWhereClause).append(")");
         return sb.toString();
     }
     
@@ -94,5 +100,28 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand  {
             node.accept(context);
         }
         return context;
+    }
+	
+    protected final String replaceString(String text, String fromText, String toText) {
+        if(text == null || fromText == null || toText == null)
+            return null;
+        StringBuffer buf = new StringBuffer(100);
+        int pos = 0;
+        int pos2 = 0;
+        do {
+            pos = text.indexOf(fromText, pos2);
+            if(pos == 0) {
+                buf.append(toText);
+                pos2 = fromText.length();
+            } else
+            if(pos > 0) {
+                buf.append(text.substring(pos2, pos));
+                buf.append(toText);
+                pos2 = pos + fromText.length();
+            } else {
+                buf.append(text.substring(pos2));
+                return buf.toString();
+            }
+        } while(true);
     }
 }

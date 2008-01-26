@@ -120,8 +120,7 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
             }
         } else {
             if (cb.isSelectCountIgnoreFetchScope()) {
-                final String fromWhereClause = setupRealFromWhereClause(args, bindVariableList, bindVariableTypeList);
-                finalClause = "select count(*) " + fromWhereClause;
+                finalClause = setupRealSelectCountClause(args, bindVariableList, bindVariableTypeList);
             } else {
                 finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
             }
@@ -323,20 +322,28 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
         return realClause;
     }
 	
-    protected String setupRealFromWhereClause(Object[] args, java.util.List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+    protected String setupRealSelectCountClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-        final String realFromWhereClause;
+        final String realSelectCountClause;
         {
-            final ${glSelectDynamicCommand} fromWhereCommand = createMySelectDynamicCommand();
-            fromWhereCommand.setArgNames(getArgNames());
-            fromWhereCommand.setArgTypes(getArgTypes());
-            fromWhereCommand.setSql(cb.getSqlClause().getClauseFromWhere());
+            final ${glSelectDynamicCommand} selectCountCommand = createMySelectDynamicCommand();
+            selectCountCommand.setArgNames(getArgNames());
+            selectCountCommand.setArgTypes(getArgTypes());
+			final String selectClause = "select count(*)";
+			String fromWhereClause = cb.getSqlClause().getClauseFromWhereWithUnionTemplate();
+			
+    		// Replace template marks. These are very important!
+    		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionSelectClauseMark(), selectClause);
+    		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereClauseMark(), "");
+    		fromWhereClause = replaceString(fromWhereClause, cb.getSqlClause().getUnionWhereFirstConditionMark(), "");
 		
-            final CommandContext ctx = fromWhereCommand.apply(args);
-            realFromWhereClause = ctx.getSql();
+			selectCountCommand.setSql(selectClause + " " + fromWhereClause);
+		
+            final CommandContext ctx = selectCountCommand.apply(args);
+            realSelectCountClause = ctx.getSql();
             addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         }
-        return realFromWhereClause;
+        return realSelectCountClause;
     }
 
     protected ${glInternalBasicSelectHandler} createBasicSelectHandler(String realSql, ResultSetHandler specifiedResultSetHandler) {
@@ -417,6 +424,29 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
      */
     protected String getLineSeparator() {
         return System.getProperty("line.separator");
+    }
+	
+    protected final String replaceString(String text, String fromText, String toText) {
+        if(text == null || fromText == null || toText == null)
+            return null;
+        StringBuffer buf = new StringBuffer(100);
+        int pos = 0;
+        int pos2 = 0;
+        do {
+            pos = text.indexOf(fromText, pos2);
+            if(pos == 0) {
+                buf.append(toText);
+                pos2 = fromText.length();
+            } else
+            if(pos > 0) {
+                buf.append(text.substring(pos2, pos));
+                buf.append(toText);
+                pos2 = pos + fromText.length();
+            } else {
+                buf.append(text.substring(pos2));
+                return buf.toString();
+            }
+        } while(true);
     }
 
     // -----------------------------------------------------

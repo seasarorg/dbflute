@@ -177,18 +177,18 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     /**
      * ${database.ImplementComment}
      * 
-     * @return The from-where clause without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
+     * @return The from-where clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
-    public String getClauseFromWhere() {
+    public String getClauseFromWhereWithUnionTemplate() {
 	    return buildClauseFromWhereAsTemplate(false);
     }
 	
 	/**
      * ${database.ImplementComment}
      * 
-     * @return The from-where clause without 'select' and 'orderBy' and 'sqlSuffix' as template. (NotNull)
+     * @return The from-where clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
-    public String getClauseFromWhereAsTemplate() {
+    public String getClauseFromWhereWithWhereUnionTemplate() {
 	    return buildClauseFromWhereAsTemplate(true);
 	}
 	

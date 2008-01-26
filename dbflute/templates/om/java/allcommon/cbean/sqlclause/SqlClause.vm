@@ -42,19 +42,26 @@ public interface ${myClassName} {
 
     /**
      * Get from-where clause without select and orderBy and sqlSuffix. <br />
-	 * For subQuery and selectCount without union.
+	 * For subQuery and selectCount.
+	 * <p>
+	 * You should handle UnionSelectClauseMark and UnionWhereClauseMark and UnionWhereFirstConditionMark in clause.
+	 * </p>
      * 
-     * @return The from-where clause without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
+     * @return The from-where clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
-    public String getClauseFromWhere();
+    public String getClauseFromWhereWithUnionTemplate();
 	
     /**
      * Get from-where clause without select and orderBy and sqlSuffix as template. <br />
-	 * For subQuery and selectCount without union.
-     * 
-     * @return The from-where clause without 'select' and 'orderBy' and 'sqlSuffix' as template. (NotNull)
+	 * For subQuery and selectCount.
+     * <p>
+	 * You should handle UnionSelectClauseMark and UnionWhereClauseMark and UnionWhereFirstConditionMark
+	 * and WhereClauseMark and WhereFirstConditionMark in clause.
+	 * </p>
+	 * 
+     * @return The from-where clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
-    public String getClauseFromWhereAsTemplate();
+    public String getClauseFromWhereWithWhereUnionTemplate();
 
     // =====================================================================================
     //                                                                          Clause Parts
