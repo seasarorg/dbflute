@@ -30,5 +30,6 @@
 	<classpathentry kind="lib" path="lib/forCompile/javassist-3.4.ga.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/s2-extension-2.4.12.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/s2-framework-2.4.12.jar"/>
+	<classpathentry kind="lib" path="lib/forExecute/db2java.zip"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
