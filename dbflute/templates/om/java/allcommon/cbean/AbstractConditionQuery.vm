@@ -336,9 +336,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // ===================================================================================
     //                                                                            Register
     //                                                                            ========
-    // ----------------------------------------
-    //                          Include-As-Mine
-    //                          ---------------
+    // -----------------------------------------------------
+    //                                       Include-As-Mine
+    //                                       ---------------
     /**
      * Register included-select-column.
      * 
@@ -351,9 +351,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         getSqlClause().registerIncludedSelectColumn(aliasName, realColumnName);
     }
 
-    // ----------------------------------------
-    //                                   Normal
-    //                                   ------
+    // -----------------------------------------------------
+    //                                          Normal Query
+    //                                          ------------
     protected void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                  , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
@@ -368,9 +368,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    // ----------------------------------------
-    //                                   FromTo
-    //                                   ------
+    // -----------------------------------------------------
+    //                                          FromTo Query
+    //                                          ------------
     protected void registerFromToQuery(java.util.Date fromDate, java.util.Date toDate, ${glConditionValueName} cvalue
                                  , String colName, String capPropName, String uncapPropName, ${glConditionOptionFromToName} option) {
         {
@@ -389,9 +389,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    // ----------------------------------------
-    //                               LikeSearch
-    //                               ----------
+    // -----------------------------------------------------
+    //                                      LikeSearch Query
+    //                                      ----------------
     protected void registerLikeSearchQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
                                      , String colName, String capPropName, String uncapPropName, ${glConditionOptionLikeSearchName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
@@ -464,9 +464,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    // ----------------------------------------
-    //                                  InScope
-    //                                  -------
+    // -----------------------------------------------------
+    //                                          InScopeQuery
+    //                                          ------------
     protected void registerInScopeQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
                                      , String colName, String capPropName, String uncapPropName, ${glConditionOptionInScopeName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
@@ -496,9 +496,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
 
-    // ----------------------------------------
-    //                                   Inline
-    //                                   ------
+    // -----------------------------------------------------
+    //                                           InlineQuery
+    //                                           -----------
     protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                        , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
@@ -605,9 +605,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-    // ----------------------------------------
-    //                               UnionQuery
-    //                               ----------
+    // -----------------------------------------------------
+    //                                            UnionQuery
+    //                                            ----------
     public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, String unionQueryPropertyName) {
         final String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
 		
@@ -636,6 +636,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return replaceString(unionQueryClause, oldStr, newStr);// Very Important!
     }
 
+    // -----------------------------------------------------
+    //                                               OrderBy
+    //                                               -------
+    public void registerOrderBy(String columnName, boolean ascOrDesc) {
+        getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
+    }
+	
     // ===================================================================================
     //                                                                       Name Resolver
     //                                                                       =============
@@ -938,6 +945,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 #end
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+	@Override
+    public String toString() {
+        return getSqlClause().getClause();
+    }
+	
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======

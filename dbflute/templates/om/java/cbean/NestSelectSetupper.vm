@@ -14,17 +14,11 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The query of local. (NotNull)*/
     protected ${myConditionQueryClassName} _query;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     * 
-     * @param query The query of local. (NotNull)
-     */
     public ${myClassName}(${myConditionQueryClassName} query) {
         _query = query;
     }
@@ -32,11 +26,6 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    /**
-     * Has conditionQuery?
-     * 
-     * @return Determination.
-     */
     public boolean hasConditionQuery() {
         return _query != null;
     }
@@ -48,11 +37,6 @@ public class ${myClassName} {
 #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
 
-    /**
-     * Set up select with ${tmpPropertyName}.
-	 * 
-	 * @return The nest-select-setupper-terminal of foreign. (NotNull)
-     */
 #if ($database.isVersionAfter1047())
     public ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName} with${tmpPropertyNameInitCap}() {
 #else
@@ -77,11 +61,6 @@ public class ${myClassName} {
 #set ($tmpPropertyName = "${referrer.reffererPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
 
-    /**
-     * Set up select with ${tmpPropertyName}.
-	 * 
-	 * @return The nest-select-setupper-terminal of referrer-as-one. (NotNull)
-     */
 #if ($database.isVersionAfter1047())
     public ${referrer.referrerTableNestSelectSetupperTerminalClassName} with${tmpPropertyNameInitCap}() {
 #else

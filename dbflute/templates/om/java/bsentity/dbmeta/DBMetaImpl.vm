@@ -855,8 +855,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     #set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
     #set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
     #set ($targetColumnName = ${table.findTargetColumnNameByCommonColumnName(${columnName})})
-    #set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
-    #set ($col = $table.getColumnByFlexibleName($targetJavaName))
+    #set ($col = $table.getColumnByFlexibleName($columnName))
     #if ($col.isJavaNativeDateObject())
 
         sb.append(delimiter).append("${targetColumnName}").append(equal);

@@ -17,32 +17,21 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                          Annotation
     //                                                                          ==========
-    /** TABLE-Annotation. But now this is unnecessary... */
+    /** @Deprecated */
     public static final String TABLE = "$table.name";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Condition query. */
     protected ${myConditionQueryClassName} _conditionQuery;
 
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Table db-name. (NotNull)
-     */
     final public String getTableDbName() {
         return "${table.name}";
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Table sql-name. (NotNull)
-     */
     final public String getTableSqlName() {
         return "${table.tableSqlName}";
     }
@@ -50,11 +39,6 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                      PrimaryKey Map
     //                                                                      ==============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param primaryKeyMap Primary key map. (NotNull and NotEmpty)
-     */
     public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
         if (primaryKeyMap == null) {
             String msg = "The argument[primaryKeyMap] must not be null.";
@@ -131,11 +115,6 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                     OrderBy Setting
     //                                                                     ===============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return this. (NotNull)
-     */
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.PrimaryKey)
@@ -150,11 +129,6 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
 #end
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return this. (NotNull)
-     */
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Desc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.PrimaryKey)
@@ -172,20 +146,10 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
-    /**
-     * Query.
-     * 
-     * @return Instance of query. (NotNull)
-     */
     public ${myConditionQueryClassName} query() {
         return getConditionQuery();
     }
 
-    /**
-     * Get condition query. {Internal method for s2dao}
-     * 
-     * @return Instance of condition query. (NotNull)
-     */
     public ${myConditionQueryClassName} getConditionQuery() {
         if (_conditionQuery == null) {
             _conditionQuery = new ${myConditionQueryClassName}(null, getSqlClause(), "dflocal", 0);
@@ -193,11 +157,6 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return _conditionQuery;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Instance of query as interface. (NotNull)
-     */
     public ${glConditionQueryInterfaceName} getConditionQueryAsInterface() {
         return getConditionQuery();
     }
@@ -205,31 +164,14 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
-    /**
-     * Union. <br />
-     * Add union query to condition bean. <br />
-     * 
-     * @param unionQuery Union query. (NotNull)
-     */
     public void union(${myConditionQueryClassName} unionQuery) {
         query().xsetUnionQuery(unionQuery);
     }
 
-    /**
-     * Union all. <br />
-     * Add union all query to condition bean. <br />
-     * 
-     * @param unionAllQuery Union all query. (NotNull)
-     */
     public void unionAll(${myConditionQueryClassName} unionAllQuery) {
         query().xsetUnionAllQuery(unionAllQuery);
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determination.
-     */
     public boolean hasUnionQueryOrUnionAllQuery() {
         return query().hasUnionQueryOrUnionAllQuery();
     }
@@ -246,27 +188,14 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //   ForeignTable    = [${foreignKeys.foreignTable.name}]
     //   ForeignProperty = [${tmpPropertyName}]
     // * * * * * * * * */
-
-    /** Nest select setupper for ${tmpPropertyName}. */
+	
     protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-
-    /**
-     * Get nest select setupper for ${tmpPropertyName}. {For Internal}
-     * 
-     * @return Nest select setupper. (NotNull)
-     */
     public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) {
             _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(null);// for Dummy
         }
         return _nss${tmpPropertyNameInitCap};
     }
-    /**
-     * Set up select for ${tmpPropertyName}.
-     * If you invoke this, this entity is target of select.
-     * 
-     * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
-     */
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
 		final String localRelationPath = query().getRelationPath();
@@ -290,25 +219,13 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //   ReferrerProperty = [${tmpPropertyName}]
     // * * * * * * * * */
 
-    /** Nest select setupper for ${tmpPropertyName}. */
     protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-    /**
-     * Get nest select setupper for ${tmpPropertyName}. {For Internal}
-     * 
-     * @return Nest select setupper. (NotNull)
-     */
     public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) {
             _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(null);// for Dummy
         }
         return _nss${tmpPropertyNameInitCap};
     }
-    /**
-     * Set up select for ${tmpPropertyName}.
-     * If you invoke this, this entity is target of select.
-     * 
-     * @return Nest select setupper for ${tmpPropertyName}. (NotNull)
-     */
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
 		final String localRelationPath = query().getRelationPath();

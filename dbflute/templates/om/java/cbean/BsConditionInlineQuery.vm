@@ -26,21 +26,11 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Corresponding condition query. */
     protected ${myCQClassName} _myCQ;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     * 
-     * @param childQuery Child query as abstract class. (Nullable: If null, this is base instance.)
-     * @param sqlClause SQL clause instance. (NotNull)
-     * @param aliasName My alias name. (NotNull)
-     * @param nestLevel Nest level.
-     * @param myCQ Target wrapped condition-qyery. (NotNull)
-     */
     public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
         super(childQuery, sqlClause, aliasName, nestLevel);
         _myCQ = myCQ;

@@ -13,17 +13,11 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Nest-select-setupper as helper. */
     protected ${myNestSelectSetupperClassName} _nss;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     * 
-     * @param query The query of local. (NotNull)
-     */
     public ${myNestSelectSetupperTerminalClassName}(${myConditionQueryClassName} query) {
         _nss = new ${myNestSelectSetupperClassName}(query);
     }
@@ -31,11 +25,6 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    /**
-     * Has conditionQuery?
-     * 
-     * @return Determination.
-     */
     public boolean hasConditionQuery() {
         return _nss.hasConditionQuery();
     }
@@ -47,9 +36,6 @@ public class ${myClassName} {
   #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
   #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
 
-    /**
-     * Set up select with ${tmpPropertyName}.
-     */
     public void with${tmpPropertyNameInitCap}() {
 	    _nss.with${tmpPropertyNameInitCap}();
     }
@@ -63,9 +49,6 @@ public class ${myClassName} {
     #set ($tmpPropertyName = "${referrer.reffererPropertyNameAsOne}")
     #set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
 
-    /**
-     * Set up select with ${tmpPropertyName}.
-     */
     public void with${tmpPropertyNameInitCap}() {
 	    _nss.with${tmpPropertyNameInitCap}();
     }

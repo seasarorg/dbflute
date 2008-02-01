@@ -104,11 +104,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     * 
-     * @param tableName Table name. (NotNull)
-     **/
     public ${myClassName}(String tableName) {
         if (tableName == null) {
             String msg = "Argument[tableName] must not be null.";
@@ -120,40 +115,24 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                              Clause
     //                                                                              ======
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The clause of all resources. (NotNull)
-     */
     public String getClause() {
-        final StringBuffer sb = new StringBuffer(512);
+        final StringBuilder sb = new StringBuilder(512);
 		sb.append(getSelectClause());
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect(false));
         return sb.toString();
     }
 	
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The clause of all resources but PK-Only. (NotNull)
-     */
 	public String getClausePKOnly() {
-        final StringBuffer sb = new StringBuffer(512);
+        final StringBuilder sb = new StringBuilder(512);
 		sb.append(getSelectClausePKOnly());
         sb.append(" ");
         sb.append(buildClauseWithoutMainSelect(true));
         return sb.toString();
 	}
 	
-    /**
-     * Build the clause without select clause.
-     * 
-	 * @param pkonly Is is for PK-only?
-     * @return The clause without select clause. (NotNull)
-     */
 	protected String buildClauseWithoutMainSelect(boolean pkonly) {
-	    final StringBuffer sb = new StringBuffer(512);
+	    final StringBuilder sb = new StringBuilder(512);
         sb.append(getFromClause());
         sb.append(getFromHint());
         sb.append(" ");
@@ -174,26 +153,16 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return sb.toString();
 	}
 	
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The from-where clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
-     */
     public String getClauseFromWhereWithUnionTemplate() {
 	    return buildClauseFromWhereAsTemplate(false);
     }
 	
-	/**
-     * ${database.ImplementComment}
-     * 
-     * @return The from-where clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
-     */
     public String getClauseFromWhereWithWhereUnionTemplate() {
 	    return buildClauseFromWhereAsTemplate(true);
 	}
 	
     protected String buildClauseFromWhereAsTemplate(boolean template) {
-        final StringBuffer sb = new StringBuffer(512);
+        final StringBuilder sb = new StringBuilder(512);
         sb.append(getFromClause());
         sb.append(getFromHint());
         sb.append(" ");
@@ -202,9 +171,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return sb.toString();
 	}
 	
-	
     protected String buildUnionClause(String selectClause) {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         for (final java.util.Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
             final UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
             final String unionQueryClause = unionQueryInfo.getUnionQueryClause();
@@ -217,13 +185,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                        Clause Parts
     //                                                                        ============
-	/**
-     * ${database.ImplementComment}
-     * 
-     * @return The clause of select. {[select ...] from table...} (NotNull)
-     */
 	public String getSelectClause() {
-	    final StringBuffer sb = new StringBuffer();
+	    final StringBuilder sb = new StringBuilder();
 		final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
 		final List<${glColumnInfoName}> columnInfoList = dbmeta.getColumnInfoList();
 		for (${glColumnInfoName} columnInfo : columnInfoList) {
@@ -253,11 +216,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 		return sb.toString();
 	}
 	
-	/**
-     * ${database.ImplementComment}
-     * 
-     * @return The clause of select pk-only. {[select ...] from table...} (NotNull)
-     */
 	public String getSelectClausePKOnly() {
 	    final StringBuffer sb = new StringBuffer();
 		final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
@@ -280,20 +238,10 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 		return sb.toString();
 	}
 	
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The hint of select. {select [select-hint] * from table...} (NotNull)
-     */
     public String getSelectHint() {
         return createSelectHint();
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The clause of includedSelectColumn. {select ... , [included-select-column clause] from table...} (NotNull)
-     */
     public String getIncludedSelectColumnClause() {
         final StringBuffer sb = new StringBuffer();
         int count = 0;
@@ -306,11 +254,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return sb.toString();
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The clause of from. (NotNull)
-     */
     public String getFromClause() {
         final StringBuffer sb = new StringBuffer();
         sb.append("from ");
@@ -380,20 +323,10 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return sb.toString();
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The hint of fromBaseTable. {select * from table [from-base-table-hint] where ...} (NotNull)
-     */
     public String getFromBaseTableHint() {
         return createFromBaseTableHint();
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The hint of from. {select * from table left outer join ... on ... [from-hint] where ...} (NotNull)
-     */
     public String getFromHint() {
         return createFromHint();
     }
@@ -432,11 +365,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         }
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return The sql suffix. {select * from table where ... order by ... [sql-suffix]} (NotNull)
-     */
     public String getSqlSuffix() {
         return createSqlSuffix();
     }
@@ -444,9 +372,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                          Copy Parts
     //                                                                          ==========
-    /**
-     * Copy included select column.
-     */
     public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause) {
         final java.util.Set keySet = _includedSelectColumnMap.keySet();
         for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
@@ -533,28 +458,16 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                IncludedSelectColumn
     //                                                                ====================
-    /**
-     * Ignore included select column.
-     */
     public void ignoreIncludedSelectColumn() {
         _isIncludedSelectColumnEffective = false;
     }
 
-    /**
-     * Make included select column effective.
-     */
     public void makeIncludedSelectColumnEffective() {
         if (!_includedSelectColumnMap.isEmpty()) {
             _isIncludedSelectColumnEffective = true;
         }
     }
 
-    /**
-     * Register included select column.
-     * 
-     * @param aliasName Alias name. (NotNull)
-     * @param realColumnName Real column name. (NotNull)
-     */
     public void registerIncludedSelectColumn(String aliasName, String realColumnName) {
         _isIncludedSelectColumnEffective = true;
         _includedSelectColumnMap.put(aliasName, realColumnName);
@@ -563,13 +476,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param joinTableName Join table name(outer join [joinTableName]). (NotNull)
-     * @param aliasName Alias name of join table. (NotNull and Unique per invoking method.)
-     * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
-     */
     public void registerOuterJoin(String joinTableName, String aliasName, java.util.Map<String, String> joinOnMap) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
@@ -625,11 +531,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         }
     }
 
-    /**
-     * Assert whether the alias name have already registered in outer join.
-     * 
-     * @param aliasName Alias name.
-     */
     protected void assertAlreadyOuterJoin(String aliasName) {
         if (_outerJoinMap.containsKey(aliasName)) {
             String msg = "The alias name have already registered in outer join: " + aliasName;
@@ -637,13 +538,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         }
     }
 
-    /**
-     * Assert whether the joinOnMap should not be empty.
-     * 
-     * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
-     * @param aliasName Alias name.
-     */
-    protected void assertJoinOnMapNotEmpty(java.util.Map<String, String> joinOnMap, String aliasName) {
+    protected void assertJoinOnMapNotEmpty(Map<String, String> joinOnMap, String aliasName) {
         if (joinOnMap.isEmpty()) {
             String msg = "The joinOnMap should not be empty: aliasName=" + aliasName;
             throw new IllegalStateException(msg);
@@ -653,27 +548,12 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param columnFullName Column-full-name([table-name].[column-name]). (NotNull)
-     * @param key Condition key. (NotNull)
-     * @param value Condition value. (NotNull)
-     */
     public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         key.addWhereClause(_whereList, columnFullName, value);
         arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
-    /**
-     * Register where clause.
-     * 
-     * @param columnFullName Column-full-name([table-name].[column-name]). (NotNull)
-     * @param key Condition key. (NotNull)
-     * @param value Condition value. (NotNull)
-     * @param option Operand option. (NotNull)
-     */
     public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         assertObjectNotNull("option of " + columnFullName, option);
@@ -681,20 +561,12 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param clause Where-clause. (NotNull)
-     */
     public void registerWhereClause(String clause) {
         assertStringNotNullAndNotTrimmedEmpty("clause", clause);
         _whereList.add(clause);
         arrangeWhereListAdditionalConditionAsOr(_whereList);
     }
 
-    /**
-     * Exchange first where clause for last one.
-     */
     public void exchangeFirstWhereClauseForLastOne() {
         if (_whereList.size() > 1) {
             final String first = (String)_whereList.get(0);

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCKey};
@@ -9,63 +10,48 @@ using ${glPackageBaseCommonCValue};
 
 namespace ${glPackageBaseCommonSqlClause} {
 
-    /// <summary>
-    /// The abstract class of SqlClause.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     [System.Serializable]
     public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
-        /** Target table name. */
+        // =================================================================================
+        //                                                                         Attribute
+        //                                                                         =========
+        // -------------------------------------------------
+        //                                             Basic
+        //                                             -----
         protected String _tableName;
-
-        /** Included select column map. */
-        protected System.Collections.IDictionary _includedSelectColumnMap = new System.Collections.Hashtable();
-
-        /** Outer join map. */
-        protected System.Collections.IDictionary _outerJoinMap = new System.Collections.Hashtable();
-
-        /** Outer join list. (For order guarantee) */
-        protected System.Collections.IList _outerJoinList = new System.Collections.ArrayList();
-
-        /** Where list. */
-        protected System.Collections.IList _whereList = new System.Collections.ArrayList();
-
-        /** Inline where list for BaseTable. */
-        protected System.Collections.IList _baseTableInlineWhereList = new System.Collections.ArrayList();
-
-        /** Order by clause. */
+		
+        // -------------------------------------------------
+        //                                   Clause Resource
+        //                                   ---------------
+        protected IDictionary<String, IDictionary<String, SelectedSelectColumnInfo>> _selectedSelectColumnMap = new Dictionary<String, IDictionary<String, SelectedSelectColumnInfo>>();		
+        protected IDictionary<String, String>> _includedSelectColumnMap = new Dictionary<String, String>();
+	    protected IDictionary<String, String> _selectClauseRealColumnAliasMap = new Dictionary<String, String>();// Without linked!
+        protected IDictionary<String, LeftOuterJoinInfo> _outerJoinMap = new Dictionary<String, LeftOuterJoinInfo>();
+        protected IList<String> _outerJoinList = new List<String>();
+        protected IList<String> _whereList = new List<String>();
+        protected IList<String> _baseTableInlineWhereList = new List<String>();
         protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
-
-        /** Is incoluded-select-column effective? Default value is false. */
+		protected IList<UnionQueryInfo> _unionQueryInfoList = new List<UnionQueryInfo>();
         protected bool _isIncludedSelectColumnEffective = false;
-
-        /** Is order-by effective? Default value is false. */
         protected bool _isOrderByEffective = false;
-
-        /** Fetch start index. (for fetchXxx()) */
+		
+        // -------------------------------------------------
+        //                                    Fetch Property
+        //                                    --------------
         protected int _fetchStartIndex = 0;
-
-        /** Fetch size. (for fetchXxx()) */
         protected int _fetchSize = 0;
-
-        /** Fetch page number. (for fetchXxx()) This value should be plus. */
         protected int _fetchPageNumber = 1;
-
-        /** Is fetch-narrowing effective? Default value is false. */
         protected bool _isFetchScopeEffective = false;
+		
+		// -------------------------------------------------
+        //                             Selected Foreign Info
+        //                             ---------------------
+		protected IDictionary<String, String> _selectedForeignInfo;
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
-        /**
-         * Constructor.
-         * 
-         * @param tableName Table name. (NotNull)
-         **/
+        // =================================================================================
+        //                                                                       Constructor
+        //                                                                       ===========
         public ${myClassName}(String tableName) {
             if (tableName == null) {
                 String msg = "Argument[tableName] must not be null.";
@@ -74,64 +60,150 @@ namespace ${glPackageBaseCommonSqlClause} {
             _tableName = tableName;
         }
 
-        // =====================================================================================
-        //                                                                                Clause
-        //                                                                                ======
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Clause string. (NotNull)
-         */
+        // =================================================================================
+        //                                                                            Clause
+        //                                                                            ======
         public String GetClause() {
-            StringBuilder sb = new StringBuilder(128);
-            if (_isIncludedSelectColumnEffective && _includedSelectColumnMap.Count != 0) {
-                sb.Append(" ").Append(GetIncludedSelectColumnClause());
-            }
+            StringBuilder sb = new StringBuilder(512);
+    		sb.Append(GetSelectClause());
             sb.Append(" ");
+            sb.Append(BuildClauseWithoutMainSelect(false));
+            return sb.ToString();
+        }
+    	
+    	public String GetClausePKOnly() {
+            StringBuilder sb = new StringBuilder(512);
+    		sb.Append(GetSelectClausePKOnly());
+            sb.Append(" ");
+            sb.Append(BuildClauseWithoutMainSelect(true));
+            return sb.ToString();
+    	}
+    	
+    	protected String buildClauseWithoutMainSelect(boolean pkonly) {
+    	    StringBuilder sb = new StringBuilder(512);
             sb.Append(GetFromClause());
-            sb.Append(" ");
             sb.Append(GetFromHint());
             sb.Append(" ");
             sb.Append(GetWhereClause());
-
-            if (_isOrderByEffective && !_orderByClause.IsEmpty()) {
+    		String unionClause = BuildUnionClause(pkonly ? GetSelectClausePKOnly() : GetSelectClause());
+    		
+    		// Delete template mark! (At the future this will be unnecessary.)
+    		unionClause = ReplaceString(unionClause, GetUnionWhereClauseMark(), "");// Required!
+    		unionClause = ReplaceString(unionClause, GetUnionWhereFirstConditionMark(), "");// Required!
+    		
+            sb.Append(unionClause);
+            if (_isOrderByEffective && _orderByClause.Count > 0) {
                 sb.Append(" ");
                 sb.Append(GetOrderByClause());
             }
             sb.Append(" ");
             sb.Append(GetSqlSuffix());
             return sb.ToString();
+    	}
+    	
+        public String GetClauseFromWhereWithUnionTemplate() {
+    	    return BuildClauseFromWhereAsTemplate(false);
+        }
+    	
+        public String GetClauseFromWhereWithWhereUnionTemplate() {
+    	    return BuildClauseFromWhereAsTemplate(true);
+    	}
+    	
+        protected String BuildClauseFromWhereAsTemplate(boolean template) {
+            StringBuilder sb = new StringBuilder(512);
+            sb.Append(GetFromClause());
+            sb.Append(GetFromHint());
+            sb.Append(" ");
+            sb.Append(BuildWhereClause(template));
+            sb.Append(BuildUnionClause(getUnionSelectClauseMark()));
+            return sb.ToString();
+    	}
+    	
+        protected String BuildUnionClause(String selectClause) {
+            StringBuilder sb = new StringBuilder();
+            for (UnionQueryInfo unionQueryInfo in _unionQueryInfoList) {
+                String unionQueryClause = unionQueryInfo.GetUnionQueryClause();
+                bool unionAll = unionQueryInfo.IsUnionAll();
+                sb.Append(unionAll ? " union all " : " union ").Append(selectClause).Append(" ").Append(unionQueryClause);
+            }
+            return sb.ToString();
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return select-hint. {select [select-hint] * from table...}
-         */
-        public String GetSelectHint() {
+        // =================================================================================
+        //                                                                      Clause Parts
+        //                                                                      ============
+    	public String GetSelectClause() {
+    	    StringBuilder sb = new StringBuilder();
+    		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
+    		IList<${glColumnInfoName}> columnInfoList = dbmeta.GetColumnInfoList();
+    		for (${glColumnInfoName} columnInfo : columnInfoList) {
+    		    String columnName = columnInfo.getColumnDbName();
+    			if (sb.Length > 0) {
+    			    sb.Append(", ");
+    			} else {
+    			    sb.Append("select/*$dto.selectHint*/ ");
+    			}
+    			String realColumnName = GetLocalTableAliasName() + "." + columnName;
+    			sb.Append(realColumnName).Append(" as ").Append(columnName);
+    			_selectClauseRealColumnAliasMap.put(realColumnName, columnName);
+    		}
+    	    ICollection<String> tableAliasNameSet = _selectedSelectColumnMap.Keys;
+    		for (String tableAliasName in tableAliasNameSet) {
+    		    IDictionary<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap[tableAliasName];
+    			ICollection<SelectedSelectColumnInfo> selectColumnInfoList = map.Values;
+    			for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
+    			    String realColumnName = selectColumnInfo.buildRealColumnName();
+                    sb.Append(", ").Append(realColumnName).Append(" as ").Append(selectColumnInfo.GetColumnAliasName());
+    				_selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
+    			}
+    		}
+    		if (_isIncludedSelectColumnEffective && _includedSelectColumnMap.Count > 0) {
+    		    sb.Append(GetIncludedSelectColumnClause());
+    		}
+    		return sb.toString();
+    	}
+    	
+    	public String GetSelectClausePKOnly() {
+    	    StringBuffer sb = new StringBuffer();
+    		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
+    		${glUniqueInfoName} uniqueInfo = dbmeta.GetPrimaryUniqueInfo();
+    		IList<${glColumnInfoName}> columnInfoList = uniqueInfo.GetUniqueColumnList();
+    		for (${glColumnInfoName} columnInfo in columnInfoList) {
+    		    String columnName = columnInfo.GetColumnDbName();
+    			if (sb.Length > 0) {
+    			    sb.Append(", ");
+    			} else {
+    			    sb.Append("select/*$dto.selectHint*/ ");
+    			}
+    			String realColumnName = GetLocalTableAliasName() + "." + columnName;
+    			sb.Append(realColumnName).Append(" as ").Append(columnName);
+    			_selectClauseRealColumnAliasMap.Add(realColumnName, columnName);
+    		}
+    		if (_isIncludedSelectColumnEffective && _includedSelectColumnMap.Count > 0) {
+    		    sb.Append(GetIncludedSelectColumnClause());
+    		}
+    		return sb.toString();
+    	}
+		
+        public String getSelectHint() {
             return CreateSelectHint();
         }
-
-        public String GetIncludedSelectColumnClause() {
+    
+        public String getIncludedSelectColumnClause() {
             StringBuilder sb = new StringBuilder();
-            System.Collections.ICollection keySet = _includedSelectColumnMap.Keys;
+            ICollection<String> keySet = _includedSelectColumnMap.Keys;
             foreach (String aliasName in keySet) {
-                String realColumnName = (String)_includedSelectColumnMap[aliasName];
+                String realColumnName = _includedSelectColumnMap[aliasName];
                 sb.Append(", ").Append(realColumnName).Append(" as ").Append(aliasName);
             }
             return sb.ToString();
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return From clause. (NotNull)
-         */
         public String GetFromClause() {
             StringBuilder sb = new StringBuilder(128);
             sb.Append("from ");
             if (_baseTableInlineWhereList.Count == 0) {
-                sb.Append(_tableName);
+                sb.Append(_tableName).Append(" dflocal");
             } else {
                 sb.Append(GetInlineViewClause(_tableName, _baseTableInlineWhereList)).Append(" ").Append(_tableName);
             }
@@ -143,10 +215,12 @@ namespace ${glPackageBaseCommonSqlClause} {
         protected String GetLeftOuterJoinClause() {
             StringBuilder sb = new StringBuilder();
             foreach (String aliasName in _outerJoinList) {
-                LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
+                LeftOuterJoinInfo joinInfo = _outerJoinMap[aliasName];
                 String joinTableName = joinInfo.JoinTableName;
-                System.Collections.IList inlineWhereClauseList = joinInfo.InlineWhereClauseList;
-                System.Collections.IDictionary joinOnMap = joinInfo.JoinOnMap;
+                IList<String> inlineWhereClauseList = joinInfo.InlineWhereClauseList;
+				IList<String> additionalOnClauseList = joinInfo.AdditionalOnClauseList;
+	
+                IDictionary<String> joinOnMap = joinInfo.JoinOnMap;
                 AssertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
                 sb.Append(" left outer join ");
@@ -157,15 +231,22 @@ namespace ${glPackageBaseCommonSqlClause} {
                 }
                 sb.Append(" ").Append(aliasName).Append(" on ");
                 int count = 0;
-                System.Collections.ICollection localColumnNameSet = joinOnMap.Keys;
+                ICollection<String> localColumnNameSet = joinOnMap.Keys;
                 foreach (String localColumnName in localColumnNameSet) {
                     String foreignColumnName = (String)joinOnMap[localColumnName];
-                    if (count != 0) {
+                    if (count > 0) {
                         sb.Append(" and ");
                     }
-                    sb.Append(localColumnName).Append(" = ").Append(foreignColumnName);
-                    count++;
+                    if (localColumnName.equals("$$fixedCondition$$")) {
+                        sb.Append(foreignColumnName);
+                    } else {
+                        sb.Append(localColumnName).append(" = ").Append(foreignColumnName);
+                    }
+                    ++count;
                 }
+    			for (String additionalOnClause : additionalOnClauseList) {
+    			    sb.Append(" and ").Append(additionalOnClause);
+    			}
             }
             return sb.ToString();
         }
@@ -185,87 +266,147 @@ namespace ${glPackageBaseCommonSqlClause} {
             return sb.ToString();
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return from-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
-         */
         public String GetFromBaseTableHint() {
             return CreateFromBaseTableHint();
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return from-hint. {select * from table [from-hint] where ...} (NotNull)
-         */
         public String GetFromHint() {
             return CreateFromHint();
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Where clause. (NotNull)
-         */
         public String GetWhereClause() {
+		    return BuildWhereClause(false);
+        }
+		
+    	protected String BuildWhereClause(bool template) {
             StringBuilder sb = new StringBuilder(128);
             int count = 0;
-            foreach (String clause in _whereList) {
+            foreach (String clauseElement in _whereList) {
                 if (count == 0) {
-                    sb.Append("where ").Append(clause);
+                    sb.Append("where ").Append(template  ? getWhereFirstConditionMark() : "").Append(clauseElement);
                 } else {
-                    sb.Append(" and ").Append(clause);
+                    sb.Append(" and ").Append(clauseElement);
                 }
                 count++;
             }
+    		if (template && sb.length() == 0) {
+    		    sb.append(getWhereClauseMark());
+    		}
             return sb.ToString();
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Order-by clause. (NotNull)
-         */
         public String GetOrderByClause() {
-            return _orderByClause.GetOrderByClause();
+            if (_unionQueryInfoList.Count > 0) {
+                if (_selectClauseRealColumnAliasMap == null || _selectClauseRealColumnAliasMap.Count == 0) {
+                    String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists: " + toString();
+                    throw new IllegalStateException(msg);
+                }
+                return _orderByClause.GetOrderByClause(_selectClauseRealColumnAliasMap);
+            } else {
+                return _orderByClause.GetOrderByClause();
+            }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return from-hint. {select * from table where ... order by ... [sql-suffix]}
-         */
         public String GetSqlSuffix() {
             return CreateSqlSuffix();
         }
 
-        // =====================================================================================
-        //                                                                  IncludedSelectColumn
-        //                                                                  ====================
-        public void MakeIncludedSelectColumnEffective() {
-            _isIncludedSelectColumnEffective = true;
+        // =================================================================================
+        //                                                                        Copy Parts
+        //                                                                        ==========
+        public void CopyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause) {
+            ICollection<String> keySet = _includedSelectColumnMap.Keys;
+            for (String aliasName in keySet) {
+                String realColumnName = _includedSelectColumnMap[aliasName];
+                sqlClause.RegisterIncludedSelectColumn(aliasName, realColumnName);
+            }
         }
-
+		
+        // =================================================================================
+        //                                                              SelectedSelectColumn
+        //                                                              ====================
+        public void RegisterSelectedSelectColumn(String foreignTableAliasName
+    			                               , String localTableName
+    										   , String foreignPropertyName
+    										   , String localRelationPath) {
+            _selectedSelectColumnMap.Add(foreignTableAliasName, CreateSelectedSelectColumnInfo(foreignTableAliasName, localTableName, foreignPropertyName, localRelationPath));
+        }
+		
+    	protected IDictionary<String, SelectedSelectColumnInfo> CreateSelectedSelectColumnInfo(String foreignTableAliasName
+    											                                             , String localTableName
+    													                                     , String foreignPropertyName
+    													                                     , String localRelationPath) {
+    		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(localTableName);
+            ${glForeignInfoName} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
+    		int relationNo = foreignInfo.GetRelationNo();
+    		String nextRelationPath = "_" + relationNo;
+            if (localRelationPath != null) {
+                nextRelationPath = localRelationPath + nextRelationPath;
+            }
+    		IDictionary<String, SelectedSelectColumnInfo> resultMap = new Dictionary<String, SelectedSelectColumnInfo>();
+    		${glDBMetaInterfaceName} foreignDBMeta = foreignInfo.GetForeignDBMeta();
+            IList<${glColumnInfoName}> columnInfoList = foreignDBMeta.GetColumnInfoList();
+            for (${glColumnInfoName} columnInfo in columnInfoList) {
+                String columnDbName = columnInfo.GetColumnDbName();
+    			SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
+    			selectColumnInfo.TableAliasName = foreignTableAliasName;
+    			selectColumnInfo.ColumnName = columnDbName;
+    			selectColumnInfo.ColumnAliasName = columnDbName + nextRelationPath;
+    			resultMap.Add(columnDbName, selectColumnInfo);
+            }
+    		return resultMap;
+    	}
+		
+        public static class SelectedSelectColumnInfo {
+            protected String tableAliasName;
+            protected String columnName;
+            protected String columnAliasName;
+            public String BuildRealColumnName() {
+                if (tableAliasName != null) {
+                    return tableAliasName + "." + columnName;
+                } else {
+                    return columnName;
+                }
+            }
+            public String TableAliasName {
+                get { return tableAliasName; }
+				set { this.tableAliasName = value; }
+            }
+            public String ColumnName {
+                get { return columnName; }
+				set { this.columnName = value; }
+            }
+            public String ColumnAliasName {
+                get { return columnAliasName; }
+				set { this.columnAliasName = value; }
+            }
+        }
+		
+		// =================================================================================
+        //                                                              IncludedSelectColumn
+        //                                                              ====================
         public void IgnoreIncludedSelectColumn() {
             _isIncludedSelectColumnEffective = false;
+        }
+		
+        public void MakeIncludedSelectColumnEffective() {
+		    if (_includedSelectColumnMap.Count > 0) {
+                _isIncludedSelectColumnEffective = true;
+			}
         }
 
         public void RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
             _isIncludedSelectColumnEffective = true;
             _includedSelectColumnMap.Add(aliasName, realColumnName);
         }
+		
+		
+		// 2008/02/01 19:30:00
+		
 
         // =====================================================================================
         //                                                                             OuterJoin
         //                                                                             =========
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param joinTableName Join table name(outer join [joinTableName]). (NotNull)
-         * @param aliasName Alias name of join table. (NotNull and Unique per invoking method.)
-         * @param joinOnMap Map that has conditions of 'on' clause. (NotNull)
-         */
         public void RegisterOuterJoin(String joinTableName, String aliasName, System.Collections.IDictionary joinOnMap) {
             AssertAlreadyOuterJoin(aliasName);
             AssertJoinOnMapNotEmpty(joinOnMap, aliasName);
