@@ -124,8 +124,9 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
     }
 
     public String getDaoSqlFileEncoding() {
-        final String property = stringProp("torque.daoSqlFileEncoding", "UTF-8");
-        return !property.equals("null") ? property : "";
+        final String defaultEncoding = "UTF-8";
+        final String property = stringProp("torque.daoSqlFileEncoding", defaultEncoding);
+        return !property.equals("null") ? property : defaultEncoding;
     }
 
 }

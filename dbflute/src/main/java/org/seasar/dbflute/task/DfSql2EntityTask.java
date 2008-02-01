@@ -98,6 +98,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
+        runInfo.setEncoding(getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding());
 
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
@@ -560,7 +561,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             this.propertyNameOptionMap = propertyNameOptionMap;
         }
     }
-    
+
     // ===================================================================================
     //                                                                       Task Override
     //                                                                       =============
@@ -616,13 +617,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected void setupTorqueType(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, final Column col) {
+    protected void setupTorqueType(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName,
+            final Column col) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
         final Integer jdbcType = metaInfo.getJdbcTypeCode();
         col.setTorqueType(TypeMap.getTorqueType(jdbcType));
     }
-    
-    protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, final Column col) {
+
+    protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
+            String columnName, final Column col) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
         final int columnSize = metaInfo.getColumnSize();
         final int decimalDigits = metaInfo.getDecimalDigits();

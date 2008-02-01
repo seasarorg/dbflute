@@ -150,11 +150,15 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
-        runInfo.setEncoding("UTF-8");// TODO: @jflute - from Property
+        runInfo.setEncoding(getReplaceSchemaSqlFileEncoding());
         runInfo.setAutoCommit(getMyProperties().isReplaceSchemaAutoCommit());
         runInfo.setErrorContinue(getMyProperties().isReplaceSchemaErrorContinue());
         runInfo.setRollbackOnly(getMyProperties().isReplaceSchemaRollbackOnly());
         return runInfo;
+    }
+    
+    protected String getReplaceSchemaSqlFileEncoding() {
+        return "UTF-8";
     }
 
     protected void replaceSchema(DfRunnerInformation runInfo) {

@@ -64,7 +64,12 @@ public class DfInvokeSqlDirectoryTask extends DfAbstractTask {
         runInfo.setAutoCommit(isAutoCommit());
         runInfo.setErrorContinue(isErrorContinue());
         runInfo.setRollbackOnly(isRollbackOnly());
+        customizeRunnerInformation(runInfo);
         return runInfo;
+    }
+    
+    protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
+        // for Override
     }
 
     // ===================================================================================

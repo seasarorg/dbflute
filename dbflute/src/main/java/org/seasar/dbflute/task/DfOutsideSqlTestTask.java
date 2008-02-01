@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
@@ -40,6 +41,11 @@ public class DfOutsideSqlTestTask extends DfInvokeSqlDirectoryTask {
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
+    @Override
+    protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
+        runInfo.setEncoding(getProperties().getS2DaoAdjustmentProperties().getDaoSqlFileEncoding());
+    }
+
     @Override
     protected List<File> getSqlFileList() {
         final String sqlDirectory = getSqlDirectory();
