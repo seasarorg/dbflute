@@ -400,13 +400,9 @@ namespace ${glPackageBaseCommonSqlClause} {
             _includedSelectColumnMap.Add(aliasName, realColumnName);
         }
 		
-		
-		// 2008/02/01 19:30:00
-		
-
-        // =====================================================================================
-        //                                                                             OuterJoin
-        //                                                                             =========
+		// =================================================================================
+        //                                                                         OuterJoin
+        //                                                                         =========
         public void RegisterOuterJoin(String joinTableName, String aliasName, System.Collections.IDictionary joinOnMap) {
             AssertAlreadyOuterJoin(aliasName);
             AssertJoinOnMapNotEmpty(joinOnMap, aliasName);
@@ -421,8 +417,10 @@ namespace ${glPackageBaseCommonSqlClause} {
         public class LeftOuterJoinInfo {
             protected String _aliasName;
             protected String _joinTableName;
-            protected System.Collections.IList _inlineWhereClauseList = new System.Collections.ArrayList();
-            protected System.Collections.IDictionary _joinOnMap;
+            protected IList<String> _inlineWhereClauseList = new List<String>();
+            protected IList<String> _additionalOnClauseList = new List<String>();
+            protected IDictionary<String, String> _joinOnMap;
+			protected bool _onClauseInline;
             public String AliasName {
                 get { return _aliasName; }
                 set { _aliasName = value; }
@@ -431,15 +429,25 @@ namespace ${glPackageBaseCommonSqlClause} {
                 get { return _joinTableName; }
                 set { _joinTableName = value; }
             }
-            public System.Collections.IList InlineWhereClauseList {
+            public IList<String> InlineWhereClauseList {
                 get { return _inlineWhereClauseList; }
             }
             public void AddInlineWhereClause(String value) {
                 _inlineWhereClauseList.Add(value);
             }
-            public System.Collections.IDictionary JoinOnMap {
+            public IList<String> AdditionalOnClauseList {
+                get { return _additionalOnClauseList; }
+            }
+            public void AddAdditionalOnClause(String value) {
+                _additionalOnClauseList.Add(value);
+            }
+            public IDictionary<String, String> JoinOnMap {
                 get { return _joinOnMap; }
                 set { _joinOnMap = value; }
+            }
+            public String IsOnClauseInline {
+                get { return _onClauseInline; }
+                set { _onClauseInline = value; }
             }
         }
 
@@ -457,66 +465,84 @@ namespace ${glPackageBaseCommonSqlClause} {
             }
         }
 
-        // =====================================================================================
-        //                                                                                 Where
-        //                                                                                 =====
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param columnName Column name([table-name].[column-name]). (NotNull)
-         * @param key Condition key. (NotNull)
-         * @param value Condition value. (NotNull)
-         */
-        public void RegisterWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
-            AssertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-            key.AddWhereClause(_whereList, columnName, value);
+		// =================================================================================
+        //                                                                             Where
+        //                                                                             =====
+        public void RegisterWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+            AssertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
+            key.AddWhereClause(_whereList, columnFullName, value);
+        }
+		
+        public void RegisterWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+            AssertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
+			AssertObjectNotNull("option of " + columnFullName, option);
+            key.AddWhereClause(_whereList, columnFullName, value);
         }
 
-        /**
-         * Register where clause.
-         * 
-         * @param clause Where clause. (NotNull)
-         * @return this. (NotNull)
-         */
         public void RegisterWhereClause(String clause) {
             AssertStringNotNullAndNotTrimmedEmpty("clause", clause);
             _whereList.Add(clause);
         }
+		
+        public void ExchangeFirstWhereClauseForLastOne() {
+            if (_whereList.Count > 1) {
+                String first = _whereList[0];
+                String last = _whereList[_whereList.size() - 1];
+                _whereList.Set(0, last);
+                _whereList.Set(_whereList.Count - 1, first);
+            }
+        }
 
-        // =====================================================================================
-        //                                                                           InlineWhere
-        //                                                                           ===========
+		// =================================================================================
+        //                                                                       InlineWhere
+        //                                                                       ===========
         public void RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
-            RegisterWhereClause(columnName, key, value);
-            String inlineWhereClause = (String)_whereList[_whereList.Count-1];
-            _whereList.RemoveAt(_whereList.Count-1);
-            _baseTableInlineWhereList.Add(inlineWhereClause);
+		    AssertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+            key.AddWhereClause(_baseTableInlineWhereList, columnName, value);
+        }
+		
+        public void RegisterBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+		    AssertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+			AssertObjectNotNull("option of " + columnName, option);
+            key.AddWhereClause(_baseTableInlineWhereList, columnName, value, option);
         }
 
         public void RegisterBaseTableInlineWhereClause(String value) {
             _baseTableInlineWhereList.Add(value);
         }
 
-        public void RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value) {
+        public void RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, boolean onClauseInline) {
             AssertNotYetOuterJoin(aliasName);
+			AssertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
             LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
-            RegisterWhereClause(columnName, key, value);
-            String inlineWhereClause = (String)_whereList[_whereList.Count-1];
-            _whereList.RemoveAt(_whereList.Count-1);
-            joinInfo.AddInlineWhereClause(inlineWhereClause);
+    		if (onClauseInline) {
+                key.addWhereClause(joinInfo.AdditionalOnClauseList, aliasName + "." + columnName, value);
+    		} else {
+                key.addWhereClause(joinInfo.InlineWhereClauseList, columnName, value);
+    		}
+        }
+		
+        public void RegisterOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, boolean onClauseInline, ${glConditionOptionInterfaceName} option) {
+            AssertNotYetOuterJoin(aliasName);
+			AssertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
+            LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
+    		if (onClauseInline) {
+                key.addWhereClause(joinInfo.AdditionalOnClauseList, aliasName + "." + columnName, value, option);
+    		} else {
+                key.addWhereClause(joinInfo.InlineWhereClauseList, columnName, value, option);
+    		}
         }
 
-        public void RegisterOuterJoinInlineWhereClause(String aliasName, String value) {
+        public void RegisterOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline) {
             AssertNotYetOuterJoin(aliasName);
             LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap[aliasName];
-            joinInfo.AddInlineWhereClause(value);
+    		if (onClauseInline) {
+                joinInfo.AddInlineWhereClause(value);
+    		} else {
+    		    joinInfo.AddInlineWhereClause(value);
+    		}
         }
 
-        /**
-         * Assert whether the alias name have already registered in outer join.
-         * 
-         * @param aliasName Alias name.
-         */
         protected void AssertNotYetOuterJoin(String aliasName) {
             if (!_outerJoinMap.Contains(aliasName)) {
                 String msg = "The alias name have not registered in outer join yet: " + aliasName;
@@ -524,44 +550,28 @@ namespace ${glPackageBaseCommonSqlClause} {
             }
         }
 
-        // =====================================================================================
-        //                                                                               OrderBy
-        //                                                                               =======
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
+		// =================================================================================
+        //                                                           AdditionalConditionAsOr
+        //                                                           =======================
+		
+		// =================================================================================
+        //                                                                           OrderBy
+        //                                                                           =======
         public ${glOrderByClauseName} GetSqlComponentOfOrderByClause() {
             return _orderByClause;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
         public ${glSqlClauseInterfaceName} ClearOrderBy() {
             _isOrderByEffective = false;
             _orderByClause.Clear();
             return this;
         }
 
-       /**
-        * ${database.ImplementComment}
-        * 
-        * @return this. (NotNull)
-        */
         public ${glSqlClauseInterfaceName} IgnoreOrderBy() {
             _isOrderByEffective = false;
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
         public ${glSqlClauseInterfaceName} MakeOrderByEffective() {
             _isOrderByEffective = true;
             return this;
@@ -571,33 +581,21 @@ namespace ${glPackageBaseCommonSqlClause} {
             ReverseOrderBy_Or_OverrideOrderBy(columnFullName, null, isAsc);
         }
 
-        public void ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc) {
+        public void ReverseOrderBy_Or_OverrideOrderBy(String columnFullName, String registeredColumnFullName, bool ascOrDesc) {
             _isOrderByEffective = true;
             if (!_orderByClause.IsSameOrderByColumn(columnFullName)) {
                 ClearOrderBy();
-                RegisterOrderBy(columnFullName, registeredColumnFullName, isAsc);
+                RegisterOrderBy(columnFullName, registeredColumnFullName, ascOrDesc);
             } else {
                 _orderByClause.ReverseAll();
             }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
-         * @param registeredColumnFullName Registered-column-full-name. ([table-name].[column-name]) (Nullable)
-         */
         public void RegisterOrderBy(String columnFullName, bool isAsc) {
             RegisterOrderBy(columnFullName, null, isAsc);
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
-         * @param registeredColumnFullName Registered-column-full-name. ([table-name].[column-name]) (Nullable)
-         */
-        public void RegisterOrderBy(String columnFullName, String registeredColumnFullName, bool isAsc) {
+        public void RegisterOrderBy(String columnFullName, String registeredColumnFullName, bool ascOrDesc) {
             try {
                 String[] orderByArray = columnFullName.Split('/');
                 if (registeredColumnFullName == null || registeredColumnFullName.Trim().Length ==0) {
@@ -633,7 +631,7 @@ namespace ${glPackageBaseCommonSqlClause} {
                     element.ColumnName = columnName;
                     element.RegisteredAliasName = registeredAliasName;
                     element.RegisteredColumnName = registeredColumnName;
-                    if (isAsc) {
+                    if (ascOrDesc) {
                         element.SetupAsc();
                     } else {
                         element.SetupDesc();
@@ -641,25 +639,43 @@ namespace ${glPackageBaseCommonSqlClause} {
                     _orderByClause.AddOrderByElement(element);
 
                     count++;
-                }
+                }s
             } catch (Exception e) {
                 String msg = "RegisterOrderBy() threw the exception: columnFullName=" + columnFullName;
                 msg = msg + " registeredColumnFullName=" + registeredColumnFullName;
-                msg = msg + " isAsc=" + isAsc;
+                msg = msg + " ascOrDesc=" + ascOrDesc;
                 msg = msg + " sqlClause=" + this.ToString();
                 throw new SystemException(msg, e);
             }
         }
 
-        // =====================================================================================
-        //                                                                               Advance
-        //                                                                               =======
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param fetchSize Fetch-size. (NotMinus & NotZero)
-         * @return this. (NotNull)
-         */
+		// =================================================================================
+        //                                                                        UnionQuery
+        //                                                                        ==========
+        public void registerUnionQuery(String unionQueryClause, bool unionAll) {
+            assertStringNotNullAndNotTrimmedEmpty("unionQueryClause", unionQueryClause);
+            UnionQueryInfo unionQueryInfo = new UnionQueryInfo();
+            unionQueryInfo.setUnionQueryClause(unionQueryClause);
+            unionQueryInfo.setUnionAll(unionAll);
+            _unionQueryInfoList.add(unionQueryInfo);
+        }
+    
+        protected static class UnionQueryInfo {
+            protected String _unionQueryClause;
+            protected bool _unionAll;
+            public String UnionQueryClause {
+                get { return _unionQueryClause; }
+				set { _unionQueryClause = value; }
+            }
+            public bool isUnionAll {
+                get { return _unionAll; }
+				set { _unionAll = value; }
+            }
+        }
+		
+		// =================================================================================
+        //                                                                        FetchScope
+        //                                                                        ==========
         public ${glSqlClauseInterfaceName} FetchFirst(int fetchSize) {
             _isFetchScopeEffective = true;
             if (fetchSize <= 0) {
@@ -674,13 +690,6 @@ namespace ${glPackageBaseCommonSqlClause} {
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
-         * @param fetchSize Fetch size. (NotMinus)
-         * @return this. (NotNull)
-         */
         public ${glSqlClauseInterfaceName} FetchScope(int fetchStartIndex, int fetchSize) {
             _isFetchScopeEffective = true;
             if (fetchStartIndex < 0) {
@@ -696,12 +705,6 @@ namespace ${glPackageBaseCommonSqlClause} {
             return FetchPage(1);
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @param fetchPageNumber Page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
-         * @return this. (NotNull)
-         */
         public ${glSqlClauseInterfaceName} FetchPage(int fetchPageNumber) {
             _isFetchScopeEffective = true;
             if (fetchPageNumber <= 0) {
@@ -722,59 +725,22 @@ namespace ${glPackageBaseCommonSqlClause} {
             return this;
         }
 
-        /**
-         * Do fetch first.
-         */
         abstract protected void DoFetchFirst();
-
-        /**
-         * Do fetch page.
-         */
         abstract protected void DoFetchPage();
-
-        /**
-         * Do clear fetch-page clause.
-         */
         abstract protected void DoClearFetchPageClause();
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Fetch start index.
-         */
+		
         public int FetchStartIndex {
-            get {
-                return _fetchStartIndex;
-            }
+            get { return _fetchStartIndex; }
         }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Fetch size.
-         */
+		
         public int FetchSize {
-            get {
-                return _fetchSize;
-            }
+            get { return _fetchSize; }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Fetch page number.
-         */
         public int FetchPageNumber {
-            get {
-                return _fetchPageNumber;
-            }
+            get { return _fetchPageNumber; }
         }
 
-        /**
-         * Get page start index.
-         * 
-         * @return Page start index. 0 origin. (NotMinus)
-         */
         public int PageStartIndex {
             get {
                 if (_fetchPageNumber <= 0) {
@@ -785,11 +751,6 @@ namespace ${glPackageBaseCommonSqlClause} {
             }
         }
 
-        /**
-         * Get page end index.
-         * 
-         * @return Page end index. 0 origin. (NotMinus)
-         */
         public int PageEndIndex {
             get {
                 if (_fetchPageNumber <= 0) {
@@ -800,22 +761,12 @@ namespace ${glPackageBaseCommonSqlClause} {
             }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
         public ${glSqlClauseInterfaceName} IgnoreFetchScope() {
             _isFetchScopeEffective = false;
             DoClearFetchPageClause();
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
         public ${glSqlClauseInterfaceName} MakeFetchScopeEffective() {
             _isFetchScopeEffective = true;
             if (this.FetchSize > 0 && this.FetchPageNumber > 0) {
@@ -824,82 +775,26 @@ namespace ${glPackageBaseCommonSqlClause} {
             return this;
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determiantion.
-         */
         public bool IsFetchScopeEffective {
-            get {
-                return _isFetchScopeEffective;
-            }
+            get { return _isFetchScopeEffective; }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determination.
-         */
-        public virtual bool IsFetchStartIndexSupported {
-            get {
-                return true; // Default
-            }
+		public virtual bool IsFetchStartIndexSupported {
+            get { return true; } // Default
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determination.
-         */
         public virtual bool IsFetchSizeSupported {
-            get {
-                return true; // Default
-            }
+            get { return true; } // Default
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
-        abstract public ${glSqlClauseInterfaceName} LockForUpdate();
-
-        /**
-         * Create select-hint.
-         * 
-         * @return Select-hint. {select [select-hint] * from table...} (NotNull)
-         */
         abstract protected String CreateSelectHint();
-
-        /**
-         * Create from-base-table-hint.
-         * 
-         * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
-         */
         abstract protected String CreateFromBaseTableHint();
-
-        /**
-         * Create from-hint.
-         * 
-         * @return From-hint. {select * from table [from-hint] where ...} (NotNull)
-         */
         abstract protected String CreateFromHint();
-
-        /**
-         * Create sql-suffix.
-         * 
-         * @return Sql-suffix. {select * from table where ... order by ... [sql-suffix]} (NotNull)
-         */
         abstract protected String CreateSqlSuffix();
 
-        // =====================================================================================
-        //                                                                        FetchNarrowing
-        //                                                                        ==============
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Fetch-narrowing start-index.
-         */
+		// =================================================================================
+        //                                                                    FetchNarrowing
+        //                                                                    ==============
         public int FetchNarrowingSkipStartIndex {
             get {
                 if (this.IsFetchStartIndexSupported) {
@@ -910,40 +805,106 @@ namespace ${glPackageBaseCommonSqlClause} {
             }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Fetch-narrowing size.
-         */
         public int FetchNarrowingLoopCount {
-            get {
-                return this.FetchSize;
-            }
+            get { return this.FetchSize; }
         }
 
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Determiantion.
-         */
         public bool IsFetchNarrowingEffective {
-            get {
-                return _isFetchScopeEffective;
-            }
+            get { return _isFetchScopeEffective; }
         }
 
-
-        // ----------------------------------------------------------------
-        //                                                    Assert Object
-        //                                                    -------------
+		// =================================================================================
+        //                                                                              Lock
+        //                                                                              ====
+        abstract public ${glSqlClauseInterfaceName} LockForUpdate();
+		
+		// =================================================================================
+        //                                                                          Resolver
+        //                                                                          ========
+        public String resolveJoinAliasName(String relationPath, int cqNestNo) {
+            return ResolveNestLevelExpression("dfrelation" + relationPath, cqNestNo);
+        }
+    
+        public String ResolveNestLevelExpression(String name, int cqNestNo) {
+            // if (cqNestNo > 1) {
+            //     return name + "_n" + cqNestNo;
+            // } else {
+            //     return name;
+            // }
+    		return name;
+        }
+    
+        public int ResolveRelationNo(String localTableName, String foreignPropertyName) {
+            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(localTableName);
+            ${glForeignInfoName} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
+            return foreignInfo.GetRelationNo();
+        }
+		
+		// =================================================================================
+        //                                                                  Table Alias Info
+        //                                                                  ================
+    	public String GetLocalTableAliasName() {
+    	    return "dflocal";
+    	}
+    	
+    	public String GetForeignTableAliasPrefix() {
+    	    return "dfrelation";
+    	}
+	
+		// =================================================================================
+        //                                                                     Template Mark
+        //                                                                     =============
+    	public String GetWhereClauseMark() {
+    	    return "#df:whereClause#";
+    	}
+    	
+    	public String GetWhereFirstConditionMark() {
+    	    return "#df:whereFirstCondition#";
+    	}
+    	
+    	public String GetUnionSelectClauseMark() {
+    	    return "#df:unionSelectClause#";
+    	}
+    	
+    	public String GetUnionWhereClauseMark() {
+    	    return "#df:unionWhereClause#";
+    	}
+    	
+    	public String GetUnionWhereFirstConditionMark() {
+    	    return "#df:unionWhereFirstCondition#";
+    	}
+	
+		// =================================================================================
+        //                                                             Selected Foreign Info
+        //                                                             =====================
+    	public bool HasSelectedForeignInfo(String relationPath) {
+    		if (_selectedForeignInfo == null) {
+    		    return false;
+    		}
+    	    return _selectedForeignInfo.containsKey(relationPath);
+    	}
+    
+    	public void RegisterSelectedForeignInfo(String relationPath, String foreignPropertyName) {
+    		if (_selectedForeignInfo == null) {
+    		    _selectedForeignInfo = new Dictionary<String, String>();
+    		}
+    		_selectedForeignInfo.Add(relationPath, foreignPropertyName);
+    	}
+		
+		// =================================================================================
+        //                                                                            Helper
+        //                                                                            ======
+		protected String ReplaceString(String text, String fromText, String toText) {
+            if(text == null || fromText == null || toText == null) {
+                return null;
+			}
+		    text.Replace(fromText, toText);
+		}
+		
+        // -----------------------------------------------------
+        //                                         Assert Object
+        //                                         -------------
         #region Assert Object
-
-        /**
-         * Assert that the argument is not null.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param arg Argument. (NotNull)
-         */
         protected void AssertObjectNotNull(String variableName, Object arg) {
             if (variableName == null) {
                 String msg = "Argument[variableName] should not be null.";
@@ -954,12 +915,11 @@ namespace ${glPackageBaseCommonSqlClause} {
                 throw new ArgumentNullException(msg);
             }
         }
-
         #endregion
 
-        // ----------------------------------------------------------------
-        //                                                    Assert String
-        //                                                    -------------
+        // -----------------------------------------------------
+        //                                         Assert String
+        //                                         -------------
         #region Assert String
 
         /**

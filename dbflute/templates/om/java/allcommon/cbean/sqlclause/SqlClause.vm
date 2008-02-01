@@ -238,8 +238,20 @@ public interface ${myClassName} {
     public ${myClassName} clearOrderBy();
     public ${myClassName} ignoreOrderBy();
     public ${myClassName} makeOrderByEffective();
-    public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
-    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc);
+	
+    /**
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
+     * @param ascOrDesc Is it ascend or descend?
+     */
+    public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+	
+    /**
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
+     * @param ascOrDesc Is it ascend or descend?
+     */
+    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
 
     // ===================================================================================
     //                                                                               Union

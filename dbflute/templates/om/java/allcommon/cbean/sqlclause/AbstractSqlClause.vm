@@ -633,11 +633,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 		}
     }
 
-    /**
-     * Assert whether the alias name have already registered in outer join.
-     * 
-     * @param aliasName Alias name.
-     */
     protected void assertNotYetOuterJoin(String aliasName) {
         if (!_outerJoinMap.containsKey(aliasName)) {
             String msg = "The alias name have not registered in outer join yet: " + aliasName;
@@ -676,41 +671,21 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return this. (NotNull)
-     */
     public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
         return _orderByClause;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return this. (NotNull)
-     */
     public ${glSqlClauseInterfaceName} clearOrderBy() {
         _isOrderByEffective = false;
         _orderByClause.clear();
         return this;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return this. (NotNull)
-     */
     public ${glSqlClauseInterfaceName} ignoreOrderBy() {
         _isOrderByEffective = false;
         return this;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return this. (NotNull)
-     */
     public ${glSqlClauseInterfaceName} makeOrderByEffective() {
         if (!_orderByClause.isEmpty()) {
             _isOrderByEffective = true;
@@ -718,31 +693,17 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return this;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
-     * @param isAsc Is asc?
-     */
-    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc) {
+    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc) {
         _isOrderByEffective = true;
         if (!_orderByClause.isSameOrderByColumn(orderByProperty)) {
             clearOrderBy();
-            registerOrderBy(orderByProperty, registeredOrderByProperty, isAsc);
+            registerOrderBy(orderByProperty, registeredOrderByProperty, ascOrDesc);
         } else {
             _orderByClause.reverseAll();
         }
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
-     * @param isAsc Is asc?
-     */
-    public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean isAsc) {
+    public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc) {
         try {
             _isOrderByEffective = true;
             final List<String> orderByList = new ArrayList<String>();
@@ -795,7 +756,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
                 element.setColumnName(columnName);
                 element.setRegisteredAliasName(registeredAliasName);
                 element.setRegisteredColumnName(registeredColumnName);
-                if (isAsc) {
+                if (ascOrDesc) {
                     element.setupAsc();
                 } else {
                     element.setupDesc();
@@ -807,7 +768,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         } catch (RuntimeException e) {
             String msg = "registerOrderBy() threw the exception: orderByProperty=" + orderByProperty;
             msg = msg + " registeredColumnFullName=" + registeredOrderByProperty;
-            msg = msg + " isAsc=" + isAsc;
+            msg = msg + " ascOrDesc=" + ascOrDesc;
             msg = msg + " sqlClause=" + this.toString();
             throw new RuntimeException(msg, e);
         }
@@ -845,8 +806,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                             Advance
     //                                                                             =======
     /**
-     * ${database.ImplementComment}
-     * 
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
@@ -865,8 +824,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     /**
-     * ${database.ImplementComment}
-     * 
      * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
      * @param fetchSize Fetch size. (NotMinus)
      * @return this. (NotNull)
@@ -887,8 +844,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     /**
-     * ${database.ImplementComment}
-     * 
      * @param fetchPageNumber Page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
@@ -916,51 +871,23 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return this;
     }
 
-    /**
-     * Do fetch first.
-     */
     abstract protected void doFetchFirst();
-
-    /**
-     * Do fetch page.
-     */
     abstract protected void doFetchPage();
-
-    /**
-     * Do clear fetch-page clause.
-     */
     abstract protected void doClearFetchPageClause();
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch start index.
-     */
     public int getFetchStartIndex() {
         return _fetchStartIndex;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch size.
-     */
     public int getFetchSize() {
         return _fetchSize;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch page number.
-     */
     public int getFetchPageNumber() {
         return _fetchPageNumber;
     }
 
     /**
-     * Get page start index.
-     * 
      * @return Page start index. 0 origin. (NotMinus)
      */
     public int getPageStartIndex() {
@@ -972,8 +899,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     /**
-     * Get page end index.
-     * 
      * @return Page end index. 0 origin. (NotMinus)
      */
     public int getPageEndIndex() {
@@ -984,82 +909,34 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         return _fetchStartIndex + (_fetchSize * _fetchPageNumber);
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determiantion.
-     */
     public boolean isFetchScopeEffective() {
         return _isFetchScopeEffective;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return this. (NotNull)
-     */
     public ${glSqlClauseInterfaceName} ignoreFetchScope() {
         _isFetchScopeEffective = false;
         doClearFetchPageClause();
         return this;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return this. (NotNull)
-     */
     public ${glSqlClauseInterfaceName} makeFetchScopeEffective() {
         if (getFetchSize() > 0 && getFetchPageNumber() > 0) {
             fetchPage(getFetchPageNumber());
         }
         return this;
     }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determination.
-     */
+	
     public boolean isFetchStartIndexSupported() {
         return true; // Default
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determination.
-     */
     public boolean isFetchSizeSupported() {
         return true; // Default
     }
 
-    /**
-     * Create select-hint.
-     * 
-     * @return Select-hint. {select [select-hint] * from table...} (NotNull)
-     */
     abstract protected String createSelectHint();
-
-    /**
-     * Create from-base-table-hint.
-     * 
-     * @return From-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
-     */
     abstract protected String createFromBaseTableHint();
-
-    /**
-     * Create from-hint.
-     * 
-     * @return From-hint. {select * from table left outer join ... on ... [from-hint] where ...} (NotNull)
-     */
     abstract protected String createFromHint();
-
-    /**
-     * Create sql-suffix.
-     * 
-     * @return Sql-suffix. {select * from table where ... order by ... [sql-suffix]} (NotNull)
-     */
     abstract protected String createSqlSuffix();
 
     // ===================================================================================
@@ -1095,24 +972,10 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                            Resolver
     //                                                                            ========
-    /**
-     * Resolve join alias name.
-     * 
-     * @param relationNo Relation no.
-     * @param cqNestNo The nest no of condition query.
-     * @return Resolved join alias name. (NotNull)
-     */
     public String resolveJoinAliasName(String relationPath, int cqNestNo) {
         return resolveNestLevelExpression("dfrelation" + relationPath, cqNestNo);
     }
 
-    /**
-     * Resolve nest level expression.
-     * 
-     * @param name Name. (NotNull)
-     * @param cqNestNo The nest no of condition query.
-     * @return Resolved name about nest level. (NotNull)
-     */
     public String resolveNestLevelExpression(String name, int cqNestNo) {
         // if (cqNestNo > 1) {
         //     return name + "_n" + cqNestNo;
@@ -1122,13 +985,6 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 		return name;
     }
 
-    /**
-     * Resolve relation no.
-     * 
-     * @param localTableName The table name of local. (NotNull)
-     * @param foreignPropertyName The property name of foreign. (NotNull)
-     * @return Resolved relation no.
-     */
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
         final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(localTableName);
         final ${glForeignInfoName} foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
