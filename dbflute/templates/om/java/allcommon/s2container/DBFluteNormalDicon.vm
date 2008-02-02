@@ -113,8 +113,7 @@
         <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
     </component>
 #end
-  #if (${database.isAvailableBehaviorGeneration()})
-    #if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
+#if (${database.isAvailableCommonColumnSetupInterceptorToBehavior()})
 
     <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}">
 #if (${database.isAvailableBehaviorRequiresNewTx()})
@@ -149,8 +148,7 @@
     #end
 
     </component>
-    #end
-  #end
+#end
 #end
 
 </components>

@@ -56,6 +56,7 @@ targetdatabase = $targetDatabase
     #set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
     #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
     #set ($glJdbcDiconResourceName = "${database.jdbcDiconResourceName}")
+    #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 
     ## -----------------------------------------------------
     ##                                            Class Name
@@ -76,7 +77,10 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Base-BFinder]
     #set ($glBFinderName = "${glProjectPrefix}BFinder")
-
+	
+    ## [Allcommon-Base-CacheAbstractSelector]
+    #set ($glCacheAbstractSelector = "${glProjectPrefix}CacheAbstractSelector")
+	
     ## [Allcommon-Base-DaoSelector]
     #set ($glDaoSelectorInterfaceName = "${glProjectPrefix}DaoSelector")
     #set ($glCacheDaoSelectorName = "${glProjectPrefix}CacheDaoSelector")
@@ -1464,38 +1468,50 @@ targetdatabase = $targetDatabase
     $database.setupJavaDir_for_daoDicon()
     #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
       $database.debug("parseAllcommonS2Container() {")
-      #if ($database.isAvailableHotDeploy())
-        #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2Container}))
-        $database.makeDirectory($path)
-
-        $database.debug("    parse('BehaviorCreator');")
-        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Container})}${glBehaviorCreator}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/allcommon/s2container/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
-
-        #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-          #set ($path = "${dbfluteDiconPackageName}" )
+      #if ($database.isTargetContainerSeasar())
+        #if ($database.isAvailableHotDeploy())
+          #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2Container}))
           $database.makeDirectory($path)
 
-          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-          $database.debug("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteHotDeployDicon.${glTemplateFileExtension}", $path, "", "")
+          $database.debug("    parse('BehaviorCreator');")
+          #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Container})}${glBehaviorCreator}.${glClassFileExtension}" )
+          $generator.parse("om/${glResourceDirectory}/allcommon/s2container/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
 
-          #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
-          $database.debug("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteCreatorDicon.${glTemplateFileExtension}", $path, "", "")
+          #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+            #set ($path = "${dbfluteDiconPackageName}" )
+            $database.makeDirectory($path)
 
-          #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
-          $database.debug("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteCustomizerDicon.${glTemplateFileExtension}", $path, "", "")
+            #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+            $database.debug("    ${path}")
+            $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteHotDeployDicon.${glTemplateFileExtension}", $path, "", "")
+
+            #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
+            $database.debug("    ${path}")
+            $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteCreatorDicon.${glTemplateFileExtension}", $path, "", "")
+
+            #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
+            $database.debug("    ${path}")
+            $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteCustomizerDicon.${glTemplateFileExtension}", $path, "", "")
+		  #end
+        #else
+          #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+            #set ($path = "${dbfluteDiconPackageName}" )
+            $database.makeDirectory($path)
+
+            #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+            $database.debug("    ${path}")
+            $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteNormalDicon.${glTemplateFileExtension}", $path, "", "")
+          #end
         #end
-      #else
+	  #end
+	  #if ($database.isTargetContainerSpring())
         #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
           #set ($path = "${dbfluteDiconPackageName}" )
           $database.makeDirectory($path)
 
-          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteBeansFileName}" )
           $database.debug("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteNormalDicon.${glTemplateFileExtension}", $path, "", "")
+          $generator.parse("om/${glResourceDirectory}/allcommon/s2container/DBFluteBeans.${glTemplateFileExtension}", $path, "", "")
         #end
       #end
       $database.debug("}")
@@ -1514,7 +1530,7 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                         allcommon flute
     ##                                         ---------------
-    #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
+    #if ($database.isTargetContainerSeasar() && $database.isTargetLanguageJava() && $database.isAvailableGenerics())
       $database.debug("public void parseBFinder() {")
       $database.debug("    parse('BFinder');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glBFinderName}.${glClassFileExtension}" )
@@ -1525,12 +1541,18 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                      allcommon selector
     ##                                      ------------------
+    ## Setup java directory for daoSelector.
+    $database.setupJavaDir_for_daoSelector()
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
+    $database.makeDirectory($path)
+	
+    $database.debug("public void parseSelector() {")
+	#if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
+      $database.debug("    parse('CacheAbstractSelector');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glCacheAbstractSelector}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/CacheAbstractSelector.${glTemplateFileExtension}",$path ,"", "")
+	#end
     #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
-      $database.setupJavaDir_for_daoSelector()
-
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
-      $database.makeDirectory($path)
-
       $database.debug("public void parseBehaviorSelector() {")
       $database.debug("    parse('BehaviorSelector');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glBehaviorSelectorInterfaceName}.${glClassFileExtension}" )
@@ -1546,13 +1568,6 @@ targetdatabase = $targetDatabase
       $database.debug("}")
     #end
 
-    ## Setup java directory for daoSelector.
-    $database.setupJavaDir_for_daoSelector()
-
-    #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
-    $database.makeDirectory($path)
-
-    $database.debug("public void parseDaoSelector() {")
     $database.debug("    parse('DaoSelector');")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoSelectorInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/DaoSelector.${glTemplateFileExtension}",$path ,"", "")
@@ -1903,10 +1918,8 @@ targetdatabase = $targetDatabase
     ## for Sql2Entity
     #set ($isSql2Entity = false)
 
-    #if ($database.isAvailableBehaviorGeneration())
-      #set ($path = $strings.getPackageAsPath(${glPackageBaseBhv}))
-      $database.makeDirectory($path)
-    #end
+    #set ($path = $strings.getPackageAsPath(${glPackageBaseBhv}))
+    $database.makeDirectory($path)
     #set ($path = $strings.getPackageAsPath(${glPackageBaseDao}))
     $database.makeDirectory($path)
     #set ($path = $strings.getPackageAsPath(${glPackageBaseEntity}))
@@ -1941,10 +1954,8 @@ targetdatabase = $targetDatabase
     ## Setup java directory for extended.
     $database.setupJavaDir_for_extended()
 
-    #if ($database.isAvailableBehaviorGeneration())
-      #set ($path = $strings.getPackageAsPath(${glPackageExtendedBhv}))
-      $database.makeDirectory($path)
-    #end
+    #set ($path = $strings.getPackageAsPath(${glPackageExtendedBhv}))
+    $database.makeDirectory($path)
     #set ($path = $strings.getPackageAsPath(${glPackageExtendedDao}))
     $database.makeDirectory($path)
     #set ($path = $strings.getPackageAsPath(${glPackageExtendedEntity}))
@@ -2006,33 +2017,29 @@ targetdatabase = $targetDatabase
         ## Determination
         ##
         #set ($isExistBehavior = false)
-        #if ($database.isAvailableBehaviorGeneration())
-          #set ($isExistBehavior = true)
-        #end
+        #set ($isExistBehavior = true)
         #set ($isExistDao = true)
         #set ($isExistConditionBean = true)
 
         ## Setup java directory for base.
         $database.setupJavaDir_for_base()
 
-        #if ($database.isAvailableBehaviorGeneration())
-          #if ($database.isTargetLanguageCSharp() || $database.isTargetLanguageCSharpOld())
-            #set ($myBaseBhvInterfaceName = "${table.baseBehaviorClassName}")
-            #set ($myExtendedBhvInterfaceName = "${table.extendedBehaviorClassName}")
-            #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}Impl")
-            #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}Impl")
+        #if ($database.isTargetLanguageCSharp() || $database.isTargetLanguageCSharpOld())
+          #set ($myBaseBhvInterfaceName = "${table.baseBehaviorClassName}")
+          #set ($myExtendedBhvInterfaceName = "${table.extendedBehaviorClassName}")
+          #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}Impl")
+          #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}Impl")
 
-            #if ($database.isTargetLanguageCSharpOld())
-              #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
-              $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
-            #end
-
-            #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvInterfaceName}.${glClassFileExtension}" )
-            $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
-          #else
+          #if ($database.isTargetLanguageCSharpOld())
             #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
-            $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+            $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
           #end
+
+          #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvInterfaceName}.${glClassFileExtension}" )
+          $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+        #else
+          #set ( $path = "${strings.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
+          $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
         #end
 
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseDao})}${myBaseDaoClassName}.${glClassFileExtension}" )
@@ -2048,29 +2055,27 @@ targetdatabase = $targetDatabase
         $database.setupJavaDir_for_extended()
 
         #if (!$database.isStopGenerateExtendedBhv())
-          #if ($database.isAvailableBehaviorGeneration())
-            #if ($database.isTargetLanguageCSharp() || $database.isTargetLanguageCSharpOld())
-              #set ($myBaseBhvInterfaceName = "${table.baseBehaviorClassName}")
-              #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
-              #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
-              #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
+          #if ($database.isTargetLanguageCSharp() || $database.isTargetLanguageCSharpOld())
+            #set ($myBaseBhvInterfaceName = "${table.baseBehaviorClassName}")
+            #set ($myExtendedBhvInterfaceName = "${glProjectPrefix}${table.JavaName}Bhv")
+            #set ($myBaseBhvClassName = "${glProjectPrefix}${glBasePrefix}${table.JavaName}BhvImpl")
+            #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
 
-              #if ($database.isTargetLanguageCSharpOld())
-                #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
-                #if (!$files.file(${generator.OutputPath},$path).exists())
-                  $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
-                #end
-              #end
-
-              #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvInterfaceName}.${glClassFileExtension}" )
-              #if (!$files.file(${generator.OutputPath},$path).exists())
-                $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
-              #end
-            #else
+            #if ($database.isTargetLanguageCSharpOld())
               #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
               #if (!$files.file(${generator.OutputPath},$path).exists())
-                $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+                $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
               #end
+            #end
+
+            #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvInterfaceName}.${glClassFileExtension}" )
+            #if (!$files.file(${generator.OutputPath},$path).exists())
+              $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+            #end
+          #else
+            #set ( $path = "${strings.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
+            #if (!$files.file(${generator.OutputPath},$path).exists())
+              $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
             #end
           #end
         #end

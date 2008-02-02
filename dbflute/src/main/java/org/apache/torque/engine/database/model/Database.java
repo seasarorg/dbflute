@@ -682,6 +682,21 @@ public class Database {
     }
 
     // -----------------------------------------------------
+    //                                             Container
+    //                                             ---------
+    public String getTargetContainerName() {
+        return getBasicProperties().getTargetContainerName();
+    }
+
+    public boolean isTargetContainerSeasar() {
+        return getBasicProperties().isTargetContainerSeasar();
+    }
+
+    public boolean isTargetContainerSpring() {
+        return getBasicProperties().isTargetContainerSpring();
+    }
+
+    // -----------------------------------------------------
     //                                             Extension
     //                                             ---------
     public String getTemplateFileExtension() {
@@ -874,6 +889,10 @@ public class Database {
 
     public boolean isAvailableBehaviorRequiredTx() {
         return getProperties().getDBFluteDiconProperties().isAvailableBehaviorRequiredTx();
+    }
+
+    public String getDBFluteBeansFileName() {
+        return getProperties().getDBFluteDiconProperties().getDBFluteBeansFileName();
     }
 
     // ===============================================================================

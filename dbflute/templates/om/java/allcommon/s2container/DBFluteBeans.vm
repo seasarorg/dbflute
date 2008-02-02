@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans
+    PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd"
+>
+<beans>
+
+    <bean id="transactionManager" class="org.seasar.extension.jta.TransactionManagerImpl"/>
+    <bean id="userTransaction" class="org.seasar.extension.jta.UserTransactionImpl">
+        <constructor-arg>
+            <ref bean="transactionManager"/>
+        </constructor-arg>
+    </bean>
+    <bean id="jtaTransactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="userTransaction">
+            <ref bean="userTransaction"/>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.seasar.extension.jta.TransactionManagerImpl"/>
+    <bean id="jtaTransactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+    </bean>
+
+	<bean id="basicResultSetFactory" class="org.seasar.extension.jdbc.impl.BasicResultSetFactory"/>
+	<bean id="resultSetFactory" class="org.seasar.dao.pager.PagerResultSetFactoryWrapper">
+        <constructor-arg>
+            <ref bean="basicResultSetFactory"/>
+        </constructor-arg>
+        <property name="useScrollCursor">
+            <value>false</value>
+        </property>
+	</bean>
+	<bean id="pagerStatementFactory" class="org.seasar.dao.pager.PagerStatementFactory"/>
+	<bean id="statementFactory" class="org.seasar.extension.jdbc.impl.ConfigurableStatementFactory">
+        <constructor-arg>
+            <ref bean="pagerStatementFactory"/>
+        </constructor-arg>
+        <property name="fetchSize">
+            <value>100</value>
+        </property>
+	</bean>
+
+    <bean id="beanMetaDataFactory" class="org.seasar.dao.impl.BeanMetaDataFactoryImpl">
+        <property name="annotationReaderFactory" ref="annotationReaderFactory" />
+        <property name="valueTypeFactory" ref="valueTypeFactory" />
+        <property name="dataSource" ref="dataSource" />
+        <property name="daoNamingConvention" ref="daoNamingConvention" />
+        <property name="beanEnhancer" ref="beanEnhancer" />
+    </bean>
+	<bean id="annotationReaderFactory" class="${database.extendedAnnotationReaderFactoryClassName}"/>
+	<bean id="valueTypeFactory" class="org.seasar.dao.impl.ValueTypeFactoryImpl"/>
+	<bean id="daoMetaDataFactory" class="${database.extendedDaoMetaDataFactoryImplClassName}">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="statementFactory" ref="statementFactory"></property>
+        <property name="resultSetFactory" ref="resultSetFactory"></property>
+        <property name="resultSetHandlerFactory" ref="resultSetHandlerFactory"></property>
+        <property name="annotationReaderFactory" ref="annotationReaderFactory"></property>
+        <property name="valueTypeFactory" ref="valueTypeFactory"></property>
+        <property name="daoNamingConvention" ref="daoNamingConvention"></property>
+        <property name="dtoMetaDataFactory" ref="dtoMetaDataFactory"></property>
+        <property name="beanMetaDataFactory" ref="beanMetaDataFactory"></property>
+        <property name="procedureMetaDataFactory" ref="procedureMetaDataFactory"></property>
+        <property name="propertyTypeFactoryBuilder" ref="propertyTypeFactoryBuilder"></property>
+        <property name="relationPropertyTypeFactoryBuilder" ref="relationPropertyTypeFactoryBuilder"></property>
+        <property name="tableNaming" ref="tableNaming"></property>
+        <property name="columnNaming" ref="columnNaming"></property>
+        <property name="beanEnhancer" ref="beanEnhancer"></property>
+        <property name="sqlFileEncoding"><value>${database.daoSqlFileEncoding}</value></property>
+	</bean>
+	<bean id="s2daoInterceptor" class="${glPackageBaseCommonS2Dao}.${glDaoInterceptor}">
+        <constructor-arg>
+            <ref bean="daoMetaDataFactory"/>
+        </constructor-arg>
+    </bean>
+	<bean id="beanMetaDataFactory" class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}">
+        <property name="annotationReaderFactory" ref="annotationReaderFactory" />
+        <property name="valueTypeFactory" ref="valueTypeFactory" />
+        <property name="dataSource" ref="dataSource" />
+        <property name="daoNamingConvention" ref="daoNamingConvention" />
+        <property name="beanEnhancer" ref="beanEnhancer" />
+    </bean>
+	<bean id="valueTypeFactory" class="org.seasar.dao.impl.DaoNamingConventionImpl"/>
+	<bean id="beanEnhancer" class="org.seasar.dao.impl.NullBeanEnhancer"/>
+	<bean id="resultSetHandlerFactory" class="${glPackageBaseCommonS2Dao}.${glDaoMetaDataExtension}$ResultSetHandlerFactoryExtension"/>
+	<bean id="dtoMetaDataFactory" class="org.seasar.dao.impl.DtoMetaDataFactoryImpl"/>
+	<bean id="propertyTypeFactoryBuilder" class="${glPackageBaseCommonS2Dao}.${glDaoPropertyTypeFactoryBuilderExtension}"/>
+	<bean id="relationPropertyTypeFactoryBuilder" class="org.seasar.dao.impl.RelationPropertyTypeFactoryBuilderImpl"/>
+	<bean id="tableNaming" class="org.seasar.dao.impl.DefaultTableNaming"/>
+	<bean id="columnNaming" class="org.seasar.dao.impl.DefaultColumnNaming"/>
+	<bean id="procedureMetaDataFactory" class="org.seasar.dao.impl.ProcedureMetaDataFactoryImpl"/>
+	<bean id="dbfluteStringClobType" class="org.seasar.extension.jdbc.types.StringClobType"/>
+
+	<bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheBehaviorSelectorName}" destroy-method="destroy"/>
+	<bean id="${database.daoSelectorComponentName}" class="${glPackageBaseCommon}.${glCacheDaoSelectorName}" destroy-method="destroy"/>
+
+    <bean id="autoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="interceptorNames">
+            <list>
+                <value>s2daoInterceptor</value>
+            </list>
+        </property>
+        <property name="beanNames">
+            <list>
+                <value>outsideSqlDao</value>
+#foreach ($table in $database.tables)
+                <value>${table.daoComponentName}</value>
+#end
+            </list>
+        </property>
+    </bean>
+    
+	<bean id="outsideSqlDao" class="${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlDaoName}"/>
+  
+#foreach ($table in $database.tables)
+	<bean id="${table.daoComponentName}" class="${table.extendedDaoFullClassName}"/>
+#end
+
+#foreach ($table in $database.tables)
+	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}"/>
+#end
+</beans>

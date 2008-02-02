@@ -205,7 +205,6 @@ public interface ${myClassName} {
 
     /**
      * Register 'where' clause.
-     * 
      * @param clause The clause of 'where'. (NotNull)
      */
     public void registerWhereClause(String clause);
@@ -353,21 +352,18 @@ public interface ${myClassName} {
     //                                                                     ===============
     /**
      * Is fetch-narrowing effective?
-     * 
      * @return Determiantion.
      */
     public boolean isFetchNarrowingEffective();
 
     /**
      * Get fetch-narrowing skip-start-index.
-     * 
      * @return Skip-start-index.
      */
     public int getFetchNarrowingSkipStartIndex();
 
     /**
      * Get fetch-narrowing loop-count.
-     * 
      * @return Loop-count.
      */
     public int getFetchNarrowingLoopCount();

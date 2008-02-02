@@ -251,4 +251,11 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
     public boolean isAvailableBehaviorRequiredTx() {
         return booleanProp("torque.isAvailableBehaviorRequiredTx", false);
     }
+    
+    // ===================================================================================
+    //                                                                        DBFluteBeans
+    //                                                                        ============
+    public String getDBFluteBeansFileName() {
+        return stringProp("torque.dbfluteBeansFileName", "dbfluteBeans.xml");
+    }
 }

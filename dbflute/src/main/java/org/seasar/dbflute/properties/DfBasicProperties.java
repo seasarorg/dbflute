@@ -189,6 +189,21 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                           Container
+    //                                                                           =========
+    public String getTargetContainerName() {
+        return stringProp("torque.targetContainer", "seasar");
+    }
+    
+    public boolean isTargetContainerSeasar() {
+        return getTargetContainerName().trim().equalsIgnoreCase("seasar");
+    }
+    
+    public boolean isTargetContainerSpring() {
+        return getTargetContainerName().trim().equalsIgnoreCase("spring");
+    }
+    
+    // ===================================================================================
     //                                                                           Extension
     //                                                                           =========
     public String getTemplateFileExtension() {
@@ -231,6 +246,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
+    /** @deprecated */
     public boolean isAvailableBehaviorGeneration() {
         return booleanProp("torque.isAvailableBehaviorGeneration", true);
     }
@@ -238,6 +254,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                            Generics
     //                                                                            ========
+    /** @deprecated */
     public boolean isAvailableGenerics() {
         return booleanProp("torque.isAvailableGenerics", true);
     }
