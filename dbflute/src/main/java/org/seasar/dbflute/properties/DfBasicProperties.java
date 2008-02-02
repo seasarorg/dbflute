@@ -50,7 +50,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabasePostgreSQL() {
         return getDatabaseName().equalsIgnoreCase("postgresql");
     }
-    
+
     public boolean isDatabaseMySQL() {
         return getDatabaseName().equalsIgnoreCase("mysql");
     }
@@ -182,7 +182,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         final String targetLanguageVersion = getBasicProperties().getTargetLanguageVersion();
         return isTargetLanguageJava() && targetLanguageVersion.compareToIgnoreCase("5.0") >= 0;
     }
-    
+
     public boolean isJavaVersionGreaterEqualMustang() {
         final String targetLanguageVersion = getBasicProperties().getTargetLanguageVersion();
         return isTargetLanguageJava() && targetLanguageVersion.compareToIgnoreCase("6.0") >= 0;
@@ -192,17 +192,26 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                           Container
     //                                                                           =========
     public String getTargetContainerName() {
-        return stringProp("torque.targetContainer", "seasar");
+        final String containerName = stringProp("torque.targetContainer", "seasar");
+        checkContainer(containerName);
+        return containerName;
     }
-    
+
     public boolean isTargetContainerSeasar() {
         return getTargetContainerName().trim().equalsIgnoreCase("seasar");
     }
-    
+
     public boolean isTargetContainerSpring() {
         return getTargetContainerName().trim().equalsIgnoreCase("spring");
     }
-    
+
+    protected void checkContainer(String containerName) {
+        if (!containerName.equalsIgnoreCase("seasar") && !containerName.equalsIgnoreCase("spring")) {
+            String msg = "The targetContainer should be 'seasar' or 'spring': targetContainer=" + containerName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
     // ===================================================================================
     //                                                                           Extension
     //                                                                           =========

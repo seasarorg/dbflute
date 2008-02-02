@@ -1,6 +1,11 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+#if ($database.isTargetContainerSeasar())
 import org.seasar.framework.container.S2Container;
+#end
+#if ($database.isTargetContainerSpring())
+import org.springframework.context.ApplicationContext;
+#end
 
 /**
  * The abstract class of cache-selector.
@@ -12,8 +17,14 @@ public abstract class ${glCacheAbstractSelector} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+#if ($database.isTargetContainerSeasar())
     /** The container of Seasar. */
     protected S2Container _container;
+#end
+#if ($database.isTargetContainerSpring())
+    /** The container of Spring. */
+    protected ApplicationContext _container;
+#end
 
     // ===================================================================================
     //                                                                           Component
@@ -21,7 +32,12 @@ public abstract class ${glCacheAbstractSelector} {
 	public <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) {
 		assertObjectNotNull("componentType", componentType);
 		assertObjectNotNull("_container", _container);
+#if ($database.isTargetContainerSeasar())
 		return (COMPONENT)_container.getComponent(componentType);
+#end
+#if ($database.isTargetContainerSpring())
+		return (COMPONENT)_container.getBean(initUncap(componentType.getSimpleName()));
+#end
 	}
 	
     // ===================================================================================
@@ -31,6 +47,13 @@ public abstract class ${glCacheAbstractSelector} {
         _container = null;
     }
 
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    protected String initUncap(String str) {
+        return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+	
     // ===================================================================================
     //                                                                              Assert
     //                                                                              ======
@@ -76,7 +99,14 @@ public abstract class ${glCacheAbstractSelector} {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+#if ($database.isTargetContainerSeasar())
     public void setContainer(S2Container container) {
         this._container = container;
     }
+#end
+#if ($database.isTargetContainerSpring())
+    public void setContainer(ApplicationContext container) {
+        this._container = container;
+    }
+#end
 }
