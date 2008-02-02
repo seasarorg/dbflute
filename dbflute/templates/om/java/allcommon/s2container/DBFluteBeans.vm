@@ -15,6 +15,9 @@
         <property name="userTransaction">
             <ref bean="userTransaction"/>
         </property>
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
     </bean>
 
 	<bean id="resultSetFactory" class="org.seasar.extension.jdbc.impl.BasicResultSetFactory"/>
