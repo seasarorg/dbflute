@@ -5,21 +5,6 @@
 >
 <beans>
 
-    <bean id="transactionManager" class="org.seasar.extension.jta.TransactionManagerImpl"/>
-    <bean id="userTransaction" class="org.seasar.extension.jta.UserTransactionImpl">
-        <constructor-arg>
-            <ref bean="transactionManager"/>
-        </constructor-arg>
-    </bean>
-    <bean id="jtaTransactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
-        <property name="userTransaction">
-            <ref bean="userTransaction"/>
-        </property>
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-    </bean>
-
 	<bean id="resultSetFactory" class="org.seasar.extension.jdbc.impl.BasicResultSetFactory"/>
 	<bean id="statementFactory" class="org.seasar.extension.jdbc.impl.BasicStatementFactory"/>
 
