@@ -42,7 +42,7 @@
             <ref bean="daoMetaDataFactory"/>
         </constructor-arg>
     </bean>
-    <bean id="beanMetaDataFactory" class="org.seasar.dao.impl.BeanMetaDataFactoryImpl" autowire="byType"/>
+    <bean id="beanMetaDataFactory" class="${glPackageBaseCommonS2Dao}.${glBeanMetaDataFactoryImpl}" autowire="byType"/>
 	<bean id="annotationReaderFactory" class="${database.extendedAnnotationReaderFactoryClassName}" autowire="byType"/>
 	<bean id="valueTypeFactory" class="org.seasar.dao.impl.ValueTypeFactoryImpl" autowire="byType"/>
     <bean id="daoNamingConvention" class="org.seasar.dao.impl.DaoNamingConventionImpl" autowire="byType"/>
