@@ -122,8 +122,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
-	s
-#foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList())
+#foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
 
     /**
      * Set the value of ${propertyName} as ${classificationMap.get('name')}.
