@@ -1992,7 +1992,7 @@ public class Table implements IDMethod {
     public boolean hasClassification() {
         final Column[] columns = getColumns();
         for (Column column : columns) {
-            if (getDatabase().hasClassification(getName(), column.getName())) {
+            if (column.hasClassification()) {
                 return true;
             }
         }
