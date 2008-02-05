@@ -63,7 +63,7 @@ public class PmbMetaDataPropertyOptionClassification {
             }
         }
         if (option.startsWith("cls(") && option.endsWith(")")) {
-            System.out.println("3: " + className + "." + propertyName + ":" + option);
+            System.out.println("3: " + className + "." + propertyName + ":{" + option + "}");
             if (check) {
                 String msg = "The option of class name and the property name should be 'cls(xxx)': " + className
                         + "." + propertyName + " - " + option;
