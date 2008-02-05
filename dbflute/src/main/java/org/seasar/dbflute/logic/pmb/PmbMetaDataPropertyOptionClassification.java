@@ -33,12 +33,9 @@ public class PmbMetaDataPropertyOptionClassification {
     }
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList() {
-        System.out.println("************************ " + _className + "." + _propertyName);
         final String classificationName = extractClassificationNameFromOption(_className, _propertyName, true);
-        System.out.println("classificationName=" + classificationName);
         final List<Map<String, String>> classificationMapList = _classificationProperties
                 .getClassificationMapList(classificationName);
-        System.out.println("classificationMapList=" + classificationMapList);
         if (classificationMapList == null) {
             String msg = "The classification was Not Found:";
             msg = msg + " " + _className + " " + _propertyName;
@@ -80,7 +77,7 @@ public class PmbMetaDataPropertyOptionClassification {
         }
         final int clsIdx = OPTION_PREFIX.length();
         final int clsEndIdx = option.length() - OPTION_SUFFIX.length();
-        return option.substring(clsIdx) + option.substring(clsIdx, clsEndIdx);
+        return option.substring(clsIdx, clsEndIdx);
     }
 
     protected String getPmbMetaDataPropertyOption() {

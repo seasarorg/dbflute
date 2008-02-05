@@ -553,7 +553,6 @@ public class Database {
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
             String propertyName) {
-        System.out.println("getPmbMetaDataPropertyOptionClassificationMapList()");
         final PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
                 propertyName);
         System.out.println("result=" + obj.getPmbMetaDataPropertyOptionClassificationMapList());
