@@ -35,7 +35,7 @@ public class PmbMetaDataPropertyOptionClassification {
     public String getPmbMetaDataPropertyOptionClassificationName() {
         return extractClassificationNameFromOption(_className, _propertyName, true);
     }
-    
+
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList() {
         final String classificationName = extractClassificationNameFromOption(_className, _propertyName, true);
         final List<Map<String, String>> classificationMapList = _classificationProperties
@@ -84,7 +84,18 @@ public class PmbMetaDataPropertyOptionClassification {
         }
         final int clsIdx = OPTION_PREFIX.length();
         final int clsEndIdx = option.length() - OPTION_SUFFIX.length();
-        return option.substring(clsIdx, clsEndIdx);
+        try {
+            return option.substring(clsIdx, clsEndIdx);
+        } catch (StringIndexOutOfBoundsException e) {
+            String msg = "Look the message below:" + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + getLineSeparator();
+            msg = msg + "IndexOutOfBounds ocurred:" + getLineSeparator();
+            msg = msg + " " + _className + " " + _propertyName;
+            msg = msg + ":" + option + getLineSeparator();
+            msg = msg + "{" + option + "}.substring(" + clsIdx + ", " + clsEndIdx + ")" + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
+            throw new IllegalStateException(msg, e);
+        }
     }
 
     protected String getPmbMetaDataPropertyOption() {
