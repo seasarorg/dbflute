@@ -126,7 +126,8 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
 #foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName} as ${classificationMap.get('name')}.
+     * Set the value of ${propertyName} as ${classificationMap.get('name')}. <br />
+	 * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
         _${propertyName} = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')};

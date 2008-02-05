@@ -152,7 +152,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
     /**
      * Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
-     * ${database.getMapValue($classificationMap, 'comment')} <br />
+     * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void classify${col.JavaName}${classificationMap.get('name')}() {
         String code = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${col.classificationName}_${classificationMap.get('name')};
