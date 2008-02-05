@@ -33,16 +33,19 @@ public class PmbMetaDataPropertyOptionClassification {
     }
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList() {
+        System.out.println("************************ " + _className + "." + _propertyName);
         final String classificationName = extractClassificationNameFromOption(_className, _propertyName, true);
+        System.out.println("classificationName=" + classificationName);
         final List<Map<String, String>> classificationMapList = _classificationProperties
                 .getClassificationMapList(classificationName);
+        System.out.println("classificationMapList=" + classificationMapList);
         if (classificationMapList == null) {
             String msg = "The classification was Not Found:";
             msg = msg + " " + _className + " " + _propertyName;
             msg = msg + ":" + OPTION_PREFIX + classificationName + OPTION_SUFFIX;
             throw new IllegalStateException(msg);
         }
-        return _classificationProperties.getClassificationMapList(classificationName);
+        return classificationMapList;
     }
 
     protected String extractClassificationNameFromOption(String className, String propertyName, boolean check) {
@@ -66,7 +69,7 @@ public class PmbMetaDataPropertyOptionClassification {
                 return null;
             }
         }
-        if (!option.startsWith(OPTION_PREFIX) || !option.endsWith(")")) {
+        if (!option.startsWith(OPTION_PREFIX) || !option.endsWith(OPTION_SUFFIX)) {
             if (check) {
                 String msg = "The option of class name and the property name should be 'cls(xxx)':";
                 msg = msg + " " + className + "." + propertyName + ":" + option;
