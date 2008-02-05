@@ -74,6 +74,8 @@ import org.seasar.dbflute.DfComponentProvider;
 import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
+import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfSelectParamProperties;
@@ -465,9 +467,12 @@ public class Database {
         return result.toString();
     }
 
-    // ===============================================================================
-    //                                                                  Parameter Bean
-    //                                                                  ==============
+    // ===================================================================================
+    //                                                                      Parameter Bean
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                           PmbMetaData
+    //                                           -----------
     public boolean isExistPmbMetaData() {
         return _pmbMetaDataMap != null && !_pmbMetaDataMap.isEmpty();
     }
@@ -527,6 +532,9 @@ public class Database {
         return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
     }
 
+    // -----------------------------------------------------
+    //                                    Option LikeSeasrch
+    //                                    ------------------
     public boolean isPmbMetaDataPropertyOptionLikeSearch(String className, String propertyName) {
         final PmbMetaDataPropertyOptionFinder finder = new PmbMetaDataPropertyOptionFinder(className, propertyName,
                 _pmbMetaDataMap);
@@ -534,86 +542,20 @@ public class Database {
         return option != null && option.trim().equalsIgnoreCase("like");
     }
 
+    // -----------------------------------------------------
+    //                                 Option Classification
+    //                                 ---------------------
     public boolean isPmbMetaDataPropertyOptionClassification(String className, String propertyName) {
-        final PmbMetaDataPropertyOptionClassification agent = createPmbMetaDataPropertyOptionClassification(className,
+        final PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
                 propertyName);
-        return agent.isPmbMetaDataPropertyOptionClassification();
+        return obj.isPmbMetaDataPropertyOptionClassification();
     }
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
             String propertyName) {
-        final PmbMetaDataPropertyOptionClassification agent = createPmbMetaDataPropertyOptionClassification(className,
+        final PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
                 propertyName);
-        return agent.getPmbMetaDataPropertyOptionClassificationMapList();
-    }
-
-    protected static class PmbMetaDataPropertyOptionClassification {
-        protected String _className;
-        protected String _propertyName;
-        protected DfClassificationProperties _classificationProperties;
-        protected PmbMetaDataPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
-
-        public PmbMetaDataPropertyOptionClassification(String className, String propertyName,
-                DfClassificationProperties classificationProperties,
-                PmbMetaDataPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
-            _className = className;
-            _propertyName = propertyName;
-            _classificationProperties = classificationProperties;
-            _pmbMetaDataPropertyOptionFinder = pmbMetaDataPropertyOptionFinder;
-        }
-
-        public boolean isPmbMetaDataPropertyOptionClassification() {
-            return extractClassificationNameFromOption(_className, _propertyName, false) != null;
-        }
-
-        public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList() {
-            final String classificationName = extractClassificationNameFromOption(_className, _propertyName, true);
-            final List<Map<String, String>> classificationMapList = _classificationProperties
-                    .getClassificationMapList(classificationName);
-            if (classificationMapList == null) {
-                String msg = "The classification was Not Found: " + _className + " " + _propertyName + ":cls("
-                        + classificationName + ")";
-                throw new IllegalStateException(msg);
-            }
-            return _classificationProperties.getClassificationMapList(classificationName);
-        }
-
-        protected String extractClassificationNameFromOption(String className, String propertyName, boolean check) {
-            final String pmbMetaDataPropertyOption = getPmbMetaDataPropertyOption();
-            if (pmbMetaDataPropertyOption == null) {
-                if (check) {
-                    String msg = "The property name don't have Option: " + className + "." + propertyName;
-                    throw new IllegalStateException(msg);
-                } else {
-                    return null;
-                }
-            }
-            final String option = pmbMetaDataPropertyOption.trim();
-            if (option.length() == 0) {
-                if (check) {
-                    String msg = "The option of the property name should not be empty: " + className + "."
-                            + propertyName;
-                    throw new IllegalStateException(msg);
-                } else {
-                    return null;
-                }
-            }
-            if (option.startsWith("cls(") && option.endsWith(")")) {
-                if (check) {
-                    String msg = "The option of class name and the property name should be 'cls(xxx)': " + className
-                            + "." + propertyName + " - " + option;
-                    throw new IllegalStateException(msg);
-                } else {
-                    return null;
-                }
-            }
-            return option.substring("cls(".length())
-                    + option.substring("cls(".length(), option.length() - ")".length());
-        }
-
-        protected String getPmbMetaDataPropertyOption() {
-            return _pmbMetaDataPropertyOptionFinder.findPmbMetaDataPropertyOption(_className, _propertyName);
-        }
+        return obj.getPmbMetaDataPropertyOptionClassificationMapList();
     }
 
     protected PmbMetaDataPropertyOptionClassification createPmbMetaDataPropertyOptionClassification(String className,
@@ -626,28 +568,9 @@ public class Database {
         return pmbMetaDataPropertyOptionClassification;
     }
 
-    protected static class PmbMetaDataPropertyOptionFinder {
-        protected String _className;
-        protected String _propertyName;
-        Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
-
-        public PmbMetaDataPropertyOptionFinder(String className, String propertyName,
-                Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
-            _className = className;
-            _propertyName = propertyName;
-            _pmbMetaDataMap = pmbMetaDataMap;
-        }
-
-        protected String findPmbMetaDataPropertyOption(String className, String propertyName) {
-            final DfParameterBeanMetaData meta = _pmbMetaDataMap.get(_className);
-            if (meta == null) {
-                return null;
-            }
-            final Map<String, String> optionMap = meta.getPropertyNameOptionMap();
-            return optionMap != null ? optionMap.get(propertyName) : null;
-        }
-    }
-
+    // -----------------------------------------------------
+    //                                                Assert
+    //                                                ------
     protected void assertArgumentPmbMetaDataClassName(String className) {
         if (className == null || className.trim().length() == 0) {
             String msg = "The className should not be null or empty: [" + className + "]";

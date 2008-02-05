@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
 /**
- * The parametaer-bean of ${pmbClassName}.
+ * The parameter-bean of ${pmbClassName}.
  * 
  * @author ${database.ClassAuthor}
  */
