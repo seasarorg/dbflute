@@ -74,11 +74,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-    @Override
     /**
      * The override. <br />
      * Using data source.
      */
+    @Override
     protected boolean isUseDataSource() {
         return true;
     }

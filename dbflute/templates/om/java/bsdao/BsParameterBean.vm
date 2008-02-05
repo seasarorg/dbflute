@@ -121,5 +121,16 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
         return _${propertyName}InternalLikeSearchOption;
     }
 #end
+#if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
+#foreach ($classificationMap in $database.pmbMetaDataPropertyOptionClassificationMapList)
+
+    /**
+     * Set the value of ${propertyName} as ${classificationMap.get('name')}.
+     */
+    public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
+        _${propertyName} = ${classificationMap.get('code')};
+    }
+#end
+#end
 #end
 }
