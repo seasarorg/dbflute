@@ -37,9 +37,12 @@ public class PmbMetaDataPropertyOptionClassification {
         final List<Map<String, String>> classificationMapList = _classificationProperties
                 .getClassificationMapList(classificationName);
         if (classificationMapList == null) {
-            String msg = "The classification was Not Found:";
+            String msg = "Look the message below:" + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + getLineSeparator();
+            msg = msg + "The classification was Not Found:" + getLineSeparator();
             msg = msg + " " + _className + " " + _propertyName;
-            msg = msg + ":" + OPTION_PREFIX + classificationName + OPTION_SUFFIX;
+            msg = msg + ":" + OPTION_PREFIX + classificationName + OPTION_SUFFIX + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
         return classificationMapList;
@@ -82,5 +85,12 @@ public class PmbMetaDataPropertyOptionClassification {
 
     protected String getPmbMetaDataPropertyOption() {
         return _pmbMetaDataPropertyOptionFinder.findPmbMetaDataPropertyOption(_className, _propertyName);
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
 }
