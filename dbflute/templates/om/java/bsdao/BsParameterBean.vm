@@ -122,13 +122,14 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
+#set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))
 #foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
 
     /**
      * Set the value of ${propertyName} as ${classificationMap.get('name')}.
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
-        _${propertyName} = ${classificationMap.get('code')};
+        _${propertyName} = ${glPackageBaseCommon}.${glClassificationDefinition}.${database.classificationCodeVariableNamePrefix}${classificationName}_${classificationMap.get('name')};
     }
 #end
 #end

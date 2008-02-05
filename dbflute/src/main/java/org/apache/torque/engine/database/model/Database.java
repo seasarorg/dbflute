@@ -551,11 +551,16 @@ public class Database {
         return obj.isPmbMetaDataPropertyOptionClassification();
     }
 
+    public String getPmbMetaDataPropertyOptionClassificationName(String className, String propertyName) {
+        final PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
+                propertyName);
+        return obj.getPmbMetaDataPropertyOptionClassificationName();
+    }
+
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
             String propertyName) {
         final PmbMetaDataPropertyOptionClassification obj = createPmbMetaDataPropertyOptionClassification(className,
                 propertyName);
-        System.out.println("result=" + obj.getPmbMetaDataPropertyOptionClassificationMapList());
         return obj.getPmbMetaDataPropertyOptionClassificationMapList();
     }
 

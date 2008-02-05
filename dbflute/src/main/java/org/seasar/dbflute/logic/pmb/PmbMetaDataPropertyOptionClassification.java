@@ -32,6 +32,10 @@ public class PmbMetaDataPropertyOptionClassification {
         return extractClassificationNameFromOption(_className, _propertyName, false) != null;
     }
 
+    public String getPmbMetaDataPropertyOptionClassificationName() {
+        return extractClassificationNameFromOption(_className, _propertyName, true);
+    }
+    
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList() {
         final String classificationName = extractClassificationNameFromOption(_className, _propertyName, true);
         final List<Map<String, String>> classificationMapList = _classificationProperties
