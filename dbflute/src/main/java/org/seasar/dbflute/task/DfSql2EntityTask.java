@@ -237,6 +237,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = new LinkedHashMap<String, DfColumnMetaInfo>();
                         final ResultSetMetaData md = rs.getMetaData();
                         for (int i = 1; i <= md.getColumnCount(); i++) {
+                            String sql2EntityTableName = null;
+                            try {
+                                sql2EntityTableName = md.getTableName(i);
+                            } catch (SQLException ignored) {
+                                // Because this table name is not required. This is for classification.
+                                String msg = "ResultSetMetaData.getTableName(" + i + ") threw the exception:";
+                                msg = msg + " " + ignored.getMessage();
+                                _log.info(msg);
+                            }
                             String columnName = null;
                             if (!sql2entityUseColumnNameNotLabel) {
                                 columnName = md.getColumnLabel(i);
@@ -258,6 +267,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             }
                             int scale = md.getScale(i);
                             final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
+                            metaInfo.setSql2EntityTableName(sql2EntityTableName);
                             metaInfo.setColumnName(columnName);
                             metaInfo.setJdbcTypeCode(columnType);
                             metaInfo.setColumnSize(columnSize);
@@ -589,6 +599,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupPrimaryKey(entityName, columnName, col);
                 setupTorqueType(columnJdbcTypeMap, columnName, col);
                 setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, col);
+                setupSql2EntitySecondTableName(columnJdbcTypeMap, columnName, col);
 
                 tbl.addColumn(col);
                 _log.info("   " + (col.isPrimaryKey() ? "*" : " ") + columnName + " --> " + col.getName() + " : "
@@ -617,6 +628,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
+    protected void setupPrimaryKey(String entityName, String columnName, final Column col) {
+        final List<String> primaryKeyList = _primaryKeyMap.get(entityName);
+        col.setPrimaryKey(primaryKeyList.contains(columnName));
+    }
+
     protected void setupTorqueType(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName,
             final Column col) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
@@ -632,9 +648,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         col.setSize(columnSize + "," + decimalDigits);
     }
 
-    protected void setupPrimaryKey(String entityName, String columnName, final Column col) {
-        final List<String> primaryKeyList = _primaryKeyMap.get(entityName);
-        col.setPrimaryKey(primaryKeyList.contains(columnName));
+    protected void setupSql2EntitySecondTableName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
+            String columnName, final Column col) {
+        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+        final String sql2EntityTableName = metaInfo.getSql2EntityableName();
+        col.setSql2EntityTableName(sql2EntityTableName);
     }
 
     protected VelocityContext createVelocityContext(final AppData appData) {

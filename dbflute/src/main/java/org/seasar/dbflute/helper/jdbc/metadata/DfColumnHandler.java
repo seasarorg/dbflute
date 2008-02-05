@@ -92,6 +92,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         protected int decimalDigits;
         protected boolean required;
         protected String defaultValue;
+        protected String sql2entityTableName;
 
         public String getColumnName() {
             return columnName;
@@ -147,6 +148,14 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
         public void setDbTypeName(String sqlTypeName) {
             this.dbTypeName = sqlTypeName;
+        }
+        
+        public String getSql2EntityableName() {
+            return sql2entityTableName;
+        }
+        
+        public void setSql2EntityTableName(String sql2entityTableName) {
+            this.sql2entityTableName = sql2entityTableName;
         }
     }
 

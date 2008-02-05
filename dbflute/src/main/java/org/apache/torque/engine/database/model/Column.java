@@ -151,6 +151,8 @@ public class Column {
     //    /** class name to do input validation on this column */
     //    private String _inputValidator = null;
 
+    private String _sql2EntityTableName;
+
     // ==============================================================================
     //                                                                    Constructor
     //                                                                    ===========
@@ -692,7 +694,7 @@ public class Column {
     }
 
     // -------------------------------------------
-    //                                    Refferer
+    //                                    Referrer
     //                                    --------
     /**
      * Adds the foreign key from another table that refers to this column.
@@ -849,6 +851,14 @@ public class Column {
         return _defaultValue;
     }
 
+    public String getSql2EntityTableName() {
+        return _sql2EntityTableName;
+    }
+
+    public void setSql2EntityTableName(String sql2EntityTableName) {
+        _sql2EntityTableName = sql2EntityTableName;
+    }
+
     // =========================================================================================
     //                                                                            Checked Getter
     //                                                                            ==============
@@ -969,8 +979,6 @@ public class Column {
         }
         return javaNative;
     }
-    
-    
 
     // ===================================================================================
     //                                                                  Type Determination
@@ -1050,7 +1058,7 @@ public class Column {
     public boolean isJavaNativeCSharpNullable() {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
-    
+
     public boolean isJavaNativeOracleStringClob() {
         if (!getTable().getDatabase().isDatabaseOracle()) {
             return false;
@@ -1342,20 +1350,27 @@ public class Column {
         return getTable().getDatabase().getClassificationDefinitionMap();
     }
 
+    protected String getClassificationTableName() {
+        if (_sql2EntityTableName != null) {
+            return _sql2EntityTableName;
+        }
+        return getTableName();
+    }
+
     public boolean hasClassification() {
-        return getTable().getDatabase().hasClassification(getTableName(), getName());
+        return getTable().getDatabase().hasClassification(getClassificationTableName(), getName());
     }
 
     public boolean hasClassificationName() {
-        return getTable().getDatabase().hasClassificationName(getTableName(), getName());
+        return getTable().getDatabase().hasClassificationName(getClassificationTableName(), getName());
     }
 
     public boolean hasClassificationAlias() {
-        return getTable().getDatabase().hasClassificationAlias(getTableName(), getName());
+        return getTable().getDatabase().hasClassificationAlias(getClassificationTableName(), getName());
     }
 
     public String getClassificationName() {
-        return getTable().getDatabase().getClassificationName(getTableName(), getName());
+        return getTable().getDatabase().getClassificationName(getClassificationTableName(), getName());
     }
 
     public List<Map<String, String>> getClassificationMapList() {
