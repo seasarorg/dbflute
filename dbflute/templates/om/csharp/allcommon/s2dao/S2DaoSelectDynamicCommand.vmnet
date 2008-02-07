@@ -468,7 +468,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                 } else {
                     ParseCommentBindVariable();
                 }
-            }
+            } else if (comment != null && 0 < comment.Length) {
+				String before = _tokenizer.Before; // for Hint Clause of Database
+				Peek().AddChild(new SqlNode(before.Substring(before.LastIndexOf("/*"))));
+			}
         }
 
         protected void ParseIf() {
