@@ -284,6 +284,12 @@ targetdatabase = $targetDatabase
     #set ($glCommonColumnSetupBeforeUpdateInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeUpdateInterceptor")
     #set ($glCommonColumnSetupBeforeDeleteInterceptor = "${glProjectPrefix}CommonColumnSetupBeforeDeleteInterceptor")
 
+	## [Allcommon-JavaLike]
+    #set ($glJavaBasic = "${glProjectPrefix}JavaBasic")
+    #set ($glJavaCollection = "${glProjectPrefix}JavaCollection")
+    #set ($glJavaException = "${glProjectPrefix}JavaException")
+    #set ($glJavaReflection = "${glProjectPrefix}JavaReflection")
+	
     ## [Allcommon-JDBC]
     #set ($glCursorHandlerName = "${glProjectPrefix}CursorHandler")
     #set ($glCursorFetcherName = "${glProjectPrefix}CursorFetcher")
@@ -400,6 +406,7 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.helper.token.file.impl")
 
     #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.interceptor")
+	#set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.javalike")
     #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
     #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.jdbc.history")
     #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
@@ -450,6 +457,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.Helper.Token.File")
       #set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.Helper.Token.File.Impl")
       #set ($glPackageBaseCommonInterceptor = "${database.baseCommonPackage}.Interceptor")
+      #set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.JavaLike")
       #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
       #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
       #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
@@ -1658,6 +1666,33 @@ targetdatabase = $targetDatabase
       $database.debug("}")
     #end
 
+    ## -----------------------------------------------------------------------------------------------------
+    ##                                                                                       Parse java like
+    ##                                                                                       ---------------
+    #if ($database.isTargetLanguageCSharp())
+      $database.setupJavaDir_for_allcommon()
+      $database.debug("public void parseJavaLike() {")
+	
+	  #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJavaLike}))
+      $database.makeDirectory($path)
+	  
+      $database.debug("    parse('JavaBasic');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glJavaBasic}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaBasic.${glTemplateFileExtension}",$path,"", "")
+	  
+      $database.debug("    parse('JavaCollection');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glJavaCollection}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaCollection.${glTemplateFileExtension}",$path,"", "")
+	  
+      $database.debug("    parse('JavaException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glJavaException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaException.${glTemplateFileExtension}",$path,"", "")
+	  
+      $database.debug("    parse('JavaReflection');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glJavaReflection}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaReflection.${glTemplateFileExtension}",$path,"", "")
+	#end
+	
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                      Parse jdbc class
     ##                                                                                      ----------------
