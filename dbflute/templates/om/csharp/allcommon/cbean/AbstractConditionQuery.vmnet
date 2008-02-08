@@ -1,9 +1,7 @@
 #set ($myClassName = "${glConditionQueryAbstractName}")
 
 using System;
-using System.Collections;
 using System.Reflection;
-using System.Text;
 using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonDBMeta};
@@ -11,438 +9,572 @@ using ${glPackageBaseCommonSqlClause};
 
 namespace ${glPackageBaseCommonCBean} {
 
-    /// <summary>
-    /// The abstract class of condition-query.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    [System.Serializable]
-    public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
+[System.Serializable]
+public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
-        /** Condition value for DUMMY. */
-        protected static readonly ${glConditionValueName} DUMMY_CONDITION_VALUE = new ${glConditionValueName}();
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected static readonly ${glConditionValueName} DUMMY_CONDITION_VALUE = new ${glConditionValueName}();
+    protected static readonly Object DUMMY_OBJECT = new Object();
+    protected readonly ${glSqlClauseName} _sqlClause;
+    protected readonly String _aliasName;
+    protected readonly int _nestLevel;
+	protected int _subQueryLevel;
 
-        /** Object for DUMMY. */
-        protected static readonly Object DUMMY_OBJECT = new Object();
+    // -----------------------------------------------------
+    //                                          Foreign Info
+    //                                          ------------
+    protected String _foreignPropertyName;
+    protected String _relationPath;
+    protected readonly ${glConditionQueryInterfaceName} _childQuery;
 
-        /** SQL clause. */
-        protected readonly ${glSqlClauseName} _sqlClause;
+    // -----------------------------------------------------
+    //                                                Inline
+    //                                                ------
+	protected bool _onClauseInline;
 
-        /** My alias name. */
-        protected readonly String _aliasName;
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
+        _childQuery = childQuery;
+        _sqlClause = sqlClause;
+        _aliasName = aliasName;
+        _nestLevel = nestLevel;
+    }
 
-        /** Nest level. */
-        protected readonly int _nestLevel;
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    public abstract String getTableDbName();
 
-        /** Child query. */
-        protected readonly ${glConditionQueryInterfaceName} _childQuery;
+    // ===================================================================================
+    //                                                                  Important Accessor
+    //                                                                  ==================
+    public ${glConditionQueryInterfaceName} getChildQuery() {
+        return _childQuery;
+    }
 
-        // =====================================================================================
-        //                                                                           Constructor
-        //                                                                           ===========
-        /**
-         * Constructor.
-         * 
-         * @param childQuery Child query. (Nullable: If null, this is base instance.)
-         * @param sqlClause SQL clause instance. (NotNull)
-         * @param aliasName My alias name. (NotNull)
-         * @param nestLevel Nest level.
-         */
-        public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
-            _childQuery = childQuery;
-            _sqlClause = sqlClause;
-            _aliasName = aliasName;
-            _nestLevel = nestLevel;
-        }
+    public ${glSqlClauseName} getSqlClause() {
+        return _sqlClause;
+    }
 
-        // =====================================================================================
-        //                                                                            Table Name
-        //                                                                            ==========
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        public abstract String TableDbName { get; }
+    public String getAliasName() {
+        return _aliasName;
+    }
 
-        // =====================================================================================
-        //                                                                                Getter
-        //                                                                                ======
-        /**
-         * Get child query.
-         * 
-         * @return Child query. (Nullable)
-         */
-        public ${glConditionQueryInterfaceName} GetChildQuery() {
-            return _childQuery;
-        }
+    public int getNestLevel() {
+        return _nestLevel;
+    }
 
-        /**
-         * Get sql clause.
-         * 
-         * @return Sql clause. (NotNull)
-         */
-        public ${glSqlClauseName} GetSqlClause() {
-            return _sqlClause;
-        }
+    public int getNextNestLevel() {
+        return _nestLevel+1;
+    }
 
-        /**
-         * Get alias name.
-         * 
-         * @return Alias name. (NotNull)
-         */
-        public String GetAliasName() {
-            return _aliasName;
-        }
+    public bool isBaseQuery(${glConditionQueryInterfaceName} query) {
+        return (query.getChildQuery() == null);
+    }
 
-        /**
-         * Get nest level.
-         * 
-         * @return Nest level.
-         */
-        public int GetNestLevel() {
-            return _nestLevel;
-        }
+	public int getSubQueryLevel() {
+	    return _subQueryLevel;
+	}
 
-        /**
-         * Get next nest level.
-         * 
-         * @return Next nest level.
-         */
-        public int GetNextNestLevel() {
-            return _nestLevel+1;
-        }
+    // -----------------------------------------------------
+    //                                             Real Name
+    //                                             ---------
+    public String getRealAliasName() {
+	    return getAliasName();
+    }
 
-        /**
-         * Is base query?
-         * 
-         * @param query Condition query. (NotNull)
-         * @return Determination.
-         */
-        public bool IsBaseQuery(${glConditionQueryInterfaceName} query) {
-            return (query.GetChildQuery() == null);
-        }
+    public String getRealColumnName(String columnName) {
+        assertColumnName(columnName);
+        return buildRealColumnName(GetRealAliasName(), columnName);
+    }
 
-        // =====================================================================================
-        //                                                                              RealName
-        //                                                                              ========
-        /// <summary>
-        ///    Get real alias name(that has nest level mark).
-        /// </summary>
-        /// <returns>Real alias name. (NotNull)</returns>
-        public String GetRealAliasName() {
-            if (GetNestLevel() > 1) {
-                return GetAliasName() + "_n" + GetNestLevel();
+	protected String buildRealColumnName(String aliasName, String columnName) {
+        return aliasName + "." + columnName;
+    }
+
+    // -----------------------------------------------------
+    //                                          Foreign Info
+    //                                          ------------
+    public String getForeignPropertyName() {
+        return _foreignPropertyName;
+    }
+
+    public void xsetForeignPropertyName(String foreignPropertyName) {
+        this._foreignPropertyName = foreignPropertyName;
+    }
+
+    public String getRelationPath() {
+        return _relationPath;
+    }
+
+    public void xsetRelationPath(String relationPath) {
+        this._relationPath = relationPath;
+    }
+
+    // -----------------------------------------------------
+    //                                                Inline
+    //                                                ------
+	public void xsetOnClauseInline(bool onClauseInline) {
+	    _onClauseInline = onClauseInline;
+	}
+
+    // ===================================================================================
+    //                                                                            Location
+    //                                                                            ========
+    protected String getLocation(String columnPropertyName, ${glConditionKeyName} key) {
+        return getLocationBase(columnPropertyName) + "." + key.getConditionKey();
+    }
+
+    protected String getLocationBase() {
+        StringBuilder sb = new StringBuilder();
+        ${glConditionQueryInterfaceName} query = this;
+        while (true) {
+            if (query.isBaseQuery(query)) {
+                sb.insert(0, "ConditionQuery.");
+                break;
             } else {
-                return GetAliasName();
+                sb.insert(0, "ConditionQuery" + InitCap(query.getForeignPropertyName()) + ".");
             }
+            query = query.getChildQuery();
         }
+        return sb.ToString();
+    }
 
-        /// <summary>
-        /// Get real column name(with real alias name).
-        /// </summary>
-        /// <param name="columnName">Column name without alias name. This should not contain comma.</param>
-        /// <returns>Real column name.</returns>
-        public String GetRealColumnName(String columnName) {
-            AssertColumnName(columnName);
-            return GetRealAliasName() + "." + columnName;
+    protected String getLocationBase(String columnPropertyName) {
+        return getLocationBase() + columnPropertyName;
+    }
+	
+    // ===================================================================================
+    //                                                                         Union Query
+    //                                                                         ===========
+    protected Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+
+    public Map<String, ${glConditionQueryInterfaceName}> getUnionQueryMap() {// for Internal
+        return _unionQueryMap;
+    }
+
+    public void xsetUnionQuery(${glConditionQueryInterfaceName} unionQuery) {
+        xsetupUnion(unionQuery, false, _unionQueryMap);
+    }
+
+    protected Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+
+    public Map<String, ${glConditionQueryInterfaceName}> getUnionAllQueryMap() {// for Internal
+        return _unionAllQueryMap;
+    }
+
+    public void xsetUnionAllQuery(${glConditionQueryInterfaceName} unionAllQuery) {
+        xsetupUnion(unionAllQuery, true, _unionAllQueryMap);
+    }
+
+    protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, bool unionAll, Map<String, ${glConditionQueryInterfaceName}> unionQueryMap) {
+        if (unionQuery == null) {
+            String msg = "The argument[unionQuery] should not be null.";
+            throw new SystemException(msg);
         }
+        ReflectRelationOnUnionQuery(this, unionQuery);// Reflect Relation!
+        GetSqlClause().CopyIncludedSelectColumn(unionQuery.GetSqlClause());// Reflect IncludedSelectColumn!
+        String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
+        unionQueryMap.put(key, unionQuery);
+        RegisterUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
+    }
+	
+    abstract protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper);
 
-        // =====================================================================================
-        //                                                                         IncludeAsMine
-        //                                                                         =============
-        /// <summary>
-        /// Register included-select-column.
-        /// </summary>
-        /// <param name="aliasName">Alias name. This should not contain comma. (NotNull)</param>
-        /// <param name="realColumnName">Real column name. This should not contain comma. (NotNull)</param>
-        protected void RegisterIncludedSelectColumn(String aliasName, String realColumnName) {
-            AssertAliasName(aliasName);
-            AssertColumnName(realColumnName);
-            GetSqlClause().RegisterIncludedSelectColumn(aliasName, realColumnName);
+    public bool HasUnionQueryOrUnionAllQuery() {
+        return !_unionQueryMap.isEmpty() || !_unionAllQueryMap.isEmpty();
+    }
+
+    /**
+     * Get the list of union query.
+     * 
+     * @return The list of union query. (NotNull)
+     */
+    public List<${glConditionQueryInterfaceName}> getUnionQueryList() {
+        return new ArrayList<${glConditionQueryInterfaceName}>(_unionQueryMap.values());
+    }
+
+    /**
+     * Get the list of union all query.
+     * 
+     * @return The list of union all query. (NotNull)
+     */
+    public List<${glConditionQueryInterfaceName}> getUnionAllQueryList() {
+        return new ArrayList<${glConditionQueryInterfaceName}>(_unionAllQueryMap.values());
+    }
+
+    // ===================================================================================
+    //                                                                            Register
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                       Include-As-Mine
+    //                                       ---------------
+    protected void registerIncludedSelectColumn(String aliasName, String realColumnName) {
+        AssertAliasName(aliasName);
+        AssertColumnName(realColumnName);
+        GetSqlClause().RegisterIncludedSelectColumn(aliasName, realColumnName);
+    }
+	
+    // -----------------------------------------------------
+    //                                          Normal Query
+    //                                          ------------
+    protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                         , String colName, String capPropName, String uncapPropName) {
+        if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
+            SetupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
         }
-
-        // =====================================================================================
-        //                                                                                 Query
-        //                                                                                 =====
-        /// <summary>
-        /// Register condition of ${col.UncapitalisedJavaName}.
-        /// </summary>
-        /// <param name="key">Condition key. (NotNull)</param>
-        /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
-        protected virtual void RegisterQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
-                                                             , String colName, String capPropName, String uncapPropName) {
-            if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
-                key.SetupConditionValue(cvalue, value, GetLocation(capPropName, key));// If C#, CapProp!
-                GetSqlClause().RegisterWhereClause(GetRealColumnName(colName), key, cvalue);
-            }
+    }
+	
+	protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                         , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+        if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
+            SetupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
+    }
 
-        /// <summary>
-        /// Register inline condition of ${col.UncapitalisedJavaName}.
-        /// </summary>
-        /// <param name="key">Condition key. (NotNull)</param>
-        /// <param name="value">The value of ${col.UncapitalisedJavaName}. (Nullable)</param>
-        protected virtual void RegisterInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
-                                                             , String colName, String capPropName, String uncapPropName) {
-            if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
-                key.SetupConditionValue(cvalue, value, GetLocation(capPropName, key));// If C#, CapProp!
-                if (IsBaseQuery(this)) {
-                    GetSqlClause().RegisterBaseTableInlineWhereClause(colName, key, cvalue);
-                } else {
-                    GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), colName, key, cvalue);
+    // -----------------------------------------------------
+    //                                          FromTo Query
+    //                                          ------------
+    // -----------------------------------------------------
+    //                                      LikeSearch Query
+    //                                      ----------------
+    // -----------------------------------------------------
+    //                                          InScopeQuery
+    //                                          ------------
+    protected void registerInScopeQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
+                                     , String colName, String capPropName, String uncapPropName, ${glConditionOptionInScopeName} option) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            if (value != null && option.isSplit()) {
+                final String[] strArray = option.generateSplitValueArray(value);
+                final List<String> realValueList = new ArrayList<String>();
+                for (int i=0; i < strArray.length; i++) {
+                    final String currentValue = strArray[i];
+                    realValueList.add(currentValue);
                 }
-            }
-        }
-
-        // =====================================================================================
-        //                                                                              SubQuery
-        //                                                                              ========
-        protected void RegisterInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
-                                     , String columnName, String relatedColumnName, String propertyName) {
-            String realColumnName = GetRealColumnName(columnName);
-            String subQueryClause = GetInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-            GetSqlClause().RegisterWhereClause(realColumnName + " in (" + subQueryClause + ")");
-        }
-
-        protected void RegisterInlineInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
-                                     , String columnName, String relatedColumnName, String propertyName) {
-            String subQueryClause = GetInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
-            String finalClause = columnName + " in (" + subQueryClause + ")";
-            if (IsBaseQuery(this)) {
-                GetSqlClause().RegisterBaseTableInlineWhereClause(finalClause);
+                setupConditionValueAndRegisterWhereClause(key, realValueList, cvalue, colName, capPropName, uncapPropName, option);
             } else {
-                GetSqlClause().RegisterOuterJoinInlineWhereClause(GetRealAliasName(), finalClause);
+                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
             }
         }
+    }
 
-        protected String GetInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
-                                     , String relatedColumnName, String propertyName) {
-            String selectClause = "select " + subQuery.GetAliasName() + "." + relatedColumnName;
-            String fromClause = subQuery.GetSqlClause().GetFromClause();
-            String oldStr = ".ConditionQuery.";
-            String newStr = "." + GetLocationBase(propertyName) + ".";
-            String whereClause = subQuery.GetSqlClause().GetWhereClause().Replace(oldStr, newStr);
-            return selectClause + " " + fromClause + " " + whereClause;
+    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
+        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
+    }
+
+    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
+        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
+    }
+	
+    // -----------------------------------------------------
+    //                                           InlineQuery
+    //                                           -----------
+    protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                       , String colName, String capPropName, String uncapPropName) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
+            if (isBaseQuery(this)) {
+                getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
+            } else {
+                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
+            }
         }
+    }
 
-        protected void RegisterExistsSubQuery(${glConditionQueryInterfaceName} subQuery
-                                     , String columnName, String relatedColumnName, String propertyName) {
-            String realColumnName = GetRealColumnName(columnName);
-            String subQueryClause = GetExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
-            GetSqlClause().RegisterWhereClause("exists (" + subQueryClause + ")");
+    protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                       , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
+            if (isBaseQuery(this)) {
+                getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
+            } else {
+				getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option, _onClauseInline);
+            }
         }
+    }
 
-        // *Unsupport ExistsSubQuery as inline because it's so dangerous.
+    // -----------------------------------------------------
+    //                                       InScopeSubQuery
+    //                                       ---------------
+    protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String relatedColumnName, String propertyName) {
+        final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
+        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
+        registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
+    }
 
-        protected String GetExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
+    protected String getInScopeSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
+    }
+
+    protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
+                                 , String relatedColumnName, String propertyName) {
+        final String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
+        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
+        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+		
+		// Replace template marks. These are very important!
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "");
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), "");
+		
+        return selectClause + " " + fromWhereClause;
+    }
+
+    // -----------------------------------------------------
+    //                                        ExistsSubQuery
+    //                                        --------------
+    protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+                                 , String columnName, String relatedColumnName, String propertyName) {
+        final String realColumnName = getExistsSubQueryRealColumnName(columnName);
+        final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
+        registerWhereClause("exists (" + subQueryClause + ")");
+    }
+
+    protected String getExistsSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // *Unsupport ExistsSubQuery as inline because it's so dangerous.
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
-            String selectClause = "select " + subQuery.GetAliasName() + "." + relatedColumnName;
-            String fromClause = subQuery.GetSqlClause().GetFromClause();
-            String oldStr = ".ConditionQuery.";
-            String newStr = "." + GetLocationBase(propertyName) + ".";
-            String whereClause = subQuery.GetSqlClause().GetWhereClause().Replace(oldStr, newStr);
+		final int subQueryLevel = subQuery.getSubQueryLevel();
+		if (_subQueryLevel <= subQueryLevel) {
+			_subQueryLevel = subQueryLevel + 1;
+		}
+		final String tableAliasName = "dfsublocal_" + subQueryLevel;
+        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
+        String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
+		fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);// Very Important!
+        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+		
+        final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
+		
+		// Replace template marks. These are very important!
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereFirstConditionMark(), joinCondition + " and ");
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereClauseMark(), "where " + joinCondition);
+		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + " and ");
+		
+		return selectClause + " " + fromWhereClause;
+    }
 
-            // String parentCondition = " and " + relatedColumnName + " = " + realColumnName;
-            String parentCondition = "";
-            if (whereClause.Contains("where")) {
-                parentCondition = " and " + relatedColumnName + " = " + realColumnName;
+    protected void registerWhereClause(String whereClause) {
+        getSqlClause().registerWhereClause(whereClause);
+    }
+
+    protected void registerInlineWhereClause(String whereClause) {
+        if (isBaseQuery(this)) {
+            getSqlClause().registerBaseTableInlineWhereClause(whereClause);
+        } else {
+            getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause, _onClauseInline);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            UnionQuery
+    //                                            ----------
+    public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, String unionQueryPropertyName) {
+        final String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
+		
+		// At the future, building SQL will be moved to sqlClause.
+        getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
+    }
+
+    protected String getUnionQuerySql(${glConditionQueryInterfaceName} unionQuery, String unionQueryPropertyName) {
+	    final String fromClause = unionQuery.getSqlClause().getFromClause();
+		final String whereClause = unionQuery.getSqlClause().getWhereClause();
+		final String unionQueryClause;
+		if (whereClause.trim().length() <= 0) {
+		    unionQueryClause = fromClause + " " + getSqlClause().getUnionWhereClauseMark();
+		} else {
+		    final int whereIndex = whereClause.indexOf("where ");
+		    if (whereIndex < 0) {
+				String msg = "The whereClause should have 'where' string: " + whereClause;
+			    throw new IllegalStateException(msg);
+			}
+			final int clauseIndex = whereIndex + "where ".length();
+			final String mark = getSqlClause().getUnionWhereFirstConditionMark();
+			unionQueryClause = fromClause + " " + whereClause.substring(0, clauseIndex) + mark + whereClause.substring(clauseIndex);
+		}
+        final String oldStr = ".conditionQuery.";
+        final String newStr = ".conditionQuery." + unionQueryPropertyName + ".";
+        return replaceString(unionQueryClause, oldStr, newStr);// Very Important!
+    }
+
+    // -----------------------------------------------------
+    //                                               OrderBy
+    //                                               -------
+    public void registerOrderBy(String columnName, boolean ascOrDesc) {
+        getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
+    }
+	
+    // ===================================================================================
+    //                                                                       Name Resolver
+    //                                                                       =============
+    protected String resolveJoinAliasName(String relationPath, int nestLevel) {
+        return getSqlClause().resolveJoinAliasName(relationPath, nestLevel);
+    }
+
+    protected String resolveNestLevelExpression(String name) {
+        return getSqlClause().resolveNestLevelExpression(name, getNestLevel());
+    }
+
+	protected String resolveNextRelationPath(String tableName, String relationPropertyName) {
+	    final int relationNo = getSqlClause().resolveRelationNo(tableName, relationPropertyName);
+        String nextRelationPath = "_" + relationNo;
+        if (_relationPath != null) {
+            nextRelationPath = _relationPath + nextRelationPath;
+        }
+		return nextRelationPath;
+	}
+	
+    // ===================================================================================
+    //                                                                     Fixed Condition
+    //                                                                     ===============
+    protected String prepareFixedCondition(String fixedCondition, String localAliasName, String foreignAliasName) {
+        fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
+        fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
+        return fixedCondition;
+    }
+	
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public override String ToString() {
+        return getSqlClause().getClause();
+    }
+	
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+
+    protected final String replaceString(String text, String fromText, String toText) {
+        if(text == null || fromText == null || toText == null)
+            return null;
+        StringBuilder buf = new StringBuilder(100);
+        int pos = 0;
+        int pos2 = 0;
+        do {
+            pos = text.indexOf(fromText, pos2);
+            if(pos == 0) {
+                buf.append(toText);
+                pos2 = fromText.length();
+            } else
+            if(pos > 0) {
+                buf.append(text.substring(pos2, pos));
+                buf.append(toText);
+                pos2 = pos + fromText.length();
             } else {
-                parentCondition = " where " + relatedColumnName + " = " + realColumnName;
+                buf.append(text.substring(pos2));
+                return buf.toString();
             }
+        } while(true);
+    }
 
-            return selectClause + " " + fromClause + " " + whereClause + parentCondition;
+    protected <PROPERTY_TYPE> List<PROPERTY_TYPE> convertToList(Collection<PROPERTY_TYPE> col) {
+        if (col == null) {
+            return null;
         }
-
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
-        /// <returns>Foreign condition-query as interface.</returns>
-        public ${glConditionQueryInterfaceName} GetForeignConditionQuery(String foreignPropertyName) {
-            String methodName = "Query" + foreignPropertyName.Substring(0, 1).ToUpper() + foreignPropertyName.Substring(1);
-            MethodInfo methodInfo = this.GetType().GetMethod(methodName);
-            if (methodInfo == null) {
-                String msg = "The foreignPropertyName is not existing in this table: foreignPropertyName=" + foreignPropertyName;
-                msg = msg + " tableName=" + TableDbName + " methodName=" + methodName;
-                throw new SystemException(msg);
-            }
-            return (${glConditionQueryInterfaceName})methodInfo.Invoke(this, null);
+        if (col is List) {
+            return (List<PROPERTY_TYPE>)col;
         }
+        return new ArrayList<PROPERTY_TYPE>(col);
+    }
 
-        /**
-         * Get location.
-         * 
-         * @param columnPropertyName Column property name.
-         * @param key Condition key.
-         * @return Next nest level.
-         */
-        protected String GetLocation(String columnPropertyName, ${glConditionKeyName} key) {
-            return GetLocationBase(columnPropertyName) + "." + key.GetConditionKey();
+    protected String filterRemoveEmptyString(String value) {
+        return ((value != null && !"".Equals(value)) ? value : null);
+    }
+
+    protected List<String> filterRemoveEmptyStringFromList(List<String> ls) {
+        if (ls == null) {
+            return null;
         }
-
-        protected String GetLocationBase() {
-            StringBuilder sb = new StringBuilder();
-            ${glConditionQueryInterfaceName} query = this;
-            while (true) {
-                if (query.IsBaseQuery(query)) {
-                    sb.Insert(0, "ConditionQuery.");
-                    break;
-                } else {
-                    sb.Insert(0, "ConditionQuery" + query.GetAliasName() + ".");
-                }
-                query = query.GetChildQuery();
+        List<String> newList = new ArrayList<String>();
+        for (final Iterator<String> ite = ls.iterator(); ite.hasNext(); ) {
+            final String str = ite.next();
+            if (str == null || "".Equals(str)) {
+                continue;
             }
-            return sb.ToString();
+            newList.add(str);
         }
+        return newList;
+    }
 
-        protected String GetLocationBase(String columnPropertyName) {
-            return GetLocationBase() + columnPropertyName;
+    protected String initCap(String str) {
+	    JString jstr = new JString(str);
+        return (jstr.substring(0, 1).toUpperCase() + jstr.substring(1)).getString();
+    }
+
+    // ----------------------------------------------------------------
+    //                                                    Assert Object
+    //                                                    -------------
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
         }
-
-
-        // =====================================================================================
-        //                                                                                Helper
-        //                                                                                ======
-        /// <summary>
-        /// Filter removing empty-string.
-        /// If the value is null or empty-string, returns null.
-        /// </summary>
-        /// <param name="value">Query-value-string. (Nullable)</param>
-        /// <returns>Filtered value. (Nullable)</returns>
-        protected String FilterRemoveEmptyString(String value) {
-            return ((value != null && value.Length != 0) ? value : null);
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
         }
+    }
 
-        /// <summary>
-        /// Filter removing empty-string from the list.
-        /// If the list is null or empty-string, returns null.
-        /// </summary>
-        /// <param name="ls">List. (Nullable)</param>
-        /// <returns>Filtered list. (Nullable)</returns>
-        protected System.Collections.IList FilterGenericList<ELEMENT_TYPE>(System.Collections.Generic.IList<ELEMENT_TYPE> ls) {
-            if (ls == null) {
-                return null;
-            }
-            System.Collections.IList newList = new System.Collections.ArrayList();
-            foreach (ELEMENT_TYPE str in ls) {
-                newList.Add(str);
-            }
-            return newList;
+    protected void assertColumnName(String columnName) {
+        if (columnName == null) {
+            String msg = "The columnName should not be null.";
+            throw new IllegalArgumentException(msg);
         }
-
-        /// <summary>
-        /// Filter removing empty-string from the list.
-        /// If the list is null or empty-string, returns null.
-        /// </summary>
-        /// <param name="ls">List. (Nullable)</param>
-        /// <returns>Filtered list. (Nullable)</returns>
-        protected System.Collections.IList FilterGenericListWithRemovingEmptyString(System.Collections.Generic.IList<String> ls) {
-            if (ls == null) {
-                return null;
-            }
-            System.Collections.IList newList = new System.Collections.ArrayList();
-            foreach (String str in ls) {
-                if (str == null || "".Equals(str)) {
-                    continue;
-                }
-                newList.Add(str);
-            }
-            return newList;
+        if (columnName.trim().length() == 0) {
+            String msg = "The columnName should not be empty-string.";
+            throw new IllegalArgumentException(msg);
         }
-
-        // ----------------------------------------------------------------
-        //                                                    Assert Object
-        //                                                    -------------
-        #region Assert Object
-
-        /**
-         * Assert that the argument is not null.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param arg Argument. (NotNull)
-         */
-        protected void AssertObjectNotNull(String variableName, Object arg) {
-            if (variableName == null) {
-                String msg = "Argument[variableName] should not be null.";
-                throw new ArgumentNullException(msg);
-            }
-            if (arg == null) {
-                String msg = "Argument[" + variableName + "] should not be null.";
-                throw new ArgumentNullException(msg);
-            }
+        if (columnName.indexOf(",") >= 0) {
+            String msg = "The columnName should not contain comma ',': " + columnName;
+            throw new IllegalArgumentException(msg);
         }
+    }
 
-        /**
-         * Assert that the column-name is not null and is not emtpy and does not contain comma.
-         * 
-         * @param columnName Column-name. (NotNull)
-         * @exception IllegalArgumentException
-         */
-        protected void AssertColumnName(String columnName) {
-            if (columnName == null) {
-                String msg = "The columnName should not be null.";
-                throw new ArgumentNullException(msg);
-            }
-            if (columnName.Trim().Length == 0) {
-                String msg = "The columnName should not be empty-string.";
-                throw new ArgumentOutOfRangeException(msg);
-            }
-            if (columnName.Contains(",")) {
-                String msg = "The columnName should not contain comma ',': " + columnName;
-                throw new ArgumentOutOfRangeException(msg);
-            }
+    protected void assertAliasName(String aliasName) {
+        if (aliasName == null) {
+            String msg = "The aliasName should not be null.";
+            throw new IllegalArgumentException(msg);
         }
-
-        /**
-         * Assert that the alias-name is not null and is not emtpy and does not contain comma.
-         * 
-         * @param aliasName Alias-name. (NotNull)
-         * @exception IllegalArgumentException
-         */
-        protected void AssertAliasName(String aliasName) {
-            if (aliasName == null) {
-                String msg = "The aliasName should not be null.";
-                throw new ArgumentNullException(msg);
-            }
-            if (aliasName.Trim().Length == 0) {
-                String msg = "The aliasName should not be empty-string.";
-                throw new ArgumentOutOfRangeException(msg);
-            }
-            if (aliasName.Contains(",")) {
-                String msg = "The aliasName should not contain comma ',': " + aliasName;
-                throw new ArgumentOutOfRangeException(msg);
-            }
+        if (aliasName.trim().length() == 0) {
+            String msg = "The aliasName should not be empty-string.";
+            throw new IllegalArgumentException(msg);
         }
-
-        #endregion
-
-        // ----------------------------------------------------------------
-        //                                                    Assert String
-        //                                                    -------------
-        #region Assert String
-
-        /**
-         * Assert that the string is not null and not trimmed empty.
-         * 
-         * @param variableName Variable name. (NotNull)
-         * @param arg Argument. (NotNull)
-         */
-        protected void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-            if (variableName == null) {
-                String msg = "Variable[variableName] should not be null.";
-                throw new ArgumentNullException(msg);
-            }
-            if (value == null) {
-                String msg = "Variable[" + variableName + "] should not be null.";
-                throw new ArgumentNullException(msg);
-            }
-            if (value.Trim().Length == 0) {
-                String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
-                throw new ArgumentOutOfRangeException(msg);
-            }
+        if (aliasName.indexOf(",") >= 0) {
+            String msg = "The aliasName should not contain comma ',': " + aliasName;
+            throw new IllegalArgumentException(msg);
         }
+    }
 
-        #endregion
+    // ----------------------------------------------------------------
+    //                                                    Assert String
+    //                                                    -------------
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull("value", value);
+        if (new JString(value).trim().length() ==0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

@@ -1,6 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaInterfaceName}")
+import java.util.Map;
+import java.util.List;
+import java.sql.Connection;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
@@ -56,24 +59,6 @@ public interface ${myClassName} {
      */
     public String getTablePropertyName();
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Get table cap-prop-name. (Not JavaBeansRule)
-     * 
-     * @return Table cap-prop-name. (NotNull)
-     * @deprecated Please use getTablePropertyName()
-     */
-    public String getTableCapPropName();
-
-    /**
-     * Get table uncap-prop-name. (Not JavaBeansRule)
-     * 
-     * @return Table uncap-prop-name. (NotNull)
-     * @deprecated Please use getTablePropertyName()
-     */
-    public String getTableUncapPropName();
-#end
-
     // ===================================================================================
     //                                                                       Name Handling
     //                                                                       =============
@@ -109,14 +94,14 @@ public interface ${myClassName} {
      * 
      * @return The key-to-lower map of DB name(lower) and property name. (NotNull)
      */
-    public java.util.Map<String, String> getDbNamePropertyNameKeyToLowerMap();
+    public Map<String, String> getDbNamePropertyNameKeyToLowerMap();
 
     /**
      * Get the key-to-lower map of property name(lower) and db name.
      * 
      * @return The key-to-lower map of property name(lower) and db name. (NotNull)
      */
-    public java.util.Map<String, String> getPropertyNameDbNameKeyToLowerMap();
+    public Map<String, String> getPropertyNameDbNameKeyToLowerMap();
 
     // ===================================================================================
     //                                                                           Type Name
@@ -177,7 +162,7 @@ public interface ${myClassName} {
      * 
      * @return The list of DB name of column. (NotNull and NotEmpty)
      */
-    public java.util.List<${glColumnInfoName}> getColumnInfoList();
+    public List<${glColumnInfoName}> getColumnInfoList();
 
     /**
      * Has column?
@@ -330,7 +315,7 @@ public interface ${myClassName} {
          * 
          * @return The trace of relation as the list of relation info. (NotNull)
          */
-        public java.util.List${database.filterGenericsString($glRelationInfoName)} getTraceRelation();
+        public List${database.filterGenericsString($glRelationInfoName)} getTraceRelation();
 
         /**
          * Get the trace of column.
@@ -397,7 +382,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
      */
-    public void acceptPrimaryKeyMap(${glEntityInterfaceName} entity, java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
+    public void acceptPrimaryKeyMap(${glEntityInterfaceName} entity, Map<String, ? extends Object> primaryKeyMap);
 
     /**
      * Accept primary-key map-string.
@@ -419,7 +404,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
      */
-    public void acceptColumnValueMap(${glEntityInterfaceName} entity, java.util.Map${database.filterGenericsString('String, ? extends Object')} columnValueMap);
+    public void acceptColumnValueMap(${glEntityInterfaceName} entity, Map<String, ? extends Object> columnValueMap);
 
     /**
      * Accept column-value map-string.
@@ -511,7 +496,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @return The list of column value. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('Object')} convertToColumnValueList(${glEntityInterfaceName} entity);
+    public List<Object> convertToColumnValueList(${glEntityInterfaceName} entity);
 
     /**
      * Convert entity to column value as map.
@@ -519,7 +504,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @return The map of column value. (NotNull)
      */
-    public java.util.Map${database.filterGenericsString('String, Object')} convertToColumnValueMap(${glEntityInterfaceName} entity);
+    public Map<String, Object> convertToColumnValueMap(${glEntityInterfaceName} entity);
 
     /**
      * Convert entity to column string-value as list.
@@ -527,7 +512,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @return The list of column string-value. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('String')} convertToColumnStringValueList(${glEntityInterfaceName} entity);
+    public List<String> convertToColumnStringValueList(${glEntityInterfaceName} entity);
 
     /**
      * Convert entity to column string-value as map.
@@ -535,7 +520,7 @@ public interface ${myClassName} {
      * @param entity Target entity. (NotNull)
      * @return The map of column string-value. (NotNull)
      */
-    public java.util.Map${database.filterGenericsString('String, String')} convertToColumnStringValueMap(${glEntityInterfaceName} entity);
+    public Map<String, String> convertToColumnStringValueMap(${glEntityInterfaceName} entity);
 
     // ===================================================================================
     //                                                                        JDBC Support
@@ -547,7 +532,7 @@ public interface ${myClassName} {
      * @param entity Entity. (NotNull)
      * @return Prepared insert clause. (NotNull and NotEmpty)
      */
-    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity);
+    public int insertEntity(Connection conn, ${glEntityInterfaceName} entity);
 
     /**
      * Insert entity using specified connection.
@@ -557,7 +542,7 @@ public interface ${myClassName} {
      * @param preparedInsertClauseOption Prepared insert clause option. (NotNull)
      * @return Prepared insert clause. (NotNull and NotEmpty)
      */
-    public int insertEntity(java.sql.Connection conn, ${glEntityInterfaceName} entity, PreparedInsertClauseOption preparedInsertClauseOption);
+    public int insertEntity(Connection conn, ${glEntityInterfaceName} entity, PreparedInsertClauseOption preparedInsertClauseOption);
 
     /**
      * Get prepared insert clause.
@@ -644,11 +629,13 @@ public interface ${myClassName} {
     /**
      * The setupper of entity property. <br />
 	 * This class is for Internal. Don't use this!
+	 * @param <ENTITY_TYPE> The type of entity.
      */
     public interface EntityPropertySetupper<ENTITY_TYPE extends ${glEntityInterfaceName}> {
 		
 		/**
 		 * @param entity Entity. (NotNull)
+		 * @param value Value. (Nullable)
 		 */
         void setup(ENTITY_TYPE entity, Object value);
     }

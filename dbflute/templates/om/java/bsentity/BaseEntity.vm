@@ -113,20 +113,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return "${table.javaBeansRulePropertyName}";
     }
 
-#if ($database.isMakeDeprecated())
-    public String getTablePropName() {
-        return "${table.javaBeansRulePropertyName}";
-    }
-
-    public String getTableCapPropName() {
-        return "${table.javaName}";
-    }
-
-    public String getTableUncapPropName() {
-        return "${table.uncapitalisedJavaName}";
-    }
-#end
-
 #if ($isSql2Entity)
     // ===================================================================================
     //                                                                              DBMeta

@@ -2,6 +2,9 @@ ${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
 
 #set ($myClassName = "${glDBMetaAbstractName}")
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonHelper}.${glMapListStringName};
@@ -290,13 +293,13 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
     protected static abstract class AbstractRelationTrace implements RelationTrace {
 
         /** The list of relation. */
-        protected java.util.List<${glRelationInfoName}> _relationList;
+        protected List<${glRelationInfoName}> _relationList;
 
         /** The list of relation trace. */
-        protected java.util.List<AbstractRelationTrace> _relationTraceList;
+        protected List<AbstractRelationTrace> _relationTraceList;
 
         /** The list of relation info as trace. */
-        protected java.util.List<${glRelationInfoName}> _traceRelationInfoList;
+        protected List<${glRelationInfoName}> _traceRelationInfoList;
 
         /** The column info as trace. */
         protected ${glColumnInfoName} _traceColumnInfo;
@@ -310,7 +313,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * @param relationTraceFixHandler The handler of fixed relation trace. (Nullable)
          */
         public AbstractRelationTrace(RelationTraceFixHandler relationTraceFixHandler) {
-            this(new java.util.ArrayList<${glRelationInfoName}>(), new java.util.ArrayList<AbstractRelationTrace>());
+            this(new ArrayList<${glRelationInfoName}>(), new ArrayList<AbstractRelationTrace>());
             this._relationTraceFixHandler = relationTraceFixHandler;
         }
 
@@ -320,7 +323,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * @param relationList The list of relation. (NotNull)
          * @param relationTraceList The list of relation trace. (NotNull)
          */
-        public AbstractRelationTrace(java.util.List<${glRelationInfoName}> relationList, java.util.List<AbstractRelationTrace> relationTraceList) {
+        public AbstractRelationTrace(List<${glRelationInfoName}> relationList, List<AbstractRelationTrace> relationTraceList) {
             this._relationList = relationList;
             this._relationTraceList = relationTraceList;
             this._relationTraceList.add(this);
@@ -331,7 +334,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * 
          * @return The trace of relation as the list of relation info. (NotNull)
          */
-        public java.util.List<${glRelationInfoName}> getTraceRelation() {
+        public List<${glRelationInfoName}> getTraceRelation() {
             return _traceRelationInfoList;
         }
 
@@ -351,7 +354,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * @param traceColumnInfo The trace of column as column info. (Nullable)
          * @return Relation trace(result). (NotNull)
          */
-        protected RelationTrace fixTrace(java.util.List<${glRelationInfoName}> traceRelationInfoList, ${glColumnInfoName} traceColumnInfo) {
+        protected RelationTrace fixTrace(List<${glRelationInfoName}> traceRelationInfoList, ${glColumnInfoName} traceColumnInfo) {
             final AbstractRelationTrace localRelationTrace = (AbstractRelationTrace)_relationTraceList.get(0);
             localRelationTrace.setTraceRelation(traceRelationInfoList);
             localRelationTrace.setTraceColumn(traceColumnInfo);
@@ -360,7 +363,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             return localRelationTrace;
         }
 
-        protected void setTraceRelation(java.util.List<${glRelationInfoName}> traceRelationInfoList) {
+        protected void setTraceRelation(List<${glRelationInfoName}> traceRelationInfoList) {
             this._traceRelationInfoList = traceRelationInfoList;
         }
 
@@ -372,8 +375,8 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
          * ${database.ImplementComment}
          */
         protected void recycle() {
-            this._relationList = new java.util.ArrayList<${glRelationInfoName}>();
-            this._relationTraceList = new java.util.ArrayList<AbstractRelationTrace>();
+            this._relationList = new ArrayList<${glRelationInfoName}>();
+            this._relationTraceList = new ArrayList<AbstractRelationTrace>();
             this._relationTraceList.add(this);
         }
 
@@ -412,9 +415,9 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         java.sql.PreparedStatement ps = null;
         try {
             ps = conn.prepareStatement(sql);
-            final java.util.List${database.filterGenericsString('Object')} valueList = convertToColumnValueList(entity);
+            final List<Object> valueList = convertToColumnValueList(entity);
             int settingIndex = 1;
-            for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
+            for (final Iterator<Object> ite = valueList.iterator(); ite.hasNext(); ) {
                 Object value = ite.next();
                 if (value == null) {
                     ps.setNull(settingIndex, java.sql.Types.VARCHAR);// Giving a clear-cut attitude!
@@ -455,8 +458,8 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * @return Map string builder that is prepared. (NotNull)
      */
     public ${glMapStringBuilderName} createMapStringBuilder() {
-        final java.util.List${database.filterGenericsString('String')} columnDbNameList = new java.util.ArrayList${database.filterGenericsString('String')}();
-        for (final java.util.Iterator ite = getColumnInfoList().iterator(); ite.hasNext(); ) {
+        final List${database.filterGenericsString('String')} columnDbNameList = new ArrayList${database.filterGenericsString('String')}();
+        for (final Iterator<${glColumnInfoName}> ite = getColumnInfoList().iterator(); ite.hasNext(); ) {
             final ${glColumnInfoName} columnInfo = (${glColumnInfoName})ite.next();
             columnDbNameList.add(columnInfo.getColumnDbName());
         }
@@ -597,7 +600,7 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             return mapListString;
         }
 
-        public static ${glMapStringBuilderName} createMapStringBuilder(java.util.List${database.filterGenericsString('String')} columnNameList) {
+        public static ${glMapStringBuilderName} createMapStringBuilder(List${database.filterGenericsString('String')} columnNameList) {
             ${glMapStringBuilderName} mapStringBuilder = new ${glMapStringBuilderImplName}();
             mapStringBuilder.setMsMapMark(MAP_STRING_MAP_MARK);
             mapStringBuilder.setMsStartBrace(MAP_STRING_START_BRACE);

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
@@ -18,6 +20,9 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName};
 import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
+import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The abstract class of SqlClause.
@@ -173,7 +178,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 	
     protected String buildUnionClause(String selectClause) {
         final StringBuilder sb = new StringBuilder();
-        for (final java.util.Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
             final UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
             final String unionQueryClause = unionQueryInfo.getUnionQueryClause();
             final boolean unionAll = unionQueryInfo.isUnionAll();
@@ -245,8 +250,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     public String getIncludedSelectColumnClause() {
         final StringBuffer sb = new StringBuffer();
         int count = 0;
-        for (final java.util.Iterator ite = _includedSelectColumnMap.keySet().iterator(); ite.hasNext(); count++) {
-            final String aliasName = (String)ite.next();
+        for (final Iterator<String> ite = _includedSelectColumnMap.keySet().iterator(); ite.hasNext(); count++) {
+            final String aliasName = ite.next();
             final String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
             sb.append(", ").append(realColumnName).append(" as ").append(aliasName);
 			_selectClauseRealColumnAliasMap.put(realColumnName, aliasName);
@@ -269,7 +274,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     protected String getLeftOuterJoinClause() {
         final StringBuffer sb = new StringBuffer();
-        for (final java.util.Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
+        for (final Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
             final String aliasName = ite.next();
             final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
             final String joinTableName = joinInfo.getJoinTableName();
@@ -310,7 +315,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         final StringBuffer sb = new StringBuffer();
         sb.append("(select * from ").append(joinTableName).append(" where ");
         int count = 0;
-        for (final java.util.Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
             String clauseElement = ite.next();
             clauseElement = filterWhereClauseSimply(clauseElement);
             if (count > 0) {
@@ -338,7 +343,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 	protected String buildWhereClause(boolean template) {
         final StringBuffer sb = new StringBuffer();
         int count = 0;
-        for (final java.util.Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
+        for (final Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
             String clauseElement = (String)ite.next();
             clauseElement = filterWhereClauseSimply(clauseElement);
             if (count == 0) {
@@ -373,9 +378,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                          Copy Parts
     //                                                                          ==========
     public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause) {
-        final java.util.Set keySet = _includedSelectColumnMap.keySet();
-        for (final java.util.Iterator ite = keySet.iterator(); ite.hasNext(); ) {
-            final String aliasName = (String)ite.next();
+        final Set<String> keySet = _includedSelectColumnMap.keySet();
+        for (final Iterator<String> ite = keySet.iterator(); ite.hasNext(); ) {
+            final String aliasName = ite.next();
             final String realColumnName = (String)_includedSelectColumnMap.get(aliasName);
             sqlClause.registerIncludedSelectColumn(aliasName, realColumnName);
         }
@@ -476,7 +481,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    public void registerOuterJoin(String joinTableName, String aliasName, java.util.Map<String, String> joinOnMap) {
+    public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
         final LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
@@ -491,7 +496,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         protected String _joinTableName;
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
         protected List<String> _additionalOnClauseList = new ArrayList<String>();
-        protected java.util.Map<String, String> _joinOnMap;
+        protected Map<String, String> _joinOnMap;
 		protected boolean _onClauseInline;
         public String getAliasName() {
             return _aliasName;
@@ -517,10 +522,10 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         public void addAdditionalOnClause(String value) {
             _additionalOnClauseList.add(value);
         }
-        public java.util.Map<String, String> getJoinOnMap() {
+        public Map<String, String> getJoinOnMap() {
             return _joinOnMap;
         }
-        public void setJoinOnMap(java.util.Map<String, String> value) {
+        public void setJoinOnMap(Map<String, String> value) {
             _joinOnMap = value;
         }
         public boolean isOnClauseInline() {
@@ -708,7 +713,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             _isOrderByEffective = true;
             final List<String> orderByList = new ArrayList<String>();
             {
-                final  java.util.StringTokenizer st = new java.util.StringTokenizer(orderByProperty, "/");
+                final StringTokenizer st = new StringTokenizer(orderByProperty, "/");
                 while (st.hasMoreElements()) {
                     orderByList.add(st.nextToken());
                 }
@@ -720,15 +725,15 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
             final List<String> registeredOrderByList = new ArrayList<String>();
             {
-                final java.util.StringTokenizer st = new java.util.StringTokenizer(registeredOrderByProperty, "/");
+                final StringTokenizer st = new StringTokenizer(registeredOrderByProperty, "/");
                 while (st.hasMoreElements()) {
                     registeredOrderByList.add(st.nextToken());
                 }
             }
 
             int count = 0;
-            for (final java.util.Iterator ite = orderByList.iterator(); ite.hasNext(); ) {
-                String orderBy = (String)ite.next();
+            for (final Iterator<String> ite = orderByList.iterator(); ite.hasNext(); ) {
+                String orderBy = ite.next();
                 String registeredOrderBy = (String)registeredOrderByList.get(count);
 
                 _isOrderByEffective = true;
@@ -1039,8 +1044,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
         if (_whereClauseSimpleFilterList == null || _whereClauseSimpleFilterList.isEmpty()) {
             return clauseElement;
         }
-        for (final java.util.Iterator ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext(); ) {
-            final ${glWhereClauseSimpleFilterInterfaceName} filter = (${glWhereClauseSimpleFilterInterfaceName})ite.next();
+        for (final Iterator<${glWhereClauseSimpleFilterInterfaceName}> ite = _whereClauseSimpleFilterList.iterator(); ite.hasNext(); ) {
+            final ${glWhereClauseSimpleFilterInterfaceName} filter = ite.next();
             if (filter == null) {
                 String msg = "The list of filter should not have null: _whereClauseSimpleFilterList=" + _whereClauseSimpleFilterList;
                 throw new IllegalStateException(msg);
@@ -1071,73 +1076,24 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                                                              Helper
     //                                                                              ======
     protected final String replaceString(String text, String fromText, String toText) {
-        if(text == null || fromText == null || toText == null)
-            return null;
-        StringBuffer buf = new StringBuffer(100);
-        int pos = 0;
-        int pos2 = 0;
-        do {
-            pos = text.indexOf(fromText, pos2);
-            if(pos == 0) {
-                buf.append(toText);
-                pos2 = fromText.length();
-            } else
-            if(pos > 0) {
-                buf.append(text.substring(pos2, pos));
-                buf.append(toText);
-                pos2 = pos + fromText.length();
-            } else {
-                buf.append(text.substring(pos2));
-                return buf.toString();
-            }
-        } while(true);
+	    return ${glSimpleStringUtil}.replace(text, fromText, toText);
     }
 	
-    /**
-     * Get the value of line separator.
-     * 
-     * @return The value of line separator. (NotNull)
-     */
     protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
-    /**
-     * Assert that the object is not null.
-     * 
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
-     */
     protected void assertObjectNotNull(String variableName, Object value) {
-        if (variableName == null) {
-            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
-        if (value == null) {
-            String msg = "The value should not be null: variableName=" + variableName;
-            throw new IllegalArgumentException(msg);
-        }
+	    ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);
     }
 
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
-    /**
-     * Assert that the entity is not null and not trimmed empty.
-     * 
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-        assertObjectNotNull("variableName", variableName);
-        assertObjectNotNull("value", value);
-        if (value.trim().length() ==0) {
-            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
+	    ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }

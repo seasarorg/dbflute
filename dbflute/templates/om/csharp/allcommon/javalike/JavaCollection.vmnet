@@ -1,0 +1,240 @@
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ${glPackageBaseCommonJavaLike} {
+
+    public interface Collection<ELEMENT> {
+        bool add(ELEMENT element);
+        bool remove(ELEMENT element);
+        int size();
+        bool isEmpty();
+        void clear();
+        ICollection<ELEMENT> getCollection();
+    }
+
+    public interface List<ELEMENT> : Collection<ELEMENT> {
+        ELEMENT get(int index);
+        IList<ELEMENT> getList();
+    }
+
+    public class ArrayList<ELEMENT> : List<ELEMENT> {
+        IList<ELEMENT> _res = new System.Collections.Generic.List<ELEMENT>();
+        public bool add(ELEMENT element) {
+            _res.Add(element);
+            return true;
+        }
+        public ELEMENT get(int index) {
+            return _res[index];
+        }
+        public bool remove(ELEMENT element) {
+            return _res.Remove(element);
+        }
+        public int size() {
+            return _res.Count;
+        }
+        public bool isEmpty() {
+            return _res.Count == 0;
+        }
+        public void clear() {
+            _res.Clear();
+        }
+        public IList<ELEMENT> getList() {
+            return _res;
+        }
+        public ICollection<ELEMENT> getCollection() {
+            return _res;
+        }
+    }
+
+    public interface Set<ELEMENT> : Collection<ELEMENT> {
+        bool contains(ELEMENT element);
+    }
+
+    public class HashSet<ELEMENT> : Set<ELEMENT> {
+        protected IDictionary<ELEMENT, Object> _res = new Dictionary<ELEMENT, Object>();
+        public bool add(ELEMENT element) {
+            if (_res.ContainsKey(element)) {
+                return false;
+            }
+            _res.Add(element, null);
+            return true;
+        }
+        public bool remove(ELEMENT element) {
+            if (_res.ContainsKey(element)) {
+                _res.Remove(element);
+                return true;
+            }
+            return false;
+        }
+        public int size() {
+            return _res.Count;
+        }
+        public bool isEmpty() {
+            return _res.Count == 0;
+        }
+        public void clear() {
+            _res.Clear();
+        }
+        public bool contains(ELEMENT element) {
+            return _res.ContainsKey(element);
+        }
+        public ICollection<ELEMENT> getCollection() {
+            return _res.Keys;
+        }
+    }
+
+    public class LinkedHashSet<ELEMENT> : Set<ELEMENT> {
+        protected IDictionary<ELEMENT, Object> _res = new Dictionary<ELEMENT, Object>();
+        protected List<ELEMENT> _seq = new ArrayList<ELEMENT>();
+        public ELEMENT get(int index) {
+            return _seq.get(index);
+        }
+        public bool add(ELEMENT element) {
+            if (_res.ContainsKey(element)) {
+                return false;
+            }
+            _res.Add(element, null);
+            _seq.add(element);
+            return true;
+        }
+        public bool remove(ELEMENT element) {
+            if (_res.ContainsKey(element)) {
+                _res.Remove(element);
+                _seq.remove(element);
+                return true;
+            }
+            return false;
+        }
+        public int size() {
+            return _res.Count;
+        }
+        public bool isEmpty() {
+            return _res.Count == 0;
+        }
+        public void clear() {
+            _res.Clear();
+        }
+        public bool contains(ELEMENT element) {
+            return _res.ContainsKey(element);
+        }
+        public ICollection<ELEMENT> getCollection() {
+            return _seq.getCollection();
+        }
+    }
+
+    public interface Map<KEY, VALUE> {
+		VALUE get(KEY key);
+        VALUE put(KEY key, VALUE value);
+        VALUE remove(KEY obj);
+		int size();
+		bool isEmpty();
+		void clear();
+        bool containsKey(KEY obj);
+		Set<KEY> keySet();
+		Collection<VALUE> values();
+    }
+	
+    public class HashMap<KEY, VALUE> : Map<KEY, VALUE> {
+		protected IDictionary<KEY, VALUE> _res = new Dictionary<KEY, VALUE>();
+        public VALUE get(KEY key) {
+            return _res.ContainsKey(key) ? _res[key] : default(VALUE);
+        }
+        public VALUE put(KEY key, VALUE value) {
+            VALUE result = default(VALUE);
+		    if (_res.ContainsKey(key)) {
+                result = _res[key];
+			    _res.Remove(key);
+			}
+			_res.Add(key, value);
+            return result;
+		}
+        public VALUE remove(KEY key) {
+            VALUE result = default(VALUE);
+            if (_res.ContainsKey(key)) {
+                result = _res[key];
+                _res.Remove(key);
+            }
+            return result;
+        }
+		public int size() {
+            return _res.Count;
+        }
+        public bool isEmpty() {
+            return _res.Count == 0;
+        }
+        public void clear() {
+            _res.Clear();
+        }
+        public bool containsKey(KEY obj) {
+            return _res.ContainsKey(obj);
+        }
+        public Set<KEY> keySet() {
+            Set<KEY> keySet = new LinkedHashSet<KEY>();
+            ICollection<KEY> keyCol = _res.Keys;
+            foreach (KEY key in keyCol) {
+                keySet.add(key);
+            }
+            return keySet;
+        }
+        public Collection<VALUE> values() {
+            List<VALUE> valueList = new ArrayList<VALUE>();
+            ICollection<VALUE> keyCol = _res.Values;
+            foreach (VALUE value in keyCol) {
+                valueList.add(value);
+            }
+            return valueList;
+        }
+    }
+
+    public class LinkedHashMap<KEY, VALUE> : Map<KEY, VALUE> {
+        protected Map<KEY, VALUE> _res = new HashMap<KEY, VALUE>();
+        protected LinkedHashSet<KEY> _seq = new LinkedHashSet<KEY>();
+        public VALUE get(KEY key) {
+            return _res.containsKey(key) ? _res.get(key) : default(VALUE);
+        }
+        public VALUE put(KEY key, VALUE value) {
+            VALUE result = default(VALUE);
+            if (_res.containsKey(key)) {
+                result = _res.get(key);
+                _res.remove(key);
+            } else {
+                _seq.add(key);
+            }
+            _res.put(key, value);
+            return result;
+        }
+        public VALUE remove(KEY key) {
+            VALUE result = default(VALUE);
+            if (_res.containsKey(key)) {
+                result = _res.get(key);
+                _res.remove(key);
+                _seq.remove(key);
+            }
+            return result;
+        }
+        public int size() {
+            return _res.size();
+        }
+        public bool isEmpty() {
+            return _res.isEmpty();
+        }
+        public void clear() {
+            _res.clear();
+        }
+        public bool containsKey(KEY obj) {
+            return _res.containsKey(obj);
+        }
+        public Set<KEY> keySet() {
+            return _seq;
+        }
+        public Collection<VALUE> values() {
+            List<VALUE> valueList = new ArrayList<VALUE>();
+            foreach (KEY key in _seq.getCollection()) {
+                valueList.add(_res.get(key));
+            }
+            return valueList;
+        }
+    }
+}

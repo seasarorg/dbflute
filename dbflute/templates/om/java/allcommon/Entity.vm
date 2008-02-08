@@ -36,24 +36,6 @@ public interface ${glEntityInterfaceName} {
      */
     public String getTablePropertyName();
 
-#if ($database.isMakeDeprecated())
-    /**
-     * Get table cap-prop-name.
-     * 
-     * @return Table cap-prop-name. (NotNull)
-     * @deprecated Please use getTablePropertyName()
-     */
-    public String getTableCapPropName();
-
-    /**
-     * Get table uncap-prop-name.
-     * 
-     * @return Table uncap-prop-name. (NotNull)
-     * @deprecated Please use getTablePropertyName()
-     */
-    public String getTableUncapPropName();
-#end
-
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============

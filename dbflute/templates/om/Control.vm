@@ -344,6 +344,9 @@ targetdatabase = $targetDatabase
 	#set ($glInternalBindVariableUtil = "${glProjectPrefix}InternalBindVariableUtil")
 	
     ## [Allcommon-Util]
+    #set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
+    #set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
+    #set ($glSimpleSystemUtil = "${glProjectPrefix}SimpleSystemUtil")
     #set ($glValueLabelUtilName = "${glProjectPrefix}ValueLabelUtil")
     #set ($glTraceViewUtilName = "${glProjectPrefix}TraceViewUtil")
 
@@ -1900,6 +1903,15 @@ targetdatabase = $targetDatabase
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonUtil}))
       $database.makeDirectory($path)
 
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleAssertUtil}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleAssertUtil.${glTemplateFileExtension}",$path,"", "")
+
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleStringUtil}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleStringUtil.${glTemplateFileExtension}",$path,"", "")
+
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleSystemUtil}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleSystemUtil.${glTemplateFileExtension}",$path,"", "")
+	  
       #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtilName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/allcommon/util/ValueLabelUtil.${glTemplateFileExtension}",$path,"", "")

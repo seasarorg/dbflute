@@ -43,41 +43,4 @@ public interface ${glOrderByBeanInterfaceName} extends ${glSelectResourceInterfa
      * @return this. (NotNull)
      */
     public ${glOrderByBeanInterfaceName} makeOrderByEffective();
-#if ($database.isMakeRecentlyDeprecated())
-    /**
-     * Register order-by-asc.
-     * 
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @return this. (NotNull)
-     * @deprecated
-     */
-    public ${glOrderByBeanInterfaceName} registerOrderByAsc(String orderByProperty);
-
-    /**
-     * Register order-by-desc.
-     * 
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @return this. (NotNull)
-     * @deprecated
-     */
-    public ${glOrderByBeanInterfaceName} registerOrderByDesc(String orderByProperty);
-
-    /**
-     * Reverse order-by or Override order-by asc.
-     * 
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @return this. (NotNull)
-     * @deprecated
-     */
-    public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByAsc(String orderByProperty);
-
-    /**
-     * Reverse order-by or Override order-by desc.
-     * 
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @return this. (NotNull)
-     * @deprecated
-     */
-    public ${glOrderByBeanInterfaceName} reverseOrderBy_Or_OverrideOrderByDesc(String orderByProperty);
-#end
 }

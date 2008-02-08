@@ -1,0 +1,14 @@
+${database.allClassCopyright}package ${glPackageBaseCommonUtil};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glSimpleSystemUtil} {
+
+    // ===================================================================================
+    //                                                                              System
+    //                                                                              ======
+    public static String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+}

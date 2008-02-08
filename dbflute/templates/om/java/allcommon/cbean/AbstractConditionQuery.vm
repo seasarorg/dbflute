@@ -1,6 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
 #set ($myClassName = "${glConditionQueryAbstractName}")
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Iterator;
 
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
@@ -12,6 +18,7 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
+import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 
 /**
  * The abstract class of condition-query.
@@ -241,14 +248,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                         Union Query
     //                                                                         ===========
     /** The map of union query. */
-    protected java.util.Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap = new java.util.LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+    protected Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
 
     /**
      * Get the map of union query.
      * 
      * @return The map of union query. (NotNull)
      */
-    public java.util.Map<String, ${glConditionQueryInterfaceName}> getUnionQueryMap() {// for Internal
+    public Map<String, ${glConditionQueryInterfaceName}> getUnionQueryMap() {// for Internal
         return _unionQueryMap;
     }
 
@@ -264,14 +271,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     /** The map of union all query. */
-    protected java.util.Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap = new java.util.LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+    protected Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
 
     /**
      * Get the map of union all query.
      * 
      * @return The map of union all query. (NotNull)
      */
-    public java.util.Map<String, ${glConditionQueryInterfaceName}> getUnionAllQueryMap() {// for Internal
+    public Map<String, ${glConditionQueryInterfaceName}> getUnionAllQueryMap() {// for Internal
         return _unionAllQueryMap;
     }
 
@@ -286,7 +293,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         xsetupUnion(unionAllQuery, true, _unionAllQueryMap);
     }
 
-    protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, java.util.Map<String, ${glConditionQueryInterfaceName}> unionQueryMap) {
+    protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, Map<String, ${glConditionQueryInterfaceName}> unionQueryMap) {
         if (unionQuery == null) {
             String msg = "The argument[unionQuery] should not be null.";
             throw new IllegalArgumentException(msg);
@@ -320,8 +327,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * 
      * @return The list of union query. (NotNull)
      */
-    public java.util.List<${glConditionQueryInterfaceName}> getUnionQueryList() {
-        return new java.util.ArrayList<${glConditionQueryInterfaceName}>(_unionQueryMap.values());
+    public List<${glConditionQueryInterfaceName}> getUnionQueryList() {
+        return new ArrayList<${glConditionQueryInterfaceName}>(_unionQueryMap.values());
     }
 
     /**
@@ -329,8 +336,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * 
      * @return The list of union all query. (NotNull)
      */
-    public java.util.List<${glConditionQueryInterfaceName}> getUnionAllQueryList() {
-        return new java.util.ArrayList<${glConditionQueryInterfaceName}>(_unionAllQueryMap.values());
+    public List<${glConditionQueryInterfaceName}> getUnionAllQueryList() {
+        return new ArrayList<${glConditionQueryInterfaceName}>(_unionAllQueryMap.values());
     }
 
     // ===================================================================================
@@ -472,7 +479,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             if (value != null && option.isSplit()) {
                 final String[] strArray = option.generateSplitValueArray(value);
-                final java.util.List<String> realValueList = new java.util.ArrayList<String>();
+                final List<String> realValueList = new ArrayList<String>();
                 for (int i=0; i < strArray.length; i++) {
                     final String currentValue = strArray[i];
                     realValueList.add(currentValue);
@@ -963,7 +970,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     protected final String replaceString(String text, String fromText, String toText) {
         if(text == null || fromText == null || toText == null)
             return null;
-        StringBuffer buf = new StringBuffer(100);
+        StringBuilder buf = new StringBuilder(100);
         int pos = 0;
         int pos2 = 0;
         do {
@@ -990,14 +997,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param <PROPERTY_TYPE> The type of property.
      * @return List. (Nullable: If the argument is null, returns null.)
      */
-    protected <PROPERTY_TYPE> java.util.List<PROPERTY_TYPE> convertToList(java.util.Collection<PROPERTY_TYPE> col) {
+    protected <PROPERTY_TYPE> List<PROPERTY_TYPE> convertToList(Collection<PROPERTY_TYPE> col) {
         if (col == null) {
             return null;
         }
-        if (col instanceof java.util.List) {
-            return (java.util.List<PROPERTY_TYPE>)col;
+        if (col instanceof List) {
+            return (List<PROPERTY_TYPE>)col;
         }
-        return new java.util.ArrayList<PROPERTY_TYPE>(col);
+        return new ArrayList<PROPERTY_TYPE>(col);
     }
 
     /**
@@ -1018,12 +1025,12 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param ls List. (Nullable)
      * @return Filtered list. (Nullable)
      */
-    protected java.util.List<String> filterRemoveEmptyStringFromList(java.util.List<String> ls) {
+    protected List<String> filterRemoveEmptyStringFromList(List<String> ls) {
         if (ls == null) {
             return null;
         }
-        java.util.List<String> newList = new java.util.ArrayList<String>();
-        for (final java.util.Iterator<String> ite = ls.iterator(); ite.hasNext(); ) {
+        List<String> newList = new ArrayList<String>();
+        for (final Iterator<String> ite = ls.iterator(); ite.hasNext(); ) {
             final String str = (String)ite.next();
             if (str == null || "".equals(str)) {
                 continue;
@@ -1033,14 +1040,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return newList;
     }
 
-    /**
-     * Initcap string.
-     * 
-     * @param str Target string. (NotNull)
-     * @return Initcaped string. (NotNull)
-     */
     protected String initCap(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
+	    return ${glSimpleStringUtil}.initCap(str);
     }
 
     // ----------------------------------------------------------------
