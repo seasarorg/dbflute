@@ -248,7 +248,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                         Union Query
     //                                                                         ===========
     /** The map of union query. */
-    protected Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+    protected Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap;
 
     /**
      * Get the map of union query.
@@ -256,6 +256,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @return The map of union query. (NotNull)
      */
     public Map<String, ${glConditionQueryInterfaceName}> getUnionQueryMap() {// for Internal
+		if (_unionQueryMap == null) {
+		    _unionQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+		}
         return _unionQueryMap;
     }
 
@@ -267,11 +270,11 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param unionQuery Union query. (NotNull)
      */
     public void xsetUnionQuery(${glConditionQueryInterfaceName} unionQuery) {
-        xsetupUnion(unionQuery, false, _unionQueryMap);
+        xsetupUnion(unionQuery, false, getUnionQueryMap());
     }
 
     /** The map of union all query. */
-    protected Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+    protected Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap;
 
     /**
      * Get the map of union all query.
@@ -279,6 +282,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @return The map of union all query. (NotNull)
      */
     public Map<String, ${glConditionQueryInterfaceName}> getUnionAllQueryMap() {// for Internal
+		if (_unionAllQueryMap == null) {
+		    _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+		}
         return _unionAllQueryMap;
     }
 
@@ -290,7 +296,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @param unionAllQuery Union all query. (NotNull)
      */
     public void xsetUnionAllQuery(${glConditionQueryInterfaceName} unionAllQuery) {
-        xsetupUnion(unionAllQuery, true, _unionAllQueryMap);
+        xsetupUnion(unionAllQuery, true, getUnionAllQueryMap());
     }
 
     protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, Map<String, ${glConditionQueryInterfaceName}> unionQueryMap) {
@@ -319,7 +325,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @return Determination.
      */
     public boolean hasUnionQueryOrUnionAllQuery() {
-        return !_unionQueryMap.isEmpty() || !_unionAllQueryMap.isEmpty();
+        return (_unionQueryMap != null && !_unionQueryMap.isEmpty()) || (_unionAllQueryMap != null && !_unionAllQueryMap.isEmpty());
     }
 
     /**
@@ -328,6 +334,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @return The list of union query. (NotNull)
      */
     public List<${glConditionQueryInterfaceName}> getUnionQueryList() {
+		if (_unionQueryMap == null) { return new ArrayList<${glConditionQueryInterfaceName}>(); }
         return new ArrayList<${glConditionQueryInterfaceName}>(_unionQueryMap.values());
     }
 
@@ -337,6 +344,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
      * @return The list of union all query. (NotNull)
      */
     public List<${glConditionQueryInterfaceName}> getUnionAllQueryList() {
+		if (_unionAllQueryMap == null) { return new ArrayList<${glConditionQueryInterfaceName}>(); }
         return new ArrayList<${glConditionQueryInterfaceName}>(_unionAllQueryMap.values());
     }
 

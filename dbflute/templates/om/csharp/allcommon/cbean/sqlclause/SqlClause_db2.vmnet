@@ -1,116 +1,62 @@
 #set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
 
 using System;
-using System.Collections;
-using System.Text;
 
 namespace ${glPackageBaseCommonSqlClause} {
 
-    /// <summary>
-    /// SqlClause for MSSQL.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    [System.Serializable]
-    public class ${myClassName} : ${glSqlClauseAbstractName} {
+[System.Serializable]
+public class ${myClassName} : ${glSqlClauseAbstractName} {
 
-        /** String of fetch-first as sql-suffix. */
-        protected String _fetchFirstSqlSuffix = "";
+    protected String _fetchFirstSqlSuffix = "";
+    protected String _lockSqlSuffix = "";
 
-        /** String of lock as from-hint. */
-        protected String _lockSqlSuffix = "";
+    public ${myClassName}(String tableName)
+        : base(tableName) {}
 
-        /**
-         * Constructor.
-         * 
-         * @param tableName Table name. (NotNull)
-         **/
-        public ${myClassName}(String tableName)
-            : base(tableName) {}
-
-        /**
-         * ${database.ImplementComment}
-         */
-        protected override void DoFetchFirst() {
-            if (IsFetchSizeSupported) {
-                _fetchFirstSqlSuffix = " fetch first " + this.FetchSize + " rows only";
-            }
-        }
-
-        /**
-         * ${database.ImplementComment}
-         */
-        protected override void DoFetchPage() {
-            if (IsFetchSizeSupported) {
-                if (IsFetchStartIndexSupported) {
-                    _fetchFirstSqlSuffix = " fetch first " + this.FetchSize + " rows only";
-                } else {
-                    _fetchFirstSqlSuffix = " fetch first " + this.PageEndIndex + " rows only";
-                }
-            }
-        }
-
-        /**
-         * ${database.ImplementComment}
-         */
-        protected override void DoClearFetchPageClause() {
-            _fetchFirstSqlSuffix = "";
-        }
-
-        /**
-         * ${database.OverrideComment}
-         * 
-         * @return Determination.
-         */
-        public override bool IsFetchStartIndexSupported {
-            get {
-                return false; // Default
-            }
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
-        public override ${glSqlClauseInterfaceName} LockForUpdate() {
-            _lockSqlSuffix = " for update with RS";
-            return this;
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Select-hint. (NotNull)
-         */
-        protected override String CreateSelectHint() {
-            return "";
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
-         */
-        protected override String CreateFromBaseTableHint() {
-            return "";
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return From-hint. (NotNull)
-         */
-        protected override String CreateFromHint() {
-            return "";
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Sql-suffix. (NotNull)
-         */
-        protected override String CreateSqlSuffix() {
-            return _fetchFirstSqlSuffix + _lockSqlSuffix;;
+    protected override void doFetchFirst() {
+        if (isFetchSizeSupported()) {
+            _fetchFirstSqlSuffix = " fetch first " + getFetchSize() + " rows only";
         }
     }
+
+    protected override void doFetchPage() {
+        if (isFetchSizeSupported()) {
+            if (isFetchStartIndexSupported()) {
+                _fetchFirstSqlSuffix = " fetch first " + this.getFetchSize() + " rows only";
+            } else {
+                _fetchFirstSqlSuffix = " fetch first " + this.getPageEndIndex() + " rows only";
+            }
+        }
+    }
+
+    protected override void doClearFetchPageClause() {
+        _fetchFirstSqlSuffix = "";
+    }
+
+    public override bool isFetchStartIndexSupported() {
+        return false; // Default
+    }
+
+    public override ${glSqlClauseInterfaceName} lockForUpdate() {
+        _lockSqlSuffix = " for update with RS";
+        return this;
+    }
+
+    protected override String createSelectHint() {
+        return "";
+    }
+
+    protected override String createFromBaseTableHint() {
+        return "";
+    }
+
+    protected override String createFromHint() {
+        return "";
+    }
+
+    protected override String createSqlSuffix() {
+        return _fetchFirstSqlSuffix + _lockSqlSuffix;;
+    }
+}
+
 }

@@ -14,6 +14,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCQ};
 using ${glPackageCQ};
 
@@ -34,30 +35,48 @@ namespace ${glPackageCIQ} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="childQuery">Child query as interface. (Nullable: If null, this is base instance.)</param>
-        /// <param name="sqlClause">SQL clause instance. (NotNull)</param>
-        /// <param name="aliasName">My alias name. (NotNull)</param>
-        /// <param name="nestLevel">Nest level.</param>
-        /// <param name="myCQ">My condition-query. (NotNull)</param>
         public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ)
             : base(childQuery, sqlClause, aliasName, nestLevel) { _myCQ = myCQ; }
 
-        // ===============================================================================
-        //                                                                           Query
-        //                                                                           =====
-        protected override void RegisterQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+			
+        // ===================================================================================
+        //                                                             Override about Register
+        //                                                             =======================
+        protected override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+            throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
+        }
+    
+        protected override void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                                  , String colName, String capPropName, String uncapPropName) {
-            RegisterInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
+            registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
+        }
+    
+        protected override void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                                 , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+            registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
+        }
+    
+        protected override void registerWhereClause(String whereClause) {
+            registerInlineWhereClause(whereClause);
+        }
+    
+        protected override String getInScopeSubQueryRealColumnName(String columnName) {
+    	    if (_onClauseInline) {
+    		    throw new UnsupportedOperationException("InScopeSubQuery of on-clause is unsupported");
+    		}
+            return _onClauseInline ? getRealAliasName() + "." + columnName : columnName;
+        }
+    
+        protected override void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+                                     , String columnName, String relatedColumnName, String propertyName) {
+            throw new UnsupportedOperationException("Sorry! ExistsSubQuery at inline view is unsupported. So please use InScopeSubQyery.");
         }
 
   #foreach ($col in $table.columns)
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
-        protected override ${glConditionValueName} GetCValue${tmpJavaName}() {
+        protected override ${glConditionValueName} getCValue${tmpJavaName}() {
             return _myCQ.${tmpJavaName};
         }
 
@@ -67,8 +86,8 @@ namespace ${glPackageCIQ} {
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -77,8 +96,8 @@ namespace ${glPackageCIQ} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
         #end
       #end
@@ -89,9 +108,9 @@ namespace ${glPackageCIQ} {
             #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
             #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             throw new SystemException("ExistsSubQuery at inline() is unsupported! Sorry!");
-            // _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+            // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
           #end
         #end
@@ -103,8 +122,8 @@ namespace ${glPackageCIQ} {
         #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
         #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
 
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -113,8 +132,8 @@ namespace ${glPackageCIQ} {
           #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
           #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
         #end
       #end
@@ -125,9 +144,9 @@ namespace ${glPackageCIQ} {
             #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
             #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             throw new SystemException("ExistsSubQuery at inline() is unsupported! Sorry!");
-            // _myCQ.Keep${subQueryPropertyNameInitCap}(subQuery);
+            // _myCQ.keep${subQueryPropertyNameInitCap}(subQuery);
         }
           #end
         #end

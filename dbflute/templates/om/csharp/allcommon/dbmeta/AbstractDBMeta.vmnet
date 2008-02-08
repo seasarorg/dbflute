@@ -96,7 +96,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        public abstract IList<${glColumnInfoName}> GetColumnInfoList();
+        public abstract IList<${glColumnInfoName}> ColumnInfoList { get; }
 
         public bool HasColumn(String columnFlexibleName) {
             if (!HasFlexibleName(columnFlexibleName)) {
@@ -121,12 +121,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                     Unique Info
         //                                                                     ===========
-        /**
-         * Get primary unique info.
-         * 
-         * @return Primary unique info. (NotNull)
-         */
-        public abstract ${glUniqueInfoName} GetPrimaryUniqueInfo();
+        public abstract ${glUniqueInfoName} PrimaryUniqueInfo { get; }
         public abstract bool HasPrimaryKey { get; }
         public abstract bool HasTwoOrMorePrimaryKeys { get; }
 

@@ -12,30 +12,22 @@ using ${glPackageNss};
 
 namespace ${glPackageBaseCB} {
 
-    /// <summary>
-    /// The condition-bean of ${table.name}.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    [Seasar.Dao.Attrs.Table("$table.Name")]
     [System.Serializable]
     public class ${myClassName} : ${glConditionBeanAbstractName} {
 
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        /// <summary>Condition query.</summary>
         protected ${myConditionQueryClassName} _conditionQuery;
 
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        /// <summary>${database.ImplementComment}</summary>
         public override String TableDbName { get { return "${table.Name}"; } }
 
         // ===============================================================================
         //                                                                  Add OrderBy PK
         //                                                                  ==============
-        /// <summary>${database.ImplementComment}</summary><returns>this. (NotNull)</returns>
         public override ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.primaryKey)
@@ -64,18 +56,10 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                           Query
         //                                                                           =====
-        /// <summary>
-        /// Query.
-        /// </summary>
-        /// <returns>Instance of query. (NotNull)</returns>
         public ${myConditionQueryClassName} Query() {
             return this.ConditionQuery;
         }
 
-        /// <summary>
-        /// The property of condition-query. {for SqlComment}
-        /// </summary>
-        /// <returns>Instance of condition query. (NotNull)</returns>
         public ${myConditionQueryClassName} ConditionQuery {
             get {
                 if (_conditionQuery == null) {
@@ -85,14 +69,28 @@ namespace ${glPackageBaseCB} {
             }
         }
 
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
-        /// <returns>Instance of condition-query. (NotNull)</returns>
         public override ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName} ConditionQueryAsInterface {
             get { return this.ConditionQuery; }
         }
 
+        // ===============================================================================
+        //                                                                     Union Query
+        //                                                                     ===========
+        public void Union(${myConditionQueryClassName} unionQuery) {
+            query().xsetUnionQuery(unionQuery);
+        }
+    
+        public void UnionAll(${myConditionQueryClassName} unionAllQuery) {
+            query().xsetUnionAllQuery(unionAllQuery);
+        }
+    
+        public boolean HasUnionQueryOrUnionAllQuery() {
+            return query().hasUnionQueryOrUnionAllQuery();
+        }
+	
+        // ===============================================================================
+        //                                                                    Setup Select
+        //                                                                    ============
 #foreach ($foreignKeys in $table.ForeignKeys)
   #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
   #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
@@ -103,21 +101,7 @@ namespace ${glPackageBaseCB} {
         //   ForeignProperty = [${tmpPropertyName}]
         // * * * * * * * * */
 
-        /// <summary>Is select for ${tmpPropertyName}?</summary>
-        protected bool _isSelect${tmpPropertyNameInitCap};
-        /// <summary>Nest select setupper for ${tmpPropertyName}.</summary>
         protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-        /// <summary>
-        /// Is select for ${tmpPropertyName}?
-        /// </summary>
-        /// <returns>Determination.</returns>
-        public bool IsSelect${tmpPropertyNameInitCap} {
-            get { return _isSelect${tmpPropertyNameInitCap}; }
-        }
-        /// <summary>
-        /// Get nest select setupper for ${tmpPropertyName}. {For Internal}
-        /// </summary>
-        /// <returns>Nest select setupper. (NotNull)</returns>
         public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} {
             get {
                 if (_nss${tmpPropertyNameInitCap} == null) {
@@ -126,10 +110,6 @@ namespace ${glPackageBaseCB} {
                 return _nss${tmpPropertyNameInitCap};
             }
         }
-        /// <summary>
-        /// Set up select for ${tmpPropertyName}.
-        /// If you invoke this, this entity is target of select.
-        /// </summary>
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
             Query().Query${tmpPropertyNameInitCap}();// For setting outer join.
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
@@ -141,32 +121,18 @@ namespace ${glPackageBaseCB} {
             return _nss${tmpPropertyNameInitCap};
         }
 #end
-#foreach ($refferer in $table.Referrers)
+#foreach ($refferer in $table.referrers)
   #if (${refferer.isOneToOne()})
     #set ($tmpPropertyName = "${refferer.ReffererPropertyNameAsOne}")
     #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
     #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${refferer.table.javaName}Nss")
 
         // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-        //   ReferrerTable    = [${refferer.Table.Name}]
+        //   ReferrerTable    = [${refferer.table.name}]
         //   ReferrerProperty = [${tmpPropertyName}]
         // * * * * * * * * */
 
-        /// <summary> Is select for ${tmpPropertyName}?</summary>
-        protected bool _isSelect${tmpPropertyNameInitCap};
-        /// <summary>Nest select setupper for ${tmpPropertyName}.</summary>
         protected ${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
-        /// <summary>
-        /// Is select for ${tmpPropertyName}?
-        /// </summary>
-        /// <returns>Determination.</returns>
-        public bool IsSelect${tmpPropertyNameInitCap} {
-            get { return _isSelect${tmpPropertyNameInitCap}; }
-        }
-        /// <summary>
-        /// Get nest select setupper for ${tmpPropertyName}. {For Internal}
-        /// </summary>
-        /// <returns>Nest select setupper. (NotNull)</returns>
         public ${nestSelectSetuppperClassName} Nss${tmpPropertyNameInitCap} {
             get {
                 if (_nss${tmpPropertyNameInitCap} == null) {
@@ -175,17 +141,14 @@ namespace ${glPackageBaseCB} {
                 return _nss${tmpPropertyNameInitCap};
             }
         }
-        /// <summary>
-        /// Set up select for ${tmpPropertyName}.
-        /// If you invoke this, this entity is target of select.
-        /// </summary>
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
-            Query().Query${tmpPropertyNameInitCap}();// For setting outer join.
+            String foreignTableAliasName = Query().query${tmpPropertyNameInitCap}().getRealAliasName();
+    		String localRelationPath = query().getRelationPath();
+    		this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+    		this.SqlClause.registerSelectedForeignInfo(Query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
-                _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
+                _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
             }
-            // Set dummy string that means this foreign entity is target of select.
-            _isSelect${tmpPropertyNameInitCap} = true;
             LimitSelect_Off();
             return _nss${tmpPropertyNameInitCap};
         }

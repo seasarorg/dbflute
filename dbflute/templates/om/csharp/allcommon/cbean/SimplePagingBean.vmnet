@@ -35,9 +35,9 @@ namespace ${glPackageBaseCommonCBean} {
         public bool Paging { get { return _paging; } }
         public void XSetPaging(bool paging) {
             if (paging) {
-                this.SqlClause.MakeFetchScopeEffective();
+                this.SqlClause.makeFetchScopeEffective();
             } else {
-                this.SqlClause.IgnoreFetchScope();
+                this.SqlClause.ignoreFetchScope();
             }
             this._paging = paging;
         }
@@ -46,47 +46,47 @@ namespace ${glPackageBaseCommonCBean} {
         //                                     Fetch Setting
         //                                     -------------
         public ${glPagingBeanInterfaceName} FetchFirst(int fetchSize) {
-            this.SqlClause.FetchFirst(fetchSize);
+            this.SqlClause.fetchFirst(fetchSize);
             return this;
         }
 
         public ${glPagingBeanInterfaceName} FetchScope(int fetchStartIndex, int fetchSize) {
-            this.SqlClause.FetchScope(fetchStartIndex, fetchSize);
+            this.SqlClause.fetchScope(fetchStartIndex, fetchSize);
             return this;
         }
 
         public ${glPagingBeanInterfaceName} FetchPage(int fetchPageNumber) {
-            this.SqlClause.FetchPage(fetchPageNumber);
+            this.SqlClause.fetchPage(fetchPageNumber);
             return this;
         }
 
         // -------------------------------------------------
         //                                    Fetch Property
         //                                    --------------
-        public int FetchStartIndex { get { return this.SqlClause.FetchStartIndex; } }
-        public int FetchSize { get { return this.SqlClause.FetchSize; } }
-        public int FetchPageNumber { get { return this.SqlClause.FetchPageNumber; } }
-        public int PageStartIndex { get { return this.SqlClause.PageStartIndex; } }
-        public int PageEndIndex { get { return this.SqlClause.PageEndIndex; } }
-        public bool IsFetchScopeEffective { get { return this.SqlClause.IsFetchScopeEffective; } }
+        public int FetchStartIndex { get { return this.SqlClause.getFetchStartIndex(); } }
+        public int FetchSize { get { return this.SqlClause.getFetchSize(); } }
+        public int FetchPageNumber { get { return this.SqlClause.getFetchPageNumber(); } }
+        public int PageStartIndex { get { return this.SqlClause.getPageStartIndex(); } }
+        public int PageEndIndex { get { return this.SqlClause.getPageEndIndex(); } }
+        public bool IsFetchScopeEffective { get { return this.SqlClause.isFetchScopeEffective(); } }
 
         // -------------------------------------------------
         //                                     Hint Property
         //                                     -------------
-        public String SelectHint { get { return this.SqlClause.GetSelectHint(); } }
-        public String FromBaseTableHint { get { return this.SqlClause.GetFromBaseTableHint(); } }
-        public String FromHint { get { return this.SqlClause.GetFromHint(); } }
-        public String SqlSuffix { get { return this.SqlClause.GetSqlSuffix(); } }
-        public String OrderByClause { get { return this.SqlClause.GetOrderByClause(); } }
+        public String SelectHint { get { return this.SqlClause.getSelectHint(); } }
+        public String FromBaseTableHint { get { return this.SqlClause.getFromBaseTableHint(); } }
+        public String FromHint { get { return this.SqlClause.getFromHint(); } }
+        public String SqlSuffix { get { return this.SqlClause.getSqlSuffix(); } }
+        public String OrderByClause { get { return this.SqlClause.getOrderByClause(); } }
 
         // ===============================================================================
         //                                            Implementation of FetchNarrowingBean
         //                                            ====================================
-        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.FetchNarrowingSkipStartIndex; } }
-        public int FetchNarrowingLoopCount { get { return this.SqlClause.FetchNarrowingLoopCount; } }
-        public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.IsFetchStartIndexSupported; } }
-        public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.IsFetchSizeSupported; } }
-        public bool IsFetchNarrowingEffective { get { return this.SqlClause.IsFetchNarrowingEffective; } }
+        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.getFetchNarrowingSkipStartIndex(); } }
+        public int FetchNarrowingLoopCount { get { return this.SqlClause.getFetchNarrowingLoopCount(); } }
+        public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.isFetchStartIndexSupported(); } }
+        public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.isFetchSizeSupported(); } }
+        public bool IsFetchNarrowingEffective { get { return this.SqlClause.isFetchNarrowingEffective(); } }
         public void IgnoreFetchNarrowing() { _fetchNarrowing = false; }
         public void RestoreIgnoredFetchNarrowing() { _fetchNarrowing = true; }
         public int SafetyMaxResultSize { get { return _safetyMaxResultSize; } }
@@ -95,41 +95,21 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                   Implementation of OrderByBean
         //                                                   =============================
         public ${glOrderByClauseName} SqlComponentOfOrderByClause {
-            get { return this.SqlClause.GetSqlComponentOfOrderByClause(); }
+            get { return this.SqlClause.getSqlComponentOfOrderByClause(); }
         }
 
         public ${glOrderByBeanInterfaceName} ClearOrderBy() {
-            this.SqlClause.ClearOrderBy();
+            this.SqlClause.clearOrderBy();
             return this;
         }
 
         public ${glOrderByBeanInterfaceName} IgnoreOrderBy() {
-            this.SqlClause.IgnoreOrderBy();
+            this.SqlClause.ignoreOrderBy();
             return this;
         }
 
         public ${glOrderByBeanInterfaceName} MakeOrderByEffective() {
-            this.SqlClause.MakeOrderByEffective();
-            return this;
-        }
-
-        public ${glOrderByBeanInterfaceName} RegisterOrderByAsc(String columnFullName) {
-            this.SqlClause.RegisterOrderBy(columnFullName, null, true);
-            return this;
-        }
-
-        public ${glOrderByBeanInterfaceName} RegisterOrderByDesc(String columnFullName) {
-            this.SqlClause.RegisterOrderBy(columnFullName, null, false);
-            return this;
-        }
-
-        public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByAsc(String columnFullName) {
-            this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(columnFullName, null, true);
-            return this;
-        }
-
-        public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByDesc(String columnFullName) {
-            this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(columnFullName, null, false);
+            this.SqlClause.makeOrderByEffective();
             return this;
         }
 

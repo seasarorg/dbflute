@@ -1,162 +1,155 @@
 
 #set ($myClassName = "${glOrderByElementName}")
-
 using System;
-using System.Text;
+
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonSqlClause} {
 
-    /// <summary>
-    /// Order-by element.
-    /// <![CDATA[
-    ///   For example, if you make order-by 'order BOOK.BOOK_ID asc', the way is as follows:
-    ///       /-----------------------------------------------------
-    ///       ${myClassName} orderByElement = new ${myClassName}();
-    ///       orderByElement.AliasName = "BOOK";
-    ///       orderByElement.ColumnName = "BOOK_ID";
-    ///       orderByElement.SetupAsc();
-    ///       -------------/
-    /// ]]>
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    [System.Serializable]
-    public class ${myClassName} {
+[System.Serializable]
+public class ${myClassName} {
 
-        // =====================================================================================
-        //                                                                             Attribute
-        //                                                                             =========
-        /** The value of alias name. */
-        protected String _aliasName;
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The value of alias name. */
+    protected String _aliasName;
 
-        /** The value of column name. */
-        protected String _columnName;
+    /** The value of column name. */
+    protected String _columnName;
 
-        /** The value of registered alias name. */
-        protected String _registeredAliasName;
+    /** The value of registered alias name. */
+    protected String _registeredAliasName;
 
-        /** The value of registered column name. */
-        protected String _registeredColumnName;
+    /** The value of registered column name. */
+    protected String _registeredColumnName;
 
-        /** The value of ascDesc. */
-        protected String _ascDesc = "asc";
+    /** The value of ascDesc. */
+    protected String _ascDesc = "asc";
 
-        // =====================================================================================
-        //                                                                          GetterSetter
-        //                                                                          ============
-        public String AliasName {
-            get { return _aliasName; }
-            set { _aliasName = value; }
+    // ===================================================================================
+    //                                                                         Main Method
+    //                                                                         ===========
+    public void setupAsc() {
+        _ascDesc = "asc";
+    }
+
+    public void setupDesc() {
+        _ascDesc = "desc";
+    }
+
+    public void reverse() {
+        if (_ascDesc == null) {
+            String msg = "The attribute[ascDesc] should not be null.";
+            throw new IllegalStateException(msg);
         }
-        public String ColumnName {
-            get { return _columnName; }
-            set { _columnName = value; }
-        }
-        public String RegisteredAliasName {
-            get { return _registeredAliasName; }
-            set { _registeredAliasName = value; }
-        }
-        public String RegisteredColumnName {
-            get { return _registeredColumnName; }
-            set { _registeredColumnName = value; }
-        }
-        public String AscDesc {
-            get { return _ascDesc; }
-            set { _ascDesc = value; }
-        }
-
-        // =====================================================================================
-        //                                                                              Behavior
-        //                                                                              ========
-        public void SetupAsc() {
-            _ascDesc = "asc";
-        }
-
-        public void SetupDesc() {
+        if (_ascDesc.Equals("asc")) {
             _ascDesc = "desc";
-        }
-
-        public void Reverse() {
-            if (_ascDesc == null) {
-                String msg = "The attribute[ascDesc] should not be null.";
-                throw new SystemException(msg);
-            }
-            if (_ascDesc.Equals("asc")) {
-                _ascDesc = "desc";
-            } else if (_ascDesc.Equals("desc")) {
-                _ascDesc = "asc";
-            } else {
-                String msg = "The attribute[ascDesc] should be asc or desc: but ascDesc=" + _ascDesc;
-                throw new SystemException(msg);
-            }
-        }
-
-        public bool IsAsc() {
-            if (_ascDesc == null) {
-                String msg = "The attribute[ascDesc] should not be null.";
-                throw new SystemException(msg);
-            }
-            if (_ascDesc.Equals("asc")) {
-                return true;
-            } else if (_ascDesc.Equals("desc")) {
-                return false;
-            } else {
-                String msg = "The attribute[ascDesc] should be asc or desc: but ascDesc=" + _ascDesc;
-                throw new SystemException(msg);
-            }
-        }
-
-        public String GetColumnFullName() {
-            StringBuilder sb = new StringBuilder();
-            if (_aliasName != null) {
-                sb.Append(_aliasName).Append(".");
-            }
-            if (_columnName == null) {
-                String msg = "The attribute[columnName] should not be null.";
-                throw new SystemException(msg);
-            }
-            sb.Append(_columnName);
-            return sb.ToString();
-        }
-
-        public String GetRegisteredColumnFullName() {
-            StringBuilder sb = new StringBuilder();
-            if (_registeredAliasName != null) {
-                sb.Append(_registeredAliasName).Append(".");
-            }
-            if (_registeredColumnName == null) {
-                String msg = "The attribute[registeredColumnName] should not be null.";
-                throw new SystemException(msg);
-            }
-            sb.Append(_registeredColumnName);
-            return sb.ToString();
-        }
-
-        public String GetElementClause() {
-            if (_ascDesc == null) {
-                String msg = "The attribute[ascDesc] should not be null.";
-                throw new SystemException(msg);
-            }
-            StringBuilder sb = new StringBuilder();
-            sb.Append(GetColumnFullName()).Append(" ").Append(_ascDesc);
-            return sb.ToString();
-        }
-
-        // =====================================================================================
-        //                                                                        Basic Override
-        //                                                                        ==============
-        /**
-         * This method overrides the method that is declared at super.
-         * 
-         * @return View-string of all-columns value.
-         */
-        public override String ToString() {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("aliasName=").Append(_aliasName);
-            sb.Append(" columnName=").Append(_columnName);
-            sb.Append(" registeredAliasName=").Append(_registeredAliasName);
-            sb.Append(" registeredColumnName=").Append(_registeredColumnName);
-            sb.Append(" ascDesc=").Append(_ascDesc);
-            return sb.ToString();
+        } else if (_ascDesc.Equals("desc")) {
+            _ascDesc = "asc";
+        } else {
+            String msg = "The attribute[ascDesc] should be asc or desc: but ascDesc=" + _ascDesc;
+            throw new IllegalStateException(msg);
         }
     }
+
+    public bool isAsc() {
+        if (_ascDesc == null) {
+            String msg = "The attribute[ascDesc] should not be null.";
+            throw new IllegalStateException(msg);
+        }
+        if (_ascDesc.Equals("asc")) {
+            return true;
+        } else if (_ascDesc.Equals("desc")) {
+            return false;
+        } else {
+            String msg = "The attribute[ascDesc] should be asc or desc: but ascDesc=" + _ascDesc;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    public String getColumnFullName() {
+        StringBuilder sb = new StringBuilder();
+        if (_aliasName != null) {
+            sb.append(_aliasName).append(".");
+        }
+        if (_columnName == null) {
+            String msg = "The attribute[columnName] should not be null.";
+            throw new IllegalStateException(msg);
+        }
+        sb.append(_columnName);
+        return sb.toString();
+    }
+
+    public String getRegisteredColumnFullName() {
+        StringBuilder sb = new StringBuilder();
+        if (_registeredAliasName != null) {
+            sb.append(_registeredAliasName).append(".");
+        }
+        if (_registeredColumnName == null) {
+            String msg = "The attribute[registeredColumnName] should not be null.";
+            throw new IllegalStateException(msg);
+        }
+        sb.append(_registeredColumnName);
+        return sb.toString();
+    }
+
+    public String getElementClause() {
+        if (_ascDesc == null) {
+            String msg = "The attribute[ascDesc] should not be null.";
+            throw new IllegalStateException(msg);
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(getColumnFullName()).append(" ").append(_ascDesc);
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public override String ToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("aliasName=").append(_aliasName);
+        sb.append(" columnName=").append(_columnName);
+        sb.append(" registeredAliasName=").append(_registeredAliasName);
+        sb.append(" registeredColumnName=").append(_registeredColumnName);
+        sb.append(" ascDesc=").append(_ascDesc);
+        return sb.toString();
+    }
+	
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========	
+    public String getAliasName() {
+        return _aliasName;
+    }
+    public void setAliasName(String aliasName) {
+        _aliasName = aliasName;
+    }
+    public String getColumnName() {
+        return _columnName;
+    }
+    public void setColumnName(String columnName) {
+        _columnName = columnName;
+    }
+    public String getRegisteredAliasName() {
+        return _registeredAliasName;
+    }
+    public void setRegisteredAliasName(String registeredAliasName) {
+        _registeredAliasName = registeredAliasName;
+    }
+    public String getRegisteredColumnName() {
+        return _registeredColumnName;
+    }
+    public void setRegisteredColumnName(String registeredColumnName) {
+        _registeredColumnName = registeredColumnName;
+    }
+    public String getAscDesc() {
+        return _ascDesc;
+    }
+    public void setAscDesc(String ascDesc) {
+        _ascDesc = ascDesc;
+    }
+}
+
 }

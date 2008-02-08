@@ -1903,16 +1903,18 @@ targetdatabase = $targetDatabase
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonUtil}))
       $database.makeDirectory($path)
 
-	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleAssertUtil}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleAssertUtil.${glTemplateFileExtension}",$path,"", "")
+	  #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
+	    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleAssertUtil}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleAssertUtil.${glTemplateFileExtension}",$path,"", "")
 
-	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleStringUtil}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleStringUtil.${glTemplateFileExtension}",$path,"", "")
+	    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleStringUtil}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleStringUtil.${glTemplateFileExtension}",$path,"", "")
 
-	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleSystemUtil}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleSystemUtil.${glTemplateFileExtension}",$path,"", "")
+	    #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glSimpleSystemUtil}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/allcommon/util/SimpleSystemUtil.${glTemplateFileExtension}",$path,"", "")
+	  #end
 	  
-      #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
+      #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonUtil})}${glValueLabelUtilName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/allcommon/util/ValueLabelUtil.${glTemplateFileExtension}",$path,"", "")
       #end
@@ -2129,7 +2131,7 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
 
-		#if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger() && $database.isVersionAfter1047())
+		#if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger() && $database.isVersionAfter1047()) || $database.isTargetLanguageCSharp())
 		  #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperTerminalClassName}.${glClassFileExtension}" )
           $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupperTerminal.${glTemplateFileExtension}", $path, "table", $table)
 		#end

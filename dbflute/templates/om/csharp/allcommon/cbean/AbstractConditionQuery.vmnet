@@ -2,21 +2,30 @@
 
 using System;
 using System.Reflection;
+
 using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBean} {
 
+// JavaLike
 [System.Serializable]
 public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
+    //                                                                          Definition
+    //                                                                          ==========
     protected static readonly ${glConditionValueName} DUMMY_CONDITION_VALUE = new ${glConditionValueName}();
     protected static readonly Object DUMMY_OBJECT = new Object();
+	protected static readonly String CQ_PROPERTY = "ConditionQuery";
+	
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected readonly ${glSqlClauseName} _sqlClause;
     protected readonly String _aliasName;
     protected readonly int _nestLevel;
@@ -134,14 +143,14 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         ${glConditionQueryInterfaceName} query = this;
         while (true) {
             if (query.isBaseQuery(query)) {
-                sb.insert(0, "ConditionQuery.");
+                sb.insert(0, CQ_PROPERTY + ".");
                 break;
             } else {
-                sb.insert(0, "ConditionQuery" + InitCap(query.getForeignPropertyName()) + ".");
+                sb.insert(0, CQ_PROPERTY + initCap(query.getForeignPropertyName()) + ".");
             }
             query = query.getChildQuery();
         }
-        return sb.ToString();
+        return sb.toString();
     }
 
     protected String getLocationBase(String columnPropertyName) {
@@ -151,59 +160,65 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
-    protected Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+    protected Map<String, ${glConditionQueryInterfaceName}> _unionQueryMap;
 
     public Map<String, ${glConditionQueryInterfaceName}> getUnionQueryMap() {// for Internal
+		if (_unionQueryMap == null) {
+		    _unionQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+		}
         return _unionQueryMap;
     }
 
-    public void xsetUnionQuery(${glConditionQueryInterfaceName} unionQuery) {
-        xsetupUnion(unionQuery, false, _unionQueryMap);
+	public Map<String, ${glConditionQueryInterfaceName}> UnionQueryMap {// for SQL-Comment
+        get { return getUnionQueryMap(); }
     }
 
-    protected Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+    public void xsetUnionQuery(${glConditionQueryInterfaceName} unionQuery) {
+        xsetupUnion(unionQuery, false, getUnionQueryMap());
+    }
+
+    protected Map<String, ${glConditionQueryInterfaceName}> _unionAllQueryMap;
 
     public Map<String, ${glConditionQueryInterfaceName}> getUnionAllQueryMap() {// for Internal
+		if (_unionAllQueryMap == null) {
+		    _unionAllQueryMap = new LinkedHashMap<String, ${glConditionQueryInterfaceName}>();
+		}
         return _unionAllQueryMap;
     }
 
+	public Map<String, ${glConditionQueryInterfaceName}> UnionAllQueryMap {// for SQL-Comment
+        get { return getUnionAllQueryMap(); }
+    }
+
     public void xsetUnionAllQuery(${glConditionQueryInterfaceName} unionAllQuery) {
-        xsetupUnion(unionAllQuery, true, _unionAllQueryMap);
+        xsetupUnion(unionAllQuery, true, getUnionAllQueryMap());
     }
 
     protected void xsetupUnion(${glConditionQueryInterfaceName} unionQuery, bool unionAll, Map<String, ${glConditionQueryInterfaceName}> unionQueryMap) {
         if (unionQuery == null) {
             String msg = "The argument[unionQuery] should not be null.";
-            throw new SystemException(msg);
+            throw new IllegalArgumentException(msg);
         }
-        ReflectRelationOnUnionQuery(this, unionQuery);// Reflect Relation!
-        GetSqlClause().CopyIncludedSelectColumn(unionQuery.GetSqlClause());// Reflect IncludedSelectColumn!
+        reflectRelationOnUnionQuery(this, unionQuery);// Reflect Relation!
+        getSqlClause().copyIncludedSelectColumn(unionQuery.getSqlClause());// Reflect IncludedSelectColumn!
         String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.put(key, unionQuery);
-        RegisterUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
+        registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
     }
 	
     abstract protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper);
 
-    public bool HasUnionQueryOrUnionAllQuery() {
-        return !_unionQueryMap.isEmpty() || !_unionAllQueryMap.isEmpty();
+    public bool hasUnionQueryOrUnionAllQuery() {
+        return (_unionQueryMap != null && !_unionQueryMap.isEmpty()) || (_unionAllQueryMap != null && !_unionAllQueryMap.isEmpty());
     }
 
-    /**
-     * Get the list of union query.
-     * 
-     * @return The list of union query. (NotNull)
-     */
     public List<${glConditionQueryInterfaceName}> getUnionQueryList() {
+		if (_unionQueryMap == null) { return new ArrayList<${glConditionQueryInterfaceName}>(); }
         return new ArrayList<${glConditionQueryInterfaceName}>(_unionQueryMap.values());
     }
 
-    /**
-     * Get the list of union all query.
-     * 
-     * @return The list of union all query. (NotNull)
-     */
     public List<${glConditionQueryInterfaceName}> getUnionAllQueryList() {
+		if (_unionAllQueryMap == null) { return new ArrayList<${glConditionQueryInterfaceName}>(); }
         return new ArrayList<${glConditionQueryInterfaceName}>(_unionAllQueryMap.values());
     }
 
@@ -214,9 +229,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                       Include-As-Mine
     //                                       ---------------
     protected void registerIncludedSelectColumn(String aliasName, String realColumnName) {
-        AssertAliasName(aliasName);
-        AssertColumnName(realColumnName);
-        GetSqlClause().RegisterIncludedSelectColumn(aliasName, realColumnName);
+        assertAliasName(aliasName);
+        assertColumnName(realColumnName);
+        getSqlClause().registerIncludedSelectColumn(aliasName, realColumnName);
     }
 	
     // -----------------------------------------------------
@@ -224,15 +239,15 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                          ------------
     protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                          , String colName, String capPropName, String uncapPropName) {
-        if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
-            SetupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
         }
     }
 	
 	protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                          , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
-        if (key.IsValidRegistration(cvalue, value, key.GetConditionKey() + " of " + GetRealAliasName() + "." + uncapPropName)) {
-            SetupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
     }
 
@@ -249,10 +264,10 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                                      , String colName, String capPropName, String uncapPropName, ${glConditionOptionInScopeName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             if (value != null && option.isSplit()) {
-                final String[] strArray = option.generateSplitValueArray(value);
-                final List<String> realValueList = new ArrayList<String>();
+                String[] strArray = option.generateSplitValueArray(value);
+                List<String> realValueList = new ArrayList<String>();
                 for (int i=0; i < strArray.length; i++) {
-                    final String currentValue = strArray[i];
+                    String currentValue = strArray[i];
                     realValueList.add(currentValue);
                 }
                 setupConditionValueAndRegisterWhereClause(key, realValueList, cvalue, colName, capPropName, uncapPropName, option);
@@ -306,8 +321,8 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                       ---------------
     protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
-        final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
-        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
+        String realColumnName = getInScopeSubQueryRealColumnName(columnName);
+        String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
         registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
     }
 
@@ -317,9 +332,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
-        final String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
+        String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
-        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+        fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + getLocationBase(propertyName) + ".");// Very Important!
 		
 		// Replace template marks. These are very important!
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionSelectClauseMark(), selectClause);
@@ -334,8 +349,8 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                        --------------
     protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
-        final String realColumnName = getExistsSubQueryRealColumnName(columnName);
-        final String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
+        String realColumnName = getExistsSubQueryRealColumnName(columnName);
+        String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         registerWhereClause("exists (" + subQueryClause + ")");
     }
 
@@ -349,17 +364,17 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
-		final int subQueryLevel = subQuery.getSubQueryLevel();
+		int subQueryLevel = subQuery.getSubQueryLevel();
 		if (_subQueryLevel <= subQueryLevel) {
 			_subQueryLevel = subQueryLevel + 1;
 		}
-		final String tableAliasName = "dfsublocal_" + subQueryLevel;
-        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
+		String tableAliasName = "dfsublocal_" + subQueryLevel;
+        String selectClause = "select " + tableAliasName + "." + relatedColumnName;
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
 		fromWhereClause = replaceString(fromWhereClause, "dflocal", tableAliasName);// Very Important!
-        fromWhereClause = replaceString(fromWhereClause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");// Very Important!
+        fromWhereClause = replaceString(fromWhereClause, "." + CQ_PROPERTY + ".", "." + getLocationBase(propertyName) + ".");// Very Important!
 		
-        final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
+        String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
 		
 		// Replace template marks. These are very important!
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getWhereClauseMark(), "where " + joinCondition);
@@ -387,30 +402,30 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                            UnionQuery
     //                                            ----------
     public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, String unionQueryPropertyName) {
-        final String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
+        String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
 		
 		// At the future, building SQL will be moved to sqlClause.
         getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
     }
 
     protected String getUnionQuerySql(${glConditionQueryInterfaceName} unionQuery, String unionQueryPropertyName) {
-	    final String fromClause = unionQuery.getSqlClause().getFromClause();
-		final String whereClause = unionQuery.getSqlClause().getWhereClause();
-		final String unionQueryClause;
+	    String fromClause = unionQuery.getSqlClause().getFromClause();
+		String whereClause = unionQuery.getSqlClause().getWhereClause();
+		String unionQueryClause;
 		if (whereClause.trim().length() <= 0) {
 		    unionQueryClause = fromClause + " " + getSqlClause().getUnionWhereClauseMark();
 		} else {
-		    final int whereIndex = whereClause.indexOf("where ");
+		    int whereIndex = whereClause.indexOf("where ");
 		    if (whereIndex < 0) {
 				String msg = "The whereClause should have 'where' string: " + whereClause;
 			    throw new IllegalStateException(msg);
 			}
-			final int clauseIndex = whereIndex + "where ".length();
-			final String mark = getSqlClause().getUnionWhereFirstConditionMark();
+			int clauseIndex = whereIndex + "where ".length();
+			String mark = getSqlClause().getUnionWhereFirstConditionMark();
 			unionQueryClause = fromClause + " " + whereClause.substring(0, clauseIndex) + mark + whereClause.substring(clauseIndex);
 		}
-        final String oldStr = ".conditionQuery.";
-        final String newStr = ".conditionQuery." + unionQueryPropertyName + ".";
+        String oldStr = "." + CQ_PROPERTY + ".";
+        String newStr = "." + CQ_PROPERTY + "." + unionQueryPropertyName + ".";
         return replaceString(unionQueryClause, oldStr, newStr);// Very Important!
     }
 
@@ -433,7 +448,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
 
 	protected String resolveNextRelationPath(String tableName, String relationPropertyName) {
-	    final int relationNo = getSqlClause().resolveRelationNo(tableName, relationPropertyName);
+	    int relationNo = getSqlClause().resolveRelationNo(tableName, relationPropertyName);
         String nextRelationPath = "_" + relationNo;
         if (_relationPath != null) {
             nextRelationPath = _relationPath + nextRelationPath;
@@ -462,78 +477,55 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                                                              Helper
     //                                                                              ======
     protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return ${glSimpleSystemUtil}.GetLineSeparator();
     }
 
-    protected final String replaceString(String text, String fromText, String toText) {
-        if(text == null || fromText == null || toText == null)
-            return null;
-        StringBuilder buf = new StringBuilder(100);
-        int pos = 0;
-        int pos2 = 0;
-        do {
-            pos = text.indexOf(fromText, pos2);
-            if(pos == 0) {
-                buf.append(toText);
-                pos2 = fromText.length();
-            } else
-            if(pos > 0) {
-                buf.append(text.substring(pos2, pos));
-                buf.append(toText);
-                pos2 = pos + fromText.length();
-            } else {
-                buf.append(text.substring(pos2));
-                return buf.toString();
-            }
-        } while(true);
+    protected String replaceString(String text, String fromText, String toText) {
+	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
     }
 
-    protected <PROPERTY_TYPE> List<PROPERTY_TYPE> convertToList(Collection<PROPERTY_TYPE> col) {
+    protected System.Collections.IList convertToList<PROPERTY_TYPE>(ICollection<PROPERTY_TYPE> col) {
         if (col == null) {
             return null;
         }
-        if (col is List) {
-            return (List<PROPERTY_TYPE>)col;
-        }
-        return new ArrayList<PROPERTY_TYPE>(col);
+		if (col is System.Collections.IList) {
+		    return (System.Collections.IList)col;
+		}
+		System.Collections.IList resultList = new System.Collections.ArrayList();
+		foreach (PROPERTY_TYPE value in col) {
+		    resultList.Add(value);
+		}
+        return resultList;
     }
 
     protected String filterRemoveEmptyString(String value) {
         return ((value != null && !"".Equals(value)) ? value : null);
     }
 
-    protected List<String> filterRemoveEmptyStringFromList(List<String> ls) {
+    protected System.Collections.IList filterRemoveEmptyStringFromList(System.Collections.IList ls) {
         if (ls == null) {
             return null;
         }
-        List<String> newList = new ArrayList<String>();
-        for (final Iterator<String> ite = ls.iterator(); ite.hasNext(); ) {
-            final String str = ite.next();
+        System.Collections.IList resultList = new System.Collections.ArrayList();
+		foreach (Object value in col) {
+			String str = (String)value;
             if (str == null || "".Equals(str)) {
                 continue;
             }
-            newList.add(str);
-        }
-        return newList;
+		    resultList.Add(str);
+		}
+        return resultList;
     }
 
     protected String initCap(String str) {
-	    JString jstr = new JString(str);
-        return (jstr.substring(0, 1).toUpperCase() + jstr.substring(1)).getString();
+	    return ${glSimpleStringUtil}.InitCap(str);
     }
 
     // ----------------------------------------------------------------
     //                                                    Assert Object
     //                                                    -------------
     protected void assertObjectNotNull(String variableName, Object value) {
-        if (variableName == null) {
-            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
-        if (value == null) {
-            String msg = "The value should not be null: variableName=" + variableName;
-            throw new IllegalArgumentException(msg);
-        }
+	    ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);
     }
 
     protected void assertColumnName(String columnName) {
@@ -570,11 +562,6 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                                    Assert String
     //                                                    -------------
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-        assertObjectNotNull("variableName", variableName);
-        assertObjectNotNull("value", value);
-        if (new JString(value).trim().length() ==0) {
-            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
-            throw new IllegalArgumentException(msg);
-        }
+	    ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }

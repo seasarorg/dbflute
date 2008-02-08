@@ -85,13 +85,13 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> LocalForeignColumnInfoMap {
             get { return localForeignColumnInfoMap; }
             set {
-                    this.localForeignColumnInfoMap = value;
-                    ICollection<${glColumnInfoName}> keys = localForeignColumnInfoMap.Keys;
-                    foreignLocalColumnInfoMap = new Dictionary<${glColumnInfoName}, ${glColumnInfoName}>();
-                    foreach (${glColumnInfoName} key in keys) {
-                        ${glColumnInfoName} val = (${glColumnInfoName})localForeignColumnInfoMap[key];
-                        foreignLocalColumnInfoMap.Add(val, key);
-                    }
+                this.localForeignColumnInfoMap = value;
+                ICollection<${glColumnInfoName}> keys = localForeignColumnInfoMap.Keys;
+                foreignLocalColumnInfoMap = new Dictionary<${glColumnInfoName}, ${glColumnInfoName}>();
+                foreach (${glColumnInfoName} key in keys) {
+                    ${glColumnInfoName} val = (${glColumnInfoName})localForeignColumnInfoMap[key];
+                    foreignLocalColumnInfoMap.Add(val, key);
+                }
             }
         }
 

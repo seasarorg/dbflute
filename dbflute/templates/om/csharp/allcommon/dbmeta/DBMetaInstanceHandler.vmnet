@@ -6,9 +6,6 @@ using System.Collections.Generic;
 
 namespace ${glPackageBaseCommonDBMeta} {
 
-    /// <summary>
-    /// The handler of dbmeta instance.
-    /// Author : ${database.ClassAuthor}
     public class ${myClassName} {
 
         protected static readonly IDictionary<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap;
@@ -107,7 +104,7 @@ namespace ${glPackageBaseCommonDBMeta} {
                 throw new ArgumentOutOfRangeException(msg + _tableDbNameInstanceMap, e);
             }
         }
-
+		
         // ----------------------------------------------------------------
         //                                                  Assert Argument
         //                                                  ---------------

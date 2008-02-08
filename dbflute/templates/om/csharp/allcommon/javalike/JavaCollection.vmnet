@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ${glPackageBaseCommonJavaLike} {
 
-    public interface Collection<ELEMENT> {
+    public interface Collection<ELEMENT> : System.Collections.IEnumerable {
         bool add(ELEMENT element);
         bool remove(ELEMENT element);
         int size();
@@ -14,13 +14,36 @@ namespace ${glPackageBaseCommonJavaLike} {
         ICollection<ELEMENT> getCollection();
     }
 
+    public interface NgCollection {
+        bool addAsNg(Object element);
+        bool removeAsNg(Object element);
+        System.Collections.ICollection getCollectionAsNg();
+    }
+
+    public interface Iterator<ELEMENT> {
+        bool hasNext();
+        ELEMENT next();
+    }
+
     public interface List<ELEMENT> : Collection<ELEMENT> {
         ELEMENT get(int index);
         IList<ELEMENT> getList();
     }
 
-    public class ArrayList<ELEMENT> : List<ELEMENT> {
+    public interface NgList : NgCollection {
+        Object getAsNg(int index);
+        System.Collections.IList getListAsNg();
+    }
+
+    public class ArrayList<ELEMENT> : List<ELEMENT>, NgList {
         IList<ELEMENT> _res = new System.Collections.Generic.List<ELEMENT>();
+        public ArrayList() {
+        }
+        public ArrayList(Collection<ELEMENT> col) {
+            foreach (ELEMENT element in col) {
+                add(element);
+            }
+        }
         public bool add(ELEMENT element) {
             _res.Add(element);
             return true;
@@ -46,13 +69,55 @@ namespace ${glPackageBaseCommonJavaLike} {
         public ICollection<ELEMENT> getCollection() {
             return _res;
         }
+        public Object getAsNg(int index) {
+            return get(index);
+        }
+        public System.Collections.IList getListAsNg() {
+            return (System.Collections.IList)getList();
+        }
+        public bool addAsNg(Object element) {
+            return add((ELEMENT)element);
+        }
+        public bool removeAsNg(Object element) {
+            return remove((ELEMENT)element);
+        }
+        public System.Collections.ICollection getCollectionAsNg() {
+            return (System.Collections.ICollection)getCollection();
+        }
+        public System.Collections.IEnumerator GetEnumerator() {
+            return new MyEmumerator(this);
+        }
+        protected class MyEmumerator : System.Collections.IEnumerator, Iterator<ELEMENT> {
+            protected IEnumerator<ELEMENT> _target;
+            protected int _index;
+            public MyEmumerator(ArrayList<ELEMENT> target) {
+                _target = target.getCollection().GetEnumerator();
+            }
+            public Object Current { get { return _target.Current; } }
+            public bool MoveNext() {
+                return _target.MoveNext();
+            }
+            public void Reset() {
+                _target.Reset();
+            }
+            public bool hasNext() {
+                return MoveNext();
+            }
+            public ELEMENT next() {
+                return _target.Current;
+            }
+        }
     }
 
     public interface Set<ELEMENT> : Collection<ELEMENT> {
         bool contains(ELEMENT element);
     }
 
-    public class HashSet<ELEMENT> : Set<ELEMENT> {
+    public interface NgSet : NgCollection {
+        bool containsAsNg(Object element);
+    }
+
+    public class HashSet<ELEMENT> : Set<ELEMENT>, NgSet {
         protected IDictionary<ELEMENT, Object> _res = new Dictionary<ELEMENT, Object>();
         public bool add(ELEMENT element) {
             if (_res.ContainsKey(element)) {
@@ -83,9 +148,44 @@ namespace ${glPackageBaseCommonJavaLike} {
         public ICollection<ELEMENT> getCollection() {
             return _res.Keys;
         }
+        public bool containsAsNg(Object element) {
+            return contains((ELEMENT)element);
+        }
+        public bool addAsNg(Object element) {
+            return add((ELEMENT)element);
+        }
+        public bool removeAsNg(Object element) {
+            return remove((ELEMENT)element);
+        }
+        public System.Collections.ICollection getCollectionAsNg() {
+            return (System.Collections.ICollection)getCollection();
+        }
+        public System.Collections.IEnumerator GetEnumerator() {
+            return new MyEmumerator(this);
+        }
+        protected class MyEmumerator : System.Collections.IEnumerator, Iterator<ELEMENT> {
+            protected IEnumerator<ELEMENT> _target;
+            protected int _index;
+            public MyEmumerator(HashSet<ELEMENT> target) {
+                _target = target.getCollection().GetEnumerator();
+            }
+            public Object Current { get { return _target.Current; } }
+            public bool MoveNext() {
+                return _target.MoveNext();
+            }
+            public void Reset() {
+                _target.Reset();
+            }
+            public bool hasNext() {
+                return MoveNext();
+            }
+            public ELEMENT next() {
+                return _target.Current;
+            }
+        }
     }
 
-    public class LinkedHashSet<ELEMENT> : Set<ELEMENT> {
+    public class LinkedHashSet<ELEMENT> : Set<ELEMENT>, NgSet {
         protected IDictionary<ELEMENT, Object> _res = new Dictionary<ELEMENT, Object>();
         protected List<ELEMENT> _seq = new ArrayList<ELEMENT>();
         public ELEMENT get(int index) {
@@ -122,6 +222,42 @@ namespace ${glPackageBaseCommonJavaLike} {
         public ICollection<ELEMENT> getCollection() {
             return _seq.getCollection();
         }
+        public bool containsAsNg(Object element) {
+            return contains((ELEMENT)element);
+        }
+        public bool addAsNg(Object element) {
+            return add((ELEMENT)element);
+        }
+        public bool removeAsNg(Object element) {
+            return remove((ELEMENT)element);
+        }
+        public System.Collections.ICollection getCollectionAsNg() {
+            return (System.Collections.ICollection)getCollection();
+        }
+        public System.Collections.IEnumerator GetEnumerator() {
+            return new MyEmumerator(this);
+        }
+        protected class MyEmumerator : System.Collections.IEnumerator, Iterator<ELEMENT> {
+            protected LinkedHashSet<ELEMENT> _target;
+            protected int _index = -1;
+            public MyEmumerator(LinkedHashSet<ELEMENT> target) {
+                _target = target;
+            }
+            public Object Current { get { return _target.get(_index); } }
+            public bool MoveNext() {
+                ++_index;
+                return _target.size() > _index;
+            }
+            public void Reset() {
+                _index = -1;
+            }
+            public bool hasNext() {
+                return MoveNext();
+            }
+            public ELEMENT next() {
+                return _target.get(_index);
+            }
+        }
     }
 
     public interface Map<KEY, VALUE> {
@@ -131,12 +267,19 @@ namespace ${glPackageBaseCommonJavaLike} {
 		int size();
 		bool isEmpty();
 		void clear();
-        bool containsKey(KEY obj);
+        bool containsKey(KEY key);
 		Set<KEY> keySet();
 		Collection<VALUE> values();
     }
-	
-    public class HashMap<KEY, VALUE> : Map<KEY, VALUE> {
+
+    public interface NgMap {
+        Object getAsNg(Object key);
+        Object putAsNg(Object key, Object value);
+        Object removeAsNg(Object key);
+        bool containsKeyAsNg(Object key);
+    }
+
+    public class HashMap<KEY, VALUE> : Map<KEY, VALUE>, NgMap {
 		protected IDictionary<KEY, VALUE> _res = new Dictionary<KEY, VALUE>();
         public VALUE get(KEY key) {
             return _res.ContainsKey(key) ? _res[key] : default(VALUE);
@@ -167,8 +310,8 @@ namespace ${glPackageBaseCommonJavaLike} {
         public void clear() {
             _res.Clear();
         }
-        public bool containsKey(KEY obj) {
-            return _res.ContainsKey(obj);
+        public bool containsKey(KEY key) {
+            return _res.ContainsKey(key);
         }
         public Set<KEY> keySet() {
             Set<KEY> keySet = new LinkedHashSet<KEY>();
@@ -186,9 +329,21 @@ namespace ${glPackageBaseCommonJavaLike} {
             }
             return valueList;
         }
+        public Object getAsNg(Object key) {
+            return get((KEY)key);
+        }
+        public Object putAsNg(Object key, Object value) {
+            return put((KEY)key, (VALUE)value);
+        }
+        public Object removeAsNg(Object key) {
+            return remove((KEY)key);
+        }
+        public bool containsKeyAsNg(Object key) {
+            return containsKey((KEY)key);
+        }
     }
 
-    public class LinkedHashMap<KEY, VALUE> : Map<KEY, VALUE> {
+    public class LinkedHashMap<KEY, VALUE> : Map<KEY, VALUE>, NgMap {
         protected Map<KEY, VALUE> _res = new HashMap<KEY, VALUE>();
         protected LinkedHashSet<KEY> _seq = new LinkedHashSet<KEY>();
         public VALUE get(KEY key) {
@@ -214,6 +369,7 @@ namespace ${glPackageBaseCommonJavaLike} {
             }
             return result;
         }
+
         public int size() {
             return _res.size();
         }
@@ -235,6 +391,18 @@ namespace ${glPackageBaseCommonJavaLike} {
                 valueList.add(_res.get(key));
             }
             return valueList;
+        }
+        public Object getAsNg(Object key) {
+            return get((KEY)key);
+        }
+        public Object putAsNg(Object key, Object value) {
+            return put((KEY)key, (VALUE)value);
+        }
+        public Object removeAsNg(Object key) {
+            return remove((KEY)key);
+        }
+        public bool containsKeyAsNg(Object key) {
+            return containsKey((KEY)key);
         }
     }
 }

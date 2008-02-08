@@ -1,0 +1,38 @@
+
+using System;
+using System.Text;
+
+namespace ${glPackageBaseCommonUtil} {
+
+    public class ${glSimpleAssertUtil} {
+    
+        // ===================================================================================
+        //                                                                              Assert
+        //                                                                              ======
+        // -----------------------------------------------------
+        //                                         Assert Object
+        //                                         -------------
+        public static void AssertObjectNotNull(String variableName, Object value) {
+            if (variableName == null) {
+                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+                throw new IllegalArgumentException(msg);
+            }
+            if (value == null) {
+                String msg = "The value should not be null: variableName=" + variableName;
+                throw new IllegalArgumentException(msg);
+            }
+        }
+    
+        // -----------------------------------------------------
+        //                                         Assert String
+        //                                         -------------
+        public static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+            assertObjectNotNull("variableName", variableName);
+            assertObjectNotNull("value", value);
+            if (value.trim().length() ==0) {
+                String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+                throw new IllegalArgumentException(msg);
+            }
+        }
+    }
+}

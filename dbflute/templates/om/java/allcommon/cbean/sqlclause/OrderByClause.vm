@@ -1,6 +1,10 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 #set ($myClassName = "${glOrderByClauseName}")
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * The paging-result-bean of ${myClassName}.
@@ -15,7 +19,7 @@ public class ${myClassName} implements java.io.Serializable {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected java.util.List${database.filterGenericsString(${glOrderByElementName})} _orderByList = new java.util.ArrayList${database.filterGenericsString(${glOrderByElementName})}();
+    protected List${database.filterGenericsString(${glOrderByElementName})} _orderByList = new ArrayList${database.filterGenericsString(${glOrderByElementName})}();
 
     // =====================================================================================
     //                                                                           Constructor
@@ -68,7 +72,7 @@ public class ${myClassName} implements java.io.Serializable {
      * 
      * @return The value of allRecordCount.
      */
-    public java.util.List${database.filterGenericsString(${glOrderByElementName})} getOrderByList() {
+    public List${database.filterGenericsString(${glOrderByElementName})} getOrderByList() {
         return _orderByList;
     }
 
@@ -78,8 +82,8 @@ public class ${myClassName} implements java.io.Serializable {
         }
         final StringBuffer sb = new StringBuffer();
         final String delimiter = ", ";
-        for (final java.util.Iterator ite = _orderByList.iterator(); ite.hasNext(); ) {
-            final ${glOrderByElementName} element = (${glOrderByElementName})ite.next();
+        for (final Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
+            final ${glOrderByElementName} element = ite.next();
             sb.append(delimiter).append(element.getElementClause());
         }
         sb.delete(0, delimiter.length()).insert(0, "order by ");
@@ -92,8 +96,8 @@ public class ${myClassName} implements java.io.Serializable {
         }
         final StringBuffer sb = new StringBuffer();
         final String delimiter = ", ";
-        for (final java.util.Iterator ite = _orderByList.iterator(); ite.hasNext(); ) {
-            final ${glOrderByElementName} element = (${glOrderByElementName})ite.next();
+        for (final Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
+            final ${glOrderByElementName} element = ite.next();
             sb.append(delimiter).append(element.getElementClause(selectClauseRealColumnAliasMap));
         }
         sb.delete(0, delimiter.length()).insert(0, "order by ");
@@ -101,9 +105,9 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     public boolean isSameOrderByColumn(String orderByProperty) {
-        final java.util.List<String> orderByList = new java.util.ArrayList${database.filterGenericsString('String')}();
+        final List<String> orderByList = new ArrayList<String>();
         {
-            final java.util.StringTokenizer st = new java.util.StringTokenizer(orderByProperty, "/");
+            final StringTokenizer st = new StringTokenizer(orderByProperty, "/");
             while (st.hasMoreElements()) {
                 orderByList.add(st.nextToken());
             }
@@ -112,8 +116,8 @@ public class ${myClassName} implements java.io.Serializable {
             return false;
         }
         int count = 0;
-        for (final java.util.Iterator ite = orderByList.iterator(); ite.hasNext(); ) {
-            final String columnFullName = (String)ite.next();
+        for (final Iterator<String> ite = orderByList.iterator(); ite.hasNext(); ) {
+            final String columnFullName = ite.next();
             final ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(count);
             if (!element.getColumnFullName().equals(columnFullName)) {
                 return false;

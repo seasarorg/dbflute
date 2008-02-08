@@ -9,10 +9,6 @@ using ${glPackageBaseCommonDBMetaInfo};
 
 namespace ${glPackageBaseCommonDBMeta} {
 
-    /// <summary>
-    /// The interface of dbmeta.
-    /// Author : ${database.ClassAuthor}
-    /// </summary>
     public interface ${myClassName} {
 
         // ===============================================================================
@@ -56,14 +52,14 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        IList<${glColumnInfoName}> GetColumnInfoList();
+        IList<${glColumnInfoName}> ColumnInfoList { get; }
         bool HasColumn(String columnFlexibleName);
         ${glColumnInfoName} FindColumnInfo(String columnFlexibleName);
 
         // ===============================================================================
         //                                                                     Unique Info
         //                                                                     ===========
-        ${glUniqueInfoName} GetPrimaryUniqueInfo();
+        ${glUniqueInfoName} PrimaryUniqueInfo { get; }
         bool HasPrimaryKey { get; }
         bool HasTwoOrMorePrimaryKeys { get; }
 

@@ -5,85 +5,40 @@ using ${glPackageBaseCommonSqlClause};
 
 namespace ${glPackageBaseCommonCBean} {
 
-    /// <summary>
-    /// The condition-bean as interface.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     public interface ${glConditionBeanInterfaceName} : ${glPagingBeanInterfaceName} {
 
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        /// <summary>
-        /// Get the value of tableName. (readonly)
-        /// </summary>
         String TableDbName { get; }
 
         // ===============================================================================
         //                                                                       SqlClause
         //                                                                       =========
-        /**
-         * Get sql-clause instance.
-         * 
-         * @return Sql-clause. (NotNUll)
-         */
         ${glSqlClauseName} SqlClause { get; }
-
-        /**
-         * Get clause string.
-         * 
-         * @return Sql clause string. (NotNUll)
-         */
         String GetClause();
-
-        // ===============================================================================
-        //                                                                           Query
-        //                                                                           =====
-        /// <summary>
-        /// The property of condition-query as inteface.
-        /// </summary>
-        /// <returns>Instance of condition-query. (NotNull)</returns>
-        ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
 
         // ===============================================================================
         //                                                                 OrderBy Setting
         //                                                                 ===============
-        /**
-         * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
-         * 
-         * @return this. (NotNUll)
-         */
         ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc();
-
-        /**
-         * Add order-by PrimaryKey desc. {order by primaryKey1 desc, primaryKey2 desc...}
-         * 
-         * @return this. (NotNUll)
-         */
         ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc();
+		
+        // ===============================================================================
+        //                                                                           Query
+        //                                                                           =====
+        ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
+
+        // ===============================================================================
+        //                                                                     Union Query
+        //                                                                     ===========
+        bool HasUnionQueryOrUnionAllQuery();
 
         // ===============================================================================
         //                                                                    Limit Select
         //                                                                    ============
-        /**
-         * Is limit-select PK only?
-         * 
-         * @return Determination.
-         */
         bool IsLimitSelect_PKOnly();
-
-        /**
-         * Limit select PK only.
-         *
-         * @return this. (NotNull)
-         */
         ${glConditionBeanInterfaceName} LimitSelect_PKOnly();
-
-        /**
-         * Limit select off.
-         *
-         * @return this. (NotNull)
-         */
         ${glConditionBeanInterfaceName} LimitSelect_Off();
 
         // ===============================================================================

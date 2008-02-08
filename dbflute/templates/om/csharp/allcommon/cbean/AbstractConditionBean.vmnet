@@ -6,23 +6,17 @@ using System.Text;
 
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCBean} {
 
-    /// <summary>
-    /// The condition-bean as abstract.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     [System.Serializable]
     public abstract class $myClassName : ${glConditionBeanInterfaceName} {
 
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        /// <summary>SQL clause. (NotNull)</summary>
         protected readonly ${glSqlClauseName} _sqlClause;
-
-        /// <summary>Safety max result size.</summary>
         protected int _safetyMaxResultSize;
 
         // ===============================================================================
@@ -35,24 +29,17 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        /// <summary>
-        /// ${database.ImplementComment}
-        /// </summary>
         public abstract String TableDbName { get; }
 
         // ===============================================================================
         //                                                                       SqlClause
         //                                                                       =========
         public ${glSqlClauseName} SqlClause { get { return _sqlClause; } }
-        public String GetClause() { return this.SqlClause.GetClause(); }
+        public String GetClause() { return this.SqlClause.getClause(); }
 
         // ===============================================================================
         //                                                                           Query
         //                                                                           =====
-        /// <summary>
-        /// The property of condition-query as inteface.
-        /// </summary>
-        /// <returns>Instance of condition-query. (NotNull)</returns>
         public abstract ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
 
         // ===============================================================================
@@ -64,147 +51,85 @@ namespace ${glPackageBaseCommonCBean} {
         // * * * * * * * *
         // For SQL Comment
         // * * * * * * * *
-        public bool Paging { get { throw new SystemException("This method is unsupported on ConditionBean!"); } }
+        public bool Paging { get { throw new UnsupportedOperationException("This method is unsupported on ConditionBean!"); } }
         public void XSetPaging(bool paging) {
-            throw new SystemException("This method is unsupported on ConditionBean!");
+            throw new UnsupportedOperationException("This method is unsupported on ConditionBean!");
         }
 
         // -------------------------------------------------
         //                                     Fetch Setting
         //                                     -------------
         public ${glPagingBeanInterfaceName} FetchFirst(int fetchSize) {
-            this.SqlClause.FetchFirst(fetchSize);
+            this.SqlClause.fetchFirst(fetchSize);
             return this;
         }
 
         public ${glPagingBeanInterfaceName} FetchScope(int fetchStartIndex, int fetchSize) {
-            this.SqlClause.FetchScope(fetchStartIndex, fetchSize);
+            this.SqlClause.fetchScope(fetchStartIndex, fetchSize);
             return this;
         }
 
         public ${glPagingBeanInterfaceName} FetchPage(int fetchPageNumber) {
-            this.SqlClause.FetchPage(fetchPageNumber);
+            this.SqlClause.fetchPage(fetchPageNumber);
             return this;
         }
 
         // -------------------------------------------------
         //                                    Fetch Property
         //                                    --------------
-        public int FetchStartIndex { get { return this.SqlClause.FetchStartIndex; } }
-        public int FetchSize { get { return this.SqlClause.FetchSize; } }
-        public int FetchPageNumber { get { return this.SqlClause.FetchPageNumber; } }
-        public int PageStartIndex { get { return this.SqlClause.PageStartIndex; } }
-        public int PageEndIndex { get { return this.SqlClause.PageEndIndex; } }
-        public bool IsFetchScopeEffective { get { return this.SqlClause.IsFetchScopeEffective; } }
+        public int FetchStartIndex { get { return this.SqlClause.getFetchStartIndex(); } }
+        public int FetchSize { get { return this.SqlClause.getFetchSize(); } }
+        public int FetchPageNumber { get { return this.SqlClause.getFetchPageNumber(); } }
+        public int PageStartIndex { get { return this.SqlClause.getPageStartIndex(); } }
+        public int PageEndIndex { get { return this.SqlClause.getPageEndIndex(); } }
+        public bool IsFetchScopeEffective { get { return this.SqlClause.isFetchScopeEffective(); } }
         public int SafetyMaxResultSize { get { return _safetyMaxResultSize; } }
 
         // -------------------------------------------------
         //                                     Hint Property
         //                                     -------------
-        public String SelectHint { get { return this.SqlClause.GetSelectHint(); } }
-        public String FromBaseTableHint { get { return this.SqlClause.GetFromBaseTableHint(); } }
-        public String FromHint { get { return this.SqlClause.GetFromHint(); } }
-        public String WhereClause { get { return this.SqlClause.GetWhereClause(); } }
-        public String OrderByClause { get { return this.SqlClause.GetOrderByClause(); } }
-        public String SqlSuffix { get { return this.SqlClause.GetSqlSuffix(); } }
+        public String SelectHint { get { return this.SqlClause.getSelectHint(); } }
+        public String FromBaseTableHint { get { return this.SqlClause.getFromBaseTableHint(); } }
+        public String FromHint { get { return this.SqlClause.getFromHint(); } }
+        public String WhereClause { get { return this.SqlClause.getWhereClause(); } }
+        public String OrderByClause { get { return this.SqlClause.getOrderByClause(); } }
+        public String SqlSuffix { get { return this.SqlClause.getSqlSuffix(); } }
 
         // ===============================================================================
         //                                            Implementation of FetchNarrowingBean
         //                                            ====================================
-        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.FetchNarrowingSkipStartIndex; } }
-        public int FetchNarrowingLoopCount { get { return this.SqlClause.FetchNarrowingLoopCount; } }
-        public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.IsFetchStartIndexSupported; } }
-        public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.IsFetchSizeSupported; } }
-        public bool IsFetchNarrowingEffective { get { return this.SqlClause.IsFetchNarrowingEffective; } }
-        public void IgnoreFetchNarrowing() { throw new SystemException("This method is unsupported on ConditionBean!"); }
+        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.isFetchNarrowingSkipStartIndex(); } }
+        public int FetchNarrowingLoopCount { get { return this.SqlClause.isFetchNarrowingLoopCount(); } }
+        public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.isFetchStartIndexSupported(); } }
+        public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.isFetchSizeSupported(); } }
+        public bool IsFetchNarrowingEffective { get { return this.SqlClause.isFetchNarrowingEffective(); } }
+        public void IgnoreFetchNarrowing() { throw new UnsupportedOperationException("This method is unsupported on ConditionBean!"); }
         public void RestoreIgnoredFetchNarrowing() {}
 
         // ===============================================================================
         //                                                   Implementation of OrderByBean
         //                                                   =============================
         public ${glOrderByClauseName} SqlComponentOfOrderByClause {
-            get { return this.SqlClause.GetSqlComponentOfOrderByClause(); }
+            get { return this.SqlClause.getSqlComponentOfOrderByClause(); }
         }
 
         public ${glOrderByBeanInterfaceName} ClearOrderBy() {
-            this.SqlClause.ClearOrderBy();
+            this.SqlClause.clearOrderBy();
             return this;
         }
 
         public ${glOrderByBeanInterfaceName} IgnoreOrderBy() {
-            this.SqlClause.IgnoreOrderBy();
+            this.SqlClause.ignoreOrderBy();
             return this;
         }
 
         public $glOrderByBeanInterfaceName MakeOrderByEffective() {
-            this.SqlClause.MakeOrderByEffective();
+            this.SqlClause.makeOrderByEffective();
             return this;
         }
 
         public abstract ${glConditionBeanInterfaceName} AddOrderBy_PK_Asc();
-
         public abstract ${glConditionBeanInterfaceName} AddOrderBy_PK_Desc();
-
-        public ${glOrderByBeanInterfaceName} RegisterOrderByAsc(String orderByProperty) {
-            this.SqlClause.RegisterOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, true);
-            return this;
-        }
-
-        public ${glOrderByBeanInterfaceName} RegisterOrderByDesc(String orderByProperty) {
-            this.SqlClause.RegisterOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, false);
-            return this;
-        }
-
-        public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByAsc(String orderByProperty) {
-            this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, true);
-            return this;
-        }
-
-        public ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByDesc(String orderByProperty) {
-            this.SqlClause.ReverseOrderBy_Or_OverrideOrderBy(FilterOrderByProperty(orderByProperty), orderByProperty, false);
-            return this;
-        }
-
-        protected String FilterOrderByProperty(String orderByProperty) {
-            String[] orderBySlashArray = orderByProperty.Split('/');
-            StringBuilder sb = new StringBuilder();
-            ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(TableDbName);
-            ${glConditionQueryInterfaceName} query = this.ConditionQueryAsInterface;
-            foreach (String orderBySlashElement in orderBySlashArray) {
-                String[] orderByDotArray = orderBySlashElement.Split('.');
-
-                if (orderByDotArray.Length == 1) {
-                    if (dbmeta.HasColumn(orderBySlashElement)) {
-                        sb.Append("/").Append(query.GetRealColumnName(dbmeta.FindDbName(orderBySlashElement)));
-                    } else {
-                        sb.Append("/").Append(orderBySlashElement);
-                    }
-                } else {
-                    ${glDBMetaInterfaceName} foreignDBMeta = dbmeta;
-                    ${glConditionQueryInterfaceName} foreignQuery = query;
-                    int count = 0;
-                    foreach (String orderByDotElement in orderByDotArray) {
-                        count++;
-
-                        if (orderByDotArray.Length == count) {// Last Loop!
-                            if (!foreignDBMeta.HasColumn(orderByDotElement)) {
-                                String msg = "The name for order-by is not existing: name=" + orderByDotElement;
-                                msg = msg + " orderBySlashElement=" + orderBySlashElement + " orderByProperty=" + orderByProperty;
-                                throw new SystemException(msg);
-                            }
-                            sb.Append("/").Append(foreignQuery.GetRealColumnName(foreignDBMeta.FindDbName(orderByDotElement)));
-                            break;
-                        }
-
-                        // TODO: @jflute
-                        // foreignDBMeta = foreignDBMeta.GetForeignDBMeta(orderByDotElement);
-                        foreignQuery = foreignQuery.GetForeignConditionQuery(orderByDotElement);
-                    }
-                }
-            }
-            sb.Remove(0, "/".Length);
-            return sb.ToString();
-        }
 
         // ===============================================================================
         //                                                Implementation of SelectResource
@@ -236,7 +161,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                    Lock Setting
         //                                                                    ============
         public ${glConditionBeanInterfaceName} LockForUpdate() {
-            this.SqlClause.LockForUpdate();
+            this.SqlClause.lockForUpdate();
             return this;
         }
 
@@ -245,17 +170,29 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                    ============
         public ${glConditionBeanInterfaceName} XSetupSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = true;
-            this.SqlClause.IgnoreIncludedSelectColumn();
-            this.SqlClause.IgnoreOrderBy();
-            this.SqlClause.IgnoreFetchScope();
+
+            // If the query uses union query, it needs included-select-column.
+            if (!HasUnionQueryOrUnionAllQuery()) {
+                this.SqlClause.ignoreIncludedSelectColumn();
+            }
+
+            this.SqlClause.ignoreIncludedSelectColumn();
+            this.SqlClause.ignoreOrderBy();
+            this.SqlClause.ignoreFetchScope();
             return this;
         }
 
         public ${glConditionBeanInterfaceName} XAfterCareSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = false;
-            this.SqlClause.MakeIncludedSelectColumnEffective();
-            this.SqlClause.MakeOrderByEffective();
-            this.SqlClause.MakeFetchScopeEffective();
+
+            // If the query uses union query, it needs included-select-column.
+            if (!HasUnionQueryOrUnionAllQuery()) {
+                this.SqlClause.makeIncludedSelectColumnEffective();
+            }
+		
+            this.SqlClause.makeIncludedSelectColumnEffective();
+            this.SqlClause.makeOrderByEffective();
+            this.SqlClause.makeFetchScopeEffective();
             return this;
         }
 

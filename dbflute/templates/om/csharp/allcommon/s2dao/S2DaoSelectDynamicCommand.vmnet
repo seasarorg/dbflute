@@ -14,6 +14,7 @@ using Seasar.Dao.Parser;
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -687,16 +688,24 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (value == null) {
                     break;
                 }
-                // {Unsupported}
-                // if (value is IDictionary<>) {
-                //     IDictionary map = (IDictionary) value;
-                //     value = map[_names[pos]];
-                //     if (value == null) {
-                //         break;
-                //     }
-                //     type = value.GetType();
-                //     continue;
-                // }
+                if (value is System.Collections.IDictionary) {
+                    System.Collections.IDictionary map = (System.Collections.IDictionary) value;
+                    value = map[_names[pos]];
+                    if (value == null) {
+                        break;
+                    }
+                    type = value.GetType();
+                    continue;
+                }
+                if (value is NgMap) {
+                    NgMap map = (NgMap) value;
+                    value = map.get(_names[pos]);
+                    if (value == null) {
+                        break;
+                    }
+                    type = value.GetType();
+                    continue;
+                }
                 String currentName = _names[pos];
                 PropertyInfo pi = type.GetProperty(currentName);
                 if (pi != null) {

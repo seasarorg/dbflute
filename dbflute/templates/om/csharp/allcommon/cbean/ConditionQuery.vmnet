@@ -1,84 +1,34 @@
 
 using System;
-using System.Collections;
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonSqlClause};
 
 namespace ${glPackageBaseCommonCBean} {
 
-    /// <summary>
-    /// The condition-bean as interface.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    public interface ${glConditionQueryInterfaceName} {
+// JavaLike
+public interface ${glConditionQueryInterfaceName} {
 
-        /// <summary>
-        /// Get the value of tableName. (readonly)
-        /// </summary>
-        String TableDbName { get; }
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    String getTableDbName();
+	
+    // ===================================================================================
+    //                                                                  Important Accessor
+    //                                                                  ==================
+    ${glConditionQueryInterfaceName} getChildQuery();
+    ${glSqlClauseName} getSqlClause();
+    String getAliasName();
+    String getRealAliasName();
+    String getRealColumnName(String columnName);
+    int getNestLevel();
+    int getNextNestLevel();
+    bool isBaseQuery(${glConditionQueryInterfaceName} query);
 
-        /// <summary>
-        /// Get child query.
-        /// </summary>
-        /// <returns>Child query. (Nullable)</returns>
-        ${glConditionQueryInterfaceName} GetChildQuery();
+    // ===================================================================================
+    //                                                                       Foregin Query
+    //                                                                       =============
+    ${glConditionQueryInterfaceName} getForeignConditionQuery(String foreignPropertyName);
+}
 
-        /// <summary>
-        /// Get sql clause.
-        /// </summary>
-        /// <returns>Sql clause. (NotNull)</returns>
-        ${glSqlClauseName} GetSqlClause();
-
-        /**
-         * Get alias name.
-         * 
-         * @return Alias name. (NotNull)
-         */
-        String GetAliasName();
-
-        /// <summary>
-        ///	Get real alias name(that has nest level mark).
-        /// </summary>
-        /// <returns>Real alias name. (NotNull)</returns>
-        String GetRealAliasName();
-
-        /// <summary>
-        /// Get real column name(with real alias name).
-        /// </summary>
-        /// <param name="columnName">Column name without alias name.</param>
-        /// <returns>Real column name.</returns>
-        String GetRealColumnName(String columnName);
-
-        /**
-         * Get nest level.
-         * 
-         * @return Nest level.
-         */
-        int GetNestLevel();
-
-        /**
-         * Get next nest level.
-         * 
-         * @return Next nest level.
-         */
-        int GetNextNestLevel();
-
-        /**
-         * Is base query?
-         * 
-         * @param query Condition query. (NotNull)
-         * @return Determination.
-         */
-        bool IsBaseQuery(${glConditionQueryInterfaceName} query);
-
-        // =====================================================================================
-        //                                                                         Foregin Query
-        //                                                                         =============
-        /// <summary>
-        /// Get foreign condition-query.
-        /// </summary>
-        /// <param name="foreignPropertyName">Foreign-property-name(Both OK - InitCap or not). (NotNull)</param>
-        /// <returns>Foreign condition-query as interface.</returns>
-        ${glConditionQueryInterfaceName} GetForeignConditionQuery(String foreignPropertyName);
-    }
 }

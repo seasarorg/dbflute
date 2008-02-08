@@ -43,37 +43,5 @@ namespace ${glPackageBaseCommonCBean} {
 	     * @return Order-by clause. (NotNull)
 	     */
 	    String OrderByClause { get; }
-
-	    /**
-	     * Register order-by-asc.
-	     * 
-	     * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
-	     * @return this. (NotNull)
-	     */
-	    ${glOrderByBeanInterfaceName} RegisterOrderByAsc(String columnFullName);
-
-	    /**
-	     * Register order-by-desc.
-	     * 
-	     * @param columnFullName Column-full-name. ([table-name].[column-name]) (NotNull)
-	     * @return this. (NotNull)
-	     */
-	    ${glOrderByBeanInterfaceName} RegisterOrderByDesc(String columnFullName);
-
-        /**
-         * Reverse order-by or Override order-by asc.
-         * 
-         * @param columnFullName Column-full-name. [firstColumn/secondColumn/...] (NotNull)
-         * @return this. (NotNull)
-         */
-        ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByAsc(String columnFullName);
-
-        /**
-         * Reverse order-by or Override order-by desc.
-         * 
-         * @param columnFullName Column-full-name. [firstColumn/secondColumn/...] (NotNull)
-         * @return this. (NotNull)
-         */
-        ${glOrderByBeanInterfaceName} ReverseOrderBy_Or_OverrideOrderByDesc(String columnFullName);
     }
 }

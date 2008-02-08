@@ -17,6 +17,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonJavaLike};
 
 using ${glPackageCIQ};
 
@@ -28,10 +29,6 @@ namespace ${glPackageBaseCQ} {
 namespace ${glPackageCQ} {
 #end
 
-    /// <summary>
-    /// The condition-query of {table.Name}.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     [System.Serializable]
     public class ${myClassName} : ${myAbstractBaseConditionQueryClassName} {
 
@@ -43,13 +40,6 @@ namespace ${glPackageCQ} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="childQuery">Child query as interfaec. (Nullable: If null, this is base instance.)</param>
-        /// <param name="sqlClause">SQL clause instance. (NotNull)</param>
-        /// <param name="aliasName">My alias name. (NotNull)</param>
-        /// <param name="nestLevel">Nest level.</param>
         public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel)
             : base(childQuery, sqlClause, aliasName, nestLevel) {}
 
@@ -58,17 +48,23 @@ namespace ${glPackageCQ} {
         //                                                                          ======
         public ${myConditionInlineQueryClassName} Inline() {
             if (_inlineQuery == null) {
-                _inlineQuery = new ${myConditionInlineQueryClassName}(GetChildQuery(), GetSqlClause(), GetAliasName(), GetNestLevel(), this);
+                _inlineQuery = new ${myConditionInlineQueryClassName}(GetChildQuery(), getSqlClause(), GetAliasName(), GetNestLevel(), this);
             }
             return _inlineQuery;
+        }
+		
+        public ${myConditionInlineQueryClassName} On() {
+    	    if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
+    	    ${myConditionInlineQueryClassName} inlineQuery = Inline();
+    		inlineQuery.xsetOnClauseInline(true);
+    		return inlineQuery;
         }
 
         // ===============================================================================
         //                                                                   IncludeAsMine
         //                                                                   =============
 #foreach ($col in $table.columns)
-        public void IncludeAsMine_${col.JavaName}() { RegisterIncludedSelectColumn("${col.JavaName}", GetRealColumnName("${col.Name}")); }
-        public void IncludeAsMine_${col.JavaName}(String aliasName) { RegisterIncludedSelectColumn(aliasName, GetRealColumnName("${col.Name}")); }
+        public void IncludeAsMine_${col.JavaName}(String aliasName) { RegisterIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}")); }
 #end
 
         // ===============================================================================
@@ -82,7 +78,7 @@ namespace ${glPackageCQ} {
         public ${glConditionValueName} ${tmpJavaName} {
             get { if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ${glConditionValueName}(); } return _${tmpUncapitalisedJavaName}; }
         }
-        protected override ${glConditionValueName} GetCValue${tmpJavaName}() { return this.${tmpJavaName}; }
+        protected override ${glConditionValueName} getCValue${tmpJavaName}() { return this.${tmpJavaName}; }
 
     #if (${col.isJavaNativeStringObject()})
       #if (${col.isSingleKeyForeignKey()})
@@ -92,7 +88,7 @@ namespace ${glPackageCQ} {
 
         protected ${relatedCQClassName} _${subQueryPropertyName};
         public ${relatedCQClassName} ${subQueryPropertyNameInitCap} { get { return _${subQueryPropertyName}; } }
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
@@ -102,7 +98,7 @@ namespace ${glPackageCQ} {
 
         protected ${relatedCQClassName} _${subQueryPropertyName};
         public ${relatedCQClassName} ${subQueryPropertyNameInitCap} { get { return _${subQueryPropertyName}; } }
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -114,7 +110,7 @@ namespace ${glPackageCQ} {
 
         protected ${relatedCQClassName} _${subQueryPropertyName};
         public ${relatedCQClassName} ${subQueryPropertyNameInitCap} { get { return _${subQueryPropertyName}; } }
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
           #end
         #end
       #end
@@ -127,7 +123,7 @@ namespace ${glPackageCQ} {
 
         protected ${relatedCQClassName} _${subQueryPropertyName};
         public ${relatedCQClassName} ${subQueryPropertyNameInitCap} { get { return _${subQueryPropertyName}; } }
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
       #end
       #if (${col.hasSingleKeyReferrer()})
         #foreach ($refferer in $col.SingleKeyReferrers)
@@ -137,7 +133,7 @@ namespace ${glPackageCQ} {
 
         protected ${relatedCQClassName} _${subQueryPropertyName};
         public ${relatedCQClassName} ${subQueryPropertyNameInitCap} { get { return _${subQueryPropertyName}; } }
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
         #end
       #end
       #if (${col.hasSingleKeyReferrer()})
@@ -149,7 +145,7 @@ namespace ${glPackageCQ} {
 
         protected ${relatedCQClassName} _${subQueryPropertyName};
         public ${relatedCQClassName} ${subQueryPropertyNameInitCap} { get { return _${subQueryPropertyName}; } }
-        public override void Keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
+        public override void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) { _${subQueryPropertyName} = subQuery; }
           #end
         #end
       #end
@@ -163,15 +159,35 @@ namespace ${glPackageCQ} {
     #if (!${col.isNotNull()})
     #end
 
-        public ${myClassName} AddOrderBy_${tmpJavaName}_Asc() { GetSqlClause().RegisterOrderBy(GetRealColumnName("${col.name}"), true);return this; }
-        public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() { GetSqlClause().RegisterOrderBy(GetRealColumnName("${col.name}"), false);return this; }
+        public ${myClassName} AddOrderBy_${tmpJavaName}_Asc() { getSqlClause().registerOrderBy(getRealColumnName("${col.name}"), true);return this; }
+        public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() { getSqlClause().registerOrderBy(getRealColumnName("${col.name}"), false);return this; }
 
   #end
 
         // ===============================================================================
         //                                                                     Union Query
         //                                                                     ===========
+		protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+#if ($table.hasForeignKeyOrRefererAsOne())
+            ${relationCQPackagePrefix}${myConditionQueryClassName} baseQuery = (${relationCQPackagePrefix}${myConditionQueryClassName})baseQueryAsSuper;
+            ${relationCQPackagePrefix}${myConditionQueryClassName} unionQuery = (${relationCQPackagePrefix}${myConditionQueryClassName})unionQueryAsSuper;
+#end
+#foreach ($foreignKeys in $table.foreignKeys)
+            if (baseQuery.hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
+                unionQuery.Query${foreignKeys.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(baseQuery.query${foreignKeys.foreignPropertyNameInitCap}(), unionQuery.Query${foreignKeys.foreignPropertyNameInitCap}());
+            }
+#end
+#foreach ($refferer in $table.referrers)
+#if (${refferer.isOneToOne()})
+            if (baseQuery.hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
+                unionQuery.Query${refferer.reffererPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.query${refferer.reffererPropertyNameInitCapAsOne}(), unionQuery.Query${refferer.reffererPropertyNameInitCapAsOne}());
+            }
+#end
+#end
 
+    	}
+
+	
         // ===============================================================================
         //                                                                   Foreign Query
         //                                                                   =============
@@ -183,36 +199,42 @@ namespace ${glPackageCQ} {
         //   ForeignProperty = [${foreignKeys.foreignPropertyNameInitCap}]
         // * * * * * * * * */
 
-        public ${foreignCQClassName} Query${foreignKeys.ForeignPropertyNameInitCap}() { return this.ConditionQuery${foreignKeys.ForeignPropertyNameInitCap}; }
-        public void SetupOuterJoin_${foreignKeys.ForeignPropertyNameInitCap}() {
-            System.Collections.IDictionary joinOnMap = new System.Collections.Hashtable();
-            String key = null;
-            String value = null;
-    #foreach ($columnName in $foreignKeys.LocalColumns)
-      #set ($localColumn = $table.getColumn($columnName))
-      #set ($foreignColumnName = $foreignKeys.getLocalForeignMapping().get($columnName))
-
-            key = GetRealColumnName("${localColumn.Name}");
-            value = this.ConditionQuery${foreignKeys.ForeignPropertyNameInitCap}.GetRealColumnName("${foreignColumnName}");
-            joinOnMap.Add(key, value);
-    #end
-
-            String joinTableName = "${foreignKeys.foreignTable.Name}";
-            String aliasName = this.ConditionQuery${foreignKeys.ForeignPropertyNameInitCap}.GetRealAliasName();
-            GetSqlClause().RegisterOuterJoin(joinTableName, aliasName, joinOnMap);
-        }
         protected ${foreignCQClassName} _conditionQuery${foreignKeys.ForeignPropertyNameInitCap};
         public ${foreignCQClassName} ConditionQuery${foreignKeys.ForeignPropertyNameInitCap} {
             get {
                 if (_conditionQuery${foreignKeys.foreignPropertyNameInitCap} == null) {
-                    _conditionQuery${foreignKeys.foreignPropertyNameInitCap} = NewQuery${foreignKeys.ForeignPropertyNameInitCap}();
+                    _conditionQuery${foreignKeys.foreignPropertyNameInitCap} = createQuery${foreignKeys.ForeignPropertyNameInitCap}();
                     SetupOuterJoin_${foreignKeys.foreignPropertyNameInitCap}();
                 }
                 return _conditionQuery${foreignKeys.ForeignPropertyNameInitCap};
             }
         }
-        protected ${foreignCQClassName} NewQuery${foreignKeys.ForeignPropertyNameInitCap}() {
-            return new ${foreignCQClassName}(this, GetSqlClause(), "${foreignKeys.ForeignPropertyNameInitCap}", GetNextNestLevel());
+        public ${foreignCQClassName} Query${foreignKeys.ForeignPropertyNameInitCap}() { return this.ConditionQuery${foreignKeys.ForeignPropertyNameInitCap}; }
+        public void SetupOuterJoin_${foreignKeys.ForeignPropertyNameInitCap}() {
+            final Map<String, String> joinOnMap = new LinkedHashMap<String, String>();
+#foreach ($columnName in $foreignKeys.LocalColumns)
+#set ($localColumn = $table.getColumn($columnName))
+#set ($foreignColumnName = $foreignKeys.getLocalForeignMapping().get($columnName))
+            joinOnMap.put(getRealColumnName("${localColumn.name}"), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealColumnName("${foreignColumnName}"));
+#end
+#if ($foreignKeys.hasFixedCondition())
+            joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${foreignKeys.fixedCondition}", getRealAliasName(), ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getRealAliasName()));
+#end
+	        getSqlClause().registerOuterJoin("${foreignKeys.foreignTable.name}", ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getRealAliasName(), joinOnMap);
+        }
+        protected ${foreignCQClassName} createQuery${foreignKeys.ForeignPropertyNameInitCap}() {
+    	    String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
+            String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
+            ${foreignCQClassName} cq = new ${foreignCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
+            cq.xsetForeignPropertyName("${foreignKeys.foreignPropertyName}");
+            cq.xsetRelationPath(nextRelationPath);
+            return cq;
+        }
+    	protected String resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}() {
+    	    return resolveNextRelationPath("${table.name}", "${foreignKeys.foreignPropertyName}");
+    	}
+        public boolean hasConditionQuery${foreignKeys.ForeignPropertyNameInitCap}() {
+            return _conditionQuery${foreignKeys.ForeignPropertyNameInitCap} != null;
         }
   #end
 
@@ -225,36 +247,42 @@ namespace ${glPackageCQ} {
         //   ReferrerProperty = [${refferer.reffererPropertyNameInitCapAsOne}]
         // * * * * * * * * */
 
-        public ${relatedCQClassName} Query${refferer.reffererPropertyNameInitCapAsOne}() { return this.ConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}; }
-        public void SetupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}() {
-            System.Collections.IDictionary joinOnMap = new System.Collections.Hashtable();
-            String key = null;
-            String value = null;
-      #foreach ($columnName in $refferer.ForeignColumns)
-        #set ($foreignColumn = $table.getColumn($columnName))
-        #set ($reffererColumnName = $refferer.getLocalForeignMapping().get($columnName))
-
-            key = GetRealColumnName("${foreignColumn.Name}");
-            value = this.ConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}.GetRealColumnName("${reffererColumnName}");
-            joinOnMap.Add(key, value);
-      #end
-
-            String joinTableName = "${refferer.Table.Name}";
-            String aliasName = this.ConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}.GetRealAliasName();
-            GetSqlClause().RegisterOuterJoin(joinTableName, aliasName, joinOnMap);
-        }
         protected ${relatedCQClassName} _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
         public ${relatedCQClassName} ConditionQuery${refferer.ReffererPropertyNameInitCapAsOne} {
             get {
                 if (_conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} == null) {
-                    _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} = NewQuery${refferer.ReffererPropertyNameInitCapAsOne}();
+                    _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne} = createQuery${refferer.ReffererPropertyNameInitCapAsOne}();
                     SetupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}();
                 }
                 return _conditionQuery${refferer.ReffererPropertyNameInitCapAsOne};
             }
         }
-        protected ${relatedCQClassName} NewQuery${refferer.ReffererPropertyNameInitCapAsOne}() {
-            return new ${relatedCQClassName}(this, GetSqlClause(), "${refferer.ReffererPropertyNameInitCapAsOne}", GetNextNestLevel());
+        public ${relatedCQClassName} Query${refferer.reffererPropertyNameInitCapAsOne}() { return this.ConditionQuery${refferer.ReffererPropertyNameInitCapAsOne}; }
+        public void SetupOuterJoin_${refferer.ReffererPropertyNameInitCapAsOne}() {
+        final Map<String, String> joinOnMap = new LinkedHashMap<String, String>();
+#foreach ($columnName in $referer.foreignColumns)
+#set ($foreignColumn = $table.getColumn($columnName))
+#set ($refererColumnName = $referer.getForeignLocalMapping().get($columnName))
+        joinOnMap.put(getRealColumnName("${foreignColumn.name}"), getConditionQuery${referer.reffererPropertyNameInitCapAsOne}().getRealColumnName("${refererColumnName}"));
+#end
+#if ($referer.hasFixedCondition())
+        joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${referer.fixedCondition}", getRealAliasName(), ConditionQuery${referer.reffererPropertyNameInitCapAsOne}.getRealAliasName()));
+#end
+        getSqlClause().registerOuterJoin("${referer.table.name}", ConditionQuery${referer.reffererPropertyNameInitCapAsOne}.getRealAliasName(), joinOnMap);
+        }
+        protected ${relatedCQClassName} createQuery${referer.ReffererPropertyNameInitCapAsOne}() {
+            final String nextRelationPath = resolveNextRelationPath${referer.ReffererPropertyNameInitCapAsOne}();
+            final String resolvedAliasName = resolveJoinAliasName(nextRelationPath, getNextNestLevel());
+            final ${relatedCQClassName} cq = new ${relatedCQClassName}(this, getSqlClause(), resolvedAliasName, getNextNestLevel());
+            cq.xsetForeignPropertyName("${referer.reffererPropertyNameAsOne}");
+            cq.xsetRelationPath(nextRelationPath);
+            return cq;
+        }
+    	protected String resolveNextRelationPath${referer.ReffererPropertyNameInitCapAsOne}() {
+    	    return resolveNextRelationPath("${table.name}", "${referer.reffererPropertyNameAsOne}");
+    	}
+        public boolean hasConditionQuery${referer.ReffererPropertyNameInitCapAsOne}() {
+            return _conditionQuery${referer.ReffererPropertyNameInitCapAsOne} != null;
         }
     #end
   #end

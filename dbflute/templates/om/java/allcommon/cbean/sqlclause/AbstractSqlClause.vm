@@ -32,6 +32,11 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+	protected static final String SELECT_HINT = "/*$dto.selectHint*/";
+	
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     // -----------------------------------------------------
@@ -199,7 +204,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 			if (sb.length() > 0) {
 			    sb.append(", ");
 			} else {
-			    sb.append("select/*$dto.selectHint*/ ");
+			    sb.append("select").append(SELECT_HINT).append(" ");
 			}
 			final String realColumnName = getLocalTableAliasName() + "." + columnName;
 			sb.append(realColumnName).append(" as ").append(columnName);
@@ -231,7 +236,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 			if (sb.length() > 0) {
 			    sb.append(", ");
 			} else {
-			    sb.append("select/*$dto.selectHint*/ ");
+			    sb.append("select").append(SELECT_HINT).append(" ");
 			}
 			final String realColumnName = getLocalTableAliasName() + "." + columnName;
 			sb.append(realColumnName).append(" as ").append(columnName);
