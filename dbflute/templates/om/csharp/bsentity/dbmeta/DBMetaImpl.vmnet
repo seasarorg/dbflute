@@ -243,7 +243,7 @@ namespace ${myDBMetaPackageName} {
             foreignInfo.ForeignDBMeta = ${foreignKeys.foreignTableDBMetaClassName}.GetInstance();
             IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
 #foreach ($column in $foreignKeys.localColumnList)
-		    map.Add(Column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap}());
+		    map.Add(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
             foreignInfo.LocalForeignColumnInfoMap = map;
             foreignInfo.RelationNo = ${table.resolveForeignIndex($foreignKeys)};
@@ -262,7 +262,7 @@ namespace ${myDBMetaPackageName} {
             foreignInfo.ForeignDBMeta = ${referrer.referrerTableDBMetaClassName}.GetInstance();
             IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
 #foreach ($column in $referrer.foreignColumnList)
-            map.Add(Column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
+            map.Add(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
             foreignInfo.LocalForeignColumnInfoMap = map;
             foreignInfo.RelationNo = ${table.resolveReferrerIndexAsOne($referrer)};
@@ -280,12 +280,12 @@ namespace ${myDBMetaPackageName} {
 #set ($referrerTable = $referrer.table)
         public ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
             ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrerInfo = new ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName}();
-            referrerInfo.ReferrerPropertyName("${referrer.referrerJavaBeansRulePropertyName}");
-            referrerInfo.LocalDBMeta(${referrer.foreignTableDBMetaClassName}.GetInstance());
-            referrerInfo.ReferrerDBMeta(${referrer.referrerTableDBMetaClassName}.GetInstance());
+            referrerInfo.ReferrerPropertyName = "${referrer.referrerJavaBeansRulePropertyName}";
+            referrerInfo.LocalDBMeta = ${referrer.foreignTableDBMetaClassName}.GetInstance();
+            referrerInfo.ReferrerDBMeta = ${referrer.referrerTableDBMetaClassName}.GetInstance();
             IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
 #foreach ($column in $referrer.foreignColumnList)
-            map.Add(Column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
+            map.Add(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
             referrerInfo.LocalReferrerColumnInfoMap = map;
             referrerInfo.IsOneToOne = ${referrer.isOneToOne()};
