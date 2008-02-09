@@ -12,10 +12,6 @@ using ${glPackageBaseCommonDBMetaInfo};
 
 namespace ${glPackageBaseCommonDBMeta} {
 
-    /// <summary>
-    /// The abstract class of dbmeta.
-    /// Author : ${database.ClassAuthor}
-    /// </summary>
     public abstract class ${myClassName} : ${glDBMetaInterfaceName} {
 
         // ===============================================================================

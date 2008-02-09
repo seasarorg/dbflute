@@ -5,6 +5,8 @@ using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonDBMetaInfo};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
 
@@ -210,7 +212,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 	}
 	
 	public String getSelectClausePKOnly() {
-	    StringBuffer sb = new StringBuffer();
+	    StringBuilder sb = new StringBuilder();
 		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
 		${glUniqueInfoName} uniqueInfo = dbmeta.GetPrimaryUniqueInfo();
 		List<${glColumnInfoName}> columnInfoList = uniqueInfo.UniqueColumnList;
@@ -236,7 +238,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     }
 
     public String getIncludedSelectColumnClause() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int count = 0;
         for (Iterator<String> ite = _includedSelectColumnMap.keySet().iterator(); ite.hasNext(); count++) {
              String aliasName = ite.next();
@@ -248,7 +250,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     }
 
     public String getFromClause() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("from ");
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(_tableName).append(" dflocal");
@@ -261,7 +263,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     }
 
     protected String getLeftOuterJoinClause() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
             String aliasName = ite.next();
             LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
@@ -300,7 +302,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     }
 
     protected String getInlineViewClause(String joinTableName, List<String> inlineWhereClauseList) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("(select * from ").append(joinTableName).append(" where ");
         int count = 0;
         for (Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
@@ -329,7 +331,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     }
 	
 	protected String buildWhereClause(bool template) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int count = 0;
         for (Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
             String clauseElement = (String)ite.next();

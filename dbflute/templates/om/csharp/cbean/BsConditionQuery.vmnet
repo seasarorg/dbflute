@@ -200,7 +200,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($columnName in $foreignKeys.LocalColumns)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $foreignKeys.getLocalForeignMapping().get($columnName))
-            joinOnMap.put(getRealColumnName("${localColumn.name}"), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealColumnName("${foreignColumnName}"));
+            joinOnMap.put(getRealColumnName("${localColumn.name}"), ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getRealColumnName("${foreignColumnName}"));
 #end
 #if ($foreignKeys.hasFixedCondition())
             joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${foreignKeys.fixedCondition}", getRealAliasName(), ConditionQuery${foreignKeys.foreignPropertyNameInitCap}.getRealAliasName()));

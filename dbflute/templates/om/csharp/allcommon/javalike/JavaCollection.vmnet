@@ -11,6 +11,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         int size();
         bool isEmpty();
         void clear();
+		Iterator<ELEMENT> iterator();
         ICollection<ELEMENT> getCollection();
     }
 
@@ -83,6 +84,9 @@ namespace ${glPackageBaseCommonJavaLike} {
         }
         public System.Collections.ICollection getCollectionAsNg() {
             return (System.Collections.ICollection)getCollection();
+        }
+        public Iterator<ELEMENT> iterator() {
+            return new MyEmumerator(this);
         }
         public System.Collections.IEnumerator GetEnumerator() {
             return new MyEmumerator(this);
@@ -160,6 +164,9 @@ namespace ${glPackageBaseCommonJavaLike} {
         public System.Collections.ICollection getCollectionAsNg() {
             return (System.Collections.ICollection)getCollection();
         }
+        public Iterator<ELEMENT> iterator() {
+            return new MyEmumerator(this);
+        }
         public System.Collections.IEnumerator GetEnumerator() {
             return new MyEmumerator(this);
         }
@@ -233,6 +240,9 @@ namespace ${glPackageBaseCommonJavaLike} {
         }
         public System.Collections.ICollection getCollectionAsNg() {
             return (System.Collections.ICollection)getCollection();
+        }
+        public Iterator<ELEMENT> iterator() {
+            return new MyEmumerator(this);
         }
         public System.Collections.IEnumerator GetEnumerator() {
             return new MyEmumerator(this);

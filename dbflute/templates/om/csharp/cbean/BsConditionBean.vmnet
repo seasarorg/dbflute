@@ -77,15 +77,15 @@ namespace ${glPackageBaseCB} {
         //                                                                     Union Query
         //                                                                     ===========
         public void Union(${myConditionQueryClassName} unionQuery) {
-            query().xsetUnionQuery(unionQuery);
+            Query().xsetUnionQuery(unionQuery);
         }
     
         public void UnionAll(${myConditionQueryClassName} unionAllQuery) {
-            query().xsetUnionAllQuery(unionAllQuery);
+            Query().xsetUnionAllQuery(unionAllQuery);
         }
     
         public override bool HasUnionQueryOrUnionAllQuery() {
-            return query().hasUnionQueryOrUnionAllQuery();
+            return Query().hasUnionQueryOrUnionAllQuery();
         }
 	
         // ===============================================================================

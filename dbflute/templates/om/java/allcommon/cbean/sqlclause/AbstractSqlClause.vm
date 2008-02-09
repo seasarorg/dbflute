@@ -227,7 +227,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 	}
 	
 	public String getSelectClausePKOnly() {
-	    final StringBuffer sb = new StringBuffer();
+	    final StringBuilder sb = new StringBuilder();
 		final ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.findDBMeta(_tableName);
 		final ${glUniqueInfoName} uniqueInfo = dbmeta.getPrimaryUniqueInfo();
 		final List<${glColumnInfoName}> columnInfoList = uniqueInfo.getUniqueColumnList();
@@ -253,7 +253,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     public String getIncludedSelectColumnClause() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         int count = 0;
         for (final Iterator<String> ite = _includedSelectColumnMap.keySet().iterator(); ite.hasNext(); count++) {
             final String aliasName = ite.next();
@@ -265,7 +265,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     public String getFromClause() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("from ");
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(_tableName).append(" dflocal");
@@ -278,7 +278,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     protected String getLeftOuterJoinClause() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         for (final Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
             final String aliasName = ite.next();
             final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
@@ -317,7 +317,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     protected String getInlineViewClause(String joinTableName, List<String> inlineWhereClauseList) {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("(select * from ").append(joinTableName).append(" where ");
         int count = 0;
         for (final Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
@@ -346,7 +346,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 	
 	protected String buildWhereClause(boolean template) {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         int count = 0;
         for (final Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
             String clauseElement = (String)ite.next();

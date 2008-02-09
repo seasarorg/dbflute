@@ -103,8 +103,8 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                            Implementation of FetchNarrowingBean
         //                                            ====================================
-        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.isFetchNarrowingSkipStartIndex(); } }
-        public int FetchNarrowingLoopCount { get { return this.SqlClause.isFetchNarrowingLoopCount(); } }
+        public int FetchNarrowingSkipStartIndex { get { return this.SqlClause.getFetchNarrowingSkipStartIndex(); } }
+        public int FetchNarrowingLoopCount { get { return this.SqlClause.getFetchNarrowingLoopCount(); } }
         public bool IsFetchNarrowingSkipStartIndexEffective { get { return !this.SqlClause.isFetchStartIndexSupported(); } }
         public bool IsFetchNarrowingLoopCountEffective { get { return !this.SqlClause.isFetchSizeSupported(); } }
         public bool IsFetchNarrowingEffective { get { return this.SqlClause.isFetchNarrowingEffective(); } }
