@@ -75,14 +75,15 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return stringProp("torque.java.dir", defaultSourceDirectory);
     }
 
+    /** @deprecated */
     public String getJavaLocation_for_gen() {
         return stringProp("torque.java.location.for.gen", "");
     }
-
+    /** @deprecated */
     public String getJavaLocation_for_main() {
         return stringProp("torque.java.location.for.main", "");
     }
-
+    /** @deprecated */
     public String getJavaDir_for_gen() {
         final String fileSeparator = "/";
         final String javaDirBase = getJavaDir();
@@ -103,7 +104,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
         return outputPath;
     }
-
+    /** @deprecated */
     public String getJavaDir_for_main() {
         final String fileSeparator = "/";
         final String javaDirBase = getJavaDir();
@@ -124,7 +125,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
         return outputPath;
     }
-
+    /** @deprecated */
     public boolean isJavaDirOnlyOne() {
         return getJavaDir_for_gen().equals(getJavaDir_for_main());
     }

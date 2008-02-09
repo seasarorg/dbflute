@@ -1,20 +1,13 @@
 ${database.allClassCopyright}package ${glPackageCIQ};
 
 #set ($myClassName = "${myConditionInlineQueryClassName}")
-#set ($myCQClassName = "")
-#if ($database.isJavaDirOnlyOne())
-  #set ($myCQClassName = "${myBaseConditionQueryClassName}")
-#else
-import ${glPackageCQ}.*;
-  #set ($myCQClassName = "${myConditionQueryClassName}")
-#end
-import ${glPackageBaseCQ}.*;
-
+#set ($myCQClassName = "${myBaseConditionQueryClassName}")
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCKey}.*;
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
+import ${glPackageBaseCQ}.*;
 
 /**
  * The condition-inline-query of ${table.name}.

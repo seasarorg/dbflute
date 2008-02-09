@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 #set ($myClassName = "${glSqlClauseInterfaceName}")
-
 import java.util.Map;
 
 import ${glPackageBaseCommonCKey}.${glConditionKeyName};

@@ -1374,22 +1374,18 @@ public class Table implements IDMethod {
         return unique;
     }
 
-    /**
-     * Has foreign key or referer?
-     * 
-     * @return Determination.
-     */
-    public boolean hasForeignKeyOrReferer() {
+    public boolean hasForeignKeyOrReferrer() {
         return hasForeignKey() || hasReferrer();
     }
+    public boolean hasForeignKeyOrReferer() {
+        return hasForeignKeyOrReferrer();
+    }
 
-    /**
-     * Has foreign key or referer as one?
-     * 
-     * @return Determination.
-     */
+    public boolean hasForeignKeyOrReferrerAsOne() {
+        return hasForeignKey() || hasReferrerAsOne();
+    }
     public boolean hasForeignKeyOrRefererAsOne() {
-        return hasForeignKey() || hasRefererAsOne();
+        return hasForeignKeyOrReferrerAsOne();
     }
 
     // ===================================================================================
@@ -1413,39 +1409,23 @@ public class Table implements IDMethod {
         _referrers.add(fk);
     }
 
-    /**
-     * Get list of references to this table.
-     *
-     * @return A list of references to this table
-     */
-    public List<ForeignKey> getRefererList() {
+    public List<ForeignKey> getReferrerList() {
         return _referrers;
     }
+    public List<ForeignKey> getRefererList() {
+        return getReferrerList();
+    }
 
-    /**
-     * @return A list of references to this table
-     * @deprecated
-     */
     public List<ForeignKey> getReferrers() {
-        return getRefererList();
+        return getReferrerList();
     }
 
-    /**
-     * Has refferer?
-     * 
-     * @return Determination.
-     */
     public boolean hasReferrer() {
-        return (getRefererList() != null && !getRefererList().isEmpty());
+        return (getReferrerList() != null && !getReferrerList().isEmpty());
     }
 
-    /**
-     * Has refferer as one?
-     * 
-     * @return Determination.
-     */
-    protected boolean hasRefererAsOne() {
-        final List<ForeignKey> referrers = getRefererList();
+    protected boolean hasReferrerAsOne() {
+        final List<ForeignKey> referrers = getReferrerList();
         if (referrers == null || referrers.isEmpty()) {
             return false;
         }

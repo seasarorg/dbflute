@@ -258,27 +258,27 @@ public class ForeignKey {
     }
     
     public String getRefererTableExtendedEntityClassName() {
-        return getTable().getExtendedEntityClassName();
+        return getReferrerTableExtendedEntityClassName();
     }
 
     public String getRefererTableExtendedBehaviorClassName() {
-        return getTable().getExtendedBehaviorClassName();
+        return getReferrerTableExtendedBehaviorClassName();
     }
 
     public String getRefererTableDBMetaClassName() {
-        return getTable().getDBMetaClassName();
+        return getReferrerTableDBMetaClassName();
     }
 
     public String getRefererTableExtendedConditionBeanClassName() {
-        return getTable().getExtendedConditionBeanClassName();
+        return getReferrerTableExtendedConditionBeanClassName();
     }
 
     public String getRefererTableExtendedConditionQueryClassName() {
-        return getTable().getExtendedConditionQueryClassName();
+        return getReferrerTableExtendedConditionQueryClassName();
     }
 
     public String getRefererTableNestSelectSetupperClassName() {
-        return getTable().getNestSelectSetupperClassName();
+        return getReferrerTableNestSelectSetupperClassName();
     }
 
     // ==========================================================================================
@@ -672,62 +672,35 @@ public class ForeignKey {
         return columnAliasName;
     }
 
-    /**
-     * @return Generated string.
-     * @deprecated
-     */
-    public String getReffererPropertyName() {
-        return getRefererPropertyName();
+    public String getReferrerPropertyName() {
+        return getReferrerPropertyName(false);
     }
-
-    /**
-     * Get thr value of refferer property name.
-     * 
-     * @return Generated string.
-     */
     public String getRefererPropertyName() {
-        return getRefererPropertyName(false);
+        return getReferrerPropertyName();
+    }
+    public String getReffererPropertyName() {
+        return getReferrerPropertyName();
     }
 
-    /**
-     * Get the value of referer property name.
-     * 
-     * @return Generated string.
-     */
+    public String getReferrerJavaBeansRulePropertyName() {
+        return getReferrerPropertyName(true);
+    }
     public String getReffererJavaBeansRulePropertyName() {
-        return getRefererPropertyName(true);
+        return getReferrerJavaBeansRulePropertyName();
     }
-
-    /**
-     * Get the value of referer property name.
-     * 
-     * @return Generated string.
-     */
     public String getRefererJavaBeansRulePropertyName() {
-        return getRefererPropertyName(true);
+        return getReferrerJavaBeansRulePropertyName();
     }
 
-    /**
-     * Get the value of referer property name.
-     * 
-     * @return Generated string.
-     */
+    public String getReferrerJavaBeansRulePropertyNameInitCap() {
+        final String referrerPropertyName = getReferrerPropertyName(true);
+        return initCap(referrerPropertyName);
+    }
     public String getRefererJavaBeansRulePropertyNameInitCap() {
-        final String refererPropertyName = getRefererPropertyName(true);
-        return initCap(refererPropertyName);
+        return getReferrerJavaBeansRulePropertyNameInitCap();
     }
 
-    protected String initCap(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
-    }
-
-    /**
-     * Get thr value of referer property name.
-     * 
-     * @param isJavaBeansRule Is java-beans rule.
-     * @return Generated string. (NotNull)
-     */
-    public String getRefererPropertyName(boolean isJavaBeansRule) {
+    public String getReferrerPropertyName(boolean isJavaBeansRule) {
         final List<Column> localColumnList = getLocalColumnObjectList();
 
         final List<String> columnNameList = new ArrayList<String>();
@@ -768,59 +741,38 @@ public class ForeignKey {
             return getTable().getUncapitalisedJavaName() + result + "List";
         }
     }
-
-    /**
-     * @param isJavaBeansRule Is java-beans rule.
-     * @return Generated string.
-     * @deprecated
-     */
+    public String getRefererPropertyName(boolean isJavaBeansRule) {
+        return getReferrerPropertyName(isJavaBeansRule);
+    }
     public String getReffererPropertyName(boolean isJavaBeansRule) {
-        return getRefererPropertyName(isJavaBeansRule);
+        return getReferrerPropertyName(isJavaBeansRule);
     }
 
-    /**
-     * Get thr value of refferer property name.
-     * 
-     * @return Generated string.
-     */
+    public String getReferrerPropertyNameAsOne() {
+        return getReferrerPropertyNameAsOne(false);
+    }
     public String getReffererPropertyNameAsOne() {
-        return getReffererPropertyNameAsOne(false);
+        return getReferrerPropertyNameAsOne();
     }
 
-    /**
-     * Get the value of referer property name.
-     * 
-     * @return Generated string.
-     */
+    public String getReferrerJavaBeansRulePropertyNameAsOne() {
+        return getReferrerPropertyNameAsOne(true);
+    }
     public String getReffererJavaBeansRulePropertyNameAsOne() {
-        return getReffererPropertyNameAsOne(true);
+        return getReferrerJavaBeansRulePropertyNameAsOne();
     }
-
-    /**
-     * Get the value of referer property name.
-     * 
-     * @return Generated string.
-     */
     public String getRefererJavaBeansRulePropertyNameAsOne() {
-        return getReffererPropertyNameAsOne(true);
+        return getReferrerJavaBeansRulePropertyNameAsOne();
     }
 
-    /**
-     * Get the value of referer property name as one init cap.
-     * 
-     * @return Generated string.
-     */
     public String getRefererJavaBeansRulePropertyNameAsOneInitCap() {
         return initCap(getReffererPropertyNameAsOne(true));
     }
+    public String getReferrerJavaBeansRulePropertyNameAsOneInitCap() {
+        return initCap(getReferrerPropertyNameAsOne(true));
+    }
 
-    /**
-     * Get thr value of refferer property name.
-     * 
-     * @param isJavaBeansRule Is java-beans rule.
-     * @return Generated string.
-     */
-    protected String getReffererPropertyNameAsOne(boolean isJavaBeansRule) {
+    protected String getReferrerPropertyNameAsOne(boolean isJavaBeansRule) {
         final List<Column> localColumnList = getLocalColumnObjectList();
 
         String result = "";
@@ -843,53 +795,36 @@ public class ForeignKey {
             return getTable().getUncapitalisedJavaName() + result + "AsOne";
         }
     }
+    
+    protected String getReffererPropertyNameAsOne(boolean isJavaBeansRule) {
+        return getReferrerPropertyNameAsOne(isJavaBeansRule);
+    }
 
-    /**
-     * Get the value of foreign property name with capitalising the initial character.
-     * 
-     * @return String.
-     */
     public String getForeignPropertyNameInitCap() {
         final String foreignPropertyName = getForeignPropertyName();
         return foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
     }
 
-    /**
-     * @return Generated string.
-     * @deprecated
-     */
-    public String getReffererPropertyNameInitCap() {
-        return getRefererPropertyNameInitCap();
-    }
-
-    /**
-     * Get the value of refferer property name with capitalising the initial character.
-     * 
-     * @return Generated string.
-     */
-    public String getRefererPropertyNameInitCap() {
+    public String getReferrerPropertyNameInitCap() {
         final String reffererPropertyName = getRefererPropertyName();
         return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
     }
-
-    /**
-     * Get the value of refferer property name with capitalising the initial character.
-     * 
-     * @return Generated string.
-     */
-    public String getReffererPropertyNameInitCapAsOne() {
-        final String reffererPropertyName = getReffererPropertyNameAsOne();
-        return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
+    public String getReffererPropertyNameInitCap() {
+        return getReferrerPropertyNameInitCap();
+    }
+    public String getRefererPropertyNameInitCap() {
+        return getReferrerPropertyNameInitCap();
     }
 
-    /**
-     * Get the value of referer property name with capitalising the initial character.
-     * 
-     * @return Generated string.
-     */
+    public String getReferrerPropertyNameInitCapAsOne() {
+        final String referrerPropertyName = getReferrerPropertyNameAsOne();
+        return referrerPropertyName.substring(0, 1).toUpperCase() + referrerPropertyName.substring(1);
+    }
+    public String getReffererPropertyNameInitCapAsOne() {
+        return getReferrerPropertyNameInitCapAsOne();
+    }
     public String getRefererPropertyNameInitCapAsOne() {
-        final String reffererPropertyName = getReffererPropertyNameAsOne();
-        return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
+        return getReferrerPropertyNameInitCapAsOne();
     }
 
     /**
@@ -1050,6 +985,10 @@ public class ForeignKey {
             }
         }
         return result;
+    }
+
+    protected String initCap(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     // ==========================================================================================

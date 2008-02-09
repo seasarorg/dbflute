@@ -11,7 +11,8 @@ targetdatabase = $targetDatabase
   ## Loop by database.
   ##
   #foreach ($database in $dataModel.Databases)
-
+    ${database.setupJavaDir_for_generate()}
+	
     ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     ## Initialize CustomizeDao and AdditionalForeignKey and ClassificationDeployment and IncludeQuery.
     ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -519,9 +520,6 @@ targetdatabase = $targetDatabase
     ##                                                                          annotation
     ##                                                                          ==========
     #if (($database.isTargetLanguageJava() && $database.isAvailableGenerics()) || $database.isTargetLanguageCSharp() || $database.isTargetLanguageCSharpOld())
-      ## Setup java directory for allcommon.
-      $database.setupJavaDir_for_allcommon()
-
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonAnnotation}))
       $database.makeDirectory($path)
 
@@ -537,9 +535,6 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                            behavior
     ##                                                                            ========
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonBhv}))
     $database.makeDirectory($path)
 
@@ -626,9 +621,6 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                      access-context
     ##                                                                      ==============
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
       $database.debug("    parseAccessContext()")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glAccessContextName}.${glClassFileExtension}" )
@@ -638,9 +630,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                         allcommon dao
     ##                                         -------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     $database.debug("    parseDaoReadable")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoReadableInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/DaoReadable.${glTemplateFileExtension}",$path ,"", "")
@@ -652,9 +641,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                      allcommon entity
     ##                                      ----------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     $database.debug("public void parseEntityInterface() {")
     $database.debug("    parseEntity();")
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glEntityInterfaceName}.${glClassFileExtension}" )
@@ -668,9 +654,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                              allcommon condition-bean
     ##                              ------------------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBean}))
     $database.makeDirectory($path)
 
@@ -747,9 +730,6 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCBean})}${glSelectResourceInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SelectResource.${glTemplateFileExtension}",$path ,"", "")
 
-    ## Setup java directory.
-    $database.setupJavaDir_for_abstractCBean()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBean}))
     $database.makeDirectory($path)
 
@@ -764,9 +744,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                allcommon condition-bean condition-key
     ##                --------------------------------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCKey}))
     $database.makeDirectory($path)
 
@@ -828,9 +805,6 @@ targetdatabase = $targetDatabase
       ## -----------------------------------------------------
       ##             allcommon condition-bean condition-option
       ##             -----------------------------------------
-      ## Setup java directory for allcommon.
-      $database.setupJavaDir_for_allcommon()
-
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
       $database.makeDirectory($path)
 
@@ -885,9 +859,6 @@ targetdatabase = $targetDatabase
       ## -----------------------------------------------------
       ##             allcommon condition-bean condition-option
       ##             -----------------------------------------
-      ## Setup java directory for allcommon.
-      $database.setupJavaDir_for_allcommon()
-
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
       $database.makeDirectory($path)
 	  
@@ -899,9 +870,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                allcommon condition-bean condition-value
     ##                ----------------------------------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCValue}))
     $database.makeDirectory($path)
 
@@ -912,9 +880,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                       allcommon condition-bean grouping
     ##                       ---------------------------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCBeanGrouping}))
       $database.makeDirectory($path)
@@ -1025,9 +990,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                     allcommon condition-bean sql-clause
     ##                     -----------------------------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonSqlClause}))
     $database.makeDirectory($path)
 
@@ -1104,9 +1066,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                        allcommon dbmeta
     ##                                        ----------------
-    ## Setup java directory.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonDBMeta}))
     $database.makeDirectory($path)
 
@@ -1183,7 +1142,7 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glForeignInfoName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ForeignInfo.${glTemplateFileExtension}",$path,"", "")
 
-#if ($database.isMakeRecentlyDeprecated())
+#if ($database.isMakeDeprecated())
       $database.debug("    parse('RefererInfo');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glRefererInfoName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/RefererInfo.${glTemplateFileExtension}",$path,"", "")
@@ -1233,9 +1192,6 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ColumnInfo.${glTemplateFileExtension}",$path,"", "")
     #end
 
-    ## Setup java directory.
-    $database.setupJavaDir_for_dbmetaInstanceHandler()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonDBMeta}))
     $database.makeDirectory($path)
 
@@ -1246,9 +1202,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                     allcommon exception
     ##                                     -------------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonException}))
     $database.makeDirectory($path)
 
@@ -1317,9 +1270,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                        allcommon helper
     ##                                        ----------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonHelper}))
     $database.makeDirectory($path)
 
@@ -1473,9 +1423,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                allcommon classification
     ##                                ------------------------
-    ## Setup java directory for allcommon.
-    $database.setupJavaDir_for_allcommon()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
     $database.makeDirectory($path)
 
@@ -1490,8 +1437,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                   allcommon s2container
     ##                                   ---------------------
-    ## Setup java directory for daoDicon.
-    $database.setupJavaDir_for_daoDicon()
     #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
       $database.debug("parseAllcommonS2Container() {")
       #if ($database.isTargetContainerSeasar())
@@ -1567,8 +1512,6 @@ targetdatabase = $targetDatabase
     ## -------------------------------------------------------
     ##                                      allcommon selector
     ##                                      ------------------
-    ## Setup java directory for daoSelector.
-    $database.setupJavaDir_for_daoSelector()
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
     $database.makeDirectory($path)
 	
@@ -1584,7 +1527,6 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glBehaviorSelectorInterfaceName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/BehaviorSelector.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.setupJavaDir_for_cacheDaoSelector()
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
       $database.makeDirectory($path)
 
@@ -1598,9 +1540,6 @@ targetdatabase = $targetDatabase
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glDaoSelectorInterfaceName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/DaoSelector.${glTemplateFileExtension}",$path ,"", "")
 
-    ## Setup java directory for cacheDaoSelector.
-    $database.setupJavaDir_for_cacheDaoSelector()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
     $database.makeDirectory($path)
 
@@ -1612,9 +1551,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                   Parse gen meta data
     ##                                                                                   -------------------
-    ## Setup java directory for genMetaData.
-    $database.setupJavaDir_for_genMetaData()
-
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
     $database.makeDirectory($path)
 
@@ -1625,9 +1561,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                            Parse internal map context
     ##                                                                            --------------------------
-    ## Setup java directory for genMetaData.
-    $database.setupJavaDir_for_genMetaData()
-
     #if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger()) || $database.isTargetLanguageCSharp())
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommon}))
       $database.makeDirectory($path)
@@ -1640,9 +1573,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                            Parse qlog
     ##                                                                                            ----------
-    ## Setup java directory for qlog.
-    $database.setupJavaDir_for_genMetaData()
-
     #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
       $database.debug("parse('QLog');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommon})}${glQLog}.${glClassFileExtension}" )
@@ -1657,8 +1587,6 @@ targetdatabase = $targetDatabase
     ##                                                                               Parse interceptor class
     ##                                                                               -----------------------
     #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharpOld())
-      ## Setup java directory for Interceptor.
-      $database.setupJavaDir_for_interceptor()
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonInterceptor}))
       $database.makeDirectory($path)
 
@@ -1685,7 +1613,6 @@ targetdatabase = $targetDatabase
     ##                                                                                       Parse java like
     ##                                                                                       ---------------
     #if ($database.isTargetLanguageCSharp())
-      $database.setupJavaDir_for_allcommon()
       $database.debug("public void parseJavaLike() {")
 	
 	  #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJavaLike}))
@@ -1693,25 +1620,24 @@ targetdatabase = $targetDatabase
 	  
       $database.debug("    parse('JavaBasic');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaBasic}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaBasic.${glTemplateFileExtension}",$path,"", "")
+      $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaBasic.${glTemplateFileExtension}",$path,"", "")
 	  
       $database.debug("    parse('JavaCollection');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaCollection}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaCollection.${glTemplateFileExtension}",$path,"", "")
+      $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaCollection.${glTemplateFileExtension}",$path,"", "")
 	  
       $database.debug("    parse('JavaException');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaException}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaException.${glTemplateFileExtension}",$path,"", "")
+      $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaException.${glTemplateFileExtension}",$path,"", "")
 	  
       $database.debug("    parse('JavaReflection');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaReflection}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaReflection.${glTemplateFileExtension}",$path,"", "")
+      $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaReflection.${glTemplateFileExtension}",$path,"", "")
 	#end
 	
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                      Parse jdbc class
     ##                                                                                      ----------------
-    $database.setupJavaDir_for_allcommon()
     $database.debug("public void parseInterceptorClass() {")
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbc}))
     $database.makeDirectory($path)
@@ -1763,8 +1689,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                            Parse extended s2dao class
     ##                                                                            --------------------------
-    ## Setup java directory for s2daoObject.
-    $database.setupJavaDir_for_s2daoObject()
     $database.debug("public void parseS2DaoClass() {")
 	
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2Dao}))
@@ -1948,8 +1872,6 @@ targetdatabase = $targetDatabase
     ##                                                                                            Parse util
     ##                                                                                            ----------
     #if ($database.isTargetLanguageJava() || $database.isTargetLanguageCSharp())
-      $database.setupJavaDir_for_allcommon()
-
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonUtil}))
       $database.makeDirectory($path)
 
@@ -1976,9 +1898,6 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                    Parse table object
     ##                                                                                    ------------------
-    ## Setup java directory for base.
-    $database.setupJavaDir_for_base()
-
     ## for Sql2Entity
     #set ($isSql2Entity = false)
 
@@ -1990,9 +1909,6 @@ targetdatabase = $targetDatabase
     $database.makeDirectory($path)
     #set ($path = $strings.getPackageAsPath(${glPackageBaseDBMeta}))
     $database.makeDirectory($path)
-
-    ## Setup java directory for cbean.
-    $database.setupJavaDir_for_base_cbean()
 
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCB}))
     $database.makeDirectory($path)
@@ -2009,14 +1925,8 @@ targetdatabase = $targetDatabase
     #set ($path = $strings.getPackageAsPath(${glPackageNss}))
     $database.makeDirectory($path)
 
-    ## Setup java directory for cbean.
-    $database.setupJavaDir_for_extended_cbean()
-
     #set ($path = $strings.getPackageAsPath(${glPackageCB}))
     $database.makeDirectory($path)
-
-    ## Setup java directory for extended.
-    $database.setupJavaDir_for_extended()
 
     #set ($path = $strings.getPackageAsPath(${glPackageExtendedBhv}))
     $database.makeDirectory($path)
@@ -2085,9 +1995,6 @@ targetdatabase = $targetDatabase
         #set ($isExistDao = true)
         #set ($isExistConditionBean = true)
 
-        ## Setup java directory for base.
-        $database.setupJavaDir_for_base()
-
         #if ($database.isTargetLanguageCSharp() || $database.isTargetLanguageCSharpOld())
           #set ($myBaseBhvInterfaceName = "${table.baseBehaviorClassName}")
           #set ($myExtendedBhvInterfaceName = "${table.extendedBehaviorClassName}")
@@ -2114,9 +2021,6 @@ targetdatabase = $targetDatabase
 
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseDBMeta})}${myDBMetaClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
-
-        ## Setup java directory for extended.
-        $database.setupJavaDir_for_extended()
 
         #if (!$database.isStopGenerateExtendedBhv())
           #if ($database.isTargetLanguageCSharp() || $database.isTargetLanguageCSharpOld())
@@ -2158,9 +2062,6 @@ targetdatabase = $targetDatabase
           #end
         #end
 
-        ## Setup java directory for base-cbean.
-        $database.setupJavaDir_for_base_cbean()
-
         #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/cbean/BsConditionBean.${glTemplateFileExtension}", $path, "table", $table)
 
@@ -2170,13 +2071,8 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageCIQ})}${myConditionInlineQueryClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/cbean/BsConditionInlineQuery.${glTemplateFileExtension}", $path, "table", $table)
 
-        #if ($database.isJavaDirOnlyOne())
-          #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCQ})}${myBaseConditionQueryClassName}.${glClassFileExtension}" )
-          $generator.parse("om/${glResourceDirectory}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
-        #else
-          #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
-          $generator.parse("om/${glResourceDirectory}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
-        #end
+        #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCQ})}${myBaseConditionQueryClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
 
         #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
@@ -2186,19 +2082,14 @@ targetdatabase = $targetDatabase
           $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupperTerminal.${glTemplateFileExtension}", $path, "table", $table)
 		#end
 		
-        ## Setup java directory for extended-cbean.
-        $database.setupJavaDir_for_extended_cbean()
-
         #set ( $path = "${strings.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
         #if (!$files.file(${generator.OutputPath},$path).exists())
           $generator.parse("om/${glResourceDirectory}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
         #end
 
-        #if ($database.isJavaDirOnlyOne())
-          #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
-          #if (!$files.file(${generator.OutputPath},$path).exists())
-            $generator.parse("om/${glResourceDirectory}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
-          #end
+        #set ( $path = "${strings.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
+        #if (!$files.file(${generator.OutputPath},$path).exists())
+          $generator.parse("om/${glResourceDirectory}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
         #end
       #end
     #end

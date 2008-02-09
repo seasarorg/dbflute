@@ -1800,98 +1800,11 @@ public class Database {
     // ===============================================================================
     //                                                                         JavaDir
     //                                                                         =======
-    public void setupJavaDir_for_genMetaData() {
-        setupJavaDir_for_extended();
+    public void setupJavaDir_for_generate() {
+        Generator.getInstance().setOutputPath(getProperties().getBasicProperties().getJavaDir());
     }
-
-    public void setupJavaDir_for_lazyLoadContainer() {
-        setupJavaDir_for_allcommon();
-    }
-
-    public void setupJavaDir_for_daoDicon() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_daoSelector() {
-        setupJavaDir_for_allcommon();
-    }
-
-    public void setupJavaDir_for_cacheDaoSelector() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_abstractCBean() {
-        setupJavaDir_for_gen();
-    }
-
-    public void setupJavaDir_for_dbmetaInstanceHandler() {
-        setupJavaDir_for_gen();
-    }
-
-    public void setupJavaDir_for_interceptor() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_s2daoObject() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_baseCustomizeDao() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_extendedCustomizeDao() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_baseSqlParameter() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_extendedSqlParameter() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_argumentBean() {
-        setupJavaDir_for_extended();
-    }
-
-    public void setupJavaDir_for_allcommon() {
-        setupJavaDir_for_gen();
-    }
-
-    public void setupJavaDir_for_base() {
-        setupJavaDir_for_main();
-    }
-
-    public void setupJavaDir_for_base_cbean() {
-        setupJavaDir_for_gen();
-    }
-
-    public void setupJavaDir_for_extended_cbean() {
-        setupJavaDir_for_main();
-    }
-
-    public void setupJavaDir_for_extended() {
-        setupJavaDir_for_main();
-    }
-
+    
     public void setupJavaDir_for_sql2entity() {
         Generator.getInstance().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
-    }
-
-    // --------------------------------------------
-    //                                  Basic Setup
-    //                                  -----------
-    protected void setupJavaDir_for_main() {
-        Generator.getInstance().setOutputPath(getBasicProperties().getJavaDir_for_main());
-    }
-
-    protected void setupJavaDir_for_gen() {
-        Generator.getInstance().setOutputPath(getBasicProperties().getJavaDir_for_gen());
-    }
-
-    public boolean isJavaDirOnlyOne() {
-        return getBasicProperties().isJavaDirOnlyOne();
     }
 }

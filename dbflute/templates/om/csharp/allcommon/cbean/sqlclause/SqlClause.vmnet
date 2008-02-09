@@ -1,3 +1,4 @@
+#set ($myClassName = "${glSqlClauseInterfaceName}")
 
 using System;
 using System.Collections;
@@ -169,4 +170,6 @@ public interface ${glSqlClauseInterfaceName} {
     //                                                                 =====================
 	public boolean hasSelectedForeignInfo(String relationPath);
 	public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
+}
+
 }
