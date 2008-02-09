@@ -34,15 +34,25 @@ public class ${myClassName} {
     }
 
     public String getOrderByClause() {
-        if (isEmpty()) {
+	    return getOrderByClause(null);
+    }
+	
+    public String getOrderByClause(Map<String, String> selectClauseRealColumnAliasMap) {
+        if (_orderByList.isEmpty()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
-        String delimiter = ", ";
-        foreach (${glOrderByElementName} element in _orderByList) {
-            sb.append(delimiter).append(element.getElementClause());
+        final StringBuffer sb = new StringBuffer();
+        final String delimiter = ", ";
+        for (Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
+            ${glOrderByElementName} element = ite.next();
+            sb.append(delimiter);
+			if (selectClauseRealColumnAliasMap != null) {
+			    sb.append(element.getElementClause(selectClauseRealColumnAliasMap));
+			} else {
+			    sb.append(element.getElementClause());
+			}
         }
-        sb.remove(0, delimiter.Length).insert(0, "order by ");
+        sb.delete(0, delimiter.Length).insert(0, "order by ");
         return sb.toString();
     }
 

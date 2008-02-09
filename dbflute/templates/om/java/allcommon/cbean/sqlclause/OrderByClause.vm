@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 
 #set ($myClassName = "${glOrderByClauseName}")
+import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -72,25 +73,15 @@ public class ${myClassName} implements java.io.Serializable {
      * 
      * @return The value of allRecordCount.
      */
-    public List${database.filterGenericsString(${glOrderByElementName})} getOrderByList() {
+    public List<${glOrderByElementName}> getOrderByList() {
         return _orderByList;
     }
 
     public String getOrderByClause() {
-        if (_orderByList.isEmpty()) {
-            return "";
-        }
-        final StringBuffer sb = new StringBuffer();
-        final String delimiter = ", ";
-        for (final Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
-            final ${glOrderByElementName} element = ite.next();
-            sb.append(delimiter).append(element.getElementClause());
-        }
-        sb.delete(0, delimiter.length()).insert(0, "order by ");
-        return sb.toString();
+	    return getOrderByClause(null);
     }
 
-    public String getOrderByClause(java.util.Map<String, String> selectClauseRealColumnAliasMap) {
+    public String getOrderByClause(Map<String, String> selectClauseRealColumnAliasMap) {
         if (_orderByList.isEmpty()) {
             return "";
         }
@@ -98,7 +89,12 @@ public class ${myClassName} implements java.io.Serializable {
         final String delimiter = ", ";
         for (final Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
             final ${glOrderByElementName} element = ite.next();
-            sb.append(delimiter).append(element.getElementClause(selectClauseRealColumnAliasMap));
+            sb.append(delimiter);
+			if (selectClauseRealColumnAliasMap != null) {
+			    sb.append(element.getElementClause(selectClauseRealColumnAliasMap));
+			} else {
+			    sb.append(element.getElementClause());
+			}
         }
         sb.delete(0, delimiter.length()).insert(0, "order by ");
         return sb.toString();
