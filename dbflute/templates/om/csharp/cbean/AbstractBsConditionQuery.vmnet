@@ -93,7 +93,7 @@ namespace ${glPackageBaseCQ} {
     #if (${col.isAvailableStringLikeSearch()})
 
         public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
-		    if (value == null) { return; }
+		    if (value == null || value.Length == 0) { return; }
 		    if (likeSearchOption.IsLikeContain) {
 			    Set${tmpJavaName}_PrefixSearch("%" + value)
 			} else {
