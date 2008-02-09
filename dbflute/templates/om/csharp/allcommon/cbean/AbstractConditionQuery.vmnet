@@ -485,7 +485,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
     }
 
-    protected System.Collections.IList convertToList<PROPERTY_TYPE>(ICollection<PROPERTY_TYPE> col) {
+    protected System.Collections.IList convertToList<PROPERTY_TYPE>(System.Collections.Generic.ICollection<PROPERTY_TYPE> col) {
         if (col == null) {
             return null;
         }

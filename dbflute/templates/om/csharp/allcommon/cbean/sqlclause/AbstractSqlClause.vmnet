@@ -3,6 +3,7 @@
 using System;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonUtil};
@@ -291,7 +292,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                 }
                 ++count;
             }
-			for (String additionalOnClause in additionalOnClauseList) {
+			foreach (String additionalOnClause in additionalOnClauseList) {
 			    sb.append(" and ").append(additionalOnClause);
 			}
         }

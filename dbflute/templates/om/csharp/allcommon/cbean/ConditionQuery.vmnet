@@ -24,11 +24,6 @@ public interface ${glConditionQueryInterfaceName} {
     int getNestLevel();
     int getNextNestLevel();
     bool isBaseQuery(${glConditionQueryInterfaceName} query);
-
-    // ===================================================================================
-    //                                                                       Foregin Query
-    //                                                                       =============
-    ${glConditionQueryInterfaceName} getForeignConditionQuery(String foreignPropertyName);
 }
 
 }

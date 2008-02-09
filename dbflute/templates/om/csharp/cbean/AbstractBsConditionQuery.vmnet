@@ -23,7 +23,7 @@ namespace ${glPackageBaseCQ} {
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        public override String TableDbName { get { return "${table.Name}"; } }
+        public override String getTableDbName() { return "${table.Name}"; }
 
         // ===============================================================================
         //                                                                           Query
