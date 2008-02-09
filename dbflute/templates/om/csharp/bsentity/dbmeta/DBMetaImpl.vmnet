@@ -257,7 +257,7 @@ namespace ${myDBMetaPackageName} {
 #if (${referrer.isOneToOne()})
         public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
             ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
-            foreignInfo.ForeignPropertyName = "${referrer.refererJavaBeansRulePropertyNameInitCapAsOne}";
+            foreignInfo.ForeignPropertyName = "${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}";
             foreignInfo.LocalDBMeta = ${referrer.foreignTableDBMetaClassName}.GetInstance();
             foreignInfo.ForeignDBMeta = ${referrer.referrerTableDBMetaClassName}.GetInstance();
             IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();

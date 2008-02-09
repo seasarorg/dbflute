@@ -92,7 +92,7 @@ namespace ${glPackageBaseCB} {
         //                                                                    Setup Select
         //                                                                    ============
 #foreach ($foreignKeys in $table.ForeignKeys)
-  #set ($tmpPropertyName = "${foreignKeys.foreignPropertyName}")
+  #set ($tmpPropertyName = "${foreignKeys.foreignPropertyNameInitCap}")
   #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
   #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${foreignKeys.foreignTable.javaName}Nss")
 
@@ -124,7 +124,7 @@ namespace ${glPackageBaseCB} {
 #end
 #foreach ($referrer in $table.referrers)
   #if (${referrer.isOneToOne()})
-    #set ($tmpPropertyName = "${referrer.ReferrerPropertyNameAsOne}")
+    #set ($tmpPropertyName = "${referrer.ReferrerPropertyNameInitCapAsOne}")
     #set ($tmpPropertyNameInitCap = "${referrer.ReferrerPropertyNameInitCapAsOne}")
     #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
 
