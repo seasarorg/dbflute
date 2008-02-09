@@ -63,7 +63,7 @@ namespace ${glPackageBaseCB} {
         public ${myConditionQueryClassName} ConditionQuery {
             get {
                 if (_conditionQuery == null) {
-                    _conditionQuery = new ${myConditionQueryClassName}(null, this.SqlClause, TableDbName, 0);
+                    _conditionQuery = new ${myConditionQueryClassName}(null, this.SqlClause, this.SqlClause.getLocalTableAliasName(), 0);
                 }
                 return _conditionQuery;
             }
