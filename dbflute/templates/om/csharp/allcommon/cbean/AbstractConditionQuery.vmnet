@@ -262,6 +262,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                         InScope Query
     //                                         -------------
 
+    // -----------------------------------------------------
+    //                                 Where Clause Setupper
+    //                                 ---------------------
     protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
