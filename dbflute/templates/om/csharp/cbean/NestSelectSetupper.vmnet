@@ -37,7 +37,7 @@ namespace ${glPackageNss} {
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
 #set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
-        public void With${tmpPropertyNameInitCap}() {
+        public ${referrer.referrerTableNestSelectSetupperTerminalClassName} With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
     		String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
     		String localRelationPath = _query.getRelationPath();

@@ -27,8 +27,8 @@ namespace ${glPackageBaseCommonUtil} {
         //                                         Assert String
         //                                         -------------
         public static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-            assertObjectNotNull("variableName", variableName);
-            assertObjectNotNull("value", value);
+            AssertObjectNotNull("variableName", variableName);
+            AssertObjectNotNull("value", value);
             if (value.Trim().Length == 0) {
                 String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
                 throw new SystemException(msg);
