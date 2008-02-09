@@ -416,7 +416,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		return resultMap;
 	}
 
-    public static class SelectedSelectColumnInfo {
+    public class SelectedSelectColumnInfo {
         protected String tableAliasName;
         protected String columnName;
         protected String columnAliasName;
@@ -478,7 +478,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         _outerJoinMap.put(aliasName, joinInfo);
     }
 
-    protected static class LeftOuterJoinInfo {
+    protected class LeftOuterJoinInfo {
         protected String _aliasName;
         protected String _joinTableName;
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
@@ -777,7 +777,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         _unionQueryInfoList.add(unionQueryInfo);
     }
 
-    protected static class UnionQueryInfo {
+    protected class UnionQueryInfo {
         protected String _unionQueryClause;
         protected bool _unionAll;
         public String getUnionQueryClause() {

@@ -84,7 +84,7 @@ namespace ${glPackageBaseCB} {
             query().xsetUnionAllQuery(unionAllQuery);
         }
     
-        public boolean HasUnionQueryOrUnionAllQuery() {
+        public bool HasUnionQueryOrUnionAllQuery() {
             return query().hasUnionQueryOrUnionAllQuery();
         }
 	

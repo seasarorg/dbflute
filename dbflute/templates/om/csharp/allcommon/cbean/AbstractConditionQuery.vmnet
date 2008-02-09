@@ -565,3 +565,5 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 	    ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }
+
+}

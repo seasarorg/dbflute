@@ -12,13 +12,7 @@ using ${glPackageBaseCommonJavaLike};
 using ${glPackageCQ};
 using ${glPackageCIQ};
 
-#if ($database.isJavaDirOnlyOne())
-
 namespace ${glPackageBaseCQ} {
-#else
-
-namespace ${glPackageCQ} {
-#end
 
     [System.Serializable]
     public class ${myClassName} : ${myAbstractBaseConditionQueryClassName} {
@@ -230,7 +224,7 @@ namespace ${glPackageCQ} {
   #end
 
   #foreach ($referrer in $table.Referrers)
-    #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}${glConditionQueryInitialName}")
+    #set ($relatedCQClassName = "${glProjectPrefix}${referrer.table.javaName}${glConditionQueryInitialName}")
     #if (${referrer.isOneToOne()})
 
         // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
