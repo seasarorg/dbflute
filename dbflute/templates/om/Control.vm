@@ -1692,19 +1692,19 @@ targetdatabase = $targetDatabase
       $database.makeDirectory($path)
 	  
       $database.debug("    parse('JavaBasic');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glJavaBasic}.${glClassFileExtension}" )
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaBasic}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaBasic.${glTemplateFileExtension}",$path,"", "")
 	  
       $database.debug("    parse('JavaCollection');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glJavaCollection}.${glClassFileExtension}" )
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaCollection}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaCollection.${glTemplateFileExtension}",$path,"", "")
 	  
       $database.debug("    parse('JavaException');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glJavaException}.${glClassFileExtension}" )
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaException.${glTemplateFileExtension}",$path,"", "")
 	  
       $database.debug("    parse('JavaReflection');")
-      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJdbc})}${glJavaReflection}.${glClassFileExtension}" )
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaReflection}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/JavaReflection.${glTemplateFileExtension}",$path,"", "")
 	#end
 	
