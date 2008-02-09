@@ -389,7 +389,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                           Union Query
     //                                           -----------
-    public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, boolean unionAll, String unionQueryPropertyName) {
+    public void registerUnionQuery(${glConditionQueryInterfaceName} unionQuery, bool unionAll, String unionQueryPropertyName) {
         String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
 		
 		// At the future, building SQL will be moved to sqlClause.
@@ -400,17 +400,17 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 	    String fromClause = unionQuery.getSqlClause().getFromClause();
 		String whereClause = unionQuery.getSqlClause().getWhereClause();
 		String unionQueryClause;
-		if (whereClause.trim().length() <= 0) {
+		if (whereClause.Trim().Length <= 0) {
 		    unionQueryClause = fromClause + " " + getSqlClause().getUnionWhereClauseMark();
 		} else {
-		    int whereIndex = whereClause.indexOf("where ");
+		    int whereIndex = whereClause.IndexOf("where ");
 		    if (whereIndex < 0) {
 				String msg = "The whereClause should have 'where' string: " + whereClause;
 			    throw new IllegalStateException(msg);
 			}
 			int clauseIndex = whereIndex + "where ".length();
 			String mark = getSqlClause().getUnionWhereFirstConditionMark();
-			unionQueryClause = fromClause + " " + whereClause.substring(0, clauseIndex) + mark + whereClause.substring(clauseIndex);
+			unionQueryClause = fromClause + " " + whereClause.Substring(0, clauseIndex) + mark + whereClause.Substring(clauseIndex);
 		}
         String oldStr = "." + CQ_PROPERTY + ".";
         String newStr = "." + CQ_PROPERTY + "." + unionQueryPropertyName + ".";
@@ -420,7 +420,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
-    public void registerOrderBy(String columnName, boolean ascOrDesc) {
+    public void registerOrderBy(String columnName, bool ascOrDesc) {
         getSqlClause().registerOrderBy(getRealColumnName(columnName), null, ascOrDesc);
     }
 	
@@ -521,11 +521,11 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             String msg = "The columnName should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        if (columnName.trim().length() == 0) {
+        if (columnName.Trim().Length == 0) {
             String msg = "The columnName should not be empty-string.";
             throw new IllegalArgumentException(msg);
         }
-        if (columnName.indexOf(",") >= 0) {
+        if (columnName.IndexOf(",") >= 0) {
             String msg = "The columnName should not contain comma ',': " + columnName;
             throw new IllegalArgumentException(msg);
         }
@@ -536,11 +536,11 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             String msg = "The aliasName should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        if (aliasName.trim().length() == 0) {
+        if (aliasName.Trim().Length == 0) {
             String msg = "The aliasName should not be empty-string.";
             throw new IllegalArgumentException(msg);
         }
-        if (aliasName.indexOf(",") >= 0) {
+        if (aliasName.IndexOf(",") >= 0) {
             String msg = "The aliasName should not contain comma ',': " + aliasName;
             throw new IllegalArgumentException(msg);
         }
