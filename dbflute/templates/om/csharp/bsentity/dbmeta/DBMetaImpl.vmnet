@@ -217,7 +217,7 @@ namespace ${myDBMetaPackageName} {
                 uniqueInfo.IsPrimary = true;
                 return uniqueInfo;
 #else
-		        throw new NotSupportedException("The table doen not have primary key: " + getTableDbName());
+		        throw new NotSupportedException("The table doen not have primary key: " + TableDbName);
 #end
             }
 		}
