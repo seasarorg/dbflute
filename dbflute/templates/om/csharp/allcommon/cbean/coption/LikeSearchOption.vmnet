@@ -74,7 +74,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     }
 	public bool IsLikeContain { get {
 	    return _like != null ? _like.Equals(LIKE_CONTAIN) : false;
-	}
+	}}
 
     // ===================================================================================
     //                                                                              Escape
@@ -113,7 +113,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
             tmp = Replace(tmp, "_", _escape + "_");
             value = tmp;
         }
-        final String wildCard = "${database.wildCard}";
+        String wildCard = "${database.wildCard}";
         if (_like == null || _like.Trim().Length == 0) {
             return value;
         } else if (_like.Equals(LIKE_PREFIX)) {
@@ -131,5 +131,7 @@ public class ${myClassName} : ${glConditionOptionSimpleStringName} {
     // ===================================================================================
     //                                                                            DeepCopy
     //                                                                            ========
+
+}
 
 }

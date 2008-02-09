@@ -95,7 +95,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
 		    if (value == null || value.Length == 0) { return; }
 		    if (likeSearchOption.IsLikeContain) {
-			    Set${tmpJavaName}_PrefixSearch("%" + value)
+			    Set${tmpJavaName}_PrefixSearch("%" + value);
 			} else {
                 throw new NotSupportedException("Now only LikeContain() has been supported. Sorry...");
 			}
