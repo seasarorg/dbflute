@@ -152,7 +152,7 @@ namespace ${glPackageBaseCQ} {
         // ===============================================================================
         //                                                                     Union Query
         //                                                                     ===========
-		protected override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+		public override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
 #if ($table.hasForeignKeyOrRefererAsOne())
             ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
             ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;
@@ -218,7 +218,7 @@ namespace ${glPackageBaseCQ} {
     	protected String resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}() {
     	    return resolveNextRelationPath("${table.name}", "${foreignKeys.foreignPropertyName}");
     	}
-        public boolean hasConditionQuery${foreignKeys.ForeignPropertyNameInitCap}() {
+        public bool hasConditionQuery${foreignKeys.ForeignPropertyNameInitCap}() {
             return _conditionQuery${foreignKeys.ForeignPropertyNameInitCap} != null;
         }
   #end
@@ -266,7 +266,7 @@ namespace ${glPackageBaseCQ} {
     	protected String resolveNextRelationPath${referrer.ReffererPropertyNameInitCapAsOne}() {
     	    return resolveNextRelationPath("${table.name}", "${referrer.reffererPropertyNameAsOne}");
     	}
-        public boolean hasConditionQuery${referrer.ReffererPropertyNameInitCapAsOne}() {
+        public bool hasConditionQuery${referrer.ReffererPropertyNameInitCapAsOne}() {
             return _conditionQuery${referrer.ReffererPropertyNameInitCapAsOne} != null;
         }
     #end
