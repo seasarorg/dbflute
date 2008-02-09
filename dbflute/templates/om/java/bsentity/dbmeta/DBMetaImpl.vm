@@ -320,7 +320,7 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         final ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
         uniqueInfo.setDBMeta(this);
 #foreach ($col in $table.primaryKey)
-        uniqueInfo.addUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", ${col.javaNative}.class, true, ${col.columnSizeSettingExpression}));
+        uniqueInfo.addUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", ${col.javaNative}.class, true, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}));
 #end
         uniqueInfo.setPrimary(true);
         return uniqueInfo;

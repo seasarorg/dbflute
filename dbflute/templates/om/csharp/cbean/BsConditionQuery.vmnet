@@ -248,7 +248,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($columnName in $referrer.foreignColumns)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($refererColumnName = $referrer.getForeignLocalMapping().get($columnName))
-        joinOnMap.put(getRealColumnName("${foreignColumn.name}"), getConditionQuery${referrer.reffererPropertyNameInitCapAsOne}().getRealColumnName("${refererColumnName}"));
+        joinOnMap.put(getRealColumnName("${foreignColumn.name}"), ConditionQuery${referrer.reffererPropertyNameInitCapAsOne}.getRealColumnName("${refererColumnName}"));
 #end
 #if ($referrer.hasFixedCondition())
         joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${referrer.fixedCondition}", getRealAliasName(), ConditionQuery${referrer.reffererPropertyNameInitCapAsOne}.getRealAliasName()));

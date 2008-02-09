@@ -28,6 +28,7 @@ namespace ${glPackageBaseCommonJavaLike} {
 
     public interface List<ELEMENT> : Collection<ELEMENT> {
         ELEMENT get(int index);
+		ELEMENT set(int index, ELEMENT element)
 		ELEMENT remove(int index);
         IList<ELEMENT> getList();
     }
@@ -52,6 +53,11 @@ namespace ${glPackageBaseCommonJavaLike} {
         }
         public ELEMENT get(int index) {
             return _res[index];
+        }
+        public ELEMENT set(int index, ELEMENT element) {
+            ELEMENT result = _res[index];
+            _res[index] = element;
+            return result;
         }
         public ELEMENT remove(int index) {
 		    ELEMENT result = _res[index]; 

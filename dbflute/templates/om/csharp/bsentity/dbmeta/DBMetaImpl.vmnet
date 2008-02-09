@@ -212,9 +212,9 @@ namespace ${myDBMetaPackageName} {
                 ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
                 uniqueInfo.DBMeta = this;
 #foreach ($col in $table.primaryKey)
-                uniqueInfo.AddUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", typeof(${col.javaNative}), true, ${col.columnSizeSettingExpression}));
+                uniqueInfo.AddUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", typeof(${col.javaNative}), true, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}));
 #end
-                uniqueInfo.Primary = true;
+                uniqueInfo.IsPrimary = true;
                 return uniqueInfo;
 #else
 		        throw new UnsupportedOperationException("The table doen not have primary key: " + getTableDbName());

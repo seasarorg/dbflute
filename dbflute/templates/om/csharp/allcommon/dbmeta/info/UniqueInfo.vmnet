@@ -34,7 +34,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
-       public ${glDBMetaInterfaceName} MyDBMeta {
+       public ${glDBMetaInterfaceName} DBMeta {
            get { return dbmeta; }
            set { this.dbmeta = value; }
        }
