@@ -33,7 +33,7 @@ namespace ${glPackageBaseCQ} {
         //                                                                          ======
         public ${myConditionInlineQueryClassName} Inline() {
             if (_inlineQuery == null) {
-                _inlineQuery = new ${myConditionInlineQueryClassName}(GetChildQuery(), getSqlClause(), GetAliasName(), GetNestLevel(), this);
+                _inlineQuery = new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
             }
             return _inlineQuery;
         }
