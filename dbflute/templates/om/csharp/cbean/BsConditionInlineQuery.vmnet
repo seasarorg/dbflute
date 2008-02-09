@@ -34,7 +34,7 @@ namespace ${glPackageCIQ} {
         // ===================================================================================
         //                                                             Override about Register
         //                                                             =======================
-        protected override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+        public override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
             throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
         }
     
