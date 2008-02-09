@@ -183,8 +183,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 	public String getSelectClause() {
 	    StringBuilder sb = new StringBuilder();
 		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
-		List<${glColumnInfoName}> columnInfoList = dbmeta.GetColumnInfoList();
-		foreach (${glColumnInfoName} columnInfo in columnInfoList) {
+		foreach (${glColumnInfoName} columnInfo in dbmeta.ColumnInfoList) {
 		     String columnName = columnInfo.ColumnDbName;
 			if (sb.length() > 0) {
 			    sb.append(", ");
@@ -197,7 +196,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		}
 	    Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
 		foreach (String tableAliasName in tableAliasNameSet) {
-		     Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
+		    Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
 			Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
 			foreach (SelectedSelectColumnInfo selectColumnInfo in selectColumnInfoList) {
 			     String realColumnName = selectColumnInfo.buildRealColumnName();
@@ -214,9 +213,8 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 	public String getSelectClausePKOnly() {
 	    StringBuilder sb = new StringBuilder();
 		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
-		${glUniqueInfoName} uniqueInfo = dbmeta.GetPrimaryUniqueInfo();
-		List<${glColumnInfoName}> columnInfoList = uniqueInfo.UniqueColumnList;
-		foreach (${glColumnInfoName} columnInfo in columnInfoList) {
+		${glUniqueInfoName} uniqueInfo = dbmeta.PrimaryUniqueInfo;
+		foreach (${glColumnInfoName} columnInfo in uniqueInfo.UniqueColumnList) {
 		     String columnName = columnInfo.ColumnDbName;
 			if (sb.length() > 0) {
 			    sb.append(", ");
@@ -287,7 +285,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                 if (count > 0) {
                     sb.append(" and ");
                 }
-                if (localColumnName.equals("$$fixedCondition$$")) {
+                if (localColumnName.Equals("$$fixedCondition$$")) {
                     sb.append(foreignColumnName);
                 } else {
                     sb.append(localColumnName).append(" = ").append(foreignColumnName);
@@ -307,7 +305,8 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         int count = 0;
         for (Iterator<String> ite = inlineWhereClauseList.iterator(); ite.hasNext(); ) {
             String clauseElement = ite.next();
-            clauseElement = filterWhereClauseSimply(clauseElement);
+			// Non Support on C#
+            // clauseElement = filterWhereClauseSimply(clauseElement);
             if (count > 0) {
                 sb.append(" and ");
             }
@@ -335,7 +334,8 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         int count = 0;
         for (Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
             String clauseElement = (String)ite.next();
-            clauseElement = filterWhereClauseSimply(clauseElement);
+			// Non Support on C#
+            // clauseElement = filterWhereClauseSimply(clauseElement);
             if (count == 0) {
                 sb.append("where ").append(template  ? getWhereFirstConditionMark() : "").append(clauseElement);
             } else {
@@ -407,8 +407,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         }
 		Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
 		${glDBMetaInterfaceName} foreignDBMeta = foreignInfo.ForeignDBMeta;
-         List<${glColumnInfoName}> columnInfoList = foreignDBMeta.GetColumnInfoList();
-        foreach (${glColumnInfoName} columnInfo in columnInfoList) {
+        foreach (${glColumnInfoName} columnInfo in foreignDBMeta.ColumnInfoList) {
             String columnDbName = columnInfo.ColumnDbName();
 			SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
 			selectColumnInfo.setTableAliasName(foreignTableAliasName);
