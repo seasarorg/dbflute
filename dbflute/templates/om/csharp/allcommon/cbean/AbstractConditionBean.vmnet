@@ -43,6 +43,11 @@ namespace ${glPackageBaseCommonCBean} {
         public abstract ${glConditionQueryInterfaceName} ConditionQueryAsInterface { get; }
 
         // ===============================================================================
+        //                                                                     Union Query
+        //                                                                     ===========
+        public abstract bool HasUnionQueryOrUnionAllQuery();
+
+        // ===============================================================================
         //                                                    Implementation of PagingBean
         //                                                    ============================
         // -------------------------------------------------
