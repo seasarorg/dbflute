@@ -181,7 +181,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 	    StringBuilder sb = new StringBuilder();
 		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
 		List<${glColumnInfoName}> columnInfoList = dbmeta.GetColumnInfoList();
-		for (${glColumnInfoName} columnInfo in columnInfoList) {
+		foreach (${glColumnInfoName} columnInfo in columnInfoList) {
 		     String columnName = columnInfo.ColumnDbName;
 			if (sb.length() > 0) {
 			    sb.append(", ");
@@ -193,10 +193,10 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 			_selectClauseRealColumnAliasMap.put(realColumnName, columnName);
 		}
 	    Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
-		for (String tableAliasName : tableAliasNameSet) {
+		foreach (String tableAliasName in tableAliasNameSet) {
 		     Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
 			Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
-			for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
+			foreach (SelectedSelectColumnInfo selectColumnInfo in selectColumnInfoList) {
 			     String realColumnName = selectColumnInfo.buildRealColumnName();
                 sb.append(", ").append(realColumnName).append(" as ").append(selectColumnInfo.getColumnAliasName());
 				_selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
@@ -213,7 +213,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
 		${glUniqueInfoName} uniqueInfo = dbmeta.GetPrimaryUniqueInfo();
 		List<${glColumnInfoName}> columnInfoList = uniqueInfo.UniqueColumnList;
-		for (${glColumnInfoName} columnInfo in columnInfoList) {
+		foreach (${glColumnInfoName} columnInfo in columnInfoList) {
 		     String columnName = columnInfo.ColumnDbName;
 			if (sb.length() > 0) {
 			    sb.append(", ");
@@ -279,7 +279,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             sb.append(" ").append(aliasName).append(" on ");
             int count = 0;
              Set<String> localColumnNameSet = joinOnMap.keySet();
-            for (String localColumnName in localColumnNameSet) {
+            foreach (String localColumnName in localColumnNameSet) {
                  String foreignColumnName = (String)joinOnMap.get(localColumnName);
                 if (count > 0) {
                     sb.append(" and ");
@@ -405,7 +405,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
 		${glDBMetaInterfaceName} foreignDBMeta = foreignInfo.ForeignDBMeta;
          List<${glColumnInfoName}> columnInfoList = foreignDBMeta.GetColumnInfoList();
-        for (${glColumnInfoName} columnInfo in columnInfoList) {
+        foreach (${glColumnInfoName} columnInfo in columnInfoList) {
             String columnDbName = columnInfo.ColumnDbName();
 			SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
 			selectColumnInfo.setTableAliasName(foreignTableAliasName);
@@ -934,29 +934,14 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                     Fetch Narrowing
     //                                                                     ===============
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch-narrowing start-index.
-     */
     public int getFetchNarrowingSkipStartIndex() {
         return getPageStartIndex();
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Fetch-narrowing size.
-     */
     public int getFetchNarrowingLoopCount() {
         return getFetchSize();
     }
 
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Determiantion.
-     */
     public bool isFetchNarrowingEffective() {
         return _isFetchScopeEffective;
     }

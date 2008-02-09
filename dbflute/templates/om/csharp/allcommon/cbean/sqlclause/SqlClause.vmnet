@@ -14,34 +14,34 @@ public interface ${glSqlClauseInterfaceName} {
     // =====================================================================================
     //                                                                                Clause
     //                                                                                ======
-    public String getClause();
-	public String getClausePKOnly();
-    public String getClauseFromWhereWithUnionTemplate();
-    public String getClauseFromWhereWithWhereUnionTemplate();
+    String getClause();
+	String getClausePKOnly();
+    String getClauseFromWhereWithUnionTemplate();
+    String getClauseFromWhereWithWhereUnionTemplate();
 
     // =====================================================================================
     //                                                                          Clause Parts
     //                                                                          ============
-	public String getSelectClause();
-	public String getSelectClausePKOnly();
-    public String getSelectHint();
-    public String getIncludedSelectColumnClause();
-    public String getFromClause();
-    public String getFromBaseTableHint();
-    public String getFromHint();
-    public String getWhereClause();
-    public String getOrderByClause();
-    public String getSqlSuffix();
+	String getSelectClause();
+	String getSelectClausePKOnly();
+    String getSelectHint();
+    String getIncludedSelectColumnClause();
+    String getFromClause();
+    String getFromBaseTableHint();
+    String getFromHint();
+    String getWhereClause();
+    String getOrderByClause();
+    String getSqlSuffix();
 
     // ===================================================================================
     //                                                                          Copy Parts
     //                                                                          ==========
-    public void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause);
+    void copyIncludedSelectColumn(${glSqlClauseInterfaceName} sqlClause);
 
 	// ===================================================================================
     //                                                                SelectedSelectColumn
     //                                                                ====================
-    public void registerSelectedSelectColumn(String foreignTableAliasName
+    void registerSelectedSelectColumn(String foreignTableAliasName
 			                               , String localTableName
 										   , String foreignPropertyName
 										   , String localRelationPath);
@@ -49,127 +49,127 @@ public interface ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                IncludedSelectColumn
     //                                                                ====================
-    public void ignoreIncludedSelectColumn();
-    public void makeIncludedSelectColumnEffective();
-    public void registerIncludedSelectColumn(String aliasName, String realColumnName);
+    void ignoreIncludedSelectColumn();
+    void makeIncludedSelectColumnEffective();
+    void registerIncludedSelectColumn(String aliasName, String realColumnName);
 
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
-    public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
+    void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
 
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
-    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value);
-    public void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
-    public void registerWhereClause(String clause);
-    public void exchangeFirstWhereClauseForLastOne();
+    void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    void registerWhereClause(String columnFullName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
+    void registerWhereClause(String clause);
+    void exchangeFirstWhereClauseForLastOne();
 
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
-    public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
-    public void registerBaseTableInlineWhereClause(String value);
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, boolean onClauseInline);
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline);
-    public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
+    void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
+    void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
+    void registerBaseTableInlineWhereClause(String value);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, boolean onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
 
     // ===================================================================================
     //                                                             AdditionalConditionAsOr
     //                                                             =======================
-    public void makeAdditionalConditionAsOrEffective();
-    public void ignoreAdditionalConditionAsOr();
+    void makeAdditionalConditionAsOrEffective();
+    void ignoreAdditionalConditionAsOr();
 
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
-    public ${glOrderByClauseName} getSqlComponentOfOrderByClause();
-    public ${myClassName} clearOrderBy();
-    public ${myClassName} ignoreOrderBy();
-    public ${myClassName} makeOrderByEffective();
+    ${glOrderByClauseName} getSqlComponentOfOrderByClause();
+    ${myClassName} clearOrderBy();
+    ${myClassName} ignoreOrderBy();
+    ${myClassName} makeOrderByEffective();
 	
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
      * @param ascOrDesc Is it ascend or descend?
      */
-    public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+    void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
 	
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
      * @param ascOrDesc Is it ascend or descend?
      */
-    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+    void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
 
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
-    public void registerUnionQuery(String unionClause, boolean unionAll);
+    void registerUnionQuery(String unionClause, boolean unionAll);
 
     // ===================================================================================
     //                                                                          FetchScope
     //                                                                          ==========
-    public ${myClassName} fetchFirst(int fetchSize);
-    public ${myClassName} fetchScope(int fetchStartIndex, int fetchSize);
-    public ${myClassName} fetchPage(int fetchPageNumber);
-    public int getFetchStartIndex();
-    public int getFetchSize();
-    public int getFetchPageNumber();
-    public int getPageStartIndex();
-    public int getPageEndIndex();
-    public boolean isFetchScopeEffective();
-    public ${myClassName} ignoreFetchScope();
-    public ${myClassName} makeFetchScopeEffective();
-    public boolean isFetchStartIndexSupported();
-    public boolean isFetchSizeSupported();
+    ${myClassName} fetchFirst(int fetchSize);
+    ${myClassName} fetchScope(int fetchStartIndex, int fetchSize);
+    ${myClassName} fetchPage(int fetchPageNumber);
+    int getFetchStartIndex();
+    int getFetchSize();
+    int getFetchPageNumber();
+    int getPageStartIndex();
+    int getPageEndIndex();
+    boolean isFetchScopeEffective();
+    ${myClassName} ignoreFetchScope();
+    ${myClassName} makeFetchScopeEffective();
+    boolean isFetchStartIndexSupported();
+    boolean isFetchSizeSupported();
 
     // ===================================================================================
     //                                                                     Fetch Narrowing
     //                                                                     ===============
-    public boolean isFetchNarrowingEffective();
-    public int getFetchNarrowingSkipStartIndex();
-    public int getFetchNarrowingLoopCount();
+    boolean isFetchNarrowingEffective();
+    int getFetchNarrowingSkipStartIndex();
+    int getFetchNarrowingLoopCount();
 
     // ===================================================================================
     //                                                                                Lock
     //                                                                                ====
-    public ${myClassName} lockForUpdate();
+    ${myClassName} lockForUpdate();
 
     // ===================================================================================
     //                                                                            Resolver
     //                                                                            ========
-    public String resolveJoinAliasName(String relationPath, int cqNestNo);
-    public String resolveNestLevelExpression(String name, int cqNestNo);
-    public int resolveRelationNo(String baseTableName, String foreignPropertyName);
+    String resolveJoinAliasName(String relationPath, int cqNestNo);
+    String resolveNestLevelExpression(String name, int cqNestNo);
+    int resolveRelationNo(String baseTableName, String foreignPropertyName);
 
 	// ===================================================================================
     //                                                                    Table Alias Info
     //                                                                    ================
-	public String getLocalTableAliasName();
-	public String getForeignTableAliasPrefix();
+	String getLocalTableAliasName();
+	String getForeignTableAliasPrefix();
 
 	// ===================================================================================
     //                                                                       Template Mark
     //                                                                       =============
-	public String getWhereClauseMark();
-	public String getWhereFirstConditionMark();
-	public String getUnionSelectClauseMark();
-	public String getUnionWhereClauseMark();
-	public String getUnionWhereFirstConditionMark();
+	String getWhereClauseMark();
+	String getWhereFirstConditionMark();
+	String getUnionSelectClauseMark();
+	String getUnionWhereClauseMark();
+	String getUnionWhereFirstConditionMark();
 	
     // =====================================================================================
     //                                                            Where Clause Simple Filter
     //                                                            ==========================
-    // public void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
+    // void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilterInterfaceName} whereClauseSimpleFilter);
 	
     // =====================================================================================
     //                                                                 Selected Foreign Info
     //                                                                 =====================
-	public boolean hasSelectedForeignInfo(String relationPath);
-	public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
+	boolean hasSelectedForeignInfo(String relationPath);
+	void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 }
 
 }

@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 
 using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonSqlClause};

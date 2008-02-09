@@ -42,24 +42,6 @@ public class ${myClassName} : ${glConditionKeyName} {
         }
         conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
     }
-	
-    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
-        if (value.NotInScope == null) {
-            return;
-        }
-        System.Collections.IList valueList = value.NotInScope;
-        System.Collections.IList checkedValueList = new System.Collections.Generic.List<Object>();
-        foreach (Object checkTargetValue in valueList) {
-            if (checkTargetValue == null) {
-                continue;
-            }
-            checkedValueList.Add(checkTargetValue);
-        }
-        if (checkedValueList.Count == 0) {
-            return;
-        }
-        conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
-    }
 
     protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
         throw new UnsupportedOperationException("doAddWhereClause with condition-option is unsupported!!!");
