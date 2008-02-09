@@ -96,8 +96,8 @@ namespace ${myDBMetaPackageName} {
         // -------------------------------------------------
         //                                     Referrer Name
         //                                     -------------
-#foreach ($children in $table.refererList)
-        public static readonly String REFERRER_PROPERTY_NAME_${children.refererPropertyNameInitCap} = "$children.refererPropertyNameInitCap";
+#foreach ($referrer in $table.referrers)
+        public static readonly String REFERRER_PROPERTY_NAME_${referrer.referrerPropertyNameInitCap} = "$referrer.referrerPropertyNameInitCap";
 #end
 
         // -------------------------------------------------

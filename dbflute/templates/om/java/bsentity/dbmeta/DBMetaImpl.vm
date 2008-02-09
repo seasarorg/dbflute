@@ -108,9 +108,9 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // -----------------------------------------------------
     //                                         Referrer Name
     //                                         -------------
-#foreach ($children in $table.referrers)
-    /** The referrer property name(JavaBeansRule) of ${children.refererJavaBeansRulePropertyName}. */
-    public static final String REFERRER_PROPERTY_NAME_${children.refererJavaBeansRulePropertyName} = "$children.refererJavaBeansRulePropertyName";
+#foreach ($referrer in $table.referrers)
+    /** The referrer property name(JavaBeansRule) of ${referrer.referrerJavaBeansRulePropertyName}. */
+    public static final String REFERRER_PROPERTY_NAME_${referrer.referrerJavaBeansRulePropertyName} = "$referrer.referrerJavaBeansRulePropertyName";
 
 #end
     // -----------------------------------------------------

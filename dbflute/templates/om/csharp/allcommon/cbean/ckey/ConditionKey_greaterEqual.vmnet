@@ -41,12 +41,12 @@ public class ${myClassName} : ${glConditionKeyName} {
         throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
     }
 
-    protected override void DoSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
         conditionValue.GreaterEqual = value;
         conditionValue.setGreaterEqualLocation(location);
     }
 
-    protected override void DoSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }

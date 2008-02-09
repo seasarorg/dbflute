@@ -229,7 +229,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                       Include-As-Mine
     //                                       ---------------
-    protected void registerIncludedSelectColumn(String aliasName, String realColumnName) {
+    protected virtual void registerIncludedSelectColumn(String aliasName, String realColumnName) {
         assertAliasName(aliasName);
         assertColumnName(realColumnName);
         getSqlClause().registerIncludedSelectColumn(aliasName, realColumnName);
@@ -263,24 +263,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                         -------------
 
     // -----------------------------------------------------
-    //                                 Where Clause Setupper
-    //                                 ---------------------
-    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
-                                                             , String colName, String capPropName, String uncapPropName) {
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
-        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
-    }
-
-    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
-        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
-    }
-	
-    // -----------------------------------------------------
     //                                          Inline Query
     //                                          ------------
-    protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected virtual void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                        , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
@@ -292,7 +277,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
     }
 
-    protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+    protected virtual void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                        , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
@@ -307,18 +292,18 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                       InScopeSubQuery
     //                                       ---------------
-    protected void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected virtual void registerInScopeSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
         registerWhereClause(realColumnName + " in (" + subQueryClause + ")");
     }
 
-    protected String getInScopeSubQueryRealColumnName(String columnName) {
+    protected virtual String getInScopeSubQueryRealColumnName(String columnName) {
         return getRealColumnName(columnName);
     }
 
-    protected String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
+    protected virtual String getInScopeSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String relatedColumnName, String propertyName) {
         String selectClause = "select " + getSqlClause().getLocalTableAliasName() + "." + relatedColumnName;
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
@@ -335,14 +320,14 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // -----------------------------------------------------
     //                                        ExistsSubQuery
     //                                        --------------
-    protected void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
+    protected virtual void registerExistsSubQuery(${glConditionQueryInterfaceName} subQuery
                                  , String columnName, String relatedColumnName, String propertyName) {
         String realColumnName = getExistsSubQueryRealColumnName(columnName);
         String subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         registerWhereClause("exists (" + subQueryClause + ")");
     }
 
-    protected String getExistsSubQueryRealColumnName(String columnName) {
+    protected virtual String getExistsSubQueryRealColumnName(String columnName) {
         return getRealColumnName(columnName);
     }
 
@@ -350,7 +335,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     // *Unsupport ExistsSubQuery as inline because it's so dangerous.
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-    protected String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
+    protected virtual String getExistsSubQuerySql(${glConditionQueryInterfaceName} subQuery
                                  , String realColumnName, String relatedColumnName, String propertyName) {
 		int subQueryLevel = subQuery.getSubQueryLevel();
 		if (_subQueryLevel <= subQueryLevel) {
@@ -374,11 +359,26 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 		return selectClause + " " + fromWhereClause;
     }
 
-    protected void registerWhereClause(String whereClause) {
+    // -----------------------------------------------------
+    //                                          Where Clause
+    //                                          ------------
+    protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
+        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
+    }
+
+    protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
+        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
+    }
+	
+    protected virtual void registerWhereClause(String whereClause) {
         getSqlClause().registerWhereClause(whereClause);
     }
 
-    protected void registerInlineWhereClause(String whereClause) {
+    protected virtual void registerInlineWhereClause(String whereClause) {
         if (isBaseQuery(this)) {
             getSqlClause().registerBaseTableInlineWhereClause(whereClause);
         } else {

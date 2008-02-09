@@ -500,21 +500,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // -----------------------------------------------------
-    //                                 Where Clause Setupper
-    //                                 ---------------------
-    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
-                                                             , String colName, String capPropName, String uncapPropName) {
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
-        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
-    }
-
-    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
-        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
-    }
-
-    // -----------------------------------------------------
     //                                          Inline Query
     //                                          ------------
     protected void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
@@ -609,6 +594,21 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 		fromWhereClause = replaceString(fromWhereClause, getSqlClause().getUnionWhereFirstConditionMark(), joinCondition + " and ");
 		
 		return selectClause + " " + fromWhereClause;
+    }
+
+    // -----------------------------------------------------
+    //                                          Where Clause
+    //                                          ------------
+    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName) {
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
+        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
+    }
+
+    protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
+                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
+        getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
 
     protected void registerWhereClause(String whereClause) {
