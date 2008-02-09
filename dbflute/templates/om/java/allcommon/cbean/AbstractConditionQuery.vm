@@ -820,43 +820,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-	@Override
-    public String toString() {
-        return getSqlClause().getClause();
-    }
-	
-    // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
-    }
-		
-    protected final String replaceString(String text, String fromText, String toText) {
-        if(text == null || fromText == null || toText == null)
-            return null;
-        StringBuilder buf = new StringBuilder(100);
-        int pos = 0;
-        int pos2 = 0;
-        do {
-            pos = text.indexOf(fromText, pos2);
-            if(pos == 0) {
-                buf.append(toText);
-                pos2 = fromText.length();
-            } else
-            if(pos > 0) {
-                buf.append(text.substring(pos2, pos));
-                buf.append(toText);
-                pos2 = pos + fromText.length();
-            } else {
-                buf.append(text.substring(pos2));
-                return buf.toString();
-            }
-        } while(true);
-    }
-
+    //                                                                       Assist Helper
+    //                                                                       =============
     /**
      * Initcap string.
      * 
@@ -907,13 +872,43 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         return newList;
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+		
+    protected final String replaceString(String text, String fromText, String toText) {
+        if(text == null || fromText == null || toText == null)
+            return null;
+        StringBuilder buf = new StringBuilder(100);
+        int pos = 0;
+        int pos2 = 0;
+        do {
+            pos = text.indexOf(fromText, pos2);
+            if(pos == 0) {
+                buf.append(toText);
+                pos2 = fromText.length();
+            } else
+            if(pos > 0) {
+                buf.append(text.substring(pos2, pos));
+                buf.append(toText);
+                pos2 = pos + fromText.length();
+            } else {
+                buf.append(text.substring(pos2));
+                return buf.toString();
+            }
+        } while(true);
+    }
+
     protected String initCap(String str) {
 	    return ${glSimpleStringUtil}.initCap(str);
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
     /**
      * Assert that the object is not null.
      * 
@@ -974,10 +969,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
     }
 
-
-    // ----------------------------------------------------------------
-    //                                                    Assert String
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
      * 
@@ -991,5 +985,13 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
+    }
+	
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+	@Override
+    public String toString() {
+        return getSqlClause().getClause();
     }
 }

@@ -111,7 +111,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
             String propertyName = "Column" + InitCap(FindPropertyName(columnFlexibleName));
             PropertyInfo propertyInfo = GetType().GetProperty(propertyName);
-            return (${glColumnInfoName})propertyInfo.GetValue(propertyInfo, null);
+            return (${glColumnInfoName})propertyInfo.GetValue(this, null);
         }
 
         // ===============================================================================
@@ -150,7 +150,7 @@ namespace ${glPackageBaseCommonDBMeta} {
                 String msg = "The property '" + propertyName + "' was Not Found on " + GetType().Name;
                 throw new SystemException(msg);
             }
-            return (${glForeignInfoName})propertyInfo.GetValue(propertyInfo, null);
+            return (${glForeignInfoName})propertyInfo.GetValue(this, null);
         }
 
         // -------------------------------------------------
@@ -175,7 +175,7 @@ namespace ${glPackageBaseCommonDBMeta} {
                 String msg = "The property '" + propertyName + "' was Not Found on " + GetType().Name;
                 throw new SystemException(msg);
             }
-            return (${glReferrerInfoName})propertyInfo.GetValue(propertyInfo, null);
+            return (${glReferrerInfoName})propertyInfo.GetValue(this, null);
         }
 
         // -------------------------------------------------

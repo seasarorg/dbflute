@@ -286,24 +286,7 @@ public class ${glSelectDynamicCommand} extends ${glInternalAbstractDynamicComman
     // -----------------------------------------------------
     //                                          Setup Clause
     //                                          ------------
-	// This is an old style logic.
-    // protected String setupRealSelectClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
-    //     final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-    //     final String realSelectClause;
-    //     {
-    //         final CommandContext ctx;
-    //         if (cb.isLimitSelect_PKOnly()) {
-    //             ctx = _selectClausePKOnlyCommand.doApply(args);
-    //         } else {
-    //             ctx = _selectClauseCommand.doApply(args);
-    //         }
-    //         realSelectClause = ctx.getSql();
-    //         addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
-    //     }
-    //     return realSelectClause;
-    // }
-
-	protected String setupRealClause(Object[] args, java.util.List<Object> bindVariableList, List<Class> bindVariableTypeList) {
+	protected String setupRealClause(Object[] args, List<Object> bindVariableList, List<Class> bindVariableTypeList) {
         final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
         final String realClause;
         {

@@ -453,25 +453,10 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
         return fixedCondition;
     }
-	
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    public override String ToString() {
-        return getSqlClause().getClause();
-    }
-	
-    // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    protected String getLineSeparator() {
-        return ${glSimpleSystemUtil}.GetLineSeparator();
-    }
 
-    protected String replaceString(String text, String fromText, String toText) {
-	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
-    }
-
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected System.Collections.IList convertToList<PROPERTY_TYPE>(System.Collections.Generic.ICollection<PROPERTY_TYPE> col) {
         if (col == null) {
             return null;
@@ -505,13 +490,24 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         return resultList;
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.GetLineSeparator();
+    }
+
+    protected String replaceString(String text, String fromText, String toText) {
+	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
+    }
+
     protected String initCap(String str) {
 	    return ${glSimpleStringUtil}.InitCap(str);
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
     protected void assertObjectNotNull(String variableName, Object value) {
 	    ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
     }
@@ -546,11 +542,18 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         }
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert String
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
 	    ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
+    }
+	
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public override String ToString() {
+        return getSqlClause().getClause();
     }
 }
 

@@ -53,7 +53,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
 
         public bool IsTwoOrMore {
-            get { return this.uniqueColumnList.Count > 1; }
+            get { return this.uniqueColumnList.size() > 1; }
         }
 
         public bool IsPrimary {

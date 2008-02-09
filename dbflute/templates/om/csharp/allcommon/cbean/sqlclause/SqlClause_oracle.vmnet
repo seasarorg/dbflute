@@ -2,6 +2,8 @@
 
 using System;
 
+using ${glPackageBaseCommonDBMeta};
+
 namespace ${glPackageBaseCommonSqlClause} {
 
 [System.Serializable]
@@ -47,7 +49,7 @@ public class ${myClassName} : ${glSqlClauseAbstractName} {
             String primaryKeyColumnName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
             _lockSqlSuffix = " for update of " + _tableName + "." + primaryKeyColumnName;
         } else {
-            String randomColumnName = ((${glColumnInfoName})dbmeta.ColumnInfoList[0]).ColumnDbName;
+            String randomColumnName = dbmeta.ColumnInfoList.get(0).ColumnDbName;
             _lockSqlSuffix = " for update of " + _tableName + "." + randomColumnName;
         }
 

@@ -130,19 +130,14 @@ namespace ${glPackageBaseCommonS2Dao} {
                     // /----------------------------------------------------- [MyExtension]
                     if (${glConditionBeanContextName}.IsTheTypeConditionBean(argTypes[0])) {
                         ${glSelectDynamicCommand} dynamicCommand = CreateCustomizeSelectDynamicCommand(handler);
-                        String sqlNormal = GetSelectClause();
-                        String sqlPKOnly = GetSelectClausePKOnly();
-                        sql = sqlNormal;
                         cmd = dynamicCommand;
-                        dynamicCommand.SetSelectClause(sqlNormal);
-                        dynamicCommand.SetSelectClausePKOnly(sqlPKOnly);
-                        dynamicCommand.ArgNames4Nest = argNames;// Oops!
-                        dynamicCommand.ArgTypes4Nest = argTypes;// Oops!
+                        dynamicCommand.ArgNames4Nest = argNames;
+                        dynamicCommand.ArgTypes4Nest = argTypes;
                     } else {
                         if (typeof(${glSelectResourceInterfaceName}).IsAssignableFrom(argTypes[0])) {
                             String msg = "If the first argument type is select-resource(and not condition-bean), ";
                             msg = msg + "the method should not use auto-select-sql-by-dto.";
-                            msg = msg + " (Do you want to use outer-file-sql? Please check your sql-file-name and build-action!)";
+                            msg = msg + " (Do you want to use outside-sql? Please check your sql-file-name and build-action!)";
                             msg = msg + ": dao=" + methodInfo.DeclaringType + " method=" + methodInfo.Name + "()";
                             msg = msg + " firstArgument=" + argTypes[0] + " argTypes.Length=" + argTypes.Length;
                             throw new SystemException(msg);
