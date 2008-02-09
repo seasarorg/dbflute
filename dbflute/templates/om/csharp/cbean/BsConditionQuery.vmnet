@@ -144,8 +144,8 @@ namespace ${glPackageBaseCQ} {
     #if (!${col.isNotNull()})
     #end
 
-        public ${myClassName} AddOrderBy_${tmpJavaName}_Asc() { registerOrderBy(getRealColumnName("${col.name}"), true);return this; }
-        public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() { registerOrderBy(getRealColumnName("${col.name}"), false);return this; }
+        public ${myClassName} AddOrderBy_${tmpJavaName}_Asc() { registerOrderBy("${col.name}", true);return this; }
+        public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() { registerOrderBy("${col.name}", false);return this; }
 
   #end
 
