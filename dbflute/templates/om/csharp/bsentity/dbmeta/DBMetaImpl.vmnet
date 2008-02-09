@@ -238,7 +238,7 @@ namespace ${myDBMetaPackageName} {
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
         public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
             ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
-            foreignInfo.ForeignPropertyName = "${foreignKeys.foreignJavaBeansRulePropertyName}";
+            foreignInfo.ForeignPropertyName = "${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}";
             foreignInfo.LocalDBMeta = ${table.DBMetaClassName}.GetInstance();
             foreignInfo.ForeignDBMeta = ${foreignKeys.foreignTableDBMetaClassName}.GetInstance();
             IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
@@ -257,7 +257,7 @@ namespace ${myDBMetaPackageName} {
 #if (${referrer.isOneToOne()})
         public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
             ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
-            foreignInfo.ForeignPropertyName = "${referrer.refererJavaBeansRulePropertyNameAsOne}";
+            foreignInfo.ForeignPropertyName = "${referrer.refererJavaBeansRulePropertyNameInitCapAsOne}";
             foreignInfo.LocalDBMeta = ${referrer.foreignTableDBMetaClassName}.GetInstance();
             foreignInfo.ForeignDBMeta = ${referrer.referrerTableDBMetaClassName}.GetInstance();
             IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
@@ -280,7 +280,7 @@ namespace ${myDBMetaPackageName} {
 #set ($referrerTable = $referrer.table)
         public ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
             ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrerInfo = new ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName}();
-            referrerInfo.ReferrerPropertyName = "${referrer.referrerJavaBeansRulePropertyName}";
+            referrerInfo.ReferrerPropertyName = "${referrer.referrerJavaBeansRulePropertyNameInitCap}";
             referrerInfo.LocalDBMeta = ${referrer.foreignTableDBMetaClassName}.GetInstance();
             referrerInfo.ReferrerDBMeta = ${referrer.referrerTableDBMetaClassName}.GetInstance();
             IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
