@@ -1,0 +1,135 @@
+#set ($myClassName = "${glConditionOptionLikeSearchName}")
+
+using System;
+
+// using ${glPackageBaseCommonCOptionPartsLocal};
+
+namespace ${glPackageBaseCommonCOption} {
+
+public class ${myClassName} : ${glConditionOptionSimpleStringName} {
+
+    public static readonly String LIKE_PREFIX = "prefix";
+    public static readonly String LIKE_SUFFIX = "suffix";
+    public static readonly String LIKE_CONTAIN = "contain";
+
+    protected String _like;
+    protected String _escape;
+
+    // protected java.util.List<LikeAsOrCallback> _likeAsOrCallbackList = new java.util.ArrayList<LikeAsOrCallback>();
+
+    // ===================================================================================
+    //                                                                         Rear Option
+    //                                                                         ===========
+    public override String RearOption { get {
+        if (_escape == null || _escape.Trim().Length == 0) {
+            return "";
+        }
+        return " escape '" + _escape + "'";
+    }}
+
+    // ===================================================================================
+    //                                                                                AsOr
+    //                                                                                ====
+    // public static interface LikeAsOrCallback {
+    //     public String getAdditionalTargetPropertyName();
+    //     public String filterValue(String currentValue);
+    //     public ${myClassName} filterOption(${myClassName} optionDeepCopyWithoutCallback);
+    // }
+
+    // public static abstract class DefaultLikeAsOrCallback implements LikeAsOrCallback {
+    //     public String filterValue(String currentValue) {
+    //         return currentValue;
+    //     }
+    //     public ${myClassName} filterOption(${myClassName} optionDeepCopyWithoutCallback) {
+    //         return optionDeepCopyWithoutCallback;
+    //     }
+    // }
+
+    // public java.util.List${database.filterGenericsString('LikeAsOrCallback')} getLikeAsOrCallbackList() {
+    //     return _likeAsOrCallbackList;
+    // }
+
+    // public void addLikeAsOrCallback(LikeAsOrCallback likeAsOrCallback) {
+    //     _likeAsOrCallbackList.add(likeAsOrCallback);
+    // }
+
+    // public void clearLikeAsOrCallback() {
+    //     _likeAsOrCallbackList.clear();
+    // }
+
+    // ===================================================================================
+    //                                                                                Like
+    //                                                                                ====
+    public ${myClassName} LikePrefix() {
+        _like = LIKE_PREFIX;
+        return this;
+    }
+    // public ${myClassName} LikeSuffix() {
+    //     _like = LIKE_SUFFIX;
+    //     return this;
+    // }
+    public ${myClassName} LikeContain() {
+        _like = LIKE_CONTAIN;
+        return this;
+    }
+	public bool IsLikeContain { get {
+	    return _like != null ? _like.Equals(LIKE_CONTAIN) : false;
+	}
+
+    // ===================================================================================
+    //                                                                              Escape
+    //                                                                              ======
+
+    // ===================================================================================
+    //                                                                               Split
+    //                                                                               =====
+
+    // ===================================================================================
+    //                                                                 To Upper/Lower Case
+    //                                                                 ===================
+
+    // ===================================================================================
+    //                                                                      To Single Byte
+    //                                                                      ==============
+
+    // ===================================================================================
+    //                                                                      To Double Byte
+    //                                                                      ==============
+
+    // ===================================================================================
+    //                                                                            Japanese
+    //                                                                            ========
+
+    // ===================================================================================
+    //                                                                          Real Value
+    //                                                                          ==========
+    public override String GenerateRealValue(String value) {
+        value = base.GenerateRealValue(value);
+
+        // Escape
+        if (_escape != null && _escape.Trim().Length != 0) {
+            String tmp = Replace(value, _escape, _escape + _escape);
+            tmp = Replace(tmp, "%", _escape + "%");
+            tmp = Replace(tmp, "_", _escape + "_");
+            value = tmp;
+        }
+        final String wildCard = "${database.wildCard}";
+        if (_like == null || _like.Trim().Length == 0) {
+            return value;
+        } else if (_like.Equals(LIKE_PREFIX)) {
+            return value + wildCard;
+        } else if (_like.Equals(LIKE_SUFFIX)) {
+            return wildCard + value;
+        } else if (_like.Equals(LIKE_CONTAIN)) {
+            return wildCard + value + wildCard;
+        } else {
+            String msg = "The like was wrong string: " + _like;
+            throw new SystemException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            DeepCopy
+    //                                                                            ========
+
+}

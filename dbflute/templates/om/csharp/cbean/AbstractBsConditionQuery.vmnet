@@ -89,6 +89,17 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
             register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
         }
+	#end
+    #if (${col.isAvailableStringLikeSearch()})
+
+        public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} likeSearchOption) {
+		    if (value == null) { return; }
+		    if (likeSearchOption.IsLikeContain) {
+			    Set${tmpJavaName}_PrefixSearch("%" + value)
+			} else {
+                throw new NotSupportedException("Now only LikeContain() has been supported. Sorry...");
+			}
+        }
     #end
     #if (${col.isAvailableStringInScope()})
 

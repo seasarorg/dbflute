@@ -812,7 +812,7 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
 
-      $database.debug("    parseSimpleStringOption")
+      $database.debug("    parse('SimpleStringOption')")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
 
@@ -862,9 +862,18 @@ targetdatabase = $targetDatabase
       #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
       $database.makeDirectory($path)
 	  
-	  $database.debug("    parseConditionOption")
+	  $database.debug("    parse('ConditionOption');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('SimpleStringOption');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionSimpleStringName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/SimpleStringOption.${glTemplateFileExtension}",$path ,"", "")
+
+      $database.debug("    parse('LikeSearchOption');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionLikeSearchName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
+
     #end
 	  
     ## -------------------------------------------------------

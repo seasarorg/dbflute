@@ -6,6 +6,7 @@ import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsSplitName};
 import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsToUpperLowerCaseName};
 import ${glPackageBaseCommonCOptionParts}.${glConditionOptionPartsToSingleByteName};
 import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
+import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 
 /**
  * The class of simple-string-option.
@@ -148,32 +149,10 @@ public class ${myClassName} implements ${glConditionOptionInterfaceName} {
     }
 
     // =====================================================================================
-    //                                                                                Helper
-    //                                                                                ======
-    protected final String replace(String text, String fromText,
-            String toText) {
-
-        if (text == null || fromText == null || toText == null) {
-            return null;
-        }
-        StringBuffer buf = new StringBuffer(100);
-        int pos = 0;
-        int pos2 = 0;
-        while (true) {
-            pos = text.indexOf(fromText, pos2);
-            if (pos == 0) {
-                buf.append(toText);
-                pos2 = fromText.length();
-            } else if (pos > 0) {
-                buf.append(text.substring(pos2, pos));
-                buf.append(toText);
-                pos2 = pos + fromText.length();
-            } else {
-                buf.append(text.substring(pos2));
-                break;
-            }
-        }
-        return buf.toString();
+    //                                                                        General Helper
+    //                                                                        ==============
+    protected String replace(String text, String fromText, String toText) {
+	    return ${glSimpleStringUtil}.replace(text, fromText, toText);
     }
 
     // =====================================================================================
