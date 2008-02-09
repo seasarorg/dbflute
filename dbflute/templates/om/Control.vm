@@ -881,6 +881,12 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/parts/local/JapaneseOptionPartsAgent.${glTemplateFileExtension}",$path ,"", "")
     #end
 
+    #if ($database.isTargetLanguageCSharp())
+	  $database.debug("    parseConditionOption")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
+    #end
+	  
     ## -------------------------------------------------------
     ##                allcommon condition-bean condition-value
     ##                ----------------------------------------
