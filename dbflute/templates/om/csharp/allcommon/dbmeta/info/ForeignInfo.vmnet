@@ -2,8 +2,10 @@
 
 using System;
 using System.Reflection;
-using System.Collections.Generic;
+
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonDBMetaInfo} {
 
@@ -15,8 +17,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected String foreignPropertyName;
         protected ${glDBMetaInterfaceName} localDBMeta;
         protected ${glDBMetaInterfaceName} foreignDBMeta;
-        protected IDictionary<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap;
-        protected IDictionary<${glColumnInfoName}, ${glColumnInfoName}> foreignLocalColumnInfoMap;
+        protected Map<${glColumnInfoName}, ${glColumnInfoName}> localForeignColumnInfoMap;
+        protected Map<${glColumnInfoName}, ${glColumnInfoName}> foreignLocalColumnInfoMap;
         protected int relationNo;
         protected bool oneToOne;
 
@@ -25,7 +27,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                          ======
         public ${glColumnInfoName} FindLocalByForeign(String foreignColumnDbName) {
             ${glColumnInfoName} keyColumnInfo = new ${glColumnInfoName}(foreignDBMeta, foreignColumnDbName);
-            ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})foreignLocalColumnInfoMap[keyColumnInfo];
+            ${glColumnInfoName} resultColumnInfo = (${glColumnInfoName})foreignLocalColumnInfoMap.get(keyColumnInfo);
             if (resultColumnInfo == null) {
                 String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
                 msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap=" + foreignLocalColumnInfoMap;
@@ -35,7 +37,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
 
         public PropertyInfo FindAccessor() {
-            return FindProperty(localDBMeta.EntityType, BuildInitCapPropertyName(), new Type[] { typeof(IList<>) });
+            return FindProperty(localDBMeta.EntityType, BuildInitCapPropertyName(), new Type[] { typeof(System.Collections.Generic.IList<>) });
         }
 
         // ===============================================================================
@@ -56,7 +58,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             get { return ForeignDBMeta; }
         }
 
-        public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> LocalTargetColumnInfoMap {
+        public Map<${glColumnInfoName}, ${glColumnInfoName}> LocalTargetColumnInfoMap {
             get { return LocalForeignColumnInfoMap; }
         }
 
@@ -82,20 +84,19 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             set { this.foreignDBMeta = value; }
         }
 
-        public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> LocalForeignColumnInfoMap {
+        public Map<${glColumnInfoName}, ${glColumnInfoName}> LocalForeignColumnInfoMap {
             get { return localForeignColumnInfoMap; }
             set {
                 this.localForeignColumnInfoMap = value;
-                ICollection<${glColumnInfoName}> keys = localForeignColumnInfoMap.Keys;
-                foreignLocalColumnInfoMap = new Dictionary<${glColumnInfoName}, ${glColumnInfoName}>();
-                foreach (${glColumnInfoName} key in keys) {
-                    ${glColumnInfoName} val = (${glColumnInfoName})localForeignColumnInfoMap[key];
-                    foreignLocalColumnInfoMap.Add(val, key);
+                foreignLocalColumnInfoMap = new LinkedHashMap<${glColumnInfoName}, ${glColumnInfoName}>();
+                foreach (${glColumnInfoName} key in localForeignColumnInfoMap.keySet()) {
+                    ${glColumnInfoName} val = (${glColumnInfoName})localForeignColumnInfoMap.get(key);
+                    foreignLocalColumnInfoMap.put(val, key);
                 }
             }
         }
 
-        public IDictionary<${glColumnInfoName}, ${glColumnInfoName}> ForeignLocalColumnInfoMap {
+        public Map<${glColumnInfoName}, ${glColumnInfoName}> ForeignLocalColumnInfoMap {
             get { return foreignLocalColumnInfoMap; }
         }
 
@@ -110,14 +111,20 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
 
         // ===============================================================================
-        //                                                                 Internal Helper
-        //                                                                 ===============
-        protected static String InitCap(String name) {
-            return name.Substring(0, 1).ToUpper() + name.Substring(1);
-        }
-
+        //                                                                  General Helper
+        //                                                                  ==============
+        // -------------------------------------------------
+        //                               Reflection Handling
+        //                               -------------------
         protected static PropertyInfo FindProperty(Type clazz, String propertyName, Type[] argTypes) {
             return clazz.GetProperty(propertyName, argTypes);
+        }
+		
+        // -------------------------------------------------
+        //                                   String Handling
+        //                                   ---------------
+        protected static String InitCap(String name) {
+            return ${glSimpleStringUtil}.InitCap(str);
         }
     }
 }

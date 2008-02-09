@@ -1,11 +1,11 @@
 #set ($myClassName = "${glDBMetaInterfaceName}")
 
 using System;
-using System.Collections.Generic;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMetaInfo};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonDBMeta} {
 
@@ -27,8 +27,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                        Name Map
         //                                                                        ========
-        IDictionary<String, String> DbNamePropertyNameKeyToLowerMap { get; }
-        IDictionary<String, String> PropertyNameDbNameKeyToLowerMap { get; }
+        Map<String, String> DbNamePropertyNameKeyToLowerMap { get; }
+        Map<String, String> PropertyNameDbNameKeyToLowerMap { get; }
 
         // ===============================================================================
         //                                                                       Type Name
@@ -52,7 +52,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        IList<${glColumnInfoName}> ColumnInfoList { get; }
+        List<${glColumnInfoName}> ColumnInfoList { get; }
         bool HasColumn(String columnFlexibleName);
         ${glColumnInfoName} FindColumnInfo(String columnFlexibleName);
 

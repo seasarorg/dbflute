@@ -16,6 +16,9 @@ import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** The key-to-lower map of db-name and property-name for table. */
     protected static final Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
     static {
@@ -63,6 +66,9 @@ public class ${myClassName} {
         }
     }
 
+    // ===================================================================================
+    //                                                                         Main Method
+    //                                                                         ===========
     /**
      * Find dbmeta by table flexible-name.
      * <pre>
@@ -108,16 +114,19 @@ public class ${myClassName} {
         return instance;
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
     protected static void assertObjectNotNull(String variableName, Object value) {
 	    ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert String
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
     protected static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
 	    ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }

@@ -746,9 +746,9 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         }
     }
 
-    // =====================================================================================
-    //                                                                                Helper
-    //                                                                                ======
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     abstract protected void checkDowncast(${glEntityInterfaceName} entity);
 
     protected String helpGettingColumnStringValue(Object value) {
@@ -769,10 +769,12 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
         return MapStringUtil.formatTimestamp(timestamp);
     }
 
-    protected String initCap(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
-    }
-
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    // -----------------------------------------------------
+    //                                   Reflection Handling
+    //                                   -------------------
     protected boolean hasMethod(String methodName) {
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
         try {
@@ -782,30 +784,30 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
             return false;
         }
     }
+	
+    // -----------------------------------------------------
+    //                                       String Handling
+    //                                       ---------------
+    protected String initCap(String str) {
+        return ${glSimpleStringUtil}.initCap(str);
+    }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
     /**
      * Assert that the argument is not null.
      * 
      * @param variableName Variable name. (NotNull)
      * @param arg Argument. (NotNull)
      */
-    protected void assertObjectNotNull(String variableName, Object arg) {
-        if (variableName == null) {
-            String msg = "Argument[variableName] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (arg == null) {
-            String msg = "Argument[" + variableName + "] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
+    protected void assertObjectNotNull(String variableName, Object value) {
+        ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert String
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
     /**
      * Assert that the string is not null and not trimmed empty.
      * 
@@ -813,17 +815,6 @@ public abstract class ${myClassName} implements ${glDBMetaInterfaceName} {
      * @param value Value. (NotNull)
      */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-        if (variableName == null) {
-            String msg = "Variable[variableName] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (value == null) {
-            String msg = "Variable[" + variableName + "] should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (value.trim().length() == 0) {
-            String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
-            throw new IllegalArgumentException(msg);
-        }
+        ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }

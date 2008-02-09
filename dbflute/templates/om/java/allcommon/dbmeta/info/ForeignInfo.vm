@@ -137,12 +137,8 @@ public class ${myClassName} implements ${glRelationInfoName} {
     }
 
     // ===================================================================================
-    //                                                                     Internal Helper
-    //                                                                     ===============
-    protected String initCap(final String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
-    }
-
+    //                                                                      General Helper
+    //                                                                      ==============
     protected java.lang.reflect.Method findMethod(Class clazz, String methodName, Class[] argTypes) {
         try {
             return clazz.getMethod(methodName, argTypes);
@@ -150,5 +146,9 @@ public class ${myClassName} implements ${glRelationInfoName} {
             String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
             throw new RuntimeException(msg, ex);
         }
+    }
+	
+    protected String initCap(final String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }

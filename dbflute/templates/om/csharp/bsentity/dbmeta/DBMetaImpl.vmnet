@@ -1,14 +1,13 @@
 #set ($myClassName = "${myDBMetaClassName}")
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonDBMetaInfo};
+using ${glPackageBaseCommonJavaLike};
 using ${myExtendedEntityPackageName};
 #if (${isExistDao})
 
@@ -103,24 +102,24 @@ namespace ${myDBMetaPackageName} {
         // -------------------------------------------------
         //                               DB-Property Mapping
         //                               -------------------
-        protected static readonly IDictionary<String, String> _dbNamePropertyNameKeyToLowerMap;
-        protected static readonly IDictionary<String, String> _propertyNameDbNameKeyToLowerMap;
+        protected static readonly Map<String, String> _dbNamePropertyNameKeyToLowerMap;
+        protected static readonly Map<String, String> _propertyNameDbNameKeyToLowerMap;
 
         static ${myClassName}() {
             {
-                IDictionary<String, String> map = new Dictionary<String, String>();
-                map.Add(TABLE_DB_NAME.ToLower(), TABLE_PROPERTY_NAME);
+                Map<String, String> map = new LinkedHashMap<String, String>();
+                map.put(TABLE_DB_NAME.ToLower(), TABLE_PROPERTY_NAME);
 #foreach ($col in $table.columns)
-                map.Add(DB_NAME_${col.name}.ToLower(), PROPERTY_NAME_${col.name});
+                map.put(DB_NAME_${col.name}.ToLower(), PROPERTY_NAME_${col.name});
 #end
                 _dbNamePropertyNameKeyToLowerMap = map;
             }
 
             {
-                IDictionary<String, String> map = new Dictionary<String, String>();
-                map.Add(TABLE_PROPERTY_NAME.ToLower(), TABLE_DB_NAME);
+                Map<String, String> map = new LinkedHashMap<String, String>();
+                map.put(TABLE_PROPERTY_NAME.ToLower(), TABLE_DB_NAME);
 #foreach ($col in $table.Columns)
-                map.Add(PROPERTY_NAME_${col.name}.ToLower(), DB_NAME_${col.name});
+                map.put(PROPERTY_NAME_${col.name}.ToLower(), DB_NAME_${col.name});
 #end
                 _propertyNameDbNameKeyToLowerMap = map;
             }
@@ -140,8 +139,8 @@ namespace ${myDBMetaPackageName} {
         //                                                                        Name Map
         //                                                                        ========
         #region Name Map
-        public override IDictionary<String, String> DbNamePropertyNameKeyToLowerMap { get { return _dbNamePropertyNameKeyToLowerMap; } }
-        public override IDictionary<String, String> PropertyNameDbNameKeyToLowerMap { get { return _propertyNameDbNameKeyToLowerMap; } }
+        public override Map<String, String> DbNamePropertyNameKeyToLowerMap { get { return _dbNamePropertyNameKeyToLowerMap; } }
+        public override Map<String, String> PropertyNameDbNameKeyToLowerMap { get { return _propertyNameDbNameKeyToLowerMap; } }
         #endregion
 
         // ===============================================================================
@@ -189,11 +188,11 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        public override IList<${glColumnInfoName}> ColumnInfoList {
+        public override List<${glColumnInfoName}> ColumnInfoList {
 			get {
-                IList<${glColumnInfoName}> columnInfoList = new List<${glColumnInfoName}>();
+                List<${glColumnInfoName}> columnInfoList = new ArrayList<${glColumnInfoName}>();
 #foreach ($col in $table.columns)
-                columnInfoList.Add(Column${col.javaName});
+                columnInfoList.add(Column${col.javaName});
 #end
                 return columnInfoList;
             }
@@ -236,39 +235,39 @@ namespace ${myDBMetaPackageName} {
         //                                   ---------------
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
-        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap} { get {
             ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
             foreignInfo.ForeignPropertyName = "${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}";
             foreignInfo.LocalDBMeta = ${table.DBMetaClassName}.GetInstance();
             foreignInfo.ForeignDBMeta = ${foreignKeys.foreignTableDBMetaClassName}.GetInstance();
-            IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $foreignKeys.localColumnList)
-		    map.Add(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
+		    map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
             foreignInfo.LocalForeignColumnInfoMap = map;
             foreignInfo.RelationNo = ${table.resolveForeignIndex($foreignKeys)};
             foreignInfo.IsOneToOne = ${foreignKeys.isOneToOne()};
             return foreignInfo;
-		}
+		}}
 #end
 
 #foreach ($referrer in $table.referrers)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
 #if (${referrer.isOneToOne()})
-        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} { get {
             ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
             foreignInfo.ForeignPropertyName = "${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}";
             foreignInfo.LocalDBMeta = ${referrer.foreignTableDBMetaClassName}.GetInstance();
             foreignInfo.ForeignDBMeta = ${referrer.referrerTableDBMetaClassName}.GetInstance();
-            IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $referrer.foreignColumnList)
-            map.Add(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
+            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
             foreignInfo.LocalForeignColumnInfoMap = map;
             foreignInfo.RelationNo = ${table.resolveReferrerIndexAsOne($referrer)};
             foreignInfo.IsOneToOne = ${referrer.isOneToOne()};
             return foreignInfo;
-        }
+        }}
 #end
 #end
 
@@ -278,19 +277,19 @@ namespace ${myDBMetaPackageName} {
 #foreach ($referrer in $table.referrers)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
 #set ($referrerTable = $referrer.table)
-        public ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+        public ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrer${referrer.referrerJavaBeansRulePropertyNameInitCap} { get {
             ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrerInfo = new ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName}();
             referrerInfo.ReferrerPropertyName = "${referrer.referrerJavaBeansRulePropertyNameInitCap}";
             referrerInfo.LocalDBMeta = ${referrer.foreignTableDBMetaClassName}.GetInstance();
             referrerInfo.ReferrerDBMeta = ${referrer.referrerTableDBMetaClassName}.GetInstance();
-            IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
+            Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $referrer.foreignColumnList)
-            map.Add(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
+            map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
             referrerInfo.LocalReferrerColumnInfoMap = map;
             referrerInfo.IsOneToOne = ${referrer.isOneToOne()};
             return referrerInfo;
-        }
+        }}
 #end
 
         // -------------------------------------------------
@@ -316,7 +315,7 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                           Entity Property Setup
         //                                                           =====================
-        protected IDictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new Dictionary<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
+        protected Map<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new LinkedHashMap<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
 
 		protected void InitializeEntityPropertySetupper() {
 #foreach ($column in $table.columns)

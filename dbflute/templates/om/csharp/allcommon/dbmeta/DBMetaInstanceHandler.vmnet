@@ -2,37 +2,42 @@
 #set ($instanceMapGenericDefinition = "String, ${glDBMetaInterfaceName}")
 
 using System;
-using System.Collections.Generic;
+
+using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonDBMeta} {
 
     public class ${myClassName} {
 
-        protected static readonly IDictionary<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap;
-        protected static readonly IDictionary<String, String> _tableDbNamePropertyNameKeyToLowerMap;
-        protected static readonly IDictionary<String, String> _tablePropertyNameDbNameKeyToLowerMap;
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        protected static readonly Map<String, ${glDBMetaInterfaceName}> _tableDbNameInstanceMap;
+        protected static readonly Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
+        protected static readonly Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
 
         static ${myClassName}() {
             {
-                IDictionary<String, ${glDBMetaInterfaceName}> tmpMap = new Dictionary<String, ${glDBMetaInterfaceName}>();
+                Map<String, ${glDBMetaInterfaceName}> tmpMap = new HashMap<String, ${glDBMetaInterfaceName}>();
 #foreach ($table in $database.tables)
-                tmpMap.Add("${table.name}", GetDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
+                tmpMap.put("${table.name}", GetDBMeta("${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm"));
 #end
                 _tableDbNameInstanceMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
 
             {
-                IDictionary<String, String> tmpMap = new Dictionary<String, String>();
+                Map<String, String> tmpMap = new HashMap<String, String>();
 #foreach ($table in $database.tables)
-                tmpMap.Add("${table.name}".ToLower(), "${table.javaBeansRulePropertyName}");
+                tmpMap.put("${table.name}".ToLower(), "${table.javaBeansRulePropertyName}");
 #end
                 _tableDbNamePropertyNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
 
             {
-                IDictionary<String, String> tmpMap = new Dictionary<String, String>();
+                Map<String, String> tmpMap = new HashMap<String, String>();
 #foreach ($table in $database.tables)
-                tmpMap.Add("${table.javaName}".ToLower(), "${table.name}");
+                tmpMap.put("${table.javaName}".ToLower(), "${table.name}");
 #end
                 _tablePropertyNameDbNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
@@ -66,6 +71,9 @@ namespace ${glPackageBaseCommonDBMeta} {
             return type;
         }
 
+        // ===============================================================================
+        //                                                                     Main Method
+        //                                                                     ===========
         /// <summary>
         /// Find dbmeta by table flexible-name.
         /// <![CDATA[
@@ -83,12 +91,12 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
             String toLowerKey = tableFlexibleName.ToLower();
             if (_tableDbNamePropertyNameKeyToLowerMap.ContainsKey(toLowerKey)) {
-                String propertyName = (String)_tableDbNamePropertyNameKeyToLowerMap[toLowerKey];
-                String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap[propertyName.ToLower()];
+                String propertyName = (String)_tableDbNamePropertyNameKeyToLowerMap.get(toLowerKey);
+                String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(propertyName.ToLower());
                 return ByTableDbName(dbName);
             }
             if (_tablePropertyNameDbNameKeyToLowerMap.ContainsKey(toLowerKey)) {
-                String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap[toLowerKey];
+                String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(toLowerKey);
                 return ByTableDbName(dbName);
             }
             String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
@@ -98,43 +106,28 @@ namespace ${glPackageBaseCommonDBMeta} {
         protected static ${glDBMetaInterfaceName} ByTableDbName(String tableDbName) {
             AssertObjectNotNull("tableDbName", tableDbName);
             try {
-                return (${glDBMetaInterfaceName})_tableDbNameInstanceMap[tableDbName];
+                return (${glDBMetaInterfaceName})_tableDbNameInstanceMap.get(tableDbName);
             } catch (System.Collections.Generic.KeyNotFoundException e) {
                 String msg = "The tableDbNameInstanceMap didn't contain the key of '" + tableDbName + "': ";
                 throw new ArgumentOutOfRangeException(msg + _tableDbNameInstanceMap, e);
             }
         }
 		
-        // ----------------------------------------------------------------
-        //                                                  Assert Argument
-        //                                                  ---------------
-        protected static void AssertObjectNotNull(String variableName, Object arg) {
-            if (variableName == null) {
-                String msg = "Argument[variableName] must not be null.";
-                throw new ArgumentNullException(msg);
-            }
-            if (arg == null) {
-                String msg = "Argument[" + variableName + "] must not be null.";
-                throw new ArgumentNullException(msg);
-            }
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        // -------------------------------------------------
+        //                                     Assert Object
+        //                                     -------------
+        protected static void AssertObjectNotNull(String variableName, Object value) {
+		    ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
         }
 
-        // ----------------------------------------------------------------
-        //                                                    Assert String
-        //                                                    -------------
+        // -------------------------------------------------
+        //                                     Assert String
+        //                                     -------------
         protected static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-            if (variableName == null) {
-                String msg = "Variable[variableName] should not be null.";
-                throw new ArgumentNullException(msg);
-            }
-            if (value == null) {
-                String msg = "Variable[" + variableName + "] should not be null.";
-                throw new ArgumentNullException(msg);
-            }
-            if (value.Trim().Length == 0) {
-                String msg = "Variable[" + variableName + "] should not be empty: [" + value + "]";
-                throw new ArgumentOutOfRangeException(msg);
-            }
+            ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
         }
     }
 }
