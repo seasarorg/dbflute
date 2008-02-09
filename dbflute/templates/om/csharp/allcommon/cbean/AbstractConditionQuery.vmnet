@@ -99,7 +99,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     public String getRealColumnName(String columnName) {
         assertColumnName(columnName);
-        return buildRealColumnName(GetRealAliasName(), columnName);
+        return buildRealColumnName(getRealAliasName(), columnName);
     }
 
 	protected String buildRealColumnName(String aliasName, String columnName) {
