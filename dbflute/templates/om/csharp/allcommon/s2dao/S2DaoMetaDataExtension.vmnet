@@ -131,8 +131,6 @@ namespace ${glPackageBaseCommonS2Dao} {
                     if (${glConditionBeanContextName}.IsTheTypeConditionBean(argTypes[0])) {
                         ${glSelectDynamicCommand} dynamicCommand = CreateCustomizeSelectDynamicCommand(handler);
                         cmd = dynamicCommand;
-                        dynamicCommand.ArgNames4Nest = argNames;
-                        dynamicCommand.ArgTypes4Nest = argTypes;
                     } else {
                         if (typeof(${glSelectResourceInterfaceName}).IsAssignableFrom(argTypes[0])) {
                             String msg = "If the first argument type is select-resource(and not condition-bean), ";
@@ -163,90 +161,13 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (query != null) {
                     sql = sql + " " + query;
                 }
-                cmd.Sql = sql;
+				if (sql != null) {
+                    cmd.Sql = sql;
+				}
             }
             cmd.ArgNames = argNames;
             cmd.ArgTypes = argTypes;
             _sqlCommands[methodInfo.Name] = cmd;
-        }
-
-        protected String GetSelectClausePKOnly() {
-            StringBuilder sb = new StringBuilder(100);
-            sb.Append("select/*$dto.SelectHint*/ ");
-
-            StringBuilder sbMySelectList = new StringBuilder(100);
-            for (int i = 0; i < _beanMetaData.PropertyTypeSize; ++i) {
-                IPropertyType pt = _beanMetaData.GetPropertyType(i);
-                if (pt.IsPersistent && pt.IsPrimaryKey) {
-                    if (sbMySelectList.Length != 0) {
-                        sbMySelectList.Append(", ");
-                    }
-                    sbMySelectList.Append(_beanMetaData.TableName);
-                    sbMySelectList.Append(".");
-                    sbMySelectList.Append(pt.ColumnName);
-                }
-            }
-            sb.Append(sbMySelectList);
-
-            return sb.ToString();
-        }
-
-        protected String GetSelectClause() {
-            StringBuilder sb = new StringBuilder(100);
-            sb.Append("select/*$dto.SelectHint*/ ");
-
-            StringBuilder sbMySelectList = new StringBuilder(100);
-            for (int i = 0; i < _beanMetaData.PropertyTypeSize; ++i) {
-                IPropertyType pt = _beanMetaData.GetPropertyType(i);
-                if (pt.IsPersistent) {
-                    if (sbMySelectList.Length != 0) {
-                        sbMySelectList.Append(", ");
-                    }
-                    sbMySelectList.Append(_beanMetaData.TableName);
-                    sbMySelectList.Append(".");
-                    sbMySelectList.Append(pt.ColumnName);
-                }
-            }
-            sb.Append(sbMySelectList);
-
-            SetupRelationSelectClause(sb, _beanMetaData, "", "", 1);
-            return sb.ToString();
-        }
-
-        protected void SetupRelationSelectClause(StringBuilder sb, IBeanMetaData baseBmd, String judgeProp, String preNoSuffix, int cqNestNo) {
-            for (int i = 0; i < baseBmd.RelationPropertyTypeSize; ++i) {
-                StringBuilder sbYourSelectList = new StringBuilder(100);
-                IRelationPropertyType rpt = baseBmd.GetRelationPropertyType(i);
-                if (rpt == null) {
-                    String msg = "The baseBmd.GetRelationPropertyType(" + i + ") returned null";
-                    msg = msg + ": baseBmd.TableName=" + baseBmd.TableName;
-                    msg = msg + ": baseBmd.RelationPropertyTypeSize=" + baseBmd.RelationPropertyTypeSize;
-                    throw new SystemException(msg);
-                }
-
-                IBeanMetaData relationBmd = rpt.BeanMetaData;
-                String initCapPropertyName = rpt.PropertyName;
-                String ifComment = "/*IF dto." + judgeProp + "IsSelect" + initCapPropertyName + "*/";
-                String endComment = "/*END*/";
-                for (int j = 0; j < relationBmd.PropertyTypeSize; ++j) {
-                    IPropertyType pt = relationBmd.GetPropertyType(j);
-                    String tableAliasName = rpt.PropertyName + (cqNestNo > 1 ? "_n" + cqNestNo : "");
-                    if (pt.IsPersistent) {
-                        String columnName = pt.ColumnName;
-                        sbYourSelectList.Append(", ");
-                        sbYourSelectList.Append(tableAliasName).Append(".").Append(columnName);
-                        sbYourSelectList.Append(" AS ");
-                        sbYourSelectList.Append(pt.ColumnName).Append(preNoSuffix).Append("_").Append(rpt.RelationNo);
-                    }
-                }
-                if (relationBmd.RelationPropertyTypeSize > 0) {
-                    String nssString = "Nss" + initCapPropertyName + ".";
-                    String nextPreNoSuffix = preNoSuffix + "_" + rpt.RelationNo;
-                    int nextCQNestNo = cqNestNo + 1;
-                    SetupRelationSelectClause(sbYourSelectList, relationBmd, nssString, nextPreNoSuffix, nextCQNestNo);
-                }
-                sb.Append(ifComment).Append(sbYourSelectList).Append(endComment);
-            }
         }
 
         // ===============================================================================

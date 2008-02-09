@@ -38,12 +38,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         private IDataReaderHandler dataReaderHandler;
         private IDataReaderFactory dataReaderFactory;
 
-        /// <summary>The cache of select clause command.</summary>
-        protected ${glSelectDynamicCommand} _selectClauseCommand;
-
-        /// <summary>The cache of select clause PK-only command.</summary>
-        protected ${glSelectDynamicCommand} _selectClausePKOnlyCommand;
-
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
@@ -67,42 +61,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         // -------------------------------------------------
         //                                         Extension
         //                                         ---------
-        public ${glSelectDynamicCommand} SetSelectClause(String value) {
-            _selectClauseCommand = CreateMySelectDynamicCommand();
-            _selectClauseCommand.Sql = value;
-            return this;
-        }
-
-        public ${glSelectDynamicCommand} SetSelectClausePKOnly(String value) {
-            _selectClausePKOnlyCommand = CreateMySelectDynamicCommand();
-            _selectClausePKOnlyCommand.Sql = value;
-            return this;
-        }
-
         protected ${glSelectDynamicCommand} CreateMySelectDynamicCommand() {
             return new ${glSelectDynamicCommand}(DataSource, CommandFactory, dataReaderHandler, dataReaderFactory);
-        }
-
-        public string[] ArgNames4Nest {
-            set {
-                if (_selectClauseCommand != null) {
-                    _selectClauseCommand.ArgNames = value;
-                }
-                if (_selectClausePKOnlyCommand != null) {
-                    _selectClausePKOnlyCommand.ArgNames = value;
-                }
-            }
-        }
-
-        public Type[] ArgTypes4Nest {
-            set {
-                if (_selectClauseCommand != null) {
-                    _selectClauseCommand.ArgTypes = value;
-                }
-                if (_selectClausePKOnlyCommand != null) {
-                    _selectClausePKOnlyCommand.ArgTypes = value;
-                }
-            }
         }
 
         // -------------------------------------------------
@@ -142,7 +102,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             // - - - - - - - - - - - -
             // Execute conditionBean.
             // - - - - - - - - - - - -
-            AssertSelectClauseCommand();
             IList<Object> bindVariableList = new System.Collections.Generic.List<Object>();
             IList<Type> bindVariableTypeList = new System.Collections.Generic.List<Type>();
             IList<String> bindVariableNameList = new System.Collections.Generic.List<String>();
@@ -397,13 +356,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected void AddBindVariableNameList(IList<String> bindVariableNameList, String[] bindVariableNames) {
             for (int i=0; i < bindVariableNames.Length; i++) {
                 bindVariableNameList.Add(bindVariableNames[i]);
-            }
-        }
-
-        protected void AssertSelectClauseCommand() {
-            if (_selectClauseCommand == null) {
-                String msg = "Select clause command should not be null.";
-                throw new SystemException(msg);
             }
         }
 

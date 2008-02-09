@@ -1,13 +1,6 @@
-#set ($myClassName = "")
-#if ($database.isJavaDirOnlyOne())
 
 using ${glPackageCQ};
-  #set ($myClassName = "${myBaseConditionQueryClassName}")
-#else
-
-using ${glPackageBaseCQ};
-  #set ($myClassName = "${myConditionQueryClassName}")
-#end
+#set ($myClassName = "${myBaseConditionQueryClassName}")
 
 using System;
 using System.Collections;
@@ -20,13 +13,7 @@ using ${glPackageBaseCommonSqlClause};
 
 using ${glPackageCIQ};
 
-#if ($database.isJavaDirOnlyOne())
-
 namespace ${glPackageBaseCQ} {
-#else
-
-namespace ${glPackageCQ} {
-#end
 
     /// <summary>
     /// The condition-query of {table.Name}.

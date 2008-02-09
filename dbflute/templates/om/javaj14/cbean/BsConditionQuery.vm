@@ -1,17 +1,9 @@
-#set ($myClassName = "")
-#if ($database.isJavaDirOnlyOne())
 ${database.allClassCopyright}package ${glPackageBaseCQ};
 
 #if ($table.hasForeignKeyOrReferer())
 import ${glPackageCQ}.*;
 #end
 #set ($myClassName = "${myBaseConditionQueryClassName}")
-#else
-${database.allClassCopyright}package ${glPackageCQ};
-
-import ${glPackageBaseCQ}.*;
-#set ($myClassName = "${myConditionQueryClassName}")
-#end
 
 import ${glPackageBaseCommonCBean}.*;
 import ${glPackageBaseCommonCValue}.${glConditionValueName};

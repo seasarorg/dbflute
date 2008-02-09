@@ -1,13 +1,7 @@
 ${database.allClassCopyright}package ${glPackageCIQ};
 
 #set ($myClassName = "${myConditionInlineQueryClassName}")
-#set ($myCQClassName = "")
-#if ($database.isJavaDirOnlyOne())
-  #set ($myCQClassName = "${myBaseConditionQueryClassName}")
-#else
-import ${glPackageCQ}.*;
-  #set ($myCQClassName = "${myConditionQueryClassName}")
-#end
+#set ($myCQClassName = "${myBaseConditionQueryClassName}")
 import ${glPackageBaseCQ}.*;
 
 import ${glPackageBaseCommonCBean}.*;

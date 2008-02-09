@@ -1,10 +1,5 @@
 #set ($myClassName = "${myConditionInlineQueryClassName}")
-#set ($myCQClassName = "")
-#if ($database.isJavaDirOnlyOne())
-  #set ($myCQClassName = "${myBaseConditionQueryClassName}")
-#else
-  #set ($myCQClassName = "${myConditionQueryClassName}")
-#end
+#set ($myCQClassName = "${myBaseConditionQueryClassName}")
 
 using System;
 using System.Collections;
@@ -19,10 +14,6 @@ using ${glPackageCQ};
 
 namespace ${glPackageCIQ} {
 
-    /// <summary>
-    /// The condition-query of {table.Name}.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     [System.Serializable]
     public class ${myClassName} : ${myAbstractBaseConditionQueryClassName} {
 
