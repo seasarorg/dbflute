@@ -319,6 +319,6 @@ namespace ${glPackageBaseCQ} {
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============
-        public override String ToString() { return getSqlClause().GetClause(); }
+        public override String ToString() { return getSqlClause().getClause(); }
     }
 }

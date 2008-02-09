@@ -49,7 +49,7 @@ namespace ${glPackageBaseCQ} {
         //                                                                   IncludeAsMine
         //                                                                   =============
 #foreach ($col in $table.columns)
-        public void IncludeAsMine_${col.JavaName}(String aliasName) { RegisterIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}")); }
+        public void IncludeAsMine_${col.JavaName}(String aliasName) { registerIncludedSelectColumn(aliasName, getRealColumnName("${col.Name}")); }
 #end
 
         // ===============================================================================
