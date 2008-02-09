@@ -208,14 +208,14 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
         return _nss${tmpPropertyNameInitCap};
     }
 #end
-#foreach ($referer in $table.refererList)
-  #if (${referer.isOneToOne()})
-    #set ($tmpPropertyName = "${referer.ReffererPropertyNameAsOne}")
-    #set ($tmpPropertyNameInitCap = "${referer.ReffererPropertyNameInitCapAsOne}")
-    #set ($nestSelectSetuppperClassName = "${referer.refererTableNestSelectSetupperClassName}")
+#foreach ($referrer in $table.referrers)
+  #if (${referrer.isOneToOne()})
+    #set ($tmpPropertyName = "${referrer.ReferrerPropertyNameAsOne}")
+    #set ($tmpPropertyNameInitCap = "${referrer.ReferrerPropertyNameInitCapAsOne}")
+    #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
 
     // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   ReferrerTable    = [${referer.table.name}]
+    //   ReferrerTable    = [${referrer.table.name}]
     //   ReferrerProperty = [${tmpPropertyName}]
     // * * * * * * * * */
 

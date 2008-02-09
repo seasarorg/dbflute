@@ -24,20 +24,26 @@ namespace ${glPackageNss} {
         //                                                                    ============
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-        protected bool _isSelect${tmpPropertyNameInitCap};
-        public bool IsSelect${tmpPropertyNameInitCap} { get { return _isSelect${tmpPropertyNameInitCap}; } }
-        public void With${tmpPropertyNameInitCap}() {
-            AssertConditionQuery(); _query.Query${tmpPropertyNameInitCap}(); _isSelect${tmpPropertyNameInitCap} = true;
+        public ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName} With${tmpPropertyNameInitCap}() {
+            AssertConditionQuery();
+    		String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
+    		String localRelationPath = _query.getRelationPath();
+    		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+    		_query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+			return new ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName}(_query.Query${tmpPropertyNameInitCap}());
         }
 
 #end
 #foreach ($referer in $table.refererList)
 #if (${referer.isOneToOne()})
 #set ($tmpPropertyNameInitCap = "${referer.ReffererPropertyNameInitCapAsOne}")
-        protected bool _isSelect${tmpPropertyNameInitCap};
-        public bool IsSelect${tmpPropertyNameInitCap} { get { return _isSelect${tmpPropertyNameInitCap}; } }
         public void With${tmpPropertyNameInitCap}() {
-            AssertConditionQuery(); _query.Query${tmpPropertyNameInitCap}(); _isSelect${tmpPropertyNameInitCap} = true;
+            AssertConditionQuery();
+    		String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
+    		String localRelationPath = _query.getRelationPath();
+    		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+    		_query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+    		return new ${referrer.referrerTableNestSelectSetupperTerminalClassName}(_query.Query${tmpPropertyNameInitCap}());
         }
 
 #end

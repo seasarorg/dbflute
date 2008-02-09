@@ -111,24 +111,25 @@ namespace ${glPackageBaseCB} {
             }
         }
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
-            Query().Query${tmpPropertyNameInitCap}();// For setting outer join.
+            String foreignTableAliasName = Query().Query${tmpPropertyNameInitCap}().getRealAliasName();
+    		String localRelationPath = Query().getRelationPath();
+    		this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+    		this.SqlClause.registerSelectedForeignInfo(Query().Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
-                _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
+                _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
             }
-            // Set dummy string that means this foreign entity is target of select.
-            _isSelect${tmpPropertyNameInitCap} = true;
             LimitSelect_Off();
             return _nss${tmpPropertyNameInitCap};
         }
 #end
-#foreach ($refferer in $table.referrers)
-  #if (${refferer.isOneToOne()})
-    #set ($tmpPropertyName = "${refferer.ReffererPropertyNameAsOne}")
-    #set ($tmpPropertyNameInitCap = "${refferer.ReffererPropertyNameInitCapAsOne}")
-    #set ($nestSelectSetuppperClassName = "${glProjectPrefix}${refferer.table.javaName}Nss")
+#foreach ($referrer in $table.referrers)
+  #if (${referrer.isOneToOne()})
+    #set ($tmpPropertyName = "${referrer.ReferrerPropertyNameAsOne}")
+    #set ($tmpPropertyNameInitCap = "${referrer.ReferrerPropertyNameInitCapAsOne}")
+    #set ($nestSelectSetuppperClassName = "${referrer.referrerTableNestSelectSetupperClassName}")
 
         // /* * * * * * * * * * * * * * * * * * * * * * * {as one}
-        //   ReferrerTable    = [${refferer.table.name}]
+        //   ReferrerTable    = [${referrer.table.name}]
         //   ReferrerProperty = [${tmpPropertyName}]
         // * * * * * * * * */
 
@@ -142,12 +143,12 @@ namespace ${glPackageBaseCB} {
             }
         }
         public ${nestSelectSetuppperClassName} SetupSelect_${tmpPropertyNameInitCap}() {
-            String foreignTableAliasName = Query().query${tmpPropertyNameInitCap}().getRealAliasName();
-    		String localRelationPath = query().getRelationPath();
+            String foreignTableAliasName = Query().Query${tmpPropertyNameInitCap}().getRealAliasName();
+    		String localRelationPath = Query().getRelationPath();
     		this.SqlClause.registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-    		this.SqlClause.registerSelectedForeignInfo(Query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+    		this.SqlClause.registerSelectedForeignInfo(Query().Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
             if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.HasConditionQuery) {
-                _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
+                _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(Query().Query${tmpPropertyNameInitCap}());
             }
             LimitSelect_Off();
             return _nss${tmpPropertyNameInitCap};

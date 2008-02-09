@@ -28,7 +28,7 @@ namespace ${glPackageBaseCommonJavaLike} {
 
     public interface List<ELEMENT> : Collection<ELEMENT> {
         ELEMENT get(int index);
-		ELEMENT set(int index, ELEMENT element)
+		ELEMENT set(int index, ELEMENT element);
 		ELEMENT remove(int index);
         IList<ELEMENT> getList();
     }
