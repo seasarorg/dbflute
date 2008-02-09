@@ -150,7 +150,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                 String foreignPropertyName = query.getForeignPropertyName();
                 if (foreignPropertyName == null) {
                     String msg = "The foreignPropertyName of the query should not be null:";
-                    msg = msg + " : " + query.GetType().Name + " = " + query;
+                    msg = msg + " query=" + query;
                     throw new IllegalStateException(msg);
                 }
                 sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
