@@ -1241,12 +1241,18 @@ public class Table implements IDMethod {
         return doResolveRelationIndex(foreignKey, false, false);// Ignore oneToOne
     }
 
-    public int resolveRefererIndexAsOne(ForeignKey foreignKey) {// oneToOne!
+    public int resolveReferrerIndexAsOne(ForeignKey foreignKey) {// oneToOne!
         return doResolveRelationIndex(foreignKey, true, true);
     }
+    public int resolveRefererIndexAsOne(ForeignKey foreignKey) {// oneToOne!
+        return resolveReferrerIndexAsOne(foreignKey);
+    }
 
-    public int resolveRefererIndex(ForeignKey foreignKey) {
+    public int resolveReferrerIndex(ForeignKey foreignKey) {
         return doResolveRelationIndex(foreignKey, true, false);
+    }
+    public int resolveRefererIndex(ForeignKey foreignKey) {
+        return resolveReferrerIndex(foreignKey);
     }
 
     protected int doResolveRelationIndex(ForeignKey foreignKey, boolean referer, boolean oneToOne) {

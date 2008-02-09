@@ -70,7 +70,7 @@ namespace ${myDBMetaPackageName} {
         //                                             Table
         //                                             -----
         public static readonly String TABLE_DB_NAME = "$table.name";
-        public static readonly String TABLE_PROPERTY_NAME = "$table.c";
+        public static readonly String TABLE_PROPERTY_NAME = "$table.javaName";
 
         // -------------------------------------------------
         //                                    Column DB-Name
@@ -236,27 +236,63 @@ namespace ${myDBMetaPackageName} {
         //                                   ---------------
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
-        // public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${foreignKeys.foreignPropertyNameInitCap} {
-        //     get {
-        //         ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
-        //         foreignInfo.ForeignPropertyName = "${foreignKeys.foreignPropertyNameInitCap}";
-        //         foreignInfo.LocalDBMeta = ${table.DBMetaClassName}.getInstance();
-        //         foreignInfo.ForeignDBMeta = ${foreignKeys.foreignTableDBMetaClassName}.getInstance();
-        //         IDictionary<$genericsColumnInfoMap> map = new IDictionary<$genericsColumnInfoMap>();
+        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+            ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
+            foreignInfo.ForeignPropertyName = "${foreignKeys.foreignJavaBeansRulePropertyName}";
+            foreignInfo.LocalDBMeta = ${table.DBMetaClassName}.GetInstance();
+            foreignInfo.ForeignDBMeta = ${foreignKeys.foreignTableDBMetaClassName}.GetInstance();
+            IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
 #foreach ($column in $foreignKeys.localColumnList)
-        //         map.Add(column${column.javaName}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaName}());
+		    map.Add(Column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.GetInstance().Column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap}());
 #end
-        //         foreignInfo.LocalForeignColumnInfoMap = map;
-        //         foreignInfo.RelationNo = ${table.resolveForeignIndex($foreignKeys)};
-        //         foreignInfo.OneToOne = ${foreignKeys.isOneToOne()};
-        //         return foreignInfo;
-        //     }
-        // }
+            foreignInfo.LocalForeignColumnInfoMap = map;
+            foreignInfo.RelationNo = ${table.resolveForeignIndex($foreignKeys)};
+            foreignInfo.IsOneToOne = ${foreignKeys.isOneToOne()};
+            return foreignInfo;
+		}
+#end
+
+#foreach ($referrer in $table.referrers)
+#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+#if (${referrer.isOneToOne()})
+        public ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} Foreign${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+            ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName} foreignInfo = new ${glPackageBaseCommonDBMetaInfo}.${glForeignInfoName}();
+            foreignInfo.ForeignPropertyName = "${referrer.refererJavaBeansRulePropertyNameAsOne}";
+            foreignInfo.LocalDBMeta = ${referrer.foreignTableDBMetaClassName}.GetInstance();
+            foreignInfo.ForeignDBMeta = ${referrer.referrerTableDBMetaClassName}.GetInstance();
+            IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
+#foreach ($column in $referrer.foreignColumnList)
+            map.Add(Column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
+#end
+            foreignInfo.LocalForeignColumnInfoMap = map;
+            foreignInfo.RelationNo = ${table.resolveReferrerIndexAsOne($referrer)};
+            foreignInfo.IsOneToOne = ${referrer.isOneToOne()};
+            return foreignInfo;
+        }
+#end
 #end
 
         // -------------------------------------------------
         //                                  Referrer Element
         //                                  ----------------
+#foreach ($referrer in $table.referrers)
+#set ($genericsColumnInfoMap = "${glColumnInfoName}, ${glColumnInfoName}")
+#set ($referrerTable = $referrer.table)
+        public ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+            ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName} referrerInfo = new ${glPackageBaseCommonDBMetaInfo}.${glReferrerInfoName}();
+            referrerInfo.ReferrerPropertyName("${referrer.referrerJavaBeansRulePropertyName}");
+            referrerInfo.LocalDBMeta(${referrer.foreignTableDBMetaClassName}.GetInstance());
+            referrerInfo.ReferrerDBMeta(${referrer.referrerTableDBMetaClassName}.GetInstance());
+            IDictionary<${genericsColumnInfoMap}> map = new Dictionary<${genericsColumnInfoMap}>();
+#foreach ($column in $referrer.foreignColumnList)
+            map.Add(Column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
+#end
+            referrerInfo.LocalReferrerColumnInfoMap = map;
+            referrerInfo.IsOneToOne = ${referrer.isOneToOne()};
+            return referrerInfo;
+        }
+#end
+
         // -------------------------------------------------
         //                                    Relation Trace
         //                                    --------------
@@ -276,10 +312,6 @@ namespace ${myDBMetaPackageName} {
         //                                                              Common Column Info
         //                                                              ==================
         public override bool HasCommonColumn { get { return ${table.hasAllCommonColumn()}; } }
-
-        // ===============================================================================
-        //                                                                  Foreign DBMeta
-        //                                                                  ==============
 
         // ===============================================================================
         //                                                           Entity Property Setup
