@@ -408,7 +408,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 		Map<String, SelectedSelectColumnInfo> resultMap = new LinkedHashMap<String, SelectedSelectColumnInfo>();
 		${glDBMetaInterfaceName} foreignDBMeta = foreignInfo.ForeignDBMeta;
         foreach (${glColumnInfoName} columnInfo in foreignDBMeta.ColumnInfoList) {
-            String columnDbName = columnInfo.ColumnDbName();
+            String columnDbName = columnInfo.ColumnDbName;
 			SelectedSelectColumnInfo selectColumnInfo = new SelectedSelectColumnInfo();
 			selectColumnInfo.setTableAliasName(foreignTableAliasName);
 			selectColumnInfo.setColumnName(columnDbName);
@@ -1075,5 +1075,13 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
 	    ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
+	
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+	public String toString() {
+	    return ToString();
+	}
 }
+
 }

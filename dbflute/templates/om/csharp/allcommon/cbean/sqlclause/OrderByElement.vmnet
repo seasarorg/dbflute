@@ -113,7 +113,7 @@ public class ${myClassName} {
             String msg = "The attribute[ascDesc] should not be null.";
             throw new IllegalStateException(msg);
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String columnAlias = selectClauseRealColumnAliasMap.get(getColumnFullName());
         if (columnAlias == null || columnAlias.Trim().Length == 0) {
             String msg = "The selectClauseRealColumnAliasMap should have the value of the key: " + getColumnFullName();

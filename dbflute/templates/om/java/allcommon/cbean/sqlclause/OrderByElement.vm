@@ -117,7 +117,7 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     public String getColumnFullName() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         if (_aliasName != null) {
             sb.append(_aliasName).append(".");
         }
@@ -134,7 +134,7 @@ public class ${myClassName} implements java.io.Serializable {
             String msg = "The attribute[ascDesc] should not be null.";
             throw new IllegalStateException(msg);
         }
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append(getColumnFullName()).append(" ").append(_ascDesc);
         return sb.toString();
     }
@@ -148,7 +148,7 @@ public class ${myClassName} implements java.io.Serializable {
             String msg = "The attribute[ascDesc] should not be null.";
             throw new IllegalStateException(msg);
         }
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final String columnAlias = selectClauseRealColumnAliasMap.get(getColumnFullName());
         if (columnAlias == null || columnAlias.trim().length() == 0) {
             String msg = "The selectClauseRealColumnAliasMap should have the value of the key: " + getColumnFullName();
@@ -167,7 +167,7 @@ public class ${myClassName} implements java.io.Serializable {
      * @return View-string of all-columns value.
      */
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append("[OrderByElement] aliasName=").append(_aliasName);
         sb.append(" columnName=").append(_columnName);
         sb.append(" registeredAliasName=").append(_registeredAliasName);
