@@ -73,9 +73,9 @@ public interface ${glSqlClauseInterfaceName} {
     void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value);
     void registerBaseTableInlineWhereClause(String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
     void registerBaseTableInlineWhereClause(String value);
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, boolean onClauseInline);
-    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, boolean onClauseInline);
-    void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, bool onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKeyName} key, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option, bool onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline);
 
     // ===================================================================================
     //                                                             AdditionalConditionAsOr
@@ -96,19 +96,19 @@ public interface ${glSqlClauseInterfaceName} {
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
      * @param ascOrDesc Is it ascend or descend?
      */
-    void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+    void registerOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc);
 	
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
      * @param ascOrDesc Is it ascend or descend?
      */
-    void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+    void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc);
 
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
-    void registerUnionQuery(String unionClause, boolean unionAll);
+    void registerUnionQuery(String unionClause, bool unionAll);
 
     // ===================================================================================
     //                                                                          FetchScope
@@ -121,16 +121,16 @@ public interface ${glSqlClauseInterfaceName} {
     int getFetchPageNumber();
     int getPageStartIndex();
     int getPageEndIndex();
-    boolean isFetchScopeEffective();
+    bool isFetchScopeEffective();
     ${myClassName} ignoreFetchScope();
     ${myClassName} makeFetchScopeEffective();
-    boolean isFetchStartIndexSupported();
-    boolean isFetchSizeSupported();
+    bool isFetchStartIndexSupported();
+    bool isFetchSizeSupported();
 
     // ===================================================================================
     //                                                                     Fetch Narrowing
     //                                                                     ===============
-    boolean isFetchNarrowingEffective();
+    bool isFetchNarrowingEffective();
     int getFetchNarrowingSkipStartIndex();
     int getFetchNarrowingLoopCount();
 
@@ -169,7 +169,7 @@ public interface ${glSqlClauseInterfaceName} {
     // =====================================================================================
     //                                                                 Selected Foreign Info
     //                                                                 =====================
-	boolean hasSelectedForeignInfo(String relationPath);
+	bool hasSelectedForeignInfo(String relationPath);
 	void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 }
 

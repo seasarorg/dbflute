@@ -2,6 +2,7 @@
 
 using System;
 
+using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonJavaLike};
 
@@ -83,7 +84,17 @@ public abstract class ${myClassName} {
         return this;
     }
 
+    public ${myClassName} addWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+        if (value == null) {
+            String msg = "Argument[value] must not be null:";
+            throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
+        }
+        doAddWhereClause(conditionList, columnName, value, option);
+        return this;
+    }
+	
     abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
 
     public ${glConditionValueName} setupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
         if (conditionValue == null) {
@@ -94,7 +105,17 @@ public abstract class ${myClassName} {
         return conditionValue;
     }
 
+    public ${glConditionValueName} setupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+        if (conditionValue == null) {
+            String msg = "Argument[conditionValue] must not be null:";
+            throw new IllegalArgumentException(msg + " value=" + value + " this.ToString()=" + ToString());
+        }
+        doSetupConditionValue(conditionValue, value, location, option);
+        return conditionValue;
+    }
+	
     abstract protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location);
+    abstract protected void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option);
 
     protected String buildBindClause(String columnName, String location) {
         return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null";

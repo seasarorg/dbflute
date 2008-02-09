@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCKey};
 
 #set ($myClassName = "${glConditionKeyName}")
+import java.util.List;
 
 import ${glPackageBaseCommonCOption}.${glConditionOptionInterfaceName};
 import ${glPackageBaseCommonCValue}.${glConditionValueName};
@@ -96,7 +97,7 @@ public abstract class ${myClassName} {
      * @param value Condition value. (NotNull)
      * @return this.
      */
-    public ${myClassName} addWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value) {
+    public ${myClassName} addWhereClause(java.util.List<String> conditionList, String columnName, ${glConditionValueName} value) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.toString()=" + toString());
@@ -114,7 +115,7 @@ public abstract class ${myClassName} {
      * @param option Condition option. (NotNull)
      * @return this.
      */
-    public ${myClassName} addWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    public ${myClassName} addWhereClause(java.util.List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.toString()=" + toString());
@@ -130,7 +131,7 @@ public abstract class ${myClassName} {
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    abstract protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value);
 
     /**
      * Do add where clause.
@@ -140,7 +141,7 @@ public abstract class ${myClassName} {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option);
 
     /**
      * Setup condition value.

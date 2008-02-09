@@ -947,6 +947,11 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         return _isFetchScopeEffective;
     }
 
+	// ===================================================================================
+    //                                                                                Lock
+    //                                                                                ====
+	public abstract ${glSqlClauseInterfaceName} lockForUpdate();
+	
     // ===================================================================================
     //                                                                            Resolver
     //                                                                            ========
