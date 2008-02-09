@@ -700,11 +700,11 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc) {
         try {
             _isOrderByEffective = true;
-             List<String> orderByList = new ArrayList<String>();
+            List<String> orderByList = new ArrayList<String>();
             {
-                 StringTokenizer st = new StringTokenizer(orderByProperty, "/");
-                while (st.hasMoreElements()) {
-                    orderByList.add(st.nextToken());
+                String[] splitArray = orderByProperty.Split('/');
+				foreach (String element in splitArray) {
+                    orderByList.add(element);
                 }
             }
 
@@ -712,11 +712,11 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                 registeredOrderByProperty = orderByProperty;
             }
 
-             List<String> registeredOrderByList = new ArrayList<String>();
+            List<String> registeredOrderByList = new ArrayList<String>();
             {
-                 StringTokenizer st = new StringTokenizer(registeredOrderByProperty, "/");
-                while (st.hasMoreElements()) {
-                    registeredOrderByList.add(st.nextToken());
+			    String[] splitArray = registeredOrderByProperty.Split('/');
+				foreach (String element in splitArray) {
+                    registeredOrderByList.add(element);
                 }
             }
 

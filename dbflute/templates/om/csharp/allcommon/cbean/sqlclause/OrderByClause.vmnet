@@ -2,7 +2,6 @@
 #set ($myClassName = "${glOrderByClauseName}")
 
 using System;
-using System.Text;
 
 using ${glPackageBaseCommonJavaLike};
 
@@ -75,7 +74,7 @@ public class ${myClassName} {
     }
 
     public bool isSameOrderByColumn(String columnFullName) {
-        String[] columnFullNameArray = columnFullName.split('/');
+        String[] columnFullNameArray = columnFullName.Split('/');
         if (_orderByList.size() != columnFullNameArray.Length) {
             return false;
         }
@@ -137,7 +136,7 @@ public class ${myClassName} {
             throw new IllegalStateException(msg);
         }
         ${glOrderByElementName} element = (${glOrderByElementName})_orderByList.get(0);
-        String actualRegisteredAliasName = element.RegisteredAliasName;
+        String actualRegisteredAliasName = element.getRegisteredAliasName();
         if (actualRegisteredAliasName != null && expectedRegisteredAliasName != null) {
             return actualRegisteredAliasName.Equals(expectedRegisteredAliasName);
         } else {

@@ -13,6 +13,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         void clear();
 		Iterator<ELEMENT> iterator();
         ICollection<ELEMENT> getCollection();
+		String toString();
     }
 
     public interface NgCollection {
@@ -123,6 +124,9 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return _target.Current;
             }
         }
+		public String toString() {
+		    return _res.ToString();
+		}
     }
 
     public interface Set<ELEMENT> : Collection<ELEMENT> {
@@ -202,6 +206,9 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return _target.Current;
             }
         }
+		public String toString() {
+		    return _res.ToString();
+		}
     }
 
     public class LinkedHashSet<ELEMENT> : Set<ELEMENT>, NgSet {
@@ -280,6 +287,9 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return _target.get(_index);
             }
         }
+		public String toString() {
+		    return _res.ToString();
+		}
     }
 
     public interface Map<KEY, VALUE> {
@@ -363,6 +373,9 @@ namespace ${glPackageBaseCommonJavaLike} {
         public bool containsKeyAsNg(Object key) {
             return containsKey((KEY)key);
         }
+		public String toString() {
+		    return _res.ToString();
+		}
     }
 
     public class LinkedHashMap<KEY, VALUE> : Map<KEY, VALUE>, NgMap {
@@ -426,5 +439,8 @@ namespace ${glPackageBaseCommonJavaLike} {
         public bool containsKeyAsNg(Object key) {
             return containsKey((KEY)key);
         }
+		public String toString() {
+		    return _res.ToString();
+		}
     }
 }

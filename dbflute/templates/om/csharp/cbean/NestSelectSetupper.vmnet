@@ -35,7 +35,7 @@ namespace ${glPackageNss} {
 
 #end
 #foreach ($referrer in $table.referrers)
-#if (${referer.isOneToOne()})
+#if (${referrer.isOneToOne()})
 #set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
         public void With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();

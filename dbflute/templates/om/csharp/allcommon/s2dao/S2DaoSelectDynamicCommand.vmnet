@@ -2,7 +2,6 @@
 using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
 
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
@@ -143,14 +142,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             // Execute conditionBean.
             // - - - - - - - - - - - -
             AssertSelectClauseCommand();
-            IList<Object> bindVariableList = new List<Object>();
-            IList<Type> bindVariableTypeList = new List<Type>();
-            IList<String> bindVariableNameList = new List<String>();
+            IList<Object> bindVariableList = new System.Collections.Generic.List<Object>();
+            IList<Type> bindVariableTypeList = new System.Collections.Generic.List<Type>();
+            IList<String> bindVariableNameList = new System.Collections.Generic.List<String>();
 
             StringBuilder sb = new StringBuilder();
-            sb.Append(SetupRealSelectClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
-            sb.Append(" ");
-            sb.Append(SetupRealFromWhereClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
+            sb.append(SetupRealSelectClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
+            sb.append(" ");
+            sb.append(SetupRealFromWhereClause(args, bindVariableList, bindVariableTypeList, bindVariableNameList));
 
             BasicSelectHandler selectHandler = CreateBasicSelectHandler(sb.ToString(), this.dataReaderHandler);
             Object[] bindVariableArray = new Object[bindVariableList.Count];
@@ -251,9 +250,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             ICommandContext ctx = outsideSqlCommand.DoApply(filteredArgs);
-            IList<Object> bindVariableList = new List<Object>();
-            IList<Type> bindVariableTypeList = new List<Type>();
-            IList<String> bindVariableNameList = new List<String>();
+            IList<Object> bindVariableList = new System.Collections.Generic.List<Object>();
+            IList<Type> bindVariableTypeList = new System.Collections.Generic.List<Type>();
+            IList<String> bindVariableNameList = new System.Collections.Generic.List<String>();
             AddBindVariableInfo(ctx, bindVariableList, bindVariableTypeList, bindVariableNameList);
             BasicSelectHandler selectHandler = CreateBasicSelectHandler(ctx.Sql, specifiedDataReaderHandler);
             Object[] bindVariableArray = new Object[bindVariableList.Count];
@@ -699,7 +698,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
                 if (value is NgMap) {
                     NgMap map = (NgMap) value;
-                    value = map.get(_names[pos]);
+                    value = map.getAsNg(_names[pos]);
                     if (value == null) {
                         break;
                     }

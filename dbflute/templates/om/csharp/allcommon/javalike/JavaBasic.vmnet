@@ -53,14 +53,4 @@ namespace ${glPackageBaseCommonJavaLike} {
             return a.toString() + b.toString();
         }
     }
-	
-    public class boolean {
-        bool _res = false;
-        public boolean(bool value) {
-            _res = value;
-        }
-        public bool getBool() {
-            return _res;
-        }
-    }
 }
