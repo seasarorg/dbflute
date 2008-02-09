@@ -34,7 +34,7 @@ namespace ${glPackageBaseCQ} {
   #if (${col.isJavaNativeStringObject()})
 
         public void Set${tmpJavaName}_Equal($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, FilterRemoveEmptyString(value));
+            register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, filterRemoveEmptyString(value));
         }
     #if ($database.isMakeConditionQueryEqualEmptyString())
 
@@ -57,37 +57,37 @@ namespace ${glPackageBaseCQ} {
     #if (${col.isAvailableStringNotEqual()})
 
         public void Set${tmpJavaName}_NotEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, FilterRemoveEmptyString(value));
+            register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, filterRemoveEmptyString(value));
         }
     #end
     #if (${col.isAvailableStringGreaterThan()})
 
         public void Set${tmpJavaName}_GreaterThan($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, FilterRemoveEmptyString(value));
+            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, filterRemoveEmptyString(value));
         }
     #end
     #if (${col.isAvailableStringLessThan()})
 
         public void Set${tmpJavaName}_LessThan($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, FilterRemoveEmptyString(value));
+            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, filterRemoveEmptyString(value));
         }
     #end
     #if (${col.isAvailableStringGreaterEqual()})
 
         public void Set${tmpJavaName}_GreaterEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, FilterRemoveEmptyString(value));
+            register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, filterRemoveEmptyString(value));
         }
     #end
     #if (${col.isAvailableStringLessEqual()})
 
         public void Set${tmpJavaName}_LessEqual($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, FilterRemoveEmptyString(value));
+            register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, filterRemoveEmptyString(value));
         }
     #end
     #if (${col.isAvailableStringPrefixSearch()})
 
         public void Set${tmpJavaName}_PrefixSearch($col.JavaNative value) {
-            register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, FilterRemoveEmptyString(value));
+            register${tmpJavaName}(${glConditionKeyName}.CK_PREFIX_SEARCH, filterRemoveEmptyString(value));
         }
     #end
     #if (${col.isAvailableStringInScope()})

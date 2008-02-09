@@ -408,7 +408,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 				String msg = "The whereClause should have 'where' string: " + whereClause;
 			    throw new IllegalStateException(msg);
 			}
-			int clauseIndex = whereIndex + "where ".length();
+			int clauseIndex = whereIndex + "where ".Length;
 			String mark = getSqlClause().getUnionWhereFirstConditionMark();
 			unionQueryClause = fromClause + " " + whereClause.Substring(0, clauseIndex) + mark + whereClause.Substring(clauseIndex);
 		}
@@ -495,7 +495,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
             return null;
         }
         System.Collections.IList resultList = new System.Collections.ArrayList();
-		foreach (Object value in col) {
+		foreach (Object value in ls) {
 			String str = (String)value;
             if (str == null || "".Equals(str)) {
                 continue;
@@ -513,7 +513,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                                    Assert Object
     //                                                    -------------
     protected void assertObjectNotNull(String variableName, Object value) {
-	    ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);
+	    ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
     }
 
     protected void assertColumnName(String columnName) {
@@ -550,7 +550,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                                    Assert String
     //                                                    -------------
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-	    ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
+	    ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }
 
