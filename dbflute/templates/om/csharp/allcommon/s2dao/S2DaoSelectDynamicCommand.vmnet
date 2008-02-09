@@ -14,6 +14,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
