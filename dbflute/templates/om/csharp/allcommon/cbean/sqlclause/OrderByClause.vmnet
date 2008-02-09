@@ -41,8 +41,8 @@ public class ${myClassName} {
         if (_orderByList.isEmpty()) {
             return "";
         }
-        final StringBuffer sb = new StringBuffer();
-        final String delimiter = ", ";
+        StringBuilder sb = new StringBuilder();
+        String delimiter = ", ";
         for (Iterator<${glOrderByElementName}> ite = _orderByList.iterator(); ite.hasNext(); ) {
             ${glOrderByElementName} element = ite.next();
             sb.append(delimiter);
@@ -74,7 +74,7 @@ public class ${myClassName} {
         return element.getRegisteredColumnFullName();
     }
 
-    public bool IsSameOrderByColumn(String columnFullName) {
+    public bool isSameOrderByColumn(String columnFullName) {
         String[] columnFullNameArray = columnFullName.split('/');
         if (_orderByList.size() != columnFullNameArray.Length) {
             return false;

@@ -653,8 +653,8 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
             }
              String lastWhereClause = (String)whereList.remove(whereList.size() - 1);
              String preWhereClause = (String)whereList.remove(whereList.size() - 1);
-            if (preWhereClause.startsWith("(") && preWhereClause.endsWith(")")) {
-                String plainClause = preWhereClause.Substring("(".length(), preWhereClause.length() - ")".Length);
+            if (preWhereClause.StartsWith("(") && preWhereClause.EndsWith(")")) {
+                String plainClause = preWhereClause.Substring("(".Length, preWhereClause.Length - ")".Length);
                 whereList.add("(" + plainClause + " or " + lastWhereClause + ")");
             } else {
                 whereList.add("(" + preWhereClause + " or " + lastWhereClause + ")");
@@ -708,7 +708,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                 }
             }
 
-            if (registeredOrderByProperty == null || registeredOrderByProperty.trim().length() ==0) {
+            if (registeredOrderByProperty == null || registeredOrderByProperty.Trim().Length ==0) {
                 registeredOrderByProperty = orderByProperty;
             }
 
@@ -731,7 +731,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
                 String registeredAliasName = null;
                 String registeredColumnName = null;
 
-                if (orderBy.indexOf(".") < 0) {
+                if (orderBy.IndexOf(".") < 0) {
                     columnName = orderBy;
                 } else {
                     aliasName = orderBy.Substring(0, orderBy.LastIndexOf("."));
@@ -1059,7 +1059,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     }
 	
     protected String getLineSeparator() {
-        return ${glSimpleStringUtil}.GetLineSeparator();
+        return ${glSimpleSystemUtil}.GetLineSeparator();
     }
 
     // -----------------------------------------------------
