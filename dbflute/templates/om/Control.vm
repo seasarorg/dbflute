@@ -882,6 +882,15 @@ targetdatabase = $targetDatabase
     #end
 
     #if ($database.isTargetLanguageCSharp())
+      ## -----------------------------------------------------
+      ##             allcommon condition-bean condition-option
+      ##             -----------------------------------------
+      ## Setup java directory for allcommon.
+      $database.setupJavaDir_for_allcommon()
+
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonCOption}))
+      $database.makeDirectory($path)
+	  
 	  $database.debug("    parseConditionOption")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonCOption})}${glConditionOptionInterfaceName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/ConditionOption.${glTemplateFileExtension}",$path ,"", "")
