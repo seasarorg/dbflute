@@ -240,14 +240,14 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                          ------------
     protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                          , String colName, String capPropName, String uncapPropName) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
         }
     }
 	
 	protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                          , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
         }
     }
@@ -267,8 +267,8 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                          ------------
     protected virtual void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                        , String colName, String capPropName, String uncapPropName) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+            key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If C#, it is necessary to use capPropName!
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
             } else {
@@ -279,8 +279,8 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
 
     protected virtual void registerInlineQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                        , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-            key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+            key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If C#, it is necessary to use capPropName!
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
             } else {
@@ -364,13 +364,13 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                          ------------
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, UncapProp!
+        key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If C#, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName, ${glConditionOptionInterfaceName} option) {
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, UncapProp!
+        key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If C#, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
 	
