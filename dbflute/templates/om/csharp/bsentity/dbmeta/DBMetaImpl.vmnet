@@ -189,13 +189,15 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                     Column Info
         //                                                                     ===========
-        public override IList<${glColumnInfoName}> GetColumnInfoList() {
-            IList<${glColumnInfoName}> columnInfoList = new List<${glColumnInfoName}>();
+        public override IList<${glColumnInfoName}> ColumnInfoList {
+			get {
+                IList<${glColumnInfoName}> columnInfoList = new List<${glColumnInfoName}>();
 #foreach ($col in $table.columns)
-            columnInfoList.Add(Column${col.javaName});
+                columnInfoList.Add(Column${col.javaName});
 #end
-            return columnInfoList;
-        }
+                return columnInfoList;
+            }
+		}
 
 #foreach ($col in $table.columns)
         public ${glColumnInfoName} Column${col.javaName} { get { return new ${glColumnInfoName}(this, "${col.name}", "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}); } }
@@ -204,11 +206,21 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                     Unique Info
         //                                                                     ===========
-
-        public override ${glUniqueInfoName} GetPrimaryUniqueInfo() {
-            // TODO: @jflute
-            return null;
-        }
+        public override ${glUniqueInfoName} PrimaryUniqueInfo {
+		    get {
+#if ($table.hasPrimaryKey())
+                ${glUniqueInfoName} uniqueInfo = new ${glUniqueInfoName}();
+                uniqueInfo.DBMeta = this;
+#foreach ($col in $table.primaryKey)
+                uniqueInfo.AddUniqueColumnList(new ${glColumnInfoName}(this, "${col.name}", "${col.uncapitalisedJavaName}", typeof(${col.javaNative}), true, ${col.columnSizeSettingExpression}));
+#end
+                uniqueInfo.Primary = true;
+                return uniqueInfo;
+#else
+		        throw new UnsupportedOperationException("The table doen not have primary key: " + getTableDbName());
+#end
+            }
+		}
 
         // -------------------------------------------------
         //                                   Primary Element

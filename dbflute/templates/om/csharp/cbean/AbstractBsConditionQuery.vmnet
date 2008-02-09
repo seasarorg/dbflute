@@ -132,10 +132,9 @@ namespace ${glPackageBaseCQ} {
     #end
     #if (${col.hasSingleKeyReferrer()})
       #foreach ($refferer in $col.SingleKeyReferrers)
-        #if (!$refferer.isSelfReference())
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+        #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
         public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             assertObjectNotNull("subQuery", subQuery);
@@ -144,7 +143,6 @@ namespace ${glPackageBaseCQ} {
         }
 
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-        #end
       #end
     #end
   #end
@@ -237,11 +235,10 @@ namespace ${glPackageBaseCQ} {
       #end
     #end
     #if (${col.hasSingleKeyReferrer()})
-      #foreach ($refferer in $col.SingleKeyReferrers)
-        #if (!$refferer.isSelfReference())
-          #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
-          #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
-          #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+      #foreach ($refferer in $col.singleKeyReferrers)
+        #set ($relatedCQClassName = "${glProjectPrefix}${refferer.Table.JavaName}CQ")
+        #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
+        #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${refferer.ReffererPropertyNameInitCap}")
 
         public void Set${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             assertObjectNotNull("subQuery", subQuery);
@@ -250,7 +247,6 @@ namespace ${glPackageBaseCQ} {
         }
 
         public abstract void keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
-        #end
       #end
     #end
   #end

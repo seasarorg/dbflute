@@ -1,74 +1,46 @@
 #set ($myClassName = "${glConditionKeyName}LessEqual")
 
 using System;
-using System.Collections;
-using System.Reflection;
+
 using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonCOption};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCKey} {
 
-    /// <summary>
-    /// The condition-key of lessEqual.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    public class ${myClassName} : ${glConditionKeyName} {
+public class ${myClassName} : ${glConditionKeyName} {
 
-        /** Log-instance. */
-        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        /**
-         * Constructor.
-         */
-        public ${myClassName}() {
-            _conditionKey = "lessEqual";
-            _operand = "<=";
-        }
-
-        /**
-         * Is valid registration?
-         * 
-         * @param conditionValue Condition value. (NotNull)
-         * @param value Value. (NotNull)
-         * @param callerName Caller name. (NotNull)
-         * @return Determination.
-         */
-        public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
-            if (value == null) {
-                return false;
-            }
-            Object valueObject = conditionValue.LessEqual;
-            if (valueObject != null && valueObject.Equals(value)) {
-                _log.Warn("The value has already registered at " + callerName + ": " + valueObject + " = " + value);
-                return false;
-            }
-            return true;
-        }
-
-        /**
-         * This method implements super#doAddWhereClause().
-         * 
-         * @param conditionList Condition list. (NotNull)
-         * @param columnName Column name. (NotNull)
-         * @param value Condition value. (NotNull)
-         */
-        protected override void DoAddWhereClause(System.Collections.IList conditionList, String columnName, ${glConditionValueName} value) {
-            if (value.LessEqual == null) {
-                return;
-            }
-            Object valueObject = value.LessEqual;
-            conditionList.Add(BuildBindClause(columnName, value.GetLessEqualLocation()));
-        }
-
-        /**
-         * This method implements super#doSetupConditionValue().
-         * 
-         * @param conditionValue Condition value. (NotNull)
-         * @param value Value. (NotNull)
-         * @param location Location. (NotNull)
-         */
-        protected override void DoSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
-            conditionValue.LessEqual = value;
-            conditionValue.SetLessEqualLocation(location);
-        }
+    public ${myClassName}() {
+        _conditionKey = "lessEqual";
+        _operand = "<=";
     }
+
+    public override bool isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
+        if (value == null) {
+            return false;
+        }
+        Object valueObject = conditionValue.LessEqual;
+        if (valueObject != null && valueObject.Equals(value)) {
+            _log.Warn("The value has already registered at " + callerName + ": " + valueObject + " = " + value);
+            return false;
+        }
+        return true;
+    }
+
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
+        if (value.LessEqual == null) {
+            return;
+        }
+        Object valueObject = value.LessEqual;
+        conditionList.add(buildBindClause(columnName, value.getLessEqualLocation()));
+    }
+
+    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+        conditionValue.LessEqual = value;
+        conditionValue.setLessEqualLocation(location);
+    }
+}
+	
 }

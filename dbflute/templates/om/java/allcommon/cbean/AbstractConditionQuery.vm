@@ -1074,7 +1074,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     /**
-     * Assert that the column-name is not null and is not emtpy and does not contain comma.
+     * Assert that the column-name is not null and is not empty and does not contain comma.
      * 
      * @param columnName Column-name. (NotNull)
      * @exception IllegalArgumentException
@@ -1095,7 +1095,7 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     /**
-     * Assert that the alias-name is not null and is not emtpy and does not contain comma.
+     * Assert that the alias-name is not null and is not empty and does not contain comma.
      * 
      * @param aliasName Alias-name. (NotNull)
      * @exception IllegalArgumentException

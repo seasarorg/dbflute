@@ -1204,7 +1204,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 	
 	    /** The key of DBMeta cache. */
 	    protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
-	
+
         @Override
         public Object createRow(ResultSet rs, Map propertyCache, Class beanClass) throws SQLException  {
             final Object row = newBean(beanClass);

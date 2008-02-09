@@ -1,6 +1,7 @@
 #set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
 
 using System;
+
 using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonSqlClause} {

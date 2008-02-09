@@ -1,79 +1,78 @@
 #set ($myClassName = "${glConditionKeyName}NotInScope")
 
 using System;
-using System.Collections;
-using System.Reflection;
+
 using ${glPackageBaseCommonCValue};
+using ${glPackageBaseCommonCOption};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonCKey} {
 
-    /// <summary>
-    /// The condition-key of notInScope.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    public class ${myClassName} : ${glConditionKeyName} {
+public class ${myClassName} : ${glConditionKeyName} {
 
-        /**
-         * Constructor.
-         */
-        public ${myClassName}() {
-            _conditionKey = "notInScope";
-            _operand = "not in";
-        }
-
-        /**
-         * Is valid registration?
-         * 
-         * @param conditionValue Condition value. (NotNull)
-         * @param value Value. (NotNull)
-         * @param callerName Caller name. (NotNull)
-         * @return Determination.
-         */
-        public override bool IsValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
-            if (value == null) {
-                return false;
-            }
-            if (value is System.Collections.IList && ((System.Collections.IList)value).Count == 0) {
-                return false;
-            }
-            return true;
-        }
-
-        /**
-         * This method implements super#doAddWhereClause().
-         * 
-         * @param conditionList Condition list. (NotNull)
-         * @param columnName Column name. (NotNull)
-         * @param value Condition value. (NotNull)
-         */
-        protected override void DoAddWhereClause(System.Collections.IList conditionList, String columnName, ${glConditionValueName} value) {
-            if (value.NotInScope == null) {
-                return;
-            }
-            System.Collections.IList valueList = value.NotInScope;
-            System.Collections.IList checkedValueList = new System.Collections.Generic.List<Object>();
-            foreach (Object checkTargetValue in valueList) {
-                if (checkTargetValue == null) {
-                    continue;
-                }
-                checkedValueList.Add(checkTargetValue);
-            }
-            if (checkedValueList.Count == 0) {
-                return;
-            }
-            conditionList.Add(BuildBindClause(columnName, value.GetNotInScopeLocation(), "('a1', 'a2')"));
-        }
-
-        /**
-         * This method implements super#doSetupConditionValue().
-         * 
-         * @param conditionValue Condition value. (NotNull)
-         * @param value Value. (NotNull)
-         * @param location Location. (NotNull)
-         */
-        protected override void DoSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
-            conditionValue.NotInScope = ((System.Collections.IList)value);
-            conditionValue.SetNotInScopeLocation(location);
-        }
+    public ${myClassName}() {
+        _conditionKey = "notInScope";
+        _operand = "not in";
     }
+
+    public override bool isValidRegistration(${glConditionValueName} conditionValue, Object value, String callerName) {
+        if (value == null) {
+            return false;
+        }
+        if (value is System.Collections.IList && ((System.Collections.IList)value).Count == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
+        if (value.NotInScope == null) {
+            return;
+        }
+        System.Collections.IList valueList = value.NotInScope;
+        System.Collections.IList checkedValueList = new System.Collections.Generic.List<Object>();
+        foreach (Object checkTargetValue in valueList) {
+            if (checkTargetValue == null) {
+                continue;
+            }
+            checkedValueList.Add(checkTargetValue);
+        }
+        if (checkedValueList.Count == 0) {
+            return;
+        }
+        conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
+    }
+	
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value) {
+        if (value.NotInScope == null) {
+            return;
+        }
+        System.Collections.IList valueList = value.NotInScope;
+        System.Collections.IList checkedValueList = new System.Collections.Generic.List<Object>();
+        foreach (Object checkTargetValue in valueList) {
+            if (checkTargetValue == null) {
+                continue;
+            }
+            checkedValueList.Add(checkTargetValue);
+        }
+        if (checkedValueList.Count == 0) {
+            return;
+        }
+        conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
+    }
+
+    protected override void doAddWhereClause(List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+        throw new UnsupportedOperationException("doAddWhereClause with condition-option is unsupported!!!");
+    }
+
+    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location) {
+        conditionValue.NotInScope = ((System.Collections.IList)value);
+        conditionValue.setNotInScopeLocation(location);
+    }
+	
+    protected override void doSetupConditionValue(${glConditionValueName} conditionValue, Object value, String location, ${glConditionOptionInterfaceName} option) {
+        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
+    }
+}
+	
 }

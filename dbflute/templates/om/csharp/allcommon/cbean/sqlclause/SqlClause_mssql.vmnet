@@ -1,116 +1,64 @@
 #set ($myClassName = "${glSqlClauseInterfaceName}${database.DaoGenDbName}")
 
 using System;
-using System.Collections;
-using System.Text;
 
 namespace ${glPackageBaseCommonSqlClause} {
 
-    /// <summary>
-    /// SqlClause for MSSQL.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    [System.Serializable]
-    public class ${myClassName} : ${glSqlClauseAbstractName} {
+[System.Serializable]
+public class ${myClassName} : ${glSqlClauseAbstractName} {
 
-        /** String of fetch-first as select-hint. */
-        protected String _fetchFirstSelectHint = "";
+    protected String _fetchFirstSelectHint = "";
+    protected String _lockFromHint = "";
 
-        /** String of lock as from-hint. */
-        protected String _lockFromHint = "";
+    public ${myClassName}(String tableName)
+        : base(tableName) {}
 
-        /**
-         * Constructor.
-         * 
-         * @param tableName Table name. (NotNull)
-         **/
-        public ${myClassName}(String tableName)
-            : base(tableName) {}
-
-        /**
-         * ${database.ImplementComment}
-         */
-        protected override void DoFetchFirst() {
-            if (this.IsFetchSizeSupported) {
-                _fetchFirstSelectHint = " top " + this.FetchSize;
-            }
-        }
-
-        /**
-         * ${database.ImplementComment}
-         */
-        protected override void DoFetchPage() {
-            if (this.IsFetchSizeSupported) {
-                if (this.IsFetchStartIndexSupported) {
-                    _fetchFirstSelectHint = " top " + this.FetchSize;
-                } else {
-                    _fetchFirstSelectHint = " top " + this.PageEndIndex;
-                }
-            }
-        }
-
-        /**
-         * ${database.ImplementComment}
-         */
-        protected override void DoClearFetchPageClause() {
-            _fetchFirstSelectHint = "";
-        }
-
-        /**
-         * ${database.OverrideComment}
-         * 
-         * @return Determination.
-         */
-        public override bool IsFetchStartIndexSupported {
-            get {
-                return false; // Default
-            }
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return this. (NotNull)
-         */
-        public override ${glSqlClauseInterfaceName} LockForUpdate() {
-            _lockFromHint = " with (updlock)";
-            return this;
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Select-hint. (NotNull)
-         */
-        protected override String CreateSelectHint() {
-            return _fetchFirstSelectHint;
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
-         */
-        protected override String CreateFromBaseTableHint() {
-            return _lockFromHint;
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return From-hint. (NotNull)
-         */
-        protected override String CreateFromHint() {
-            return "";
-        }
-
-        /**
-         * ${database.ImplementComment}
-         * 
-         * @return Sql-suffix. (NotNull)
-         */
-        protected override String CreateSqlSuffix() {
-            return "";
+    protected override void doFetchFirst() {
+        if (this.isFetchSizeSupported()) {
+            _fetchFirstSelectHint = " top " + this.getFetchSize();
         }
     }
+
+    protected override void doFetchPage() {
+        if (this.isFetchSizeSupported()) {
+            if (this.isFetchStartIndexSupported()) {
+                _fetchFirstSelectHint = " top " + this.getFetchSize();
+            } else {
+                _fetchFirstSelectHint = " top " + this.getPageEndIndex();
+            }
+        }
+    }
+
+    protected override void doClearFetchPageClause() {
+        _fetchFirstSelectHint = "";
+    }
+
+    public override bool isFetchStartIndexSupported {
+        get {
+            return false; // Default
+        }
+    }
+
+    public override ${glSqlClauseInterfaceName} lockForUpdate() {
+        _lockFromHint = " with (updlock)";
+        return this;
+    }
+
+    protected override String createSelectHint() {
+        return _fetchFirstSelectHint;
+    }
+
+    protected override String createFromBaseTableHint() {
+        return _lockFromHint;
+    }
+
+    protected override String createFromHint() {
+        return "";
+    }
+
+    protected override String createSqlSuffix() {
+        return "";
+    }
+}
+
 }
