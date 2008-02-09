@@ -86,16 +86,16 @@ namespace ${glPackageBaseCommonDBMeta} {
         /// <returns>DBMeta. (NotNull)</returns>
         public static ${glDBMetaInterfaceName} FindDBMeta(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-            if (_tableDbNameInstanceMap.ContainsKey(tableFlexibleName)) {
+            if (_tableDbNameInstanceMap.containsKey(tableFlexibleName)) {
                 return ByTableDbName(tableFlexibleName);
             }
             String toLowerKey = tableFlexibleName.ToLower();
-            if (_tableDbNamePropertyNameKeyToLowerMap.ContainsKey(toLowerKey)) {
+            if (_tableDbNamePropertyNameKeyToLowerMap.containsKey(toLowerKey)) {
                 String propertyName = (String)_tableDbNamePropertyNameKeyToLowerMap.get(toLowerKey);
                 String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(propertyName.ToLower());
                 return ByTableDbName(dbName);
             }
-            if (_tablePropertyNameDbNameKeyToLowerMap.ContainsKey(toLowerKey)) {
+            if (_tablePropertyNameDbNameKeyToLowerMap.containsKey(toLowerKey)) {
                 String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(toLowerKey);
                 return ByTableDbName(dbName);
             }

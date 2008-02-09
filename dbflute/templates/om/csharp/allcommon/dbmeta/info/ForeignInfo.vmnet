@@ -123,7 +123,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // -------------------------------------------------
         //                                   String Handling
         //                                   ---------------
-        protected static String InitCap(String name) {
+        protected static String InitCap(String str) {
             return ${glSimpleStringUtil}.InitCap(str);
         }
     }

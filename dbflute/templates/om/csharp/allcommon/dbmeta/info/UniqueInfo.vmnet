@@ -45,11 +45,11 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
 
         public void AddUniqueColumnList(${glColumnInfoName} uniqueColumn) {
-            this.uniqueColumnList.Add(uniqueColumn);
+            this.uniqueColumnList.add(uniqueColumn);
         }
 
         public ${glColumnInfoName} FirstColumn {
-            get { return (${glColumnInfoName})this.uniqueColumnList[0]; }
+            get { return (${glColumnInfoName})this.uniqueColumnList.get(0); }
         }
 
         public bool IsTwoOrMore {

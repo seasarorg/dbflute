@@ -336,7 +336,7 @@ namespace ${myDBMetaPackageName} {
 			    msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.size()=" + _entityPropertySetupperMap.size();
 		        throw new SystemException(msg);
             }
-            EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap[propertyName];
+            EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap.get(propertyName);
             callback.Setup((${myExtendedObjectClassName})entity, value);
         }
 
