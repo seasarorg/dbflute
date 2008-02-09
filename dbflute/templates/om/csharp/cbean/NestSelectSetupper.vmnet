@@ -34,9 +34,9 @@ namespace ${glPackageNss} {
         }
 
 #end
-#foreach ($referer in $table.refererList)
+#foreach ($referrer in $table.referrers)
 #if (${referer.isOneToOne()})
-#set ($tmpPropertyNameInitCap = "${referer.ReffererPropertyNameInitCapAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
         public void With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
     		String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
