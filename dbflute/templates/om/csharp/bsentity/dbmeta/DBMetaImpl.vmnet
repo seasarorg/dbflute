@@ -324,16 +324,16 @@ namespace ${myDBMetaPackageName} {
 		}
 		
 	    public override bool HasEntityPropertySetupper(String propertyName) {
-		    if (_entityPropertySetupperMap.Count == 0) {
+		    if (_entityPropertySetupperMap.isEmpty()) {
 			    InitializeEntityPropertySetupper();
 			}
-		    return _entityPropertySetupperMap.ContainsKey(propertyName);
+		    return _entityPropertySetupperMap.containsKey(propertyName);
 		}
 
         public override void SetupEntityProperty(String propertyName, Object entity, Object value) {
-            if (!_entityPropertySetupperMap.ContainsKey(propertyName)) {
+            if (!_entityPropertySetupperMap.containsKey(propertyName)) {
 		        String msg = "The propertyName was Not Found in the map of setupper of entity property:";
-			    msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.Count=" + _entityPropertySetupperMap.Count;
+			    msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.size()=" + _entityPropertySetupperMap.size();
 		        throw new SystemException(msg);
             }
             EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap[propertyName];
