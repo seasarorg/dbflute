@@ -147,7 +147,13 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
                 sb.insert(0, CQ_PROPERTY + ".");
                 break;
             } else {
-                sb.insert(0, CQ_PROPERTY + initCap(query.getForeignPropertyName()) + ".");
+                String foreignPropertyName = query.getForeignPropertyName();
+                if (foreignPropertyName == null) {
+                    String msg = "The foreignPropertyName of the query should not be null:";
+                    msg = msg + " : query=" + query.GetType().Name;
+                    throw new SystemException(msg);
+                }
+                sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
             }
             query = query.getChildQuery();
         }

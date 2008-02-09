@@ -33,6 +33,28 @@ public class ${glSimpleStringUtil} {
     }
 	
     public static String initCap(String str) {
+	    assertObjectNotNull("str", str);
         return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+	
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
+    /**
+     * Assert that the object is not null.
+     * 
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    public static void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

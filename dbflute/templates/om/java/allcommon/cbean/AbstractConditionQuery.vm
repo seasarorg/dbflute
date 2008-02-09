@@ -35,6 +35,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /** Object for DUMMY. */
     protected static final Object DUMMY_OBJECT = new Object();
+	
+    /** The property of condition-query. */
+	protected static final String CQ_PROPERTY = "conditionQuery";
 
     /** SQL clause. */
     protected final ${glSqlClauseName} _sqlClause;
@@ -230,10 +233,16 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         ${glConditionQueryInterfaceName} query = this;
         while (true) {
             if (query.isBaseQuery(query)) {
-                sb.insert(0, "conditionQuery.");
+                sb.insert(0, CQ_PROPERTY + ".");
                 break;
             } else {
-                sb.insert(0, "conditionQuery" + initCap(query.getForeignPropertyName()) + ".");
+                final String foreignPropertyName = query.getForeignPropertyName();
+                if (foreignPropertyName == null) {
+                    String msg = "The foreignPropertyName of the query should not be null:";
+                    msg = msg + " : query=" + query.getClass().getName();
+                    throw new SystemException(msg);
+                }
+                sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
             }
             query = query.getChildQuery();
         }
