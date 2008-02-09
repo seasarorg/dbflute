@@ -152,7 +152,7 @@ namespace ${glPackageBaseCQ} {
         // ===============================================================================
         //                                                                     Union Query
         //                                                                     ===========
-		protected void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
+		protected override void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper) {
 #if ($table.hasForeignKeyOrRefererAsOne())
             ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
             ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;

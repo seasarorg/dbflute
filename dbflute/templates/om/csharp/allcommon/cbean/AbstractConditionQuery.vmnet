@@ -236,8 +236,8 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
 	
     // -----------------------------------------------------
-    //                                          Normal Query
-    //                                          ------------
+    //                                           NormalQuery
+    //                                           -----------
     protected virtual void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                          , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
@@ -253,30 +253,14 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     }
 
     // -----------------------------------------------------
-    //                                          FromTo Query
-    //                                          ------------
+    //                                           FromToQuery
+    //                                           -----------
     // -----------------------------------------------------
-    //                                      LikeSearch Query
-    //                                      ----------------
+    //                                       LikeSearchQuery
+    //                                       ---------------
     // -----------------------------------------------------
     //                                          InScopeQuery
     //                                          ------------
-    protected void registerInScopeQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
-                                     , String colName, String capPropName, String uncapPropName, ${glConditionOptionInScopeName} option) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-            if (value != null && option.isSplit()) {
-                String[] strArray = option.generateSplitValueArray(value);
-                List<String> realValueList = new ArrayList<String>();
-                for (int i=0; i < strArray.length; i++) {
-                    String currentValue = strArray[i];
-                    realValueList.add(currentValue);
-                }
-                setupConditionValueAndRegisterWhereClause(key, realValueList, cvalue, colName, capPropName, uncapPropName, option);
-            } else {
-                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
-            }
-        }
-    }
 
     protected void setupConditionValueAndRegisterWhereClause(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                                              , String colName, String capPropName, String uncapPropName) {

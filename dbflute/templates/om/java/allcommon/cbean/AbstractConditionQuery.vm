@@ -367,8 +367,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // -----------------------------------------------------
-    //                                          Normal Query
-    //                                          ------------
+    //                                                 Query
+    //                                                 -----
     protected void registerQuery(${glConditionKeyName} key, Object value, ${glConditionValueName} cvalue
                                  , String colName, String capPropName, String uncapPropName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
@@ -384,8 +384,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // -----------------------------------------------------
-    //                                          FromTo Query
-    //                                          ------------
+    //                                           FromToQuery
+    //                                           -----------
     protected void registerFromToQuery(java.util.Date fromDate, java.util.Date toDate, ${glConditionValueName} cvalue
                                  , String colName, String capPropName, String uncapPropName, ${glConditionOptionFromToName} option) {
         {
@@ -405,8 +405,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     }
 
     // -----------------------------------------------------
-    //                                      LikeSearch Query
-    //                                      ----------------
+    //                                       LikeSearchQuery
+    //                                       ---------------
     protected void registerLikeSearchQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
                                      , String colName, String capPropName, String uncapPropName, ${glConditionOptionLikeSearchName} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
