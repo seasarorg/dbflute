@@ -210,7 +210,9 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
         getSqlClause().copyIncludedSelectColumn(unionQuery.getSqlClause());// Reflect IncludedSelectColumn!
         String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.put(key, unionQuery);
-        registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
+		
+		// If C#, The property of 'Union' should be 'InitCap'.
+        registerUnionQuery(unionQuery, unionAll, (unionAll ? "UnionAllQueryMap" : "UnionQueryMap") + "." + key);
     }
 	
     abstract public void reflectRelationOnUnionQuery(${glConditionQueryInterfaceName} baseQueryAsSuper, ${glConditionQueryInterfaceName} unionQueryAsSuper);
