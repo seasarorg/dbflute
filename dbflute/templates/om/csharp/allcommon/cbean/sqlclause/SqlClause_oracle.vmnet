@@ -29,8 +29,8 @@ public class ${myClassName} : ${glSqlClauseAbstractName} {
         if (isFetchStartIndexSupported()) {
             _fetchScopeSqlSuffix = ") base ) where rn > " + this.getPageStartIndex();
         }
-        if (isFetchSizeSupported) {
-            if (isFetchStartIndexSupported) {
+        if (isFetchSizeSupported()) {
+            if (isFetchStartIndexSupported()) {
                 _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + this.getPageEndIndex();
             } else {
                 _fetchScopeSqlSuffix = ") base ) where rn <= " + this.getPageEndIndex();
