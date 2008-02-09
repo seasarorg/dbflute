@@ -239,8 +239,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
                 final String foreignPropertyName = query.getForeignPropertyName();
                 if (foreignPropertyName == null) {
                     String msg = "The foreignPropertyName of the query should not be null:";
-                    msg = msg + " : query=" + query.getClass().getName();
-                    throw new SystemException(msg);
+                    msg = msg + " : " + query.getClass().getName() + " = " + query;
+                    throw new IllegalStateException(msg);
                 }
                 sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
             }
@@ -1001,6 +1001,8 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                      ==============
 	@Override
     public String toString() {
-        return getSqlClause().getClause();
+        return getClass().getSimpleName() + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel
+		     + ", subQueryLevel=" + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName
+			 + ", relationPath=" + _relationPath + ", onClauseInline=" + _onClauseInline + "}";
     }
 }
