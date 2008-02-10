@@ -449,27 +449,12 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-    public class BeanMetaDataExtension : BeanMetaDataImpl {
+	public class BeanMetaDataDBFluteDBMetaExtension : BeanMetaDataImpl {
         public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {
             this.BeanType = beanType;
             this._relation = relation;
             this.AnnotationReaderFactory = annotationReaderFactory;
-        }
-        protected int _nestNo;
-        public int NestNo {
-            get { return _nestNo; }
-            set { _nestNo = value; }
-        }
-        protected override IBeanMetaData CreateRelationBeanMetaData(PropertyInfo propertyInfo, IDatabaseMetaData dbMetaData, IDbms dbms) {
-            bool isRelation = false;
-            if (this.NestNo > 0) {
-                isRelation = true;
-            }
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(propertyInfo.PropertyType, this.AnnotationReaderFactory, isRelation);
-            bmdExt.NestNo = this.NestNo + 1;
-            bmdExt.Initialize(dbMetaData, dbms);
-            return bmdExt;
         }
         protected override void SetupProperty(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (!IsEntity(beanType)) {
@@ -531,8 +516,32 @@ namespace ${glPackageBaseCommonS2Dao} {
             return typeof(Entity).IsAssignableFrom(beanType);
         }
     }
+	
+    public class BeanMetaDataExtension : BeanMetaDataDBFluteDBMetaExtension {
+        public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
+            : base() {
+            this.BeanType = beanType;
+            this._relation = relation;
+            this.AnnotationReaderFactory = annotationReaderFactory;
+        }
+        protected int _nestNo;
+        public int NestNo {
+            get { return _nestNo; }
+            set { _nestNo = value; }
+        }
+        protected override IBeanMetaData CreateRelationBeanMetaData(PropertyInfo propertyInfo, IDatabaseMetaData dbMetaData, IDbms dbms) {
+            bool isRelation = false;
+            if (this.NestNo > 0) {
+                isRelation = true;
+            }
+            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(propertyInfo.PropertyType, this.AnnotationReaderFactory, isRelation);
+            bmdExt.NestNo = this.NestNo + 1;
+            bmdExt.Initialize(dbMetaData, dbms);
+            return bmdExt;
+        }
+    }
 
-    public class BeanMetaDataNonConcurrency : BeanMetaDataImpl {
+    public class BeanMetaDataNonConcurrency : BeanMetaDataDBFluteDBMetaExtension {
         public BeanMetaDataNonConcurrency(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {
             this.BeanType = beanType;
