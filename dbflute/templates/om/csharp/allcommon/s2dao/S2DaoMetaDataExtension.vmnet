@@ -471,6 +471,65 @@ namespace ${glPackageBaseCommonS2Dao} {
             bmdExt.Initialize(dbMetaData, dbms);
             return bmdExt;
         }
+        protected override void SetupProperty(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
+            if (!IsEntity(beanType)) {
+                base.SetupProperty(beanType, dbMetaData, dbms);
+                return;
+            }
+            Entity entity = (Entity)ClassUtil.NewInstance(beanType);
+            DBMeta dbmeta = entity.DBMeta;
+            foreach (PropertyInfo pi in beanType.GetProperties()) {
+                IPropertyType pt = null;
+                RelnoAttribute relnoAttr = _beanAnnotationReader.GetRelnoAttribute(pi);
+                if (relnoAttr != null) {
+                    if (!_relation) {
+                        IRelationPropertyType rpt = CreateRelationPropertyType(beanType, pi, relnoAttr, dbMetaData, dbms);
+                        AddRelationPropertyType(rpt);
+                    }
+                } else {
+                    if (pi.CanWrite) {
+                        pt = CreatePropertyTypeExtension(pi, dbmeta);
+                        if (pt != null) {
+                            AddPropertyType(pt);
+                        }
+                    }
+                }
+                if (IdentifierGenerator == null) {
+                    IDAttribute idAttr = _beanAnnotationReader.GetIdAttribute(pi, dbms);
+                    if (idAttr != null) {
+                        _identifierGenerator = Seasar.Dao.Id.IdentifierGeneratorFactory.CreateIdentifierGenerator(pi.Name, dbms, idAttr);
+                        if (pt != null) {
+                            _primaryKeys = new string[] { pt.ColumnName };
+                            pt.IsPrimaryKey = true;
+                        }
+                    }
+                }
+            }
+        }
+        protected IPropertyType CreatePropertyTypeExtension(PropertyInfo pi, DBMeta dbmeta) {
+            string columnName = _beanAnnotationReader.GetColumn(pi);
+            if (columnName == null) {
+                return null; ;
+            }
+            IValueType valueType = ValueTypes.GetValueType(pi.PropertyType);
+            IPropertyType pt = new PropertyTypeImpl(pi, valueType, columnName);
+            pt.IsPersistent = true;
+            if (dbmeta.HasPrimaryKey && dbmeta.HasColumn(pt.ColumnName)) {
+                if (dbmeta.FindColumnInfo(pt.ColumnName).IsPrimary) {
+                    pt.IsPrimaryKey = true;
+                }
+            }
+            return pt;
+        }
+        protected override void SetupDatabaseMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
+            if (IsEntity(beantype)) {
+			    return;
+			}
+            base.SetupDatabaseMetaData(beanType, dbMetaData, dbms);
+        }
+		protected bool IsEntity(Type beanType) {
+            return typeof(Entity).IsAssignableFrom(beanType);
+        }
     }
 
     public class BeanMetaDataNonConcurrency : BeanMetaDataImpl {
