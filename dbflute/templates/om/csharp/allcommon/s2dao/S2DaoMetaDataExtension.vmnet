@@ -450,11 +450,8 @@ namespace ${glPackageBaseCommonS2Dao} {
     }
 
 	public class BeanMetaDataDBFluteDBMetaExtension : BeanMetaDataImpl {
-        public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
+        public BeanMetaDataDBFluteDBMetaExtension() 
             : base() {
-            this.BeanType = beanType;
-            this._relation = relation;
-            this.AnnotationReaderFactory = annotationReaderFactory;
         }
         protected override void SetupProperty(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (!IsEntity(beanType)) {
@@ -507,7 +504,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             return pt;
         }
         protected override void SetupDatabaseMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
-            if (IsEntity(beantype)) {
+            if (IsEntity(beanType)) {
 			    return;
 			}
             base.SetupDatabaseMetaData(beanType, dbMetaData, dbms);
