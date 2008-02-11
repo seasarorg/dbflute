@@ -10,10 +10,6 @@ namespace ${glPackageBaseCommonException} {
     /// </summary>
     public class ${glIfCommentNotBooleanResultException} : SystemException {
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param="msg">Exception message. (NotNull)</param>
         public ${glIfCommentNotBooleanResultException}(String msg)
         : base(msg) {}
     }

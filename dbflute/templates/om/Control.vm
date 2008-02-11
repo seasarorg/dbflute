@@ -229,9 +229,11 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-Exception]
     #set ($glBindVariableCommentNotFoundPropertyException = "${glProjectPrefix}BindVariableCommentNotFoundPropertyException")
+    #set ($glBindVariableParameterNullValueException = "${glProjectPrefix}BindVariableParameterNullValueException")
     #set ($glDangerousResultSizeExceptionName = "${glProjectPrefix}DangerousResultSizeException")
     #set ($glDangerousResultSizeException = "${glProjectPrefix}DangerousResultSizeException")
     #set ($glEmbeddedValueCommentNotFoundPropertyException = "${glProjectPrefix}EmbeddedValueCommentNotFoundPropertyException")
+    #set ($glEmbeddedValueParameterNullValueException = "${glProjectPrefix}EmbeddedValueParameterNullValueException")
     #set ($glEntityAlreadyUpdatedException = "${glProjectPrefix}EntityAlreadyUpdatedException")
     #set ($glEntityAlreadyDeletedException = "${glProjectPrefix}EntityAlreadyDeletedException")
     #set ($glEntityDuplicatedException = "${glProjectPrefix}EntityDuplicatedException")
@@ -1221,9 +1223,17 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glBindVariableCommentNotFoundPropertyException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/exception/BindVariableCommentNotFoundPropertyException.${glTemplateFileExtension}",$path,"", "")
 
+	  $database.debug("    parse('BindVariableParameterNullValueException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glBindVariableParameterNullValueException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/BindVariableParameterNullValueException.${glTemplateFileExtension}",$path,"", "")
+
       $database.debug("    parse('EmbeddedValueCommentNotFoundPropertyException');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEmbeddedValueCommentNotFoundPropertyException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/exception/EmbeddedValueCommentNotFoundPropertyException.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('EmbeddedValueParameterNullValueException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEmbeddedValueParameterNullValueException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/EmbeddedValueParameterNullValueException.${glTemplateFileExtension}",$path,"", "")
 
       $database.debug("    parse('IfCommentNotBooleanResultException');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glIfCommentNotBooleanResultException}.${glClassFileExtension}" )

@@ -808,6 +808,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + GetLineSeparator();
             msg = msg + "And confirm the IF comment of your specified SQL." + GetLineSeparator();
+			msg = msg + "For example, correct IF comment is as below:" + GetLineSeparator();
+            msg = msg + "  /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[IF Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
             msg = msg + GetLineSeparator();

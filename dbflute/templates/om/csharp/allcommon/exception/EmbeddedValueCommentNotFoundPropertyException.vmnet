@@ -5,15 +5,11 @@ using System.Collections;
 namespace ${glPackageBaseCommonException} {
 
     /// <summary>
-    /// The exception of when the property on embedded value comment is not found about outsideSql.
+    /// The exception of when the property on embedded value comment is not found  about outsideSql.
     /// Author: ${database.ClassAuthor}
     /// </summary>
     public class ${glEmbeddedValueCommentNotFoundPropertyException} : SystemException {
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param="msg">Exception message. (NotNull)</param>
         public ${glEmbeddedValueCommentNotFoundPropertyException}(String msg)
         : base(msg) {}
     }

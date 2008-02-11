@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonException};
 
 /**
  * The exception of when the property on embedded value comment is not found about outsideSql.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${glEmbeddedValueCommentNotFoundPropertyException} extends RuntimeException {
@@ -12,7 +11,6 @@ public class ${glEmbeddedValueCommentNotFoundPropertyException} extends RuntimeE
 
     /**
      * Constructor.
-     * 
      * @param msg Exception message. (NotNull)
      */
     public ${glEmbeddedValueCommentNotFoundPropertyException}(String msg) {
@@ -21,7 +19,6 @@ public class ${glEmbeddedValueCommentNotFoundPropertyException} extends RuntimeE
 
     /**
      * Constructor.
-     * 
      * @param msg Exception message. (NotNull)
      * @param cause Throwable.
      */
