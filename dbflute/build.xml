@@ -3,7 +3,7 @@
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
-  <property name="version" value="0.6.3"/>
+  <property name="version" value="0.6.4"/>
   <property name="deploy.base" value="../../dbflute"/>
   <property name="workspace.base" value=".."/>
 
@@ -12,7 +12,6 @@
   <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
   <property name="dbflute.zip.dirfile" value="dist/${dbflute.zip.file}"/>
   <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
-  <property name="dbflute.example.dir" value="${workspace.base}/dbflute-example"/>
   <property name="dbflute.ncsharp.dir" value="${workspace.base}/dfncsharp"/>
   <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
   <property name="dbflute.mysql.example.dir" value="${workspace.base}/dbflute-mysql-example"/>
@@ -76,9 +75,6 @@
     <copy todir="${dbflute.ncsharp.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
-    <copy todir="${dbflute.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -110,9 +106,6 @@
 
   <target name="reflectvarious" description="==> reflect to test application">
     <copy todir="${dbflute.ncsharp.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <copy todir="${dbflute.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
     <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
