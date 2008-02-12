@@ -600,8 +600,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Array array = new Object[list.Count];
                 list.CopyTo(array, 0);
                 BindArray(ctx, array);
-            } else if (IsInScope() && valueAndType.getTargetType().isArray()) {
-                BindArray(ctx, valueAndType.getTargetValue());
+            } else if (IsInScope() && valueAndType.TargetType.IsArray) {
+                BindArray(ctx, valueAndType.TargetValue);
             } else {
                 ctx.AddSql(valueAndType.TargetValue, valueAndType.TargetType, _expression.Replace('.', '_'));
             }
@@ -620,8 +620,8 @@ namespace ${glPackageBaseCommonS2Dao} {
 		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullValueException(_expression, valueAndType.TargetType, _specifiedSql, true);
 		}
 		
-		protected boolean IsInScope() {
-		    return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
+		protected bool IsInScope() {
+		    return _testValue != null && _testValue.StartsWith("(") && _testValue.EndsWith(")");
 		}
 		
         protected void BindArray(ICommandContext ctx, object arrayArg) {
@@ -637,9 +637,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (o != null) type = o.GetType();
             }
             ctx.AddSql("(");
-            ctx.AddSql(array[0], type, _bindName + 1);
+            ctx.AddSql(array[0], type, _expression + 1);
             for (int i = 1; i < length; ++i) {
-                ctx.AppendSql(array[i], type, _bindName + (i + 1));
+                ctx.AppendSql(array[i], type, _expression + (i + 1));
             }
             ctx.AddSql(")");
         }
@@ -677,8 +677,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Array array = new Object[list.Count];
                 list.CopyTo(array, 0);
                 EmbedArray(ctx, array);
-            } else if (IsInScope() && valueAndType.getTargetType().isArray()) {
-                EmbedArray(ctx, valueAndType.getTargetValue());
+            } else if (IsInScope() && valueAndType.TargetType.IsArray) {
+                EmbedArray(ctx, valueAndType.TargetValue);
             } else {
 		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	            // [UnderReview]: Should I make an original exception instead of this exception?
@@ -703,8 +703,8 @@ namespace ${glPackageBaseCommonS2Dao} {
 		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullValueException(_expression, valueAndType.TargetType, _specifiedSql, false);
 		}
 		
-		protected boolean IsInScope() {
-		    return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
+		protected bool IsInScope() {
+		    return _testValue != null && _testValue.StartsWith("(") && _testValue.EndsWith(")");
 		}
 		
         protected void EmbedArray(ICommandContext ctx, object arrayArg) {
@@ -721,7 +721,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 			
 			Object firstElement = array[0];
-			String quote = !(firstElement is Number) ? "'" : "";
+			String quote = !(firstElement is int) ? "'" : "";
 			
             ctx.AddSql("(");
             ctx.AddSql(quote + firstElement + quote);
