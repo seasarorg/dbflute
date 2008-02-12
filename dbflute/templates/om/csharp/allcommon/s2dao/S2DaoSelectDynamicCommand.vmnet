@@ -736,24 +736,31 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (length == 0) {
 			    ThrowBindOrEmbeddedParameterEmptyListException();
 			}
+            String quote = null;
+            for (int i = 0; i < length; ++i) {
+                Object obj = array[i];
+                if (obj != null) {
+				    quote = !IsNumeric(currentElement) ? "'" : "";
+					break;
+				}
+            }
+			if (quote == null) {
+			    ThrowBindOrEmbeddedParameterNullOnlyListException();
+			}
 			bool existsValidElements = false;
             ctx.AddSql("(");
             for (int i = 0; i < length; ++i) {
 				Object currentElement = array[i];
 				if (currentElement != null) {
-				    String quote = !IsNumeric(currentElement) ? "'" : "";
 					if (!existsValidElements) {
                         ctx.AddSql(quote + currentElement + quote);
+				        existsValidElements = true;
 					} else {
 					    ctx.AddSql(", " + quote + currentElement + quote);
 					}
-					existsValidElements = true;
 				}
             }
             ctx.AddSql(")");
-			if (!existsValidElements) {
-			    ThrowBindOrEmbeddedParameterNullOnlyListException();
-			}
         }
 
         protected bool IsNumeric(object Expression) {

@@ -326,10 +326,10 @@ public class ${glInternalSqlParser} implements SqlParser {
 				if (currentElement != null) {
 				    if (!existsValidElements) {
                         ctx.addSql("?", currentElement, clazz);
+				        existsValidElements = true;
 					} else {
                         ctx.addSql(", ?", currentElement, clazz);
 					}
-				    existsValidElements = true;
 				}
             }
             ctx.addSql(")");
@@ -410,24 +410,31 @@ public class ${glInternalSqlParser} implements SqlParser {
             if (length == 0) {
 			    throwBindOrEmbeddedParameterEmptyListException();
             }
+            String quote = null;
+            for (int i = 0; i < length; ++i) {
+                final Object o = Array.get(array, i);
+                if (o != null) {
+                    quote = !(currentElement instanceof Number) ? "'" : "";
+					break;
+                }
+            }
+			if (quote == null) {
+			    throwBindOrEmbeddedParameterNullOnlyListException();
+			}
 			boolean existsValidElements = false;
             ctx.addSql("(");
             for (int i = 0; i < length; ++i) {
 				final Object currentElement = Array.get(array, i);
 				if (currentElement != null) {
-				    final String quote = !(currentElement instanceof Number) ? "'" : "";
 				    if (!existsValidElements) {
                         ctx.addSql(quote + currentElement + quote);
+				        existsValidElements = true;
 					} else {
                         ctx.addSql(", " + quote + currentElement + quote);
 					}
-				    existsValidElements = true;
 				}
             }
             ctx.addSql(")");
-			if (!existsValidElements) {
-			    throwBindOrEmbeddedParameterNullOnlyListException();
-			}
         }
 		
 		protected void throwBindOrEmbeddedParameterEmptyListException() {
