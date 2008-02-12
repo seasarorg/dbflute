@@ -593,6 +593,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             SetupValueAndType(valueAndType);
 			
 			if (valueAndType.TargetValue == null) {
+                if (valueAndType.TargetType == null && _expression.StartsWith("$")) {
+                    return;
+                }
 			    ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
 			}
             if (IsInScope() && typeof(System.Collections.IList).IsAssignableFrom(valueAndType.TargetType)) {
