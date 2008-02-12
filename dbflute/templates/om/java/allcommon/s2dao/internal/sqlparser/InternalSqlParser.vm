@@ -4,7 +4,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Stack;
+import java.util.StringTokenizer;
 
 import org.seasar.dao.CommandContext;
 import org.seasar.dao.EndCommentNotFoundRuntimeException;
@@ -34,6 +36,7 @@ import ${glPackageBaseCommonException}.${glIfCommentNotBooleanResultException};
 import ${glPackageBaseCommonException}.${glIfCommentWrongExpressionException};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
 import ${glPackageBaseCommonS2DaoInternalUtil}.${glInternalBindVariableUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -134,6 +137,9 @@ public class ${glInternalSqlParser} implements SqlParser {
     protected void parseIf() {
         String condition = tokenizer.getToken().substring(2).trim();
         if (InternalStringUtil.isEmpty(condition)) {
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	        // [UnderReview]: Should I make an original exception instead of this exception?
+		    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             throw new IfConditionNotFoundRuntimeException();
         }
         final ContainerNode ifNode = createIfNode(condition);
@@ -157,6 +163,9 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             parseToken();
         }
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // [UnderReview]: Should I make an original exception instead of this exception?
+	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         throw new EndCommentNotFoundRuntimeException();
     }
 
@@ -272,9 +281,6 @@ public class ${glInternalSqlParser} implements SqlParser {
                 bindArray(ctx, valueAndType.getTargetValue());
             } else {
                 ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
-            }
-            if (valueAndType.isValidRearOption()) {
-                ctx.addSql(valueAndType.buildRearOptionOnSql());
             }
             if (valueAndType.isValidRearOption()) {
                 ctx.addSql(valueAndType.buildRearOptionOnSql());
@@ -533,7 +539,7 @@ public class ${glInternalSqlParser} implements SqlParser {
         }
 		
         protected String initCap(String name) {
-            return name.substring(0, 1).toUpperCase() + name.substring(1);
+		    return ${glSimpleStringUtil}.initCap(name);
         }
 
         protected Object invokeGetter(Method method, Object target) {
@@ -592,6 +598,8 @@ public class ${glInternalSqlParser} implements SqlParser {
             msg = msg + "  after  - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Parameter Property Type]" + getLineSeparator() + targetType + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
@@ -734,35 +742,15 @@ public class ${glInternalSqlParser} implements SqlParser {
         }
 
         public static final String replace(String text, String fromText,  String toText) {
-            if (text == null || fromText == null || toText == null) {
-                return null;
-            }
-            StringBuffer buf = new StringBuffer(100);
-            int pos = 0;
-            int pos2 = 0;
-            while (true) {
-                pos = text.indexOf(fromText, pos2);
-                if (pos == 0) {
-                    buf.append(toText);
-                    pos2 = fromText.length();
-                } else if (pos > 0) {
-                    buf.append(text.substring(pos2, pos));
-                    buf.append(toText);
-                    pos2 = pos + fromText.length();
-                } else {
-                    buf.append(text.substring(pos2));
-                    break;
-                }
-            }
-            return buf.toString();
+		    return ${glSimpleStringUtil}.replace(text, fromText, toText);
         }
 
         public static String[] split(String str, String delim) {
             if (str == null) {
                 return EMPTY_STRINGS;
             }
-            java.util.List${database.filterGenericsString('String')} list = new java.util.ArrayList${database.filterGenericsString('String')}();
-            java.util.StringTokenizer st = new java.util.StringTokenizer(str, delim);
+            List<String> list = new ArrayList<String>();
+            StringTokenizer st = new StringTokenizer(str, delim);
             while (st.hasMoreElements()) {
                 list.add(st.nextToken());
             }

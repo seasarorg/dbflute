@@ -428,17 +428,12 @@ namespace ${glPackageBaseCommonS2Dao} {
                 st.SkipWhitespace();
                 string token = st.SkipToken();
                 st.SkipWhitespace();
-                if ("AND".Equals(token.ToUpper()) || "OR".Equals(token.ToUpper()))
-                {
+                if ("AND".Equals(token.ToUpper()) || "OR".Equals(token.ToUpper())) {
                     node.AddChild(new PrefixSqlNode(st.Before, st.After));
-                }
-                else
-                {
+                } else {
                     node.AddChild(new SqlNode(sql));
                 }
-            }
-            else
-            {
+            } else {
                 node.AddChild(new SqlNode(sql));
             }
         }
@@ -506,30 +501,24 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected void ParseCommentBindVariable() {
             string expr = _tokenizer.Token;
             string s = _tokenizer.SkipToken();
-            if (s.StartsWith("(") && s.EndsWith(")")) {
-                Peek().AddChild(CreateParenBindVariableNode(expr));
-            } else if (expr.StartsWith("$")) {
-                Peek().AddChild(CreateEmbeddedValueNode(expr.Substring(1)));
+            if (expr.StartsWith("$")) {
+                Peek().AddChild(CreateEmbeddedValueNode(expr.Substring(1), s));
             } else {
-                Peek().AddChild(CreateBindVariableNode(expr));
+                Peek().AddChild(CreateBindVariableNode(expr, s));
             }
         }
 
         protected void ParseBindVariable() {
             string expr = _tokenizer.Token;
-            Peek().AddChild(CreateBindVariableNode(expr));
+            Peek().AddChild(CreateBindVariableNode(expr, null));
         }
 
-        protected ParenBindVariableNode CreateParenBindVariableNode(string expr) {
-            return new ParenBindVariableNode(expr);
+        protected AbstractNode CreateEmbeddedValueNode(string expr, String textValue) {
+            return new InternalEmbeddedValueNode(expr, textValue, _specifiedSql);
         }
 
-        protected AbstractNode CreateEmbeddedValueNode(string expr) {
-            return new InternalEmbeddedValueNode(expr, _specifiedSql);
-        }
-
-        protected AbstractNode CreateBindVariableNode(string expr) {
-            return new InternalBindVariableNode(expr, _specifiedSql);
+        protected AbstractNode CreateBindVariableNode(String expr, String textValue) {
+            return new InternalBindVariableNode(expr, textValue, _specifiedSql);
         }
 
         protected ContainerNode CreateIfNode(string expr) {
@@ -583,12 +572,14 @@ namespace ${glPackageBaseCommonS2Dao} {
     //                                      BindVariableNode
     //                                      ----------------
     public class InternalBindVariableNode : AbstractNode {
-        private String _expression;
-        private String[] _names;
-        private String _specifiedSql;
+        protected String _expression;
+        protected String _testValue;
+        protected String[] _names;
+        protected String _specifiedSql;
 
-        public InternalBindVariableNode(String expression, String specifiedSql) : base () {
+        public InternalBindVariableNode(String expression, String testValue, String specifiedSql) : base () {
             _expression = expression;
+            _testValue = testValue;
             _names = expression.Split('.');
             _specifiedSql = specifiedSql;
         }
@@ -600,12 +591,57 @@ namespace ${glPackageBaseCommonS2Dao} {
             valueAndType.TargetValue = value;
             valueAndType.TargetType = type;
             SetupValueAndType(valueAndType);
-            ctx.AddSql(valueAndType.TargetValue, valueAndType.TargetType, _expression.Replace('.', '_'));
+			
+			if (valueAndType.TargetValue == null) {
+			    ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
+			}
+            if (IsInScope() && typeof(System.Collections.IList).IsAssignableFrom(valueAndType.TargetType)) {
+                System.Collections.IList list = valueAndType.TargetValue as System.Collections.IList;
+                Array array = new Object[list.Count];
+                list.CopyTo(array, 0);
+                BindArray(ctx, array);
+            } else if (IsInScope() && valueAndType.getTargetType().isArray()) {
+                BindArray(ctx, valueAndType.getTargetValue());
+            } else {
+                ctx.AddSql(valueAndType.TargetValue, valueAndType.TargetType, _expression.Replace('.', '_'));
+            }
+			// [UnderReview]: NotImplement
+            // if (valueAndType.IsValidRearOption()) {
+            //     ctx.AddSql(valueAndType.BuildRearOptionOnSql());
+            // }
         }
 
         protected void SetupValueAndType(InternalValueAndType valueAndType) {
             InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, true);
             setupper.SetupValueAndType(valueAndType);
+        }
+		
+		protected void ThrowBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
+		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullValueException(_expression, valueAndType.TargetType, _specifiedSql, true);
+		}
+		
+		protected boolean IsInScope() {
+		    return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
+		}
+		
+        protected void BindArray(ICommandContext ctx, object arrayArg) {
+            if (arrayArg == null) {
+                return;
+            }
+            object[] array = arrayArg as object[];
+            int length = array.Length;
+            if (length == 0) return;
+            Type type = null;
+            for (int i = 0; i < length; ++i) {
+                object o = array[i];
+                if (o != null) type = o.GetType();
+            }
+            ctx.AddSql("(");
+            ctx.AddSql(array[0], type, _bindName + 1);
+            for (int i = 1; i < length; ++i) {
+                ctx.AppendSql(array[i], type, _bindName + (i + 1));
+            }
+            ctx.AddSql(")");
         }
     }
 
@@ -613,12 +649,14 @@ namespace ${glPackageBaseCommonS2Dao} {
     //                                     EmbeddedValueNode
     //                                     -----------------
     public class InternalEmbeddedValueNode : AbstractNode {
-        private String _expression;
-        private String[] _names;
-        private String _specifiedSql;
+        protected String _expression;
+		protected String _testValue;
+        protected String[] _names;
+        protected String _specifiedSql;
 
-        public InternalEmbeddedValueNode(String expression, String specifiedSql) : base () {
+        public InternalEmbeddedValueNode(String expression, String testValue, String specifiedSql) : base () {
             _expression = expression;
+            _testValue = testValue;
             _names = expression.Split('.');
             _specifiedSql = specifiedSql;
         }
@@ -630,12 +668,67 @@ namespace ${glPackageBaseCommonS2Dao} {
             valueAndType.TargetValue = value;
             valueAndType.TargetType = type;
             SetupValueAndType(valueAndType);
-            ctx.AddSql(valueAndType.TargetValue != null ? valueAndType.TargetValue.ToString() : (String)null);
+			
+			if (valueAndType.TargetValue == null) {
+			    ThrowBindOrEmbeddedParameterNullValueException(valueAndType);
+			}
+            if (IsInScope() && typeof(System.Collections.IList).IsAssignableFrom(valueAndType.TargetType)) {
+                System.Collections.IList list = valueAndType.TargetValue as System.Collections.IList;
+                Array array = new Object[list.Count];
+                list.CopyTo(array, 0);
+                EmbedArray(ctx, array);
+            } else if (IsInScope() && valueAndType.getTargetType().isArray()) {
+                EmbedArray(ctx, valueAndType.getTargetValue());
+            } else {
+		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	            // [UnderReview]: Should I make an original exception instead of this exception?
+		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // if (valueAndType.TargetValue != null && valueAndType.TargetValue.ToString().IndexOf("?") > -1) {
+                //     throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
+                // }
+                ctx.AddSql(valueAndType.TargetValue.ToString());
+            }
+			// [UnderReview]: NotImplement
+            // if (valueAndType.IsValidRearOption()) {
+            //     ctx.AddSql(valueAndType.BuildRearOptionOnSql());
+            // }
         }
 
         protected void SetupValueAndType(InternalValueAndType valueAndType) {
             InternalValueAndTypeSetuper setupper = new InternalValueAndTypeSetuper(_expression, _names, _specifiedSql, false);
             setupper.SetupValueAndType(valueAndType);
+        }
+		
+		protected void ThrowBindOrEmbeddedParameterNullValueException(InternalValueAndType valueAndType) {
+		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullValueException(_expression, valueAndType.TargetType, _specifiedSql, false);
+		}
+		
+		protected boolean IsInScope() {
+		    return _testValue != null && _testValue.startsWith("(") && _testValue.endsWith(")");
+		}
+		
+        protected void EmbedArray(ICommandContext ctx, object arrayArg) {
+            if (arrayArg == null) {
+                return;
+            }
+            object[] array = arrayArg as object[];
+            int length = array.Length;
+            if (length == 0) return;
+            Type type = null;
+            for (int i = 0; i < length; ++i) {
+                object o = array[i];
+                if (o != null) type = o.GetType();
+            }
+			
+			Object firstElement = array[0];
+			String quote = !(firstElement is Number) ? "'" : "";
+			
+            ctx.AddSql("(");
+            ctx.AddSql(quote + firstElement + quote);
+            for (int i = 1; i < length; ++i) {
+				ctx.AppendSql(", " + quote + array[i] + quote);
+            }
+            ctx.AddSql(")");
         }
     }
 
@@ -740,7 +833,42 @@ namespace ${glPackageBaseCommonS2Dao} {
             return Environment.NewLine;
         }
     }
-
+	
+    // -----------------------------------------------------
+    //                                    Exception Provider
+    //                                    ------------------
+	public class ParameterCommentExceptionProvider {
+        public static void ThrowBindOrEmbeddedParameterNullValueException(String expression, Type targetType, String specifiedSql, bool bind) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The value of " + (bind ? "bind variable" : "embedded value") + " was Null!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Is it within the scope of your assumption?" + GetLineSeparator();
+            msg = msg + "If the answer is YES, please confirm your application logic about the parameter." + GetLineSeparator();
+            msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)." + GetLineSeparator();
+            msg = msg + "For example:" + GetLineSeparator();
+            msg = msg + "  before - XXX_ID = /*pmb.xxxId*/3" + GetLineSeparator();
+            msg = msg + "  after  - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+			msg = msg + "[Parameter Property Type]" + GetLineSeparator() + targetType + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            if (bind) {
+                throw new ${glBindVariableParameterNullValueException}(msg);
+            } else {
+                throw new ${glEmbeddedValueParameterNullValueException}(msg);
+            }
+        }
+		
+        protected static String GetLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
+        }
+	}
+	
     // -----------------------------------------------------
     //                                                IfNode
     //                                                ------
