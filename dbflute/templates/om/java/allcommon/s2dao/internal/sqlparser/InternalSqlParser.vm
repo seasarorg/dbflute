@@ -306,7 +306,9 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             final int length = Array.getLength(array);
             if (length == 0) {
-                return;
+			    String msg = "The in-scope parameter should not be empty list:";
+				msg = msg + " _expression=" + _expression + (_testValue != null ? _testValue : "");
+			    throw new IllegalStateException(msg);
             }
             Class<?> clazz = null;
             for (int i = 0; i < length; ++i) {
@@ -315,12 +317,25 @@ public class ${glInternalSqlParser} implements SqlParser {
                     clazz = o.getClass();
                 }
             }
+			boolean existsValidElements = false;
             ctx.addSql("(");
-            ctx.addSql("?", Array.get(array, 0), clazz);
-            for (int i = 1; i < length; ++i) {
-                ctx.addSql(", ?", Array.get(array, i), clazz);
+            for (int i = 0; i < length; ++i) {
+				final Object currentElement = Array.get(array, i);
+				if (currentElement != null) {
+				    if (!existsValidElements) {
+                        ctx.addSql("?", currentElement, clazz);
+					} else {
+                        ctx.addSql(", ?", currentElement, clazz);
+					}
+				    existsValidElements = true;
+				}
             }
             ctx.addSql(")");
+			if (!existsValidElements) {
+			    String msg = "The in-scope parameter should not be 'Null Only List' list:";
+				msg = msg + " _expression=" + _expression + (_testValue != null ? _testValue : "");
+			    throw new IllegalStateException(msg);
+			}
         }
     }
 
@@ -388,17 +403,30 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             final int length = Array.getLength(array);
             if (length == 0) {
-                return;
+			    String msg = "The in-scope parameter should not be empty list:";
+				msg = msg + " _expression=" + _expression + (_testValue != null ? _testValue : "");
+			    throw new IllegalStateException(msg);
             }
+			boolean existsValidElements = false;
             ctx.addSql("(");
-			final Object firstElement = Array.get(array, 0);
-			final String quote = !(firstElement instanceof Number) ? "'" : "";
-			
-            ctx.addSql(quote + firstElement + quote);
-            for (int i = 1; i < length; ++i) {
-                ctx.addSql(", " + quote + Array.get(array, i) + quote);
+            for (int i = 0; i < length; ++i) {
+				final Object currentElement = Array.get(array, i);
+				if (currentElement != null) {
+				    final String quote = !(currentElement instanceof Number) ? "'" : "";
+				    if (!existsValidElements) {
+                        ctx.addSql(quote + currentElement + quote);
+					} else {
+                        ctx.addSql(", " + quote + currentElement + quote);
+					}
+				    existsValidElements = true;
+				}
             }
             ctx.addSql(")");
+			if (!existsValidElements) {
+			    String msg = "The in-scope parameter should not be 'Null Only List':";
+				msg = msg + " _expression=" + _expression + (_testValue != null ? _testValue : "");
+			    throw new IllegalStateException(msg);
+			}
         }
     }
 

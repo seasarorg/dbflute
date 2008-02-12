@@ -726,7 +726,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             ctx.AddSql("(");
             ctx.AddSql(quote + firstElement + quote);
             for (int i = 1; i < length; ++i) {
-				ctx.AppendSql(", " + quote + array[i] + quote);
+				ctx.AddSql(", " + quote + array[i] + quote);
             }
             ctx.AddSql(")");
         }
