@@ -629,9 +629,9 @@ public class ${glInternalSqlParser} implements SqlParser {
             msg = msg + "Is it within the scope of your assumption?" + getLineSeparator();
             msg = msg + "If the answer is YES, please confirm your application logic about the parameter." + getLineSeparator();
             msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)." + getLineSeparator();
-            msg = msg + "For example:" + getLineSeparator();
-            msg = msg + "  before - XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
-            msg = msg + "  after  - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
+            msg = msg + "  --> For example:" + getLineSeparator();
+            msg = msg + "        before -- XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
+            msg = msg + "        after  -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();
@@ -743,8 +743,8 @@ public class ${glInternalSqlParser} implements SqlParser {
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
             msg = msg + "And confirm the IF comment of your specified SQL." + getLineSeparator();
-            msg = msg + "For example, correct IF comment is as below:" + getLineSeparator();
-            msg = msg + "  /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + getLineSeparator();
+            msg = msg + "  --> For example, correct IF comment is as below:" + getLineSeparator();
+            msg = msg + "        /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[IF Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();

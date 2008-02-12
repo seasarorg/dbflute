@@ -630,19 +630,36 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             object[] array = arrayArg as object[];
             int length = array.Length;
-            if (length == 0) return;
+            if (length == 0) {
+			    ThrowBindOrEmbeddedParameterEmptyListException();
+			}
             Type type = null;
             for (int i = 0; i < length; ++i) {
                 object o = array[i];
                 if (o != null) type = o.GetType();
             }
+			bool existsValidElements = false;
             ctx.AddSql("(");
-            ctx.AddSql(array[0], type, _expression + 1);
-            for (int i = 1; i < length; ++i) {
-                ctx.AppendSql(array[i], type, _expression + (i + 1));
+            for (int i = 0; i < length; ++i) {
+				Object currentElement = array[i];
+				if (currentElement != null) {
+                    ctx.AddSql(currentElement, type, _expression + (i + 1));
+				    existsValidElements = true;
+				}
             }
             ctx.AddSql(")");
+			if (!existsValidElements) {
+			    ThrowBindOrEmbeddedParameterNullOnlyListException();
+			}
         }
+		
+		protected void ThrowBindOrEmbeddedParameterEmptyListException() {
+		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, true);
+		}
+		
+		protected void ThrowBindOrEmbeddedParameterNullOnlyListException() {
+		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, true);
+		}
     }
 
     // -----------------------------------------------------
@@ -713,22 +730,27 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             object[] array = arrayArg as object[];
             int length = array.Length;
-            if (length == 0) return;
-            Type type = null;
-            for (int i = 0; i < length; ++i) {
-                object o = array[i];
-                if (o != null) type = o.GetType();
-            }
-			
-			Object firstElement = array[0];
-			String quote = !IsNumeric(firstElement) ? "'" : "";
-			
+            if (length == 0) {
+			    ThrowBindOrEmbeddedParameterEmptyListException();
+			}
+			bool existsValidElements = false;
             ctx.AddSql("(");
-            ctx.AddSql(quote + firstElement + quote);
-            for (int i = 1; i < length; ++i) {
-                ctx.AddSql(", " + quote + array[i] + quote);
+            for (int i = 0; i < length; ++i) {
+				Object currentElement = array[i];
+				if (currentElement != null) {
+				    String quote = !IsNumeric(firstElement) ? "'" : "";
+					if (!existsValidElements) {
+                        ctx.AddSql(quote + currentElement + quote);
+					} else {
+					    ctx.AddSql(", " + quote + currentElement + quote);
+					}
+					existsValidElements = true;
+				}
             }
             ctx.AddSql(")");
+			if (!existsValidElements) {
+			    ThrowBindOrEmbeddedParameterNullOnlyListException();
+			}
         }
 
         protected bool IsNumeric(object Expression) {
@@ -743,6 +765,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
             return isNum;
         }
+		
+		protected void ThrowBindOrEmbeddedParameterEmptyListException() {
+		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+		}
+		
+		protected void ThrowBindOrEmbeddedParameterNullOnlyListException() {
+		    ParameterCommentExceptionProvider.ThrowBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
+		}
     }
 
     // -----------------------------------------------------
@@ -829,7 +859,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + GetLineSeparator();
             msg = msg + GetLineSeparator();
-            msg = msg + "[SQL Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
+            msg = msg + "[Parameter Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[NotFound Property]" + GetLineSeparator() + (targetType != null ? targetType.Name + "#" : "") + notFoundProperty + GetLineSeparator();
             msg = msg + GetLineSeparator();
@@ -860,9 +890,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             msg = msg + "Is it within the scope of your assumption?" + GetLineSeparator();
             msg = msg + "If the answer is YES, please confirm your application logic about the parameter." + GetLineSeparator();
             msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)." + GetLineSeparator();
-            msg = msg + "For example:" + GetLineSeparator();
-            msg = msg + "  before - XXX_ID = /*pmb.xxxId*/3" + GetLineSeparator();
-            msg = msg + "  after  - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + GetLineSeparator();
+            msg = msg + "  --> For example:" + GetLineSeparator();
+            msg = msg + "        before -- XXX_ID = /*pmb.xxxId*/3" + GetLineSeparator();
+            msg = msg + "        after  -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
             msg = msg + GetLineSeparator();
@@ -876,6 +906,31 @@ namespace ${glPackageBaseCommonS2Dao} {
                 throw new ${glEmbeddedValueParameterNullValueException}(msg);
             }
         }
+		
+        public static void ThrowBindOrEmbeddedParameterEmptyListException(String expression, String specifiedSql, bool bind) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was empty!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            throw new IllegalArgumentException(msg);
+        }
+		
+        public static void ThrowBindOrEmbeddedParameterNullOnlyListException(String expression, String specifiedSql, bool bind) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was 'Null Only List'!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            throw new IllegalArgumentException(msg);
+        }
+		
 		
         protected static String GetLineSeparator() {
             return ${glSimpleSystemUtil}.GetLineSeparator();
@@ -949,8 +1004,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             msg = msg + "[Advice]" + GetLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + GetLineSeparator();
             msg = msg + "And confirm the IF comment of your specified SQL." + GetLineSeparator();
-			msg = msg + "For example, correct IF comment is as below:" + GetLineSeparator();
-            msg = msg + "  /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + GetLineSeparator();
+			msg = msg + "  --> For example, correct IF comment is as below:" + GetLineSeparator();
+            msg = msg + "        /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + GetLineSeparator();
             msg = msg + GetLineSeparator();
             msg = msg + "[IF Comment Expression]" + GetLineSeparator() + expression + GetLineSeparator();
             msg = msg + GetLineSeparator();
