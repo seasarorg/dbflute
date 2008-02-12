@@ -306,9 +306,7 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             final int length = Array.getLength(array);
             if (length == 0) {
-			    String msg = "The in-scope parameter should not be empty list:";
-				msg = msg + " _expression=" + _expression + (_testValue != null ? _testValue : "");
-			    throw new IllegalStateException(msg);
+			    throwBindOrEmbeddedParameterEmptyListException();
             }
             Class<?> clazz = null;
             for (int i = 0; i < length; ++i) {
@@ -332,11 +330,17 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             ctx.addSql(")");
 			if (!existsValidElements) {
-			    String msg = "The in-scope parameter should not be 'Null Only List' list:";
-				msg = msg + " _expression=" + _expression + (_testValue != null ? _testValue : "");
-			    throw new IllegalStateException(msg);
+			    throwBindOrEmbeddedParameterNullOnlyListException();
 			}
         }
+
+		protected void throwBindOrEmbeddedParameterEmptyListException() {
+		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+		}
+		
+		protected void throwBindOrEmbeddedParameterNullOnlyListException() {
+		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, true);
+		}
     }
 
     // -----------------------------------------------------
@@ -403,9 +407,7 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             final int length = Array.getLength(array);
             if (length == 0) {
-			    String msg = "The in-scope parameter should not be empty list:";
-				msg = msg + " _expression=" + _expression + (_testValue != null ? _testValue : "");
-			    throw new IllegalStateException(msg);
+			    throwBindOrEmbeddedParameterEmptyListException();
             }
 			boolean existsValidElements = false;
             ctx.addSql("(");
@@ -423,11 +425,17 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             ctx.addSql(")");
 			if (!existsValidElements) {
-			    String msg = "The in-scope parameter should not be 'Null Only List':";
-				msg = msg + " _expression=" + _expression + (_testValue != null ? _testValue : "");
-			    throw new IllegalStateException(msg);
+			    throwBindOrEmbeddedParameterNullOnlyListException();
 			}
         }
+		
+		protected void throwBindOrEmbeddedParameterEmptyListException() {
+		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+		}
+		
+		protected void throwBindOrEmbeddedParameterNullOnlyListException() {
+		    ParameterCommentExceptionProvider.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
+		}
     }
 
     // -----------------------------------------------------
@@ -636,6 +644,30 @@ public class ${glInternalSqlParser} implements SqlParser {
             } else {
                 throw new ${glEmbeddedValueParameterNullValueException}(msg);
             }
+        }
+		
+        public static void throwBindOrEmbeddedParameterEmptyListException(String expression, String specifiedSql, boolean bind) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was empty!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalArgumentException(msg);
+        }
+		
+        public static void throwBindOrEmbeddedParameterNullOnlyListException(String expression, String specifiedSql, boolean bind) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was 'Null Only List'!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalArgumentException(msg);
         }
 		
         protected static String getLineSeparator() {

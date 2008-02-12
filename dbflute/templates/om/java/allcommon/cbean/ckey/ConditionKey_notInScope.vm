@@ -10,7 +10,6 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
  * The condition-key of notInScope.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glConditionKeyName} {
@@ -28,7 +27,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
 
     /**
      * Is valid registration?
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param callerName Caller name. (NotNull)
@@ -62,19 +60,8 @@ public class ${myClassName} extends ${glConditionKeyName} {
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value) {
+    protected void doAddWhereClause(java.util.List<String> conditionList, String columnName, ${glConditionValueName} value) {
         if (value.getNotInScope() == null) {
-            return;
-        }
-        final java.util.List valueList = value.getNotInScope();
-        final java.util.List${database.filterGenericsString('Object')} checkedValueList = new java.util.ArrayList${database.filterGenericsString('Object')}();
-        for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
-            final Object checkTargetValue = ite.next();
-            if (checkTargetValue != null) {
-                checkedValueList.add(checkTargetValue);
-            }
-        }
-        if (checkedValueList.isEmpty()) {
             return;
         }
         conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
@@ -82,19 +69,17 @@ public class ${myClassName} extends ${glConditionKeyName} {
 
     /**
      * This method implements super#doAddWhereClause().
-     * 
      * @param conditionList Condition list. (NotNull)
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doAddWhereClause(java.util.List${database.filterGenericsString('String')} conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
+    protected void doAddWhereClause(java.util.List<String> conditionList, String columnName, ${glConditionValueName} value, ${glConditionOptionInterfaceName} option) {
         throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
     }
 
     /**
      * This method implements super#doSetupConditionValue().
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param location Location. (NotNull)
@@ -105,7 +90,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
 
     /**
      * This method implements super#doSetupConditionValue().
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param location Location. (NotNull)

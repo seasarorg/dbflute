@@ -158,7 +158,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.UncapitalisedJavaName} as inScope.
      */
     public void set${tmpJavaName}_InScope(Collection<${col.JavaNative}> ${tmpUncapitalisedJavaName}List) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, filterRemoveEmptyStringFromList(convertToList(${tmpUncapitalisedJavaName}List)));
+        register${tmpJavaName}(${glConditionKeyName}.CK_IN_SCOPE, convertToList(${tmpUncapitalisedJavaName}List));
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.UncapitalisedJavaName} as notInScope.
      */
     public void set${tmpJavaName}_NotInScope(Collection<${col.JavaNative}> ${tmpUncapitalisedJavaName}List) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, filterRemoveEmptyStringFromList(convertToList(${tmpUncapitalisedJavaName}List)));
+        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_IN_SCOPE, convertToList(${tmpUncapitalisedJavaName}List));
     }
 #end
 #if (${col.isSingleKeyForeignKey()})

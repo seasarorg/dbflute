@@ -19,10 +19,10 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The abstract class of condition-query.
- * 
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} implements ${glConditionQueryInterfaceName} {
@@ -74,7 +74,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param childQuery Child query. (Nullable: If null, this is base instance.)
      * @param sqlClause SQL clause instance. (NotNull)
      * @param aliasName My alias name. (NotNull)
@@ -92,7 +91,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                  ==================
     /**
      * Get child query.
-     * 
      * @return Child query. (Nullable)
      */
     public ${glConditionQueryInterfaceName} getChildQuery() {
@@ -101,7 +99,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Get sql clause.
-     * 
      * @return Sql clause. (NotNull)
      */
     public ${glSqlClauseName} getSqlClause() {
@@ -110,7 +107,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Get alias name.
-     * 
      * @return Alias name. (NotNull)
      */
     public String getAliasName() {
@@ -119,7 +115,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Get nest level.
-     * 
      * @return Nest level.
      */
     public int getNestLevel() {
@@ -128,7 +123,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Get next nest level.
-     * 
      * @return Next nest level.
      */
     public int getNextNestLevel() {
@@ -137,7 +131,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Is base query?
-     * 
      * @param query Condition query. (NotNull)
      * @return Determination.
      */
@@ -147,7 +140,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
 	/**
 	 * Get the level of subQuery.
-	 * 
 	 * @return The level of subQuery.
 	 */
 	public int getSubQueryLevel() {
@@ -159,7 +151,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                             ---------
     /**
      * Get real alias name(that has nest level mark).
-     * 
      * @return Real alias name.
      */
     public String getRealAliasName() {
@@ -168,7 +159,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Get real column name(with real alias name).
-     * 
      * @param columnName Column name without alias name. This should not contain comma. (NotNull)
      * @return Real column name.
      */
@@ -179,7 +169,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
 
     /**
      * Build real column name.
-     * 
      * @param aliasName Alias name. (NotNull)
      * @param columnName Column name. (NotNull)
      * @return Real column name. (NotNull)
@@ -219,7 +208,6 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                            ========
     /**
      * Get location.
-     * 
      * @param columnPropertyName Column property name.
      * @param key Condition key.
      * @return Next nest level.
@@ -832,8 +820,14 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     //                                                                       Assist Helper
     //                                                                       =============
     /**
-     * Initcap string.
-     * 
+     * @param value Query-value-string. (Nullable)
+     * @return Filtered value. (Nullable)
+     */
+    protected String filterRemoveEmptyString(String value) {
+        return ((value != null && !"".equals(value)) ? value : null);
+    }
+	
+    /**
      * @param col Target collection. (Nullable)
      * @param <PROPERTY_TYPE> The type of property.
      * @return List. (Nullable: If the argument is null, returns null.)
@@ -843,78 +837,46 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
             return null;
         }
         if (col instanceof List) {
-            return (List<PROPERTY_TYPE>)col;
+            return filterRemoveNullOrEmptyValueFromList((List<PROPERTY_TYPE>)col);
         }
-        return new ArrayList<PROPERTY_TYPE>(col);
+        return filterRemoveNullOrEmptyValueFromList(new ArrayList<PROPERTY_TYPE>(col));
     }
 
-    /**
-     * Filter removing empty-string.
-     * If the value is null or empty-string, returns null.
-     * 
-     * @param value Query-value-string. (Nullable)
-     * @return Filtered value. (Nullable)
-     */
-    protected String filterRemoveEmptyString(String value) {
-        return ((value != null && !"".equals(value)) ? value : null);
-    }
-
-    /**
-     * Filter removing empty-string from the list.
-     * If the list is null or empty-string, returns null.
-     * 
-     * @param ls List. (Nullable)
-     * @return Filtered list. (Nullable)
-     */
-    protected List<String> filterRemoveEmptyStringFromList(List<String> ls) {
+    private <PROPERTY_TYPE> List<PROPERTY_TYPE> filterRemoveNullOrEmptyValueFromList(List<PROPERTY_TYPE> ls) {
         if (ls == null) {
             return null;
         }
-        List<String> newList = new ArrayList<String>();
-        for (final Iterator<String> ite = ls.iterator(); ite.hasNext(); ) {
-            final String str = (String)ite.next();
-            if (str == null || "".equals(str)) {
+        List<PROPERTY_TYPE> newList = new ArrayList<PROPERTY_TYPE>();
+        for (Iterator<PROPERTY_TYPE> ite = ls.iterator(); ite.hasNext(); ) {
+            final PROPERTY_TYPE element = ite.next();
+            if (element == null) {
                 continue;
             }
-            newList.add(str);
+			if (element instanceof String) {
+			    if (((String)element).length() == 0) {
+				    continue;
+				}
+			}
+            newList.add(element);
         }
         return newList;
     }
-
+	
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
-    }
-		
     protected final String replaceString(String text, String fromText, String toText) {
-        if(text == null || fromText == null || toText == null)
-            return null;
-        StringBuilder buf = new StringBuilder(100);
-        int pos = 0;
-        int pos2 = 0;
-        do {
-            pos = text.indexOf(fromText, pos2);
-            if(pos == 0) {
-                buf.append(toText);
-                pos2 = fromText.length();
-            } else
-            if(pos > 0) {
-                buf.append(text.substring(pos2, pos));
-                buf.append(toText);
-                pos2 = pos + fromText.length();
-            } else {
-                buf.append(text.substring(pos2));
-                return buf.toString();
-            }
-        } while(true);
+	    return ${glSimpleStringUtil}.replace(text, fromText, toText);
     }
 
     protected String initCap(String str) {
 	    return ${glSimpleStringUtil}.initCap(str);
     }
 
+    protected String getLineSeparator() {
+	    return ${glSimpleSystemUtil}.getLineSeparator();
+    }
+		
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------

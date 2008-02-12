@@ -11,7 +11,6 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
 
 /**
  * The condition-key of inScope.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glConditionKeyName} {
@@ -29,7 +28,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
 
     /**
      * Is valid registration?
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param callerName Caller name. (NotNull)
@@ -58,7 +56,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
 
     /**
      * This method implements super#doAddWhereClause().
-     * 
      * @param conditionList Condition list. (NotNull)
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
@@ -67,23 +64,11 @@ public class ${myClassName} extends ${glConditionKeyName} {
         if (value.getInScope() == null) {
             return;
         }
-        final java.util.List valueList = value.getInScope();
-        final java.util.List<Object> checkedValueList = new java.util.ArrayList<Object>();
-        for (final java.util.Iterator<Object> ite = valueList.iterator(); ite.hasNext(); ) {
-            final Object checkTargetValue = ite.next();
-            if (checkTargetValue != null) {
-                checkedValueList.add(checkTargetValue);
-            }
-        }
-        if (checkedValueList.isEmpty()) {
-            return;
-        }
         conditionList.add(buildBindClause(columnName, value.getInScopeLocation(), "('a1', 'a2')"));
     }
 
     /**
      * This method implements super#doAddWhereClause().
-     * 
      * @param conditionList Condition list. (NotNull)
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
@@ -103,7 +88,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
 
     /**
      * This method implements super#doSetupConditionValue().
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param location Location. (NotNull)
@@ -114,7 +98,6 @@ public class ${myClassName} extends ${glConditionKeyName} {
 
     /**
      * This method implements super#doSetupConditionValue().
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param location Location. (NotNull)
