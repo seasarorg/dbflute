@@ -310,9 +310,9 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             Class<?> clazz = null;
             for (int i = 0; i < length; ++i) {
-                final Object o = Array.get(array, i);
-                if (o != null) {
-                    clazz = o.getClass();
+                final Object currentElement = Array.get(array, i);
+                if (currentElement != null) {
+                    clazz = currentElement.getClass();
 					break;
                 }
             }
@@ -412,8 +412,8 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             String quote = null;
             for (int i = 0; i < length; ++i) {
-                final Object o = Array.get(array, i);
-                if (o != null) {
+                final Object currentElement = Array.get(array, i);
+                if (currentElement != null) {
                     quote = !(currentElement instanceof Number) ? "'" : "";
 					break;
                 }

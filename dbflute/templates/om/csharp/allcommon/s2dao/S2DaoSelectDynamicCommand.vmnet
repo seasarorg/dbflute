@@ -635,9 +635,9 @@ namespace ${glPackageBaseCommonS2Dao} {
 			}
             Type type = null;
             for (int i = 0; i < length; ++i) {
-                Object obj = array[i];
-                if (obj != null) {
-				    type = obj.GetType();
+                Object currentElement = array[i];
+                if (currentElement != null) {
+				    type = currentElement.GetType();
 					break;
 				}
             }
@@ -738,8 +738,8 @@ namespace ${glPackageBaseCommonS2Dao} {
 			}
             String quote = null;
             for (int i = 0; i < length; ++i) {
-                Object obj = array[i];
-                if (obj != null) {
+                Object currentElement = array[i];
+                if (currentElement != null) {
 				    quote = !IsNumeric(currentElement) ? "'" : "";
 					break;
 				}
