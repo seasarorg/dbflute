@@ -310,11 +310,15 @@ public class ${glInternalSqlParser} implements SqlParser {
             }
             Class<?> clazz = null;
             for (int i = 0; i < length; ++i) {
-                Object o = Array.get(array, i);
+                final Object o = Array.get(array, i);
                 if (o != null) {
                     clazz = o.getClass();
+					break;
                 }
             }
+			if (clazz == null) {
+			    throwBindOrEmbeddedParameterNullOnlyListException();
+			}
 			boolean existsValidElements = false;
             ctx.addSql("(");
             for (int i = 0; i < length; ++i) {
@@ -329,9 +333,6 @@ public class ${glInternalSqlParser} implements SqlParser {
 				}
             }
             ctx.addSql(")");
-			if (!existsValidElements) {
-			    throwBindOrEmbeddedParameterNullOnlyListException();
-			}
         }
 
 		protected void throwBindOrEmbeddedParameterEmptyListException() {
