@@ -350,6 +350,7 @@ targetdatabase = $targetDatabase
 	#set ($glInternalSqlLogRegistry = "${glProjectPrefix}InternalSqlLogRegistry")
 	#set ($glInternalCommandContextCreator = "${glProjectPrefix}InternalCommandContextCreator")
 	#set ($glInternalSqlParser = "${glProjectPrefix}InternalSqlParser")
+	#set ($glInternalSqlTokenizer = "${glProjectPrefix}InternalSqlTokenizer")
 	#set ($glInternalBindVariableUtil = "${glProjectPrefix}InternalBindVariableUtil")
 	
     ## [Allcommon-Util]
@@ -1871,6 +1872,10 @@ targetdatabase = $targetDatabase
       $database.debug("    parse('InternalSqlParser');")	  
 	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser})}${glInternalSqlParser}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlparser/InternalSqlParser.${glTemplateFileExtension}",$path,"", "")
+
+	  $database.debug("    parse('InternalSqlTokenizer');")	  
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser})}${glInternalSqlTokenizer}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlparser/InternalSqlTokenizer.${glTemplateFileExtension}",$path,"", "")
 
       $database.debug("    parse('InternalCommandContextCreator');")	  
 	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser})}${glInternalCommandContextCreator}.${glClassFileExtension}" )

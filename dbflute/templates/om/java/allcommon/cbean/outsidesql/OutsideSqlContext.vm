@@ -1,10 +1,14 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanOutsidesql};
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.framework.util.InputStreamReaderUtil;
 import org.seasar.framework.util.ReaderUtil;
 import org.seasar.framework.util.ResourceUtil;
 
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The context of outside-sql.
@@ -13,6 +17,9 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
  */
 public class ${glOutsideSqlContextName} {
 
+    /** Log-instance. */
+    private static final Log _log = LogFactory.getLog(${glOutsideSqlContextName}.class);
+	
     // ===================================================================================
     //                                                                        Thread Local
     //                                                                        ============
@@ -111,16 +118,55 @@ public class ${glOutsideSqlContextName} {
     // ===================================================================================
     //                                                                            Read SQL
     //                                                                            ========
+	public String readFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
+	    final String sql = readOutsideSql(sqlFileEncoding, dbmsSuffix);
+		return replaceOutsideSqlBindCharacterOnLineComment(sql);
+	}
+
+    protected String replaceOutsideSqlBindCharacterOnLineComment(String sql) {
+        final String bindCharacter = "?";
+        if (sql.indexOf(bindCharacter) < 0) {
+            return sql;
+        }
+        final String lineSeparator = "\n";
+        if (sql.indexOf(lineSeparator) < 0) {
+            return sql;
+        }
+        final String lineCommentMark = "--";
+        if (sql.indexOf(lineCommentMark) < 0) {
+            return sql;
+        }
+        final StringBuilder sb = new StringBuilder();
+        final String[] lines = sql.split(lineSeparator);
+        for (String line : lines) {
+            final int lineCommentIndex = line.indexOf("--");
+            if (lineCommentIndex < 0) {
+                sb.append(line).append(lineSeparator);
+                continue;
+            }
+            final String lineComment = line.substring(lineCommentIndex);
+            if (lineComment.contains("ELSE") || !lineComment.contains(bindCharacter)) {
+                sb.append(line).append(lineSeparator);
+                continue;
+            }
+			
+            if (_log.isDebugEnabled()) {
+                _log.debug("...Replacing bind character on line comment: " + lineComment);
+            }
+            final String filteredLineComment = replaceString(lineComment, bindCharacter, "Q");
+            sb.append(line.substring(0, lineCommentIndex)).append(filteredLineComment).append(lineSeparator);
+        }
+        return sb.toString();
+    }
+	
     /**
-     * Read outside-sql path. <br />
-     * Required attribute is 'outsideSqlPath'.
-     * 
+     * Read outside-sql path. Required attribute is 'outsideSqlPath'.
      * @param sqlFileEncoding The encoding of SQL file. (NotNull)
      * @param dbmsSuffix The suffix of DBMS. (NotNull)
      * @return The text of SQL. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
      */
-    public String readOutsideSqlPath(String sqlFileEncoding, String dbmsSuffix) {
+    public String readOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
         final String standardPath = _outsideSqlPath;
         final String dbmsPath = buildDbmsPath(standardPath, dbmsSuffix);
         if (isExistResource(dbmsPath)) {
@@ -153,8 +199,8 @@ public class ${glOutsideSqlContextName} {
     }
 
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                      General Helper
+    //                                                                      ==============
     protected boolean isExistResource(String path) {
         return ResourceUtil.isExist(path);
     }
@@ -165,13 +211,12 @@ public class ${glOutsideSqlContextName} {
         return ReaderUtil.readText(reader);
     }
 
-    /**
-     * Get the value of line separator.
-     * 
-     * @return The value of line separator. (NotNull)
-     */
+    protected static String replaceString(String text, String fromText, String toText) {
+        return ${glSimpleStringUtil}.replace(text, fromText, toText);
+    }
+	
     protected static String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 
     // ===================================================================================

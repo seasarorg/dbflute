@@ -12,15 +12,12 @@ import org.seasar.dao.CommandContext;
 import org.seasar.dao.EndCommentNotFoundRuntimeException;
 import org.seasar.dao.IfConditionNotFoundRuntimeException;
 import org.seasar.dao.Node;
-import org.seasar.dao.SqlParser;
-import org.seasar.dao.SqlTokenizer;
 import org.seasar.dao.node.AbstractNode;
 import org.seasar.dao.node.BeginNode;
 import org.seasar.dao.node.ContainerNode;
 import org.seasar.dao.node.ElseNode;
 import org.seasar.dao.node.PrefixSqlNode;
 import org.seasar.dao.node.SqlNode;
-import org.seasar.dao.parser.SqlTokenizerImpl;
 import org.seasar.framework.beans.BeanDesc;
 import org.seasar.framework.beans.PropertyDesc;
 import org.seasar.framework.beans.factory.BeanDescFactory;
@@ -42,12 +39,12 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glInternalSqlParser} implements SqlParser {
+public class ${glInternalSqlParser} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private SqlTokenizer tokenizer;
+    private ${glInternalSqlTokenizer} tokenizer;
     private Stack<Node> nodeStack = new Stack<Node>();
     private String specifiedSql;// Extension!
 
@@ -60,12 +57,15 @@ public class ${glInternalSqlParser} implements SqlParser {
             sql = sql.substring(0, sql.length() - 1);
         }
         specifiedSql = sql;// Extension!
-        tokenizer = new SqlTokenizerImpl(sql);
+        tokenizer = new ${glInternalSqlTokenizer}(sql);
     }
 
+    // ===================================================================================
+    //                                                                               Parse
+    //                                                                               =====
     public Node parse() {
         push(new ContainerNode());
-        while (SqlTokenizer.EOF != tokenizer.next()) {
+        while (${glInternalSqlTokenizer}.EOF != tokenizer.next()) {
             parseToken();
         }
         return pop();
@@ -73,16 +73,16 @@ public class ${glInternalSqlParser} implements SqlParser {
 
     protected void parseToken() {
         switch (tokenizer.getTokenType()) {
-        case SqlTokenizer.SQL:
+        case ${glInternalSqlTokenizer}.SQL:
             parseSql();
             break;
-        case SqlTokenizer.COMMENT:
+        case ${glInternalSqlTokenizer}.COMMENT:
             parseComment();
             break;
-        case SqlTokenizer.ELSE:
+        case ${glInternalSqlTokenizer}.ELSE:
             parseElse();
             break;
-        case SqlTokenizer.BIND_VARIABLE:
+        case ${glInternalSqlTokenizer}.BIND_VARIABLE:
             parseBindVariable();
             break;
         }
@@ -96,7 +96,7 @@ public class ${glInternalSqlParser} implements SqlParser {
         Node node = peek();
         if ((node instanceof InternalIfNode || node instanceof ElseNode) && node.getChildSize() == 0) {
 
-            SqlTokenizer st = new SqlTokenizerImpl(sql);
+            ${glInternalSqlTokenizer} st = new ${glInternalSqlTokenizer}(sql);
             st.skipWhitespace();
             String token = st.skipToken();
             st.skipWhitespace();
@@ -117,7 +117,7 @@ public class ${glInternalSqlParser} implements SqlParser {
     }
 
     protected void parseComment() {
-        String comment = tokenizer.getToken();
+        final String comment = tokenizer.getToken();
         if (isTargetComment(comment)) {
             if (isIfComment(comment)) {
                 parseIf();
@@ -129,6 +129,9 @@ public class ${glInternalSqlParser} implements SqlParser {
                 parseCommentBindVariable();
             }
         } else if (comment != null && 0 < comment.length()) {
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	        // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
+		    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             String before = tokenizer.getBefore();
             peek().addChild(new SqlNode(before.substring(before.lastIndexOf("/*"))));
         }
@@ -156,8 +159,8 @@ public class ${glInternalSqlParser} implements SqlParser {
     }
 
     protected void parseEnd() {
-        while (SqlTokenizer.EOF != tokenizer.next()) {
-            if (tokenizer.getTokenType() == SqlTokenizer.COMMENT && isEndComment(tokenizer.getToken())) {
+        while (${glInternalSqlTokenizer}.EOF != tokenizer.next()) {
+            if (tokenizer.getTokenType() == ${glInternalSqlTokenizer}.COMMENT && isEndComment(tokenizer.getToken())) {
                 pop();
                 return;
             }
@@ -275,13 +278,18 @@ public class ${glInternalSqlParser} implements SqlParser {
 			if (valueAndType.getTargetValue() == null) {
 			    throwBindOrEmbeddedParameterNullValueException(valueAndType);
 			}
-            if (isInScope() && List.class.isAssignableFrom(valueAndType.getTargetType())) {
-                bindArray(ctx, ((List<?>)valueAndType.getTargetValue()).toArray());
-            } else if (isInScope() && valueAndType.getTargetType().isArray()) {
-                bindArray(ctx, valueAndType.getTargetValue());
-            } else {
-                ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
-            }
+			if (!isInScope()) {
+			    // Main Root
+			    ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
+			} else {
+			    if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
+				    bindArray(ctx, ((List<?>)valueAndType.getTargetValue()).toArray());
+				} else if (valueAndType.getTargetType().isArray()) {
+				    bindArray(ctx, valueAndType.getTargetValue());
+				} else {
+				    ctx.addSql("?", valueAndType.getTargetValue(), valueAndType.getTargetType());
+				}
+			}
             if (valueAndType.isValidRearOption()) {
                 ctx.addSql(valueAndType.buildRearOptionOnSql());
             }
@@ -371,11 +379,8 @@ public class ${glInternalSqlParser} implements SqlParser {
 			if (valueAndType.getTargetValue() == null) {
 			    throwBindOrEmbeddedParameterNullValueException(valueAndType);
 			}
-            if (isInScope() && List.class.isAssignableFrom(valueAndType.getTargetType())) {
-                embedArray(ctx, ((List<?>)valueAndType.getTargetValue()).toArray());
-            } else if (isInScope() && valueAndType.getTargetType().isArray()) {
-                embedArray(ctx, valueAndType.getTargetValue());
-            } else {
+			if (!isInScope()) {
+			    // Main Root
 		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	            // [UnderReview]: Should I make an original exception instead of this exception?
 		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -383,7 +388,21 @@ public class ${glInternalSqlParser} implements SqlParser {
                     throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
                 }
                 ctx.addSql(valueAndType.getTargetValue().toString());
-            }
+			} else {
+			    if (List.class.isAssignableFrom(valueAndType.getTargetType())) {
+                    embedArray(ctx, ((List<?>)valueAndType.getTargetValue()).toArray());
+				} else if (valueAndType.getTargetType().isArray()) {
+                    embedArray(ctx, valueAndType.getTargetValue());
+				} else {
+    		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    	            // [UnderReview]: Should I make an original exception instead of this exception?
+    		        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                    if (valueAndType.getTargetValue() != null && valueAndType.getTargetValue().toString().indexOf("?") > -1) {
+                        throw new org.seasar.framework.exception.SRuntimeException("EDAO0023");
+                    }
+                    ctx.addSql(valueAndType.getTargetValue().toString());
+				}
+			}
             if (valueAndType.isValidRearOption()) {
                 ctx.addSql(valueAndType.buildRearOptionOnSql());
             }

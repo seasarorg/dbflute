@@ -1512,6 +1512,14 @@ public class Database {
     public String getBehaviorSelectorComponentName() {
         return filterProjectSuffixForComponentName("behaviorSelector");
     }
+    
+    public String getSharp() {
+        return "#";
+    }
+    
+    public String getDollar() {
+        return "$";
+    }
 
     // ==================================================================
     //                                         databaseInfoMap (Internal)
