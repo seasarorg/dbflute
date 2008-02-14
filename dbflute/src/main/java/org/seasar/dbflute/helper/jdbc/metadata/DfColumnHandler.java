@@ -18,11 +18,13 @@ package org.seasar.dbflute.helper.jdbc.metadata;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 
 /**
@@ -84,6 +86,38 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return columns;
     }
 
+    public String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
+        final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
+        if (Types.OTHER != sqlTypeCode) {
+            try {
+                return TypeMap.getTorqueType(sqlTypeCode);
+            } catch (RuntimeException e) {
+                String msg = "Not found the sqlTypeCode in TypeMap: sqlTypeCode=";
+                msg = msg + sqlTypeCode + " message=" + e.getMessage();
+                _log.warn(msg);
+            }
+        }
+
+        // If other
+        final String dbTypeName = columnMetaInfo.getDbTypeName();
+        if (dbTypeName == null) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
+            return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("char")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
+            return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("date")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.DATE);
+            return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("timestamp")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.TIMESTAMP);
+            return torqueType;
+        } else {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
+            return torqueType;
+        }
+    }
+    
     public static class DfColumnMetaInfo {
         protected String columnName;
         protected int jdbcTypeCode;

@@ -70,7 +70,6 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
-import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.transform.DTDResolver;
 import org.apache.xerces.dom.DocumentImpl;
@@ -351,43 +350,16 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo, columnElement));
+        columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
     }
 
-    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
-        if (Types.OTHER != sqlTypeCode) {
-            try {
-                return TypeMap.getTorqueType(sqlTypeCode);
-            } catch (RuntimeException e) {
-                String msg = "Not found the sqlTypeCode in TypeMap: sqlTypeCode=";
-                msg = msg + sqlTypeCode + " message=" + e.getMessage();
-                _log.warn(msg);
-            }
-        }
-
-        // If other
-        final String dbTypeName = columnMetaInfo.getDbTypeName();
-        if (dbTypeName == null) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("char")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("date")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.DATE);
-            return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("timestamp")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.TIMESTAMP);
-            return torqueType;
-        } else {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            return torqueType;
-        }
+    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
+        final DfColumnHandler columnHandler = new DfColumnHandler();
+        return columnHandler.getColumnTorqueType(columnMetaInfo);
     }
 
     protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final String jdbcType = getColumnTorqueType(columnMetaInfo, columnElement);
+        final String jdbcType = getColumnTorqueType(columnMetaInfo);
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
         final String javaNative = TypeMap.findJavaNativeTypeString(jdbcType, columnSize > 0 ? columnSize : null,

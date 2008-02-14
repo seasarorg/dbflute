@@ -33,10 +33,10 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
-import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
@@ -635,11 +635,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected void setupTorqueType(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName,
             final Column col) {
-        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
-        final Integer jdbcType = metaInfo.getJdbcTypeCode();
-        col.setTorqueType(TypeMap.getTorqueType(jdbcType));
+        final DfColumnMetaInfo columnMetaInfo = columnJdbcTypeMap.get(columnName);
+        final String columnTorqueType = getColumnTorqueType(columnMetaInfo);
+        col.setTorqueType(columnTorqueType);
     }
 
+    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
+        final DfColumnHandler columnHandler = new DfColumnHandler();
+        return columnHandler.getColumnTorqueType(columnMetaInfo);
+    }
+    
     protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
             String columnName, final Column col) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
