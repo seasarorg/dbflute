@@ -822,7 +822,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     public ${glSqlClauseInterfaceName} fetchFirst(int fetchSize) {
         _isFetchScopeEffective = true;
         if (fetchSize <= 0) {
-            String msg = "Argument[fetchSize] must be plus: " + fetchSize;
+            String msg = "Argument[fetchSize] should be plus: " + fetchSize;
             throw new IllegalArgumentException(msg);
         }
         _fetchStartIndex = 0;
@@ -845,7 +845,7 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             throw new IllegalArgumentException(msg);
         }
         if (fetchSize <= 0) {
-            String msg = "Argument[fetchSize] must be plus: " + fetchSize;
+            String msg = "Argument[fetchSize] should be plus: " + fetchSize;
             throw new IllegalArgumentException(msg);
         }
         _fetchStartIndex = fetchStartIndex;
@@ -863,12 +863,25 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             fetchPageNumber = 1;
         }
         if (_fetchSize <= 0) {
-            String msg = "Fetch size should not be minus or zero!" + getLineSeparator();
+            String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "Fetch size should not be minus or zero!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "When you invoke this method, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. " + getLineSeparator();
             msg = msg + "Please confirm your program. Does it really invoke 'fetchPage()' with 'fetchFirst()' or 'fetchScope()'?" + getLineSeparator();
-            msg = msg + "- - - - -" + getLineSeparator();
-            msg = msg + "fetchPageNumber=" + fetchPageNumber + " _fetchSize=" + _fetchSize + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    before (x):" + getLineSeparator();
+            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
+            msg = msg + "      cb.fetchPage(3);" + getLineSeparator();
+            msg = msg + "    after  (o):" + getLineSeparator();
+            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
+            msg = msg + "      cb.fetchFirst(20); // The size of page" + getLineSeparator();
+            msg = msg + "      cb.fetchPage(3);   // The number of target page" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Actual Parameter Value]" + getLineSeparator();
+			msg = msg + "fetchSize=" + _fetchSize + getLineSeparator();
+            msg = msg + "fetchPageNumber=" + fetchPageNumber + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
             throw new IllegalStateException(msg);
         }

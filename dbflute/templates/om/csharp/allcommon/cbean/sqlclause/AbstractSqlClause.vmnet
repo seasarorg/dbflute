@@ -849,10 +849,23 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         if (_fetchSize <= 0) {
             String msg = "Fetch size should not be minus or zero!" + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "When you invoke this method, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. " + getLineSeparator();
-            msg = msg + "Please confirm your program. Does it really invoke 'fetchPage()' with 'fetchFirst()' or 'fetchScope()'?" + getLineSeparator();
-            msg = msg + "- - - - -" + getLineSeparator();
-            msg = msg + "fetchPageNumber=" + fetchPageNumber + " _fetchSize=" + _fetchSize + getLineSeparator();
+            msg = msg + "Look! Read the message below." + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "When you invoke this method, it is necessary to invoke 'FetchFirst()' or 'FetchScope()' ahead of that. " + getLineSeparator();
+            msg = msg + "Please confirm your program. Does it really invoke 'FetchPage()' with 'FetchFirst()' or 'FetchScope()'?" + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    before (x):" + getLineSeparator();
+            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
+            msg = msg + "      cb.FetchPage(3);" + getLineSeparator();
+            msg = msg + "    after  (o):" + getLineSeparator();
+            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
+            msg = msg + "      cb.FetchFirst(20); // The size of page" + getLineSeparator();
+            msg = msg + "      cb.FetchPage(3);   // The number of target page" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Actual Parameter Value]" + getLineSeparator();
+            msg = msg + "fetchSize=" + _fetchSize + getLineSeparator();
+            msg = msg + "fetchPageNumber=" + fetchPageNumber + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();
             throw new IllegalStateException(msg);
         }
