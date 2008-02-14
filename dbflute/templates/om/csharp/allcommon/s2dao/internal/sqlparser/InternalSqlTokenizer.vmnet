@@ -6,6 +6,14 @@ using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
 
+    public enum InternalTokenType {
+        SQL = 0,
+        COMMENT = 1,
+        ELSE = 2,
+        BIND_VARIABLE = 3,
+        EOF = 4,
+    }
+	
     public class ${glInternalSqlTokenizer} {
 	
         // ===============================================================================
@@ -14,8 +22,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         protected readonly string _sql;
         protected int _position = 0;
         protected string _token;
-        protected TokenType _tokenType = TokenType.SQL;
-        protected TokenType _nextTokenType = TokenType.SQL;
+        protected InternalTokenType _tokenType = InternalTokenType.SQL;
+        protected InternalTokenType _nextTokenType = InternalTokenType.SQL;
         protected int _bindVariableNum = 0;
 
         // ===============================================================================
@@ -28,27 +36,27 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         // ===============================================================================
         //                                                                        Tokenize
         //                                                                        ========
-        public TokenType Next()
+        public InternalTokenType Next()
         {
             if (_position >= _sql.Length)
             {
                 _token = null;
-                _tokenType = TokenType.EOF;
-                _nextTokenType = TokenType.EOF;
+                _tokenType = InternalTokenType.EOF;
+                _nextTokenType = InternalTokenType.EOF;
                 return _tokenType;
             }
             switch (_nextTokenType)
             {
-                case TokenType.SQL:
+                case InternalTokenType.SQL:
                     ParseSql();
                     break;
-                case TokenType.COMMENT:
+                case InternalTokenType.COMMENT:
                     ParseComment();
                     break;
-                case TokenType.ELSE:
+                case InternalTokenType.ELSE:
                     ParseElse();
                     break;
-                case TokenType.BIND_VARIABLE:
+                case InternalTokenType.BIND_VARIABLE:
                     ParseBindVariable();
                     break;
                 default:
@@ -99,8 +107,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                 }
             }
             _token = _sql.Substring(_position, (index - _position));
-            _tokenType = TokenType.SQL;
-            _nextTokenType = TokenType.SQL;
+            _tokenType = InternalTokenType.SQL;
+            _nextTokenType = InternalTokenType.SQL;
             _position = index;
             return _token;
         }
@@ -140,28 +148,28 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             if (nextStartPos < 0)
             {
                 _token = _sql.Substring(_position);
-                _nextTokenType = TokenType.EOF;
+                _nextTokenType = InternalTokenType.EOF;
                 _position = _sql.Length;
-                _tokenType = TokenType.SQL;
+                _tokenType = InternalTokenType.SQL;
             }
             else
             {
                 _token = _sql.Substring(_position, nextStartPos - _position);
-                _tokenType = TokenType.SQL;
+                _tokenType = InternalTokenType.SQL;
                 bool needNext = nextStartPos == _position;
                 if (nextStartPos == commentStartPos)
                 {
-                    _nextTokenType = TokenType.COMMENT;
+                    _nextTokenType = InternalTokenType.COMMENT;
                     _position = commentStartPos + 2;
                 }
                 else if (nextStartPos == elseCommentStartPos)
                 {
-                    _nextTokenType = TokenType.ELSE;
+                    _nextTokenType = InternalTokenType.ELSE;
                     _position = elseCommentStartPos + elseCommentLength;
                 }
                 else if (nextStartPos == bindVariableStartPos)
                 {
-                    _nextTokenType = TokenType.BIND_VARIABLE;
+                    _nextTokenType = InternalTokenType.BIND_VARIABLE;
                     _position = bindVariableStartPos;
                 }
                 if (needNext) Next();
@@ -199,31 +207,31 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
                     _sql.Substring(_position));
 
             _token = _sql.Substring(_position, (commentEndPos - _position));
-            _nextTokenType = TokenType.SQL;
+            _nextTokenType = InternalTokenType.SQL;
             _position = commentEndPos + 2;
-            _tokenType = TokenType.COMMENT;
+            _tokenType = InternalTokenType.COMMENT;
         }
 
         protected void ParseBindVariable()
         {
             _token = NextBindVariableName;
-            _nextTokenType = TokenType.SQL;
+            _nextTokenType = InternalTokenType.SQL;
             _position++;
-            _tokenType = TokenType.BIND_VARIABLE;
+            _tokenType = InternalTokenType.BIND_VARIABLE;
         }
 
         protected void ParseElse()
         {
             _token = null;
-            _nextTokenType = TokenType.SQL;
-            _tokenType = TokenType.ELSE;
+            _nextTokenType = InternalTokenType.SQL;
+            _tokenType = InternalTokenType.ELSE;
         }
 
         protected void ParseEof()
         {
             _token = null;
-            _tokenType = TokenType.EOF;
-            _nextTokenType = TokenType.EOF;
+            _tokenType = InternalTokenType.EOF;
+            _nextTokenType = InternalTokenType.EOF;
         }
 
         private int SkipWhitespace(int position)
@@ -264,12 +272,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             get { return _position; }
         }
 
-        public TokenType TokenType
+        public InternalTokenType TokenType
         {
             get { return _tokenType; }
         }
 
-        public TokenType NextTokenType
+        public InternalTokenType NextTokenType
         {
             get { return NextTokenType; }
         }

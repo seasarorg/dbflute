@@ -68,7 +68,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         protected static String GetLineSeparator() {
-            return Environment.NewLine;
+		    return ${glSimpleSystemUtil}.GetLineSeparator();
+        }
+
+        protected static String ReplaceString(String text, String fromText, String toText) {
+    	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
         }
 
         // ===============================================================================
@@ -108,11 +112,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             if (sql.IndexOf(bindCharacter) < 0) {
                 return sql;
             }
-            final String lineSeparator = "\n";
+            String lineSeparator = "\n";
             if (sql.IndexOf(lineSeparator) < 0) {
                 return sql;
             }
-            final String lineCommentMark = "--";
+            String lineCommentMark = "--";
             if (sql.IndexOf(lineCommentMark) < 0) {
                 return sql;
             }
@@ -185,14 +189,6 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                     return reader.ReadToEnd();
                 }
             }
-        }
-
-        protected String GetLineSeparator() {
-            return ${glSimpleSystemUtil}.GetLineSeparator();
-        }
-
-        protected String ReplaceString(String text, String fromText, String toText) {
-    	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
         }
 
         // ===============================================================================

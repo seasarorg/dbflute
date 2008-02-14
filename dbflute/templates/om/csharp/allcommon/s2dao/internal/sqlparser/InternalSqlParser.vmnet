@@ -44,24 +44,24 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         //                                                                           =====
         public INode Parse() {
             Push(new ContainerNode());
-            while (TokenType.EOF != _tokenizer.Next()) {
+            while (InternalTokenType.EOF != _tokenizer.Next()) {
                 ParseToken();
             }
             return Pop();
         }
 
         protected void ParseToken() {
-            switch (_tokenizer.TokenType) {
-                case TokenType.SQL:
+            switch (_tokenizer.InternalTokenType) {
+                case InternalTokenType.SQL:
                     ParseSql();
                     break;
-                case TokenType.COMMENT:
+                case InternalTokenType.COMMENT:
                     ParseComment();
                     break;
-                case TokenType.ELSE:
+                case InternalTokenType.ELSE:
                     ParseElse();
                     break;
-                case TokenType.BIND_VARIABLE:
+                case InternalTokenType.BIND_VARIABLE:
                     ParseBindVariable();
                     break;
             }
@@ -148,8 +148,8 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         }
 
         protected void ParseEnd() {
-            while (TokenType.EOF != _tokenizer.Next()) {
-                if (_tokenizer.TokenType == TokenType.COMMENT
+            while (InternalTokenType.EOF != _tokenizer.Next()) {
+                if (_tokenizer.TokenType == InternalTokenType.COMMENT
                     && IsEndComment(_tokenizer.Token)) {
                     Pop();
                     return;
