@@ -224,7 +224,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + GetLineSeparator();
             msg = msg + "[End Comment Expected Place]" + GetLineSeparator() + expression + GetLineSeparator();
             msg = msg + GetLineSeparator();
-            msg = msg + "[Specified SQL]" + GetLineSeparator() + sql + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + _sql + GetLineSeparator();
             msg = msg + "* * * * * * * * * */" + GetLineSeparator();
             throw new ${glEndCommentNotFoundException}(msg);
         }
