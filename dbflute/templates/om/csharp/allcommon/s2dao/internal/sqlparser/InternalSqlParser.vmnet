@@ -14,6 +14,7 @@ using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonException};
 using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonS2DaoInternalUtil};
 using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
@@ -257,6 +258,30 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             return content != null && "END".Equals(content);
         }
 		
+	
+    	// ===============================================================================
+        //                                                                         Convert
+        //                                                                         =======
+    	public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, Object arg) {
+    	    String[] argNames = new String[]{"dto"};
+    	    Type[] argTypes = new Type[]{arg.GetType()};
+    	    Object[] args = new Object[]{arg};
+    		return ConvertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args);
+    	}
+    	
+    	public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
+            final ICommandContext context;
+    		{
+                ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
+                INode node = parser.Parse();
+                ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
+                context = creator.CreateCommandContext(args);
+                node.accept(context);
+    		}
+            String preparedSql = context.Sql;
+    		return ${glInternalBindVariableUtil}.GetCompleteSql(preparedSql, context.BindVariables);
+    	}
+	
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============

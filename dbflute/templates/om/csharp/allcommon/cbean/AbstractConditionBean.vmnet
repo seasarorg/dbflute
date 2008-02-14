@@ -1,8 +1,6 @@
 #set ($myClassName = "${glConditionBeanAbstractName}")
 
 using System;
-using System.Collections;
-using System.Text;
 
 using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonSqlClause};
@@ -206,5 +204,19 @@ namespace ${glPackageBaseCommonCBean} {
         public bool IsSelectCountIgnoreFetchScope() {
             return _isSelectCountIgnoreFetchScope;
         }
+		
+        // ===============================================================================
+        //                                                                     Display SQL
+        //                                                                     ===========
+    	public virtual String ToDisplaySql() {
+    	    return ${glConditionBeanContextName}.ConvertConditionBean2DisplaySql(this);
+    	}
+		
+        // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+		public override String ToString() {
+		    return ToDisplaySql();
+		}
     }
 }

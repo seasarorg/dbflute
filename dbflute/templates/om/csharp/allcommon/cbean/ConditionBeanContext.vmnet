@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
+using ${glPackageBaseCommonS2DaoInternalSqlParser};
+
 namespace ${glPackageBaseCommonCBean} {
 
     public static class ${glConditionBeanContextName} {
@@ -122,9 +124,22 @@ namespace ${glPackageBaseCommonCBean} {
             // return displaySql.Substring(0, basePointIndex) + GetLineSeparator() + " " + displaySql.Substring(basePointIndex);
         }
 
-        // ===================================================================================
-        //                                                                              Helper
-        //                                                                              ======
+    	// ===============================================================================
+        //                                                                     Display SQL
+        //                                                                     ===========
+    	public static String ConvertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb) {
+    	    final String twoWaySql;
+    	    if (cb.IsLimitSelect_PKOnly()) {
+    		    twoWaySql = cb.SqlClause.getClausePKOnly();
+    		} else {
+    		    twoWaySql = cb.SqlClause.getClause();
+    		}
+    	    return ${glInternalSqlParser}.ConvertTwoWaySql2DisplaySql(twoWaySql, cb);
+    	}
+	
+    	// ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
         private static String GetLineSeparator() {
             return Environment.NewLine;
         }

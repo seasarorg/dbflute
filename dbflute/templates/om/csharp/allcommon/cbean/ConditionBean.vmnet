@@ -52,5 +52,10 @@ namespace ${glPackageBaseCommonCBean} {
         ${glConditionBeanInterfaceName} XSetupSelectCountIgnoreFetchScope();
         ${glConditionBeanInterfaceName} XAfterCareSelectCountIgnoreFetchScope();
         bool IsSelectCountIgnoreFetchScope();
+		
+        // ===============================================================================
+        //                                                                     Display SQL
+        //                                                                     ===========
+    	String ToDisplaySql();
     }
 }

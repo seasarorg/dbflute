@@ -469,6 +469,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
       #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
       #set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.S2Dao.Internal.SqlParser")
+      #set ($glPackageBaseCommonS2DaoInternalUtil = "${database.baseCommonPackage}.S2Dao.Internal.Util")
       #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
     #end
 
@@ -1910,6 +1911,17 @@ targetdatabase = $targetDatabase
 	  $database.debug("    parse('InternalSqlTokenizer');")	  
 	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser})}${glInternalSqlTokenizer}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlparser/InternalSqlTokenizer.${glTemplateFileExtension}",$path,"", "")
+	  
+      $database.debug("    parse('InternalCommandContextCreator');")	  
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser})}${glInternalCommandContextCreator}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlparser/InternalCommandContextCreator.${glTemplateFileExtension}",$path,"", "")
+	  
+      #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil}))
+      $database.makeDirectory($path)
+	  
+      $database.debug("    parse('InternalBindVariableUtil');")	  
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil})}${glInternalBindVariableUtil}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/util/InternalBindVariableUtil.${glTemplateFileExtension}",$path,"", "")
 	#end
     $database.debug("}")
 	
