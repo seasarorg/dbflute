@@ -21,7 +21,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public SqlTokenizerImpl(string sql) {
+        public ${glInternalSqlTokenizer}(string sql) {
             _sql = sql;
         }
 

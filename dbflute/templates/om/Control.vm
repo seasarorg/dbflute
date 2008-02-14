@@ -468,6 +468,7 @@ targetdatabase = $targetDatabase
       #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
       #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
       #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
+      #set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.S2Dao.Internal.SqlParser")
       #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
     #end
 
