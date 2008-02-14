@@ -1,12 +1,10 @@
 
 using System;
-using Seasar.Dao;
 
 namespace ${glPackageBaseCommonException} {
 
     /// <summary>
     /// The exception of when the result size is dangerous.
-    /// Author: ${database.ClassAuthor}
     /// </summary>
     public class ${glDangerousResultSizeException} : SystemException {
 

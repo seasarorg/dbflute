@@ -9,8 +9,6 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 
 import org.seasar.dao.CommandContext;
-import org.seasar.dao.EndCommentNotFoundRuntimeException;
-import org.seasar.dao.IfConditionNotFoundRuntimeException;
 import org.seasar.dao.Node;
 import org.seasar.dao.node.AbstractNode;
 import org.seasar.dao.node.BeginNode;
@@ -29,6 +27,8 @@ import ${glPackageBaseCommonException}.${glBindVariableCommentNotFoundPropertyEx
 import ${glPackageBaseCommonException}.${glBindVariableParameterNullValueException};
 import ${glPackageBaseCommonException}.${glEmbeddedValueCommentNotFoundPropertyException};
 import ${glPackageBaseCommonException}.${glEmbeddedValueParameterNullValueException};
+import ${glPackageBaseCommonException}.${glEndCommentNotFoundException};
+import ${glPackageBaseCommonException}.${glIfCommentConditionNotFoundException};
 import ${glPackageBaseCommonException}.${glIfCommentNotBooleanResultException};
 import ${glPackageBaseCommonException}.${glIfCommentWrongExpressionException};
 import ${glPackageBaseCommonException}.${glRequiredOptionNotFoundException};
@@ -44,9 +44,9 @@ public class ${glInternalSqlParser} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private ${glInternalSqlTokenizer} tokenizer;
-    private Stack<Node> nodeStack = new Stack<Node>();
-    private String specifiedSql;// Extension!
+    protected ${glInternalSqlTokenizer} tokenizer;
+    protected Stack<Node> nodeStack = new Stack<Node>();
+    protected String specifiedSql;// Extension!
 
     // ===================================================================================
     //                                                                         Constructor
@@ -138,17 +138,33 @@ public class ${glInternalSqlParser} {
     }
 
     protected void parseIf() {
-        String condition = tokenizer.getToken().substring(2).trim();
+        final String condition = tokenizer.getToken().substring(2).trim();
         if (InternalStringUtil.isEmpty(condition)) {
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	        // [UnderReview]: Should I make an original exception instead of this exception?
-		    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            throw new IfConditionNotFoundRuntimeException();
+            throwIfCommentConditionNotFoundException();
         }
         final ContainerNode ifNode = createIfNode(condition);
         peek().addChild(ifNode);
         push(ifNode);
         parseEnd();
+    }
+	
+    protected void throwIfCommentConditionNotFoundException() {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The condition of IF comment was Not Found!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm the IF comment expression." + getLineSeparator();
+        msg = msg + "It may exist the IF comment that DOESN'T have a condition." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    before (x) -- /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
+        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[IF Comment Expression]" + getLineSeparator() + tokenizer.getToken() + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        throw new ${glIfCommentConditionNotFoundException}(msg);
     }
 
     protected void parseBegin() {
@@ -166,12 +182,26 @@ public class ${glInternalSqlParser} {
             }
             parseToken();
         }
-		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // [UnderReview]: Should I make an original exception instead of this exception?
-	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        throw new EndCommentNotFoundRuntimeException();
+        throwEndCommentNotFoundException();
     }
 
+    protected void throwEndCommentNotFoundException() {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The end comment was Not Found!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm the parameter comment logic." + getLineSeparator();
+        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
+        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        throw new ${glEndCommentNotFoundException}(msg);
+    }
+	
     protected void parseElse() {
         final Node parent = peek();
         if (!(parent instanceof InternalIfNode)) {
@@ -187,7 +217,7 @@ public class ${glInternalSqlParser} {
     protected void parseCommentBindVariable() {
         final String expr = tokenizer.getToken();
         final String s = tokenizer.skipToken();
-        if (expr.startsWith("$")) {
+        if (expr.startsWith("${database.dollar}")) {
             peek().addChild(createEmbeddedValueNode(expr.substring(1), s));// Extension!
         } else {
             peek().addChild(createBindVariableNode(expr, s));// Extension!
@@ -246,6 +276,17 @@ public class ${glInternalSqlParser} {
 
     protected ContainerNode createIfNode(String expr) {// Extension!
         return new InternalIfNode(expr, specifiedSql);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
+    }
+	
+    protected final String replaceString(String text, String fromText, String toText) {
+	    return ${glSimpleStringUtil}.replace(text, fromText, toText);
     }
 	
     // ===================================================================================
@@ -624,6 +665,7 @@ public class ${glInternalSqlParser} {
             msg = msg + getLineSeparator();
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
+            msg = msg + "Abd has the property had misspelling?" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();
@@ -657,8 +699,8 @@ public class ${glInternalSqlParser} {
             msg = msg + "If the answer is YES, please confirm your application logic about the parameter." + getLineSeparator();
             msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)." + getLineSeparator();
             msg = msg + "  --> For example:" + getLineSeparator();
-            msg = msg + "        before -- XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
-            msg = msg + "        after  -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
+            msg = msg + "        before (x) -- XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
+            msg = msg + "        after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();
@@ -678,6 +720,18 @@ public class ${glInternalSqlParser} {
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was empty!" + getLineSeparator();
             msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm your application logic." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    before (x):" + getLineSeparator();
+            msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + getLineSeparator();
+            msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + getLineSeparator();
+            msg = msg + "    after  (o):" + getLineSeparator();
+            msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + getLineSeparator();
+            msg = msg + "      xxxIdList.add(3);" + getLineSeparator();
+            msg = msg + "      xxxIdList.add(7);" + getLineSeparator();
+            msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + getLineSeparator();
+            msg = msg + getLineSeparator();
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
@@ -689,6 +743,20 @@ public class ${glInternalSqlParser} {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was 'Null Only List'!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "Please confirm your application logic." + getLineSeparator();
+            msg = msg + "  For example:" + getLineSeparator();
+            msg = msg + "    before (x):" + getLineSeparator();
+            msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + getLineSeparator();
+            msg = msg + "      xxxIdList.add(null);" + getLineSeparator();
+            msg = msg + "      xxxIdList.add(null);" + getLineSeparator();
+            msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + getLineSeparator();
+            msg = msg + "    after  (o):" + getLineSeparator();
+            msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + getLineSeparator();
+            msg = msg + "      xxxIdList.add(3);" + getLineSeparator();
+            msg = msg + "      xxxIdList.add(7);" + getLineSeparator();
+            msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();
@@ -770,8 +838,11 @@ public class ${glInternalSqlParser} {
             msg = msg + "[Advice]" + getLineSeparator();
             msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
             msg = msg + "And confirm the IF comment of your specified SQL." + getLineSeparator();
-            msg = msg + "  --> For example, correct IF comment is as below:" + getLineSeparator();
-            msg = msg + "        /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + getLineSeparator();
+            msg = msg + "  For example, correct IF comment is as below:" + getLineSeparator();
+            msg = msg + "    /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + getLineSeparator();
+            msg = msg + "    /*IF pmb.isPaging()*/.../*END*/" + getLineSeparator();
+            msg = msg + "    /*IF pmb.xxxId == null && pmb.xxxName != null*/.../*END*/" + getLineSeparator();
+            msg = msg + "    /*IF pmb.xxxId == null || pmb.xxxName != null*/.../*END*/" + getLineSeparator();
             msg = msg + getLineSeparator();
             msg = msg + "[IF Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();

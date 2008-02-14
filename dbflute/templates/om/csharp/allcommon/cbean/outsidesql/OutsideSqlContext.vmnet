@@ -13,6 +13,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
     public class ${glOutsideSqlContextName} {
 
         // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        /** Log instance. */
+        private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+		
+        // ===============================================================================
         //                                                                    Thread Local
         //                                                                    ============
         private static readonly LocalDataStoreSlot _slot = Thread.AllocateDataSlot();
@@ -92,6 +98,47 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                        Read SQL
         //                                                                        ========
+    	public String ReadFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
+    	    String sql = ReadOutsideSql(sqlFileEncoding, dbmsSuffix);
+    		return ReplaceOutsideSqlBindCharacterOnLineComment(sql);
+    	}
+    
+        protected String ReplaceOutsideSqlBindCharacterOnLineComment(String sql) {
+            String bindCharacter = "?";
+            if (sql.IndexOf(bindCharacter) < 0) {
+                return sql;
+            }
+            final String lineSeparator = "\n";
+            if (sql.IndexOf(lineSeparator) < 0) {
+                return sql;
+            }
+            final String lineCommentMark = "--";
+            if (sql.IndexOf(lineCommentMark) < 0) {
+                return sql;
+            }
+            StringBuilder sb = new StringBuilder();
+            String[] lines = sql.Split(lineSeparator);
+            foreach (String line in lines) {
+                int lineCommentIndex = line.IndexOf("--");
+                if (lineCommentIndex < 0) {
+                    sb.Append(line).Append(lineSeparator);
+                    continue;
+                }
+                String lineComment = line.Substring(lineCommentIndex);
+                if (lineComment.Contains("ELSE") || !lineComment.Contains(bindCharacter)) {
+                    sb.Append(line).Append(lineSeparator);
+                    continue;
+                }
+    			
+                if (_log.IsDebugEnabled) {
+                    _log.debug("...Replacing bind character on line comment: " + lineComment);
+                }
+                String filteredLineComment = ReplaceString(lineComment, bindCharacter, "Q");
+                sb.Append(line.Substring(0, lineCommentIndex)).Append(filteredLineComment).Append(lineSeparator);
+            }
+            return sb.ToString();
+        }
+	
         public String ReadOutsideSqlPath(String sqlFileEncoding, String dbmsSuffix) {
             String standardPath = _outsideSqlPath.Replace("/", ".");// Replacing is required for csharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
@@ -126,8 +173,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         // ===============================================================================
-        //                                                                          Helper
-        //                                                                          ======
+        //                                                                  General Helper
+        //                                                                  ==============
         protected virtual bool IsExistResource(String path, Assembly asm) {
             return ResourceUtil.IsExist(path, asm);
         }
@@ -138,6 +185,14 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                     return reader.ReadToEnd();
                 }
             }
+        }
+
+        protected String GetLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
+        }
+
+        protected String ReplaceString(String text, String fromText, String toText) {
+    	    return ${glSimpleStringUtil}.Replace(text, fromText, toText);
         }
 
         // ===============================================================================

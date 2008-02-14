@@ -1,0 +1,19 @@
+${database.allClassCopyright}package ${glPackageBaseCommonException};
+
+/**
+ * The exception of when the end comment is not found about outsideSql.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glEndCommentNotFoundException} extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     */
+    public ${glEndCommentNotFoundException}(String msg) {
+        super(msg);
+    }
+}

@@ -234,9 +234,11 @@ targetdatabase = $targetDatabase
     #set ($glDangerousResultSizeException = "${glProjectPrefix}DangerousResultSizeException")
     #set ($glEmbeddedValueCommentNotFoundPropertyException = "${glProjectPrefix}EmbeddedValueCommentNotFoundPropertyException")
     #set ($glEmbeddedValueParameterNullValueException = "${glProjectPrefix}EmbeddedValueParameterNullValueException")
+    #set ($glEndCommentNotFoundException = "${glProjectPrefix}EndCommentNotFoundException")
     #set ($glEntityAlreadyUpdatedException = "${glProjectPrefix}EntityAlreadyUpdatedException")
     #set ($glEntityAlreadyDeletedException = "${glProjectPrefix}EntityAlreadyDeletedException")
     #set ($glEntityDuplicatedException = "${glProjectPrefix}EntityDuplicatedException")
+    #set ($glIfCommentConditionNotFoundException = "${glProjectPrefix}IfCommentConditionNotFoundException")
     #set ($glIfCommentNotBooleanResultException = "${glProjectPrefix}IfCommentNotBooleanResultException")
     #set ($glIfCommentWrongExpressionException = "${glProjectPrefix}IfCommentWrongExpressionException")
     #set ($glOutsideSqlNotFoundException = "${glProjectPrefix}OutsideSqlNotFoundException")
@@ -1236,6 +1238,14 @@ targetdatabase = $targetDatabase
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEmbeddedValueParameterNullValueException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/exception/EmbeddedValueParameterNullValueException.${glTemplateFileExtension}",$path,"", "")
 
+      $database.debug("    parse('EndCommentNotFoundException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glEndCommentNotFoundException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/EndCommentNotFoundException.${glTemplateFileExtension}",$path,"", "")
+
+      $database.debug("    parse('IfCommentConditionNotFoundException');")
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glIfCommentConditionNotFoundException}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/exception/IfCommentConditionNotFoundException.${glTemplateFileExtension}",$path,"", "")
+
       $database.debug("    parse('IfCommentNotBooleanResultException');")
       #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonException})}${glIfCommentNotBooleanResultException}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/exception/IfCommentNotBooleanResultException.${glTemplateFileExtension}",$path,"", "")
@@ -1678,7 +1688,7 @@ targetdatabase = $targetDatabase
       $generator.parse("om/${glResourceDirectory}/allcommon/jdbc/StatementConfig.${glTemplateFileExtension}",$path,"", "")
 	#end
 
-    #if ($database.isTargetLanguageJava() && $database.isAvailableGenerics())
+    #if ($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger())
       #if ($database.isMakeTraceablePreparedStatement())
         #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonJdbcHistory}))
         $database.makeDirectory($path)
@@ -1887,8 +1897,18 @@ targetdatabase = $targetDatabase
       $database.debug("    parse('InternalBindVariableUtil');")	  
 	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil})}${glInternalBindVariableUtil}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/util/InternalBindVariableUtil.${glTemplateFileExtension}",$path,"", "")
-
+	#end
+    #if ($database.isTargetLanguageCSharp())
+	  #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser}))
+      $database.makeDirectory($path)
 	  
+      $database.debug("    parse('InternalSqlParser');")	  
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser})}${glInternalSqlParser}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlparser/InternalSqlParser.${glTemplateFileExtension}",$path,"", "")
+
+	  $database.debug("    parse('InternalSqlTokenizer');")	  
+	  #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser})}${glInternalSqlTokenizer}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlparser/InternalSqlTokenizer.${glTemplateFileExtension}",$path,"", "")
 	#end
     $database.debug("}")
 	

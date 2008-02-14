@@ -1,5 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlParser};
 
+import ${glPackageBaseCommonException}.${glEndCommentNotFoundException};
 import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
@@ -134,7 +135,7 @@ public class ${glInternalSqlTokenizer} {
             commentEndPos = commentEndPos2;
         }
         if (commentEndPos < 0) {
-			throwParameterCommentEndCommentNotFoundException(sql.substring(position));
+			throwEndCommentNotFoundException(sql.substring(position));
         }
         token = sql.substring(position, commentEndPos);
         nextTokenType = SQL;
@@ -142,7 +143,7 @@ public class ${glInternalSqlTokenizer} {
         tokenType = COMMENT;
     }
 
-    protected void throwParameterCommentEndCommentNotFoundException(String expression) {
+    protected void throwEndCommentNotFoundException(String expression) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The end comment was Not Found!" + getLineSeparator();
@@ -150,12 +151,15 @@ public class ${glInternalSqlTokenizer} {
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + "Please confirm the parameter comment logic." + getLineSeparator();
         msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
+        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[End Comment Expected Place]" + getLineSeparator() + expression + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Specified SQL]" + getLineSeparator() + sql + getLineSeparator();
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
-        throw new IllegalStateException(msg);
+        throw new ${glEndCommentNotFoundException}(msg);
     }
 
     protected void parseBindVariable() {
