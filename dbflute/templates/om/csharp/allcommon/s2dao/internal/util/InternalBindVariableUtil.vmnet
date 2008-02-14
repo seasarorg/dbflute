@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Seasar.Framework.Util;
+using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Impl;
 
 namespace ${glPackageBaseCommonS2DaoInternalUtil} {
 
@@ -50,7 +52,7 @@ namespace ${glPackageBaseCommonS2DaoInternalUtil} {
             return text.ToString();
         }
 
-        protected virtual string GetBindVariableText(object bindVariable) {
+        protected static string GetBindVariableText(object bindVariable) {
             if (bindVariable is INullable)
             {
                 INullable nullable = bindVariable as INullable;
@@ -84,11 +86,11 @@ namespace ${glPackageBaseCommonS2DaoInternalUtil} {
             {
                 if ((DateTime) bindVariable == ((DateTime) bindVariable).Date)
                 {
-                    return "'" + ((DateTime) bindVariable).ToString(SqlLogDateFormat) + "'";
+                    return "'" + ((DateTime) bindVariable).ToString(sqlLogDateFormat) + "'";
                 }
                 else
                 {
-                    return "'" + ((DateTime) bindVariable).ToString(SqlLogDateTimeFormat) + "'";
+                    return "'" + ((DateTime) bindVariable).ToString(sqlLogDateTimeFormat) + "'";
                 }
             }
             else if (bindVariable is bool)

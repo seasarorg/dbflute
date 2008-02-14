@@ -270,13 +270,13 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
     	}
     	
     	public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Type[] argTypes, Object[] args) {
-            final ICommandContext context;
+            ICommandContext context;
     		{
                 ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql);
                 INode node = parser.Parse();
                 ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
                 context = creator.CreateCommandContext(args);
-                node.accept(context);
+                node.Accept(context);
     		}
             String preparedSql = context.Sql;
     		return ${glInternalBindVariableUtil}.GetCompleteSql(preparedSql, context.BindVariables);

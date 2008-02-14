@@ -1,6 +1,8 @@
 
 using System;
-using Seasar.Dao.Impl;
+using Seasar.Dao;
+using Seasar.Dao.Context;
+
 
 namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
 
@@ -9,15 +11,15 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         // ===================================================================================
         //                                                                           Attribute
         //                                                                           =========
-        protected String[] argNames;
-        protected Type[] argTypes;
+        protected String[] _argNames;
+        protected Type[] _argTypes;
     
         // ===================================================================================
         //                                                                         Constructor
         //                                                                         ===========
     	public ${glInternalCommandContextCreator}(String[] argNames, Type[] argTypes) {
-    	    this.argNames = (argNames != null ? argNames : new String[0]);
-    	    this.argTypes = (argTypes != null ? argTypes : new Type[0]);
+    	    this._argNames = (argNames != null ? argNames : new String[0]);
+    	    this._argTypes = (argTypes != null ? argTypes : new Type[0]);
     	}
     	
         // ===================================================================================

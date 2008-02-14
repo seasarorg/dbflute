@@ -23,6 +23,7 @@ namespace ${glPackageNss} {
         //                                                                    Setup Select
         //                                                                    ============
 #foreach ($foreignKeys in $table.foreignKeys)
+#set ($tmpPropertyName = "${foreignKeys.foreignPropertyNameInitCap}")
 #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
         public ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName} With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
@@ -36,6 +37,7 @@ namespace ${glPackageNss} {
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
+#set ($tmpPropertyName = "${referrer.ReffererPropertyNameInitCapAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
         public ${referrer.referrerTableNestSelectSetupperTerminalClassName} With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();

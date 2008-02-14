@@ -128,7 +128,7 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                     Display SQL
         //                                                                     ===========
     	public static String ConvertConditionBean2DisplaySql(${glConditionBeanInterfaceName} cb) {
-    	    final String twoWaySql;
+    	    String twoWaySql;
     	    if (cb.IsLimitSelect_PKOnly()) {
     		    twoWaySql = cb.SqlClause.getClausePKOnly();
     		} else {
