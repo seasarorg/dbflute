@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         }
 
         protected void ParseToken() {
-            switch (_tokenizer.InternalTokenType) {
+            switch (_tokenizer.TokenType) {
                 case InternalTokenType.SQL:
                     ParseSql();
                     break;
@@ -171,7 +171,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             msg = msg + "    before (x) -- /*IF pmb.XxxId != null*/XXX_ID = /*pmb.XxxId*/3" + GetLineSeparator();
             msg = msg + "    after  (o) -- /*IF pmb.XxxId != null*/XXX_ID = /*pmb.XxxId*/3/*END*/" + GetLineSeparator();
             msg = msg + GetLineSeparator();
-            msg = msg + "[Specified SQL]" + GetLineSeparator() + specifiedSql + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + _specifiedSql + GetLineSeparator();
             msg = msg + "* * * * * * * * * */" + GetLineSeparator();
             throw new ${glEndCommentNotFoundException}(msg);
         }

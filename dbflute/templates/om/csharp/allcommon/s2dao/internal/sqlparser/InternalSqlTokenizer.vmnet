@@ -194,22 +194,39 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             return nextStartPos;
         }
 
-        protected string NextBindVariableName
-        {
-            get { return "$" + ++_bindVariableNum; }
+        protected string NextBindVariableName {
+            get { return "${database.dollar}" + ++_bindVariableNum; }
         }
 
-        protected void ParseComment()
-        {
+        protected void ParseComment() {
             int commentEndPos = _sql.IndexOf("*/", _position);
-            if (commentEndPos < 0)
-                throw new TokenNotClosedRuntimeException("*/",
-                    _sql.Substring(_position));
-
+            if (commentEndPos < 0) {
+				ThrowEndCommentNotFoundException(_sql.Substring(_position));
+			}
             _token = _sql.Substring(_position, (commentEndPos - _position));
             _nextTokenType = InternalTokenType.SQL;
             _position = commentEndPos + 2;
             _tokenType = InternalTokenType.COMMENT;
+        }
+
+
+        protected void ThrowEndCommentNotFoundException(String expression) {
+            String msg = "Look! Read the message below." + GetLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
+            msg = msg + "The end comment was Not Found!" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Advice]" + GetLineSeparator();
+            msg = msg + "Please confirm the parameter comment logic." + GetLineSeparator();
+            msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + GetLineSeparator();
+            msg = msg + "  For example:" + GetLineSeparator();
+            msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + GetLineSeparator();
+            msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[End Comment Expected Place]" + GetLineSeparator() + expression + GetLineSeparator();
+            msg = msg + GetLineSeparator();
+            msg = msg + "[Specified SQL]" + GetLineSeparator() + sql + GetLineSeparator();
+            msg = msg + "* * * * * * * * * */" + GetLineSeparator();
+            throw new ${glEndCommentNotFoundException}(msg);
         }
 
         protected void ParseBindVariable()
@@ -249,6 +266,14 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
             return index;
         }
 		
+
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected String GetLineSeparator() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
+        }
+
         // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========

@@ -8,6 +8,8 @@ using System.Threading;
 
 using Seasar.Framework.Util;
 
+using ${glPackageBaseCommonUtil};
+
 namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
     public class ${glOutsideSqlContextName} {
@@ -121,7 +123,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 return sql;
             }
             StringBuilder sb = new StringBuilder();
-            String[] lines = sql.Split(lineSeparator);
+            String[] lines = sql.Split(lineSeparator.ToCharArray());
             foreach (String line in lines) {
                 int lineCommentIndex = line.IndexOf("--");
                 if (lineCommentIndex < 0) {
@@ -135,7 +137,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 }
     			
                 if (_log.IsDebugEnabled) {
-                    _log.debug("...Replacing bind character on line comment: " + lineComment);
+                    _log.Debug("...Replacing bind character on line comment: " + lineComment);
                 }
                 String filteredLineComment = ReplaceString(lineComment, bindCharacter, "Q");
                 sb.Append(line.Substring(0, lineCommentIndex)).Append(filteredLineComment).Append(lineSeparator);
@@ -143,7 +145,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             return sb.ToString();
         }
 	
-        public String ReadOutsideSqlPath(String sqlFileEncoding, String dbmsSuffix) {
+        public String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
             String standardPath = _outsideSqlPath.Replace("/", ".");// Replacing is required for csharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
             Assembly asm = GetType().Assembly;// In same assembly!
