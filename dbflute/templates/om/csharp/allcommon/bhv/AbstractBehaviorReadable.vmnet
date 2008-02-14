@@ -109,24 +109,24 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                     Assert Result
         //                                     -------------
-        protected static void AssertEntityNotDeleted(${glEntityInterfaceName} entity, Object searchKey4Log) {
+        protected void AssertEntityNotDeleted(${glEntityInterfaceName} entity, Object searchKey4Log) {
             if (entity == null) {
                 ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
         }
 
-        protected static void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntityInterfaceName} {
             if (ls == null || ls.Count == 0) {
                 ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
         }
 
-        protected static void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntityInterfaceName} {
             if (ls == null || ls.Count == 0) {
 				${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
             if (ls.Count != 1) {
-			    ${glConditionBeanContextName}.ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, TableDbName, null);
+			    ${glConditionBeanContextName}.ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, null, TableDbName);
             }
         }
 

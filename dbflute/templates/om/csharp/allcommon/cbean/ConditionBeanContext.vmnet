@@ -52,11 +52,11 @@ namespace ${glPackageBaseCommonCBean} {
         // ===================================================================================
         //                                                                  Exception Handling
         //                                                                  ==================
-        public static void ThrowEntityAlreadyDeletedException(Object searchKey4log) {
-            ThrowEntityAlreadyDeletedException(searchKey4log, null);
+        public static void ThrowEntityAlreadyDeletedException(Object searchKey4Log) {
+            ThrowEntityAlreadyDeletedException(searchKey4Log, null);
         }
 
-        public static void ThrowEntityAlreadyDeletedException(Object searchKey4log, String tableDbName) {
+        public static void ThrowEntityAlreadyDeletedException(Object searchKey4Log, String tableDbName) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
             msg = msg + "The entity was Not Found! it has already been deleted!" + GetLineSeparator();
@@ -106,7 +106,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
         }
 
-        protected static String FilterDisplaySql(String displaySql, String tableDbName) {
+        private static String FilterDisplaySql(String displaySql, String tableDbName) {
             if (displaySql == null || displaySql.Trim().Length == 0) {
                 return null;
             }
