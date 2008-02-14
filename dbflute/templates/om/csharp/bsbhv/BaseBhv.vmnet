@@ -22,10 +22,6 @@ using ${glPackageCB};
 
 namespace ${glPackageExtendedBhv} {
 
-    /// <summary>
-    /// The behavior of ${table.Name}. (partial class for auto-generation)
-    /// Author : ${database.ClassAuthor}
-    /// </summary>
     [Implementation]
     public partial class ${myClassName} : ${glPackageBaseCommonBhv}.${myExtendClassName} {
 
@@ -33,7 +29,6 @@ namespace ${glPackageExtendedBhv} {
         //                                                                       Attribute
         //                                                                       =========
         #region Attribute
-        /// <summary>Dao instance.</summary>
         [Binding("${table.daoComponentName}")]
         protected ${myExtendedDaoClassName} _dao;
         #endregion
@@ -68,16 +63,9 @@ namespace ${glPackageExtendedBhv} {
         //                                                                    New Instance
         //                                                                    ============
         #region New Instance
-        /// <summary>New entity.</summary><returns>Entity. (NotNull)</returns>
         public override ${glEntityInterfaceName} NewEntity() { return NewMyEntity(); }
-
-        /// <summary>New conditionBean.</summary><returns>Condition-bean. (NotNull)</returns>
         public override ${glConditionBeanInterfaceName} NewConditionBean() { return NewMyConditionBean(); }
-
-        /// <summary>New my entity.</summary><returns>My conditionBean. (NotNull)</returns>
         public virtual ${myExtendedObjectClassName} NewMyEntity() { return new ${myExtendedObjectClassName}(); }
-
-        /// <summary>New my conditionBean.</summary><returns>My conditionBean. (NotNull)</returns>
         public virtual ${myConditionBeanClassName} NewMyConditionBean() { return new ${myConditionBeanClassName}(); }
         #endregion
 
@@ -85,22 +73,11 @@ namespace ${glPackageExtendedBhv} {
         //                                                                    Basic Select
         //                                                                    ============
         #region Basic Select
-        /// <summary>
-        /// Select the count by conditionBean.
-        /// </summary>
-        /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
-        /// <returns>The selected count. (NotNull)</returns>
         public virtual int SelectCount(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return this.DelegateSelectCount(cb);
         }
 
-        /// <summary>
-        /// Select the entity by conditionBean.
-        /// </summary>
-        /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
-        /// <returns>The selected entity. (Nullalble)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public virtual ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
@@ -109,13 +86,6 @@ namespace ${glPackageExtendedBhv} {
             return (${myExtendedObjectClassName})ls[0];
         }
 
-        /// <summary>
-        /// Select the entity by conditionBean with deleted check.
-        /// </summary>
-        /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
-        /// <returns>The selected entity. (NotNull)</returns>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has been deleted by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public virtual ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
@@ -135,21 +105,11 @@ namespace ${glPackageExtendedBhv} {
 //        }
 #end
 
-        /// <summary>
-        /// Select the list.
-        /// </summary>
-        /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
-        /// <returns>The result-bean of selected list. (NotNull)</returns>
         public virtual ${glListResultBeanName}<${myExtendedObjectClassName}> SelectList(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             return new ResultBeanBuilder<${myExtendedObjectClassName}>(TableDbName).BuildListResultBean(cb, this.DelegateSelectList(cb));
         }
 
-        /// <summary>
-        /// Select the page.
-        /// </summary>
-        /// <param name="cb">The conditionBean of ${myExtendedObjectClassName}. (NotNull)</param>
-        /// <returns>The result-bean of selected page. (NotNull)</returns>
         public virtual ${glPagingResultBeanName}<${myExtendedObjectClassName}> SelectPage(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
             PagingInvoker<${myExtendedObjectClassName}> invoker = new PagingInvoker<${myExtendedObjectClassName}>(TableDbName);
@@ -237,22 +197,11 @@ namespace ${glPackageExtendedBhv} {
         //                                                             Basic Entity Update
         //                                                             ===================
         #region Basic Entity Update
-        /// <summary>
-        /// Insert the entity.
-        /// </summary>
-        /// <param name="entity">The entity of insert target. (NotNull)</param>
         public virtual void Insert(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             this.DelegateInsert(entity);
         }
 
-        /// <summary>
-        /// Update the entity modified-only.
-        /// </summary>
-        /// <param name="entity">The entity of update target. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public virtual void Update(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int updatedCount = this.DelegateUpdate(entity);
@@ -260,12 +209,6 @@ namespace ${glPackageExtendedBhv} {
         }
 
 #if ($table.hasOptimisticLock())
-        /// <summary>
-        /// Update the entity non-strictly modified-only.
-        /// </summary>
-        /// <param name="entity">The entity of update target. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public virtual void UpdateNonstrict(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int updatedCount = this.DelegateUpdateNonstrict(entity);
@@ -273,13 +216,6 @@ namespace ${glPackageExtendedBhv} {
         }
 #end
 
-        /// <summary>
-        /// Insert or update the entity.
-        /// </summary>
-        /// <param name="entity">The entity of insert or update target. This must contain primary-key value at least. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
 // TODO: @jflute - In development
 //        public virtual void InsertOrUpdate(${myExtendedObjectClassName} entity) {
 //            AssertEntityNotNull(entity);
@@ -295,13 +231,6 @@ namespace ${glPackageExtendedBhv} {
 //            }
 //        }
 
-        /// <summary>
-        /// Delete the entity.
-        /// </summary>
-        /// <param name="entity">The entity of delete target. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException}">When the entity has already been updated by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public virtual void Delete(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int deletedCount = this.DelegateDelete(entity);
@@ -309,12 +238,6 @@ namespace ${glPackageExtendedBhv} {
         }
 
 #if ($table.hasOptimisticLock())
-        /// <summary>
-        /// Delete the entity non-strictly.
-        /// </summary>
-        /// <param name="entity">The entity of delete target. (NotNull)</param>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}">When the entity has already been deleted by other thread.</exception>
-        /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         public virtual void DeleteNonstrict(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             int deletedCount = this.DelegateDeleteNonstrict(entity);

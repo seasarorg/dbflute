@@ -109,29 +109,24 @@ namespace ${glPackageBaseCommonBhv} {
         // -------------------------------------------------
         //                                     Assert Result
         //                                     -------------
-        protected static void AssertEntityNotDeleted(${glEntityInterfaceName} entity, Object searchKey4log) {
+        protected static void AssertEntityNotDeleted(${glEntityInterfaceName} entity, Object searchKey4Log) {
             if (entity == null) {
-                String msg = "The entity has already been deleted by other thread: searchKey=" + searchKey4log;
-                throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+                ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
         }
 
-        protected static void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4log) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected static void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntityInterfaceName} {
             if (ls == null || ls.Count == 0) {
-                String msg = "The entity has already been deleted by other thread: searchKey=" + searchKey4log;
-                throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+                ${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
         }
 
-        protected static void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4log) where ENTITY_TYPE : ${glEntityInterfaceName} {
+        protected static void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntityInterfaceName} {
             if (ls == null || ls.Count == 0) {
-                String msg = "The entity has already been deleted by other thread: searchKey=" + searchKey4log;
-                throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
+				${glConditionBeanContextName}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
             }
             if (ls.Count != 1) {
-                String msg = "This selected contents should be only one: searchKey=" + searchKey4log;
-                msg = msg + " resultCount=" + ls.Count;
-                throw new ${glPackageBaseCommonException}.${glEntityDuplicatedException}(msg);
+			    ${glConditionBeanContextName}.ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, TableDbName, null);
             }
         }
 
