@@ -82,7 +82,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         if (tableName.indexOf("-") >= 0) {
             tableName = tableName.substring(tableName.indexOf("-") + "-".length());
         }
-        final Map columnMap = getColumnMap(tableName, _dataSource);
+        final Map<?, ?> columnMap = getColumnMap(tableName, _dataSource);
         if (columnMap.isEmpty()) {
             String msg = "The tableName[" + tableName + "] was not found: filename=" + _filename;
             throw new IllegalStateException(msg);
@@ -467,7 +467,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         return firstLineInformation;
     }
 
-    protected Map getColumnMap(String tableName, DataSource dataSource) {
+    protected Map<?, ?> getColumnMap(String tableName, DataSource dataSource) {
         final Connection connection;
         final DatabaseMetaData dbMetaData;
         try {
@@ -476,7 +476,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        final Map columnMap = DatabaseMetaDataUtil.getColumnMap(dbMetaData, tableName);
+        final Map<?, ?> columnMap = DatabaseMetaDataUtil.getColumnMap(dbMetaData, tableName);
         return columnMap;
     }
 

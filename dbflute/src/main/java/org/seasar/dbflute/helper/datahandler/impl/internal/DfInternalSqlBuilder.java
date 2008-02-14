@@ -12,11 +12,11 @@ import java.util.Set;
  */
 public class DfInternalSqlBuilder {
 
-    // ===================================================================================
+    //====================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableName;
-    protected Map _columnMap;
+    protected Map<?, ?> _columnMap;
     protected List<String> _columnNameList;
     protected List<String> _valueList;
     protected Map<String, Set<String>> _notFoundColumnMap;
@@ -163,11 +163,11 @@ public class DfInternalSqlBuilder {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map getColumnMap() {
+    public Map<?, ?> getColumnMap() {
         return _columnMap;
     }
 
-    public void setColumnMap(Map columnMap) {
+    public void setColumnMap(Map<?, ?> columnMap) {
         this._columnMap = columnMap;
     }
 

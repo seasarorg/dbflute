@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommonJdbc};
 
 /**
  * The interface of statement history witness.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glCursorHandlerName} {

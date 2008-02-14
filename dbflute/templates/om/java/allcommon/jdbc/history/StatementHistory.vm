@@ -4,6 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonJdbcHistory};
  * The history of statement.
  * 
  * @author ${database.ClassAuthor}
+ * @deprecated Please use SqlLogRegistry
  */
 public class ${glStatementHistoryName} {
 

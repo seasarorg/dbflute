@@ -4,6 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonJdbcHistory};
  * The element of prepared parameters.
  * 
  * @author ${database.ClassAuthor}
+ * @deprecated Please use SqlLogRegistry
  */
 public class ${glPreparedParameterElementName} {
 

@@ -4,6 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonJdbcHistory};
  * The bean of prepared execution.
  * 
  * @author ${database.ClassAuthor}
+ * @deprecated Please use SqlLogRegistry
  */
 public class ${glPreparedExecutionBeanName} {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007 the Seasar Foundation and the Others.
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,19 +27,18 @@ import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
  */
 public class DfDatabaseConfig {
 
-    //========================================================================================
-    //                                                                               Attribute
-    //                                                                               =========
+    //====================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _databaseBaseInfo;
 
     protected Map<String, Map<String, String>> _databaseBaseInfoOgnlTest;
 
-    //========================================================================================
-    //                                                                               Analyzing
-    //                                                                               =========
+    //====================================================================================
+    //                                                                           Analyzing
+    //                                                                           =========
     /**
      * Analyze database base-info.
-     * 
      * @return Database base-info. (NotNull)
      */
     public Map<String, Map<String, String>> analyzeDatabaseBaseInfo() {
@@ -49,10 +48,9 @@ public class DfDatabaseConfig {
         final Map<String, Map<String, String>> realMap = new LinkedHashMap<String, Map<String, String>>();
         final Set<String> keySet = map.keySet();
         for (String key : keySet) {
-            final Map elementMap = (Map) map.get(key);
+            final Map<?, ?> elementMap = (Map<?, ?>) map.get(key);
             final Map<String, String> elementRealMap = new LinkedHashMap<String, String>();
-
-            final Set elementKeySet = elementMap.keySet();
+            final Set<?> elementKeySet = elementMap.keySet();
             for (Object elementKey : elementKeySet) {
                 final Object elementValue = elementMap.get(elementKey);
                 elementRealMap.put((String) elementKey, (String) elementValue);

@@ -26,6 +26,7 @@ import java.util.Calendar;
  * The implementation of prepared statement as traceable prepared statement.
  * 
  * @author ${database.ClassAuthor}
+ * @deprecated Please use SqlLogRegistry
  */
 public class ${glTraceablePreparedStatementName} implements PreparedStatement {
 

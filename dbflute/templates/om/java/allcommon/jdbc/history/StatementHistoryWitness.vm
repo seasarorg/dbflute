@@ -4,6 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonJdbcHistory};
  * The interface of statement history witness.
  * 
  * @author ${database.ClassAuthor}
+ * @deprecated Please use SqlLogRegistry
  */
 public interface ${glStatementHistoryWitnessName} {
 
