@@ -2134,7 +2134,7 @@ targetdatabase = $targetDatabase
         #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
 
-		#if (($database.isTargetLanguageJava() && $database.isJavaVersionGreaterEqualTiger() && $database.isVersionAfter1047()) || $database.isTargetLanguageCSharp())
+		#if ($database.isTargetLanguageCSharp())
 		  #set ( $path = "${strings.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperTerminalClassName}.${glClassFileExtension}" )
           $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupperTerminal.${glTemplateFileExtension}", $path, "table", $table)
 		#end
