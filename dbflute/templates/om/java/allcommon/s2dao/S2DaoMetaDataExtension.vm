@@ -1279,6 +1279,30 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected static class RelationRowCreatorExtension extends org.seasar.dao.impl.RelationRowCreatorImpl {
 	
         @Override
+        protected void setupRelationAllValue(RelationRowCreationResource res) throws SQLException {
+            final Map propertyCacheElement = res.extractPropertyCacheElement();
+            final Set columnNameCacheElementKeySet = propertyCacheElement.keySet();
+            for (final Iterator ite = columnNameCacheElementKeySet.iterator(); ite.hasNext();) {
+                final String columnName = (String) ite.next();
+                final PropertyType pt = (PropertyType) propertyCacheElement.get(columnName);
+                res.setCurrentPropertyType(pt);
+                if (!isValidRelationPerPropertyLoop(res)) {
+                    res.clearRowInstance();
+                    return;
+                }
+                setupRelationProperty(res);
+            }
+            if (!isValidRelationAfterPropertyLoop(res)) {
+                res.clearRowInstance();
+                return;
+            }
+            res.clearValidValueCount();
+            if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
+                setupNextRelationRow(res);
+            }
+        }
+		
+        @Override
         protected void registerRelationValue(RelationRowCreationResource res, String columnName) throws SQLException {
             final PropertyType pt = res.getCurrentPropertyType();
             Object value = null;
@@ -1317,13 +1341,13 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             // - - - - - - - - - - -
             res.initializePropertyCacheElement();
     
-			// Do only selected foreign property for performance.
-			if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
-			    final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-				if (!cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
-				    return;
-				}
-			}
+			// Do only selected foreign property for performance if condition-bean exists.
+            if (hasConditionBean(res)) {
+                final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+                if (!cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
+                    return;
+                }
+            }
 			
 			// Set up property cache about current beanMetaData.
             final BeanMetaData nextBmd = res.getRelationBeanMetaData();
@@ -1337,7 +1361,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
 			
 			// Set up next relation.
-            if (res.hasNextRelationProperty() && res.hasNextRelationLevel()) {
+            if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
                 res.backupRelationPropertyType();
                 res.incrementCurrentRelationNestLevel();
                 try {
@@ -1365,10 +1389,10 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         protected boolean isCreateDeadLink() {
             return false;
         }
-
+		
 		@Override
         protected int getLimitRelationNestLevel() {
-            return 3;
+            return 2;// for Compatible
         }
 		
         @Override
@@ -1384,6 +1408,20 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             res.setLimitRelationNestLevel(limitRelationNestLevel);
             res.setCurrentRelationNestLevel(1);// as Default
             return res;
+        }
+		
+        protected boolean isConditionBeanSelectedRelation(RelationRowCreationResource res) {
+            if (hasConditionBean(res)) {
+                final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
+                if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+		
+        protected boolean hasConditionBean(RelationRowCreationResource res) {
+            return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
         }
     }
 	

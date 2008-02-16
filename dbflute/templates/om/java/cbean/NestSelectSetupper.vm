@@ -38,7 +38,7 @@ public class ${myClassName} {
 #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
 
 #if ($database.isVersionAfter1047())
-    public ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName} with${tmpPropertyNameInitCap}() {
+    public ${foreignKeys.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
 #else
     public void with${tmpPropertyNameInitCap}() {
 #end
@@ -48,7 +48,7 @@ public class ${myClassName} {
 		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
 		_query.getSqlClause().registerSelectedForeignInfo(_query.query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
 #if ($database.isVersionAfter1047())
-		return new ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName}(_query.query${tmpPropertyNameInitCap}());
+		return new ${foreignKeys.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
 #end
     }
 #end
@@ -62,7 +62,7 @@ public class ${myClassName} {
 #set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
 
 #if ($database.isVersionAfter1047())
-    public ${referrer.referrerTableNestSelectSetupperTerminalClassName} with${tmpPropertyNameInitCap}() {
+    public ${referrer.referrerTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
 #else
 	public void with${tmpPropertyNameInitCap}() {
 #end
@@ -72,7 +72,7 @@ public class ${myClassName} {
 		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
 		_query.getSqlClause().registerSelectedForeignInfo(_query.query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
 #if ($database.isVersionAfter1047())
-		return new ${referrer.referrerTableNestSelectSetupperTerminalClassName}(_query.query${tmpPropertyNameInitCap}());
+		return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
 #end
     }
 #end
