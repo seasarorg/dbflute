@@ -62,8 +62,8 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 #end
 
 #if ($database.isVersionAfter1047())
-	/** The lock monitor of dao meta data initialization. */
-	protected Object _daoMetaDataInitializationLockMonitor = new Object();
+    /** The lock monitor of dao meta data initialization. */
+    protected Object _daoMetaDataInitializationLockMonitor = new Object();
 #end
 
     // ===================================================================================
@@ -93,19 +93,19 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
         initializeDatabaseProductNameOfContext(xaDataSource);
 
-		final StringBuilder sb = new StringBuilder();
-		sb.append("{SqlLog Information}").append(getLineSeparator());
-		sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-		final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
-		if (sqlLogRegistry != null) {
-		    ${glInternalSqlLogRegistry}.closeRegistration();
-			sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
-			sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
-		} else {
-			sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
-		}
-		_log.info(sb);
-		${glDBFluteConfig}.getInstance().lock();
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{SqlLog Information}").append(getLineSeparator());
+        sb.append("  [SqlLogRegistry]").append(getLineSeparator());
+        final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+        if (sqlLogRegistry != null) {
+            ${glInternalSqlLogRegistry}.closeRegistration();
+            sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
+            sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
+        } else {
+            sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
+        }
+        _log.info(sb);
+        ${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
     }
 
@@ -187,69 +187,69 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 #end
 
 #if ($database.isVersionAfter1047())
-	@SuppressWarnings("unchecked")
-	@Override
+    @SuppressWarnings("unchecked")
+    @Override
     public DaoMetaData getDaoMetaData(final Class daoClass) {
         if (!initialized) {
             DisposableUtil.add(this);
             initialized = true;
         }
         final String key = daoClass.getName();
-		
-		// [A]
+        
+        // [A]
         DaoMetaData dmd = getSynchronizedDaoMetaDataCache(key);
-		
-		// [B]
+        
+        // [B]
         if (dmd != null) {
             return dmd;
         }
-		
-		// [C]
-		synchronized (_daoMetaDataInitializationLockMonitor) {// One Thread Only Entered
-		    // [D]
-		    dmd = getSynchronizedDaoMetaDataCache(key);
-			// [E]
-			if (dmd != null) {
-			    // The second thread that stops at [C] can find
-				// because the first thread have already initialized.
-				if (_log.isDebugEnabled()) {
-				    _log.debug("...Getting daoMetaData as cache because the previous thread have already initilized.");
-				}
+        
+        // [C]
+        synchronized (_daoMetaDataInitializationLockMonitor) {// One Thread Only Entered
+            // [D]
+            dmd = getSynchronizedDaoMetaDataCache(key);
+            // [E]
+            if (dmd != null) {
+                // The second thread that stops at [C] can find
+                // because the first thread have already initialized.
+                if (_log.isDebugEnabled()) {
+                    _log.debug("...Getting daoMetaData as cache because the previous thread have already initilized.");
+                }
                 return dmd;
             }
-			// [F]
-			if (_log.isDebugEnabled()) {
-			    _log.debug("...Initializing daoMetaData.");
-			}
+            // [F]
+            if (_log.isDebugEnabled()) {
+                _log.debug("...Initializing daoMetaData.");
+            }
             final DaoMetaData dmdi = createDaoMetaData(daoClass);
-			putSynchronizedDaoMetaDataCache(key, dmdi);
-		}
-		// [G]
-	    dmd = getSynchronizedDaoMetaDataCache(key);
+            putSynchronizedDaoMetaDataCache(key, dmdi);
+        }
+        // [G]
+        dmd = getSynchronizedDaoMetaDataCache(key);
         if (dmd != null) {
-			if (_log.isDebugEnabled()) {
-			    _log.debug("...Confirming that daoMetaData have been certainly initialized and cached.");
-			}
+            if (_log.isDebugEnabled()) {
+                _log.debug("...Confirming that daoMetaData have been certainly initialized and cached.");
+            }
             return dmd;
         }
-		String msg = "The cache should have data meta data here: key=" + key + " cache=" + daoMetaDataCache;
+        String msg = "The cache should have data meta data here: key=" + key + " cache=" + daoMetaDataCache;
         throw new IllegalStateException(msg);
     }
-	
-	@SuppressWarnings("unchecked")
-	protected void putSynchronizedDaoMetaDataCache(String key, DaoMetaData dmd) {
-		synchronized (daoMetaDataCache) {
-	        daoMetaDataCache.put(key, dmd);
-		}
-	}
-	
-	protected DaoMetaData getSynchronizedDaoMetaDataCache(String key) {
-	    DaoMetaData dmd = null;
-		synchronized (daoMetaDataCache) {
-	        dmd = (DaoMetaData) daoMetaDataCache.get(key);
-		}
-		return dmd;
-	}
+    
+    @SuppressWarnings("unchecked")
+    protected void putSynchronizedDaoMetaDataCache(String key, DaoMetaData dmd) {
+        synchronized (daoMetaDataCache) {
+            daoMetaDataCache.put(key, dmd);
+        }
+    }
+    
+    protected DaoMetaData getSynchronizedDaoMetaDataCache(String key) {
+        DaoMetaData dmd = null;
+        synchronized (daoMetaDataCache) {
+            dmd = (DaoMetaData) daoMetaDataCache.get(key);
+        }
+        return dmd;
+    }
 #end
 
 #if ($database.isAvailableOtherConnectionDaoInitialization())
@@ -300,7 +300,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         dmdExtension.setTableNaming(tableNaming);
 #end
         dmdExtension.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
-		dmdExtension.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
+        dmdExtension.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return dmdExtension;
     }
 #end
