@@ -219,7 +219,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             }
             // [F]
             if (_log.isDebugEnabled()) {
-                _log.debug("...Initializing daoMetaData.");
+                _log.debug("...Creating daoMetaData.");
             }
             final DaoMetaData dmdi = createDaoMetaData(daoClass);
             putSynchronizedDaoMetaDataCache(key, dmdi);
