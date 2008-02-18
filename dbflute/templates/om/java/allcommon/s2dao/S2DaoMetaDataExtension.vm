@@ -138,6 +138,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     /** The config of dbflute. {Since DBFlute-0.6.2} */
 	protected ${glStatementConfig} _defaultStatementConfig;
 	
+	/** The lock monitor of method initialization. */
+	protected Object _methodInitializationLockMonitor = new Object();
+	
     /** The determination of internal debug. {Since DBFlute-0.6.2} */
 	protected boolean _internalDebug;
 
@@ -289,14 +292,21 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 
     @Override
     public SqlCommand getSqlCommand(String methodName) throws MethodNotFoundRuntimeException {
-        final SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
+        SqlCommand cmd = (SqlCommand) sqlCommands.get(methodName);
         if (cmd != null) {
             return cmd;
         }
         if (_internalDebug) {
-            _log.debug("...initializing sqlCommand: " + methodName);
+            _log.debug("...Initializing sqlCommand: " + methodName);
         }
-        return initializeSqlCommand(methodName);
+		synchronized (_methodInitializationLockMonitor) {
+			cmd = (SqlCommand) sqlCommands.get(methodName);
+            if (cmd != null) {
+                return cmd;
+            }
+            cmd = initializeSqlCommand(methodName);
+		}
+		return cmd;
     }
 
     protected SqlCommand initializeSqlCommand(String methodName) throws MethodNotFoundRuntimeException {

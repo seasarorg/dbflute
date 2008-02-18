@@ -8,10 +8,12 @@ import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.StatementFactory;
 
 #if ($database.isVersionAfter1047())
+import org.seasar.dao.DaoMetaData;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
 import org.seasar.dao.TableNaming;
 import org.seasar.dao.ColumnNaming;
+import org.seasar.framework.util.DisposableUtil;
 #end
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
@@ -57,6 +59,11 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 #if ($database.isAvailableOtherConnectionDaoInitialization())
     /** The transaction manager for other connection dao initialization. */
     protected javax.transaction.TransactionManager transactionManager;
+#end
+
+#if ($database.isVersionAfter1047())
+	/** The lock monitor of dao meta data initialization. */
+	protected Object _daoMetaDataInitializationLockMonitor = new Object();
 #end
 
     // ===================================================================================
@@ -177,6 +184,72 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             resultSetHandlerFactory = factory;
         }
     }
+#end
+
+#if ($database.isVersionAfter1047())
+	@SuppressWarnings("unchecked")
+	@Override
+    public DaoMetaData getDaoMetaData(final Class daoClass) {
+        if (!initialized) {
+            DisposableUtil.add(this);
+            initialized = true;
+        }
+        final String key = daoClass.getName();
+		
+		// [A]
+        DaoMetaData dmd = getSynchronizedDaoMetaDataCache(key);
+		
+		// [B]
+        if (dmd != null) {
+            return dmd;
+        }
+		
+		// [C]
+		synchronized (_daoMetaDataInitializationLockMonitor) {// One Thread Only Entered
+		    // [D]
+		    dmd = getSynchronizedDaoMetaDataCache(key);
+			// [E]
+			if (dmd != null) {
+			    // The second thread that stops at [C] can find
+				// because the first thread have already initialized.
+				if (_log.isDebugEnabled()) {
+				    _log.debug("...Getting daoMetaData as cache because the previous thread have already initilized.");
+				}
+                return dmd;
+            }
+			// [F]
+			if (_log.isDebugEnabled()) {
+			    _log.debug("...Initializing daoMetaData.");
+			}
+            final DaoMetaData dmdi = createDaoMetaData(daoClass);
+			putSynchronizedDaoMetaDataCache(key, dmdi);
+		}
+		// [G]
+	    dmd = getSynchronizedDaoMetaDataCache(key);
+        if (dmd != null) {
+			if (_log.isDebugEnabled()) {
+			    _log.debug("...Confirming that daoMetaData have been certainly initialized and cached.");
+			}
+            return dmd;
+        }
+		String msg = "The cache should have data meta data here: key=" + key + " cache=" + daoMetaDataCache;
+        throw new IllegalStateException(msg);
+    }
+	
+	@SuppressWarnings("unchecked")
+	protected void putSynchronizedDaoMetaDataCache(String key, DaoMetaData dmd) {
+		synchronized (daoMetaDataCache) {
+	        daoMetaDataCache.put(key, dmd);
+		}
+	}
+	
+	protected DaoMetaData getSynchronizedDaoMetaDataCache(String key) {
+	    DaoMetaData dmd = null;
+		synchronized (daoMetaDataCache) {
+	        dmd = (DaoMetaData) daoMetaDataCache.get(key);
+		}
+		return dmd;
+	}
 #end
 
 #if ($database.isAvailableOtherConnectionDaoInitialization())

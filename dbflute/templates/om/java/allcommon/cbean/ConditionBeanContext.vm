@@ -1,5 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,6 +67,7 @@ public class ${glConditionBeanContextName} {
     // ===================================================================================
     //                                         Initialize against the ClassLoader Headache
     //                                         ===========================================
+	@SuppressWarnings("unused")
     public static void initialize() {
         boolean debugEnabled = _log.isDebugEnabled();
         // Against the ClassLoader Headache!
@@ -71,39 +76,21 @@ public class ${glConditionBeanContextName} {
             final Class<?> clazz = ${glPackageBaseCommonCBean}.${glSimplePagingBeanName}.class;
             if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
         }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
+		{
+            Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionFromToName}.class;
+            clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
+            clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
+            clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName}.class;
+            clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName}.class;
+            clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName}.class;
+            clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName}.class;
+            clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName}.class;
+            clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName}.class;
+#if ($database.isVersionAfter1047())
+            clazz = ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class;
+#end
             if (debugEnabled) { sb.append("  ...Loading class of ...and so on"); }
         }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName}.class;
-        }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCOption}.${glConditionOptionInScopeName}.class;
-        }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName}.class;
-        }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName}.class;
-        }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName}.class;
-        }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName}.class;
-        }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName}.class;
-        }
-        {
-            final Class<?> clazz = ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName}.class;
-        }
-#if ($database.isVersionAfter1047())
-        {
-            final Class<?> clazz = ${glPackageBaseCommonJdbc}.${glCursorHandlerName}.class;
-        }
-#end
         if (debugEnabled) { 
             _log.debug("{Initialize against the ClassLoader Headache}" + getLineSeparator() + sb);
         }
@@ -141,26 +128,6 @@ public class ${glConditionBeanContextName} {
     }
 
     // ===================================================================================
-    //                                                                        Column Alias
-    //                                                                        ============
-    public static final java.util.Map<Class<?>, java.util.Map<String, String>> _selectClauseColumnAliasContainerMap = new java.util.HashMap<Class<?>, java.util.Map<String, String>>();
-
-    public static void addColumnAliasInfo(Class<?> conditionBeanClass, String columnFullName, String columnAliasName) {
-        if (_selectClauseColumnAliasContainerMap.containsKey(conditionBeanClass)) {
-            final java.util.Map<String, String> selectClauseColumnAliasMap = (java.util.Map<String, String>)_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
-            selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
-        } else {
-            final java.util.Map<String, String> selectClauseColumnAliasMap = new java.util.HashMap<String, String>();
-            _selectClauseColumnAliasContainerMap.put(conditionBeanClass, selectClauseColumnAliasMap);
-            selectClauseColumnAliasMap.put(columnFullName, columnAliasName);
-        }
-    }
-
-    public static java.util.Map<String, String> getSelectClauseColumnAliasMap(Class<?> conditionBeanClass) {
-        return (java.util.Map<String, String>)_selectClauseColumnAliasContainerMap.get(conditionBeanClass);
-    }
-
-    // ===================================================================================
     //                                                                        Product Name
     //                                                                        ============
     public static final String DB_NAME_DERBY = "derby";
@@ -173,10 +140,9 @@ public class ${glConditionBeanContextName} {
     public static final String DB_NAME_SYBASE = "sybase";
     public static final String DB_NAME_DB2 = "db2";
 
-    protected static final java.util.Map<String, String> _driverHintDatabaseProductNameMap;
-    protected static final java.util.List<String> _targetDatabaseProductNameList = new java.util.ArrayList<String>();
+    protected static final Map<String, String> _driverHintDatabaseProductNameMap;
     static {
-        final java.util.Map<String, String> tmpMap = new java.util.LinkedHashMap<String, String>();
+        final Map<String, String> tmpMap = Collections.synchronizedMap(new LinkedHashMap<String, String>());
         tmpMap.put("org.apache.derby", DB_NAME_DERBY);
         tmpMap.put("org.h2", DB_NAME_H2);
         tmpMap.put("oracle", DB_NAME_ORACLE);
