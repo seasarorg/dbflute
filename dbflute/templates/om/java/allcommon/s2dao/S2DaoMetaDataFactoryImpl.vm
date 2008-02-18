@@ -227,9 +227,6 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         // [G]
         dmd = getSynchronizedDaoMetaDataCache(key);
         if (dmd != null) {
-            if (_log.isDebugEnabled()) {
-                _log.debug("...Confirming that daoMetaData have been certainly initialized and cached.");
-            }
             return dmd;
         }
         String msg = "The cache should have data meta data here: key=" + key + " cache=" + daoMetaDataCache;

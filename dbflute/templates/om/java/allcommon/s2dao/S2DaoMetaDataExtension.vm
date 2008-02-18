@@ -296,13 +296,16 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (cmd != null) {
             return cmd;
         }
-        if (_internalDebug) {
-            _log.debug("...Initializing sqlCommand: " + methodName);
-        }
         synchronized (_methodInitializationLockMonitor) {
             cmd = (SqlCommand) sqlCommands.get(methodName);
             if (cmd != null) {
+                if (_log.isDebugEnabled()) {
+                    _log.debug("...Getting sqlCommand as cache because the previous thread have already initilized.");
+                }
                 return cmd;
+            }
+            if (_log.isDebugEnabled()) {
+                _log.debug("...Initializing sqlCommand.");
             }
             cmd = initializeSqlCommand(methodName);
         }
