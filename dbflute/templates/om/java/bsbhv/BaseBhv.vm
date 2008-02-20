@@ -5,13 +5,11 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 import java.util.List;
 
 import ${glPackageBaseCommon}.*;
-#if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonBhvSetup}.${glConditionBeanSetupperName};
 import ${glPackageBaseCommonBhvSetup}.${glValueLabelSetupperName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyArrangerName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyBasicRequestName};
 import ${glPackageBaseCommonDBMetaHierarchy}.${glHierarchyRequestName};
-#end
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
@@ -20,10 +18,9 @@ import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingResultBeanName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 #if (${table.hasOnlyOnePrimaryKey()})
-  #if (${table.hasReferrer()})
-
+#if (${table.hasReferrer()})
 import ${glPackageExtendedBhv}.*;
-  #end
+#end
 #end
 
 import ${glPackageExtendedDao}.*;
@@ -41,7 +38,6 @@ import ${glPackageCB}.*;
 
 /**
  * The behavior of ${table.name}.
- * 
  * <pre>
  * [primary-key]
  *     ${table.PrimaryKeyNameCommaString}
@@ -68,7 +64,6 @@ import ${glPackageCB}.*;
  *     ${table.VersionNoJavaName}
  * 
  * </pre>
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExtendClassName} {
@@ -76,142 +71,47 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Dao instance. */
     protected ${myExtendedDaoClassName} _dao;
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    public ${myClassName}() {
-    }
 
     // ===================================================================================
     //                                                                          Table name
     //                                                                          ==========
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Table db-name. (NotNull)
-     */
-    public String getTableDbName() {
-        return "${table.Name}";
-    }
+    /** @return The name on database of table. (NotNull) */
+    public String getTableDbName() { return "${table.name}"; }
 
     // ===================================================================================
     //                                                                              DBMeta
     //                                                                              ======
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return DBMeta. (NotNull)
-     */
-    public ${glDBMetaInterfaceName} getDBMeta() {
-        return ${myDBMetaClassName}.getInstance();
-    }
+    /** @return The meta data of the database. (NotNull) */
+    public ${glDBMetaInterfaceName} getDBMeta() { return ${myDBMetaClassName}.getInstance(); }
 
-    /**
-     * Get my dbmeta.
-     * 
-     * @return DBMeta. (NotNull)
-     */
-    public ${myDBMetaClassName} getMyDBMeta() {
-        return ${myDBMetaClassName}.getInstance();
-    }
+    /** @return The meta data of the database as my table type. (NotNull) */
+    public ${myDBMetaClassName} getMyDBMeta() { return ${myDBMetaClassName}.getInstance(); }
 
     // ===================================================================================
     //                                                                        Dao Accessor
     //                                                                        ============
-    /**
-     * Get my dao.
-     * 
-     * @return My dao.
-     */
-    public ${myExtendedDaoClassName} getMyDao() {
-        return _dao;
-    }
-
-    /**
-     * Set my dao.
-     * 
-     * @param dao My dao. (NotNull)
-     */
-    public void setMyDao(${myExtendedDaoClassName} dao) {
-        assertObjectNotNull("dao", dao);
-        _dao = dao;
-    }
-
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Dao-readable. (NotNull)
-     */
-    public ${glDaoReadableInterfaceName} getDaoReadable() {
-        return getMyDao();
-    }
-
+    public ${myExtendedDaoClassName} getMyDao() { return _dao; }
+    public void setMyDao(${myExtendedDaoClassName} dao) { assertObjectNotNull("dao", dao); _dao = dao; }
+    public ${glDaoReadableInterfaceName} getDaoReadable() { return getMyDao(); }
 #if ($table.isWritable())
-    /**
-     * ${database.ImplementComment}
-     * 
-     * @return Dao-writable. (NotNull)
-     */
-    public ${glDaoWritableInterfaceName} getDaoWritable() {
-        return getMyDao();
-    }
+    public ${glDaoWritableInterfaceName} getDaoWritable() { return getMyDao(); }
 #end
 
     // ===================================================================================
     //                                                                        New Instance
     //                                                                        ============
-    /**
-     * New entity.
-     * 
-     * @return Entity. (NotNull)
-     */
-    public ${glEntityInterfaceName} newEntity() {
-        return newMyEntity();
-    }
-
-    /**
-     * New conditionBean.
-     * 
-     * @return Condition-bean. (NotNull)
-     */
-    public ${glConditionBeanInterfaceName} newConditionBean() {
-        return newMyConditionBean();
-    }
-
-    /**
-     * New my entity.
-     * 
-     * @return My entity. (NotNull)
-     */
-    public ${myExtendedObjectClassName} newMyEntity() {
-        return new ${myExtendedObjectClassName}();
-    }
-
-    /**
-     * New my conditionBean.
-     * 
-     * @return My conditionBean. (NotNull)
-     */
-    public ${myConditionBeanClassName} newMyConditionBean() {
-        return new ${myConditionBeanClassName}();
-    }
+    public ${glEntityInterfaceName} newEntity() { return newMyEntity(); }
+    public ${glConditionBeanInterfaceName} newConditionBean() { return newMyConditionBean(); }
+    public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
+    public ${myConditionBeanClassName} newMyConditionBean() { return new ${myConditionBeanClassName}(); }
 
     // ===================================================================================
     //                                                                  Basic Select Count
     //                                                                  ==================
     /**
-     * Select the count by conditionBean.
-     * <pre>
-     * If the argument 'conditionBean' is effective about fetch-scope,
-     * this method invoke select count ignoring the fetch-scope.
-     * </pre>
-     * @param cb The conditionBean of ${myExtendedObjectClassName}. This conditionBean should not be set up about fetch-scope. (NotNull)
+     * Select the count of the condition-bean. {IgnorePagingCondition}
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected count.
      */
     public int selectCount(${myConditionBeanClassName} cb) {
@@ -223,9 +123,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                 Basic Select Entity
     //                                                                 ===================
     /**
-     * Select the entity by conditionBean.
-     * 
-     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * Select the entity by the condition-bean.
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected entity. (Nullalble)
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -235,9 +134,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Select the entity by conditionBean with deleted check.
-     * 
-     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * Select the entity by the condition-bean with deleted check.
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -248,10 +146,9 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
 #if ($table.hasPrimaryKey())
-    /*
-     * Select the entity with deleted check. {by primary-key}
-     * 
-     * @param primaryKey
+    /* (non-javadoc)
+     * Select the entity with deleted check. {by primary-key value}
+     * @param primaryKey The keys of primary.
      * @return The selected entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -270,8 +167,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                   =================
     /**
      * Select the list as result-bean.
-     * 
-     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result-bean of selected list. (NotNull)
      */
     public ${glListResultBeanName}<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
@@ -281,8 +177,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Select the page as result-bean.
-     * 
-     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The result-bean of selected page. (NotNull)
      */
     public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
@@ -295,34 +190,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         };
         return invoker.invokePaging(handler);
     }
-#if ($database.isMakeDeprecated())
-
-    /**
-     * Select the page as result-bean.
-     * 
-     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
-     * @param invoker The invoker of select-page. (NotNull)
-     * @return The result-bean of selected page. (NotNull)
-     * @deprecated
-     */
-    public ${glPagingResultBeanName}<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb, SelectPageInvoker<${myExtendedObjectClassName}> invoker) {
-        assertConditionBeanNotNull(cb);
-        final SelectPageCallback<${myExtendedObjectClassName}> pageCallback = new SelectPageCallback<${myExtendedObjectClassName}>() {
-            public ${glPagingBeanInterfaceName} getPagingBean() { return cb; }
-            public int selectCountIgnoreFetchScope() { return selectCount(cb); }
-            public List<${myExtendedObjectClassName}> selectListWithFetchScope() { return selectList(cb); }
-        };
-        return invoker.invokeSelectPage(pageCallback);
-    }
-#end
 
     // ===================================================================================
     //                                                                      Various Select
     //                                                                      ==============
     /**
      * Select the list of value-label.
-     * 
-     * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param valueLabelSetupper The setupper of value-label. (NotNull)
      * @return The list of value-label. (NotNull)
      */
@@ -336,7 +210,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                            ========
     /**
      * Select the next value as sequence.
-     * 
      * @return The next value. (NotNull)
      */
     public ${table.sequenceReturnType} selectNextVal() {
@@ -348,127 +221,76 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                       Load Referrer
     //                                                                       =============
-  #foreach ($refferer in $table.refererList)
-    #set ($reffererTable = $refferer.Table)
-    #set ($reffererEntityClassName = "${refferer.refererTableExtendedEntityClassName}")
-    #set ($reffererBhvClassName = "${refferer.refererTableExtendedBehaviorClassName}")
-    #set ($reffererCBClassName = "${refferer.refererTableExtendedConditionBeanClassName}")
-    #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
-    #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
+  #foreach ($referrer in $table.refererList)
+    #set ($referrerTable = $referrer.Table)
+    #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+    #set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
+    #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+    #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.RefrererPropertyNameInitCap}")
+    #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
     #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
-    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List${database.filterGenericsString(${reffererEntityClassName})}")
+    #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
 
     // /* * * * * * * * * * * * * * * * * * * * * * *
-    //   ReferrerTable    = [${refferer.table.name}]
-    //   ReferrerProperty = [${refferer.reffererPropertyName}]
+    //   ReferrerTable    = [${referrer.table.name}]
+    //   ReferrerProperty = [${referrer.referrerPropertyName}]
     // * * * * * * * * */
 
     /**
-     * Load referrer of ${refferer.ReffererPropertyName}.
-     * <pre>
-     *   You can load referrer.
-     * 
-     *   ex) {Client Example}
-     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *     cb.query().setXxx_Equal("xxx");
-     *     final List&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myBehaviorVariableName}.selectList(cb);
-     *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName});
-     * 
-     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
-     * </pre>
-     * 
-     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * Load referrer of ${referrer.referrerPropertyName}. <br />
+     * About internal policy, the value of primary key(and others too) is treated as case-insensitive.
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        final ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper = new ${glConditionBeanSetupperName}<${reffererCBClassName}>() {
-            public void setup(${reffererCBClassName} cb) {}
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        final ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper = new ${glConditionBeanSetupperName}<${referrerCBClassName}>() {
+            public void setup(${referrerCBClassName} cb) {}
         };
-        load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
     }
 
     /**
-     * Load referrer of ${refferer.refererJavaBeansRulePropertyName}.
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the setupper for condition-bean of referrer. <br />
+     * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
+     * The conditionBean that the setupper provides have settings before you touch it. It is as follows:
      * <pre>
-     *   You can load referrer with your original condition.
-     * 
-     *   ex) {Client Example}: Referrer conditions are 'Xxx' is not null and order-by 'Yyy' desc
-     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *     cb.query().setXxx_Equal("xxx");
-     *     final List&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myBehaviorVariableName}.selectList(cb);
-     *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; conditionBeanSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
-     *         public void setup(${reffererCBClassName} cb) {
-     *             cb.query().setXxx_IsNotNull();
-     *             cb.query().addOrderBy_Yyy_Desc();
-     *         }
-     *     };
-     *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, conditionBeanSetupper);
-     *     - - - - - - - - - -/
-     * 
-     *   The conditionBean that the setupper provides have settings before you touch it. It is as follows:
-     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-     *     cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-     *     - - - - - - - - - -/
-     * 
-     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
      * </pre>
-     * 
-     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param conditionBeanSetupper Referrer condition setupper instance for registering referrer condition. (NotNull)
      */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${reffererCBClassName}> conditionBeanSetupper) {
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupperName}<${referrerCBClassName}> conditionBeanSetupper) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
-        assertObjectNotNull("conditionBeanSetupper<${reffererCBClassName}>", conditionBeanSetupper);
+        assertObjectNotNull("conditionBeanSetupper<${referrerCBClassName}>", conditionBeanSetupper);
         if (${myEntityListVariableName}.isEmpty()) { return; }
-        load${refferer.refererJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(conditionBeanSetupper));
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
     }
 
     /**
-     * Load referrer of ${refferer.refererJavaBeansRulePropertyName}.
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the option of load-referrer. <br />
+     * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
+     * The conditionBean that the setupper provides have settings before you touch it. It is as follows:
      * <pre>
-     *   You can load referrer with your original condition.
-     * 
-     *   ex) {Client Example}: Referrer conditions are 'Xxx' is not null and order-by 'Yyy' desc
-     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     *     cb.query().setXxx_Equal("xxx");
-     *     final List&lt;${myExtendedObjectClassName}&gt; ${myEntityListVariableName} = ${myBehaviorVariableName}.selectList(cb);
-     *     final ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt; cbSetupper = new ${glConditionBeanSetupperName}&lt;${reffererCBClassName}&gt;() {
-     *         public void setup(${reffererCBClassName} cb) {
-     *             cb.query().setXxx_IsNotNull();
-     *             cb.query().addOrderBy_Yyy_Desc();
-     *         }
-     *     };
-     *     ${myBehaviorVariableName}.load${refferer.reffererPropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOptionName}<${reffererCBClassName}, ${reffererEntityClassName}>(cbSetupper));
-     *     - - - - - - - - - -/
-     * 
-     *   The conditionBean that the setupper provides have settings before you touch it. It is as follows:
-     *     /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-     *     cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
-     *     cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc();
-     *     - - - - - - - - - -/
-     * 
-     *   *About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
+     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
      * </pre>
-     * 
-     * @param ${myEntityListVariableName} Entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadReferrerOption Load-referrer option. (NotNull)
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param loadReferrerOption the option of load-referrer. (NotNull)
      */
-    public void load${refferer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName}<${reffererCBClassName}, ${reffererEntityClassName}> loadReferrerOption) {
+    public void load${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glPackageBaseCommonBhvLoad}.${glLoadReferrerOptionName}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         assertObjectNotNull("${myEntityListVariableName}<${myExtendedObjectClassName}>", ${myEntityListVariableName});
-        assertObjectNotNull("loadReferrerOption<${reffererEntityClassName}, ${reffererCBClassName}>", loadReferrerOption);
+        assertObjectNotNull("loadReferrerOption<${referrerEntityClassName}, ${referrerCBClassName}>", loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }
-        final ${reffererBhvClassName} referrerBhv = getBehaviorSelector().select(${reffererBhvClassName}.class);
-        helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${reffererCBClassName}, ${reffererEntityClassName}>() {
+        final ${referrerBhvClassName} referrerBhv = getBehaviorSelector().select(${referrerBhvClassName}.class);
+        helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity) { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
-            public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, List<${reffererEntityClassName}> referrerList) { entity.set${refferer.ReffererPropertyNameInitCap}(referrerList); }
-            public ${reffererCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.newMyConditionBean(); }
-            public void callbackReferrer_queryForeignKeyInScope(${reffererCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.query().set${refferer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
-            public void callbackReferrer_queryAddOrderByForeignKeyAsc(${reffererCBClassName} cb) { cb.query().addOrderBy_${refferer.getLocalColumnJavaNameAsOne()}_Asc(); }
-            public List<${reffererEntityClassName}> callbackReferrer_selectList(${reffererCBClassName} cb) { return referrerBhv.selectList(cb); }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${reffererEntityClassName} entity) { return entity.get${refferer.getLocalColumnJavaNameAsOne()}(); }
-            public void callbackReferrer_setForeignEntity(${reffererEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity) { referrerEntity.set${refferer.foreignPropertyNameInitCap}(baseEntity); }
+            public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, List<${referrerEntityClassName}> referrerList) { entity.set${referrer.referrerPropertyNameInitCap}(referrerList); }
+            public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.newMyConditionBean(); }
+            public void callbackReferrer_queryForeignKeyInScope(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
+            public void callbackReferrer_queryAddOrderByForeignKeyAsc(${referrerCBClassName} cb) { cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc(); }
+            public List<${referrerEntityClassName}> callbackReferrer_selectList(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${referrerEntityClassName} entity) { return entity.get${referrer.getLocalColumnJavaNameAsOne()}(); }
+            public void callbackReferrer_setForeignEntity(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity) { referrerEntity.set${referrer.foreignPropertyNameInitCap}(baseEntity); }
         } );
     }
   #end
@@ -477,12 +299,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                    Pull Out Foreign
     //                                                                    ================
-#foreach ($foreignKeys in $table.ForeignKeys)
-  #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
+#foreach ($foreignKeys in $table.foreignKeys)
+#set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
 
     /**
      * Pull out the list of foreign table '${foreignEntityClassName}'.
-     * 
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
      * @return The list of foreign table. (NotNull)
      */
@@ -491,20 +312,19 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
             public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${foreignKeys.foreignPropertyNameInitCap}(); } });
     }
 #end
-#foreach ($refferer in $table.Referrers)
-  #set ($reffererTable = $refferer.Table)
-  #set ($reffererEntityClassName = "${glProjectPrefix}${reffererTable.JavaName}")
-  #if (${refferer.isOneToOne()})
+#foreach ($referrer in $table.referrers)
+  #set ($referrerTable = $referrer.table)
+  #set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
+  #if (${referrer.isOneToOne()})
 
     /**
-     * Pull out the list of referrer-as-one table '${reffererEntityClassName}'.
-     * 
+     * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
      * @return The list of referrer-as-one table. (NotNull)
      */
-    public List<${reffererEntityClassName}> pullout${refferer.reffererPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${reffererEntityClassName}>() {
-            public ${reffererEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${refferer.reffererPropertyNameInitCapAsOne}(); } });
+    public List<${referrerEntityClassName}> pullout${referrer.referrerPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
+            public ${referrerEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${referrer.referrerPropertyNameInitCapAsOne}(); } });
     }
   #end
 #end
@@ -515,7 +335,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                 ===================
     /**
      * Insert the entity.
-     * 
      * @param ${myEntityVariableName} The entity of insert target. (NotNull)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -529,12 +348,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Update the entity modified-only. <br />
-     * If it updates count zero, throws exception. <br />
-     * If concurrency control of this table is valid, this update have it. <br />
-     * So then the entity of argument should have the value of concurrency column.
-     * 
-     * @param ${myEntityVariableName} The entity of update target. (NotNull)
+     * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
+     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -548,14 +363,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doModify(${glEntityInterfaceName} entity) {
         update((${myExtendedObjectClassName})entity);
     }
-
 #if ($table.hasOptimisticLock())
+	
     /**
-     * Update the entity non-strictly modified-only. <br />
-     * This update ignores concurrency control. <br />
-     * So if the entity of argument have the value of concurrency column, it is ignored.
-     * 
-     * @param ${myEntityVariableName} The entity of update target. (NotNull)
+     * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonConcurrencyControl}
+     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -575,9 +387,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Insert or update the entity modified-only.
-     * 
-     * @param ${myEntityVariableName} The entity of insert or update target. This should contain primary-key value at least(Except use identity). (NotNull)
+     * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
+     * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -595,13 +406,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doCreateOrUpdate(${glEntityInterfaceName} ${myEntityVariableName}) {
         insertOrUpdate((${myExtendedObjectClassName})${myEntityVariableName});
     }
-
 #if ($table.hasOptimisticLock())
 
     /**
-     * Insert or update the entity non-strictly modified-only.
-     * 
-     * @param ${myEntityVariableName} The entity of insert or update target. This should contain primary-key value at least(Except use identity). (NotNull)
+     * Insert or update the entity non-strictly modified-only. {NonConcurrencyControl(when update)}
+     * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -623,9 +432,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Delete the entity.
-     * 
-     * @param ${myEntityVariableName} The entity of delete target. (NotNull)
+     * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -639,13 +447,11 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     protected void doRemove(${glEntityInterfaceName} ${myEntityVariableName}) {
         delete((${myExtendedObjectClassName})${myEntityVariableName});
     }
-
 #if ($table.hasOptimisticLock())
+
     /**
-     * Delete the entity non-strictly. <br />
-     * This delete ignores concurrency control.
-     * 
-     * @param ${myEntityVariableName} Entity. (NotNull)
+     * Delete the entity non-strictly. {UpdateCountZeroException, NonConcurrencyControl}
+     * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -655,10 +461,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     }
 
     /**
-     * Delete the entity non-strictly ignoring deleted. <br />
-     * This delete ignores concurrency control.
-     * 
-     * @param ${myEntityVariableName} Entity. (NotNull)
+     * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonConcurrencyControl}
+     * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException}
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
      */
@@ -686,7 +490,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                  ==================
     /**
      * Batch insert the list. This method use 'Batch Update' of java.sql.PreparedStatement.
-     * 
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of inserted count.
      */
@@ -698,21 +501,19 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Batch update the list. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
-     * 
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entities has already been updated.
      */
     public ${batchUpdateReturnType} batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateUpdateList(${myEntityListVariableName});
     }
-
 #if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+
     /**
      * Batch update the list non-strictly. All columns are update target. {NOT modified only} <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
-     * 
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
      */
@@ -725,21 +526,19 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     /**
      * Batch delete the list. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
-     * 
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
+     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entities has already been updated.
      */
     public ${batchUpdateReturnType} batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
         return delegateDeleteList(${myEntityListVariableName});
     }
-
 #if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+
     /**
      * Batch delete the list non-strictly. <br />
      * This method use 'Batch Update' of java.sql.PreparedStatement.
-     * 
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
      */
@@ -748,17 +547,15 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return delegateDeleteListNonstrict(${myEntityListVariableName});
     }
 #end
-
+#if ($database.isMakeBehaviorCopyInsert())
     // ===================================================================================
     //                                                                      Various Insert
     //                                                                      ==============
-#if ($database.isMakeBehaviorCopyInsert())
 #if ($table.isUseIdentity())
 #if ($table.hasPrimaryKey())
 
     /* (non-javadoc) 
      * Copy-insert.
-     * 
      * @param primaryKey Primary-keys. (NotNull)
      * @return Inserted count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
@@ -775,20 +572,19 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Filter 'copy-insert' entity.
-     * 
      * @param ${myEntityVariableName} Entity. (NotNull)
      */
     protected void filterCopyInsertEntity(${myExtendedObjectClassName} ${myEntityVariableName}) {
     }
 #end
 #end
+
     // ===================================================================================
     //                                                                      Various Update
     //                                                                      ==============
 #if ($database.isMakeBehaviorLoopUpdate())
     /**
      * Loop update modified elements only.
-     * 
      * @param ${myEntityListVariableName} The list of entity. (NotNull and Empty OK)
      */
     public void loopUpdateModifiedElementsOnly(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -799,7 +595,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.isUseUpdateDate() || $table.isUseVersionNo())
     /**
      * Loop update modified elements only non-strictly.
-     * 
      * @param ${myEntityListVariableName} The list of entity. (NotNull and Empty OK)
      */
     public void loopUpdateModifiedElementsOnlyNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -815,14 +610,13 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                      ==============
     /**
      * Query delete the several entities.
-     * 
      * @param cb Condition-bean. (NotNull)
      * @return The deleted count.
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
-	    assertConditionBeanNotNull(cb);
-	    return getMyDao().deleteByQuery(cb);
-	}
+        assertConditionBeanNotNull(cb);
+        return getMyDao().deleteByQuery(cb);
+    }
 #end
 #else
   #if ($table.isAvailableNonPrimaryKeyWritable())
@@ -832,7 +626,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                 ===================
     /**
      * Insert.
-     * 
      * @param ${myEntityVariableName} Entity. (NotNull)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -913,7 +706,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     //                                                                           =========
     /**
      * Create the basic request of hierarchy of ${myExtendedObjectClassName}..
-     * 
      * @param sourceList The list of source. (NotNull)
      * @param <SOURCE> The type of source.
      * @return Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
@@ -926,7 +718,6 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 
     /**
      * Arrange hierarchy.
-     * 
      * @param request Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
      * @return The list of ${myExtendedObjectClassName}. (NotNull)
      */
@@ -937,16 +728,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
     // ===================================================================================
     //                                                                          CBSetupper
     //                                                                          ==========
-    /**
-     * The interface of conditionBean setupper.
-     */
     public static interface CBSetupper extends ${glConditionBeanSetupperName}<${myConditionBeanClassName}> {
-
-        /**
-         * Set up condition.
-         * 
-         * @param cb The conditionBean of ${myExtendedObjectClassName}. (NotNull)
-         */
         public void setup(${myConditionBeanClassName} cb);
     }
 
