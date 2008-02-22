@@ -1527,14 +1527,16 @@ targetdatabase = $targetDatabase
       #end
       $database.debug("}")
     #else
-      $database.debug("parseDBFluteDicon() {")
-      #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-        #set ($path = "${dbfluteDiconPackageName}" )
-        $database.makeDirectory($path)
+	  #if (!$database.isTargetLanguageCSharp())
+        $database.debug("parseDBFluteDicon() {")
+        #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+          #set ($path = "${dbfluteDiconPackageName}" )
+          $database.makeDirectory($path)
 
-        #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-        $database.debug("    ${path}")
-        $generator.parse("om/${glResourceDirectory}/allcommon/DaoDicon.${glTemplateFileExtension}", $path, "", "")
+          #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+          $database.debug("    ${path}")
+          $generator.parse("om/${glResourceDirectory}/allcommon/DaoDicon.${glTemplateFileExtension}", $path, "", "")
+        #end
       #end
     #end
 
