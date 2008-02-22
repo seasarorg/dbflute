@@ -6,20 +6,21 @@ using System.Collections.Generic;
 using Seasar.Quill.Attrs;
 using Seasar.Dao.Attrs;
 
+using ${glPackageBaseCommon};
 using ${glPackageBaseCommonS2Dao};
 using ${myExtendedEntityPackageName};
 #set ($InterfaceName = "")
 #if ($table.hasPrimaryKey())
-  #set ($InterfaceName = "${glPackageBaseCommon}.${glDaoWritableInterfaceName}")
+  #set ($InterfaceName = "${glDaoWritableInterfaceName}")
 #else
-  #set ($InterfaceName = "${glPackageBaseCommon}.${glDaoReadableInterfaceName}")
+  #set ($InterfaceName = "${glDaoReadableInterfaceName}")
 #end
 
 namespace ${myExtendedDaoPackageName} {
 
     [Implementation]
 	[S2Dao(typeof(${glS2DaoSetting}))]
-    [Bean(typeof(${myExtendedEntityPackageName}.${myExtendedObjectClassName}))]
+    [Bean(typeof(${myExtendedObjectClassName}))]
     public partial interface ${myClassName} : ${InterfaceName} {
 
         [Sql("select count(*) from ${table.Name}")]

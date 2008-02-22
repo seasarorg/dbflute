@@ -56,7 +56,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                                                          Select
         //                                                                          ======
         public IList<ENTITY> SelectList<ENTITY>(String path, Object pmb, Type entityType) {
-            return _outsideSqlDao.SelectList<ENTITY>(path, pmb, CreateOutsideSqlOption(), entityType);
+            return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), entityType);
         }
 
         // ===============================================================================

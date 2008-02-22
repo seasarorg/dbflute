@@ -28,7 +28,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                                                          Select
         //                                                                          ======
         public ENTITY SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb, Type entityType) {
-            IList<ENTITY> ls = _outsideSqlDao.SelectList<ENTITY>(path, pmb, _outsideSqlOption, entityType);
+            IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, entityType);
             if (ls.Count == 0) {
                 return default(ENTITY);
             }
@@ -40,7 +40,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         }
 
         public ENTITY SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb, Type entityType) {
-            IList<ENTITY> ls = _outsideSqlDao.SelectList<ENTITY>(path, pmb, _outsideSqlOption, entityType);
+            IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, entityType);
             if (ls == null || ls.Count == 0) {
                 String searchKey4Log = "The path of outside-sql is " + path + ". And the parameter bean is " + pmb;
                 ThrowEntityAlreadyDeletedException(searchKey4Log);

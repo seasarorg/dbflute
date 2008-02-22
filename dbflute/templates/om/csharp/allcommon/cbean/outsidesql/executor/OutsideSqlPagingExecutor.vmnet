@@ -29,7 +29,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                                                          Select
         //                                                                          ======
         public IList<ENTITY> SelectList<ENTITY>(String path, ${glPagingBeanInterfaceName} pmb, Type entityType) {
-            return _outsideSqlDao.SelectList<ENTITY>(path, pmb, _outsideSqlOption, entityType);
+            return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, entityType);
         }
 
         public ${glPagingResultBeanName}<ENTITY> SelectPage<ENTITY>(String path

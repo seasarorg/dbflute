@@ -1,6 +1,7 @@
 
 using System;
-using System.Collections;
+
+using Seasar.Quill;
 
 using ${glPackageBaseCommonDBMeta};
 
@@ -9,15 +10,12 @@ namespace ${glPackageBaseCommon} {
     public class ${glCacheDaoSelectorName} : ${glDaoSelectorInterfaceName} {
 
         // ===============================================================================
-        //                                                                       Attribute
-        //                                                                       =========
-        protected Seasar.Framework.Container.IS2Container _container;
-
-        // ===============================================================================
-        //                                                                        Selector
-        //                                                                        ========
+        //                                                                  Implementation
+        //                                                                  ==============
         public virtual DAO_TYPE Select<DAO_TYPE>(Type daoType) where DAO_TYPE : ${glDaoReadableInterfaceName} {
-            return (DAO_TYPE)_container.GetComponent(daoType);
+            QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(daoType);
+            DAO_TYPE dao = (DAO_TYPE)component.GetComponentObject(daoType);
+            return dao;
         }
 
         public virtual ${glDaoReadableInterfaceName} ByName(String tableFlexibleName) {
@@ -26,6 +24,9 @@ namespace ${glPackageBaseCommon} {
             return Select<${glDaoReadableInterfaceName}>(GetDaoType(dbmeta));
         }
 
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
         protected static Type GetDaoType(${glDBMetaInterfaceName} dbmeta) {
             String daoTypeName = dbmeta.DaoTypeName;
             if (daoTypeName == null) {
@@ -80,14 +81,5 @@ namespace ${glPackageBaseCommon} {
                 throw new SystemException(msg);
             }
         }
-
-        // ===============================================================================
-        //                                                                        Accessor
-        //                                                                        ========
-        public Seasar.Framework.Container.IS2Container Container {
-            get { return _container; }
-            set { _container = value; }
-        }
-
     }
 }

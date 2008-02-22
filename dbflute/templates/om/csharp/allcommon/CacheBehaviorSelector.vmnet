@@ -1,8 +1,8 @@
 
 using System;
-using System.Collections;
 
 using Seasar.Quill;
+
 using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonDBMeta};
 
@@ -11,8 +11,8 @@ namespace ${glPackageBaseCommon} {
     public class ${glCacheBehaviorSelectorName} : ${glBehaviorSelectorInterfaceName} {
 
         // ===============================================================================
-        //                                                                        Selector
-        //                                                                        ========
+        //                                                                  Implementation
+        //                                                                  ==============
         public virtual BEHAVIOR_TYPE Select<BEHAVIOR_TYPE>(Type behaviorType) where BEHAVIOR_TYPE : ${glBehaviorReadableInterfaceName} {
             QuillComponent component = QuillInjector.GetInstance().Container.GetComponent(behaviorType);
             BEHAVIOR_TYPE bhv = (BEHAVIOR_TYPE)component.GetComponentObject(behaviorType);
@@ -29,6 +29,9 @@ namespace ${glPackageBaseCommon} {
             return Select<${glBehaviorReadableInterfaceName}>(GetBehaviorType(dbmeta));
         }
 
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
         protected static Type GetBehaviorType(${glDBMetaInterfaceName} dbmeta) {
             String behaviorTypeName = dbmeta.BehaviorTypeName;
             if (behaviorTypeName == null) {

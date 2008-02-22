@@ -2,23 +2,30 @@
 using System;
 using System.Collections.Generic;
 
+using Seasar.Quill.Attrs;
+using Seasar.Dao.Attrs;
+
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonS2Dao};
 
 namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
-    [Seasar.Dao.Attrs.Bean(typeof(OutsideSqlDaoDummyEntity))]
+    [Implementation]
+	[S2Dao(typeof(${glS2DaoSetting}))]
+    [Bean(typeof(OutsideSqlDaoDummyEntity))]
     public interface ${glOutsideSqlDaoName} : ${glDaoReadableInterfaceName} {
 
         // ===================================================================================
         //                                                                              Select
         //                                                                              ======
-        IList<ENTITY> SelectList<ENTITY>(String path, Object pmb, ${glOutsideSqlOptionName} option, Type entityType);
+        System.Collections.IList SelectList(String path, Object pmb, ${glOutsideSqlOptionName} option, Type entityType);
 
         Object SelectCursor(String path, Object pmb, ${glOutsideSqlOptionName} option, ${glCursorHandlerName} handler);
 
         int Execute(String path, Object pmb, ${glOutsideSqlOptionName} option);
 
+		// Not implemented yet!
         // int[] batchExecute(String path, List<Object> pmb, ${glOutsideSqlOptionName} option);
     }
 
