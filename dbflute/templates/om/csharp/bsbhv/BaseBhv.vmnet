@@ -2,7 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+
 using Seasar.Quill;
+using Seasar.Quill.Attrs;
+
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonBhvSetup};
