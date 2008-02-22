@@ -29,9 +29,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${glDaoMetaDataExtension}(Type daoType, IDataSource dataSource,ICommandFactory commandFactory,
-            IDataReaderFactory dataReaderFactory, IDatabaseMetaData dbMetaData)
-            : base(daoType, dataSource, commandFactory, dataReaderFactory, dbMetaData) {}
+        public ${glDaoMetaDataExtension}()
+            : base() {}
 
         // ===============================================================================
         //                                                         Initialization Override
@@ -41,6 +40,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             _annotationReader = AnnotationReaderFactory.CreateDaoAnnotationReader(_daoType);
             _beanType = _annotationReader.GetBeanType();
             _dbms = DbmsManager.GetDbms(_dataSource);
+			
+			// Use extended bean-meta-data.
             BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(_beanType, _annotationReaderFactory, false);
             bmdExt.Initialize(_dbMetaData, _dbms);
             _beanMetaData = bmdExt;
@@ -48,7 +49,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             // For lazy initializing methods!
             // SetupSqlCommand();
         }
-
+		
         public override ISqlCommand GetSqlCommand(String methodName) {
             ISqlCommand cmd = (ISqlCommand)_sqlCommands[methodName];
             if (cmd != null) {

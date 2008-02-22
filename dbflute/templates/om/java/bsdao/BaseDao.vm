@@ -14,103 +14,39 @@ import ${glPackageCB}.${myConditionBeanClassName};
 
 /**
  * The dao interface of ${table.name}.
- * 
- * <pre>
- * [primary-key]
- *     ${table.primaryKeyNameCommaString}
- * 
- * [column-property]
- *     ${table.columnNameCommaString}
- * 
- * [foreign-property]
- *     ${table.foreignPropertyNameCommaString}
- * 
- * [referrer-property]
- *     ${table.referrerPropertyNameCommaString}
- * 
- * [sequence]
- *     ${table.definedSequenceName}
- * 
- * [identity]
- *     ${table.identityPropertyName}
- * 
- * [update-date]
- *     ${table.updateDateJavaName}
- * 
- * [version-no]
- *     ${table.versionNoJavaName}
- * 
- * </pre>
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public interface ${myClassName} extends ${InterfaceName} {
 
-    /** BEAN-Annotation. */
     public Class BEAN = ${glPackageExtendedEntity}.${myExtendedObjectClassName}.class;
-
-    /** SQL-Annotation for getCountAll(). */
     public static final String getCountAll_SQL = "select count(*) from ${table.Name}";
-
-    /**
-     * Get the count as all.
-     * 
-     * @return All count.
-     */
     public int getCountAll();
-
-    /** SQL-Annotation for getListAll(). */
     public static final String getListAll_SQL = "select ${table.columnNameCommaString} from ${table.Name}";
-
-    /**
-     * Get the list as all.
-     * 
-     * @return All list. (NotNull)
-     */
     public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} getListAll();
 #if ($table.isWritable())
-
-    /** SQL-Annotation for getEntity(). */
     public static final String getEntity_SQL = "select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}";
-
-    /** Args-Annotation for getEntity(). */
     public static final String getEntity_ARGS = "${table.PrimaryKeyUncapitalisedJavaNameCommaString}";
-
-    /* (non-javadoc)
-     * Get the entity by primary key.
-     * 
-     * @param primaryKey Primary key. (NotNull)
-     */
     public ${myExtendedObjectClassName} getEntity(${table.PrimaryKeyArgsString});
 #end
 #if ($table.isWritable() && $table.hasOnlyOnePrimaryKey() && $database.isUseBuri())
-
     public static final String getEntityByIds_ARGS = "ids";
     public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
     List<${myExtendedObjectClassName}> getEntityByIds(List<${table.primaryKeyJavaNativeAsOne}> ids);
 #end
 
     /**
-     * Select the count by condition-bean. <br />
-     * Ignore fetchFirst() and fetchScope() and fetchPage(). <br />
-     * But the fetch status of the condition-bean remains as it is.
-     * 
      * @param cb Condition-bean. (NotNull)
-     * @return Selected count. (NotNull)
+     * @return Selected count.
      */
     public int selectCount(${myConditionBeanClassName} cb);
 
     /**
-     * Select the entity '${myExtendedObjectClassName}' by condition-bean.
-     * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected entity. If the select result is zero, it returns null. (Nullable)
      */
     public ${myExtendedObjectClassName} selectEntity(${myConditionBeanClassName} cb);
 
     /**
-     * Select the list by condition-bean.
-     * 
      * @param cb Condition-bean. (NotNull)
      * @return Selected list. If the select result is zero, it returns empty list. (NotNull)
      */
@@ -118,16 +54,12 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if ($table.isWritable())
 
     /**
-     * Insert the entity.
-     * 
      * @param entity The entity of insert target. (NotNull)
      * @return The count of insert.
      */
     public int insert(${myExtendedObjectClassName} entity);
 
     /**
-     * Update the entity modified-only.
-     * 
      * @param entity The entity of update target. (NotNull)
      * @return The count of Update.
      */
@@ -135,8 +67,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 
 #if ($table.hasOptimisticLock())
     /**
-     * Update the entity non-strictly modified-only.
-     * 
      * @param entity The entity of update target. (NotNull)
      * @return The count of Update.
      */
@@ -144,8 +74,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 #end
 
     /**
-     * Delete the entity.
-     * 
      * @param entity The entity of delete target. (NotNull)
      * @return The count of delete.
      */
@@ -153,8 +81,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 
 #if ($table.hasOptimisticLock())
     /**
-     * Delete the entity non-strictly.
-     * 
      * @param entity The entity of delete target. (NotNull)
      * @return The count of delete.
      */
@@ -169,16 +95,12 @@ public interface ${myClassName} extends ${InterfaceName} {
 #end
 
     /**
-     * Insert the several entities.
-     * 
      * @param entityList The list of entity. (NotNull)
      * @return The array of inserted count.
      */
     public ${batchUpdateReturnType} insertList(List<${myExtendedObjectClassName}> entityList);
 
     /**
-     * Update the several entities.
-     * 
      * @param entityList The list of entity. (NotNull)
      * @return The array of updated count.
      */
@@ -186,8 +108,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 
 #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
     /**
-     * Update several entities non-strictly.
-     * 
      * @param the entityList The list of entity. (NotNull)
      * @return The array of updated count.
      */
@@ -195,8 +115,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 #end
 
     /**
-     * Delete the several entities.
-     * 
      * @param entityList The list of entity. (NotNull)
      * @return The array of deleted count.
      */
@@ -204,8 +122,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if ($database.isVersionAfter1040() && ($table.isUseUpdateDate() || $table.isUseVersionNo()))
 
 	/**
-     * Delete the several entities non-strictly.
-     * 
      * @param entityList The list of entity. (NotNull)
      * @return The array of deleted count.
      */
@@ -214,8 +130,6 @@ public interface ${myClassName} extends ${InterfaceName} {
 #if (${table.hasOnlyOnePrimaryKey()})
 
     /**
-     * Delete the several entities by the query.
-     * 
      * @param cb Condition-bean. (NotNull)
      * @return The deleted count.
      */
@@ -224,28 +138,13 @@ public interface ${myClassName} extends ${InterfaceName} {
 #else
   #if ($table.isAvailableNonPrimaryKeyWritable())
 
-    /** SQL-Annotation for insert(). */
     public static final String insert_SQL = "insert into ${table.Name}(${table.columnNameCommaString}) values(${table.insertClauseValuesAsSqlComment})";
-
-    /**
-     * Insert the entity.
-     * 
-     * @param entity The entity of insert target. (NotNull)
-     * @return Inserted count.
-     */
     public int insert(${myExtendedObjectClassName} entity);
   #end
 #end
 #if ($table.isUseSequence())
 
-    /** SQL-Annotation for selectNextVal(). */
     public String selectNextVal_SQL = "${table.SequenceNextSql}";
-
-    /**
-     * Select next value as sequence.
-     * 
-     * @return Next value. (NotNull)
-     */
     public ${table.sequenceReturnType} selectNextVal();
 #end
 }

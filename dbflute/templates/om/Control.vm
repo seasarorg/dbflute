@@ -313,10 +313,15 @@ targetdatabase = $targetDatabase
 
     ## [Allcommon-S2Dao]
     #set ($glSelectDynamicCommand = "${glProjectPrefix}S2DaoSelectDynamicCommand")
+    #set ($glS2DaoSetting = "${glProjectPrefix}S2DaoSetting")
+    #set ($glS2DaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
     #set ($glDaoInterceptor = "${glProjectPrefix}S2DaoInterceptor")
     #set ($glDaoLatestSqlProvider = "${glProjectPrefix}S2DaoLatestSqlProvider")
+    #set ($glS2DaoMetaDataExtension = "${glProjectPrefix}S2DaoMetaDataExtension")
     #set ($glDaoMetaDataExtension = "${glProjectPrefix}S2DaoMetaDataExtension")
+    #set ($glS2DaoMetaDataFactoryImpl = "${glProjectPrefix}S2DaoMetaDataFactoryImpl")
     #set ($glDaoMetaDataFactoryImpl = "${glProjectPrefix}S2DaoMetaDataFactoryImpl")
+    #set ($glS2BeanMetaDataFactoryImpl = "${glProjectPrefix}S2BeanMetaDataFactoryImpl")
     #set ($glBeanMetaDataFactoryImpl = "${glProjectPrefix}S2BeanMetaDataFactoryImpl")
     #set ($glDaoPropertyTypeFactoryBuilderExtension = "${glProjectPrefix}S2DaoPropertyTypeFactoryBuilderExtension")
     #set ($glDaoStatementFactory = "${glProjectPrefix}S2DaoStatementFactory")
@@ -1725,6 +1730,11 @@ targetdatabase = $targetDatabase
 	
     #set ($path = $strings.getPackageAsPath(${glPackageBaseCommonS2Dao}))
     $database.makeDirectory($path)
+	
+    #if ($database.isTargetLanguageCSharp())
+      #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glS2DaoSetting}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoSetting.${glTemplateFileExtension}",$path,"", "")
+	#end
 
     #set ( $path = "${strings.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glDaoInterceptor}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/S2DaoInterceptor.${glTemplateFileExtension}",$path,"", "")

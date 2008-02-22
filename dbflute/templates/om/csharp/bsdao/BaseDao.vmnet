@@ -2,6 +2,11 @@
 
 using System;
 using System.Collections.Generic;
+
+using Seasar.Quill.Attrs;
+using Seasar.Dao.Attrs;
+
+using ${glPackageBaseCommonS2Dao};
 using ${myExtendedEntityPackageName};
 #set ($InterfaceName = "")
 #if ($table.hasPrimaryKey())
@@ -12,51 +17,14 @@ using ${myExtendedEntityPackageName};
 
 namespace ${myExtendedDaoPackageName} {
 
-    /// <summary>
-    /// The dao interface of ${table.name}. (partial interface for auto-generation)
-    /// <![CDATA[
-    /// [primary-key]
-    ///     ${table.PrimaryKeyNameCommaString}
-    /// 
-    /// [all-columns]
-    ///     ${table.ColumnNameCommaString}
-    /// 
-    /// [foreign-table]
-    ///     ${table.ForeignPropertyNameCommaString}
-    /// 
-    /// [referrer-table]
-    ///     ${table.ReferrerPropertyNameCommaString}
-    /// 
-    /// [sequence]
-    ///     ${table.DefinedSequenceName}
-    /// 
-    /// [identity]
-    ///     ${table.IdentityPropertyName}
-    /// 
-    /// [update-date]
-    ///     ${table.UpdateDateJavaName}
-    /// 
-    /// [version-no]
-    ///     ${table.VersionNoJavaName}
-    /// 
-    /// ]]>
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
-    [Seasar.Dao.Attrs.Bean(typeof(${myExtendedEntityPackageName}.${myExtendedObjectClassName}))]
+	[S2Dao(${glS2DaoSetting})]
+    [Bean(typeof(${myExtendedEntityPackageName}.${myExtendedObjectClassName}))]
     public partial interface ${myClassName} : ${InterfaceName} {
 
-        /// <summary>
-        /// Get count of all records.
-        /// </summary>
-        /// <returns>Count of all records.</returns>
-        [Seasar.Dao.Attrs.Sql("select count(*) from ${table.Name}")]
+        [Sql("select count(*) from ${table.Name}")]
         int GetCountAll();
 
-        /// <summary>
-        /// Get list of all records.
-        /// </summary>
-        /// <returns>List of all records.</returns>
-        [Seasar.Dao.Attrs.Sql("select ${table.columnNameCommaString} from ${table.Name}")]
+        [Sql("select ${table.columnNameCommaString} from ${table.Name}")]
         IList<${myExtendedObjectClassName}> GetListAll();
 #if ($table.hasPrimaryKey())
 
@@ -64,106 +32,39 @@ namespace ${myExtendedDaoPackageName} {
         ${myExtendedObjectClassName} GetEntity(${table.PrimaryKeyArgsString});
 #end
 
-        /// <summary>
-        /// Select count by condition-bean.
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Selected count. (NotNull)</returns>
         int SelectCount(${myAttachedCBArgsString});
-
-        /// <summary>
-        /// Select entity '${myExtendedObjectClassName}' by condition-bean.
-        /// </summary> 
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Selected entity. If the select result is zero, it returns null. (Nullable)</returns>
         ${myExtendedObjectClassName} SelectEntity(${myAttachedCBArgsString});
-
-        /// <summary>
-        /// Select list by condition-bean.
-        /// </summary> 
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Selected list. If the select result is zero, it returns empty list. (NotNull)</returns>
         IList<${myExtendedObjectClassName}> SelectList(${myAttachedCBArgsString});
 #if ($table.hasPrimaryKey())
 
-        /// <summary>
-        /// Insert entity.
-        /// </summary>
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Inserted count.</returns>
         int Insert(${myExtendedObjectClassName} entity);
-
-        /// <summary>
-        /// Update entity modified-only.
-        /// </summary> 
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         int UpdateModifiedOnly(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
 
-        /// <summary>
-        /// Update entity non-strictly modified-only.
-        /// </summary> 
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Updated count.</returns>
         int UpdateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
 #end
 
-        /// <summary>
-        /// Delete entity.
-        /// </summary> 
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Deleted count.</returns>
         int Delete(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
 
-        /// <summary>
-        /// Delete entity non-strictly.
-        /// </summary> 
-        /// <param name="entity">Entity. (NotNull)</param>
-        /// <returns>Deleted count.</returns>
         int DeleteNonstrict(${myExtendedObjectClassName} entity);
 #end
 
-        /// <summary>
-        /// Insert several entities.
-        /// </summary> 
-        /// <param name="entityList">Entity-list. (NotNull)</param>
-        /// <returns>Inserted count.</returns>
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int InsertList(IList<${myExtendedObjectClassName}> entityList);
 
-        /// <summary>
-        /// Update several entities.
-        /// </summary> 
-        /// <param name="entityList">Entity-list. (NotNull)</param>
-        /// <returns>Updated count.</returns>
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int UpdateList(IList<${myExtendedObjectClassName}> entityList);
 
-        /// <summary>
-        /// Delete several entities.
-        /// </summary> 
-        /// <param name="entityList">Entity-list. (NotNull)</param>
-        /// <returns>Deleted count.</returns>
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int DeleteList(IList<${myExtendedObjectClassName}> entityList);
 
-        /// <summary>
-        /// Delete all entities.
-        /// It is necessary that sub interface of this have SQL-Annotation.
-        /// </summary>
-        /// <returns>Deleted count.</returns>
-        [Seasar.Dao.Attrs.Sql("delete from ${table.Name}")]
+        [Sql("delete from ${table.Name}")]
         int RemoveAll();
 #end
 #if ($table.isUseSequence())
 
-        /// <summary>
-        /// Select next value as sequence.
-        /// </summary>
-        /// <returns>Next value of sequence. (NotNull)</returns>
-        [Seasar.Dao.Attrs.Sql("${table.SequenceNextSql}")]
+        [Sql("${table.SequenceNextSql}")]
         int SelectNextVal();
 #end
     }

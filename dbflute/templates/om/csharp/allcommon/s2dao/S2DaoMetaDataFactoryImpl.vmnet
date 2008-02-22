@@ -6,46 +6,98 @@ using System.Text;
 
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
+using Seasar.Dao;
 
 namespace ${glPackageBaseCommonS2Dao} {
 
-    /**
-     * My-DaoMetaDataFactoryImpl.
-     * Customises original class 'DaoMetaDataFactoryImpl'.
-     * 
-     * @author ${database.ClassAuthor}
-     */
-    public class ${glDaoMetaDataFactoryImpl} : Seasar.Dao.IDaoMetaDataFactory {
+    public class ${glS2DaoMetaDataFactoryImpl} : Seasar.Dao.IDaoMetaDataFactory {
 
-        private Hashtable daoMetaDataCache = new Hashtable();
-        private IDataSource dataSource;
-        private ICommandFactory commandFactory;
-        private IDataReaderFactory dataReaderFactory;
-        private IDatabaseMetaData dbMetaData;
+        private readonly Hashtable _daoMetaDataCache = new Hashtable();
+        protected readonly IDataSource _dataSource;
+        protected readonly ICommandFactory _commandFactory;
+        protected readonly IDataReaderFactory _dataReaderFactory;
+        protected readonly IAnnotationReaderFactory _readerFactory;
+        protected IDatabaseMetaData _dbMetaData;
+        protected string _sqlFileEncoding = Encoding.Default.WebName;
+        protected string[] _insertPrefixes;
+        protected string[] _updatePrefixes;
+        protected string[] _deletePrefixes;
 
-        public ${glDaoMetaDataFactoryImpl}(IDataSource dataSource,
-            ICommandFactory commandFactory, IDataReaderFactory dataReaderFactory) {
-            this.dataSource = dataSource;
-            this.commandFactory = commandFactory;
-            this.dataReaderFactory = dataReaderFactory;
-            this.dbMetaData = new DatabaseMetaDataImpl(dataSource);
+        public ${glS2DaoMetaDataFactoryImpl}(IDataSource dataSource,
+            ICommandFactory commandFactory, IAnnotationReaderFactory readerFactory,
+            IDataReaderFactory dataReaderFactory) {
+            _dataSource = dataSource;
+            _commandFactory = commandFactory;
+            _readerFactory = readerFactory;
+            _dataReaderFactory = dataReaderFactory;
         }
 
-        public Seasar.Dao.IDaoMetaData GetDaoMetaData(Type daoType) {
-            lock(this) {
-                String key = daoType.Name;
-                Seasar.Dao.IDaoMetaData dmd = (Seasar.Dao.IDaoMetaData) daoMetaDataCache[key];
+        public IDatabaseMetaData DBMetaData {
+            set { _dbMetaData = value; }
+        }
+
+        public string[] InsertPrefixes {
+            set { _insertPrefixes = value; }
+        }
+
+        public string[] UpdatePrefixes {
+            set { _updatePrefixes = value; }
+        }
+
+        public string[] DeletePrefixes {
+            set { _deletePrefixes = value; }
+        }
+
+        public string SqlFileEncoding {
+            set { _sqlFileEncoding = value; }
+        }
+
+        #region IDaoMetaDataFactory メンバ
+
+        public IDaoMetaData GetDaoMetaData(Type daoType) {
+            lock (this) {
+                string key = daoType.FullName;
+                IDaoMetaData dmd = (IDaoMetaData)_daoMetaDataCache[key];
                 if (dmd != null) {
                     return dmd;
                 }
-                
-                // /----------------------------------------------- [MyExtention]
-                dmd = new ${glDaoMetaDataExtension}(daoType, dataSource, commandFactory, dataReaderFactory, dbMetaData);
-                // --------------------/
-                
-                daoMetaDataCache[key] = dmd;
+                dmd = CreateDaoMetaData(daoType);
+                _daoMetaDataCache[key] = dmd;
                 return dmd;
             }
+        }
+
+        #endregion
+
+        protected virtual IDaoMetaData CreateDaoMetaData(Type daoType) {
+            ${glS2DaoMetaDataExtension} dmd = CreateDaoMetaDataImpl();
+            dmd.DaoType = daoType;
+            dmd.DataSource = _dataSource;
+            dmd.CommandFactory = _commandFactory;
+            dmd.DataReaderFactory = _dataReaderFactory;
+            dmd.AnnotationReaderFactory = _readerFactory;
+            if (_dbMetaData == null) {
+                _dbMetaData = new DatabaseMetaDataImpl(_dataSource);
+            }
+            dmd.DatabaseMetaData = _dbMetaData;
+            if (_sqlFileEncoding != null) {
+                dmd.SqlFileEncoding = _sqlFileEncoding;
+            }
+            if (_insertPrefixes != null) {
+                dmd.InsertPrefixes = _insertPrefixes;
+            }
+            if (_updatePrefixes != null) {
+                dmd.UpdatePrefixes = _updatePrefixes;
+            }
+            if (_deletePrefixes != null) {
+                dmd.DeletePrefixes = _deletePrefixes;
+            }
+            dmd.Initialize();
+            return dmd;
+        }
+
+        protected virtual ${glS2DaoMetaDataExtension} CreateDaoMetaDataImpl() {
+            return new ${glS2DaoMetaDataExtension}();
         }
     }
 }
