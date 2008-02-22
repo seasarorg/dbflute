@@ -1,11 +1,12 @@
 
 using System;
-using System.Collections;
 
+using Seasar.Quill.Attrs;
 using ${glPackageBaseCommonBhv};
 
 namespace ${glPackageBaseCommon} {
 
+    [Implementation(typeof(${glCacheBehaviorSelectorName}))]
     public interface ${glBehaviorSelectorInterfaceName} {
         BEHAVIOR_TYPE Select<BEHAVIOR_TYPE>(Type behaviorType) where BEHAVIOR_TYPE : ${glBehaviorReadableInterfaceName};
         ${glBehaviorReadableInterfaceName} ByName(String tableFlexibleName);
