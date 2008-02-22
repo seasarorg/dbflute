@@ -1,96 +1,7 @@
-<map version="0.8.0">
+<map version="0.8.1">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
 <node CREATED="1175069378890" ID="Freemind_Link_230420394" MODIFIED="1199822211484" TEXT="jflute-tool-map">
 <node CREATED="1175142452062" ID="Freemind_Link_465193280" MODIFIED="1184829354687" POSITION="right" TEXT="Java">
-<node CREATED="1199786814531" ID="Freemind_Link_1480627369" MODIFIED="1199786820390" TEXT="*basic">
-<node CREATED="1175142460937" ID="Freemind_Link_1223645843" MODIFIED="1198300918718" TEXT="Memory">
-<node CREATED="1199786965171" ID="Freemind_Link_96730238" MODIFIED="1199786969640" TEXT="Management">
-<node CREATED="1175142469343" ID="Freemind_Link_1528141289" MODIFIED="1199786834328" TEXT="JMX">
-<node CREATED="1175142505015" ID="Freemind_Link_1018435714" MODIFIED="1199786923718" TEXT="*howto">
-<node CREATED="1175142535046" ID="Freemind_Link_1006096379" MODIFIED="1203047282791" TEXT="1. -Dcom.sun.management.jmxremote&#xa;2. CommandPrompt&#x3067;&#x300c;jconsole&#x300d;"/>
-</node>
-<node CREATED="1199786895203" ID="Freemind_Link_1444134890" MODIFIED="1199786896296" TEXT="*ref">
-<node CREATED="1175142501828" ID="Freemind_Link_1880669794" MODIFIED="1175142502218" TEXT="http://java.sun.com/j2se/1.5.0/ja/docs/ja/guide/management/agent.html"/>
-</node>
-</node>
-</node>
-<node CREATED="1175153749317" FOLDED="true" ID="Freemind_Link_572922185" MODIFIED="1199786847000" TEXT="VM-Memory">
-<node CREATED="1199786933484" ID="Freemind_Link_1013677374" MODIFIED="1199786936328" TEXT="*howto">
-<node CREATED="1175153772347" ID="Freemind_Link_1889098616" MODIFIED="1199786944296" TEXT="VM-Argument">
-<node CREATED="1175153790518" ID="Freemind_Link_810501668" MODIFIED="1199786857781" TEXT="Heap">
-<node CREATED="1175153833157" ID="Freemind_Link_1728088347" MODIFIED="1175153833672" TEXT="-Xms=1024m"/>
-<node CREATED="1175153839813" ID="Freemind_Link_1164558864" MODIFIED="1175153840266" TEXT="-Xmx=1024m"/>
-</node>
-<node CREATED="1175153795705" ID="Freemind_Link_443703826" MODIFIED="1199786859937" TEXT="Perm">
-<node CREATED="1175153824782" ID="Freemind_Link_1667960092" MODIFIED="1175153825329" TEXT="-XX:PermSize=128m"/>
-<node CREATED="1175153798377" ID="Freemind_Link_84554295" MODIFIED="1175153799189" TEXT="-XX:MaxPermSize=128m"/>
-</node>
-</node>
-</node>
-</node>
-</node>
-<node CREATED="1179810935484" ID="Freemind_Link_1476573439" MODIFIED="1198300866734" TEXT="Thread">
-<node CREATED="1179810938343" FOLDED="true" ID="Freemind_Link_1980006996" MODIFIED="1179810945578" TEXT="*word">
-<node CREATED="1179810989687" FOLDED="true" ID="Freemind_Link_241298689" MODIFIED="1179810990328" TEXT="Semaphore">
-<node CREATED="1179811004171" ID="Freemind_Link_1603519332" MODIFIED="1179811004859" TEXT="&#x53e4;&#x5178;&#x7684;&#x3067;&#x304b;&#x3064;&#x73fe;&#x5728;&#x3082;&#x5229;&#x7528;&#x3055;&#x308c;&#x308b;&#x540c;&#x671f;&#x6a5f;&#x69cb;&#x306e;&#x4e00;&#x7a2e;&#x3002;&#x30a8;&#x30c9;&#x30ac;&#x30fc;&#x30fb;&#x30c0;&#x30a4;&#x30af;&#x30b9;&#x30c8;&#x30e9;&#x304c;&#x8003;&#x6848;&#x3057;&#x305f;&#x3002;"/>
-<node CREATED="1179811019125" ID="Freemind_Link_1348615613" MODIFIED="1179811019968" TEXT="&#x4e26;&#x5217;&#x51e6;&#x7406;&#x306e;&#x5b9f;&#x884c;&#x74b0;&#x5883;&#x306b;&#x304a;&#x3044;&#x3066;&#x3001;&#x6392;&#x4ed6;&#x533a;&#x9593;&#x3092;&#x78ba;&#x4fdd;&#x3057;&#x3001;&#x8cc7;&#x6e90;&#x306b;&#x540c;&#x6642;&#x30a2;&#x30af;&#x30bb;&#x30b9;&#x3067;&#x304d;&#x308b;&#x4e0a;&#x9650;&#x3092;&#x898f;&#x5b9a;&#x3057;&#x305f;&#x3044;&#x6642;&#x306b;&#x7528;&#x3044;&#x308b;&#x3002;"/>
-<node CREATED="1179811054125" ID="Freemind_Link_1716224390" MODIFIED="1179811054703" TEXT="java.util.concurrent.Semaphore &#x30af;&#x30e9;&#x30b9;&#x3092;&#x4f7f;&#x3046;&#x3002;"/>
-</node>
-</node>
-<node CREATED="1203325028657" ID="Freemind_Link_1943374913" MODIFIED="1203325031205" TEXT="*attension">
-<node CREATED="1203325031791" ID="Freemind_Link_836418197" MODIFIED="1203325032489" TEXT="http://forum.java.sun.com/thread.jspa?threadID=5163912&amp;messageID=9626200"/>
-</node>
-</node>
-<node CREATED="1179809933453" ID="Freemind_Link_461717554" MODIFIED="1186634441375" TEXT="JDBC">
-<node CREATED="1179817528828" FOLDED="true" ID="Freemind_Link_1784188824" MODIFIED="1199787020875" TEXT="Connection">
-<node CREATED="1179817537843" ID="Freemind_Link_1600550388" MODIFIED="1179817553328" TEXT="URL/User/Password&#x306b;&#x3088;&#x3063;&#x3066;DB&#x306b;&#x63a5;&#x7d9a;"/>
-<node CREATED="1179817554500" ID="Freemind_Link_1384248631" MODIFIED="1179817566671" TEXT="Statement&#x3092;&#x751f;&#x6210;&#x3059;&#x308b;&#x632f;&#x821e;&#x3044;&#x3092;&#x6301;&#x3064;"/>
-</node>
-<node CREATED="1179810380968" FOLDED="true" ID="Freemind_Link_1635026725" MODIFIED="1199787023265" TEXT="Statement">
-<node CREATED="1179809936375" FOLDED="true" ID="Freemind_Link_1847209507" MODIFIED="1179809952812" TEXT="Statement#setFetchSize()">
-<node CREATED="1179810220578" ID="Freemind_Link_1080282286" MODIFIED="1179810221765" TEXT="&#x65b0;&#x3057;&#x3044;&#x884c;&#x304c;&#x5fc5;&#x8981;&#x3068;&#x3055;&#x308c;&#x308b;&#x305f;&#x3073;&#x306b;&#x30c7;&#x30fc;&#x30bf;&#x30d9;&#x30fc;&#x30b9;&#x304b;&#x3089;&#x30d5;&#x30a7;&#x30c3;&#x30c1;&#x3055;&#x308c;&#x308b;&#x884c;&#x306e;&#x6570;&#x3002;"/>
-<node CREATED="1179809954015" ID="Freemind_Link_1268172693" MODIFIED="1179809961750" TEXT="&#x30c9;&#x30e9;&#x30a4;&#x30d0;&#x306b;&#x9069;&#x3057;&#x305f;&#x3082;&#x3063;&#x3068;&#x3082;&#x52b9;&#x7387;&#x7684;&#x306a;&#x30d5;&#x30a7;&#x30c3;&#x30c1;&#x30b5;&#x30a4;&#x30ba;&#x304c;&#x30c7;&#x30d5;&#x30a9;&#x30eb;&#x30c8;&#x5024;&#x3068;&#x3057;&#x3066;&#x8a2d;&#x5b9a;&#x3055;&#x308c;&#x3066;&#x3044;&#x308b;&#x3002;"/>
-</node>
-</node>
-<node CREATED="1179810883406" FOLDED="true" ID="Freemind_Link_408918476" MODIFIED="1179810948390" TEXT="*ref">
-<node CREATED="1179810889109" ID="Freemind_Link_430277690" MODIFIED="1179810889484" TEXT="http://java.sun.com/j2se/1.5.0/ja/docs/ja/guide/jdbc/getstart/resultset.html"/>
-<node CREATED="1183710773578" ID="Freemind_Link_1142860059" MODIFIED="1183710774406" TEXT="http://sdc.sun.co.jp/java/docs/j2se/1.5.0/ja/docs/ja/api/constant-values.html"/>
-<node CREATED="1201421153963" ID="Freemind_Link_988259750" MODIFIED="1201421154726" TEXT="http://www.minq.se/products/dbvis/drivers.html"/>
-</node>
-</node>
-<node CREATED="1185425181796" FOLDED="true" ID="Freemind_Link_1078055448" MODIFIED="1185425184390" TEXT="Servlet">
-<node CREATED="1185425187468" FOLDED="true" ID="Freemind_Link_49033912" MODIFIED="1185425191187" TEXT="*ref">
-<node CREATED="1185425184968" ID="Freemind_Link_527497763" MODIFIED="1185425185515" TEXT="http://www.javaroad.jp/servletjsp/sj_servlet5.htm"/>
-</node>
-<node CREATED="1185856584421" FOLDED="true" ID="Freemind_Link_1672743330" MODIFIED="1185856732906" TEXT="*tips">
-<node CREATED="1185856733843" FOLDED="true" ID="Freemind_Link_239572626" MODIFIED="1185856745812" TEXT="Cookie&#x304c;&#x6709;&#x52b9;&#x304b;&#x5426;&#x304b;">
-<node CREATED="1185856746343" ID="Freemind_Link_272828909" MODIFIED="1185856764234" TEXT="HttpServletRequest#isRequestedSessionIdFromCookie()"/>
-</node>
-<node CREATED="1185856771078" FOLDED="true" ID="Freemind_Link_1923688711" MODIFIED="1185856803859" TEXT="SessionID&#x3092;&#x4ed8;&#x4e0e;(for sendRedirect())">
-<node CREATED="1185856778203" ID="Freemind_Link_1961347690" MODIFIED="1185856792968" TEXT="HttpServletRequest#encodeURL(url)"/>
-</node>
-<node CREATED="1186634234312" FOLDED="true" ID="Freemind_Link_1126052190" MODIFIED="1186634255906" TEXT="AppServer&#x306e;web.xml&#x304b;&#x3089;&#x5024;&#x306e;&#x53d6;&#x5f97;">
-<node CREATED="1186634260687" FOLDED="true" ID="Freemind_Link_1399043604" MODIFIED="1186634270781" TEXT="ServletContext#getInitParameter()&#x3067;&#x53ef;&#x80fd;">
-<node CREATED="1186634273078" FOLDED="true" ID="Freemind_Link_294723743" MODIFIED="1186634282765" TEXT="DB&#x63a5;&#x7d9a;&#x6587;&#x5b57;&#x5217;&#x306a;&#x3069;&#x306e;&#x7ba1;&#x7406;&#x306b;&#x6700;&#x9069;">
-<node CREATED="1186634287000" ID="Freemind_Link_131266944" MODIFIED="1186634334250" TEXT="DB&#x63a5;&#x7d9a;&#x5148;&#x3092;DB&#x4f9d;&#x5b58;&#x3059;&#x308b;&#x3053;&#x3068;&#x306b;&#x3088;&#x308a;&#xa;WAR&#x30d5;&#x30a1;&#x30a4;&#x30eb;&#x304c;DB&#x4f9d;&#x5b58;&#x3057;&#x306a;&#x3044;&#x3002;&#xa;&#x4e8b;&#x6545;&#x3092;&#x9632;&#x3050;&#x3002;"/>
-</node>
-</node>
-</node>
-<node CREATED="1187587611498" FOLDED="true" ID="Freemind_Link_91982907" MODIFIED="1187587619108" TEXT="Filter&#x306e;&#x5b9f;&#x884c;Timing&#x5236;&#x5fa1;">
-<node CREATED="1187587662326" FOLDED="true" ID="Freemind_Link_1844794656" MODIFIED="1187587681623" TEXT="Forward&#x3068;&#x304b;Error&#x3068;&#x304b;&#x306b;Dispatch&#x6642;&#x3082;&#x5b9f;&#x884c;&#x3059;&#x308b;&#x3088;&#x3046;&#x306b;&#x3059;&#x308b;&#x305f;&#x3081;&#x306b;&#x306f;">
-<node CREATED="1187587619748" ID="Freemind_Link_1788360613" MODIFIED="1187587657326" TEXT="&lt;filter-mapping&gt; &#xa;  &lt;filter-name&gt;s2filter&lt;/filter-name&gt;&#xa;  &lt;url-pattern&gt;/*&lt;/url-pattern&gt;&#xa;  &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;&#xa;  &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;&#xa;  &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;&#xa;&lt;!--         &lt;dispatcher&gt;INCLUDE&lt;/dispatcher&gt; --&gt;&#xa;&lt;/filter-mapping&gt;"/>
-</node>
-</node>
-</node>
-</node>
-<node CREATED="1179302295171" FOLDED="true" ID="Freemind_Link_1349251367" MODIFIED="1198300910875" TEXT="*tips">
-<node CREATED="1199786995093" ID="Freemind_Link_289294763" MODIFIED="1199786997468" TEXT="*attension">
-<node CREATED="1179797300078" ID="Freemind_Link_1379826252" MODIFIED="1179797305390" TEXT="&#x5909;&#x6570;&#x306e;&#x96a0;&#x853d;"/>
-<node CREATED="1179302311546" ID="Freemind_Link_1469686081" MODIFIED="1179302325765" TEXT="null&#x306e;&#x6587;&#x5b57;&#x5217;&#x9023;&#x7d50;&#x6642;&#x306e;&#x6ce8;&#x610f;"/>
-<node CREATED="1179302326859" ID="Freemind_Link_742338085" MODIFIED="1179302349734" TEXT="logger&#x306e;&#x4f8b;&#x5916;&#x5f15;&#x6570;&#x9593;&#x9055;&#x3048;"/>
-</node>
-</node>
-</node>
 <node CREATED="1186633879359" FOLDED="true" ID="Freemind_Link_1610169336" MODIFIED="1186633912281" TEXT="ApplicationServer">
 <node CREATED="1186634396984" FOLDED="true" ID="Freemind_Link_1546401381" MODIFIED="1186634402125" TEXT="WebServer">
 <node CREATED="1186634390390" FOLDED="true" ID="Freemind_Link_482592917" MODIFIED="1186634394703" TEXT="Apache">
@@ -199,10 +110,10 @@
 <node CREATED="1203474115918" ID="Freemind_Link_187896845" MODIFIED="1203474117137" TEXT="http://d.hatena.ne.jp/higayasuo/20041124"/>
 </node>
 </node>
-<node CREATED="1202978597820" ID="Freemind_Link_881677653" MODIFIED="1202978598686" TEXT="IDE">
-<node CREATED="1186894862265" ID="Freemind_Link_1811408348" MODIFIED="1186894864828" TEXT="Eclipse">
-<node CREATED="1186894865593" ID="Freemind_Link_269208490" MODIFIED="1186894867781" TEXT="Plugin">
-<node CREATED="1199705905421" ID="Freemind_Link_609685317" MODIFIED="1200032132064" TEXT="for Plug-in User">
+<node CREATED="1202978597820" FOLDED="true" ID="Freemind_Link_881677653" MODIFIED="1202978598686" TEXT="IDE">
+<node CREATED="1186894862265" FOLDED="true" ID="Freemind_Link_1811408348" MODIFIED="1186894864828" TEXT="Eclipse">
+<node CREATED="1186894865593" FOLDED="true" ID="Freemind_Link_269208490" MODIFIED="1186894867781" TEXT="Plugin">
+<node CREATED="1199705905421" FOLDED="true" ID="Freemind_Link_609685317" MODIFIED="1200032132064" TEXT="for Plug-in User">
 <node CREATED="1194938320781" FOLDED="true" ID="Freemind_Link_606292027" MODIFIED="1194938323171" TEXT="Subversion">
 <node CREATED="1199788684687" ID="Freemind_Link_955775091" MODIFIED="1199788700921" TEXT="UpdateSite">
 <node CREATED="1194938323984" ID="Freemind_Link_1479744119" MODIFIED="1194938324843" TEXT="http://www.polarion.org/projects/subversive/download/1.1/update-site/"/>
@@ -497,8 +408,97 @@
 </node>
 </node>
 </node>
+<node CREATED="1199786814531" FOLDED="true" ID="Freemind_Link_1480627369" MODIFIED="1199786820390" TEXT="*basic">
+<node CREATED="1175142460937" ID="Freemind_Link_1223645843" MODIFIED="1198300918718" TEXT="Memory">
+<node CREATED="1199786965171" ID="Freemind_Link_96730238" MODIFIED="1199786969640" TEXT="Management">
+<node CREATED="1175142469343" ID="Freemind_Link_1528141289" MODIFIED="1199786834328" TEXT="JMX">
+<node CREATED="1175142505015" ID="Freemind_Link_1018435714" MODIFIED="1199786923718" TEXT="*howto">
+<node CREATED="1175142535046" ID="Freemind_Link_1006096379" MODIFIED="1203047282791" TEXT="1. -Dcom.sun.management.jmxremote&#xa;2. CommandPrompt&#x3067;&#x300c;jconsole&#x300d;"/>
 </node>
-<node CREATED="1198138773218" ID="Freemind_Link_1487253838" MODIFIED="1199702680250" POSITION="right" TEXT="Utilities">
+<node CREATED="1199786895203" ID="Freemind_Link_1444134890" MODIFIED="1199786896296" TEXT="*ref">
+<node CREATED="1175142501828" ID="Freemind_Link_1880669794" MODIFIED="1175142502218" TEXT="http://java.sun.com/j2se/1.5.0/ja/docs/ja/guide/management/agent.html"/>
+</node>
+</node>
+</node>
+<node CREATED="1175153749317" FOLDED="true" ID="Freemind_Link_572922185" MODIFIED="1199786847000" TEXT="VM-Memory">
+<node CREATED="1199786933484" ID="Freemind_Link_1013677374" MODIFIED="1199786936328" TEXT="*howto">
+<node CREATED="1175153772347" ID="Freemind_Link_1889098616" MODIFIED="1199786944296" TEXT="VM-Argument">
+<node CREATED="1175153790518" ID="Freemind_Link_810501668" MODIFIED="1199786857781" TEXT="Heap">
+<node CREATED="1175153833157" ID="Freemind_Link_1728088347" MODIFIED="1175153833672" TEXT="-Xms=1024m"/>
+<node CREATED="1175153839813" ID="Freemind_Link_1164558864" MODIFIED="1175153840266" TEXT="-Xmx=1024m"/>
+</node>
+<node CREATED="1175153795705" ID="Freemind_Link_443703826" MODIFIED="1199786859937" TEXT="Perm">
+<node CREATED="1175153824782" ID="Freemind_Link_1667960092" MODIFIED="1175153825329" TEXT="-XX:PermSize=128m"/>
+<node CREATED="1175153798377" ID="Freemind_Link_84554295" MODIFIED="1175153799189" TEXT="-XX:MaxPermSize=128m"/>
+</node>
+</node>
+</node>
+</node>
+</node>
+<node CREATED="1179810935484" ID="Freemind_Link_1476573439" MODIFIED="1198300866734" TEXT="Thread">
+<node CREATED="1179810938343" FOLDED="true" ID="Freemind_Link_1980006996" MODIFIED="1179810945578" TEXT="*word">
+<node CREATED="1179810989687" FOLDED="true" ID="Freemind_Link_241298689" MODIFIED="1179810990328" TEXT="Semaphore">
+<node CREATED="1179811004171" ID="Freemind_Link_1603519332" MODIFIED="1179811004859" TEXT="&#x53e4;&#x5178;&#x7684;&#x3067;&#x304b;&#x3064;&#x73fe;&#x5728;&#x3082;&#x5229;&#x7528;&#x3055;&#x308c;&#x308b;&#x540c;&#x671f;&#x6a5f;&#x69cb;&#x306e;&#x4e00;&#x7a2e;&#x3002;&#x30a8;&#x30c9;&#x30ac;&#x30fc;&#x30fb;&#x30c0;&#x30a4;&#x30af;&#x30b9;&#x30c8;&#x30e9;&#x304c;&#x8003;&#x6848;&#x3057;&#x305f;&#x3002;"/>
+<node CREATED="1179811019125" ID="Freemind_Link_1348615613" MODIFIED="1179811019968" TEXT="&#x4e26;&#x5217;&#x51e6;&#x7406;&#x306e;&#x5b9f;&#x884c;&#x74b0;&#x5883;&#x306b;&#x304a;&#x3044;&#x3066;&#x3001;&#x6392;&#x4ed6;&#x533a;&#x9593;&#x3092;&#x78ba;&#x4fdd;&#x3057;&#x3001;&#x8cc7;&#x6e90;&#x306b;&#x540c;&#x6642;&#x30a2;&#x30af;&#x30bb;&#x30b9;&#x3067;&#x304d;&#x308b;&#x4e0a;&#x9650;&#x3092;&#x898f;&#x5b9a;&#x3057;&#x305f;&#x3044;&#x6642;&#x306b;&#x7528;&#x3044;&#x308b;&#x3002;"/>
+<node CREATED="1179811054125" ID="Freemind_Link_1716224390" MODIFIED="1179811054703" TEXT="java.util.concurrent.Semaphore &#x30af;&#x30e9;&#x30b9;&#x3092;&#x4f7f;&#x3046;&#x3002;"/>
+</node>
+</node>
+<node CREATED="1203325028657" ID="Freemind_Link_1943374913" MODIFIED="1203325031205" TEXT="*attension">
+<node CREATED="1203325031791" ID="Freemind_Link_836418197" MODIFIED="1203325032489" TEXT="http://forum.java.sun.com/thread.jspa?threadID=5163912&amp;messageID=9626200"/>
+</node>
+</node>
+<node CREATED="1179809933453" ID="Freemind_Link_461717554" MODIFIED="1186634441375" TEXT="JDBC">
+<node CREATED="1179817528828" FOLDED="true" ID="Freemind_Link_1784188824" MODIFIED="1199787020875" TEXT="Connection">
+<node CREATED="1179817537843" ID="Freemind_Link_1600550388" MODIFIED="1179817553328" TEXT="URL/User/Password&#x306b;&#x3088;&#x3063;&#x3066;DB&#x306b;&#x63a5;&#x7d9a;"/>
+<node CREATED="1179817554500" ID="Freemind_Link_1384248631" MODIFIED="1179817566671" TEXT="Statement&#x3092;&#x751f;&#x6210;&#x3059;&#x308b;&#x632f;&#x821e;&#x3044;&#x3092;&#x6301;&#x3064;"/>
+</node>
+<node CREATED="1179810380968" FOLDED="true" ID="Freemind_Link_1635026725" MODIFIED="1199787023265" TEXT="Statement">
+<node CREATED="1179809936375" FOLDED="true" ID="Freemind_Link_1847209507" MODIFIED="1179809952812" TEXT="Statement#setFetchSize()">
+<node CREATED="1179810220578" ID="Freemind_Link_1080282286" MODIFIED="1179810221765" TEXT="&#x65b0;&#x3057;&#x3044;&#x884c;&#x304c;&#x5fc5;&#x8981;&#x3068;&#x3055;&#x308c;&#x308b;&#x305f;&#x3073;&#x306b;&#x30c7;&#x30fc;&#x30bf;&#x30d9;&#x30fc;&#x30b9;&#x304b;&#x3089;&#x30d5;&#x30a7;&#x30c3;&#x30c1;&#x3055;&#x308c;&#x308b;&#x884c;&#x306e;&#x6570;&#x3002;"/>
+<node CREATED="1179809954015" ID="Freemind_Link_1268172693" MODIFIED="1179809961750" TEXT="&#x30c9;&#x30e9;&#x30a4;&#x30d0;&#x306b;&#x9069;&#x3057;&#x305f;&#x3082;&#x3063;&#x3068;&#x3082;&#x52b9;&#x7387;&#x7684;&#x306a;&#x30d5;&#x30a7;&#x30c3;&#x30c1;&#x30b5;&#x30a4;&#x30ba;&#x304c;&#x30c7;&#x30d5;&#x30a9;&#x30eb;&#x30c8;&#x5024;&#x3068;&#x3057;&#x3066;&#x8a2d;&#x5b9a;&#x3055;&#x308c;&#x3066;&#x3044;&#x308b;&#x3002;"/>
+</node>
+</node>
+<node CREATED="1179810883406" FOLDED="true" ID="Freemind_Link_408918476" MODIFIED="1179810948390" TEXT="*ref">
+<node CREATED="1179810889109" ID="Freemind_Link_430277690" MODIFIED="1179810889484" TEXT="http://java.sun.com/j2se/1.5.0/ja/docs/ja/guide/jdbc/getstart/resultset.html"/>
+<node CREATED="1183710773578" ID="Freemind_Link_1142860059" MODIFIED="1183710774406" TEXT="http://sdc.sun.co.jp/java/docs/j2se/1.5.0/ja/docs/ja/api/constant-values.html"/>
+<node CREATED="1201421153963" ID="Freemind_Link_988259750" MODIFIED="1201421154726" TEXT="http://www.minq.se/products/dbvis/drivers.html"/>
+</node>
+</node>
+<node CREATED="1185425181796" FOLDED="true" ID="Freemind_Link_1078055448" MODIFIED="1185425184390" TEXT="Servlet">
+<node CREATED="1185425187468" FOLDED="true" ID="Freemind_Link_49033912" MODIFIED="1185425191187" TEXT="*ref">
+<node CREATED="1185425184968" ID="Freemind_Link_527497763" MODIFIED="1185425185515" TEXT="http://www.javaroad.jp/servletjsp/sj_servlet5.htm"/>
+</node>
+<node CREATED="1185856584421" FOLDED="true" ID="Freemind_Link_1672743330" MODIFIED="1185856732906" TEXT="*tips">
+<node CREATED="1185856733843" FOLDED="true" ID="Freemind_Link_239572626" MODIFIED="1185856745812" TEXT="Cookie&#x304c;&#x6709;&#x52b9;&#x304b;&#x5426;&#x304b;">
+<node CREATED="1185856746343" ID="Freemind_Link_272828909" MODIFIED="1185856764234" TEXT="HttpServletRequest#isRequestedSessionIdFromCookie()"/>
+</node>
+<node CREATED="1185856771078" FOLDED="true" ID="Freemind_Link_1923688711" MODIFIED="1185856803859" TEXT="SessionID&#x3092;&#x4ed8;&#x4e0e;(for sendRedirect())">
+<node CREATED="1185856778203" ID="Freemind_Link_1961347690" MODIFIED="1185856792968" TEXT="HttpServletRequest#encodeURL(url)"/>
+</node>
+<node CREATED="1186634234312" FOLDED="true" ID="Freemind_Link_1126052190" MODIFIED="1186634255906" TEXT="AppServer&#x306e;web.xml&#x304b;&#x3089;&#x5024;&#x306e;&#x53d6;&#x5f97;">
+<node CREATED="1186634260687" FOLDED="true" ID="Freemind_Link_1399043604" MODIFIED="1186634270781" TEXT="ServletContext#getInitParameter()&#x3067;&#x53ef;&#x80fd;">
+<node CREATED="1186634273078" FOLDED="true" ID="Freemind_Link_294723743" MODIFIED="1186634282765" TEXT="DB&#x63a5;&#x7d9a;&#x6587;&#x5b57;&#x5217;&#x306a;&#x3069;&#x306e;&#x7ba1;&#x7406;&#x306b;&#x6700;&#x9069;">
+<node CREATED="1186634287000" ID="Freemind_Link_131266944" MODIFIED="1186634334250" TEXT="DB&#x63a5;&#x7d9a;&#x5148;&#x3092;DB&#x4f9d;&#x5b58;&#x3059;&#x308b;&#x3053;&#x3068;&#x306b;&#x3088;&#x308a;&#xa;WAR&#x30d5;&#x30a1;&#x30a4;&#x30eb;&#x304c;DB&#x4f9d;&#x5b58;&#x3057;&#x306a;&#x3044;&#x3002;&#xa;&#x4e8b;&#x6545;&#x3092;&#x9632;&#x3050;&#x3002;"/>
+</node>
+</node>
+</node>
+<node CREATED="1187587611498" FOLDED="true" ID="Freemind_Link_91982907" MODIFIED="1187587619108" TEXT="Filter&#x306e;&#x5b9f;&#x884c;Timing&#x5236;&#x5fa1;">
+<node CREATED="1187587662326" FOLDED="true" ID="Freemind_Link_1844794656" MODIFIED="1187587681623" TEXT="Forward&#x3068;&#x304b;Error&#x3068;&#x304b;&#x306b;Dispatch&#x6642;&#x3082;&#x5b9f;&#x884c;&#x3059;&#x308b;&#x3088;&#x3046;&#x306b;&#x3059;&#x308b;&#x305f;&#x3081;&#x306b;&#x306f;">
+<node CREATED="1187587619748" ID="Freemind_Link_1788360613" MODIFIED="1187587657326" TEXT="&lt;filter-mapping&gt; &#xa;  &lt;filter-name&gt;s2filter&lt;/filter-name&gt;&#xa;  &lt;url-pattern&gt;/*&lt;/url-pattern&gt;&#xa;  &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;&#xa;  &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;&#xa;  &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;&#xa;&lt;!--         &lt;dispatcher&gt;INCLUDE&lt;/dispatcher&gt; --&gt;&#xa;&lt;/filter-mapping&gt;"/>
+</node>
+</node>
+</node>
+</node>
+<node CREATED="1179302295171" FOLDED="true" ID="Freemind_Link_1349251367" MODIFIED="1198300910875" TEXT="*tips">
+<node CREATED="1199786995093" ID="Freemind_Link_289294763" MODIFIED="1199786997468" TEXT="*attension">
+<node CREATED="1179797300078" ID="Freemind_Link_1379826252" MODIFIED="1179797305390" TEXT="&#x5909;&#x6570;&#x306e;&#x96a0;&#x853d;"/>
+<node CREATED="1179302311546" ID="Freemind_Link_1469686081" MODIFIED="1179302325765" TEXT="null&#x306e;&#x6587;&#x5b57;&#x5217;&#x9023;&#x7d50;&#x6642;&#x306e;&#x6ce8;&#x610f;"/>
+<node CREATED="1179302326859" ID="Freemind_Link_742338085" MODIFIED="1179302349734" TEXT="logger&#x306e;&#x4f8b;&#x5916;&#x5f15;&#x6570;&#x9593;&#x9055;&#x3048;"/>
+</node>
+</node>
+</node>
+</node>
+<node CREATED="1198138773218" FOLDED="true" ID="Freemind_Link_1487253838" MODIFIED="1199702680250" POSITION="right" TEXT="Utilities">
 <node CREATED="1199701987921" FOLDED="true" ID="Freemind_Link_1454476193" MODIFIED="1199702013015" TEXT="Launchy">
 <node CREATED="1199789333609" FOLDED="true" ID="Freemind_Link_108120251" MODIFIED="1199789335609" TEXT="*download">
 <node CREATED="1198138776187" ID="Freemind_Link_1040002769" MODIFIED="1198138776781" TEXT="http://www.launchy.net/"/>
@@ -517,13 +517,6 @@
 </node>
 </node>
 <node CREATED="1187674606515" ID="Freemind_Link_543834341" MODIFIED="1187674610796" POSITION="left" TEXT=".NET">
-<node CREATED="1199957659438" FOLDED="true" ID="Freemind_Link_327761798" MODIFIED="1199957660785" TEXT="*basic">
-<node CREATED="1196843611500" FOLDED="true" ID="Freemind_Link_1073204163" MODIFIED="1196843613453" TEXT="MSBuild">
-<node CREATED="1199789440515" FOLDED="true" ID="Freemind_Link_497245548" MODIFIED="1199789441421" TEXT="*ref">
-<node CREATED="1196843617703" ID="Freemind_Link_1919372037" MODIFIED="1196843618453" TEXT="http://msbuildtasks.tigris.org/"/>
-</node>
-</node>
-</node>
 <node CREATED="1187674613718" FOLDED="true" ID="Freemind_Link_495016830" MODIFIED="1187674618812" TEXT="VisualStudio">
 <node CREATED="1187674621578" FOLDED="true" ID="Freemind_Link_786594834" MODIFIED="1187675333265" TEXT="v2008">
 <node CREATED="1199789501062" FOLDED="true" ID="Freemind_Link_976772434" MODIFIED="1199789683906" TEXT="*feature">
@@ -592,6 +585,24 @@
 </node>
 </node>
 </node>
+<node CREATED="1203658260512" FOLDED="true" ID="Freemind_Link_1122404214" MODIFIED="1203658263105" TEXT="ADO.NET">
+<node CREATED="1203658268554" FOLDED="true" ID="Freemind_Link_139695138" MODIFIED="1203658299830" TEXT="Connection on App.config">
+<node CREATED="1203661159931" FOLDED="true" ID="Freemind_Link_421834429" MODIFIED="1203661163066" TEXT="*attension">
+<node CREATED="1203661187942" FOLDED="true" ID="Freemind_Link_30811104" MODIFIED="1203661230313" TEXT="You should remove LocalSqlServer of default">
+<node CREATED="1203661224164" ID="Freemind_Link_477584268" MODIFIED="1203661224715" TEXT="&lt;remove name=&quot;LocalSqlServer&quot;/&gt;"/>
+</node>
+</node>
+<node CREATED="1203658348592" FOLDED="true" ID="Freemind_Link_1537312550" MODIFIED="1203658351957" TEXT="*ref-url">
+<node CREATED="1203658352478" ID="Freemind_Link_1838643756" MODIFIED="1203658352978" TEXT="http://www.msdn.net/library/ja/default.asp?url=/library/ja/jpdnvs05/htm/ADO2.0/vsgenerics.asp"/>
+<node CREATED="1203658366909" ID="Freemind_Link_1073501475" MODIFIED="1203658367610" TEXT="http://msdn2.microsoft.com/ja-jp/library/system.data.common.dbproviderfactory(VS.80).aspx"/>
+<node CREATED="1203661172890" ID="Freemind_Link_270500033" MODIFIED="1203661173541" TEXT="http://msdn2.microsoft.com/ja-jp/library/bf7sd233(VS.80).aspx"/>
+<node CREATED="1203661315286" ID="Freemind_Link_982246852" MODIFIED="1203661316207" TEXT="http://dotnetfan.org/blogs/dotnetfanblog/articles/604.aspx"/>
+</node>
+<node CREATED="1203658373879" FOLDED="true" ID="Freemind_Link_1010395085" MODIFIED="1203658378045" TEXT="*question">
+<node CREATED="1203658378736" ID="Freemind_Link_1996104995" MODIFIED="1203658428690" TEXT="Does not many data provider support it?"/>
+</node>
+</node>
+</node>
 <node CREATED="1187844893984" FOLDED="true" ID="Freemind_Link_1127921651" MODIFIED="1187844895953" TEXT="WPF">
 <node CREATED="1187845001640" FOLDED="true" ID="Freemind_Link_1360882810" MODIFIED="1199789452968" TEXT="*ref">
 <node CREATED="1187844996875" ID="Freemind_Link_1940361756" MODIFIED="1187844997453" TEXT="http://d.hatena.ne.jp/NyaRuRu/20070728/p1"/>
@@ -633,11 +644,85 @@
 </node>
 </node>
 </node>
+<node CREATED="1199957659438" FOLDED="true" ID="Freemind_Link_327761798" MODIFIED="1199957660785" TEXT="*basic">
+<node CREATED="1196843611500" FOLDED="true" ID="Freemind_Link_1073204163" MODIFIED="1196843613453" TEXT="MSBuild">
+<node CREATED="1199789440515" FOLDED="true" ID="Freemind_Link_497245548" MODIFIED="1199789441421" TEXT="*ref">
+<node CREATED="1196843617703" ID="Freemind_Link_1919372037" MODIFIED="1196843618453" TEXT="http://msbuildtasks.tigris.org/"/>
+</node>
+</node>
+</node>
 </node>
 <node CREATED="1184818165750" ID="Freemind_Link_1862050389" MODIFIED="1184829360109" POSITION="left" TEXT="Database">
-<node CREATED="1184818183078" ID="Freemind_Link_249127485" MODIFIED="1184829367968" TEXT="PostgreSQL"/>
+<node CREATED="1185872203515" FOLDED="true" ID="Freemind_Link_994063421" MODIFIED="1185872204890" TEXT="Oracle">
+<node CREATED="1203645543780" FOLDED="true" ID="Freemind_Link_143676120" MODIFIED="1203645546485" TEXT="Explain">
+<node CREATED="1203645549211" FOLDED="true" ID="Freemind_Link_1046556251" MODIFIED="1203645550884" TEXT="*ref">
+<node CREATED="1185872209906" ID="Freemind_Link_786243255" MODIFIED="1185872210296" TEXT="http://otndnld.oracle.co.jp/document/products/oracle10g/102/doc_cd/server.102/B19207-01/ex_plan.html"/>
+</node>
+</node>
+<node CREATED="1203645000339" FOLDED="true" ID="Freemind_Link_887808804" MODIFIED="1203645014058" TEXT="License">
+<node CREATED="1202978788767" FOLDED="true" ID="Freemind_Link_1512679069" MODIFIED="1202978792290" TEXT="Standard">
+<node CREATED="1202978800886" ID="Freemind_Link_1219134045" MODIFIED="1202978809300" TEXT="Processor License">
+<node CREATED="1202978792823" ID="Freemind_Link_1489079256" MODIFIED="1202978793721" TEXT="1,875,000"/>
+</node>
+</node>
+<node CREATED="1202978842291" FOLDED="true" ID="Freemind_Link_1836821451" MODIFIED="1202978846483" TEXT="Enterprise">
+<node CREATED="1202978854835" ID="Freemind_Link_405663566" MODIFIED="1202978862107" TEXT="Processor License">
+<node CREATED="1202978862520" ID="Freemind_Link_776267487" MODIFIED="1202978874524" TEXT="5,000,000"/>
+</node>
+</node>
+</node>
+<node CREATED="1200549597388" FOLDED="true" ID="Freemind_Link_1773218617" MODIFIED="1203650139620" TEXT="*topics">
+<node CREATED="1200549601374" FOLDED="true" ID="Freemind_Link_131453730" MODIFIED="1200549614968" TEXT="Refused by Listener">
+<node CREATED="1200549618109" FOLDED="true" ID="Freemind_Link_828529147" MODIFIED="1200549638104" TEXT="Oracle&#x7ba1;&#x7406;&#x753b;&#x9762;&#x306b;&#x3064;&#x306a;&#x3044;&#x3060;&#x3089;&#x76f4;&#x3063;&#x305f;">
+<node CREATED="1200549639998" ID="Freemind_Link_650512172" MODIFIED="1200549642969" TEXT="&#x306a;&#x305c;&#x304b;&#x306f;&#x4e0d;&#x660e;"/>
+<node CREATED="1200549644237" ID="Freemind_Link_1815062011" MODIFIED="1200549646112" TEXT="http://127.0.0.1:8080/apex/f?p=4550"/>
+</node>
+</node>
+<node CREATED="1203645576634" FOLDED="true" ID="Freemind_Link_78021474" MODIFIED="1203645590842" TEXT="What should I do at first?">
+<node CREATED="1198071478031" ID="Freemind_Link_827831415" MODIFIED="1198071754406" TEXT="create database [database_name]&#x306f;&#x4e0d;&#x8981;&#x304b;&#x3082;"/>
+<node CREATED="1198071516906" ID="Freemind_Link_1834048894" MODIFIED="1198071531796" TEXT="create user [user_name] identified by [password]"/>
+<node CREATED="1198071552062" ID="Freemind_Link_1487120499" MODIFIED="1198071579359" TEXT="grant all privileges to [user_name]"/>
+</node>
+</node>
+<node CREATED="1203650135775" FOLDED="true" ID="Freemind_Link_91786433" MODIFIED="1203650137727" TEXT="*tools">
+<node CREATED="1202980038286" FOLDED="true" ID="Freemind_Link_1525497877" MODIFIED="1203645152228" TEXT="Recovery">
+<node CREATED="1202980043818" FOLDED="true" ID="Freemind_Link_1270393628" MODIFIED="1202980044757" TEXT="Recovery Manager">
+<node CREATED="1202980071726" FOLDED="true" ID="Freemind_Link_873617993" MODIFIED="1202980073895" TEXT="*overview">
+<node CREATED="1202980076651" ID="Freemind_Link_1612123190" MODIFIED="1202980083174" TEXT="Oracle&#x304c;&#x6a19;&#x6e96;&#x3067;&#x63d0;&#x4f9b;&#x3057;&#x3066;&#x3044;&#x308b;&#x30d0;&#x30c3;&#x30af;&#x30a2;&#x30c3;&#x30d7;&#x3001;&#x30ea;&#x30b9;&#x30c8;&#x30a2;&#x3001;&#x30ea;&#x30ab;&#x30d0;&#x30ea;&#xa;&#x306e;&#x64cd;&#x4f5c;&#x3084;&#x7ba1;&#x7406;&#x3092;&#x884c;&#x3046;&#x3053;&#x3068;&#x304c;&#x3067;&#x304d;&#x308b;&#x30e6;&#x30fc;&#x30c6;&#x30a3;&#x30ea;&#x30c6;&#x30a3;"/>
+</node>
+<node CREATED="1202980052630" FOLDED="true" ID="Freemind_Link_1468067211" MODIFIED="1202980059358" TEXT="*nickname">
+<node CREATED="1202980059715" ID="Freemind_Link_1123412992" MODIFIED="1202980060278" TEXT="RMAN"/>
+</node>
+<node CREATED="1202980102872" FOLDED="true" ID="Freemind_Link_768521752" MODIFIED="1202980103632" TEXT="*ref">
+<node CREATED="1202980103982" ID="Freemind_Link_690025291" MODIFIED="1202980104480" TEXT="http://www.atmarkit.co.jp/fdb/rensai/ora_backup08/ora_backup08_1.html"/>
+</node>
+</node>
+</node>
+<node CREATED="1203645035279" FOLDED="true" ID="Freemind_Link_556116936" MODIFIED="1203645044822" TEXT="DB-Access">
+<node CREATED="1198299279609" FOLDED="true" ID="Freemind_Link_889602752" MODIFIED="1203645060565" TEXT="*overview">
+<node CREATED="1198299284671" ID="Freemind_Link_218302432" MODIFIED="1198299326343" TEXT="&#x57fa;&#x672c;&#x306f;SQL*Plus&#x3002;EnterpriceManager&#x3082;&#x3042;&#x308b;&#x3002;&#xa;&#x3057;&#x304b;&#x3057;&#x3001;ShareWare&#x306e;osqledit&#x304c;&#x975e;&#x5e38;&#x306b;&#x4f7f;&#x3044;&#x3084;&#x3059;&#x3044;&#x3002;&#xa;"/>
+</node>
+<node CREATED="1203645080974" FOLDED="true" ID="Freemind_Link_148444423" MODIFIED="1203645086162" TEXT="*official">
+<node CREATED="1198299275125" ID="Freemind_Link_781339241" MODIFIED="1198299278484" TEXT="SQL*Plus"/>
+<node CREATED="1203645168071" ID="Freemind_Link_1054353876" MODIFIED="1203645173212" TEXT="EnterpriceManager"/>
+</node>
+<node CREATED="1203645090438" FOLDED="true" ID="Freemind_Link_1902173130" MODIFIED="1203645097538" TEXT="*shareware">
+<node CREATED="1198299328531" FOLDED="true" ID="Freemind_Link_587517264" MODIFIED="1198299332125" TEXT="osqledit">
+<node CREATED="1198299384765" ID="Freemind_Link_40423886" MODIFIED="1198299385296" TEXT="http://www.hi-ho.ne.jp/a_ogawa/osqledit/index.htm"/>
+<node CREATED="1198299336515" ID="Freemind_Link_429609180" MODIFIED="1198299340093" TEXT="ShareWare"/>
+<node CREATED="1198299342531" ID="Freemind_Link_147311716" MODIFIED="1198299345937" TEXT="4000Yen"/>
+</node>
+</node>
+</node>
+</node>
+</node>
 <node CREATED="1184818176109" ID="Freemind_Link_687695818" MODIFIED="1184829365687" TEXT="MySQL">
-<node CREATED="1197945855921" FOLDED="true" ID="Freemind_Link_670810728" MODIFIED="1197945862718" TEXT="Command">
+<node CREATED="1186640568562" FOLDED="true" ID="Freemind_Link_1561973429" MODIFIED="1203648595292" TEXT="ColumnTypes">
+<node CREATED="1203645422825" FOLDED="true" ID="Freemind_Link_114927665" MODIFIED="1203645424939" TEXT="*ref">
+<node CREATED="1186640576390" ID="Freemind_Link_902270315" MODIFIED="1186640576968" TEXT="http://www.powerdee.com/it/mysql/dataTypes.html"/>
+</node>
+</node>
+<node CREATED="1197945855921" FOLDED="true" ID="Freemind_Link_670810728" MODIFIED="1203648592848" TEXT="Commands">
 <node CREATED="1197945868500" ID="Freemind_Link_1618117715" MODIFIED="1197945872187" TEXT="show tables;"/>
 <node CREATED="1197945864078" ID="Freemind_Link_854080357" MODIFIED="1197945864687" TEXT="show variables like &apos;wait%&apos;;"/>
 <node CREATED="1202879789545" ID="Freemind_Link_320062465" MODIFIED="1202879800970" TEXT="desc [table];"/>
@@ -649,6 +734,26 @@
 </node>
 </node>
 <node CREATED="1203562112968" ID="Freemind_Link_531623485" MODIFIED="1203562121640" TEXT="analyze table [table];"/>
+</node>
+<node CREATED="1203560151296" ID="Freemind_Link_113175614" MODIFIED="1203648589533" TEXT="Parameters">
+<node CREATED="1203560208937" FOLDED="true" ID="Freemind_Link_1912802902" MODIFIED="1203560215453" TEXT="QueryCache">
+<node CREATED="1203560217562" ID="Freemind_Link_329068409" MODIFIED="1203560226453" TEXT="query_cache_size=32M"/>
+<node CREATED="1203561974531" ID="Freemind_Link_447516462" MODIFIED="1203561976984" TEXT="default off"/>
+<node CREATED="1203561700062" ID="Freemind_Link_1394334556" MODIFIED="1203561732156" TEXT="show status like &apos;Qcache%&apos;"/>
+<node CREATED="1203563463390" FOLDED="true" ID="Freemind_Link_1643132158" MODIFIED="1203563514500" TEXT="Large result is out of target">
+<node CREATED="1203563491765" ID="Freemind_Link_1551746266" MODIFIED="1203563503609" TEXT="query_cache_limit=3M"/>
+<node CREATED="1203563506312" ID="Freemind_Link_530359401" MODIFIED="1203563509375" TEXT="default 1M"/>
+</node>
+</node>
+<node CREATED="1203561767000" FOLDED="true" ID="Freemind_Link_513386304" MODIFIED="1203561771218" TEXT="ConnectionSize">
+<node CREATED="1203561775187" ID="Freemind_Link_1406421859" MODIFIED="1203561788875" TEXT="max_connections=100"/>
+<node CREATED="1203561794468" ID="Freemind_Link_1007112951" MODIFIED="1203561801078" TEXT="default 100"/>
+</node>
+<node CREATED="1203561772406" FOLDED="true" ID="Freemind_Link_881021567" MODIFIED="1203561933718" TEXT="ThreadCacheSize">
+<node CREATED="1203561934453" ID="Freemind_Link_403242970" MODIFIED="1203561992046" TEXT="thread_cache_size=10"/>
+<node CREATED="1203561987984" ID="Freemind_Link_1384875764" MODIFIED="1203561990328" TEXT="default=0"/>
+<node CREATED="1203562022031" ID="Freemind_Link_473980602" MODIFIED="1203562055109" TEXT="recommended 1/3 of max connections"/>
+</node>
 </node>
 <node CREATED="1202276713482" FOLDED="true" ID="Freemind_Link_51791756" MODIFIED="1202276716231" TEXT="Explain">
 <node CREATED="1202882609011" FOLDED="true" ID="Freemind_Link_496858178" MODIFIED="1202882612294" TEXT="select_type">
@@ -700,54 +805,34 @@
 <node CREATED="1202883164034" ID="Freemind_Link_1898524947" MODIFIED="1202883169077" TEXT="Using index"/>
 </node>
 </node>
-<node CREATED="1203560151296" ID="Freemind_Link_113175614" MODIFIED="1203560153062" TEXT="Parameter">
-<node CREATED="1203560208937" ID="Freemind_Link_1912802902" MODIFIED="1203560215453" TEXT="QueryCache">
-<node CREATED="1203560217562" ID="Freemind_Link_329068409" MODIFIED="1203560226453" TEXT="query_cache_size=32M"/>
-<node CREATED="1203561974531" ID="Freemind_Link_447516462" MODIFIED="1203561976984" TEXT="default off"/>
-<node CREATED="1203561700062" ID="Freemind_Link_1394334556" MODIFIED="1203561732156" TEXT="show status like &apos;Qcache%&apos;"/>
-<node CREATED="1203563463390" FOLDED="true" ID="Freemind_Link_1643132158" MODIFIED="1203563514500" TEXT="Large result is out of target">
-<node CREATED="1203563491765" ID="Freemind_Link_1551746266" MODIFIED="1203563503609" TEXT="query_cache_limit=3M"/>
-<node CREATED="1203563506312" ID="Freemind_Link_530359401" MODIFIED="1203563509375" TEXT="default 1M"/>
+<node CREATED="1203645209216" ID="Freemind_Link_1539721526" MODIFIED="1203645211310" TEXT="License"/>
+<node CREATED="1203650105791" FOLDED="true" ID="Freemind_Link_662044458" MODIFIED="1203650108044" TEXT="*tools">
+<node CREATED="1203645108929" FOLDED="true" ID="Freemind_Link_1599185480" MODIFIED="1203645111885" TEXT="DB-Access">
+<node CREATED="1203645112656" ID="Freemind_Link_1609875002" MODIFIED="1203645115913" TEXT="*official">
+<node CREATED="1203645116384" ID="Freemind_Link_1869524823" MODIFIED="1203645120122" TEXT="MySQL Client"/>
+</node>
+<node CREATED="1203645130864" ID="Freemind_Link_1534107100" MODIFIED="1203645134562" TEXT="*freeware">
+<node CREATED="1203645135243" ID="Freemind_Link_1321751262" MODIFIED="1203645138099" TEXT="CSE"/>
 </node>
 </node>
-<node CREATED="1203561767000" FOLDED="true" ID="Freemind_Link_513386304" MODIFIED="1203561771218" TEXT="ConnectionSize">
-<node CREATED="1203561775187" ID="Freemind_Link_1406421859" MODIFIED="1203561788875" TEXT="max_connections=100"/>
-<node CREATED="1203561794468" ID="Freemind_Link_1007112951" MODIFIED="1203561801078" TEXT="default 100"/>
-</node>
-<node CREATED="1203561772406" FOLDED="true" ID="Freemind_Link_881021567" MODIFIED="1203561933718" TEXT="ThreadCacheSize">
-<node CREATED="1203561934453" ID="Freemind_Link_403242970" MODIFIED="1203561992046" TEXT="thread_cache_size=10"/>
-<node CREATED="1203561987984" ID="Freemind_Link_1384875764" MODIFIED="1203561990328" TEXT="default=0"/>
-<node CREATED="1203562022031" ID="Freemind_Link_473980602" MODIFIED="1203562055109" TEXT="recommended 1/3 of max connections"/>
-</node>
-</node>
-<node CREATED="1202781696947" FOLDED="true" ID="Freemind_Link_17251721" MODIFIED="1202781703150" TEXT="Tools">
 <node CREATED="1202781703971" FOLDED="true" ID="Freemind_Link_1865534507" MODIFIED="1202781709478" TEXT="Modeling">
 <node CREATED="1202781710043" FOLDED="true" ID="Freemind_Link_37809105" MODIFIED="1202781719214" TEXT="MySQL Workbench">
 <node CREATED="1202781734157" ID="Freemind_Link_281172998" MODIFIED="1202781749542" TEXT="2008/02&#x6642;&#x70b9;&#x3067;MySQL&#x793e;&#x304c;&#x958b;&#x767a;&#x4e2d;"/>
 </node>
 </node>
 </node>
-<node CREATED="1186645215250" ID="Freemind_Link_430998527" MODIFIED="1203561015093" TEXT="*trouble">
+<node CREATED="1203648689018" ID="Freemind_Link_842888400" MODIFIED="1203650109957" TEXT="*topics">
+<node CREATED="1203560432796" FOLDED="true" ID="Freemind_Link_322335631" MODIFIED="1203649760237" TEXT="Optimistic ErrorCheck">
+<node CREATED="1203649823379" FOLDED="true" ID="Freemind_Link_100389955" MODIFIED="1203649829338" TEXT="*solution">
+<node CREATED="1203560448875" ID="Freemind_Link_542670775" MODIFIED="1203649739227" TEXT="Use SQL_MODE"/>
+</node>
+</node>
 <node CREATED="1202890329181" ID="Freemind_Link_1991580946" MODIFIED="1203560351734" TEXT="Mojibake on prompt">
-<node CREATED="1203561511546" FOLDED="true" ID="Freemind_Link_1172367406" MODIFIED="1203561514265" TEXT="*solution">
+<node CREATED="1203649832042" FOLDED="true" ID="Freemind_Link_874395787" MODIFIED="1203649833023" TEXT="*solution">
 <node CREATED="1202890414451" ID="Freemind_Link_878141989" MODIFIED="1202890437227" TEXT="my.ini&#x306b;default-charaset... and set names cp932"/>
 </node>
 </node>
-<node CREATED="1203560432796" ID="Freemind_Link_322335631" MODIFIED="1203560444265" TEXT="Optimistic ErrorCheck">
-<node CREATED="1203561501390" FOLDED="true" ID="Freemind_Link_1816233785" MODIFIED="1203561504187" TEXT="*solution">
-<node CREATED="1203560448875" ID="Freemind_Link_542670775" MODIFIED="1203560454953" TEXT="Use SQL_MODE"/>
-</node>
-</node>
 <node CREATED="1203560248546" FOLDED="true" ID="Freemind_Link_1579625192" MODIFIED="1203560260640" TEXT="Slow Query">
-<node CREATED="1203560857531" FOLDED="true" ID="Freemind_Link_614582501" MODIFIED="1203560861187" TEXT="*fact">
-<node CREATED="1186750657609" ID="Freemind_Link_1778447148" MODIFIED="1186750821687" TEXT="&#x7d50;&#x5408;&#x5148;Column&#x3067;&#x306e;&#x7d5e;&#x308a;&#x8fbc;&#x307f;&#x306b;&#x304a;&#x3044;&#x3066;inner join - left outer join &#x306e;&#x5dee;&#x7121;&#x3057;"/>
-<node CREATED="1202282557521" ID="Freemind_Link_1019346289" MODIFIED="1202282602635" TEXT="MySQL-5.0&#x3088;&#x308a;or&#x53e5;&#x3092;&#x5185;&#x90e8;&#x7684;&#x306b;union&#x306b;&#x5c55;&#x958b;&#x3057;&#x3066;&#x3057;&#x3063;&#x304b;&#x308a;Index&#x3092;&#x4f7f;&#x3063;&#x3066;&#x304f;&#x308c;&#x308b;"/>
-<node CREATED="1187590478139" FOLDED="true" ID="Freemind_Link_845463092" MODIFIED="1187590499998" TEXT="&#x4e2d;&#x9593;&#x4e00;&#x81f4;&#x3067;&#x3082;&#x3042;&#x308b;&#x7a0b;&#x5ea6;&#x901f;&#x3044;">
-<node CREATED="1187590500514" FOLDED="true" ID="Freemind_Link_973211273" MODIFIED="1187590507436" TEXT="INDEX&#x3067;&#x306f;&#x306a;&#x304f;Turbo Boyer-Moore&#x3092;&#x5229;&#x7528;&#x3057;&#x3066;&#x3044;&#x308b;">
-<node CREATED="1187596087779" ID="Freemind_Link_608357687" MODIFIED="1187596088498" TEXT="http://itpro.nikkeibp.co.jp/article/COLUMN/20061024/251654/?P=9"/>
-</node>
-</node>
-</node>
 <node CREATED="1203561267546" FOLDED="true" ID="Freemind_Link_742486456" MODIFIED="1203561276578" TEXT="Exists Sub Query">
 <node CREATED="1203561317265" FOLDED="true" ID="Freemind_Link_62681752" MODIFIED="1203561320515" TEXT="*solution">
 <node CREATED="1203561031718" ID="Freemind_Link_754787509" MODIFIED="1203563348765" TEXT="Add multiple index"/>
@@ -765,90 +850,22 @@
 <node CREATED="1203561444578" ID="Freemind_Link_1476879855" MODIFIED="1203561479859" TEXT="PreparedStatement don&apos;t use query cache on MySQL-5.0"/>
 </node>
 </node>
+<node CREATED="1203560857531" FOLDED="true" ID="Freemind_Link_614582501" MODIFIED="1203560861187" TEXT="*fact">
+<node CREATED="1186750657609" ID="Freemind_Link_1778447148" MODIFIED="1186750821687" TEXT="&#x7d50;&#x5408;&#x5148;Column&#x3067;&#x306e;&#x7d5e;&#x308a;&#x8fbc;&#x307f;&#x306b;&#x304a;&#x3044;&#x3066;inner join - left outer join &#x306e;&#x5dee;&#x7121;&#x3057;"/>
+<node CREATED="1202282557521" ID="Freemind_Link_1019346289" MODIFIED="1202282602635" TEXT="MySQL-5.0&#x3088;&#x308a;or&#x53e5;&#x3092;&#x5185;&#x90e8;&#x7684;&#x306b;union&#x306b;&#x5c55;&#x958b;&#x3057;&#x3066;&#x3057;&#x3063;&#x304b;&#x308a;Index&#x3092;&#x4f7f;&#x3063;&#x3066;&#x304f;&#x308c;&#x308b;"/>
+<node CREATED="1187590478139" FOLDED="true" ID="Freemind_Link_845463092" MODIFIED="1187590499998" TEXT="&#x4e2d;&#x9593;&#x4e00;&#x81f4;&#x3067;&#x3082;&#x3042;&#x308b;&#x7a0b;&#x5ea6;&#x901f;&#x3044;">
+<node CREATED="1187590500514" FOLDED="true" ID="Freemind_Link_973211273" MODIFIED="1187590507436" TEXT="INDEX&#x3067;&#x306f;&#x306a;&#x304f;Turbo Boyer-Moore&#x3092;&#x5229;&#x7528;&#x3057;&#x3066;&#x3044;&#x308b;">
+<node CREATED="1187596087779" ID="Freemind_Link_608357687" MODIFIED="1187596088498" TEXT="http://itpro.nikkeibp.co.jp/article/COLUMN/20061024/251654/?P=9"/>
 </node>
 </node>
-<node CREATED="1197945853359" FOLDED="true" ID="Freemind_Link_630310250" MODIFIED="1197945855296" TEXT="*ref">
-<node CREATED="1203560752484" FOLDED="true" ID="Freemind_Link_23910003" MODIFIED="1203560755218" TEXT="Performance">
+</node>
+<node CREATED="1203645529863" FOLDED="true" ID="Freemind_Link_429718822" MODIFIED="1203649620363" TEXT="*ref-url">
 <node CREATED="1202390036677" ID="Freemind_Link_1034068635" MODIFIED="1203560750093" TEXT="http://ossipedia.ipa.go.jp/capacity/EV0612210231"/>
 </node>
-<node CREATED="1186640568562" FOLDED="true" ID="Freemind_Link_1561973429" MODIFIED="1186640573593" TEXT="ColumnType">
-<node CREATED="1186640576390" ID="Freemind_Link_902270315" MODIFIED="1186640576968" TEXT="http://www.powerdee.com/it/mysql/dataTypes.html"/>
 </node>
 </node>
 </node>
-<node CREATED="1185872203515" ID="Freemind_Link_994063421" MODIFIED="1185872204890" TEXT="Oracle">
-<node CREATED="1199789719703" FOLDED="true" ID="Freemind_Link_1828093467" MODIFIED="1199789720953" TEXT="*tips">
-<node CREATED="1198299110468" FOLDED="true" ID="Freemind_Link_544697406" MODIFIED="1199789730187" TEXT="for Starter">
-<node CREATED="1198071478031" ID="Freemind_Link_827831415" MODIFIED="1198071754406" TEXT="create database [database_name]&#x306f;&#x4e0d;&#x8981;&#x304b;&#x3082;"/>
-<node CREATED="1198071516906" ID="Freemind_Link_1834048894" MODIFIED="1198071531796" TEXT="create user [user_name] identified by [password]"/>
-<node CREATED="1198071552062" ID="Freemind_Link_1487120499" MODIFIED="1198071579359" TEXT="grant all privileges to [user_name]"/>
-</node>
-<node CREATED="1185872206953" FOLDED="true" ID="Freemind_Link_2866700" MODIFIED="1185872209453" TEXT="&#x5b9f;&#x884c;&#x8a08;&#x753b;">
-<node CREATED="1185872209906" ID="Freemind_Link_786243255" MODIFIED="1185872210296" TEXT="http://otndnld.oracle.co.jp/document/products/oracle10g/102/doc_cd/server.102/B19207-01/ex_plan.html"/>
-</node>
-</node>
-<node CREATED="1200549597388" FOLDED="true" ID="Freemind_Link_1773218617" MODIFIED="1200549600241" TEXT="*trouble">
-<node CREATED="1200549601374" FOLDED="true" ID="Freemind_Link_131453730" MODIFIED="1200549614968" TEXT="Refused by Listener">
-<node CREATED="1200549618109" FOLDED="true" ID="Freemind_Link_828529147" MODIFIED="1200549638104" TEXT="Oracle&#x7ba1;&#x7406;&#x753b;&#x9762;&#x306b;&#x3064;&#x306a;&#x3044;&#x3060;&#x3089;&#x76f4;&#x3063;&#x305f;">
-<node CREATED="1200549639998" ID="Freemind_Link_650512172" MODIFIED="1200549642969" TEXT="&#x306a;&#x305c;&#x304b;&#x306f;&#x4e0d;&#x660e;"/>
-<node CREATED="1200549644237" ID="Freemind_Link_1815062011" MODIFIED="1200549646112" TEXT="http://127.0.0.1:8080/apex/f?p=4550"/>
-</node>
-</node>
-</node>
-<node CREATED="1202978787225" FOLDED="true" ID="Freemind_Link_1127564963" MODIFIED="1202978788409" TEXT="*price">
-<node CREATED="1202978788767" FOLDED="true" ID="Freemind_Link_1512679069" MODIFIED="1202978792290" TEXT="Standard">
-<node CREATED="1202978800886" ID="Freemind_Link_1219134045" MODIFIED="1202978809300" TEXT="Processor License">
-<node CREATED="1202978792823" ID="Freemind_Link_1489079256" MODIFIED="1202978793721" TEXT="1,875,000"/>
-</node>
-</node>
-<node CREATED="1202978842291" FOLDED="true" ID="Freemind_Link_1836821451" MODIFIED="1202978846483" TEXT="Enterprise">
-<node CREATED="1202978854835" ID="Freemind_Link_405663566" MODIFIED="1202978862107" TEXT="Processor License">
-<node CREATED="1202978862520" ID="Freemind_Link_776267487" MODIFIED="1202978874524" TEXT="5,000,000"/>
-</node>
-</node>
-</node>
-<node CREATED="1198299268843" FOLDED="true" ID="Freemind_Link_1797108990" MODIFIED="1198299269312" TEXT="AccessTool">
-<node CREATED="1198299279609" FOLDED="true" ID="Freemind_Link_889602752" MODIFIED="1198299281765" TEXT="*summary">
-<node CREATED="1198299284671" ID="Freemind_Link_218302432" MODIFIED="1198299326343" TEXT="&#x57fa;&#x672c;&#x306f;SQL*Plus&#x3002;EnterpriceManager&#x3082;&#x3042;&#x308b;&#x3002;&#xa;&#x3057;&#x304b;&#x3057;&#x3001;ShareWare&#x306e;osqledit&#x304c;&#x975e;&#x5e38;&#x306b;&#x4f7f;&#x3044;&#x3084;&#x3059;&#x3044;&#x3002;&#xa;"/>
-</node>
-<node CREATED="1198299328531" FOLDED="true" ID="Freemind_Link_587517264" MODIFIED="1198299332125" TEXT="osqledit">
-<node CREATED="1198299384765" ID="Freemind_Link_40423886" MODIFIED="1198299385296" TEXT="http://www.hi-ho.ne.jp/a_ogawa/osqledit/index.htm"/>
-<node CREATED="1198299336515" ID="Freemind_Link_429609180" MODIFIED="1198299340093" TEXT="ShareWare"/>
-<node CREATED="1198299342531" ID="Freemind_Link_147311716" MODIFIED="1198299345937" TEXT="4000Yen"/>
-</node>
-<node CREATED="1198299275125" ID="Freemind_Link_781339241" MODIFIED="1198299278484" TEXT="SQL*Plus"/>
-</node>
-<node CREATED="1202980038286" ID="Freemind_Link_1525497877" MODIFIED="1202980043422" TEXT="RecoveryTool">
-<node CREATED="1202980043818" FOLDED="true" ID="Freemind_Link_1270393628" MODIFIED="1202980044757" TEXT="Recovery Manager">
-<node CREATED="1202980071726" FOLDED="true" ID="Freemind_Link_873617993" MODIFIED="1202980073895" TEXT="*overview">
-<node CREATED="1202980076651" ID="Freemind_Link_1612123190" MODIFIED="1202980083174" TEXT="Oracle&#x304c;&#x6a19;&#x6e96;&#x3067;&#x63d0;&#x4f9b;&#x3057;&#x3066;&#x3044;&#x308b;&#x30d0;&#x30c3;&#x30af;&#x30a2;&#x30c3;&#x30d7;&#x3001;&#x30ea;&#x30b9;&#x30c8;&#x30a2;&#x3001;&#x30ea;&#x30ab;&#x30d0;&#x30ea;&#xa;&#x306e;&#x64cd;&#x4f5c;&#x3084;&#x7ba1;&#x7406;&#x3092;&#x884c;&#x3046;&#x3053;&#x3068;&#x304c;&#x3067;&#x304d;&#x308b;&#x30e6;&#x30fc;&#x30c6;&#x30a3;&#x30ea;&#x30c6;&#x30a3;"/>
-</node>
-<node CREATED="1202980052630" FOLDED="true" ID="Freemind_Link_1468067211" MODIFIED="1202980059358" TEXT="*nickname">
-<node CREATED="1202980059715" ID="Freemind_Link_1123412992" MODIFIED="1202980060278" TEXT="RMAN"/>
-</node>
-<node CREATED="1202980102872" FOLDED="true" ID="Freemind_Link_768521752" MODIFIED="1202980103632" TEXT="*ref">
-<node CREATED="1202980103982" ID="Freemind_Link_690025291" MODIFIED="1202980104480" TEXT="http://www.atmarkit.co.jp/fdb/rensai/ora_backup08/ora_backup08_1.html"/>
-</node>
-</node>
-</node>
-</node>
-<node CREATED="1186634899281" FOLDED="true" ID="Freemind_Link_732361436" MODIFIED="1186634901281" TEXT="Sybase">
-<node CREATED="1186634929171" FOLDED="true" ID="Freemind_Link_717902627" MODIFIED="1186634933609" TEXT="*trouble">
-<node CREATED="1186634901890" ID="Freemind_Link_136571610" MODIFIED="1186634927500" TEXT="int&#x578b;&#x306b;&#x5bfe;&#x3057;&#x3066;PreparedStatement#setBigDecimal()&#x3059;&#x308b;&#x3068;Index&#x304c;&#x5229;&#x7528;&#x3055;&#x308c;&#x306a;&#x3044;">
-<node CREATED="1186634957609" ID="Freemind_Link_59993780" MODIFIED="1186634968406" TEXT="O/R Mapper&#x3068;&#x76f8;&#x6027;&#x60aa;&#x3044;"/>
-</node>
-<node CREATED="1186642818468" ID="Freemind_Link_196935854" MODIFIED="1186642842531" TEXT="Transaction&#x5185;&#x3067;JDBC&#x3088;&#x308a;Meta&#x60c5;&#x5831;&#x53d6;&#x5f97;&#x3059;&#x308b;&#x3068;tempdb&#x306b;&#x5bfe;&#x3057;&#x3066;DDL&#x304c;&#x767a;&#x884c;&#x3055;&#x308c;&#x3066;Error&#x3068;&#x306a;&#x308b;">
-<node CREATED="1186642844968" ID="Freemind_Link_1378154638" MODIFIED="1186642854343" TEXT="Sybase&#x306e;&#x8a2d;&#x5b9a;&#x3069;&#x3046;&#x306b;&#x304b;&#x306a;&#x308b;&#x3089;&#x3057;&#x3044;"/>
-<node CREATED="1186642855453" ID="Freemind_Link_1354835859" MODIFIED="1186642871406" TEXT="Transaction&#x767a;&#x884c;&#x3057;&#x3066;&#x3044;&#x308b;Connection&#x3067;Meta&#x60c5;&#x5831;&#x306f;&#x53d6;&#x3089;&#x306a;&#x3044;&#x3053;&#x3068;"/>
-</node>
-<node CREATED="1186644557671" ID="Freemind_Link_212375236" MODIFIED="1186644719843" TEXT="like &apos;1&apos; + &apos;%&apos; &#x3088;&#x308a;&#x3082; like &apos;1%&apos;&#x306e;&#x65b9;&#x304c;&#x901f;&#x3044;">
-<node CREATED="1186644723890" ID="Freemind_Link_673233840" MODIFIED="1186644746375" TEXT="&#x7d0d;&#x5f97;&#x3044;&#x304b;&#x306a;&#x30fc;&#x3044;&#xff01;"/>
-</node>
-<node CREATED="1187674862750" ID="Freemind_Link_241332433" MODIFIED="1187674871750" TEXT="Bind&#x5909;&#x6570;&#x306e;&#x5024;&#x3092;&#x8003;&#x616e;&#x3057;&#x306a;&#x3044;">
-<node CREATED="1187674886765" ID="Freemind_Link_1444275651" MODIFIED="1187674918984" TEXT="left outer join &#x3067;Join&#x5074;&#x5217;&#x3067;&#x6761;&#x4ef6;&#x7d5e;&#x308a;&#x3057;&#x3066;&#x3082;Bind&#x5909;&#x6570;&#x3060;&#x3068;Index&#x304c;&#x5229;&#x7528;&#x3055;&#x308c;&#x306a;&#x3044;"/>
-</node>
-</node>
-</node>
+<node CREATED="1184818183078" ID="Freemind_Link_249127485" MODIFIED="1184829367968" TEXT="PostgreSQL"/>
 <node CREATED="1187674688093" FOLDED="true" ID="Freemind_Link_1803707558" MODIFIED="1198298887796" TEXT="SQLServer">
 <node CREATED="1198298865765" ID="Freemind_Link_1331306264" MODIFIED="1198299495578" TEXT="*overview">
 <node CREATED="1198298879281" ID="Freemind_Link_316104024" MODIFIED="1198298881875" TEXT="AliasName">
@@ -1183,33 +1200,30 @@
 </node>
 </node>
 </node>
-<node CREATED="1199789595640" FOLDED="true" ID="Freemind_Link_1757621976" MODIFIED="1199789597218" TEXT="*basic">
-<node CREATED="1184818191421" FOLDED="true" ID="Freemind_Link_1605061468" MODIFIED="1184818203796" TEXT="*topic">
-<node CREATED="1184818204718" FOLDED="true" ID="Freemind_Link_924869874" MODIFIED="1184818208234" TEXT="*compare">
-<node CREATED="1184818208875" FOLDED="true" ID="Freemind_Link_1461248393" MODIFIED="1184818218265" TEXT="MySQL and PostgreSQL">
-<node CREATED="1184818250000" FOLDED="true" ID="Freemind_Link_1204463509" MODIFIED="1184818261609" TEXT="about Architecture">
-<node CREATED="1184818219031" ID="Freemind_Link_856920346" MODIFIED="1184818244593" TEXT="http://www.thinkit.co.jp/cert/article/0603/10/1/3.htm&#xa;&#xa;PostgreSQL&#x3067;&#x306f;&#x300c;1&#x30af;&#x30e9;&#x30a4;&#x30a2;&#x30f3;&#x30c8; &#x21d4; 1&#x30d7;&#x30ed;&#x30bb;&#x30b9;&#x300d;&#x306b;&#x3088;&#x308b;&#x30de;&#x30eb;&#x30c1;&#x30d7;&#x30ed;&#x30bb;&#x30b9;&#x69cb;&#x6210;&#x306b;&#x3066;&#x5b9f;&#x73fe;&#x3057;&#x3066;&#x3044;&#x308b;&#x90e8;&#x5206;&#x3092;&#x3001;MySQL&#x3067;&#x306f;&#x300c;1&#x30af;&#x30e9;&#x30a4;&#x30a2;&#x30f3;&#x30c8; &#x21d4; 1&#x30b9;&#x30ec;&#x30c3;&#x30c9;&#x300d;&#x306b;&#x3088;&#x308b;&#x30de;&#x30eb;&#x30c1;&#x30b9;&#x30ec;&#x30c3;&#x30c9;&#x69cb;&#x6210;&#x306b;&#x3066;&#x5b9f;&#x73fe;&#x3057;&#x3066;&#x3044;&#x307e;&#x3059;&#x3002;&#x3053;&#x306e;&#x5b9f;&#x73fe;&#x65b9;&#x6cd5;&#x306e;&#x9055;&#x3044;&#x306f;&#x3001;PostgreSQL&#x3068;MySQL&#x306e;&#x30a2;&#x30fc;&#x30ad;&#x30c6;&#x30af;&#x30c1;&#x30e3;&#x4e0a;&#x306e;&#x4e00;&#x756a;&#x7279;&#x5fb4;&#x7684;&#x306a;&#x9055;&#x3044;&#x3067;&#x3059;&#x3002;"/>
+<node CREATED="1186634899281" FOLDED="true" ID="Freemind_Link_732361436" MODIFIED="1186634901281" TEXT="Sybase">
+<node CREATED="1186634929171" FOLDED="true" ID="Freemind_Link_717902627" MODIFIED="1186634933609" TEXT="*trouble">
+<node CREATED="1186634901890" ID="Freemind_Link_136571610" MODIFIED="1186634927500" TEXT="int&#x578b;&#x306b;&#x5bfe;&#x3057;&#x3066;PreparedStatement#setBigDecimal()&#x3059;&#x308b;&#x3068;Index&#x304c;&#x5229;&#x7528;&#x3055;&#x308c;&#x306a;&#x3044;">
+<node CREATED="1186634957609" ID="Freemind_Link_59993780" MODIFIED="1186634968406" TEXT="O/R Mapper&#x3068;&#x76f8;&#x6027;&#x60aa;&#x3044;"/>
+</node>
+<node CREATED="1186642818468" ID="Freemind_Link_196935854" MODIFIED="1186642842531" TEXT="Transaction&#x5185;&#x3067;JDBC&#x3088;&#x308a;Meta&#x60c5;&#x5831;&#x53d6;&#x5f97;&#x3059;&#x308b;&#x3068;tempdb&#x306b;&#x5bfe;&#x3057;&#x3066;DDL&#x304c;&#x767a;&#x884c;&#x3055;&#x308c;&#x3066;Error&#x3068;&#x306a;&#x308b;">
+<node CREATED="1186642844968" ID="Freemind_Link_1378154638" MODIFIED="1186642854343" TEXT="Sybase&#x306e;&#x8a2d;&#x5b9a;&#x3069;&#x3046;&#x306b;&#x304b;&#x306a;&#x308b;&#x3089;&#x3057;&#x3044;"/>
+<node CREATED="1186642855453" ID="Freemind_Link_1354835859" MODIFIED="1186642871406" TEXT="Transaction&#x767a;&#x884c;&#x3057;&#x3066;&#x3044;&#x308b;Connection&#x3067;Meta&#x60c5;&#x5831;&#x306f;&#x53d6;&#x3089;&#x306a;&#x3044;&#x3053;&#x3068;"/>
+</node>
+<node CREATED="1186644557671" ID="Freemind_Link_212375236" MODIFIED="1186644719843" TEXT="like &apos;1&apos; + &apos;%&apos; &#x3088;&#x308a;&#x3082; like &apos;1%&apos;&#x306e;&#x65b9;&#x304c;&#x901f;&#x3044;">
+<node CREATED="1186644723890" ID="Freemind_Link_673233840" MODIFIED="1186644746375" TEXT="&#x7d0d;&#x5f97;&#x3044;&#x304b;&#x306a;&#x30fc;&#x3044;&#xff01;"/>
+</node>
+<node CREATED="1187674862750" ID="Freemind_Link_241332433" MODIFIED="1187674871750" TEXT="Bind&#x5909;&#x6570;&#x306e;&#x5024;&#x3092;&#x8003;&#x616e;&#x3057;&#x306a;&#x3044;">
+<node CREATED="1187674886765" ID="Freemind_Link_1444275651" MODIFIED="1187674918984" TEXT="left outer join &#x3067;Join&#x5074;&#x5217;&#x3067;&#x6761;&#x4ef6;&#x7d5e;&#x308a;&#x3057;&#x3066;&#x3082;Bind&#x5909;&#x6570;&#x3060;&#x3068;Index&#x304c;&#x5229;&#x7528;&#x3055;&#x308c;&#x306a;&#x3044;"/>
 </node>
 </node>
 </node>
-</node>
-<node CREATED="1184828197890" FOLDED="true" ID="Freemind_Link_716169093" MODIFIED="1199789574421" TEXT="*tips">
-<node CREATED="1184828207109" ID="Freemind_Link_1424210329" MODIFIED="1184829371171" TEXT="Lock">
-<node CREATED="1184828221343" FOLDED="true" ID="Freemind_Link_69924361" MODIFIED="1184829373484" TEXT="Share Lock">
-<node CREATED="1184828340875" ID="Freemind_Link_1023550135" MODIFIED="1184829094546" TEXT="Lock&#x4e2d;&#x306f;&#x4ed6;&#x306e;Transaction&#x306f;&#x53c2;&#x7167;&#x53ef;&#x80fd;/&#x66f4;&#x65b0;&#x4e0d;&#x53ef;"/>
-<node CREATED="1184829102406" ID="Freemind_Link_143098501" MODIFIED="1184829121171" TEXT="&#x8907;&#x6570;&#x306e;Transaction&#x304c;ShareLock&#x3092;&#x53d6;&#x5f97;&#x3059;&#x308b;&#x3053;&#x3068;&#x304c;&#x53ef;&#x80fd;"/>
-<node CREATED="1184828269531" FOLDED="true" ID="Freemind_Link_121511915" MODIFIED="1184828612937" TEXT="Read-commited, 1query&#x5b9f;&#x884c;&#x4e2d;&#x306b;Lock">
-<node CREATED="1184829139531" ID="Freemind_Link_499515913" MODIFIED="1184829148265" TEXT="&#x306a;&#x306e;&#x3067;&#x5927;&#x62b5;&#x306f;&#x3059;&#x3050;&#x306b;&#x624b;&#x653e;&#x3059;"/>
-<node CREATED="1184829149406" ID="Freemind_Link_122952461" MODIFIED="1184829160593" TEXT="&#x9577;&#x3044;Select&#x6587;&#x306e;&#x3068;&#x304d;&#x6ce8;&#x610f;"/>
+<node CREATED="1199789595640" FOLDED="true" ID="Freemind_Link_1757621976" MODIFIED="1203649520097" TEXT="*basic">
+<node CREATED="1203648747964" FOLDED="true" ID="Freemind_Link_1240451461" MODIFIED="1203648762385" TEXT="Modeling">
+<node CREATED="1203647968322" FOLDED="true" ID="Freemind_Link_159346713" MODIFIED="1203647972738" TEXT="ER-Studio">
+<node CREATED="1203649584972" FOLDED="true" ID="Freemind_Link_838136426" MODIFIED="1203649600835" TEXT="*ref-url">
+<node CREATED="1203649215466" ID="Freemind_Link_1817821589" MODIFIED="1203649260841" TEXT="http://www.jsys-products.com/product/erstudio/"/>
 </node>
 </node>
-<node CREATED="1184829216234" FOLDED="true" ID="Freemind_Link_421600462" MODIFIED="1184829375812" TEXT="Update Lock">
-<node CREATED="1184829227187" ID="Freemind_Link_1355938623" MODIFIED="1184829248218" TEXT="1Transaction&#x3057;&#x304b;&#x53d6;&#x5f97;&#x3067;&#x304d;&#x306a;&#x3044;Share Lock&#x306e;&#x3088;&#x3046;&#x306a;&#x3082;&#x306e;"/>
-</node>
-</node>
-<node CREATED="1184829442140" FOLDED="true" ID="Freemind_Link_1321070188" MODIFIED="1184829445343" TEXT="AutoCommit">
-<node CREATED="1184829446031" ID="Freemind_Link_1287872813" MODIFIED="1184829458640" TEXT="Query&#x7d42;&#x4e86;&#x6642;&#x81ea;&#x52d5;&#x3067;Commit&#x3055;&#x308c;&#x308b;Mode"/>
-<node CREATED="1184829459828" ID="Freemind_Link_1146878069" MODIFIED="1184829475859" TEXT="1Query&#x5185;&#x3067;&#x306f;Transaction&#x304c;&#x639b;&#x304b;&#x3063;&#x3066;&#x3044;&#x308b;"/>
 </node>
 <node CREATED="1186638078046" FOLDED="true" ID="Freemind_Link_1369035204" MODIFIED="1186638081625" TEXT="Performance">
 <node CREATED="1186638200171" FOLDED="true" ID="Freemind_Link_1905995535" MODIFIED="1186638200953" TEXT="Max&#x3084;Min&#x3092;&#x53d6;&#x5f97;">
@@ -1223,6 +1237,31 @@
 <node CREATED="1186750922375" FOLDED="true" ID="Freemind_Link_492207440" MODIFIED="1186750931484" TEXT="Bind&#x5909;&#x6570;&#x3067;&#x9006;&#x306b;&#x9045;&#x3044;&#x3068;&#x304d;&#x3082;&#x3042;&#x308b;">
 <node CREATED="1186750932046" ID="Freemind_Link_1204786873" MODIFIED="1186750932609" TEXT="http://ameblo.jp/archive-redo-blog/theme-10003659969.html"/>
 <node CREATED="1186750934968" ID="Freemind_Link_309701369" MODIFIED="1186750991812" TEXT="Sybase&#x3084;SQLServer&#x306f;Left Outer Join&#x3057;&#x305f;Table&#x306e;Column&#x6761;&#x4ef6;&#x3067;&#x306e;Bind&#x5909;&#x6570;&#x306f;&#x3001;&#xa;&#x5b9f;&#x884c;&#x8a08;&#x753b;&#x304c;&#x81ea;Table&#x958b;&#x59cb;&#x306b;&#x306a;&#x3063;&#x3066;&#x3057;&#x307e;&#x3046;&#x3002;&#x3072;&#x3069;&#x3044;&#x3002;"/>
+</node>
+</node>
+<node CREATED="1184829442140" FOLDED="true" ID="Freemind_Link_1321070188" MODIFIED="1184829445343" TEXT="AutoCommit">
+<node CREATED="1184829446031" ID="Freemind_Link_1287872813" MODIFIED="1184829458640" TEXT="Query&#x7d42;&#x4e86;&#x6642;&#x81ea;&#x52d5;&#x3067;Commit&#x3055;&#x308c;&#x308b;Mode"/>
+<node CREATED="1184829459828" ID="Freemind_Link_1146878069" MODIFIED="1184829475859" TEXT="1Query&#x5185;&#x3067;&#x306f;Transaction&#x304c;&#x639b;&#x304b;&#x3063;&#x3066;&#x3044;&#x308b;"/>
+</node>
+<node CREATED="1184828207109" FOLDED="true" ID="Freemind_Link_1424210329" MODIFIED="1184829371171" TEXT="Lock">
+<node CREATED="1184828221343" FOLDED="true" ID="Freemind_Link_69924361" MODIFIED="1184829373484" TEXT="Share Lock">
+<node CREATED="1184828340875" ID="Freemind_Link_1023550135" MODIFIED="1184829094546" TEXT="Lock&#x4e2d;&#x306f;&#x4ed6;&#x306e;Transaction&#x306f;&#x53c2;&#x7167;&#x53ef;&#x80fd;/&#x66f4;&#x65b0;&#x4e0d;&#x53ef;"/>
+<node CREATED="1184829102406" ID="Freemind_Link_143098501" MODIFIED="1184829121171" TEXT="&#x8907;&#x6570;&#x306e;Transaction&#x304c;ShareLock&#x3092;&#x53d6;&#x5f97;&#x3059;&#x308b;&#x3053;&#x3068;&#x304c;&#x53ef;&#x80fd;"/>
+<node CREATED="1184828269531" FOLDED="true" ID="Freemind_Link_121511915" MODIFIED="1184828612937" TEXT="Read-commited, 1query&#x5b9f;&#x884c;&#x4e2d;&#x306b;Lock">
+<node CREATED="1184829139531" ID="Freemind_Link_499515913" MODIFIED="1184829148265" TEXT="&#x306a;&#x306e;&#x3067;&#x5927;&#x62b5;&#x306f;&#x3059;&#x3050;&#x306b;&#x624b;&#x653e;&#x3059;"/>
+<node CREATED="1184829149406" ID="Freemind_Link_122952461" MODIFIED="1184829160593" TEXT="&#x9577;&#x3044;Select&#x6587;&#x306e;&#x3068;&#x304d;&#x6ce8;&#x610f;"/>
+</node>
+</node>
+<node CREATED="1184829216234" FOLDED="true" ID="Freemind_Link_421600462" MODIFIED="1184829375812" TEXT="Update Lock">
+<node CREATED="1184829227187" ID="Freemind_Link_1355938623" MODIFIED="1184829248218" TEXT="1Transaction&#x3057;&#x304b;&#x53d6;&#x5f97;&#x3067;&#x304d;&#x306a;&#x3044;Share Lock&#x306e;&#x3088;&#x3046;&#x306a;&#x3082;&#x306e;"/>
+</node>
+</node>
+<node CREATED="1184818191421" FOLDED="true" ID="Freemind_Link_1605061468" MODIFIED="1184818203796" TEXT="*topic">
+<node CREATED="1184818204718" ID="Freemind_Link_924869874" MODIFIED="1203648811807" TEXT="Comparing">
+<node CREATED="1184818208875" FOLDED="true" ID="Freemind_Link_1461248393" MODIFIED="1184818218265" TEXT="MySQL and PostgreSQL">
+<node CREATED="1184818250000" FOLDED="true" ID="Freemind_Link_1204463509" MODIFIED="1184818261609" TEXT="about Architecture">
+<node CREATED="1184818219031" ID="Freemind_Link_856920346" MODIFIED="1184818244593" TEXT="http://www.thinkit.co.jp/cert/article/0603/10/1/3.htm&#xa;&#xa;PostgreSQL&#x3067;&#x306f;&#x300c;1&#x30af;&#x30e9;&#x30a4;&#x30a2;&#x30f3;&#x30c8; &#x21d4; 1&#x30d7;&#x30ed;&#x30bb;&#x30b9;&#x300d;&#x306b;&#x3088;&#x308b;&#x30de;&#x30eb;&#x30c1;&#x30d7;&#x30ed;&#x30bb;&#x30b9;&#x69cb;&#x6210;&#x306b;&#x3066;&#x5b9f;&#x73fe;&#x3057;&#x3066;&#x3044;&#x308b;&#x90e8;&#x5206;&#x3092;&#x3001;MySQL&#x3067;&#x306f;&#x300c;1&#x30af;&#x30e9;&#x30a4;&#x30a2;&#x30f3;&#x30c8; &#x21d4; 1&#x30b9;&#x30ec;&#x30c3;&#x30c9;&#x300d;&#x306b;&#x3088;&#x308b;&#x30de;&#x30eb;&#x30c1;&#x30b9;&#x30ec;&#x30c3;&#x30c9;&#x69cb;&#x6210;&#x306b;&#x3066;&#x5b9f;&#x73fe;&#x3057;&#x3066;&#x3044;&#x307e;&#x3059;&#x3002;&#x3053;&#x306e;&#x5b9f;&#x73fe;&#x65b9;&#x6cd5;&#x306e;&#x9055;&#x3044;&#x306f;&#x3001;PostgreSQL&#x3068;MySQL&#x306e;&#x30a2;&#x30fc;&#x30ad;&#x30c6;&#x30af;&#x30c1;&#x30e3;&#x4e0a;&#x306e;&#x4e00;&#x756a;&#x7279;&#x5fb4;&#x7684;&#x306a;&#x9055;&#x3044;&#x3067;&#x3059;&#x3002;"/>
+</node>
 </node>
 </node>
 </node>
