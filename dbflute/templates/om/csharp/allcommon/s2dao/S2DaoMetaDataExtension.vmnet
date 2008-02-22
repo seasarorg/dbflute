@@ -294,7 +294,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     myDataReaderHandler = CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(myBeanMetaData, customizeEntityType);
 				} else if (retType.Equals(typeof(System.Collections.IList))) {
 				    // For the problem about DynamicProxy unsupporting generic method!
-				    myDataReaderHandler = CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(myBeanMetaData, customizeEntityType);
+					myDataReaderHandler = CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(myBeanMetaData, customizeEntityType);
                 } else {
                     throw new NotSupportedException("The return type of method is unsupported: method.ReturnType=" + method.ReturnType);
                 }
