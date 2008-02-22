@@ -17,7 +17,7 @@ using ${myExtendedEntityPackageName};
 
 namespace ${myExtendedDaoPackageName} {
 
-	[S2Dao(${glS2DaoSetting})]
+	[S2Dao(typeof(${glS2DaoSetting}))]
     [Bean(typeof(${myExtendedEntityPackageName}.${myExtendedObjectClassName}))]
     public partial interface ${myClassName} : ${InterfaceName} {
 
