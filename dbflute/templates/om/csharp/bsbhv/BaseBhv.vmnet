@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using Seasar.Quill.Attrs;
+using Seasar.Quill;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonBhvSetup};
@@ -28,36 +28,30 @@ namespace ${glPackageExtendedBhv} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        #region Attribute
-        [Binding("${table.daoComponentName}")]
         protected ${myExtendedDaoClassName} _dao;
-        #endregion
 
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+		public ${myClassName}() {
+		    QuillInjector.GetInstance().Inject(this);
+		}
+		
         // ===============================================================================
         //                                                                Initialized Mark
         //                                                                ================
-        #region Initialized Mark
         public override bool IsInitialized { get { return _dao != null; } }
-        #endregion
 
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        #region Table Name
-        /// <summary>${database.ImplementComment}</summary>
         public override String TableDbName { get { return "${table.Name}"; } }
-        #endregion
 
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        #region DBMeta
-        /// <summary>${database.ImplementComment}</summary>
         public override ${glDBMetaInterfaceName} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
-
-        /// <summary>The property of my dbmeta.</summary>
         public ${myDBMetaClassName} MyDBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
-        #endregion
 
         // ===============================================================================
         //                                                                    New Instance

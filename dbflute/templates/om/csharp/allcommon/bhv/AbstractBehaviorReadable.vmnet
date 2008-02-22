@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using Seasar.Quill.Attrs;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
@@ -17,10 +16,7 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                       Attribute
         //                                                                       =========
-        [Binding("${database.daoSelectorComponentName}")]
         protected ${glDaoSelectorInterfaceName} _daoSelector;
-
-        [Binding("${database.behaviorSelectorComponentName}")]
         protected ${glBehaviorSelectorInterfaceName} _behaviorSelector;
 
         // ===============================================================================
@@ -31,17 +27,11 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        /// <summary>
-        /// The property of table db-Name. (readonly)
-        /// </summary>
         public abstract String TableDbName { get; }
 
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        /// <summary>
-        /// The property of DBMeta. (readonly)
-        /// </summary>
         public abstract ${glDBMetaInterfaceName} DBMeta { get; }
 
         // ===============================================================================
