@@ -24,33 +24,43 @@ namespace ${myExtendedDaoPackageName} {
 
         [Sql("select count(*) from ${table.Name}")]
         int GetCountAll();
+		
         [Sql("select ${table.columnNameCommaString} from ${table.Name}")]
         IList<${myExtendedObjectClassName}> GetListAll();
 #if ($table.hasPrimaryKey())
-        [Seasar.Dao.Attrs.Sql("select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}")]
+
+		[Seasar.Dao.Attrs.Sql("select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}")]
         ${myExtendedObjectClassName} GetEntity(${table.PrimaryKeyArgsString});
 #end
-        int SelectCount(${myAttachedCBArgsString});
-        ${myExtendedObjectClassName} SelectEntity(${myAttachedCBArgsString});
-        IList<${myExtendedObjectClassName}> SelectList(${myAttachedCBArgsString});
+        
+		int SelectCount(${myAttachedCBArgsString});
+        
+		${myExtendedObjectClassName} SelectEntity(${myAttachedCBArgsString});
+        
+		IList<${myExtendedObjectClassName}> SelectList(${myAttachedCBArgsString});
 
 #if ($table.hasPrimaryKey())
         int Insert(${myExtendedObjectClassName} entity);
-        int UpdateModifiedOnly(${myExtendedObjectClassName} entity);
+        
+		int UpdateModifiedOnly(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
-        int UpdateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
+        
+		int UpdateNonstrictModifiedOnly(${myExtendedObjectClassName} entity);
 #end
         int Delete(${myExtendedObjectClassName} entity);
 #if ($table.hasOptimisticLock())
-        int DeleteNonstrict(${myExtendedObjectClassName} entity);
+        
+		int DeleteNonstrict(${myExtendedObjectClassName} entity);
 #end
+
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int InsertList(IList<${myExtendedObjectClassName}> entityList);
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int UpdateList(IList<${myExtendedObjectClassName}> entityList);
 /// TODO: This method has not been supported yet at S2Dao-dotNet. (2006/06/09)
 //        int DeleteList(IList<${myExtendedObjectClassName}> entityList);
-        [Sql("delete from ${table.Name}")]
+
+		[Sql("delete from ${table.Name}")]
         int RemoveAll();
 #end
 #if ($table.isUseSequence())
