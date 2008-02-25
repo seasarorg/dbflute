@@ -20,9 +20,7 @@ import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOptionName};
 import ${glPackageBaseCommonUtil}.${glTraceViewUtilName};
 
 /**
- * My-DaoInterceptor.
- * Customises original class 'S2DaoInterceptor'.
- * 
+ * The interceptor of S2Dao for DBFlute.
  * @author ${database.ClassAuthor}
  */
 public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.AbstractInterceptor {
@@ -44,7 +42,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param daoMetaDataFactory The factory of dao meta data. (NotNull)
      */
     public ${glDaoInterceptor}(DaoMetaDataFactory daoMetaDataFactory) {
@@ -56,8 +53,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                              ======
     /**
      * Invoke the method.
-     * 
-     * @param invocation The methodinvocation. (NotNull)
+     * @param invocation The method invocation. (NotNull)
      * @return The result of the method. (Nullable)
      * @throws Throwable
      */
@@ -72,8 +68,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
 
     /**
      * Dispatch invoking the method.
-     * 
-     * @param invocation The methodinvocation. (NotNull)
+     * @param invocation The method invocation. (NotNull)
      * @return The result of the method. (Nullable)
      * @throws Throwable
      */
@@ -659,11 +654,10 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                         ConditionBean
     //                                         -------------
     /**
-     * Preprocess conditionBean.
+     * Pre-process conditionBean.
      * <p>
      * If this method is condition bean select target, make dynamic SQL.
      * Else nothing.
-     * 
      * @param invocation Method invocation. (NotNull)
      * @param cmd SqlCommand. (NotNull)
      * @return ConditionBean. (Nullable)
@@ -709,8 +703,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     }
 
     /**
-     * Postprocess condition-bean.
-     * 
+     * Post-process condition-bean.
      * @param invocation Method invocation. (NotNull)
      * @param cb Condition-bean. (Nullable)
      */
@@ -766,7 +759,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                       =============
     /**
      * Is select count ignore-fetch-scope method?
-     * 
      * @param invocation Method invocation. (NotNull)
      * @return Determination.
      */
@@ -780,7 +772,6 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     //                                                                              ======
     /**
      * Get the value of line separator.
-     * 
      * @return The value of line separator. (NotNull)
      */
     protected String getLineSeparator() {

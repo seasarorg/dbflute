@@ -6,7 +6,6 @@ import ${glPackageCQ}.${myConditionQueryClassName};
 
 /**
  * The nest-select-setupper of ${table.name}.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
@@ -83,8 +82,7 @@ public class ${myClassName} {
     //                                                                              ======
     protected void assertConditionQuery() {
         if (!hasConditionQuery()) {
-            String msg = "The query should not be null.";
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException("The query should not be null.");
         }
     }
 }

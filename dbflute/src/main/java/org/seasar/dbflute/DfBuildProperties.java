@@ -306,41 +306,6 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                              Original Behavior Aspect
-    //                              ------------------------
-    public static final String KEY_originalBehaviorAspectMap = "originalBehaviorAspectMap";
-    protected Map<String, Map<String, String>> _originalBehaviorAspectMap;
-
-    public Map<String, Map<String, String>> getOriginalBehaviorAspectMap() {
-        if (_originalBehaviorAspectMap == null) {
-            _originalBehaviorAspectMap = new LinkedHashMap<String, Map<String, String>>();
-
-            final Map<String, Object> generatedMap = mapProp("torque." + KEY_originalBehaviorAspectMap,
-                    DEFAULT_EMPTY_MAP);
-            final Set<String> keySet = generatedMap.keySet();
-            for (String key : keySet) {
-                final Map<String, String> aspectDefinition = (Map<String, String>) generatedMap.get(key);
-                _originalBehaviorAspectMap.put(key, aspectDefinition);
-            }
-        }
-        return _originalBehaviorAspectMap;
-    }
-
-    public List<String> getOriginalBehaviorAspectComponentNameList() {
-        return new ArrayList<String>(getOriginalBehaviorAspectMap().keySet());
-    }
-
-    public String getOriginalBehaviorAspectClassName(String componentName) {
-        final Map<String, String> aspectDefinition = getOriginalBehaviorAspectMap().get(componentName);
-        return aspectDefinition.get("className");
-    }
-
-    public String getOriginalBehaviorAspectPointcut(String componentName) {
-        final Map<String, String> aspectDefinition = getOriginalBehaviorAspectMap().get(componentName);
-        return aspectDefinition.get("pointcut");
-    }
-
-    // -----------------------------------------------------
     //                                         Making Option
     //                                         -------------
     public DfSourceReductionProperties getSourceReductionProperties() {

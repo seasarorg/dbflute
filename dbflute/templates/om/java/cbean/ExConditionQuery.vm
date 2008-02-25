@@ -7,20 +7,20 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageBaseCQ}.${myBaseConditionQueryClassName};
 
 /**
- * The condition-query of ${table.name}. <br />
- * You can implement your original methods here. <br />
- * This class is NOT overrided when re-generating. <br />
- * 
+ * The condition-query of ${table.name}.
+ * <p>
+ * You can implement your original methods here.
+ * This class is NOT overrided when re-generating.
+ * </p>
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} extends ${myBaseConditionQueryClassName} {
 
-    // =====================================================================================
-    //                                                                           Constructor
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param childQuery Child query as abstract class. (Nullable: If null, this is base instance.)
      * @param sqlClause SQL clause instance. (NotNull)
      * @param aliasName My alias name. (NotNull)
@@ -29,4 +29,12 @@ public class ${myClassName} extends ${myBaseConditionQueryClassName} {
     public ${myClassName}(${glConditionQueryInterfaceName} childQuery, ${glSqlClauseName} sqlClause, String aliasName, int nestLevel) {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
+	
+    // ===================================================================================
+    //                                                                      Arrange Method
+    //                                                                      ==============
+	// You can make original arrange query methods here.
+	// public void arranegeXxx() {
+	//     ...
+	// }
 }

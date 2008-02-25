@@ -1,6 +1,6 @@
 ${database.allClassCopyright}package ${myDBMetaPackageName};
-
 #set ($myClassName = "${myDBMetaClassName}")
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -17,7 +17,6 @@ import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
 
 /**
  * The dbmeta of ${table.Name}. (Singleton)
- * 
  * <pre>
  * [primary-key]
  *     ${table.PrimaryKeyNameCommaString}
@@ -44,7 +43,6 @@ import ${glPackageBaseCommonDBMetaInfo}.${glUniqueInfoName};
  *     ${table.VersionNoJavaName}
  * 
  * </pre>
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} extends ${glDBMetaAbstractName} {
@@ -153,19 +151,11 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
-    /**
-     * ${database.ImplementComment}
-     * @return Table DB name. (NotNull)
-     */
     public String getTableDbName() {
         return TABLE_DB_NAME;
     }
 
-    /**
-     * ${database.ImplementComment}
-     * @return Table property name(JavaBeansRule). (NotNull)
-     */
-    public String getTablePropertyName() {
+    public String getTablePropertyName() {// as JavaBeansRule
         return TABLE_PROPERTY_NAME;
     }
 
@@ -173,7 +163,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     //                                                                            Name Map
     //                                                                            ========
     /**
-     * ${database.ImplementComment}
      * @return The key-to-lower map of DB name(lower) and property name. (NotNull)
      */
     public Map<String, String> getDbNamePropertyNameKeyToLowerMap() {
@@ -181,7 +170,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     }
 
     /**
-     * ${database.ImplementComment}
      * @return The key-to-lower map of property name(lower) and DB name. (NotNull)
      */
     public Map<String, String> getPropertyNameDbNameKeyToLowerMap() {
@@ -191,66 +179,38 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                           Type Name
     //                                                                           =========
-    /**
-     * ${database.ImplementComment}
-     * @return The type name of entity. (NotNull)
-     */ 
     public String getEntityTypeName() {
         return "${myExtendedEntityPackageName}.${myExtendedObjectClassName}";
     }
 #if ($isExistConditionBean)
 
-    /**
-     * ${database.ImplementComment}
-     * @return The type name of conditionBean. (NotNull)
-     */ 
     public String getConditionBeanTypeName() {
         return "${glPackageBaseCB}.${myConditionBeanClassName}";
     }
 #else
 
-    /**
-     * ${database.ImplementComment}
-     * @return The type name of conditionBean. (Nullable: If the conditionBean does not exist)
-     */ 
     public String getConditionBeanTypeName() {
         return null;
     }
 #end
 #if ($isExistDao)
 
-    /**
-     * ${database.ImplementComment}
-     * @return The type name of DAO. (NotNull)
-     */ 
     public String getDaoTypeName() {
         return "${myExtendedDaoPackageName}.${myExtendedDaoClassName}";
     }
 #else
 
-    /**
-     * ${database.ImplementComment}
-     * @return The type name of DAO. (Nullable: If the DAO does not exist)
-     */ 
     public String getDaoTypeName() {
         return null;
     }
 #end
 #if ($isExistBehavior)
 
-    /**
-     * ${database.ImplementComment}
-     * @return The type name of behavior. (NotNull)
-     */ 
     public String getBehaviorTypeName() {
         return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}";
     }
 #else
 
-    /**
-     * ${database.ImplementComment}
-     * @return The type name of behavior. (Nullable: If the behavior does not exist)
-     */ 
     public String getBehaviorTypeName() {
         return null;
     }
@@ -259,10 +219,6 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                         Object Type
     //                                                                         ===========
-    /**
-     * ${database.ImplementComment}
-     * @return The type of entity. (NotNull)
-     */ 
     public Class<${myExtendedObjectClassName}> getEntityType() {
         return ENTITY_TYPE;
     }
@@ -270,28 +226,18 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
     // ===================================================================================
     //                                                                     Object Instance
     //                                                                     ===============
-    /**
-     * ${database.ImplementComment}
-     * @return The type of entity. (NotNull)
-     */ 
     public ${glEntityInterfaceName} newEntity() {
         return newMyEntity();
     }
 
-    /**
-     * New the instance of my entity.
-     * @return The instance of my entity. (NotNull)
-     */ 
     public ${myExtendedObjectClassName} newMyEntity() {
         return new ${myExtendedObjectClassName}();
     }
-
 
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
     /**
-     * ${database.ImplementComment}
      * @return The list of DB name of columns. (NotNull and NotEmpty)
      */
     public List<${glColumnInfoName}> getColumnInfoList() {
@@ -686,31 +632,31 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         return "insert into ${table.name}(${table.ColumnNameCommaString}) values(${table.insertClauseValuesAsQuetionMark})";
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                               Entity Property Setup
     //                                                               =====================
-	// It's very INTERNAL!
-	protected Map<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new HashMap<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
-	{
+    // It's very INTERNAL!
+    protected Map<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new HashMap<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
+    {
 #foreach ($column in $table.columns)
-	    registerEntityPropertySetupper("$column.name", "$column.javaBeansRulePropertyName", new EntityProperty${column.javaName}Setupper(), _entityPropertySetupperMap);
+        registerEntityPropertySetupper("$column.name", "$column.javaBeansRulePropertyName", new EntityProperty${column.javaName}Setupper(), _entityPropertySetupperMap);
 #end
-	}
-	
-	public boolean hasEntityPropertySetupper(String propertyName) {
-	    return _entityPropertySetupperMap.containsKey(propertyName);
-	}
+    }
+    
+    public boolean hasEntityPropertySetupper(String propertyName) {
+        return _entityPropertySetupperMap.containsKey(propertyName);
+    }
 
-	public void setupEntityProperty(String propertyName, Object entity, Object value) {
+    public void setupEntityProperty(String propertyName, Object entity, Object value) {
         final EntityPropertySetupper<${myExtendedObjectClassName}> callback = _entityPropertySetupperMap.get(propertyName);
-		if (callback == null) {
-		    String msg = "The propertyName was Not Found in the map of setupper of entity property:";
-			msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()=" + _entityPropertySetupperMap.keySet();
-		    throw new IllegalStateException(msg);
-		}
+        if (callback == null) {
+            String msg = "The propertyName was Not Found in the map of setupper of entity property:";
+            msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()=" + _entityPropertySetupperMap.keySet();
+            throw new IllegalStateException(msg);
+        }
         callback.setup((${myExtendedObjectClassName})entity, value);
-	}
-	
+    }
+    
 #foreach ($column in $table.columns)
     public class EntityProperty${column.javaName}Setupper implements EntityPropertySetupper<${myExtendedObjectClassName}> {
         public void setup(${myExtendedObjectClassName} entity, Object value) { entity.set${column.javaName}((${column.javaNative})value); }

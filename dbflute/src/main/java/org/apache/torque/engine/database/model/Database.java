@@ -87,14 +87,19 @@ import org.xml.sax.Attributes;
 
 /**
  * A class for holding application data structures.
- * 
  * @author Modified by jflute
  */
 public class Database {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(Database.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _databaseType;
 
     protected List<Table> _tableList = new ArrayList<Table>(100);
@@ -120,9 +125,11 @@ public class Database {
     /** The meta data of parameter bean. */
     protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
 
+    // ===================================================================================
+    //                                                                             Loading
+    //                                                                             =======
     /**
      * Load the database object from an xml tag.
-     *
      * @param attrib the xml attributes
      */
     public void loadFromXML(Attributes attrib) {
@@ -138,129 +145,11 @@ public class Database {
 
     }
 
-    /**
-     * Get the name of the Database.
-     *
-     * @return Name of the Database.
-     */
-    public String getName() {
-        return _name;
-    }
-
-    /**
-     * Set the name of the Database.
-     *
-     * @param name Name of the Database.
-     */
-    public void setName(String name) {
-        this._name = (name == null ? "default" : name);
-    }
-
-    /**
-     * Get the value of package.
-     * @return value of package.
-     */
-    public String getPackage() {
-        return _pkg;
-    }
-
-    /**
-     * Set the value of package.
-     * @param v  Value to assign to package.
-     */
-    public void setPackage(String v) {
-        this._pkg = v;
-    }
-
-    /**
-     * Get the value of defaultIdMethod.
-     * @return value of defaultIdMethod.
-     */
-    public String getDefaultIdMethod() {
-        return _defaultIdMethod;
-    }
-
-    /**
-     * Set the value of defaultIdMethod.
-     * @param v Value to assign to defaultIdMethod.
-     */
-    public void setDefaultIdMethod(String v) {
-        this._defaultIdMethod = v;
-    }
-
-    /**
-     * Get type to use in Java sources (primitive || object)
-     *
-     * @return the type to use
-     */
-    public String getDefaultJavaType() {
-        return _defaultJavaType;
-    }
-
-    /**
-     * Get the value of defaultJavaNamingMethod which specifies the
-     * method for converting schema names for table and column to Java names.
-     *
-     * @return The default naming conversion used by this database.
-     */
-    public String getDefaultJavaNamingMethod() {
-        return _defaultJavaNamingMethod;
-    }
-
-    /**
-     * Set the value of defaultJavaNamingMethod.
-     * @param v The default naming conversion for this database to use.
-     */
-    public void setDefaultJavaNamingMethod(String v) {
-        this._defaultJavaNamingMethod = v;
-    }
-
-    /**
-     * Get the value of heavyIndexing.
-     * @return value of heavyIndexing.
-     */
-    public boolean isHeavyIndexing() {
-        return _isHeavyIndexing;
-    }
-
-    /**
-     * Set the value of heavyIndexing.
-     * @param v  Value to assign to heavyIndexing.
-     */
-    public void setHeavyIndexing(boolean v) {
-        this._isHeavyIndexing = v;
-    }
-
-    public void setAppData(AppData parent) {
-        _dbParent = parent;
-    }
-
-    public AppData getAppData() {
-        return _dbParent;
-    }
-
-    public String getDatabaseType() {
-        return _databaseType;
-    }
-
-    public void setDatabaseType(String databaseType) {
-        this._databaseType = databaseType;
-    }
-
-    public Map<String, DfParameterBeanMetaData> getPmbMetaDataMap() {
-        return _pmbMetaDataMap;
-    }
-
-    public void setPmbMetaDataMap(Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
-        _pmbMetaDataMap = pmbMetaDataMap;
-    }
-
-    // ===============================================================================
-    //                                                                           Table
-    //                                                                           =====
+    // ===================================================================================
+    //                                                                               Table
+    //                                                                               =====
     /**
      * Return an array of all tables
-     *
      * @return array of all tables
      */
     public Table[] getTables() {
@@ -274,7 +163,6 @@ public class Database {
 
     /**
      * Return an array of all tables
-     *
      * @return array of all tables
      */
     public List<Table> getTableList() {
@@ -288,7 +176,6 @@ public class Database {
 
     /**
      * Return the table with the specified name.
-     *
      * @param name table name
      * @return A Table object.  If it does not exist it returns null
      */
@@ -298,7 +185,6 @@ public class Database {
 
     /**
      * Return the table with the specified javaName.
-     *
      * @param javaName name of the java object representing the table
      * @return A Table object.  If it does not exist it returns null
      */
@@ -313,7 +199,6 @@ public class Database {
 
     /**
      * An utility method to add a new table from an xml attribute.
-     *
      * @param attrib the xml attributes
      * @return the created Table
      */
@@ -327,7 +212,6 @@ public class Database {
 
     /**
      * Add a table to the list and sets the Database property to this Database
-     *
      * @param tbl the table to add
      */
     public void addTable(Table tbl) {
@@ -341,7 +225,6 @@ public class Database {
     /**
      * Returns the value of the named property from this database's
      * <code>db.props</code> file.
-     *
      * @param name The name of the property to retrieve the value of.
      * @return The value of the specified property.
      * @exception EngineException Couldn't access properties.
@@ -450,7 +333,6 @@ public class Database {
     /**
      * Creats a string representation of this Database.
      * The representation is given in xml format.
-     *
      * @return string representation in xml
      */
     public String toString() {
@@ -781,11 +663,11 @@ public class Database {
     //                                             Available
     //                                             ---------
     public boolean isAvailableBehaviorGeneration() {
-        return getBasicProperties().isAvailableBehaviorGeneration();
+        return true;
     }
 
     public boolean isAvailableGenerics() {
-        return getBasicProperties().isAvailableGenerics();
+        return true;
     }
 
     public String filterGenericsString(String genericsString) {// It is very important!
@@ -903,30 +785,6 @@ public class Database {
 
     public List<String> getDaoDiconOtherIncludePathList() {
         return getProperties().getDBFluteDiconProperties().getDBFluteDiconOtherIncludePathList();
-    }
-
-    public Map<String, Map<String, String>> getOriginalDaoComponentMap() {
-        return getProperties().getDBFluteDiconProperties().getOriginalDBFluteComponentMap();
-    }
-
-    public List<String> getOriginalDaoComponentComponentNameList() {
-        return getProperties().getDBFluteDiconProperties().getOriginalDBFluteComponentComponentNameList();
-    }
-
-    public String getOriginalDaoComponentClassName(String componentName) {
-        return getProperties().getDBFluteDiconProperties().getOriginalDBFluteComponentClassName(componentName);
-    }
-
-    public boolean isDaoComponent(String componentName) {
-        return getProperties().getDBFluteDiconProperties().isDBFluteComponent(componentName);
-    }
-
-    public boolean isAvailableBehaviorRequiresNewTx() {
-        return getProperties().getDBFluteDiconProperties().isAvailableBehaviorRequiresNewTx();
-    }
-
-    public boolean isAvailableBehaviorRequiredTx() {
-        return getProperties().getDBFluteDiconProperties().isAvailableBehaviorRequiredTx();
     }
 
     public String getDBFluteBeansFileName() {
@@ -1210,27 +1068,11 @@ public class Database {
         return getClassificationProperties().getAllClassificationName(columnName);
     }
 
-    // ===============================================================================
-    //                                                       Properties - Select Param
-    //                                                       =========================
+    // ===================================================================================
+    //                                                                        Select-Param
+    //                                                                        ============
     public DfSelectParamProperties getSelectParamProperties() {
         return getProperties().getSelectParamProperties();
-    }
-
-    /**
-     * @return bool
-     * @deprecated
-     */
-    public String getSelectQueryTimeout() {
-        return getSelectParamProperties().getSelectQueryTimeout();
-    }
-
-    /**
-     * @return bool
-     * @deprecated
-     */
-    public boolean isSelectQueryTimeoutValid() {
-        return getSelectParamProperties().isSelectQueryTimeoutValid();
     }
 
     public String getStatementResultSetType() {
@@ -1241,31 +1083,8 @@ public class Database {
         return getSelectParamProperties().getStatementResultSetConcurrency();
     }
 
-    /**
-     * @return bool
-     * @deprecated
-     */
     public boolean isStatementResultSetTypeValid() {
         return getSelectParamProperties().isStatementResultSetTypeValid();
-    }
-
-    // ===============================================================================
-    //                                             Properties - OriginalBehaviorAspect
-    //                                             ===================================
-    public Map<String, Map<String, String>> getOriginalBehaviorAspectMap() {
-        return getProperties().getOriginalBehaviorAspectMap();
-    }
-
-    public List<String> getOriginalBehaviorAspectComponentNameList() {
-        return getProperties().getOriginalBehaviorAspectComponentNameList();
-    }
-
-    public String getOriginalBehaviorAspectClassName(String componentName) {
-        return getProperties().getOriginalBehaviorAspectClassName(componentName);
-    }
-
-    public String getOriginalBehaviorAspectPointcut(String componentName) {
-        return getProperties().getOriginalBehaviorAspectPointcut(componentName);
     }
 
     // -----------------------------------------------------
@@ -1283,34 +1102,10 @@ public class Database {
         return getProperties().getSourceReductionProperties().isMakeConditionQueryEqualEmptyString();
     }
 
-    public boolean isMakeBehaviorCopyInsert() {
-        return getProperties().getSourceReductionProperties().isMakeBehaviorCopyInsert();
-    }
-
     public boolean isMakeBehaviorLoopUpdate() {
         return getProperties().getSourceReductionProperties().isMakeBehaviorLoopUpdate();
     }
-
-    public boolean isMakeTraceablePreparedStatement() {
-        return getProperties().getSourceReductionProperties().isMakeTraceablePreparedStatement();
-    }
-
-    /**
-     * @return Determination.
-     * @deprecated
-     */
-    public boolean isMakeConditionQueryNumericArgumentLong() {
-        return getProperties().getSourceReductionProperties().isMakeConditionQueryNumericArgumentLong();
-    }
-
-    /**
-     * @return Determination.
-     * @deprecated
-     */
-    public boolean isMakeBehaviorForUpdate() {
-        return getProperties().getSourceReductionProperties().isMakeBehaviorForUpdate();
-    }
-
+    
     // -----------------------------------------------------
     //                                      S2Dao Adjustment
     //                                      ----------------
@@ -1328,22 +1123,6 @@ public class Database {
 
     public boolean isVersionAfter1040() {
         return getProperties().getS2DaoAdjustmentProperties().isVersionAfter1040();
-    }
-
-    public boolean isAvailableDaoMethodLazyInitializing() {
-        return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodLazyInitializing();
-    }
-
-    public boolean isAvailableDaoMethodMetaDataInitializing() {
-        return getProperties().getS2DaoAdjustmentProperties().isAvailableDaoMethodMetaDataInitializing();
-    }
-
-    public boolean isAvailableOtherConnectionDaoInitialization() {
-        return getProperties().getS2DaoAdjustmentProperties().isAvailableOtherConnectionDaoInitialization();
-    }
-
-    public boolean isAvailableChildNoAnnotationGenerating() {
-        return getProperties().getS2DaoAdjustmentProperties().isAvailableChildNoAnnotationGenerating();
     }
 
     public String getExtendedAnnotationReaderFactoryClassName() {
@@ -1814,5 +1593,124 @@ public class Database {
     
     public void setupJavaDir_for_sql2entity() {
         Generator.getInstance().setOutputPath(getProperties().getSql2EntityProperties().getOutputDirectory());
+    }
+    
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get the name of the Database.
+     * @return Name of the Database.
+     */
+    public String getName() {
+        return _name;
+    }
+
+    /**
+     * Set the name of the Database.
+     *
+     * @param name Name of the Database.
+     */
+    public void setName(String name) {
+        this._name = (name == null ? "default" : name);
+    }
+
+    /**
+     * Get the value of package.
+     * @return value of package.
+     */
+    public String getPackage() {
+        return _pkg;
+    }
+
+    /**
+     * Set the value of package.
+     * @param v  Value to assign to package.
+     */
+    public void setPackage(String v) {
+        this._pkg = v;
+    }
+
+    /**
+     * Get the value of defaultIdMethod.
+     * @return value of defaultIdMethod.
+     */
+    public String getDefaultIdMethod() {
+        return _defaultIdMethod;
+    }
+
+    /**
+     * Set the value of defaultIdMethod.
+     * @param v Value to assign to defaultIdMethod.
+     */
+    public void setDefaultIdMethod(String v) {
+        this._defaultIdMethod = v;
+    }
+
+    /**
+     * Get type to use in Java sources (primitive || object)
+     *
+     * @return the type to use
+     */
+    public String getDefaultJavaType() {
+        return _defaultJavaType;
+    }
+
+    /**
+     * Get the value of defaultJavaNamingMethod which specifies the
+     * method for converting schema names for table and column to Java names.
+     *
+     * @return The default naming conversion used by this database.
+     */
+    public String getDefaultJavaNamingMethod() {
+        return _defaultJavaNamingMethod;
+    }
+
+    /**
+     * Set the value of defaultJavaNamingMethod.
+     * @param v The default naming conversion for this database to use.
+     */
+    public void setDefaultJavaNamingMethod(String v) {
+        this._defaultJavaNamingMethod = v;
+    }
+
+    /**
+     * Get the value of heavyIndexing.
+     * @return value of heavyIndexing.
+     */
+    public boolean isHeavyIndexing() {
+        return _isHeavyIndexing;
+    }
+
+    /**
+     * Set the value of heavyIndexing.
+     * @param v  Value to assign to heavyIndexing.
+     */
+    public void setHeavyIndexing(boolean v) {
+        this._isHeavyIndexing = v;
+    }
+
+    public void setAppData(AppData parent) {
+        _dbParent = parent;
+    }
+
+    public AppData getAppData() {
+        return _dbParent;
+    }
+
+    public String getDatabaseType() {
+        return _databaseType;
+    }
+
+    public void setDatabaseType(String databaseType) {
+        this._databaseType = databaseType;
+    }
+
+    public Map<String, DfParameterBeanMetaData> getPmbMetaDataMap() {
+        return _pmbMetaDataMap;
+    }
+
+    public void setPmbMetaDataMap(Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
+        _pmbMetaDataMap = pmbMetaDataMap;
     }
 }

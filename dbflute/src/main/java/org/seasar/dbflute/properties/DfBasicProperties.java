@@ -254,19 +254,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                            Behavior
-    //                                                                            ========
-    /** @deprecated */
-    public boolean isAvailableBehaviorGeneration() {
-        return booleanProp("torque.isAvailableBehaviorGeneration", true);
-    }
-
-    // ===================================================================================
     //                                                                            Generics
     //                                                                            ========
-    /** @deprecated */
-    public boolean isAvailableGenerics() {
-        return booleanProp("torque.isAvailableGenerics", true);
+    protected boolean isAvailableGenerics() {
+        return true;
     }
 
     public String filterGenericsString(String genericsString) {

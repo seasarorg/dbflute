@@ -1,10 +1,8 @@
 ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
-
 #set ($myClassName = "${myBaseTypeSafeCursorClassName}")
 
 /**
  * The cursor of ${table.name}.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {
@@ -27,11 +25,16 @@ public class ${myClassName} {
     protected java.sql.ResultSet _rs;
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}() {
+    }
+
+    // ===================================================================================
     //                                                                             Prepare
     //                                                                             =======
     /**
      * Accept.
-     * 
      * @param rs Result set. (NotNull)
      */
     public void accept(java.sql.ResultSet rs) {
@@ -43,7 +46,6 @@ public class ${myClassName} {
     //                                                                              ======
     /**
      * Get wrapped result set.
-     * 
      * @return Wrapped result set. (NotNull)
      */
     public java.sql.ResultSet cursor() {
@@ -55,7 +57,6 @@ public class ${myClassName} {
     //                                                                            ========
     /**
      * Next result.
-     * 
      * @return Is exist next result.
      * @throws java.sql.SQLException
      */
@@ -69,7 +70,6 @@ public class ${myClassName} {
 #foreach ($col in $table.columns)
     /**
      * Get the value of ${col.uncapitalisedJavaName}.
-     * 
      * @return The value of ${col.uncapitalisedJavaName}. (Nullable)
      * @throws java.sql.SQLException
      */

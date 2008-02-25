@@ -198,8 +198,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo) {
         final Log log4inner = _log;
-        final boolean sql2entityUseColumnNameNotLabel = getProperties().getOtherProperties()
-                .isSql2EntityUseColumnNameNotLabel();
 
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // Implementing SqlFileRunnerBase as inner class.
@@ -246,10 +244,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 msg = msg + " " + ignored.getMessage();
                                 _log.info(msg);
                             }
-                            String columnName = null;
-                            if (!sql2entityUseColumnNameNotLabel) {
-                                columnName = md.getColumnLabel(i);
-                            }
+                            String columnName = md.getColumnLabel(i);
                             if (columnName == null || columnName.trim().length() == 0) {
                                 columnName = md.getColumnName(i);
                             }

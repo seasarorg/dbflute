@@ -12,8 +12,7 @@ import ${glPackageBaseCommonCValue}.${glConditionValueName};
 import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
 /**
- * The condition-query of ${table.name}.
- * 
+ * The abstract condition-query of ${table.name}.
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
@@ -28,7 +27,7 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
-    final public String getTableDbName() {
+    public String getTableDbName() {
         return "${table.Name}";
     }
 
@@ -317,72 +316,6 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public void set${tmpJavaName}_LessEqual($col.JavaNative ${tmpUncapitalisedJavaName}) {
         register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, ${tmpUncapitalisedJavaName});
     }
-#end
-#if ($database.isMakeConditionQueryNumericArgumentLong())
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName} using equal. { = }
-     * 
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as equal.
-     */
-    public void set${tmpJavaName}_Equal(long ${tmpUncapitalisedJavaName}) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_EQUAL, new ${col.JavaNative}(String.valueOf(${tmpUncapitalisedJavaName})));
-    }
-#if (${col.isAvailableNumberNotEqual()})
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName} using notEqual. { != }
-     * 
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as notEqual.
-     */
-    public void set${tmpJavaName}_NotEqual(long ${tmpUncapitalisedJavaName}) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_NOT_EQUAL, new ${col.JavaNative}(String.valueOf(${tmpUncapitalisedJavaName})));
-    }
-#end
-#if (${col.isAvailableNumberGreaterThan()})
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName} using greaterThan. { &gt; }
-     * 
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as greaterThan.
-     */
-    public void set${tmpJavaName}_GreaterThan(long ${tmpUncapitalisedJavaName}) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_THAN, new ${col.JavaNative}(String.valueOf(${tmpUncapitalisedJavaName})));
-    }
-#end
-#if (${col.isAvailableNumberLessThan()})
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName} using lessThan. { &lt; }
-     * 
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as lessThan.
-     */
-    public void set${tmpJavaName}_LessThan(long ${tmpUncapitalisedJavaName}) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_LESS_THAN, new ${col.JavaNative}(String.valueOf(${tmpUncapitalisedJavaName})));
-    }
-#end
-#if (${col.isAvailableNumberGreaterEqual()})
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName} using greaterEqual. { &gt;= }
-     * 
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as greaterEqual.
-     */
-    public void set${tmpJavaName}_GreaterEqual(long ${tmpUncapitalisedJavaName}) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_GREATER_EQUAL, new ${col.JavaNative}(String.valueOf(${tmpUncapitalisedJavaName})));
-    }
-#end
-#if (${col.isAvailableNumberLessEqual()})
-
-    /**
-     * Set the value of ${col.UncapitalisedJavaName} using lessEqual. { &lt;= }
-     * 
-     * @param ${tmpUncapitalisedJavaName} The value of ${col.UncapitalisedJavaName} as lessEqual.
-     */
-    public void set${tmpJavaName}_LessEqual(long ${tmpUncapitalisedJavaName}) {
-        register${tmpJavaName}(${glConditionKeyName}.CK_LESS_EQUAL, new ${col.JavaNative}(String.valueOf(${tmpUncapitalisedJavaName})));
-    }
-#end
 #end
 #if (${col.isAvailableNumberInScope()})
 

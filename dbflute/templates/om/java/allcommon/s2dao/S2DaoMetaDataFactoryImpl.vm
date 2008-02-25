@@ -1,31 +1,43 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.seasar.dao.AnnotationReaderFactory;
 import org.seasar.dao.BeanEnhancer;
-import org.seasar.dao.impl.DaoMetaDataFactoryImpl;
-import org.seasar.dao.impl.DaoMetaDataImpl;
-import org.seasar.extension.jdbc.ResultSetFactory;
-import org.seasar.extension.jdbc.StatementFactory;
-
-#if ($database.isVersionAfter1047())
+import org.seasar.dao.BeanMetaDataFactory;
+import org.seasar.dao.ColumnNaming;
+import org.seasar.dao.DaoAnnotationReader;
 import org.seasar.dao.DaoMetaData;
+import org.seasar.dao.DaoMetaDataFactory;
+import org.seasar.dao.DaoNamingConvention;
+import org.seasar.dao.DtoMetaDataFactory;
+import org.seasar.dao.ProcedureMetaDataFactory;
 import org.seasar.dao.PropertyTypeFactoryBuilder;
 import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
+import org.seasar.dao.ResultSetHandlerFactory;
 import org.seasar.dao.TableNaming;
-import org.seasar.dao.ColumnNaming;
+import org.seasar.dao.ValueTypeFactory;
+import org.seasar.dao.impl.DaoMetaDataImpl;
+import org.seasar.dao.pager.PagingSqlRewriter;
+import org.seasar.extension.jdbc.ResultSetFactory;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.framework.beans.BeanDesc;
+import org.seasar.framework.beans.factory.BeanDescFactory;
+import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
-#end
 
 import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
- * DaoMetaDataFactoryImpl for DBFlute.
- * 
+ * The implementation of DaoMetaDataFactory for DBFlute.
  * @author ${database.ClassAuthor}
  */
-public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
+public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -33,16 +45,78 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     /** Log-instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoInterceptor}.class);
 
+    // -----------------------------------------------------
+    //                                           For Logging
+    //                                           -----------
     /** The binding annotation for xaDataSource. {bindingType=may} */
     public static final String xaDataSource_BINDING = "bindingType=may";
+
+    // -----------------------------------------------------
+    //                                         Factory Basic
+    //                                         -------------
+    public static final String dataSource_BINDING = "bindingType=must";
+
+    public static final String statementFactory_BINDING = "bindingType=must";
+
+    public static final String resultSetFactory_BINDING = "bindingType=must";
+
+    public static final String annotationReaderFactory_BINDING = "bindingType=must";
+
+    public static final String valueTypeFactory_BINDING = "bindingType=must";
+
+    public static final String beanMetaDataFactory_BINDING = "bindingType=must";
+
+    public static final String daoNamingConvention_BINDING = "bindingType=must";
+
+    public static final String resultSetHandlerFactory_BINDING = "bindingType=must";
+
+    public static final String dtoMetaDataFactory_BINDING = "bindingType=must";
+
+    public static final String procedureMetaDataFactory_BINDING = "bindingType=must";
+
+    public static final String pagingSQLRewriter_BINDING = "bindingType=may";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Bean enhancer. */
+    // -----------------------------------------------------
+    //                                         Factory Basic
+    //                                         -------------
+    protected DataSource dataSource;
+
+    protected StatementFactory statementFactory;
+
+    protected ResultSetFactory resultSetFactory;
+
+    protected AnnotationReaderFactory annotationReaderFactory;
+
+    protected ValueTypeFactory valueTypeFactory;
+
+    protected BeanMetaDataFactory beanMetaDataFactory;
+
+    protected DaoNamingConvention daoNamingConvention;
+
+    protected ResultSetHandlerFactory resultSetHandlerFactory;
+
+    protected DtoMetaDataFactory dtoMetaDataFactory;
+
+    protected ProcedureMetaDataFactory procedureMetaDataFactory;
+
+    protected PagingSqlRewriter pagingSqlRewriter;
+
+    protected Map<String, DaoMetaData> daoMetaDataCache = new HashMap<String, DaoMetaData>();
+
+    protected boolean initialized;
+
+    protected boolean useDaoClassForLog;
+
+    protected String sqlFileEncoding;
+	
     protected BeanEnhancer beanEnhancer;
 
-#if ($database.isVersionAfter1047())
+    // -----------------------------------------------------
+    //                                  Version After 1.0.47
+    //                                  --------------------
     /** The naming of column. {After S2Dao-1.0.47} */
     protected ColumnNaming columnNaming;
 
@@ -54,36 +128,25 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
     /** The builder of table naming. {After S2Dao-1.0.47} */
     protected TableNaming tableNaming;
-#end
 
-#if ($database.isAvailableOtherConnectionDaoInitialization())
-    /** The transaction manager for other connection dao initialization. */
-    protected javax.transaction.TransactionManager transactionManager;
-#end
-
-#if ($database.isVersionAfter1047())
-    /** The lock monitor of dao meta data initialization. */
+    // -----------------------------------------------------
+    //                                     DBFlute Extension
+    //                                     -----------------
+    /** The lock monitor of DAO meta data initialization. */
     protected Object _daoMetaDataInitializationLockMonitor = new Object();
-#end
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     * 
-     * @param dataSource Data source.
-     * @param statementFactory Statement factory.
-     * @param resultSetFactory Result set factory.
-     * @param readerFactory Annotation reader factory.
-     * @param xaDataSource XA data source.
-     */
     public ${glDaoMetaDataFactoryImpl}(javax.sql.DataSource dataSource,
             StatementFactory statementFactory,
             ResultSetFactory resultSetFactory,
-            AnnotationReaderFactory readerFactory,
+            AnnotationReaderFactory annotationReaderFactory,
             javax.sql.XADataSource xaDataSource) {
-        super(dataSource, statementFactory, resultSetFactory, readerFactory);
+        this.dataSource = dataSource;
+        this.statementFactory = statementFactory;
+        this.resultSetFactory = resultSetFactory;
+        this.annotationReaderFactory = annotationReaderFactory;
 
         _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
         showInformation(dataSource, xaDataSource);
@@ -167,28 +230,10 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         return ${glConditionBeanContextName}.setupDatabaseProductNameByDriverClassName(driverClassName);
     }
 
-#if ($database.isVersionAfter1046() && !$database.isVersionAfter1047())
     // ===================================================================================
-    //                                                                          Initialize
-    //                                                                          ==========
-    public void initialize() {
-        if (dtoMetaDataFactory == null) {
-            final org.seasar.dao.impl.DtoMetaDataFactoryImpl factory = new org.seasar.dao.impl.DtoMetaDataFactoryImpl();
-            factory.setAnnotationReaderFactory(this.annotationReaderFactory);
-            factory.setValueTypeFactory(valueTypeFactory);
-            dtoMetaDataFactory = factory;
-        }
-        if (resultSetHandlerFactory == null) {
-            final org.seasar.dao.impl.ResultSetHandlerFactoryImpl factory = new ${glDaoMetaDataExtension}.ResultSetHandlerFactoryExtension();
-            factory.setDtoMetaDataFactory(dtoMetaDataFactory);
-            resultSetHandlerFactory = factory;
-        }
-    }
-#end
-
-#if ($database.isVersionAfter1047())
+    //                                                                      Implementation
+    //                                                                      ==============
     @SuppressWarnings("unchecked")
-    @Override
     public DaoMetaData getDaoMetaData(final Class daoClass) {
         if (!initialized) {
             DisposableUtil.add(this);
@@ -247,75 +292,143 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         }
         return dmd;
     }
-#end
 
-#if ($database.isAvailableOtherConnectionDaoInitialization())
     // ===================================================================================
-    //                                                      DataMetaData Creation Override
-    //                                                      ==============================
-    protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
+    //                                                               DataMetaData Creation
+    //                                                               =====================
+    protected DaoMetaData createDaoMetaData(final Class<?> daoClass) {
+        final BeanDesc daoBeanDesc = BeanDescFactory.getBeanDesc(daoClass);
+        final DaoAnnotationReader daoAnnotationReader = annotationReaderFactory.createDaoAnnotationReader(daoBeanDesc);
+
+        final DaoMetaDataImpl daoMetaData = createDaoMetaDataExtension();
+        daoMetaData.setDaoClass(daoClass);
+        daoMetaData.setDataSource(dataSource);
+        daoMetaData.setStatementFactory(statementFactory);
+        daoMetaData.setResultSetFactory(resultSetFactory);
+        daoMetaData.setValueTypeFactory(valueTypeFactory);
+        daoMetaData.setBeanMetaDataFactory(getBeanMetaDataFactory());
+        daoMetaData.setDaoNamingConvention(getDaoNamingConvention());
+        daoMetaData.setUseDaoClassForLog(useDaoClassForLog);
+        daoMetaData.setDaoAnnotationReader(daoAnnotationReader);
+        daoMetaData.setProcedureMetaDataFactory(procedureMetaDataFactory);
+        daoMetaData.setDtoMetaDataFactory(dtoMetaDataFactory);
+        daoMetaData.setResultSetHandlerFactory(resultSetHandlerFactory);
+        if (sqlFileEncoding != null) {
+            daoMetaData.setSqlFileEncoding(sqlFileEncoding);
+        }
+        if (pagingSqlRewriter != null) {
+            daoMetaData.setPagingSQLRewriter(pagingSqlRewriter);
+        }
+        daoMetaData.initialize();
+        return daoMetaData;
+    }
+	
+    protected ${glDaoMetaDataExtension} createDaoMetaDataExtension() {// Override!
         final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
         dmdExtension.setBeanEnhancer(beanEnhancer);
-        dmdExtension.setTransactionManager(this.transactionManager);
-#if ($database.isVersionAfter1046())
         dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
-#end
-#if ($database.isVersionAfter1047())
-        dmdExtension.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
-        dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
-        dmdExtension.setTableNaming(tableNaming);
-#end
-        dmdExtension.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
-        dmdExtension.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
-        return dmdExtension;
-    }
-
-    // ===================================================================================
-    //                                                                 Transaction Manager
-    //                                                                 ===================
-    public javax.transaction.TransactionManager getTransactionManager() {
-        return transactionManager;
-    }
-
-    public void setTransactionManager(javax.transaction.TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
-    }
-#else
-    // ===================================================================================
-    //                                                      DataMetaData Creation Override
-    //                                                      ==============================
-    protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
-        final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
-        dmdExtension.setBeanEnhancer(beanEnhancer);
-#if ($database.isVersionAfter1046())
-        dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
-#end
-#if ($database.isVersionAfter1047())
         dmdExtension.setColumnNaming(this.columnNaming);
         dmdExtension.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
         dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
         dmdExtension.setTableNaming(tableNaming);
-#end
         dmdExtension.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
         dmdExtension.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return dmdExtension;
     }
-#end
 
     protected ${glDaoMetaDataExtension} newDaoMetaDataExtension() {
         return new ${glDaoMetaDataExtension}();
     }
 
     // ===================================================================================
-    //                                                                   Sql File Encoding
-    //                                                                   =================
+    //                                                                             Dispose
+    //                                                                             =======
+    public synchronized void dispose() {
+        daoMetaDataCache.clear();
+        initialized = false;
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * @return The value of line separator. (NotNull)
+     */
+    protected static String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+	
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                         Factory Basic
+    //                                         -------------
+    public void setValueTypeFactory(final ValueTypeFactory valueTypeFactory) {
+        this.valueTypeFactory = valueTypeFactory;
+    }
+
+    protected BeanMetaDataFactory getBeanMetaDataFactory() {
+        return beanMetaDataFactory;
+    }
+
+    public void setBeanMetaDataFactory(final BeanMetaDataFactory beanMetaDataFactory) {
+        this.beanMetaDataFactory = beanMetaDataFactory;
+    }
+
+    public DaoNamingConvention getDaoNamingConvention() {
+        return daoNamingConvention;
+    }
+
+    public void setDaoNamingConvention(final DaoNamingConvention daoNamingConvention) {
+        this.daoNamingConvention = daoNamingConvention;
+    }
+
+    public void setAnnotationReaderFactory(final AnnotationReaderFactory annotationReaderFactory) {
+        this.annotationReaderFactory = annotationReaderFactory;
+    }
+
+    public void setDataSource(final DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public void setResultSetFactory(final ResultSetFactory resultSetFactory) {
+        this.resultSetFactory = resultSetFactory;
+    }
+
+    public void setStatementFactory(final StatementFactory statementFactory) {
+        this.statementFactory = statementFactory;
+    }
+
+    public void setUseDaoClassForLog(final boolean userDaoClassForLog) {
+        useDaoClassForLog = userDaoClassForLog;
+    }
+
+    public void setResultSetHandlerFactory(final ResultSetHandlerFactory resultSetHandlerFactory) {
+        this.resultSetHandlerFactory = resultSetHandlerFactory;
+    }
+
+    public void setDtoMetaDataFactory(final DtoMetaDataFactory dtoMetaDataFactory) {
+        this.dtoMetaDataFactory = dtoMetaDataFactory;
+    }
+
+    public void setProcedureMetaDataFactory(ProcedureMetaDataFactory procedureMetaDataFactory) {
+        this.procedureMetaDataFactory = procedureMetaDataFactory;
+    }
+
+    public void setPagingSQLRewriter(final PagingSqlRewriter pagingSqlRewriter) {
+        this.pagingSqlRewriter = pagingSqlRewriter;
+    }
+	
     public String getSqlFileEncoding() {
         return sqlFileEncoding;
     }
 
-    // ===================================================================================
-    //                                                                       Bean Enhancer
-    //                                                                       =============
+    public void setSqlFileEncoding(final String encoding) {
+        sqlFileEncoding = encoding;
+    }
+	
     public BeanEnhancer getBeanEnhancer() {
         return beanEnhancer;
     }
@@ -324,10 +437,9 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         this.beanEnhancer = beanEnhancer;
     }
 
-#if ($database.isVersionAfter1047())
-    // ===================================================================================
-    //                                                                Version After 1.0.47
-    //                                                                ====================
+    // -----------------------------------------------------
+    //                                  Version After 1.0.47
+    //                                  --------------------
     public ColumnNaming getColumnNaming() {
         return columnNaming;
     }
@@ -358,18 +470,5 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
     public void setTableNaming(final TableNaming tableNaming) {
         this.tableNaming = tableNaming;
-    }
-#end
-
-    // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    /**
-     * Get the value of line separator.
-     * 
-     * @return The value of line separator. (NotNull)
-     */
-    protected static String getLineSeparator() {
-        return System.getProperty("line.separator");
     }
 }

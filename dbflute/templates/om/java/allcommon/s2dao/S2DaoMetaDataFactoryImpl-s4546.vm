@@ -7,18 +7,12 @@ import org.seasar.dao.impl.DaoMetaDataImpl;
 import org.seasar.extension.jdbc.ResultSetFactory;
 import org.seasar.extension.jdbc.StatementFactory;
 
-#if ($database.isVersionAfter1047())
-import org.seasar.dao.PropertyTypeFactoryBuilder;
-import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
-import org.seasar.dao.TableNaming;
-import org.seasar.dao.ColumnNaming;
-#end
-
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
+import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 
 /**
  * DaoMetaDataFactoryImpl for DBFlute.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
@@ -29,37 +23,20 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     /** Log-instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoInterceptor}.class);
 
+    /** The binding annotation for xaDataSource. {bindingType=may} */
+    public static final String xaDataSource_BINDING = "bindingType=may";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** Bean enhancer. */
     protected BeanEnhancer beanEnhancer;
 
-#if ($database.isVersionAfter1047())
-    /** The naming of column. {After S2Dao-1.0.47} */
-    protected ColumnNaming columnNaming;
-
-    /** The builder of property type factory. {After S2Dao-1.0.47} */
-    protected PropertyTypeFactoryBuilder propertyTypeFactoryBuilder;
-
-    /** The builder of relation property type factory. {After S2Dao-1.0.47} */
-    protected RelationPropertyTypeFactoryBuilder relationPropertyTypeFactoryBuilder;
-
-    /** The builder of table naming. {After S2Dao-1.0.47} */
-    protected TableNaming tableNaming;
-#end
-
-#if ($database.isAvailableOtherConnectionDaoInitialization())
-    /** The transaction manager for other connection dao initialization. */
-    protected javax.transaction.TransactionManager transactionManager;
-#end
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param dataSource Data source.
      * @param statementFactory Statement factory.
      * @param resultSetFactory Result set factory.
@@ -73,7 +50,7 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
             javax.sql.XADataSource xaDataSource) {
         super(dataSource, statementFactory, resultSetFactory, readerFactory);
 
-        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
+        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
         showInformation(dataSource, xaDataSource);
 
         // Stop the LinkageError!
@@ -81,22 +58,42 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 
         initializeDatabaseProductNameOfContext(xaDataSource);
 
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{SqlLog Information}").append(getLineSeparator());
+        sb.append("  [SqlLogRegistry]").append(getLineSeparator());
+        final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+        if (sqlLogRegistry != null) {
+            ${glInternalSqlLogRegistry}.closeRegistration();
+            sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is close! It's default for DBFlute.").append(getLineSeparator());
+            sb.append("    If you want to use this, set SqlLogRegistry to SqlLogRegistryLocator at yourself.");
+        } else {
+            sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
+        }
+        _log.info(sb);
+        ${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
     }
 
     protected void showInformation(javax.sql.DataSource dataSource, javax.sql.XADataSource xaDataSource) {
+        final StringBuilder sb = new StringBuilder();
         if (xaDataSource != null && xaDataSource instanceof org.seasar.extension.dbcp.impl.XADataSourceImpl) {
             final org.seasar.extension.dbcp.impl.XADataSourceImpl xaDataSourceImpl = (org.seasar.extension.dbcp.impl.XADataSourceImpl)xaDataSource;
             final String driverClassName = xaDataSourceImpl.getDriverClassName();
             final String url = xaDataSourceImpl.getURL();
             final String user = xaDataSourceImpl.getUser();
-            _log.info("[XADataSource]: " + xaDataSourceImpl);
-            _log.info("    driver = " + driverClassName);
-            _log.info("    url    = " + url);
-            _log.info("    user   = " + user);
+            sb.append("  [XADataSource]:").append(getLineSeparator());
+            sb.append("    driver = " + driverClassName).append(getLineSeparator());
+            sb.append("    url    = " + url).append(getLineSeparator());
+            sb.append("    user   = " + user).append(getLineSeparator());
         }
-        _log.info("[StatementFactory]: " + statementFactory);
-        _log.info("[ResultSetFactory]: " + resultSetFactory);
+        final String statementFactoryExpression = statementFactory != null ? statementFactory.getClass().getSimpleName(): "null";
+        final String resultSetFactoryExpression = resultSetFactory != null ? resultSetFactory.getClass().getSimpleName(): "null";
+        sb.append("  [StatementFactory]:").append(getLineSeparator());
+        sb.append("    Injected statementFactory is " + statementFactoryExpression + ". But DBFlute uses original statementFactory.").append(getLineSeparator());
+        sb.append("    If the injected statementFactory is ConfigurableStatementFactory, the config is inherited to the original statementFactory.").append(getLineSeparator());
+        sb.append("  [ResultSetFactory]:").append(getLineSeparator());
+        sb.append("    Injected resultSetFactory is " + resultSetFactoryExpression + ". But DBFlute uses original resultSetFactory.");
+        _log.info("{Injection Information}" + getLineSeparator() + sb);
     }
 
     // -----------------------------------------------------
@@ -154,36 +151,6 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
     }
 #end
 
-#if ($database.isAvailableOtherConnectionDaoInitialization())
-    // ===================================================================================
-    //                                                      DataMetaData Creation Override
-    //                                                      ==============================
-    protected DaoMetaDataImpl createDaoMetaDataImpl() {// Override!
-        final ${glDaoMetaDataExtension} dmdExtension = newDaoMetaDataExtension();
-        dmdExtension.setBeanEnhancer(beanEnhancer);
-        dmdExtension.setTransactionManager(this.transactionManager);
-#if ($database.isVersionAfter1046())
-        dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
-#end
-#if ($database.isVersionAfter1047())
-        dmdExtension.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
-        dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
-        dmdExtension.setTableNaming(tableNaming);
-#end
-        return dmdExtension;
-    }
-
-    // ===================================================================================
-    //                                                                 Transaction Manager
-    //                                                                 ===================
-    public javax.transaction.TransactionManager getTransactionManager() {
-        return transactionManager;
-    }
-
-    public void setTransactionManager(javax.transaction.TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
-    }
-#else
     // ===================================================================================
     //                                                      DataMetaData Creation Override
     //                                                      ==============================
@@ -193,15 +160,10 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
 #if ($database.isVersionAfter1046())
         dmdExtension.setAnnotationReaderFactory(this.annotationReaderFactory);
 #end
-#if ($database.isVersionAfter1047())
-        dmdExtension.setColumnNaming(this.columnNaming);
-        dmdExtension.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
-        dmdExtension.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
-        dmdExtension.setTableNaming(tableNaming);
-#end
+        dmdExtension.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
+        dmdExtension.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return dmdExtension;
     }
-#end
 
     protected ${glDaoMetaDataExtension} newDaoMetaDataExtension() {
         return new ${glDaoMetaDataExtension}();
@@ -225,40 +187,15 @@ public class ${glDaoMetaDataFactoryImpl} extends DaoMetaDataFactoryImpl {
         this.beanEnhancer = beanEnhancer;
     }
 
-#if ($database.isVersionAfter1047())
     // ===================================================================================
-    //                                                                Version After 1.0.47
-    //                                                                ====================
-    public ColumnNaming getColumnNaming() {
-        return columnNaming;
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected static String getLineSeparator() {
+        return System.getProperty("line.separator");
     }
-
-    public void setColumnNaming(final ColumnNaming columnNaming) {
-        this.columnNaming = columnNaming;
-    }
-
-    public PropertyTypeFactoryBuilder getPropertyTypeFactoryBuilder() {
-        return propertyTypeFactoryBuilder;
-    }
-
-    public void setPropertyTypeFactoryBuilder(final PropertyTypeFactoryBuilder propertyTypeFactoryBuilder) {
-        this.propertyTypeFactoryBuilder = propertyTypeFactoryBuilder;
-    }
-
-    public RelationPropertyTypeFactoryBuilder getRelationPropertyTypeFactoryBuilder() {
-        return relationPropertyTypeFactoryBuilder;
-    }
-
-    public void setRelationPropertyTypeFactoryBuilder(final RelationPropertyTypeFactoryBuilder relationPropertyTypeFactoryBuilder) {
-        this.relationPropertyTypeFactoryBuilder = relationPropertyTypeFactoryBuilder;
-    }
-
-    public TableNaming getTableNaming() {
-        return tableNaming;
-    }
-
-    public void setTableNaming(final TableNaming tableNaming) {
-        this.tableNaming = tableNaming;
-    }
-#end
 }

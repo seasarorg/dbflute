@@ -1,10 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseParameterBean};
-
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
 /**
  * The parameter-bean of ${pmbClassName}.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
@@ -27,12 +25,9 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
     public ${myClassName}() {
     }
-
+	
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
@@ -57,7 +52,6 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                      ==============
     /**
      * ${database.OverrideComment}
-     * 
      * @return The view of properties. (NotNull)
      */
     @Override
@@ -80,7 +74,6 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
 
     /**
      * Get the value of ${propertyName}. (Converted empty to null)
-     * 
      * @return The value of ${propertyName}. (Nullable & NotEmptyString: if the value is empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
@@ -93,7 +86,6 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
 
     /**
      * Set the value of ${propertyName}.
-     * 
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
@@ -103,7 +95,6 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
 
     /**
      * Set the value of ${propertyName}.
-     * 
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      * @param ${propertyName}Option The option of likeSearch for ${propertyName}. (Nullable)
      */
@@ -114,7 +105,6 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
 
     /**
      * Get the internal option of likeSearch for ${propertyName}. {Internal Method: Don't Invoke This!}
-     * 
      * @return The internal option of likeSearch for ${propertyName}. (Nullable)
      */
     public ${glPackageBaseCommonCOption}.${glConditionOptionLikeSearchName} get${database.initCap($propertyName)}InternalLikeSearchOption() {

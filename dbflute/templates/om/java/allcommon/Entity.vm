@@ -4,7 +4,6 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 
 /**
  * The interface of entity.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glEntityInterfaceName} {
@@ -13,8 +12,7 @@ public interface ${glEntityInterfaceName} {
     //                                                                              DBMeta
     //                                                                              ======
     /**
-     * Get dbmeta.
-     * 
+     * Get the instance of target dbmeta.
      * @return DBMeta. (NotNull)
      */
     public ${glDBMetaInterfaceName} getDBMeta();
@@ -23,15 +21,13 @@ public interface ${glEntityInterfaceName} {
     //                                                                          Table Name
     //                                                                          ==========
     /**
-     * Get table db-name.
-     * 
-     * @return Table db-name. (NotNull)
+     * Get table DB-name.
+     * @return Table DB-name. (NotNull)
      */
     public String getTableDbName();
 
     /**
      * Get table property-name.
-     * 
      * @return Table property-name. (NotNull)
      */
     public String getTablePropertyName();
@@ -40,22 +36,19 @@ public interface ${glEntityInterfaceName} {
     //                                                                       Determination
     //                                                                       =============
     /**
-     * Has primary-key value?
-     * 
+     * Has the value of primary-key?
      * @return Determination.
      */
     public boolean hasPrimaryKeyValue();
 
     /**
-     * Has version no value?
-     * 
+     * Has the value of version-no?
      * @return Determination.
      */
     public boolean hasVersionNoValue();
 
     /**
-     * Has update date value?
-     * 
+     * Has the value of update-date?
      * @return Determination.
      */
     public boolean hasUpdateDateValue();
@@ -65,7 +58,6 @@ public interface ${glEntityInterfaceName} {
     //                                                                 ===================
     /**
      * Get modified property names. (JavaBeansRule)
-     * 
      * @return Modified property names. (NotNull)
      */
     public java.util.Set${database.filterGenericsString('String')} getModifiedPropertyNames();
@@ -84,11 +76,10 @@ public interface ${glEntityInterfaceName} {
         private static final long serialVersionUID = 1L;
 
         /** Set of properties. */
-        protected java.util.Set${database.filterGenericsString('String')} _propertiesSet = new java.util.LinkedHashSet${database.filterGenericsString('String')}();
+        protected java.util.Set<String> _propertiesSet = new java.util.LinkedHashSet<String>();
 
         /**
          * Add property name. (JavaBeansRule)
-         * 
          * @param propertyName Property name. (Nullable)
          */
         public void addPropertyName(String propertyName) {
@@ -97,7 +88,6 @@ public interface ${glEntityInterfaceName} {
 
         /**
          * Add property name. (JavaBeansRule)
-         * 
          * @param propertyName Property name. (NotNull)
          * @param before Before value. (Nullable)
          * @param after After value. (Nullable)
@@ -113,16 +103,14 @@ public interface ${glEntityInterfaceName} {
 
         /**
          * Get the set of properties.
-         * 
          * @return The set of properties. (NotNull)
          */
-        public java.util.Set${database.filterGenericsString('String')} getPropertyNames() {
+        public java.util.Set<String> getPropertyNames() {
             return _propertiesSet;
         }
 
         /**
          * Is empty?
-         * 
          * @return Determination.
          */
         public boolean isEmpty() {
@@ -138,7 +126,6 @@ public interface ${glEntityInterfaceName} {
 
         /**
          * Remove property name from the set. (JavaBeansRule)
-         * 
          * @param propertyName Property name. (Nullable)
          */
         public void remove(String propertyName) {

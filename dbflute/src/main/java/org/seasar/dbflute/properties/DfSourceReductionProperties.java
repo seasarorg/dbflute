@@ -7,11 +7,9 @@ import java.util.Properties;
  */
 public final class DfSourceReductionProperties extends DfAbstractHelperProperties {
 
-    /**
-     * Constructor.
-     * 
-     * @param prop Properties. (NotNull)
-     */
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfSourceReductionProperties(Properties prop) {
         super(prop);
     }
@@ -33,33 +31,49 @@ public final class DfSourceReductionProperties extends DfAbstractHelperPropertie
     public boolean isMakeConditionQueryEqualEmptyString() {
         return booleanProp("torque.isMakeConditionQueryEqualEmptyString", false);
     }
-
-    public boolean isMakeConditionQueryNumericArgumentLong() {
-        return booleanProp("torque.isMakeConditionQueryNumericArgumentLong", false);
-    }
-
+    
     public boolean isMakeConditionQueryClassificationRestriction() {
         return booleanProp("torque.isMakeConditionQueryClassificationRestriction", false);
     }
     
-    // ===============================================================================
-    //                                                           Properties - Behavior
-    //                                                           =====================
+    /**
+     * @return Determination
+     * @deprecated
+     */
+    public boolean isMakeConditionQueryNumericArgumentLong() {
+        return booleanProp("torque.isMakeConditionQueryNumericArgumentLong", false);
+    }
+    
+    // ===================================================================================
+    //                                                                            Behavior
+    //                                                                            ========
+    public boolean isMakeBehaviorLoopUpdate() {
+        return booleanProp("torque.isMakeBehaviorLoopUpdate", false);
+    }
+    
+    /**
+     * @return Determination
+     * @deprecated
+     */
     public boolean isMakeBehaviorCopyInsert() {
         return booleanProp("torque.isMakeBehaviorCopyInsert", false);
     }
 
-    public boolean isMakeBehaviorLoopUpdate() {
-        return booleanProp("torque.isMakeBehaviorLoopUpdate", false);
-    }
-
+    /**
+     * @return Determination
+     * @deprecated
+     */
     public boolean isMakeBehaviorForUpdate() {
         return booleanProp("torque.isMakeBehaviorForUpdate", false);
     }
 
-    // ===============================================================================
-    //                                                          Properties - Traceable
-    //                                                          ======================
+    // ===================================================================================
+    //                                                                           Traceable
+    //                                                                           =========
+    /**
+     * @return Determination
+     * @deprecated
+     */
     public boolean isMakeTraceablePreparedStatement() {
         return booleanProp("torque.isMakeTraceablePreparedStatement", false);
     }

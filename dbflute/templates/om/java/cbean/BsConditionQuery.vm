@@ -8,8 +8,7 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 import ${glPackageCIQ}.*;
 
 /**
- * The condition-query of ${table.name}.
- * 
+ * The base condition-query of ${table.name}.
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
@@ -350,5 +349,4 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 #end
 #end
-
 }

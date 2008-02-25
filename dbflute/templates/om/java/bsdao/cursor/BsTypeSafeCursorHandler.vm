@@ -1,19 +1,16 @@
 ${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
 
 #set ($myClassName = "${myBaseTypeSafeCursorHandlerClassName}")
-
 import ${myExtendedDaoCursorPackageName}.${myExtendedTypeSafeCursorClassName};
 
 /**
  * The cursor handler of ${table.name}.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${myClassName} implements ${glPackageBaseCommonJdbc}.${glCursorHandlerName} {
 
     /**
      * Handle.
-     * 
      * @param rs Result set. (NotNull)
      * @return Result. (Nullable)
      * @throws java.sql.SQLException
@@ -24,7 +21,6 @@ public abstract class ${myClassName} implements ${glPackageBaseCommonJdbc}.${glC
 
     /**
      * Create type safe cursor.
-     * 
      * @param rs Result set. (NotNull)
      * @return Type safe cursor. (Nullable)
      * @throws java.sql.SQLException
@@ -37,7 +33,6 @@ public abstract class ${myClassName} implements ${glPackageBaseCommonJdbc}.${glC
 
     /**
      * Fetch cursor.
-     * 
      * @param cursor Type safe cursor. (NotNull)
      * @return Result. (Nullable)
      * @throws java.sql.SQLException

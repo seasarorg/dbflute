@@ -195,63 +195,6 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
         return new ArrayList<String>(getDBFluteDiconOtherIncludeDefinitionMap().keySet());
     }
 
-    // ===============================================================================
-    //                                               Properties - originalDaoComponent
-    //                                               =================================
-    public static final String KEY_originalDBFluteoComponentMap = "originalDBFluteComponentMap";
-    public static final String KEY_originalDaoComponentMap = "originalDaoComponentMap";
-    protected Map<String, Map<String, String>> _originalDBFluteComponentMap;
-    protected Map<String, String> _isDaoMap = new LinkedHashMap<String, String>();
-
-    public Map<String, Map<String, String>> getOriginalDBFluteComponentMap() {
-        if (_originalDBFluteComponentMap != null) {
-            return _originalDBFluteComponentMap;
-        }
-
-        _originalDBFluteComponentMap = new LinkedHashMap<String, Map<String, String>>();
-
-        Map<String, Object> generatedMap = mapProp("torque." + KEY_originalDBFluteoComponentMap, null);
-        if (generatedMap == null) {
-            generatedMap = mapProp("torque." + KEY_originalDaoComponentMap, DEFAULT_EMPTY_MAP);
-        }
-
-        final Set<String> keySet = generatedMap.keySet();
-        for (String key : keySet) {
-            // TODO: @jflute - もう一段階真面目に展開すること。
-            final Map<String, String> aspectDefinition = (Map<String, String>) generatedMap.get(key);
-
-            if (key.startsWith("*")) {
-                final String realKey = key.substring("*".length());
-                _isDaoMap.put(realKey, "dummy");
-                _originalDBFluteComponentMap.put(realKey, aspectDefinition);
-            } else {
-                _originalDBFluteComponentMap.put(key, aspectDefinition);
-            }
-        }
-        return _originalDBFluteComponentMap;
-    }
-
-    public List<String> getOriginalDBFluteComponentComponentNameList() {
-        return new ArrayList<String>(getOriginalDBFluteComponentMap().keySet());
-    }
-
-    public String getOriginalDBFluteComponentClassName(String componentName) {
-        final Map<String, String> aspectDefinition = getOriginalDBFluteComponentMap().get(componentName);
-        return aspectDefinition.get("className");
-    }
-
-    public boolean isDBFluteComponent(String componentName) {
-        return _isDaoMap.containsKey(componentName);
-    }
-
-    public boolean isAvailableBehaviorRequiresNewTx() {
-        return booleanProp("torque.isAvailableBehaviorRequiresNewTx", false);
-    }
-
-    public boolean isAvailableBehaviorRequiredTx() {
-        return booleanProp("torque.isAvailableBehaviorRequiredTx", false);
-    }
-    
     // ===================================================================================
     //                                                                        DBFluteBeans
     //                                                                        ============

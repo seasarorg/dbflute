@@ -8,24 +8,20 @@ import java.util.Set;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 
 /**
- * Build properties for Torque.
- * 
  * @author jflute
  */
 public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperties {
 
-    //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
-
-    /**
-     * Constructor.
-     */
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfLittleAdjustmentProperties(Properties prop) {
         super(prop);
     }
 
-    // ===============================================================================
-    //                                                         Non PrimaryKey Writable
-    //                                                         =======================
+    // ===================================================================================
+    //                                                             Non PrimaryKey Writable
+    //                                                             =======================
     public boolean isAvailableNonPrimaryKeyWritable() {
         return booleanProp("torque.isAvailableNonPrimaryKeyWritable", false);
     }

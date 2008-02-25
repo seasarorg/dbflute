@@ -1,12 +1,12 @@
 ${database.allClassCopyright}package ${glPackageExtendedBhv};
-
 #set ($myClassName = "${myExtendedBhvClassName}")
 
 /**
- * The behavior of ${table.name}. <br />
- * You can implement your original methods here. <br />
- * This class is NOT overrided when re-generating. <br />
- * 
+ * The behavior of ${table.name}.
+ * <p>
+ * You can implement your original methods here.
+ * This class is NOT overrided when re-generating.
+ * </p>
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class $myClassName extends ${glPackageBaseBhv}.${myBaseBhvClassName} {

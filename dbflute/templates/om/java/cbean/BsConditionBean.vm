@@ -1,5 +1,4 @@
 ${database.allClassCopyright}package ${glPackageBaseCB};
-
 #set ($myClassName = "${myBaseConditionBeanClassName}")
 
 import ${glPackageBaseCommonCBean}.${glConditionBeanAbstractName};
@@ -8,8 +7,7 @@ import ${glPackageBaseCommonCBean}.${glConditionQueryInterfaceName};
 import ${glPackageCQ}.*;
 
 /**
- * The condition-bean of ${table.name}.
- * 
+ * The base condition-bean of ${table.name}.
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} extends ${glConditionBeanAbstractName} {
@@ -28,18 +26,18 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
-    final public String getTableDbName() {
+    public String getTableDbName() {
         return "${table.name}";
     }
 
-    final public String getTableSqlName() {
+    public String getTableSqlName() {
         return "${table.tableSqlName}";
     }
 
     // ===================================================================================
     //                                                                      PrimaryKey Map
     //                                                                      ==============
-    public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap) {
+    public void acceptPrimaryKeyMap(java.util.Map<String, ? extends Object> primaryKeyMap) {
         if (primaryKeyMap == null) {
             String msg = "The argument[primaryKeyMap] must not be null.";
             throw new IllegalArgumentException(msg);
@@ -49,7 +47,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
             throw new IllegalArgumentException(msg);
         }
 #if ($table.hasPrimaryKey())
-  #foreach ($col in $table.PrimaryKey)
+  #foreach ($col in $table.primaryKey)
 
         if (!primaryKeyMap.containsKey("${col.Name}")) {
             String msg = "The primaryKeyMap must have the value of ${col.Name}";
@@ -188,7 +186,7 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     //   ForeignTable    = [${foreignKeys.foreignTable.name}]
     //   ForeignProperty = [${tmpPropertyName}]
     // * * * * * * * * */
-	
+    
     protected ${glPackageNss}.${nestSelectSetuppperClassName} _nss${tmpPropertyNameInitCap};
     public ${glPackageNss}.${nestSelectSetuppperClassName} getNss${tmpPropertyNameInitCap}() {
         if (_nss${tmpPropertyNameInitCap} == null) {
@@ -198,9 +196,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
-		final String localRelationPath = query().getRelationPath();
-		getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-		getSqlClause().registerSelectedForeignInfo(query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+        final String localRelationPath = query().getRelationPath();
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+        getSqlClause().registerSelectedForeignInfo(query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
             _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
         }
@@ -228,9 +226,9 @@ public class ${myClassName} extends ${glConditionBeanAbstractName} {
     }
     public ${glPackageNss}.${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         final String foreignTableAliasName = query().query${tmpPropertyNameInitCap}().getRealAliasName();
-		final String localRelationPath = query().getRelationPath();
-		getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
-		getSqlClause().registerSelectedForeignInfo(query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
+        final String localRelationPath = query().getRelationPath();
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
+        getSqlClause().registerSelectedForeignInfo(query().query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) {
             _nss${tmpPropertyNameInitCap} = new ${glPackageNss}.${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}());
         }

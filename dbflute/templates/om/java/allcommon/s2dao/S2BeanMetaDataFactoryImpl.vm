@@ -108,7 +108,7 @@ public class ${glBeanMetaDataFactoryImpl} extends BeanMetaDataFactoryImpl {
      */
 	@Override
     protected int getLimitRelationNestLevel() {
-	    return 2;// for Compatible
+	    return 2;// for Compatible to old version DBFlute
     }
 #else
     /**

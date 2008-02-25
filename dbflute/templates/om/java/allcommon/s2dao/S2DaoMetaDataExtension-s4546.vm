@@ -1,8 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.lang.reflect.Method;
+#if ($database.isAvailableGenerics())
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+#end
+
+import java.lang.reflect.Method;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
@@ -20,6 +24,9 @@ import org.seasar.dao.BeanMetaData;
 import org.seasar.dao.BeanMetaDataFactory;
 
 import org.seasar.dao.Dbms;
+#if ($database.isVersionAfter1045())
+import org.seasar.dao.InjectDaoClassSupport;
+#end
 import org.seasar.dao.RelationPropertyType;
 import org.seasar.dao.RelationRowCreator;
 import org.seasar.dao.SqlCommand;
@@ -29,15 +36,6 @@ import org.seasar.dao.impl.SelectDynamicCommand;
 import org.seasar.dao.impl.UpdateAutoStaticCommand;
 import org.seasar.dao.impl.UpdateDynamicCommand;
 
-import org.seasar.dao.BeanAnnotationReader;
-import org.seasar.dao.PropertyTypeFactoryBuilder;
-import org.seasar.dao.RelationPropertyTypeFactoryBuilder;
-import org.seasar.dao.TableNaming;
-import org.seasar.dao.ColumnNaming;
-import org.seasar.dao.PropertyTypeFactory;
-import org.seasar.dao.impl.PropertyTypeFactoryBuilderImpl;
-import org.seasar.dao.impl.RelationRowCreationResource;
-
 import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.extension.jdbc.PropertyType;
 import org.seasar.extension.jdbc.ResultSetFactory;
@@ -46,7 +44,8 @@ import org.seasar.extension.jdbc.StatementFactory;
 import org.seasar.extension.jdbc.impl.ConfigurableStatementFactory;
 import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.extension.jdbc.ValueType;
-import org.seasar.framework.beans.PropertyDesc;
+import org.seasar.framework.beans.BeanDesc;
+
 
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommon}.${glInternalMapContextName};
@@ -67,7 +66,8 @@ import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateBatchAuto
 import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalUpdateModifiedOnlyCommand};
 
 /**
- * The extension of DaoMetaDataImpl for DBFlute.
+ * DaoMetaDataImpl for DBFlute.
+ * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
@@ -84,24 +84,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     /** Bean enhancer. */
     protected BeanEnhancer beanEnhancer;
 
+#if ($database.isVersionAfter1046())
     /** The factory of annotation reader. */
     protected org.seasar.dao.AnnotationReaderFactory annotationReaderFactory;
+#end
 
-    /** The naming of column. {After S2Dao-1.0.47} */
-    protected ColumnNaming columnNaming;
-
-    /** The builder of property type factory. {After S2Dao-1.0.47} */
-    protected PropertyTypeFactoryBuilder propertyTypeFactoryBuilder;
-
-    /** The builder of relation property type factory. {After S2Dao-1.0.47} */
-    protected RelationPropertyTypeFactoryBuilder relationPropertyTypeFactoryBuilder;
-
-    /** The builder of table naming. {After S2Dao-1.0.47} */
-    protected TableNaming tableNaming;
-
-    // -----------------------------------------------------
-    //                                     DBFlute Extension
-    //                                     -----------------
     /** The config of dbflute. {Since DBFlute-0.6.2} */
     protected ${glStatementConfig} _defaultStatementConfig;
     
@@ -110,7 +97,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     
     /** The determination of internal debug. {Since DBFlute-0.6.2} */
     protected boolean _internalDebug;
-	
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -130,6 +117,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         super.setupMethodByAuto(method);
     }
 
+#if ($database.isVersionAfter1046())
     // ===================================================================================
     //                                                           ResultSetHandler Override
     //                                                           =========================
@@ -141,6 +129,26 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected ResultSetHandler createResultSetHandler(BeanMetaData specifiedBeanMetaData, Method method) {
         return this.resultSetHandlerFactory.getResultSetHandler(daoAnnotationReader, specifiedBeanMetaData, method);
     }
+#else
+#if ($database.isVersionAfter1043())
+    // ===================================================================================
+    //                                                    ResultSetHandlerFactory Override
+    //                                                    ================================
+    @Override
+    protected org.seasar.dao.ResultSetHandlerFactory createResultSetHandlerFactory() {
+        return new ResultSetHandlerFactoryExtension(beanMetaData, annotationReader, dtoMetaDataFactory);
+    }
+#else
+
+    // ===================================================================================
+    //                                                    ResultSetHandlerFactory Override
+    //                                                    ================================
+    @Override
+    protected org.seasar.dao.ResultSetHandlerFactory createResultSetHandlerFactory(final BeanMetaData beanMetaData) {
+        return new ResultSetHandlerFactoryExtension(beanMetaData);
+    }
+#end
+#end
 
     // ===================================================================================
     //                                                           SqlCommand Setup Override
@@ -217,6 +225,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                             Customize SelectDynamicCommand Creation
     //                                             =======================================
+    /**
+     * Create customize select dynamic command.
+     * 
+     * @param handler The handler of result set. (NotNull)
+     * @return Customize select dynamic command. (NotNull)
+     */
     protected ${glSelectDynamicCommand} createCustomizeSelectDynamicCommand(org.seasar.extension.jdbc.ResultSetHandler handler) {
         final ResultSetFactory customizeResultSetFactory = createCustomizeResultSetFactory();
         final StatementFactory customizeStatementFactory = createCustomizeStatememtFactory();
@@ -328,8 +342,14 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     @Override
     protected void setupSelectMethodByAuto(final Method method) {
         final ResultSetHandler handler = createResultSetHandler(method);
+#if ($database.isVersionAfter1046())
         final String[] argNames = daoAnnotationReader.getArgNames(method);
         final String query = daoAnnotationReader.getQuery(method);
+#else
+        final org.seasar.dao.DaoAnnotationReader daoAnnotationReader = annotationReaderFactory.createDaoAnnotationReader(daoBeanDesc);
+        final String[] argNames = daoAnnotationReader.getArgNames(method);
+        final String query = daoAnnotationReader.getQuery(method);
+#end
         final SqlCommand cmd;
         if (query != null && !startsWithOrderBy(query)) {
             cmd = setupInternalQuerySelectMethodByAuto(method, handler, argNames, query);
@@ -442,8 +462,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected UpdateAutoStaticCommand createInternalUpdateAutoStaticCommand(final Method method, final String[] propertyNames) {
-        final UpdateAutoStaticCommand cmd = new UpdateAutoStaticCommand(dataSource, statementFactory, beanMetaData, propertyNames);
-        cmd.setCheckSingleRowUpdate(isCheckSingleRowUpdate(method));
+        UpdateAutoStaticCommand cmd = new UpdateAutoStaticCommand(dataSource, statementFactory, beanMetaData, propertyNames);
         return cmd;
     }
     
@@ -558,7 +577,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected BeanMetaDataFactory createNonConcurrencyBmdFactory() {
-        final ${glS2BeanMetaDataFactoryImpl} nonConcurrencyBmdFactory = new ${glS2BeanMetaDataFactoryImpl}() {
+        final ${glBeanMetaDataFactoryImpl} nonConcurrencyBmdFactory = new ${glBeanMetaDataFactoryImpl}() {
             protected BeanMetaDataImpl createBeanMetaDataImpl() {
                 return new BeanMetaDataImpl() {
                     public boolean hasVersionNoPropertyType() {
@@ -572,9 +591,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         };
         nonConcurrencyBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
-        nonConcurrencyBmdFactory.setPropertyTypeFactoryBuilder(this.propertyTypeFactoryBuilder);
-        nonConcurrencyBmdFactory.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
-        nonConcurrencyBmdFactory.setTableNaming(this.tableNaming);
+        nonConcurrencyBmdFactory.setValueTypeFactory(this.valueTypeFactory);
         nonConcurrencyBmdFactory.setDataSource(this.dataSource);
         nonConcurrencyBmdFactory.setDaoNamingConvention(this.daoNamingConvention);
         nonConcurrencyBmdFactory.setBeanEnhancer(this.beanEnhancer);
@@ -595,7 +612,11 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     @Override
     protected void setupSelectMethodByManual(Method method, String sql) {
         final Class<?>[] parameterTypes = method.getParameterTypes();
+#if ($database.isVersionAfter1046())
         final String[] argNames = this.daoAnnotationReader.getArgNames(method);
+#else
+        final String[] argNames = this.annotationReader.getArgNames(method);
+#end
         final Class<?>[] argTypes;
         if (parameterTypes != null && parameterTypes.length > 0
                 && ${glCursorHandlerName}.class.isAssignableFrom(parameterTypes[parameterTypes.length-1])) {
@@ -694,7 +715,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
 //        if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
 //            return new org.seasar.extension.jdbc.impl.ObjectResultSetHandler();
 //        }
-//        return new org.seasar.dao.impl.BeanMetaDataResultSetHandler(specifiedBeanMetaData, new org.seasar.dao.impl.RowCreatorImpl(), new RelationRowCreatorExtension());
+//        return new org.seasar.dao.impl.BeanMetaDataResultSetHandler(specifiedBeanMetaData, new RelationRowCreatorExtension());
 //    }
 
     /**
@@ -709,7 +730,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (valueType == null || !valueType.equals(ValueTypes.OBJECT)) {
             return new InternalObjectListResultSetHandler(valueType);
         }
-        return new org.seasar.dao.impl.BeanListMetaDataResultSetHandler(specifiedBeanMetaData, new org.seasar.dao.impl.RowCreatorImpl(), new RelationRowCreatorExtension());
+        return new org.seasar.dao.impl.BeanListMetaDataResultSetHandler(specifiedBeanMetaData, new RelationRowCreatorExtension());
     }
 
     protected class InternalObjectListResultSetHandler implements ResultSetHandler {
@@ -730,6 +751,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         return createOutsideSqlCustomizeBeanMetaDataFactory().createBeanMetaData(getOutsideSqlDefaultBeanClass(method));
     }
 
+    /**
+     * Create the handler of result set of specified outside-sql for cursor.
+     * 
+     * @param specifiedBeanMetaData Specified bean meta data. (NotNull)
+     * @return The handler of result set. (NotNull)
+     */
     protected ResultSetHandler createSpecifiedOutsideSqlCursorResultSetHandler(BeanMetaData specifiedBeanMetaData) {
         return new org.seasar.extension.jdbc.impl.ObjectResultSetHandler();// This is dummy for cursor handling!
     }
@@ -778,9 +805,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             }
         };
         originalBmdFactory.setAnnotationReaderFactory(this.annotationReaderFactory);
-        originalBmdFactory.setPropertyTypeFactoryBuilder(newOutsideSqlPropertyTypeFactoryBuilderImpl());
-        originalBmdFactory.setRelationPropertyTypeFactoryBuilder(this.relationPropertyTypeFactoryBuilder);
-        originalBmdFactory.setTableNaming(this.tableNaming);
+        originalBmdFactory.setValueTypeFactory(this.valueTypeFactory);
         originalBmdFactory.setDataSource(this.dataSource);
         originalBmdFactory.setDaoNamingConvention(this.daoNamingConvention);
         originalBmdFactory.setBeanEnhancer(this.beanEnhancer);
@@ -792,25 +817,9 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
 
     protected static class OutsideSqlCustomizeBeanMetaDataImpl extends BeanMetaDataImpl {
-	    // Though nothing to override, it uses original class just in case.
-    }
-
-    protected PropertyTypeFactoryBuilderImpl newOutsideSqlPropertyTypeFactoryBuilderImpl() {
-        final PropertyTypeFactoryBuilderImpl impl = new OutsideSqlPropertyTypeFactoryBuilderExtension();
-        if (columnNaming == null) {
-            String msg = "Internal Error! The columnNaming should not be null! {Failed to Injection!}";
-            throw new IllegalStateException(msg);
-        }
-        impl.setColumnNaming(columnNaming);
-        impl.setDaoNamingConvention(daoNamingConvention);
-        impl.setValueTypeFactory(valueTypeFactory);
-        return impl;
-    }
-
-    protected static class OutsideSqlPropertyTypeFactoryBuilderExtension extends PropertyTypeFactoryBuilderImpl {
         @Override
-        public PropertyTypeFactory build(Class beanClass, BeanAnnotationReader beanAnnotationReader, Dbms dbms, DatabaseMetaData databaseMetaData) {
-            return new ${glDaoPropertyTypeFactoryBuilderExtension}.FastPropertyTypeFactoryExtension(beanClass, beanAnnotationReader, valueTypeFactory, columnNaming, daoNamingConvention, dbms);
+        protected void setupDatabaseMetaData(BeanDesc beanDesc, DatabaseMetaData dbMetaData, Dbms dbms) {
+            // Nothing.
         }
     }
 
@@ -833,7 +842,16 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     }
     
     protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, BeanMetaData myBeanMetaData) {
+#if ($database.isVersionAfter1046())
         registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, createResultSetHandler(myBeanMetaData, method));
+#else
+#if ($database.isVersionAfter1043())
+        final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData, annotationReader, dtoMetaDataFactory);
+#else
+        final org.seasar.dao.ResultSetHandlerFactory factory = new ResultSetHandlerFactoryExtension(myBeanMetaData);
+#end
+        registerSqlCommand(sqlCommandKey, method, sql, argNames, argTypes, factory.createResultSetHandler(method));
+#end
     }
 
     protected void registerSqlCommand(String sqlCommandKey, Method method, String sql, String[] argNames, Class[] argTypes, ResultSetHandler myResultSetHandler) {
@@ -858,13 +876,12 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     // ===================================================================================
     //                                                                     Common Handlnig
     //                                                                     ===============
-    @Override
     protected void putSqlCommand(String methodName, SqlCommand cmd) {
         sqlCommands.put(methodName, cmd);
     }
     
     protected boolean isCheckSingleRowUpdate(Method method) {
-        return checkSingleRowUpdateForAll & daoAnnotationReader.isCheckSingleRowUpdate(method);
+        return false;
     }
     
     // ===================================================================================
@@ -914,6 +931,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
     }
 
+#if ($database.isVersionAfter1046())
     // ===================================================================================
     //                                               ResultSetHandlerFactoryImpl Extension
     //                                               =====================================
@@ -923,303 +941,135 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         }
 
         @Override
-        protected org.seasar.dao.RowCreator createRowCreator() {// [DAO-118] (2007/08/25)
-            return new RowCreatorExtension();
+        protected RelationRowCreator createRelationRowCreator() {
+            return new RelationRowCreatorExtension();
         }
-
+    }
+#else
+    // ===================================================================================
+    //                                               ResultSetHandlerFactoryImpl Extension
+    //                                               =====================================
+    public static class ResultSetHandlerFactoryExtension extends ResultSetHandlerFactoryImpl {
+#if ($database.isVersionAfter1043())
+        public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData, org.seasar.dao.DaoAnnotationReader annotationReader, org.seasar.dao.DtoMetaDataFactory dtoMetaDataFactory) {
+            super(beanMetaData, annotationReader, dtoMetaDataFactory);
+        }
+#else
+        public ResultSetHandlerFactoryExtension(BeanMetaData beanMetaData) {
+            super(beanMetaData);
+        }
+#end
         @Override
         protected RelationRowCreator createRelationRowCreator() {
             return new RelationRowCreatorExtension();
         }
     }
+#end
 
-    // ===================================================================================
-    //                                                            RowCreatorImpl Extension
-    //                                                            ========================
-    protected static class RowCreatorExtension extends org.seasar.dao.impl.RowCreatorImpl {
-    
-        /** The key of DBMeta cache. */
-        protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
-
-        @Override
-        public Object createRow(ResultSet rs, Map propertyCache, Class beanClass) throws SQLException  {
-            final Object row = newBean(beanClass);
-            final ${glDBMetaInterfaceName} dbmeta = findDBMeta(row);
-            final Set columnNameSet = propertyCache.keySet();
-            String columnName = null;
-            PropertyType pt = null;
-            String propertyName = null;
-            try {
-                for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
-                    columnName = (String) ite.next();
-                    pt = (PropertyType) propertyCache.get(columnName);
-                    propertyName = pt.getPropertyName();
-                    if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
-                        final ValueType valueType = pt.getValueType();
-                        final Object value = valueType.getValue(rs, columnName);
-                        dbmeta.setupEntityProperty(propertyName, row, value);
-                    } else {
-                        registerValue(rs, row, pt, columnName);
-                    }
-                }
-            } catch (SQLException e) {
-                if (_log.isWarnEnabled()) {
-                    String msg = SQLException.class.getSimpleName() + " occurred while ResultSet Handling:";
-                    _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName);
-                }
-                throw e;
-            }
-            return row;
-        }
-        
-        /**
-         * @param row The object of row. (NotNull)
-         * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
-         */
-        protected ${glDBMetaInterfaceName} findDBMeta(Object row) {
-            return EntityPropertySetupperHandler.findCachedDBMeta(row);
-        }
-    }
-    
-    /**
-     * The handler of setupper of entity property.
-     */
-    protected static class EntityPropertySetupperHandler {
-        
-        /** The key of DBMeta cache. */
-        protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
-        
-        public static ${glDBMetaInterfaceName} findCachedDBMeta(Object row) {
-            if (!(row instanceof ${glEntityInterfaceName})) {
-                return null;
-            }
-            final ${glEntityInterfaceName} entity = (${glEntityInterfaceName}) row;
-            Map<Class<?>, ${glDBMetaInterfaceName}> dbmetaCache = (Map<Class<?>, ${glDBMetaInterfaceName}>)${glInternalMapContextName}.getObject(DBMETA_CACHE_KEY);
-            if (dbmetaCache == null) {
-                dbmetaCache = new HashMap<Class<?>, ${glDBMetaInterfaceName}>();
-                ${glInternalMapContextName}.setObject(DBMETA_CACHE_KEY, dbmetaCache);
-            }
-            ${glDBMetaInterfaceName} dbmeta = dbmetaCache.get(entity.getClass());
-            if (dbmeta != null) {
-                return dbmeta;
-            }
-            dbmeta = entity.getDBMeta();
-            dbmetaCache.put(entity.getClass(), dbmeta);
-            return dbmeta;
-        }
-    }
-    
     // ===================================================================================
     //                                                    RelationRowCreatorImpl Extension
     //                                                    ================================
-    protected static class RelationRowCreatorExtension extends org.seasar.dao.impl.RelationRowCreatorImpl {
-    
-        @Override
-        protected void setupRelationAllValue(RelationRowCreationResource res) throws SQLException {
-            final Map propertyCacheElement = res.extractPropertyCacheElement();
-            final Set columnNameCacheElementKeySet = propertyCacheElement.keySet();
-            for (final Iterator ite = columnNameCacheElementKeySet.iterator(); ite.hasNext();) {
-                final String columnName = (String) ite.next();
-                final PropertyType pt = (PropertyType) propertyCacheElement.get(columnName);
-                res.setCurrentPropertyType(pt);
-                if (!isValidRelationPerPropertyLoop(res)) {
-                    res.clearRowInstance();
-                    return;
-                }
-                setupRelationProperty(res);
-            }
-            if (!isValidRelationAfterPropertyLoop(res)) {
-                res.clearRowInstance();
-                return;
-            }
-            res.clearValidValueCount();
-            if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
-                setupNextRelationRow(res);
-            }
+    public static class RelationRowCreatorExtension extends org.seasar.dao.impl.RelationRowCreatorImpl {
+
+        public Object createRelationRow(java.sql.ResultSet rs, RelationPropertyType rpt, java.util.Set columnNames, java.util.Map relKeyValues)
+                throws java.sql.SQLException {
+            return createRelationRow(rs, rpt, columnNames, relKeyValues, "");
         }
-        
-        @Override
-        protected void registerRelationValue(RelationRowCreationResource res, String columnName) throws SQLException {
-            final PropertyType pt = res.getCurrentPropertyType();
-            Object value = null;
-            if (res.containsRelKeyValueIfExists(columnName)) {
-                value = res.extractRelKeyValue(columnName);
-            } else {
-                final ValueType valueType = pt.getValueType();
-                value = valueType.getValue(res.getResultSet(), columnName);
-            }
-            
-            if (value != null) {
-                res.incrementValidValueCount();
-                final ${glDBMetaInterfaceName} dbmeta = findDBMeta(res.getRow());
-                final String propertyName = pt.getPropertyName();
-                if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
-                    dbmeta.setupEntityProperty(propertyName, res.getRow(), value);
-                } else {
-                    final PropertyDesc pd = pt.getPropertyDesc();
-                    pd.setValue(res.getRow(), value);
-                }
-            }
+
+        public Object createRelationRow(java.sql.ResultSet rs, RelationPropertyType rpt, java.util.Set columnNames, java.util.Map relKeyValues,
+                String preRelationNoSuffix) throws java.sql.SQLException {
+            // It must doesn't need to invoke this!
+            // final Object row = setupRelationKeyValue(rpt, columnNames, relKeyValues);
+
+            return setupRelationAllValue(rs, rpt, columnNames, relKeyValues, preRelationNoSuffix);
         }
-        
-        /**
-         * @param row The object of row. (NotNull)
-         * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
-         */
-        protected ${glDBMetaInterfaceName} findDBMeta(Object row) {
-            return EntityPropertySetupperHandler.findCachedDBMeta(row);
-        }
-        
-        @Override
-        protected void setupPropertyCache(RelationRowCreationResource res) throws SQLException {
-            // - - - - - - - - - - - 
-            // Recursive Call Point!
-            // - - - - - - - - - - -
-            res.initializePropertyCacheElement();
-    
-            // Do only selected foreign property for performance if condition-bean exists.
-            if (hasConditionBean(res)) {
-                final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-                if (!cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
-                    return;
-                }
-            }
-            
-            // Set up property cache about current beanMetaData.
-            final BeanMetaData nextBmd = res.getRelationBeanMetaData();
-            for (int i = 0; i < nextBmd.getPropertyTypeSize(); ++i) {
-                final PropertyType pt = nextBmd.getPropertyType(i);
-                res.setCurrentPropertyType(pt);
-                if (!isTargetProperty(res)) {
+
+        protected Object setupRelationAllValue(java.sql.ResultSet rs, RelationPropertyType rpt, java.util.Set columnNames,
+                java.util.Map relKeyValues, String preRelationNoSuffix) throws java.sql.SQLException {
+            Object row = null;
+            final String relationNoSuffix = preRelationNoSuffix + "_" + rpt.getRelationNo();
+            final BeanMetaData bmd = rpt.getBeanMetaData();
+            int existColumn = 0;
+            for (int i = 0; i < bmd.getPropertyTypeSize(); ++i) {
+                final PropertyType pt = bmd.getPropertyType(i);
+
+                // Excludes non writable property for performance tuning!
+                if (!pt.getPropertyDesc().hasWriteMethod()) {
                     continue;
                 }
-                setupPropertyCacheElement(res);
-            }
-            
-            // Set up next relation.
-            if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
-                res.backupRelationPropertyType();
-                res.incrementCurrentRelationNestLevel();
-                try {
-                    setupNextPropertyCache(res, nextBmd);
-                } finally {
-                    res.restoreRelationPropertyType();
-                    res.decrementCurrentRelationNestLevel();
+
+                // Excludes java.util.List property for pinpont performance tuning!
+                if (java.util.List.class.isAssignableFrom(pt.getPropertyDesc().getPropertyType())) {
+                    continue;
                 }
+
+                final String columnName = pt.getColumnName() + relationNoSuffix;
+                if (!columnNames.contains(columnName)) {
+                    continue;
+                }
+
+                // Return null if the primary key of foreign table is invalid(The foreign key is deadlink).
+                if (pt.isPrimaryKey()) {
+                    if (!isValidValue(rs, pt, columnName, relKeyValues)) {
+                        return null;
+                    }
+                }
+
+                existColumn++;
+                if (row == null) {
+                    row = createRelationRow(rpt);
+                }
+                registerRelationValue(row, rs, rpt, pt, columnName, relKeyValues);
             }
-        }
-    
-        @Override
-        protected boolean isTargetProperty(org.seasar.dao.impl.RelationRowCreationResource res) throws java.sql.SQLException {
-            final PropertyType pt = res.getCurrentPropertyType();
-            if (!pt.getPropertyDesc().hasWriteMethod()) {
-                return false;
+
+            // Return null if setupSelect_Xxx() or withXxx() has not been invoked.
+            if (existColumn == 0) {
+                return null;
             }
-            if (java.util.List.class.isAssignableFrom(pt.getPropertyDesc().getPropertyType())) {
-                return false;
+
+            if (rpt.getBeanMetaData().getRelationPropertyTypeSize() != 0) {
+                createParentRelationRow(rs, rpt.getBeanMetaData(), columnNames, relationNoSuffix, row);
             }
-            return true;
+            return row;
         }
 
-        @Override
-        protected boolean isCreateDeadLink() {
-            return false;
-        }
-        
-        @Override
-        protected int getLimitRelationNestLevel() {
-            return 2;// for Compatible
-        }
-        
-        @Override
-        protected RelationRowCreationResource createResourceForPropertyCache(RelationPropertyType rpt, Set columnNames,
-                Map relationPropertyCache, String baseSuffix, String relationNoSuffix, int limitRelationNestLevel)
-                throws SQLException {
-            final RelationRowCreationResource res = new RelationRowCreationResourceExtension();
-            res.setRelationPropertyType(rpt);
-            res.setColumnNames(columnNames);
-            res.setRelationPropertyCache(relationPropertyCache);
-            res.setBaseSuffix(baseSuffix);
-            res.setRelationNoSuffix(relationNoSuffix);
-            res.setLimitRelationNestLevel(limitRelationNestLevel);
-            res.setCurrentRelationNestLevel(1);// as Default
-            return res;
-        }
-        
-        protected boolean isConditionBeanSelectedRelation(RelationRowCreationResource res) {
-            if (hasConditionBean(res)) {
-                final ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.getConditionBeanOnThread();
-                if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
-                    return true;
-                }
+        protected boolean isValidValue(java.sql.ResultSet rs, PropertyType pt, String columnName, java.util.Map relKeyValues) throws java.sql.SQLException {
+            Object value = null;
+            if (relKeyValues != null && relKeyValues.containsKey(columnName)) {
+                value = relKeyValues.get(columnName);
+            } else {
+                final org.seasar.extension.jdbc.ValueType valueType = pt.getValueType();
+                value = valueType.getValue(rs, columnName);
             }
-            return false;
-        }
-        
-        protected boolean hasConditionBean(RelationRowCreationResource res) {
-            return ${glConditionBeanContextName}.isExistConditionBeanOnThread();
-        }
-    }
-    
-    protected static class RelationRowCreationResourceExtension extends RelationRowCreationResource {
-        protected Stack<RelationPropertyType> backupRelationPropertyType = new Stack<RelationPropertyType>();
-        protected Stack<String> backupBaseSuffix = new Stack<String>();
-        protected Stack<String> backupRelationSuffix = new Stack<String>();
-        
-        @Override
-        public void backupRelationPropertyType() {
-            backupRelationPropertyType.push(getRelationPropertyType());
-        }
-        
-        @Override
-        public void restoreRelationPropertyType() {
-            setRelationPropertyType(backupRelationPropertyType.pop());
-        }
-        
-        @Override
-        public void backupSuffixAndPrepare(String baseSuffix, String additionalRelationNoSuffix) {
-            backupBaseSuffixExtension();
-            backupRelationNoSuffixExtension();
-            setBaseSuffix(baseSuffix);
-            addRelationNoSuffix(additionalRelationNoSuffix);
-        }
-        
-        @Override
-        public void restoreSuffix() {
-            restoreBaseSuffixExtension();
-            restoreRelationNoSuffixExtension();
-        }
-        
-        protected void backupBaseSuffixExtension() {
-            backupBaseSuffix.push(getBaseSuffix());
+            return value != null;
         }
 
-        protected void restoreBaseSuffixExtension() {
-            setBaseSuffix(backupBaseSuffix.pop());
-        }
-        
-        protected void backupRelationNoSuffixExtension() {
-            backupRelationSuffix.push(getRelationNoSuffix());
-        }
-        
-        protected void restoreRelationNoSuffixExtension() {
-            setRelationNoSuffix(backupRelationSuffix.pop());
+        protected void createParentRelationRow(java.sql.ResultSet rs, BeanMetaData parentBmd, java.util.Set columnNames,
+                String relationNoSuffix, Object row) throws java.sql.SQLException {
+            for (int i = 0; i < parentBmd.getRelationPropertyTypeSize(); ++i) {
+                RelationPropertyType parentParentRpt = parentBmd.getRelationPropertyType(i);
+                if (parentParentRpt == null) {
+                    continue;
+                }
+                Object relationRow = createRelationRow(rs, parentParentRpt, columnNames, null, relationNoSuffix);
+                if (relationRow != null) {
+                    org.seasar.framework.beans.PropertyDesc pd = parentParentRpt.getPropertyDesc();
+                    pd.setValue(row, relationRow);
+                }
+            }
         }
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    // -----------------------------------------------------
-    //                                     Sql File Encoding
-    //                                     -----------------
+    //                                                                   Sql File Encoding
+    //                                                                   =================
     public String getSqlFileEncoding() {
         return sqlFileEncoding;
     }
 
-    // -----------------------------------------------------
-    //                                         Bean Enhancer
-    //                                         -------------
+    // ===================================================================================
+    //                                                                       Bean Enhancer
+    //                                                                       =============
     public BeanEnhancer getBeanEnhancer() {
         return beanEnhancer;
     }
@@ -1228,51 +1078,15 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         this.beanEnhancer = beanEnhancer;
     }
 
-    // -----------------------------------------------------
-    //                             Annotation Reader Factory
-    //                             -------------------------
+#if ($database.isVersionAfter1046())
+    // ===================================================================================
+    //                                                           Annotation Reader Factory
+    //                                                           =========================
     public void setAnnotationReaderFactory(org.seasar.dao.AnnotationReaderFactory annotationReaderFactory) {
         this.annotationReaderFactory = annotationReaderFactory;
     }
+#end
 
-    // -----------------------------------------------------
-    //                                  Version After 1.0.47
-    //                                  --------------------
-    public ColumnNaming getColumnNaming() {
-        return columnNaming;
-    }
-
-    public void setColumnNaming(final ColumnNaming columnNaming) {
-        this.columnNaming = columnNaming;
-    }
-
-    public PropertyTypeFactoryBuilder getPropertyTypeFactoryBuilder() {
-        return propertyTypeFactoryBuilder;
-    }
-
-    public void setPropertyTypeFactoryBuilder(final PropertyTypeFactoryBuilder propertyTypeFactoryBuilder) {
-        this.propertyTypeFactoryBuilder = propertyTypeFactoryBuilder;
-    }
-
-    public RelationPropertyTypeFactoryBuilder getRelationPropertyTypeFactoryBuilder() {
-        return relationPropertyTypeFactoryBuilder;
-    }
-
-    public void setRelationPropertyTypeFactoryBuilder(final RelationPropertyTypeFactoryBuilder relationPropertyTypeFactoryBuilder) {
-        this.relationPropertyTypeFactoryBuilder = relationPropertyTypeFactoryBuilder;
-    }
-
-    public TableNaming getTableNaming() {
-        return tableNaming;
-    }
-
-    public void setTableNaming(final TableNaming tableNaming) {
-        this.tableNaming = tableNaming;
-    }
-
-    // -----------------------------------------------------
-    //                                     DBFlute Extension
-    //                                     -----------------
     public ${glStatementConfig} getDefaultStatementConfig() {
         return _defaultStatementConfig;
     }

@@ -19,15 +19,19 @@ import ${glPackageCB}.${myConditionBeanClassName};
 public interface ${myClassName} extends ${InterfaceName} {
 
     public Class BEAN = ${glPackageExtendedEntity}.${myExtendedObjectClassName}.class;
+	
     public static final String getCountAll_SQL = "select count(*) from ${table.Name}";
     public int getCountAll();
-    public static final String getListAll_SQL = "select ${table.columnNameCommaString} from ${table.Name}";
+    
+	public static final String getListAll_SQL = "select ${table.columnNameCommaString} from ${table.Name}";
     public java.util.List${database.filterGenericsString(${myExtendedObjectClassName})} getListAll();
+	
 #if ($table.isWritable())
     public static final String getEntity_SQL = "select ${table.columnNameCommaString} from ${table.Name} where ${table.PrimaryKeyWhereStringWithSqlComment}";
     public static final String getEntity_ARGS = "${table.PrimaryKeyUncapitalisedJavaNameCommaString}";
     public ${myExtendedObjectClassName} getEntity(${table.PrimaryKeyArgsString});
 #end
+
 #if ($table.isWritable() && $table.hasOnlyOnePrimaryKey() && $database.isUseBuri())
     public static final String getEntityByIds_ARGS = "ids";
     public static final String getEntityByIds_QUERY = "${table.primaryKeyNameAsOne} in /*ids*/(1)";
