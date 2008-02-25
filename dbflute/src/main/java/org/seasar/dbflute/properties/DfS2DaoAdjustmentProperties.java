@@ -2,7 +2,7 @@ package org.seasar.dbflute.properties;
 
 import java.util.Properties;
 
-import org.seasar.framework.util.StringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -49,12 +49,12 @@ public final class DfS2DaoAdjustmentProperties extends DfAbstractHelperPropertie
 
     protected String getS2DaoVersion() {
         final String s2daoVersion = stringProp("torque.s2daoVersion", null);
-        return s2daoVersion != null ? StringUtil.replace(s2daoVersion, ".", "") : "9.9.99";// If null, return the latest version!
+        return s2daoVersion != null ? DfStringUtil.replace(s2daoVersion, ".", "") : "9.9.99";// If null, return the latest version!
     }
 
     protected boolean isS2DaoVersionGreaterEqual(String targetVersion) {
         final String s2daoVersion = getS2DaoVersion();
-        final String filteredTargetVersion = StringUtil.replace(targetVersion, ".", "");
+        final String filteredTargetVersion = DfStringUtil.replace(targetVersion, ".", "");
         return s2daoVersion.compareToIgnoreCase(filteredTargetVersion) >= 0;
     }
 

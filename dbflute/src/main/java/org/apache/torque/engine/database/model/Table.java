@@ -74,7 +74,6 @@ import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.framework.util.StringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -2413,14 +2412,11 @@ public class Table implements IDMethod {
 
     protected String convertCommonColumnName(String commonColumnName,
             final DfCommonColumnProperties commonColumnProperties) {
-
-        // TODO: @jflute - この定義を何か指定できれば、TableによってバラバラなCommonColumnを吸収できるかも
-
         String filteredCommonColumn = commonColumnProperties.filterCommonColumn(commonColumnName);
-        filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "TABLE_NAME", getName());
-        filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "table_name", getName());
-        filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "TableName", getJavaName());
-        filteredCommonColumn = StringUtil.replace(filteredCommonColumn, "tablename", getJavaName());
+        filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "TABLE_NAME", getName());
+        filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "table_name", getName());
+        filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "TableName", getJavaName());
+        filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "tablename", getJavaName());
         return filteredCommonColumn;
     }
 

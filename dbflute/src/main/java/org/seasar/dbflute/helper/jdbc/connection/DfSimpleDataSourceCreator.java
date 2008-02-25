@@ -19,8 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
-import org.seasar.extension.dbcp.impl.ConnectionWrapperImpl;
 
 public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
 

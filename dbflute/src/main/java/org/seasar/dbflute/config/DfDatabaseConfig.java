@@ -31,8 +31,19 @@ public class DfDatabaseConfig {
     //                                                                           Attribute
     //                                                                           =========
     protected String _databaseBaseInfo;
-
-    protected Map<String, Map<String, String>> _databaseBaseInfoOgnlTest;
+    {
+        _databaseBaseInfo = "map:{"
+                + "; derby      = map:{daoGenDbName = Derby      ; wildCard = % ; sequenceNextSql = Unsupported}"
+                + "; h2         = map:{daoGenDbName = H2         ; wildCard = % ; sequenceNextSql = Unsupported}"
+                + "; firebird   = map:{daoGenDbName = Firebird   ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
+                + "; oracle     = map:{daoGenDbName = Oracle     ; wildCard = % ; sequenceNextSql = select $$sequenceName$$.nextval from dual}"
+                + "; mysql      = map:{daoGenDbName = MySql      ; wildCard = % ; sequenceNextSql = Unsupported}"
+                + "; postgresql = map:{daoGenDbName = PostgreSql ; wildCard = % ; sequenceNextSql = select nextval ('$$sequenceName$$')}"
+                + "; mssql      = map:{daoGenDbName = SqlServer  ; wildCard = % ; sequenceNextSql = Unsupported}"
+                + "; db2        = map:{daoGenDbName = Db2        ; wildCard = % ; sequenceNextSql = values nextval for $$sequenceName$$}"
+                + "; interbase  = map:{daoGenDbName = Interbase  ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
+                + "; default    = map:{daoGenDbName = Default    ; wildCard = % ; sequenceNextSql = Unsupported}" + "}";
+    }
 
     //====================================================================================
     //                                                                           Analyzing
@@ -69,13 +80,5 @@ public class DfDatabaseConfig {
 
     public void setDatabaseBaseInfo(String databaseBaseInfo) {
         _databaseBaseInfo = databaseBaseInfo;
-    }
-
-    public Map<String, Map<String, String>> getDatabaseBaseInfoOgnlTest() {
-        return _databaseBaseInfoOgnlTest;
-    }
-
-    public void setDatabaseBaseInfoOgnlTest(Map<String, Map<String, String>> databaseBaseInfoOgnlTest) {
-        _databaseBaseInfoOgnlTest = databaseBaseInfoOgnlTest;
     }
 }

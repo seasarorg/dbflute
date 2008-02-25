@@ -1,15 +1,13 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
-import org.seasar.framework.util.StringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
 
@@ -141,7 +139,7 @@ public final class DfDBFluteDiconProperties extends DfAbstractHelperProperties {
             } else {
                 topNamespace = baseCommonPackage;
             }
-            realDiconDefault = StringUtil.replace(realDiconDefault, "${topNamespace}", topNamespace);
+            realDiconDefault = DfStringUtil.replace(realDiconDefault, "${topNamespace}", topNamespace);
         }
         return realDiconDefault;
     }

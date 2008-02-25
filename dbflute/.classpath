@@ -22,14 +22,14 @@
 	<classpathentry kind="lib" path="lib/forCompile/xmlParserAPIs-2.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/village-2.0-dev-20030825.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/forCompile/aopalliance-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/log4j-1.2.13.jar"/>
-	<classpathentry kind="lib" path="lib/forCompile/ognl-2.6.7.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/poi-2.5.1-final-20040804.jar"/>
+	<classpathentry kind="lib" path="lib/forExecute/db2java.zip"/>
+	<classpathentry kind="lib" path="lib/forCompile/aopalliance-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/javassist-3.4.ga.jar"/>
+	<classpathentry kind="lib" path="lib/forCompile/ognl-2.6.7.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/s2-extension-2.4.12.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/s2-framework-2.4.12.jar"/>
-	<classpathentry kind="lib" path="lib/forExecute/db2java.zip"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

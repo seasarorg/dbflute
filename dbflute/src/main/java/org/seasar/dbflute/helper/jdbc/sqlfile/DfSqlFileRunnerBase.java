@@ -23,7 +23,6 @@ import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.IORuntimeException;
-import org.seasar.framework.util.ClassUtil;
 
 public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
@@ -249,8 +248,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         final String className = DelimiterChanger.class.getName() + "_" + databaseName;
         DelimiterChanger changer = null;
         try {
-            changer = (DelimiterChanger) ClassUtil.newInstance(className);
-        } catch (RuntimeException ignore) {
+            changer = (DelimiterChanger) Class.forName(className).newInstance();
+        } catch (Exception ignore) {
             changer = new DelimiterChanger_null();
         }
         return changer;

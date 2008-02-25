@@ -2,8 +2,8 @@ package org.seasar.dbflute.helper.flexiblename;
 
 import java.util.Map;
 
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.framework.util.CaseInsensitiveMap;
-import org.seasar.framework.util.StringUtil;
 
 /**
  * @author jflute
@@ -40,7 +40,7 @@ public class DfFlexibleNameMap<T, E> {
     }
 
     protected String removeUnderscore(String target) {
-        return StringUtil.replace(target, "_", "");
+        return DfStringUtil.replace(target, "_", "");
     }
     
     public String toString() {

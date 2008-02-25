@@ -23,7 +23,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.framework.util.StringUtil;
 
 /**
  * Common column properties.
@@ -267,11 +266,11 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         for (String key : keySet) {
             String value = (String) map.get(key);
             if (value != null && value.contains("$$allcommon$$")) {
-                value = StringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
+                value = DfStringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
             }
             if (value != null && value.contains("$$AccessContext$$")) {
                 final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
-                value = StringUtil.replace(value, "$$AccessContext$$", accessContext);
+                value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
             }
             final String prefixMark = COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK;
             final String secondMark = COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK;

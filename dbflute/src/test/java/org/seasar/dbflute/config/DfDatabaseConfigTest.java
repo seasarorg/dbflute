@@ -15,7 +15,7 @@ public class DfDatabaseConfigTest extends DfDBFluteTestCase {
 
     @Test
     public void test_getDatabaseBaseInfo() {
-        final DfDatabaseConfig config = (DfDatabaseConfig) getComponent(DfDatabaseConfig.class);
+        final DfDatabaseConfig config = new DfDatabaseConfig();
         final Map<String, Map<String, String>> databaseBaseInfo = config.analyzeDatabaseBaseInfo();
         Assert.assertNotNull(databaseBaseInfo);
         final Set<String> keySet = databaseBaseInfo.keySet();
@@ -39,18 +39,9 @@ public class DfDatabaseConfigTest extends DfDBFluteTestCase {
 
     @Test
     public void test_getDatabaseBaseInfoTest() {
-        String real = null;
-        {
-            final DfDatabaseConfig component = (DfDatabaseConfig) getComponent(DfDatabaseConfig.class);
-            final Map<String, Map<String, String>> databaseBaseInfo = component.analyzeDatabaseBaseInfo();
-            Assert.assertNotNull(databaseBaseInfo);
-            _log.debug("databaseBaseInfoTest=" + databaseBaseInfo);
-            real = databaseBaseInfo.toString();
-        }
-        {
-            final DfDatabaseConfig component = (DfDatabaseConfig) getComponent(DfDatabaseConfig.class);
-            final Map<String, Map<String, String>> databaseBaseInfo = component.getDatabaseBaseInfoOgnlTest();
-            Assert.assertEquals(databaseBaseInfo.toString(), real);
-        }
+        final DfDatabaseConfig component = new DfDatabaseConfig();
+        final Map<String, Map<String, String>> databaseBaseInfo = component.analyzeDatabaseBaseInfo();
+        Assert.assertNotNull(databaseBaseInfo);
+        _log.debug("databaseBaseInfoTest=" + databaseBaseInfo);
     }
 }

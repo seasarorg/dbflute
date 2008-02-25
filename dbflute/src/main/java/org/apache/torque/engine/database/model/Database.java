@@ -70,7 +70,6 @@ import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.Generator;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.DfComponentProvider;
 import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
@@ -1300,16 +1299,9 @@ public class Database {
         return "$";
     }
 
-    // ==================================================================
-    //                                         databaseInfoMap (Internal)
-    //                                         ==========================
-    protected Map<String, Map<String, String>> _databaseDefinitionMap;
-
-    public Map<String, Map<String, String>> getDatabaseDefinitionMap() {
-        final DfDatabaseConfig config = (DfDatabaseConfig) DfComponentProvider.getComponent(DfDatabaseConfig.class);
-        return config.analyzeDatabaseBaseInfo();
-    }
-
+    //====================================================================================
+    //                                                                     databaseInfoMap
+    //                                                                     ===============
     protected Map<String, String> _databaseInfoMap;
 
     public Map<String, String> getDatabaseInfoMap() {
@@ -1326,6 +1318,11 @@ public class Database {
             _databaseInfoMap = databaseInfoMap;
         }
         return _databaseInfoMap;
+    }
+    
+    protected Map<String, Map<String, String>> getDatabaseDefinitionMap() {
+        final DfDatabaseConfig config = new DfDatabaseConfig();
+        return config.analyzeDatabaseBaseInfo();
     }
 
     public String getDaoGenDbName() {

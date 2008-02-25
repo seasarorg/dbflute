@@ -8,7 +8,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.seasar.framework.util.StringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -92,9 +92,9 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         String fixedCondition = componentMap.get("fixedCondition");
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
-            fixedCondition = StringUtil.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
-            fixedCondition = StringUtil.replace(fixedCondition, "$$ForeignAlias$$", "$$foreignAlias$$");
-            fixedCondition = StringUtil.replace(fixedCondition, "$$LocalAlias$$", "$$localAlias$$");
+            fixedCondition = DfStringUtil.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
+            fixedCondition = DfStringUtil.replace(fixedCondition, "$$ForeignAlias$$", "$$foreignAlias$$");
+            fixedCondition = DfStringUtil.replace(fixedCondition, "$$LocalAlias$$", "$$localAlias$$");
         }
         return fixedCondition;
     }
