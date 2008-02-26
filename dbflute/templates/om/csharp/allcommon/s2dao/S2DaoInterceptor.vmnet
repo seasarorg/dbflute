@@ -76,9 +76,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (_log.IsDebugEnabled) {
                     beforeCmd = DateTime.Now;
                 }
-                Type targetType = GetComponentDef(invocation).ComponentType;
-                IDaoMetaData dmd = daoMetaDataFactory_.GetDaoMetaData(targetType);
-                cmd = dmd.GetSqlCommand(method.Name);
+				cmd = FindSqlCommand(invocation);
                 if (_log.IsDebugEnabled && beforeCmd != null) {
                     DateTime afterCmd = DateTime.Now;
                     if (!afterCmd.Equals(beforeCmd.Value)) {

@@ -44,11 +44,10 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         protected static ${glDBMetaInterfaceName} GetDBMeta(String className) {
-            Seasar.Framework.Xml.S2Section config = Seasar.Framework.Xml.S2SectionHandler.GetS2Section();
-            Type clazz = ForName(className, config.Assemblys);
+			Type clazz = ForName(className, AppDomain.CurrentDomain.GetAssemblies());
             if (clazz == null) {
                 String msg = "The className was not found: " + className + " assemblys=";
-                msg = msg + Seasar.Framework.Util.ToStringUtil.ToString(config.Assemblys);
+                msg = msg + Seasar.Framework.Util.ToStringUtil.ToString(AppDomain.CurrentDomain.GetAssemblies());
                 throw new SystemException(msg);
             }
             System.Reflection.MethodInfo method = clazz.GetMethod("GetInstance");

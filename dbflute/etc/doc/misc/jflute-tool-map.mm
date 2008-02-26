@@ -335,7 +335,7 @@
 </node>
 </node>
 </node>
-<node CREATED="1202797068079" FOLDED="true" ID="Freemind_Link_1933038755" MODIFIED="1202797072070" TEXT="Utility">
+<node CREATED="1202797068079" ID="Freemind_Link_1933038755" MODIFIED="1202797072070" TEXT="Utility">
 <node CREATED="1202980195546" FOLDED="true" ID="Freemind_Link_308961271" MODIFIED="1202980199106" TEXT="TemplateEngine">
 <node CREATED="1202905774119" FOLDED="true" ID="Freemind_Link_1077294090" MODIFIED="1202905776111" TEXT="Velocity">
 <node CREATED="1202905776648" ID="Freemind_Link_346329057" MODIFIED="1202905777507" TEXT="*ref">
@@ -343,7 +343,7 @@
 </node>
 </node>
 </node>
-<node CREATED="1202980201943" FOLDED="true" ID="Freemind_Link_1546958893" MODIFIED="1202980206626" TEXT="OfficeEngine">
+<node CREATED="1202980201943" ID="Freemind_Link_1546958893" MODIFIED="1202980206626" TEXT="OfficeEngine">
 <node CREATED="1202797076571" FOLDED="true" ID="Freemind_Link_349867196" MODIFIED="1202797079358" TEXT="Poi">
 <node CREATED="1202797086866" FOLDED="true" ID="Freemind_Link_1207497584" MODIFIED="1202797092970" TEXT="*overview">
 <node CREATED="1202797093377" ID="Freemind_Link_1445800287" MODIFIED="1202797097516" TEXT="Handling Excel"/>
@@ -356,6 +356,11 @@
 <node CREATED="1202811852194" ID="Freemind_Link_1069467031" MODIFIED="1202811911772" TEXT="&#x3042;&#x3089;&#x304b;&#x3058;&#x3081;Excel&#x4e0a;&#x306b;&#x7528;&#x610f;&#x3057;&#x305f;&#x95a2;&#x6570;&#x306e;&#x8a08;&#x7b97;&#x5bfe;&#x8c61;&#x9818;&#x57df;&#x306b;&#xa;poi&#x304b;&#x3089;&#x5024;&#x3092;&#x8a2d;&#x5b9a;&#x3057;&#x3066;&#x3082;&#x95a2;&#x6570;&#x306e;&#x8a08;&#x7b97;&#x7d50;&#x679c;&#x306b;&#x53cd;&#x6620;&#x3055;&#x308c;&#x306a;&#x3044;"/>
 <node CREATED="1202811930125" ID="Freemind_Link_1922779876" MODIFIED="1202811947846" TEXT="poi&#x304b;&#x3089;setCellFormula()&#x3092;&#x4f7f;&#x3063;&#x3066;&#x3084;&#x308b;&#x3068;OK"/>
 </node>
+</node>
+</node>
+<node CREATED="1203997378002" ID="Freemind_Link_1934511203" MODIFIED="1203997382239" TEXT="Fisshplate">
+<node CREATED="1203997382721" ID="Freemind_Link_536583993" MODIFIED="1203997385484" TEXT="*overview">
+<node CREATED="1203997385897" ID="Freemind_Link_149733448" MODIFIED="1203997406171" TEXT="Seasar&#x304c;&#x63d0;&#x4f9b;&#x3059;&#x308b;Velocity&#x98a8;Excel&#x30a8;&#x30f3;&#x30b8;&#x30f3;"/>
 </node>
 </node>
 </node>
