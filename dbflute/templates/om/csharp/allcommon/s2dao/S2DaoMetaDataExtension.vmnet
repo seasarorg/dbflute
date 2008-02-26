@@ -77,7 +77,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected ISqlCommand InitializeSpecifiedOutsideSqlCommand(String sqlCommandKey, OutsideSqlContext outsideSqlContext) {
-            MethodInfo method = _daoInterface.GetMethod(sqlCommandKey);// By real method name.
+            MethodInfo method = _daoInterface.GetMethod(outsideSqlContext.MethodName);// By real method name.
             if (method != null && method.IsAbstract) {
                 if (IsOutsideSqlDaoMethodSelect(method)) {
                     SetupSpecifiedOutsideSqlSelectCommand(sqlCommandKey, method, outsideSqlContext);
@@ -89,7 +89,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (cmd != null) {
                 return cmd;
             }
-            String msg = "Internal Error! The methodName is not found:";
+            String msg = "Internal Error! The sql-command is not found:";
             msg = msg + " sqlCommandKey=" + sqlCommandKey;
             msg = msg + " sqlCommands=" + _sqlCommands;
             throw new SystemException(msg);

@@ -1,5 +1,7 @@
 package org.seasar.dbflute.helper.datahandler.impl;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import org.junit.Assert;
 import org.junit.Test;
 
