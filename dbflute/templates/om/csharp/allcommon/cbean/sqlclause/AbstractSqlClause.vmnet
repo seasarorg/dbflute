@@ -882,22 +882,22 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     abstract protected void doFetchPage();
     abstract protected void doClearFetchPageClause();
 
-    public int getFetchStartIndex() {
+    public virtual int getFetchStartIndex() {
         return _fetchStartIndex;
     }
 
-    public int getFetchSize() {
+    public virtual int getFetchSize() {
         return _fetchSize;
     }
 
-    public int getFetchPageNumber() {
+    public virtual int getFetchPageNumber() {
         return _fetchPageNumber;
     }
 
     /**
      * @return Page start index. 0 origin. (NotMinus)
      */
-    public int getPageStartIndex() {
+    public virtual int getPageStartIndex() {
         if (_fetchPageNumber <= 0) {
             String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
             throw new IllegalStateException(msg);
@@ -908,7 +908,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     /**
      * @return Page end index. 0 origin. (NotMinus)
      */
-    public int getPageEndIndex() {
+    public virtual int getPageEndIndex() {
         if (_fetchPageNumber <= 0) {
             String msg = "_fetchPageNumber must be plus: " + _fetchPageNumber;
             throw new IllegalStateException(msg);
@@ -916,28 +916,28 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         return _fetchStartIndex + (_fetchSize * _fetchPageNumber);
     }
 
-    public bool isFetchScopeEffective() {
+    public virtual bool isFetchScopeEffective() {
         return _isFetchScopeEffective;
     }
 
-    public ${glSqlClauseInterfaceName} ignoreFetchScope() {
+    public virtual ${glSqlClauseInterfaceName} ignoreFetchScope() {
         _isFetchScopeEffective = false;
         doClearFetchPageClause();
         return this;
     }
 
-    public ${glSqlClauseInterfaceName} makeFetchScopeEffective() {
+    public virtual ${glSqlClauseInterfaceName} makeFetchScopeEffective() {
         if (getFetchSize() > 0 && getFetchPageNumber() > 0) {
             fetchPage(getFetchPageNumber());
         }
         return this;
     }
 	
-    public bool isFetchStartIndexSupported() {
+    public virtual bool isFetchStartIndexSupported() {
         return true; // Default
     }
 
-    public bool isFetchSizeSupported() {
+    public virtual bool isFetchSizeSupported() {
         return true; // Default
     }
 
@@ -949,15 +949,15 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
     // ===================================================================================
     //                                                                     Fetch Narrowing
     //                                                                     ===============
-    public int getFetchNarrowingSkipStartIndex() {
+    public virtual int getFetchNarrowingSkipStartIndex() {
         return getPageStartIndex();
     }
 
-    public int getFetchNarrowingLoopCount() {
+    public virtual int getFetchNarrowingLoopCount() {
         return getFetchSize();
     }
 
-    public bool isFetchNarrowingEffective() {
+    public virtual bool isFetchNarrowingEffective() {
         return _isFetchScopeEffective;
     }
 
