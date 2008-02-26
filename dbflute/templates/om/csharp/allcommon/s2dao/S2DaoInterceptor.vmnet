@@ -199,7 +199,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 					    System.Collections.IList ls = (System.Collections.IList)ret;
                         if (ls.Count == 0) {
                             _log.Debug(daoResultPrefix + "Selected list: 0]");
-                        } else if (ls.Count == 1 && ls[0] instanceof Number) {
+                        } else if (ls.Count == 1 && ls[0] is int) {
                             _log.Debug(daoResultPrefix + "Selected count: " + ls[0] + "]");
                         } else {
                             _log.Debug(daoResultPrefix + "Selected list: " + ls.Count + " first=" + ls[0] + "]");
