@@ -1,7 +1,5 @@
 package org.seasar.dbflute.helper.datahandler.impl;
 
-import static org.junit.Assert.assertArrayEquals;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,6 +8,7 @@ import org.junit.Test;
  * @since 0.5.9 (2007/12/21 Friday)
  */
 public class DfSeparatedDataHandlerImplTest {
+    
     @Test
     public void test_isUnsupportedEncodingDirectory() throws Exception {
         final DfSeparatedDataHandlerImpl target = new DfSeparatedDataHandlerImpl();
