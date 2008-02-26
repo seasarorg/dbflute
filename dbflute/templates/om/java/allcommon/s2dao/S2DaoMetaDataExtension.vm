@@ -204,7 +204,7 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
         if (cmd != null) {
             return cmd;
         }
-        String msg = "Internal Error! The methodName is not found:";
+        String msg = "Internal Error! The sql-command is not found:";
         msg = msg + " sqlCommandKey=" + sqlCommandKey;
         msg = msg + " sqlCommands=" + sqlCommands;
         throw new IllegalStateException(msg);
