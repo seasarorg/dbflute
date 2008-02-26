@@ -13,7 +13,7 @@ $!table.Description
     <th class="normalFont" bgcolor="#CCCCCC">NotNull</th>
     <th class="normalFont" bgcolor="#CCCCCC">Default</th>
     <th class="normalFont" bgcolor="#CCCCCC">ForeignTable</th>
-    <th class="normalFont" bgcolor="#CCCCCC">RefererTable</th>
+    <th class="normalFont" bgcolor="#CCCCCC">ReferrerTable</th>
     <th class="normalFont" bgcolor="#CCCCCC">CapPropName</th>
     <th class="normalFont" bgcolor="#CCCCCC">${table.database.targetLanguageInitCap}Type</th>
     <th class="normalFont" bgcolor="#CCCCCC">Classification</th>
@@ -23,7 +23,7 @@ $!table.Description
     <td class="normalFont"><center> #if ($col.isPrimaryKey()==true)o#else &nbsp;#end </center></td>
     <td class="normalFont"><center> #if ($col.isAutoIncrement()==true)o#else &nbsp;#end </center></td>
     <td class="normalFont"><center> #if ($col.isUnique()==true)o#else &nbsp;#end </center></td>
-    <td class="normalFont" id="$table.Name$col.Name">$col.Name</td>
+    <td class="normalFont" id="${table.name}${col.name}">${col.name}</td>
     <td class="normalFont">$col.dbType</td>
     <td class="normalFont">#if ($col.printSize() && $col.printSize().length() > 0) $col.printSize() #else &nbsp;#end</td>
     <td class="normalFont"><center> #if ($col.isNotNull()==true)o#else &nbsp;#end </center></td>
@@ -37,12 +37,15 @@ $!table.Description
 #end
 </table>
 <script>
-#foreach ( $fk in $table.ForeignKeys )
-if( document.getElementById  )
-{
-var col = document.getElementById("$table.Name$fk.LocalColumnNames");
-col.style.backgroundColor = "$docHtmlFkColor";
-col.title="Foreignkey from $fk.ForeignTableName.$fk.ForeignColumnNames";
+#foreach ($foreignKey in $table.ForeignKeys)
+if(document.getElementById) {
+#foreach ($columnName in $foreignKey.localColumns)
+    var col = document.getElementById("${table.name}${columnName}");
+    if (col != null) {
+        col.style.backgroundColor = "${docHtmlFkColor}";
+        col.title="Foreignkey from ${foreignKey.foreignTableName}.${foreignKey.foreignColumnNames}";
+    }
+#end
 }
 #end
 </script>
