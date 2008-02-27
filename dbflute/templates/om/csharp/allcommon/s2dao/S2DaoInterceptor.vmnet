@@ -192,7 +192,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             MethodBase method = invocation.Method;
             try {
                 String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.ConvertToPerformanceView(before, after) + " - ";
-                if (typeof(System.Collections.IList).IsAssignableFrom(retType)) {
+                if (typeof(System.Collections.IList).IsAssignableFrom(retType) || (ret != null && ret is System.Collections.IList)) {
                     if (ret == null) {
                         _log.Debug(daoResultPrefix + "Selected list: null]");
                     } else {
