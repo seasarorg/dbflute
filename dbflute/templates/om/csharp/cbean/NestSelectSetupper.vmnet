@@ -25,13 +25,13 @@ namespace ${glPackageNss} {
 #foreach ($foreignKeys in $table.foreignKeys)
 #set ($tmpPropertyName = "${foreignKeys.foreignPropertyNameInitCap}")
 #set ($tmpPropertyNameInitCap = "${foreignKeys.foreignPropertyNameInitCap}")
-        public ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName} With${tmpPropertyNameInitCap}() {
+        public ${foreignKeys.foreignTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
     		String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
     		String localRelationPath = _query.getRelationPath();
     		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
     		_query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-			return new ${foreignKeys.foreignTableNestSelectSetupperTerminalClassName}(_query.Query${tmpPropertyNameInitCap}());
+			return new ${foreignKeys.foreignTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
         }
 
 #end
@@ -39,13 +39,13 @@ namespace ${glPackageNss} {
 #if (${referrer.isOneToOne()})
 #set ($tmpPropertyName = "${referrer.ReffererPropertyNameInitCapAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
-        public ${referrer.referrerTableNestSelectSetupperTerminalClassName} With${tmpPropertyNameInitCap}() {
+        public ${referrer.referrerTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
             AssertConditionQuery();
     		String foreignTableAliasName = _query.Query${tmpPropertyNameInitCap}().getRealAliasName();
     		String localRelationPath = _query.getRelationPath();
     		_query.getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, "${table.name}", "${tmpPropertyName}", localRelationPath);
     		_query.getSqlClause().registerSelectedForeignInfo(_query.Query${tmpPropertyNameInitCap}().getRelationPath(), "${tmpPropertyName}");
-    		return new ${referrer.referrerTableNestSelectSetupperTerminalClassName}(_query.Query${tmpPropertyNameInitCap}());
+    		return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());
         }
 
 #end

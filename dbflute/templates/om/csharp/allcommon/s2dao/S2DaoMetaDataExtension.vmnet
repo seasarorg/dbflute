@@ -20,11 +20,17 @@ using ${glPackageBaseCommonAnnotation};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonJavaLike};
 using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glDaoMetaDataExtension} : Seasar.Dao.Impl.DaoMetaDataImpl {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected Map<Type, IBeanMetaData> _beanMetaDataCacheMap = new HashMap<Type, IBeanMetaData>();
 
         // ===============================================================================
         //                                                                     Constructor
@@ -41,10 +47,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             _beanType = _annotationReader.GetBeanType();
             _dbms = DbmsManager.GetDbms(_dataSource);
 			
-			// Use extended bean-meta-data.
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(_beanType, _annotationReaderFactory, false);
-            bmdExt.Initialize(_dbMetaData, _dbms);
-            _beanMetaData = bmdExt;
+			// Initialize bean-meta-data!
+            BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_beanMetaDataCacheMap);
+            _beanMetaData = handler.FindOrCreateCachedMetaIfNeeds(_beanType, _annotationReaderFactory, _dbMetaData, _dbms);
+			if (_beanMetaData == null) {
+			    _beanMetaData = new BeanMetaDataExtension(_beanType, _annotationReaderFactory, false);
+			}
 
             // For lazy initializing methods!
             // SetupSqlCommand();
@@ -451,6 +459,14 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected override Seasar.Dao.IRelationRowCreator CreateRelationRowCreator() {
             return new RelationRowCreatorExtension();
         }
+		
+        // ===============================================================================
+        //                                                                BeanMetaData Map
+        //                                                                ================
+        public Map<Type, IBeanMetaData> BeanMetaDataCacheMap {
+            get { return _beanMetaDataCacheMap; }
+            set { _beanMetaDataCacheMap = value; }
+        }
     }
 
 	public class BeanMetaDataDBFluteDBMetaExtension : BeanMetaDataImpl {
@@ -519,18 +535,38 @@ namespace ${glPackageBaseCommonS2Dao} {
     }
 	
     public class BeanMetaDataExtension : BeanMetaDataDBFluteDBMetaExtension {
+	    protected Map<Type, IBeanMetaData> _metaMap;
+	    protected int _nestNo;
+		
         public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {
             this.BeanType = beanType;
             this._relation = relation;
             this.AnnotationReaderFactory = annotationReaderFactory;
         }
-        protected int _nestNo;
-        public int NestNo {
-            get { return _nestNo; }
-            set { _nestNo = value; }
+		
+        public override void Initialize(IDatabaseMetaData dbMetaData, IDbms dbms) {
+            if (_metaMap != null) {
+                BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_metaMap);
+                Type myBeanClass = BeanType;
+                if (handler.IsDBFluteEntity(myBeanClass)) {
+                    IBeanMetaData cachedMeta = handler.GetMetaFromCache(myBeanClass);
+                    if (cachedMeta == null) {
+                        handler.AddMetaFromCache(myBeanClass, this);
+                    }
+                }
+            }
+            base.Initialize(dbMetaData, dbms);
         }
+
         protected override IBeanMetaData CreateRelationBeanMetaData(PropertyInfo propertyInfo, IDatabaseMetaData dbMetaData, IDbms dbms) {
+            if (_metaMap != null) {
+                BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_metaMap);
+                IBeanMetaData cachedBmd = handler.FindOrCreateCachedMetaIfNeeds(propertyInfo.PropertyType, AnnotationReaderFactory, dbMetaData, dbms);
+				if (cachedBmd != null) {
+				    return cachedBmd;
+				}
+            }
             bool isRelation = false;
             if (this.NestNo > 0) {
                 isRelation = true;
@@ -539,6 +575,15 @@ namespace ${glPackageBaseCommonS2Dao} {
             bmdExt.NestNo = this.NestNo + 1;
             bmdExt.Initialize(dbMetaData, dbms);
             return bmdExt;
+        }
+		
+        public Map<Type, IBeanMetaData> MetaMap {
+            get { return _metaMap; }
+            set { _metaMap = value; }
+        }
+        public int NestNo {
+            get { return _nestNo; }
+            set { _nestNo = value; }
         }
     }
 
@@ -606,7 +651,29 @@ namespace ${glPackageBaseCommonS2Dao} {
 	}
 	
     public class RelationRowCreatorExtension : Seasar.Dao.Impl.RelationRowCreatorImpl {
-	
+
+        protected override void SetupRelationAllValue(RelationRowCreationResource res) {
+            IDictionary<String, IPropertyType> propertyCacheElement = res.ExtractPropertyCacheElement();
+            ICollection<String> columnNameCacheElementKeySet = propertyCacheElement.Keys;
+            foreach (String columnName in columnNameCacheElementKeySet) {
+                IPropertyType pt = propertyCacheElement[columnName];
+                res.CurrentPropertyType = pt;
+                if (!IsValidRelationPerPropertyLoop(res)) {
+                    res.ClearRowInstance();
+                    return;
+                }
+                SetupRelationProperty(res);
+            }
+            if (!IsValidRelationAfterPropertyLoop(res)) {
+                res.ClearRowInstance();
+                return;
+            }
+            res.ClearValidValueCount();
+            if (res.HasNextRelationProperty() && (HasConditionBean(res) || res.HasNextRelationLevel())) {
+                SetupNextRelationRow(res);
+            }
+        }
+
         protected override void RegisterRelationValue(RelationRowCreationResource res, String columnName) {
             IPropertyType pt = res.CurrentPropertyType;
             Object value = null;
@@ -633,6 +700,44 @@ namespace ${glPackageBaseCommonS2Dao} {
 		    return EntityPropertySetupperHandler.FindCachedDBMeta(row);
         }
 		
+        protected override void SetupPropertyCache(RelationRowCreationResource res) {
+            // - - - - - - - - - - - 
+            // Recursive Call Point!
+            // - - - - - - - - - - -
+            res.InitializePropertyCacheElement();
+
+            // Do only selected foreign property for performance if condition-bean exists.
+            if (HasConditionBean(res)) {
+                ${glConditionBeanInterfaceName} cb = ${glConditionBeanContextName}.GetConditionBeanOnThread();
+                if (!cb.SqlClause.hasSelectedForeignInfo(res.RelationNoSuffix)) {
+                    return;
+                }
+            }
+
+            // Set up property cache about current beanMetaData.
+            IBeanMetaData nextBmd = res.GetRelationBeanMetaData();
+            for (int i = 0; i < nextBmd.PropertyTypeSize; ++i) {
+                IPropertyType pt = nextBmd.GetPropertyType(i);
+                res.CurrentPropertyType = pt;
+                if (!IsTargetProperty(res)) {
+                    continue;
+                }
+                SetupPropertyCacheElement(res);
+            }
+
+            // Set up next relation.
+            if (res.HasNextRelationProperty() && (HasConditionBean(res) || res.HasNextRelationLevel())) {
+                res.BackupRelationPropertyType();
+                res.IncrementCurrentRelationNestLevel();
+                try {
+                    SetupNextPropertyCache(res, nextBmd);
+                } finally {
+                    res.RestoreRelationPropertyType();
+                    res.DecrementCurrentRelationNestLevel();
+                }
+            }
+        }
+
         protected override bool IsTargetProperty(RelationRowCreationResource res) {
             IPropertyType pt = res.CurrentPropertyType;
             if (!pt.PropertyInfo.CanWrite) {
@@ -650,6 +755,56 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected override int GetLimitRelationNestLevel() {
             return 2;
+        }
+
+        protected bool HasConditionBean(RelationRowCreationResource res) {
+            return ${glConditionBeanContextName}.IsExistConditionBeanOnThread();
+        }
+    }
+	
+    public class BeanMetaDataCacheHandler {
+        protected Map<Type, IBeanMetaData> _metaMap;
+        public BeanMetaDataCacheHandler(Map<Type, IBeanMetaData> metaMap) {
+            _metaMap = metaMap;
+        }
+        public IBeanMetaData FindOrCreateCachedMetaIfNeeds(Type beanClass, IAnnotationReaderFactory factory, IDatabaseMetaData dbMetaData, IDbms dbms) {
+            if (IsDBFluteEntity(beanClass)) {
+                IBeanMetaData cachedMeta = GetMetaFromCache(beanClass);
+                if (cachedMeta != null) {
+                    return cachedMeta;
+                } else {
+                    BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanClass, factory, false);
+                    bmdExt.MetaMap = _metaMap;
+                    bmdExt.Initialize(dbMetaData, dbms);
+                    return bmdExt;
+                }
+            }
+            return null;
+        }
+
+        public IBeanMetaData FindCachedMeta(Type beanClass) {
+            if (IsDBFluteEntity(beanClass)) {
+                IBeanMetaData cachedMeta = GetMetaFromCache(beanClass);
+                if (cachedMeta != null) {
+                    return cachedMeta;
+                }
+            }
+            return null;
+        }
+
+        public bool IsDBFluteEntity(Type beanClass) {
+            return typeof(${glEntityInterfaceName}).IsAssignableFrom(beanClass);
+        }
+
+        public IBeanMetaData GetMetaFromCache(Type beanClass) {
+            lock (_metaMap) {
+                return _metaMap.get(beanClass);
+            }
+        }
+        public IBeanMetaData AddMetaFromCache(Type beanClass, IBeanMetaData metaData) {
+            lock (_metaMap) {
+                return _metaMap.put(beanClass, metaData);
+            }
         }
     }
 }

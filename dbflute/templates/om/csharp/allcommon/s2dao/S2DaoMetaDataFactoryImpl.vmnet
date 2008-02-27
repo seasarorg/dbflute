@@ -8,6 +8,8 @@ using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;
 using Seasar.Dao;
 
+using ${glPackageBaseCommonJavaLike};
+
 namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glS2DaoMetaDataFactoryImpl} : Seasar.Dao.IDaoMetaDataFactory {
@@ -22,6 +24,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected string[] _insertPrefixes;
         protected string[] _updatePrefixes;
         protected string[] _deletePrefixes;
+		protected Map<Type, IBeanMetaData> _beanMetaDataCacheMap = new HashMap<Type, IBeanMetaData>();
 
         public ${glS2DaoMetaDataFactoryImpl}(IDataSource dataSource,
             ICommandFactory commandFactory, IAnnotationReaderFactory readerFactory,
@@ -92,6 +95,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (_deletePrefixes != null) {
                 dmd.DeletePrefixes = _deletePrefixes;
             }
+			dmd.BeanMetaDataCacheMap = _beanMetaDataCacheMap;
             dmd.Initialize();
             return dmd;
         }
