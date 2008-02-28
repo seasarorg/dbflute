@@ -1,19 +1,22 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenaviGroup};
-
 #set ($myClassName = "${glPageGroupBeanName}")
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName};
-#if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName};
-#end
 
 /**
  * The bean of page group.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements java.io.Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
@@ -27,27 +30,23 @@ public class ${myClassName} implements java.io.Serializable {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-#if ($database.isAvailableGenerics())
     /**
      * Build the list of page number link.
-     * 
-     * ${database.filterGenericsParamOutput('<LINK>', 'The type of link.')}
+	 * @param <LINK> The type of link.
      * @param pageNumberLinkSetupper Page number link setupper. (NotNull and Required LINK)
      * @return The list of Page number link. (NotNull)
      */
-    public <LINK extends ${glPageNumberLinkName}> java.util.List<LINK> buildPageNumberLinkList(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) {
-        final java.util.List<Integer> pageNumberList = createPageNumberList();
-        final java.util.List<LINK> pageNumberLinkList = new java.util.ArrayList<LINK>();
+    public <LINK extends ${glPageNumberLinkName}> List<LINK> buildPageNumberLinkList(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) {
+        final List<Integer> pageNumberList = createPageNumberList();
+        final List<LINK> pageNumberLinkList = new ArrayList<LINK>();
         for (Integer pageNumber: pageNumberList) {
             pageNumberLinkList.add(pageNumberLinkSetupper.setup(pageNumber, pageNumber.equals(_currentPageNumber)));
         }
         return pageNumberLinkList;
     }
-#end
 
     /**
      * Calculate start page number.
-     * 
      * @return Start page number.
      */
     public int calculateStartPageNumber() {
@@ -72,10 +71,9 @@ public class ${myClassName} implements java.io.Serializable {
 
     /**
      * Create the list of page number.
-     * 
-     * @return The list of page number.
+     * @return The list of page number. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('Integer')} createPageNumberList() {
+    public List<Integer> createPageNumberList() {
         assertPageGroupValid();
         final int pageGroupSize = _pageGroupOption.getPageGroupSize();
         final int allPageCount = _allPageCount;
@@ -87,7 +85,7 @@ public class ${myClassName} implements java.io.Serializable {
         }
         final int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + pageGroupSize;
 
-        final java.util.List${database.filterGenericsString('Integer')} resultList = new java.util.ArrayList${database.filterGenericsString('Integer')}();
+        final List<Integer> resultList = new ArrayList<Integer>();
         for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
             resultList.add(new Integer(i));
         }
@@ -96,8 +94,7 @@ public class ${myClassName} implements java.io.Serializable {
 
     /**
      * Create the array of page number.
-     * 
-     * @return The array of page number.
+     * @return The array of page number. (NotNUll)
      */
     public int[] createPageNumberArray() {
         assertPageGroupValid();
@@ -133,10 +130,13 @@ public class ${myClassName} implements java.io.Serializable {
         return (nextPageGroupStartPageNumber <= _allPageCount);
     }
 
-    protected int[] convertListToIntArray(java.util.List${database.filterGenericsString('Integer')} ls) {
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected int[] convertListToIntArray(List<Integer> ls) {
         final int[] resultArray = new int[ls.size()];
         int arrayIndex = 0;
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+        for (Iterator ite = ls.iterator(); ite.hasNext(); ) {
             final Integer tmpPageNumber = (Integer)ite.next();
             resultArray[arrayIndex] = tmpPageNumber.intValue();
             arrayIndex++;
@@ -162,6 +162,23 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * @return The view string of all attribute values. (NotNull)
+     */
+	@Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(" currentPageNumber=").append(_currentPageNumber);
+        sb.append(" allPageCount=").append(_allPageCount);
+        sb.append(" pageGroupOption=").append(_pageGroupOption);
+
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public void setCurrentPageNumber(int currentPageNumber) {
@@ -172,23 +189,5 @@ public class ${myClassName} implements java.io.Serializable {
     }
     public void setPageGroupOption(${glPageGroupOptionName} pageGroupOption) {
         this._pageGroupOption = pageGroupOption;
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    /**
-     * The override.
-     * 
-     * @return View string. (NotNull)
-     */
-    public String toString() {
-        final StringBuffer sb = new StringBuffer();
-
-        sb.append(" currentPageNumber=").append(_currentPageNumber);
-        sb.append(" allPageCount=").append(_allPageCount);
-        sb.append(" pageGroupOption=").append(_pageGroupOption);
-
-        return sb.toString();
     }
 }

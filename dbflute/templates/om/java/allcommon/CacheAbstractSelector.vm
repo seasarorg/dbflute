@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * The abstract class of cache-selector.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public abstract class ${glCacheAbstractSelector} {
@@ -62,7 +61,6 @@ public abstract class ${glCacheAbstractSelector} {
     //                                         -------------
     /**
      * Assert that the object is not null.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      * @exception IllegalArgumentException
@@ -83,7 +81,6 @@ public abstract class ${glCacheAbstractSelector} {
     //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      */

@@ -4,20 +4,24 @@ import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 
 /**
  * The entry of DBFlute.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${glBFinderName} {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     protected static String _dbfluteDiconName = "${database.DBFluteDiconFileName}";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     private ${glBFinderName}() {
     }
 
-    public static void setDBFluteDiconName(String dbfluteDiconName) {
-        _dbfluteDiconName = dbfluteDiconName;
-    }
-
+    // ===================================================================================
+    //                                                                              Finder
+    //                                                                             ======
     public static <BEHAVIOR_TYPE extends ${glBehaviorReadableInterfaceName}> BEHAVIOR_TYPE find(Class<BEHAVIOR_TYPE> behaviorType) {
         assertObjectNotNull("behaviorType", behaviorType);
         if (!org.seasar.framework.container.factory.SingletonS2ContainerFactory.hasContainer()) {
@@ -39,12 +43,18 @@ public class ${glBFinderName} {
         return behavior;
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public static void setDBFluteDiconName(String dbfluteDiconName) {
+        _dbfluteDiconName = dbfluteDiconName;
+    }
+	
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     /**
      * Assert that the object is not null.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      * @exception IllegalArgumentException
@@ -65,7 +75,6 @@ public class ${glBFinderName} {
     //                                                    -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
-     * 
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      */

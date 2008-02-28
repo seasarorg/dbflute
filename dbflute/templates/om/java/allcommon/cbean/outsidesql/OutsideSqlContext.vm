@@ -12,7 +12,6 @@ import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * The context of outside-sql.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${glOutsideSqlContextName} {

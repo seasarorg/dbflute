@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 /**
  * The interface of entity defined common column.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityInterfaceName} {
@@ -16,15 +15,13 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
 
     /**
      * Get the value of ${uncapitalisedJavaName}.
-     * 
-     * @return The value of ${uncapitalisedJavaName}.
+     * @return The value of ${uncapitalisedJavaName}. (Nullable)
      */
     public ${javaNative} get${javaName}();
 
     /**
      * Set the value of ${uncapitalisedJavaName}.
-     * 
-     * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}.
+     * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}. (Nullable)
      */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName});
   #if (${database.isAllClassificationColumn($filteredColumnName)})
@@ -39,18 +36,20 @@ public interface ${glEntityDefinedCommonColumnInterfaceName} extends ${glEntityI
 
     /**
      * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'?
+	 * <p>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!
-     * 
+	 * </p>
      * @return Determanation.
      */
     public boolean is${javaName}${classificationMap.get('name')}();
 
     /**
      * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'?
+	 * <p>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method throws exception!
-     * 
+	 * </p>
      * @return Determanation.
      */
     public boolean is${javaName}${classificationMap.get('name')}IfNullException();

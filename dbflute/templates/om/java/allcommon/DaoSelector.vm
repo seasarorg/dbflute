@@ -2,14 +2,12 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 /**
  * The interface of dao-selector.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glDaoSelectorInterfaceName} {
 
     /**
      * Select dao.
-     * 
      * @param <DAO_TYPE> The type of behavior.
      * @param daoType Dao type. (NotNull)
      * @return Dao. (NotNull)
@@ -18,7 +16,6 @@ public interface ${glDaoSelectorInterfaceName} {
 
     /**
      * Select dao-readable by name.
-     * 
      * @param tableFlexibleName Table flexible name. (NotNull)
      * @return Dao-readable. (NotNull)
      */

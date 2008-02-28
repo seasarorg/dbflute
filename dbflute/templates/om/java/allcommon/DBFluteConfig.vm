@@ -5,7 +5,6 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The sigleton class that has generate-meta-data(GenMetaData).
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} {
@@ -13,7 +12,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log-instance. */
+    /** Log instance. */
     private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
 	
     /** Singleton instance. */
@@ -23,9 +22,7 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
 	protected ${glStatementConfig} _defaultStatementConfig;
-	
 	protected boolean _internalDebug;
-	
 	protected boolean _locked = true;
 	
     // ===================================================================================
@@ -42,8 +39,7 @@ public class ${myClassName} {
     //                                                                           =========
     /**
      * Get instance.
-     *
-     * @return Singleton instance.
+     * @return Singleton instance. (NotNull)
      */
     public static ${myClassName} getInstance() {
         return _instance;

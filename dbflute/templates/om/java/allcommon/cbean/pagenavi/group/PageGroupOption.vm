@@ -1,14 +1,15 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenaviGroup};
-
 #set ($myClassName = "${glPageGroupOptionName}")
 
 /**
  * The option of page group.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements java.io.Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
@@ -18,6 +19,21 @@ public class ${myClassName} implements java.io.Serializable {
     protected int _pageGroupSize;
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * @return The view string of all attribute values. (NotNull)
+     */
+	@Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(" pageGroupSize=").append(_pageGroupSize);
+
+        return sb.toString();
+    }
+	
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public int getPageGroupSize() {
@@ -26,21 +42,5 @@ public class ${myClassName} implements java.io.Serializable {
 
     public void setPageGroupSize(int pageGroupSize) {
         this._pageGroupSize = pageGroupSize;
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    /**
-     * The override.
-     * 
-     * @return View string. (NotNull)
-     */
-    public String toString() {
-        final StringBuffer sb = new StringBuffer();
-
-        sb.append(" pageGroupSize=").append(_pageGroupSize);
-
-        return sb.toString();
     }
 }

@@ -2,10 +2,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 /**
  * Access-Context.
- * <pre>
+ * <p>
  * This access-context on the thread should be initialized at the beginning of access.
  * The access is various. Web-Access, Batch-Access, JUnit-Access and so on...
- * </pre>
+ * </p>
  * @author ${database.ClassAuthor}
  */
 public class ${glAccessContextName} {
@@ -14,11 +14,10 @@ public class ${glAccessContextName} {
     //                                                                        Thread Local
     //                                                                        ============
     /** The thread-local for this. */
-    private static final ThreadLocal${database.filterGenericsString(${glAccessContextName})} threadLocal = new ThreadLocal${database.filterGenericsString(${glAccessContextName})}();
+    private static final ThreadLocal<${glAccessContextName}> threadLocal = new ThreadLocal<${glAccessContextName}>();
 
     /**
      * Get access-context on thread.
-     * 
      * @return Access-context. (Nullable)
      */
     public static ${glAccessContextName} getAccessContextOnThread() {
@@ -27,7 +26,6 @@ public class ${glAccessContextName} {
 
     /**
      * Set access-context on thread.
-     * 
      * @param accessContext Access-context. (NotNull)
      */
     public static void setAccessContextOnThread(${glAccessContextName} accessContext) {
@@ -40,7 +38,6 @@ public class ${glAccessContextName} {
 
     /**
      * Is existing access-context on thread?
-     * 
      * @return Determination.
      */
     public static boolean isExistAccessContextOnThread() {
@@ -59,10 +56,10 @@ public class ${glAccessContextName} {
     //                                                                  ==================
     /**
      * Get access user on thread.
-     * <pre>
+     * <p>
      * If it can't get access user from access-context, 
      * returns 'Anonymous' as default value!
-     * </pre>
+     * </p>
      * @return Access user. (NotNull)
      */
     public static String getAccessUserOnThread() {
@@ -78,10 +75,10 @@ public class ${glAccessContextName} {
 
     /**
      * Get access process on thread.
-     * <pre>
+     * <p>
      * If it can't get access process from access-context, 
      * returns 'Anonymous' as default value!
-     * </pre>
+     * </p>
      * @return Access process. (NotNull)
      */
     public static String getAccessProcessOnThread() {
@@ -97,10 +94,10 @@ public class ${glAccessContextName} {
 
     /**
      * Get access module on thread.
-     * <pre>
+     * <p>
      * If it can't get access module from access-context, 
      * returns 'Anonymous' as default value!
-     * </pre>
+     * </p>
      * @return Access module. (NotNull)
      */
     public static String getAccessModuleOnThread() {
@@ -116,10 +113,10 @@ public class ${glAccessContextName} {
 
     /**
      * Get access date on thread.
-     * <pre>
+     * <p>
      * If it can't get access date from access-context, 
      * returns application current time as default value!
-     * </pre>
+     * </p>
      * @return Access date. (NotNull)
      */
     public static java.util.Date getAccessDateOnThread() {
@@ -138,10 +135,10 @@ public class ${glAccessContextName} {
 
     /**
      * Get access timestamp on thread.
-     * <pre>
+     * <p>
      * If it can't get access timestamp from access-context, 
      * returns application current time as default value!
-     * </pre>
+     * </p>
      * @return Access timestamp. (NotNull)
      */
     public static java.sql.Timestamp getAccessTimestampOnThread() {
@@ -162,17 +159,11 @@ public class ${glAccessContextName} {
     //                                                                           Attribute
     //                                                                           =========
     protected String accessUser;
-
     protected String accessProcess;
-
     protected String accessModule;
-
     protected java.util.Date accessDate;
-
     protected AccessDateProvider accessDateProvider;
-
     protected java.sql.Timestamp accessTimestamp;
-
     protected AccessTimestampProvider accessTimestampProvider;
 
     // ===================================================================================

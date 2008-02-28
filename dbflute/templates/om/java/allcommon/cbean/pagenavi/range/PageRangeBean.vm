@@ -1,19 +1,22 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBeanPagenaviRange};
-
 #set ($myClassName = "${glPageRangeBeanName}")
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkName};
-#if ($database.isAvailableGenerics())
 import ${glPackageBaseCommonCBeanPagenavi}.${glPageNumberLinkSetupperName};
-#end
 
 /**
  * The bean of page range.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements java.io.Serializable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
@@ -27,36 +30,32 @@ public class ${myClassName} implements java.io.Serializable {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-#if ($database.isAvailableGenerics())
     /**
      * Build the list of page number link.
-     * 
-     * ${database.filterGenericsParamOutput('<LINK>', 'The type of link.')}
+	 * @param <LINK> The type of link.
      * @param pageNumberLinkSetupper Page number link setupper. (NotNull and Required LINK)
      * @return The list of Page number link. (NotNull)
      */
-    public <LINK extends ${glPageNumberLinkName}> java.util.List<LINK> buildPageNumberLinkList(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) {
-        final java.util.List<Integer> pageNumberList = createPageNumberList();
-        final java.util.List<LINK> pageNumberLinkList = new java.util.ArrayList<LINK>();
+    public <LINK extends ${glPageNumberLinkName}> List<LINK> buildPageNumberLinkList(${glPageNumberLinkSetupperName}<LINK> pageNumberLinkSetupper) {
+        final List<Integer> pageNumberList = createPageNumberList();
+        final List<LINK> pageNumberLinkList = new ArrayList<LINK>();
         for (Integer pageNumber: pageNumberList) {
             pageNumberLinkList.add(pageNumberLinkSetupper.setup(pageNumber, pageNumber.equals(_currentPageNumber)));
         }
         return pageNumberLinkList;
     }
-#end
 
     /**
      * Create the list of page number.
-     * 
      * @return The list of page number. (NotNull)
      */
-    public java.util.List${database.filterGenericsString('Integer')} createPageNumberList() {
+    public List<Integer> createPageNumberList() {
         assertPageRangeValid();
         final int pageRangeSize = _pageRangeOption.getPageRangeSize();
         final int allPageCount = _allPageCount;
         final int currentPageNumber = _currentPageNumber;
 
-        final java.util.List${database.filterGenericsString('Integer')} resultList = new java.util.ArrayList${database.filterGenericsString('Integer')}();
+        final List<Integer> resultList = new ArrayList<Integer>();
         for (int i = currentPageNumber - pageRangeSize; i < currentPageNumber; i++) {
             if (i < 1) {
                 continue;
@@ -90,8 +89,7 @@ public class ${myClassName} implements java.io.Serializable {
 
     /**
      * Get the array of page number.
-     * 
-     * @return The array of page number.
+     * @return The array of page number. (NotNull)
      */
     public int[] createPageNumberArray() {
         assertPageRangeValid();
@@ -100,7 +98,6 @@ public class ${myClassName} implements java.io.Serializable {
 
     /**
      * Is existing previous page range?
-     * 
      * @return Determination.
      */
     public boolean isExistPrePageRange() {
@@ -114,7 +111,6 @@ public class ${myClassName} implements java.io.Serializable {
 
     /**
      * Is existing next page range?
-     * 
      * @return Determination.
      */
     public boolean isExistNextPageRange() {
@@ -126,10 +122,13 @@ public class ${myClassName} implements java.io.Serializable {
         return array[array.length-1] < _allPageCount;
     }
 
-    protected int[] convertListToIntArray(java.util.List${database.filterGenericsString('Integer')} ls) {
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected int[] convertListToIntArray(List<Integer> ls) {
         final int[] resultArray = new int[ls.size()];
         int arrayIndex = 0;
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+        for (Iterator ite = ls.iterator(); ite.hasNext(); ) {
             final Integer tmpPageNumber = (Integer)ite.next();
             resultArray[arrayIndex] = tmpPageNumber.intValue();
             arrayIndex++;
@@ -166,12 +165,11 @@ public class ${myClassName} implements java.io.Serializable {
     //                                                                      Basic Override
     //                                                                      ==============
     /**
-     * The override.
-     * 
-     * @return View string. (NotNull)
+     * @return The view string of all attribute values. (NotNull)
      */
+	 @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         sb.append(" currentPageNumber=").append(_currentPageNumber);
         sb.append(" allPageCount=").append(_allPageCount);

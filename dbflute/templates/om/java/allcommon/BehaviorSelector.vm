@@ -4,15 +4,13 @@ import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 
 /**
  * The interface of behavior-selector.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glBehaviorSelectorInterfaceName} {
 
     /**
      * Select behavior.
-     * 
-     * ${database.filterGenericsParamOutput('<BEHAVIOR_TYPE>', 'The type of behavior.')}
+	 * @param <BEHAVIOR_TYPE> The type of behavior.
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
      */
@@ -20,7 +18,6 @@ public interface ${glBehaviorSelectorInterfaceName} {
 
     /**
      * Select behavior-readable.
-     * 
      * @param tableFlexibleName Table flexible-name. (NotNull)
      * @return Behavior-readable. (NotNull)
      */

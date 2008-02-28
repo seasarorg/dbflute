@@ -1,23 +1,23 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
-
 #set ($myClassName = "${glListResultBeanName}")
 #set ($selectedListArgumentGenericDefinition = "${glEntityInterfaceName}")
-#if ($database.isAvailableGenerics())
+
+import java.util.List;
+import java.util.ArrayList;
+
 import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingOptionName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowEndDeterminerName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowResourceName};
 import ${glPackageBaseCommonCBeanGrouping}.${glGroupingRowSetupperName};
-#end
 import ${glPackageBaseCommonSqlClause}.${glOrderByClauseName};
 
 /**
  * The list-result-bean for ${myClassName}.
- * 
- * ${database.filterGenericsParamOutput('<ENTITY>', 'The type of entity for the element of selectedList()')}
+ * @param <ENTITY> The type of entity for the element of selected list.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.Serializable {
+public class ${myClassName}<ENTITY> implements List<ENTITY>, java.io.Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -35,7 +35,7 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
     protected int _allRecordCount;
 
     /** Selected list. */
-    protected java.util.List<ENTITY> _selectedList = new java.util.ArrayList<ENTITY>();
+    protected List<ENTITY> _selectedList = new java.util.ArrayList<ENTITY>();
 
     /** Order-by clause. */
     protected ${glOrderByClauseName} _orderByClause = new ${glOrderByClauseName}();
@@ -52,8 +52,8 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
     // ===================================================================================
     //                                                                            Grouping
     //                                                                            ========
-    public <ROW> java.util.List<ROW> groupingList(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
-        final java.util.List<ROW> groupingList = new java.util.ArrayList<ROW>();
+    public <ROW> List<ROW> groupingList(${glGroupingRowSetupperName}<ROW, ENTITY> groupingRowSetupper, ${glGroupingOptionName}<ENTITY> groupingOption) {
+        final List<ROW> groupingList = new ArrayList<ROW>();
         ${glGroupingRowEndDeterminerName}<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
         if (rowEndDeterminer == null) {
             rowEndDeterminer = new ${glGroupingRowEndDeterminerName}<ENTITY>() {
@@ -123,10 +123,6 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
     //                                                                       =============
     /**
      * Has this result selected?
-     * <pre>
-     * If isSetterInvokedSelectedList is true, returns true.
-     * </pre>
-     * 
      * @return Determination.
      */
     public boolean isSelectedResult() {
@@ -137,8 +133,6 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
     //                                                                      Basic Override
     //                                                                      ==============
     /**
-     * ${database.OverrideComment}
-     * 
      * @return Hash-code from primary-keys.
      */
     public int hashCode() {
@@ -149,8 +143,6 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
     }
 
     /**
-     * ${database.OverrideComment}
-     * 
      * @param other Other entity. (Nullable)
      * @return Comparing result. If other is null, returns false.
      */
@@ -161,19 +153,18 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
         if (other == null) {
             return false;
         }
-        if (!(other instanceof java.util.List)) {
+        if (!(other instanceof List)) {
             return false;
         }
         return _selectedList.equals(other);
     }
 
     /**
-     * ${database.OverrideComment}
-     * 
-     * @return View-string of all-columns value.
+     * @return The view string of all attribute values. (NotNull)
      */
+	@Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         sb.append(" tableDbName=").append(_tableDbName);
         sb.append(" allRecordCount=").append(_allRecordCount);
@@ -283,8 +274,7 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
     //                                                                            ========
     /**
      * Get the value of tableDbName.
-     * 
-     * @return The value of tableDbName.
+     * @return The value of tableDbName. (Nullable: If it's null, it means 'Not Selected Yet'.)
      */
     public String getTableDbName() {
         return _tableDbName;
@@ -292,8 +282,7 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
 
     /**
      * Set the value of tableDbName.
-     * 
-     * @param tableDbName The value of tableDbName.
+     * @param tableDbName The value of tableDbName. (NotNull)
      */
     public void setTableDbName(String tableDbName) {
         _tableDbName = tableDbName;
@@ -301,7 +290,6 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
 
     /**
      * Get the value of allRecordCount.
-     * 
      * @return The value of allRecordCount.
      */
     public int getAllRecordCount() {
@@ -310,7 +298,6 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
 
     /**
      * Set the value of allRecordCount.
-     * 
      * @param allRecordCount The value of allRecordCount.
      */
     public void setAllRecordCount(int allRecordCount) {
@@ -319,26 +306,23 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
 
     /**
      * Get the value of selectedList.
-     * 
-     * @return Selected list. (NotNull)
+     * @return Selected list. (Nullable: If it's null, it means 'Not Selected Yet'.)
      */
-    public java.util.List<ENTITY> getSelectedList() {
+    public List<ENTITY> getSelectedList() {
         return _selectedList;
     }
 
     /**
      * Set the value of selectedList.
-     * 
      * @param selectedList Selected list. (NotNull)
      */
-    public void setSelectedList(java.util.List<ENTITY> selectedList) {
+    public void setSelectedList(List<ENTITY> selectedList) {
         _selectedList = selectedList;
     }
 
     /**
      * Get the value of orderByClause.
-     * 
-     * @return The value of orderByClause. (NotNull)
+     * @return The value of orderByClause. (Nullable: If it's null, it means 'Not Selected Yet'.)
      */
     public ${glOrderByClauseName} getOrderByClause() {
         return _orderByClause;
@@ -346,7 +330,6 @@ public class ${myClassName}<ENTITY> implements java.util.List<ENTITY>, java.io.S
 
     /**
      * Set the value of orderByClause.
-     * 
      * @param orderByClause The value of orderByClause. (NotNull)
      */
     public void setOrderByClause(${glOrderByClauseName} orderByClause) {

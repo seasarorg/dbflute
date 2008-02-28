@@ -1,28 +1,31 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCBean};
-
 #set ($myClassName = "${glPagingResultBeanName}")
-#if ($database.isAvailableGenerics())
+
 import ${glPackageBaseCommonCBeanMapping}.${glEntityDtoMapperName};
-#end
 import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupBeanName};
 import ${glPackageBaseCommonCBeanPagenaviGroup}.${glPageGroupOptionName};
 import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeBeanName};
 import ${glPackageBaseCommonCBeanPagenaviRange}.${glPageRangeOptionName};
 
 /**
- * The paging-result-bean for ${myClassName}.
- * 
- * @param <ENTITY> The type of entity for the element of selectedList()
+ * The paging-result-bean for specified entity.
+ * @param <ENTITY> The type of entity for the element of selected list.
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                       Page Basic Info
+    //                                       ---------------
     /** The value of current page number. */
     protected int _pageSize;
 
@@ -57,47 +60,10 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
+    //                                                                 Calculated Property
+    //                                                                 ===================
     /**
-     * Get the value of pageSize.
-     * 
-     * @return The value of pageSize.
-     */
-    public int getPageSize() {
-        return _pageSize;
-    }
-
-    /**
-     * Set the value of pageSize.
-     * 
-     * @param pageSize The value of pageSize.
-     */
-    public void setPageSize(int pageSize) {
-        _pageSize = pageSize;
-    }
-
-    /**
-     * Get the value of currentPageNumber.
-     * 
-     * @return The value of currentPageNumber.
-     */
-    public int getCurrentPageNumber() {
-        return _currentPageNumber;
-    }
-
-    /**
-     * Set the value of currentPageNumber.
-     * 
-     * @param currentPageNumber The value of currentPageNumber.
-     */
-    public void setCurrentPageNumber(int currentPageNumber) {
-        _currentPageNumber = currentPageNumber;
-    }
-
-    /**
-     * Get the value of allPageCount.
-     * 
+     * Get the value of allPageCount that is calculated.
      * @return The value of allPageCount.
      */
     public int getAllPageCount() {
@@ -105,8 +71,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
     }
 
     /**
-     * Get the value of currentStartRecordNumber.
-     * 
+     * Get the value of currentStartRecordNumber that is calculated.
      * @return The value of currentStartRecordNumber.
      */
     public int getCurrentStartRecordNumber() {
@@ -114,20 +79,21 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
     }
 
     /**
-     * Get the value of currentEndRecordNumber.
-     * 
+     * Get the value of currentEndRecordNumber that is calculated.
      * @return The value of currentEndRecordNumber.
      */
     public int getCurrentEndRecordNumber() {
         return calculateCurrentEndRecordNumber(_currentPageNumber, _pageSize);
     }
-
+	
+    // ===================================================================================
+    //                                                                    Page Group/Range
+    //                                                                    ================
     // -----------------------------------------------------
     //                                            Page Group
     //                                            ----------
     /**
      * Get the value of pageGroupSize.
-     * 
      * @return The value of pageGroupSize.
      */
     public int getPageGroupSize() {
@@ -136,7 +102,6 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
 
     /**
      * Set the value of pageGroupSize.
-     * 
      * @param pageGroupSize The value of pageGroupSize.
      */
     public void setPageGroupSize(int pageGroupSize) {
@@ -147,8 +112,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
 
     /**
      * Set the value of pageGroupOption.
-     * 
-     * @param pageGroupOption The value of pageGroupOption.
+     * @param pageGroupOption The value of pageGroupOption. (Nullable)
      */
     public void setPageGroupOption(${glPageGroupOptionName} pageGroupOption) {
         _pageGroupOption = pageGroupOption;
@@ -156,8 +120,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
 
     /**
      * Get the value of pageGroupBean.
-     * 
-     * @return The value of pageGroupBean.
+     * @return The value of pageGroupBean. (NotNull)
      */
     public ${glPageGroupBeanName} pageGroup() {
         assertPageGroupValid();
@@ -192,7 +155,6 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
     //                                            ----------
     /**
      * Get the value of pageRangeSize.
-     * 
      * @return The value of pageRangeSize.
      */
     public int getPageRangeSize() {
@@ -201,7 +163,6 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
 
     /**
      * Set the value of pageRangeSize.
-     * 
      * @param pageRangeSize The value of pageRangeSize.
      */
     public void setPageRangeSize(int pageRangeSize) {
@@ -212,8 +173,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
 
     /**
      * Set the value of pageRangeOption.
-     * 
-     * @param pageRangeOption The value of pageRangeOption.
+     * @param pageRangeOption The value of pageRangeOption. (Nullable)
      */
     public void setPageRangeOption(${glPageRangeOptionName} pageRangeOption) {
         this._pageRangeOption = pageRangeOption;
@@ -221,8 +181,7 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
 
     /**
      * Get the value of pageRangeBean.
-     * 
-     * @return The value of pageRangeBean.
+     * @return The value of pageRangeBean. (NotNull)
      */
     public ${glPageRangeBeanName} pageRange() {
         assertPageRangeValid();
@@ -248,6 +207,27 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
     }
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    /**
+     * Is existing previous page?
+     * Using values are currentPageNumber.
+     * @return Determination.
+     */
+    public boolean isExistPrePage() {
+        return (_allRecordCount > 0 && _currentPageNumber > 1);
+    }
+
+    /**
+     * Is existing next page?
+     * Using values are currentPageNumber and allPageCount.
+     * @return Determination.
+     */
+    public boolean isExistNextPage() {
+        return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
+    }
+
+    // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
     public <DTO> ${myClassName}<DTO> mappingList(${glEntityDtoMapperName}<ENTITY, DTO> entityDtoMapper) {
@@ -265,14 +245,10 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                           Calculate
-    //                                                                           =========
-    // -----------------------------------------------------
-    //                                                  Page
-    //                                                  ----
+    //                                                                 Calculate(Internal)
+    //                                                                 ===================
     /**
      * Calculate all page count.
-     * 
      * @param allRecordCount All record count.
      * @param pageSize Fetch-size.
      * @return All page count.
@@ -296,36 +272,15 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
         return calculateCurrentStartRecordNumber(currentPageNumber, pageSize) + _selectedList.size() - 1;
     }
 
-    /**
-     * Is existing previous page?
-     * Using values are currentPageNumber.
-     * 
-     * @return Determination.
-     */
-    public boolean isExistPrePage() {
-        return (_allRecordCount > 0 && _currentPageNumber > 1);
-    }
-
-    /**
-     * Is existing next page?
-     * Using values are currentPageNumber and allPageCount.
-     * 
-     * @return Determination.
-     */
-    public boolean isExistNextPage() {
-        return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());
-    }
-
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     /**
-     * This method overrides the method that is declared at super.
-     * 
-     * @return View-string of all-columns value.
+     * @return The view string of all attribute values. (NotNull)
      */
+	@Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         sb.append(getCurrentPageNumber()).append("/").append(getAllPageCount());
         sb.append(" of ").append(getAllRecordCount());
@@ -336,5 +291,40 @@ public class ${myClassName}<ENTITY> extends ${glListResultBeanName}<ENTITY> {
         sb.append(" rangeSize=").append(getPageRangeSize());
 
         return sb.toString();
+    }
+	
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get the value of pageSize.
+     * @return The value of pageSize.
+     */
+    public int getPageSize() {
+        return _pageSize;
+    }
+
+    /**
+     * Set the value of pageSize.
+     * @param pageSize The value of pageSize.
+     */
+    public void setPageSize(int pageSize) {
+        _pageSize = pageSize;
+    }
+
+    /**
+     * Get the value of currentPageNumber.
+     * @return The value of currentPageNumber.
+     */
+    public int getCurrentPageNumber() {
+        return _currentPageNumber;
+    }
+
+    /**
+     * Set the value of currentPageNumber.
+     * @param currentPageNumber The value of currentPageNumber.
+     */
+    public void setCurrentPageNumber(int currentPageNumber) {
+        _currentPageNumber = currentPageNumber;
     }
 }
