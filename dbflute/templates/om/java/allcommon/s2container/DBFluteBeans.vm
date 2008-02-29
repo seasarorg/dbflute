@@ -62,7 +62,7 @@
 
     <bean class="org.seasar.dao.spring.autoregister.FileSystemBeanAutoRegister">
         <property name="addPackageName">
-            <value>org.seasar.dbflute.example.spring.dbflute.allcommon.cbean.outsidesql</value>
+            <value>${glPackageBaseCommonCBeanOutsidesql}</value>
         </property>
         <property name="addClassNames">
             <value>OutsideSqlDao</value>
@@ -76,7 +76,7 @@
     
     <bean class="org.seasar.dao.spring.autoregister.FileSystemBeanAutoRegister">
         <property name="addPackageName">
-            <value>org.seasar.dbflute.example.spring.dbflute.exdao</value>
+            <value>${glPackageExtendedDao}</value>
         </property>
         <property name="addClassNames">
             <value>.*Dao</value>
