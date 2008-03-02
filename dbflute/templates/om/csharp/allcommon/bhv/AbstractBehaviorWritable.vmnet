@@ -102,16 +102,10 @@ namespace ${glPackageBaseCommonBhv} {
       #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
             ${filteredLogic}
-            if (_log.IsDebugEnabled) {
-                _log.Debug("    ${columnName} has been set up: invoking=${filteredLogic}");
-            }
     #else
 
             ${javaNative} ${uncapitalisedJavaName} = ${logic};
             entity.${javaName} = ${uncapitalisedJavaName};
-            if (_log.IsDebugEnabled) {
-                _log.Debug("    ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
-            }
     #end
   #end
 #end
@@ -160,16 +154,10 @@ namespace ${glPackageBaseCommonBhv} {
       #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
             ${filteredLogic}
-            if (_log.IsDebugEnabled) {
-                _log.Debug("    ${columnName} has been set up: invoking=${filteredLogic}");
-            }
     #else
 
             ${javaNative} ${uncapitalisedJavaName} = ${logic};
             entity.${javaName} = ${uncapitalisedJavaName};
-            if (_log.IsDebugEnabled) {
-                _log.Debug("    ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
-            }
     #end
   #end
 #end
@@ -218,16 +206,10 @@ namespace ${glPackageBaseCommonBhv} {
       #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
             ${filteredLogic}
-            if (_log.IsDebugEnabled) {
-                _log.Debug("    ${columnName} has been set up: invoking=${filteredLogic}");
-            }
     #else
 
             ${javaNative} ${uncapitalisedJavaName} = ${logic};
             entity.${javaName} = ${uncapitalisedJavaName};
-            if (_log.IsDebugEnabled) {
-                _log.Debug("    ${columnName} has been set up: value=" + ${uncapitalisedJavaName});
-            }
     #end
   #end
 #end

@@ -914,7 +914,7 @@ public class Database {
     //                                 insert
     //                                 ------
     public Map<String, Object> getCommonColumnSetupBeforeInsertInterceptorLogicMap() {
-        return getProperties().getCommonColumnProperties().getCommonColumnSetupBeforeInsertInterceptorLogicMap();
+        return getProperties().getCommonColumnProperties().getBeforeInsertMap();
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
@@ -931,7 +931,7 @@ public class Database {
     //                                 update
     //                                 ------
     public Map<String, Object> getCommonColumnSetupBeforeUpdateInterceptorLogicMap() {
-        return getProperties().getCommonColumnProperties().getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
+        return getProperties().getCommonColumnProperties().getBeforeUpdateMap();
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(String columnName) {
@@ -948,7 +948,7 @@ public class Database {
     //                                 delete
     //                                 ------
     public Map<String, Object> getCommonColumnSetupBeforeDeleteInterceptorLogicMap() {
-        return getProperties().getCommonColumnProperties().getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
+        return getProperties().getCommonColumnProperties().getBeforeDeleteMap();
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(String columnName) {

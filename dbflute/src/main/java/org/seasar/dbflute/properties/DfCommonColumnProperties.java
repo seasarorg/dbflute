@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,13 @@ import java.util.Set;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
- * Common column properties.
- * 
  * @author jflute
  */
 public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
 
-    // private static final Log _log = LogFactory.getLog(DfCommonColumnProperties.class);
-
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfCommonColumnProperties(Properties prop) {
         super(prop);
     }
@@ -41,11 +40,27 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                                                       Common Column
     //                                                                       =============
     public static final String KEY_commonColumnMap = "commonColumnMap";
+    protected Map<String, Object> _commonColumnTopMap;
     protected Map<String, Object> _commonColumnMap;
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getCommonColumnMap() {
         if (_commonColumnMap == null) {
             _commonColumnMap = mapProp("torque." + KEY_commonColumnMap, DEFAULT_EMPTY_MAP);
+
+            if (_commonColumnMap.containsKey(KEY_commonColumnMap)) {
+                // For the way by dfprop-setting.
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // map:{
+                //     ; commonColumnMap = map:{
+                //         ; REGISTER_DATETIME=TIMESTAMP ; REGISTER_USER=VARCHAR ; REGISTER_PROCESS=VARCHAR
+                //         ; UPDATE_DATETIME=TIMESTAMP   ; UPDATE_USER=VARCHAR   ; UPDATE_PROCESS=VARCHAR
+                //     }
+                //     ; ...
+                // - - - - - - - - - -/ 
+                _commonColumnTopMap = _commonColumnMap;
+                _commonColumnMap = (Map<String, Object>) _commonColumnTopMap.get(KEY_commonColumnMap);
+            }
         }
         return _commonColumnMap;
     }
@@ -154,9 +169,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isExistCommonColumnSetupElement() {
-        final Map<String, Object> insertElementMap = getCommonColumnSetupBeforeInsertInterceptorLogicMap();
-        final Map<String, Object> updateElementMap = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
-        final Map<String, Object> deleteElementMap = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
+        final Map<String, Object> insertElementMap = getBeforeInsertMap();
+        final Map<String, Object> updateElementMap = getBeforeUpdateMap();
+        final Map<String, Object> deleteElementMap = getBeforeDeleteMap();
         if (insertElementMap.isEmpty() && updateElementMap.isEmpty() && deleteElementMap.isEmpty()) {
             return false;
         }
@@ -167,19 +182,37 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                                                    Intercept Insert
     //                                                                    ================
     public static final String KEY_commonColumnSetupBeforeInsertInterceptorLogicMap = "commonColumnSetupBeforeInsertInterceptorLogicMap";
-    protected Map<String, Object> _commonColumnSetupBeforeInsertInterceptorLogicMap;
+    protected Map<String, Object> _beforeInsertMap;
 
-    public Map<String, Object> getCommonColumnSetupBeforeInsertInterceptorLogicMap() {
-        if (_commonColumnSetupBeforeInsertInterceptorLogicMap == null) {
-            final String key = "torque." + KEY_commonColumnSetupBeforeInsertInterceptorLogicMap;
-            _commonColumnSetupBeforeInsertInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
-            filterCommonColumnSetupValue(_commonColumnSetupBeforeInsertInterceptorLogicMap);
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getBeforeInsertMap() {
+        if (_beforeInsertMap == null) {
+            getCommonColumnMap();// For initialization of commonColumnMap.
+            if (_commonColumnTopMap != null && _commonColumnTopMap.containsKey("beforeInsertMap")) {
+                // For the way by dfprop-setting.
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // ; beforeInsertMap = map:{
+                //     ; REGISTER_DATETIME = $$AccessContext$$.getAccessTimestampOnThread()
+                //     ; REGISTER_USER     = $$AccessContext$$.getAccessUserOnThread()
+                //     ; REGISTER_PROCESS  = $$AccessContext$$.getAccessProcessOnThread()
+                //     ; UPDATE_DATETIME   = entity.getRegisterDatetime()
+                //     ; UPDATE_USER       = entity.getRegisterUser()
+                //     ; UPDATE_PROCESS    = entity.getRegisterProcess()
+                // }
+                // - - - - - - - - - -/ 
+                _beforeInsertMap = (Map<String, Object>) _commonColumnTopMap.get("beforeInsertMap");
+            } else {
+                // For old style.
+                final String key = "torque." + KEY_commonColumnSetupBeforeInsertInterceptorLogicMap;
+                _beforeInsertMap = mapProp(key, DEFAULT_EMPTY_MAP);
+            }
+            filterCommonColumnSetupValue(_beforeInsertMap);
         }
-        return _commonColumnSetupBeforeInsertInterceptorLogicMap;
+        return _beforeInsertMap;
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(String columnName) {
-        final Map map = getCommonColumnSetupBeforeInsertInterceptorLogicMap();
+        final Map<String, Object> map = getBeforeInsertMap();
         final String logic = (String) map.get(columnName);
         if (logic != null && logic.trim().length() != 0) {
             return true;
@@ -189,7 +222,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public String getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(String columnName) {
-        final Map map = getCommonColumnSetupBeforeInsertInterceptorLogicMap();
+        final Map<String, Object> map = getBeforeInsertMap();
         return (String) map.get(columnName);
     }
 
@@ -197,19 +230,34 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                                                    Intercept Update
     //                                                                    ================
     public static final String KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap = "commonColumnSetupBeforeUpdateInterceptorLogicMap";
-    protected Map<String, Object> _commonColumnSetupBeforeUpdateInterceptorLogicMap;
+    protected Map<String, Object> _beforeUpdateMap;
 
-    public Map<String, Object> getCommonColumnSetupBeforeUpdateInterceptorLogicMap() {
-        if (_commonColumnSetupBeforeUpdateInterceptorLogicMap == null) {
-            final String key = "torque." + KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap;
-            _commonColumnSetupBeforeUpdateInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
-            filterCommonColumnSetupValue(_commonColumnSetupBeforeUpdateInterceptorLogicMap);
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getBeforeUpdateMap() {
+        if (_beforeUpdateMap == null) {
+            getCommonColumnMap();// For initialization of commonColumnMap.
+            if (_commonColumnTopMap != null && _commonColumnTopMap.containsKey("beforeUpdateMap")) {
+                // For the way by dfprop-setting.
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // ; beforeUpdateMap = map:{
+                //     ; REGISTER_DATETIME = $$AccessContext$$.getAccessTimestampOnThread()
+                //     ; REGISTER_USER     = $$AccessContext$$.getAccessUserOnThread()
+                //     ; REGISTER_PROCESS  = $$AccessContext$$.getAccessProcessOnThread()
+                // }
+                // - - - - - - - - - -/ 
+                _beforeUpdateMap = (Map<String, Object>) _commonColumnTopMap.get("beforeUpdateMap");
+            } else {
+                // For old style.
+                final String key = "torque." + KEY_commonColumnSetupBeforeUpdateInterceptorLogicMap;
+                _beforeUpdateMap = mapProp(key, DEFAULT_EMPTY_MAP);
+            }
+            filterCommonColumnSetupValue(_beforeUpdateMap);
         }
-        return _commonColumnSetupBeforeUpdateInterceptorLogicMap;
+        return _beforeUpdateMap;
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(String columnName) {
-        final Map map = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
+        final Map<String, Object> map = getBeforeUpdateMap();
         final String logic = (String) map.get(columnName);
         if (logic != null && logic.trim().length() != 0) {
             return true;
@@ -219,7 +267,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
-        final Map map = getCommonColumnSetupBeforeUpdateInterceptorLogicMap();
+        final Map<String, Object> map = getBeforeUpdateMap();
         return (String) map.get(columnName);
     }
 
@@ -227,19 +275,37 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                                                    Intercept Delete
     //                                                                    ================
     public static final String KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap = "commonColumnSetupBeforeDeleteInterceptorLogicMap";
-    protected Map<String, Object> _commonColumnSetupBeforeDeleteInterceptorLogicMap;
+    protected Map<String, Object> _beforeDeleteMap;
 
-    public Map<String, Object> getCommonColumnSetupBeforeDeleteInterceptorLogicMap() {
-        if (_commonColumnSetupBeforeDeleteInterceptorLogicMap == null) {
-            final String key = "torque." + KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap;
-            _commonColumnSetupBeforeDeleteInterceptorLogicMap = mapProp(key, DEFAULT_EMPTY_MAP);
-            filterCommonColumnSetupValue(_commonColumnSetupBeforeDeleteInterceptorLogicMap);
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getBeforeDeleteMap() {
+        if (_beforeDeleteMap == null) {
+            getCommonColumnMap();// For initialization of commonColumnMap.
+            if (_commonColumnTopMap != null && _commonColumnTopMap.containsKey("beforeDeleteMap")) {
+                // For the way by dfprop-setting.
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // ; beforeDeleteMap = map:{
+                //     ; REGISTER_DATETIME = $$AccessContext$$.getAccessTimestampOnThread()
+                //     ; REGISTER_USER     = $$AccessContext$$.getAccessUserOnThread()
+                //     ; REGISTER_PROCESS  = $$AccessContext$$.getAccessProcessOnThread()
+                //     ; UPDATE_DATETIME   = entity.getRegisterDatetime()
+                //     ; UPDATE_USER       = entity.getRegisterUser()
+                //     ; UPDATE_PROCESS    = entity.getRegisterProcess()
+                // }
+                // - - - - - - - - - -/ 
+                _beforeDeleteMap = (Map<String, Object>) _commonColumnTopMap.get("beforeDeleteMap");
+            } else {
+                // For old style.
+                final String key = "torque." + KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap;
+                _beforeDeleteMap = mapProp(key, DEFAULT_EMPTY_MAP);
+            }
+            filterCommonColumnSetupValue(_beforeDeleteMap);
         }
-        return _commonColumnSetupBeforeDeleteInterceptorLogicMap;
+        return _beforeDeleteMap;
     }
 
     public boolean containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(String columnName) {
-        final Map map = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
+        final Map<String, Object> map = getBeforeDeleteMap();
         final String logic = (String) map.get(columnName);
         if (logic != null && logic.trim().length() != 0) {
             return true;
@@ -249,7 +315,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public String getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(String columnName) {
-        final Map map = getCommonColumnSetupBeforeDeleteInterceptorLogicMap();
+        final Map<String, Object> map = getBeforeDeleteMap();
         return (String) map.get(columnName);
     }
 

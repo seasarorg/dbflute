@@ -24,7 +24,6 @@ import ${glPackageBaseCommonHelperTokenFileImpl}.${glFileTokenImplName};
 
 /**
  * The abstract class of behavior-writable.
- * 
  * @author ${database.ClassAuthor}
  */
 public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} implements ${glBehaviorWritableInterfaceName} {
@@ -66,7 +65,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                ------
     /**
      * Create.
-     * 
      * @param entity Entity. (NotNull)
      */
     public void create(${glEntityInterfaceName} entity) {
@@ -80,7 +78,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                ------
     /**
      * Modify.
-     * 
      * @param entity Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
@@ -94,7 +91,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Modify non strict.
-     * 
      * @param entity Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -110,7 +106,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                      ----------------
     /**
      * ${database.ImplementComment}
-     * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
@@ -125,7 +120,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
      * @exception ${glPackageBaseCommonException}.${glEntityDuplicatedException} When the entity has been duplicated.
@@ -142,7 +136,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                ------
     /**
      * Remove.
-     * 
      * @param entity Entity. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} When the entity has already been updated.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException} When the entity has already been deleted.
@@ -326,7 +319,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                                   =================
     /**
      * Lump create the list.
-     * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return The array of created count.
      */
@@ -337,7 +329,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Lump Modify the list.
-     * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Modified count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
@@ -349,7 +340,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Lump remove the list.
-     * 
      * @param entityList Entity-list. (NotNull and NotEmpty)
      * @return Removed count.
      * @exception ${glPackageBaseCommonException}.${glEntityAlreadyUpdatedException} If s2dao's version is over 1.0.47 (contains 1.0.47).
@@ -361,7 +351,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Inject sequence to primary key if it needs.
-     * 
      * @param entity Entity. (NotNull)
      */
     protected void injectSequenceToPrimaryKeyIfNeeds(${glEntityInterfaceName} entity) {
@@ -387,7 +376,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
         /**
          * Reflect(insert or update) token-file to this table.
-         * 
          * @param filename Name of the file. (NotNull and NotEmpty)
          * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
          * @return Token-file-reflection-result. (NotNull)
@@ -408,7 +396,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
         /**
          * Reflect(insert or update) token-file to this table.
-         * 
          * @param inputStream Input stream. (NotNull and NotClosed)
          * @param tokenFileReflectionOption token-file-reflection-option. (NotNull and Required{delimiter and encoding})
          * @return Token-file-reflection-result. (NotNull)
@@ -538,7 +525,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                ------
     /**
      * ${database.ImplementComment}
-     * 
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Inserted count.
      */
@@ -568,7 +554,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     /**
      * ${database.ImplementComment}
      * {modified only}
-     * 
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Updated count.
      */
@@ -579,7 +564,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Process before update.
-     * 
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
@@ -597,7 +581,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                                ------
     /**
      * ${database.ImplementComment}
-     * 
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Deleted count.
      */
@@ -608,7 +591,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Process before delete.
-     * 
      * @param entity Entity that the type is entity-interface. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
@@ -626,7 +608,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
     //                                    ------------------
     /**
      * Determine execution of insert.
-     * 
      * @param entity Entity. (NotNull)
      * @return Execution Determination. (true: execute / false: non)
      */
@@ -636,7 +617,6 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
 
     /**
      * Framework filter the entity of insert.
-     * 
      * @param targetEntity Target entity that the type is entity-interface. (NotNull)
      */
     protected void frameworkFilterEntityOfInsert(${glEntityInterfaceName} targetEntity) {
@@ -650,9 +630,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
         if (_log.isDebugEnabled()) {
             String msg = "...Filtering entity of INSERT about the column columns of " + getTableDbName();
-            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity);
+            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
             _log.debug(msg);
-            _log.debug("  before setup : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
+            _log.debug("  before -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #foreach ($columnName in ${database.commonColumnNameList})
   #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
@@ -667,22 +647,16 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
       #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
         ${filteredLogic}
-        if (_log.isDebugEnabled()) {
-            _log.debug("    ${filteredColumnName} has been set up: invoking=${filteredLogic}");
-        }
     #else
 
         final ${javaNative} ${uncapitalisedJavaName} = ${logic};
         entity.set${javaName}(${uncapitalisedJavaName});
-        if (_log.isDebugEnabled()) {
-            _log.debug("    ${filteredColumnName} has been set up: value=" + ${uncapitalisedJavaName});
-        }
     #end
   #end
 #end
 
         if (_log.isDebugEnabled()) {
-            _log.debug("  after setup  : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
+            _log.debug("  after  -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #end
     }
@@ -729,9 +703,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
         if (_log.isDebugEnabled()) {
             String msg = "...Filtering entity of UPDATE about the column columns of " + getTableDbName();
-            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity);
+            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
             _log.debug(msg);
-            _log.debug("  before setup : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
+            _log.debug("  before -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #foreach ($columnName in ${database.CommonColumnNameList})
   #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
@@ -746,22 +720,16 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
       #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
         ${filteredLogic}
-        if (_log.isDebugEnabled()) {
-            _log.debug("    ${filteredColumnName} has been set up: invoking=${filteredLogic}");
-        }
     #else
 
         final ${javaNative} ${uncapitalisedJavaName} = ${logic};
         entity.set${javaName}(${uncapitalisedJavaName});
-        if (_log.isDebugEnabled()) {
-            _log.debug("    ${filteredColumnName} has been set up: value=" + ${uncapitalisedJavaName});
-        }
     #end
   #end
 #end
 
         if (_log.isDebugEnabled()) {
-            _log.debug("  after setup  : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
+            _log.debug("  after  -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #end
     }
@@ -808,9 +776,9 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
         final ${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName} entity = (${glPackageBaseCommon}.${glEntityDefinedCommonColumnInterfaceName})targetEntity;
         if (_log.isDebugEnabled()) {
             String msg = "[Behavior] ...Filtering entity of DELETE about the column columns of " + getTableDbName();
-            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity);
+            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
             _log.debug(msg);
-            _log.debug("  before setup : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
+            _log.debug("  before -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #foreach ($columnName in ${database.CommonColumnNameList})
   #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
@@ -825,22 +793,16 @@ public abstract class ${myClassName} extends ${glBehaviorReadableAbstractName} i
       #set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
 
         ${filteredLogic}
-        if (_log.isDebugEnabled()) {
-            _log.debug("    ${filteredColumnName} has been set up: invoking=${filteredLogic}");
-        }
     #else
 
         final ${javaNative} ${uncapitalisedJavaName} = ${logic};
         entity.set${javaName}(${uncapitalisedJavaName});
-        if (_log.isDebugEnabled()) {
-            _log.debug("    ${filteredColumnName} has been set up: value=" + ${uncapitalisedJavaName});
-        }
     #end
   #end
 #end
 
         if (_log.isDebugEnabled()) {
-            _log.debug("  after setup  : " + entity.getDBMeta().extractCommonColumnValueMapString(entity));
+            _log.debug("  after  -- " + entity.getDBMeta().extractCommonColumnValueMapString(entity, "{", "}", ", ", "="));
         }
 #end
     }
