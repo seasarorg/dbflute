@@ -270,7 +270,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return _conditionQuery${foreignKeys.foreignPropertyNameInitCap};
     }
     protected void setupOuterJoin_${foreignKeys.foreignPropertyNameInitCap}() {
-        final java.util.Map${database.filterGenericsString('String, String')} joinOnMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
+        final java.util.Map<String, String> joinOnMap = new java.util.LinkedHashMap${database.filterGenericsString('String, String')}();
 #foreach ($columnName in $foreignKeys.LocalColumns)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $foreignKeys.getLocalForeignMapping().get($columnName))
@@ -279,7 +279,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($foreignKeys.hasFixedCondition())
         joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${foreignKeys.fixedCondition}", getRealAliasName(), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName()));
 #end
-        getSqlClause().registerOuterJoin("${foreignKeys.foreignTable.name}", getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName(), joinOnMap);
+        getSqlClause().registerOuterJoin(getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getTableSqlName(), getConditionQuery${foreignKeys.foreignPropertyNameInitCap}().getRealAliasName(), joinOnMap);
     }
     protected ${foreignCQClassName} createQuery${foreignKeys.ForeignPropertyNameInitCap}() {
 	    final String nextRelationPath = resolveNextRelationPath${foreignKeys.foreignPropertyNameInitCap}();
@@ -331,7 +331,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($referrer.hasFixedCondition())
         joinOnMap.put("$$fixedCondition$$", prepareFixedCondition("${referrer.fixedCondition}", getRealAliasName(), getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getRealAliasName()));
 #end
-        getSqlClause().registerOuterJoin("${referrer.table.name}", getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getRealAliasName(), joinOnMap);
+        getSqlClause().registerOuterJoin(getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getTableSqlName(), getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}().getRealAliasName(), joinOnMap);
     }
     protected ${relatedCQClassName} createQuery${referrer.referrerPropertyNameInitCapAsOne}() {
         final String nextRelationPath = resolveNextRelationPath${referrer.referrerPropertyNameInitCapAsOne}();

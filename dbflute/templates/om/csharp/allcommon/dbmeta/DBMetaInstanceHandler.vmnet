@@ -98,6 +98,14 @@ namespace ${glPackageBaseCommonDBMeta} {
                 String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(toLowerKey);
                 return ByTableDbName(dbName);
             }
+            int dotLastIndex = tableFlexibleName.LastIndexOf(".");
+            if (dotLastIndex >= 0) {
+                try {
+                    return FindDBMeta(tableFlexibleName.Substring(dotLastIndex + 1));
+                } catch (IllegalStateException e) {
+                    // Nothing
+                }
+            }
             String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
             throw new SystemException(msg);
         }

@@ -23,7 +23,8 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        public override String TableDbName { get { return "${table.Name}"; } }
+        public override String TableDbName { get { return "${table.name}"; } }
+        public override String TableSqlName { get { return "${table.tableSqlName}"; } }
 
         // ===============================================================================
         //                                                                  Add OrderBy PK

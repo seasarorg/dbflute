@@ -58,6 +58,7 @@ public abstract class ${myClassName} : ${glConditionQueryInterfaceName} {
     //                                                                          Table Name
     //                                                                          ==========
     public abstract String getTableDbName();
+    public abstract String getTableSqlName();
 
     // ===================================================================================
     //                                                                  Important Accessor

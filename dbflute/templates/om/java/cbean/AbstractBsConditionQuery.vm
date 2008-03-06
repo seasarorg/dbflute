@@ -30,6 +30,10 @@ public abstract class ${myClassName} extends ${glConditionQueryAbstractName} {
     public String getTableDbName() {
         return "${table.Name}";
     }
+	
+    public String getTableSqlName() {
+        return "${table.tableSqlName}";
+    }
 
     // ===================================================================================
     //                                                                               Query

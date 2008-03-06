@@ -12,6 +12,7 @@ public interface ${glConditionQueryInterfaceName} {
     //                                                                          Table Name
     //                                                                          ==========
     String getTableDbName();
+    String getTableSqlName();
 	
     // ===================================================================================
     //                                                                  Important Accessor

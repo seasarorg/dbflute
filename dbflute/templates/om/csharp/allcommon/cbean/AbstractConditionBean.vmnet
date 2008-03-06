@@ -21,13 +21,14 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                     Constructor
         //                                                                     ===========
         public ${myClassName}() {
-            _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(TableDbName);
+            _sqlClause = new ${glSqlClauseName}${database.DaoGenDbName}(TableSqlName);
         }
 
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
         public abstract String TableDbName { get; }
+        public abstract String TableSqlName { get; }
 
         // ===============================================================================
         //                                                                       SqlClause

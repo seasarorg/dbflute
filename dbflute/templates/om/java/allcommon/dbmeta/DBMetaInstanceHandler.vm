@@ -94,6 +94,14 @@ public class ${myClassName} {
             String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(toLowerKey);
             return byTableDbName(dbName);
         }
+        final int dotLastIndex = tableFlexibleName.lastIndexOf(".");
+        if (dotLastIndex >= 0) {
+            try {
+                return findDBMeta(tableFlexibleName.substring(dotLastIndex + 1));
+            } catch (IllegalStateException e) {
+                // Nothing
+            }
+        }
         String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
         throw new IllegalStateException(msg);
     }

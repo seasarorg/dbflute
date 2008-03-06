@@ -5,7 +5,6 @@ import ${glPackageBaseCommonSqlClause}.${glSqlClauseName};
 
 /**
  * The condition-query as interface.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public interface ${glConditionQueryInterfaceName} {
@@ -14,22 +13,27 @@ public interface ${glConditionQueryInterfaceName} {
     //                                                                  Important Accessor
     //                                                                  ==================
     /**
-     * Get table db-name.
-     * 
-     * @return Table db-name. (NotNull)
+     * Get table DB-name.
+     * @return Table DB-name. (NotNull)
      */
     public String getTableDbName();
+	
+    /**
+     * Get table SQL-name.
+     * @return Table SQL-name. (NotNull)
+     */
+    public String getTableSqlName() {
+        return "${table.tableSqlName}";
+    }
 
     /**
      * Get real alias name(that has nest level mark).
-     * 
      * @return Real alias name. (NotNull)
      */
     public String getRealAliasName();
 
     /**
      * Get real column name(with real alias name).
-     * 
      * @param columnName Column name without alias name. (NotNull)
      * @return Real column name. (NotNull)
      */
@@ -37,42 +41,36 @@ public interface ${glConditionQueryInterfaceName} {
 
     /**
      * Get child query.
-     * 
      * @return Child query. (Nullable)
      */
     public ${glConditionQueryInterfaceName} getChildQuery();
 
     /**
      * Get sql clause.
-     * 
      * @return Sql clause. (NotNull)
      */
     public ${glSqlClauseName} getSqlClause();
 
     /**
      * Get alias name.
-     * 
      * @return Alias name. (NotNull)
      */
     public String getAliasName();
 
     /**
      * Get nest level.
-     * 
      * @return Nest level.
      */
     public int getNestLevel();
 
     /**
      * Get next nest level.
-     * 
      * @return Next nest level.
      */
     public int getNextNestLevel();
 
     /**
      * Is base query?
-     * 
      * @param query Condition query. (NotNull)
      * @return Determination.
      */
@@ -80,15 +78,13 @@ public interface ${glConditionQueryInterfaceName} {
 
 	/**
 	 * Get the level of subQuery.
-	 * 
 	 * @return The level of subQuery.
 	 */
 	public int getSubQueryLevel();
 	
     /**
-     * Get the property name of foreign.
-     * 
-     * @return The property name of foreign. (NotNull)
+     * Get the property name of foreign relation.
+     * @return The property name of foreign relation. (NotNull)
      */
     public String getForeignPropertyName();
 
@@ -97,7 +93,6 @@ public interface ${glConditionQueryInterfaceName} {
     //                                                                              ======
     /**
      * Invoke getting value.
-     * 
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @return The conditionValue. (NotNull)
      */
@@ -105,7 +100,6 @@ public interface ${glConditionQueryInterfaceName} {
 
     /**
      * Invoke setting query.
-     * 
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @param conditionKeyName The name of the conditionKey. (NotNull)
      * @param value The value of the condition. (NotNull)
@@ -114,7 +108,6 @@ public interface ${glConditionQueryInterfaceName} {
 
     /**
      * Invoke adding orderBy.
-     * 
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @param isAsc Is it ascend?
      */
@@ -122,7 +115,6 @@ public interface ${glConditionQueryInterfaceName} {
 
     /**
      * Invoke getting foreign conditionQuery.
-     * 
      * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      */
