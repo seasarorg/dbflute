@@ -22,9 +22,7 @@ public interface ${glConditionQueryInterfaceName} {
      * Get table SQL-name.
      * @return Table SQL-name. (NotNull)
      */
-    public String getTableSqlName() {
-        return "${table.tableSqlName}";
-    }
+    public String getTableSqlName();
 
     /**
      * Get real alias name(that has nest level mark).
