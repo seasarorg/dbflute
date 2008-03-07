@@ -7,6 +7,10 @@ import org.seasar.framework.container.S2Container;
 import org.springframework.context.ApplicationContext;
 #end
 
+import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+
 /**
  * The abstract class of cache-selector.
  * @author ${database.ClassAuthor}

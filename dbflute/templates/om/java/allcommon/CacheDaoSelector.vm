@@ -1,7 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
+import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
+import ${glPackageBaseCommon}.${glDaoSelectorInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
 
 /**
  * The implementation of dao-selector.

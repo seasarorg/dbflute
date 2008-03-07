@@ -19,7 +19,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** The key-to-lower map of db-name and property-name for table. */
+    /** The key-to-lower map of DB-name and property-name for table. */
     protected static final Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
     static {
         Map<String, String> tmpMap = new LinkedHashMap<String, String>();
@@ -31,7 +31,7 @@ public class ${myClassName} {
         _tableDbNamePropertyNameKeyToLowerMap = Collections.unmodifiableMap(tmpMap);
     }
 
-    /** The key-to-lower map of property-name and db-name for table. */
+    /** The key-to-lower map of property-name and DB-name for table. */
     protected static final Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
     static {
         Map<String, String> tmpMap = new LinkedHashMap<String, String>();
@@ -64,6 +64,13 @@ public class ${myClassName} {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @return The map that contains instances of dbmeta. (NotNull & NotEmpty)
+     */
+    public static Map<String, ${glDBMetaInterfaceName}> getDBMetaMap() {
+        return _tableDbNameInstanceMap;
     }
 
     // ===================================================================================

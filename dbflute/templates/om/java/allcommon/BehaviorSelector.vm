@@ -9,6 +9,11 @@ import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 public interface ${glBehaviorSelectorInterfaceName} {
 
     /**
+     * Initialize condition-bean meta data.
+     */
+    public void initializeConditionBeanMetaData();
+	
+    /**
      * Select behavior.
 	 * @param <BEHAVIOR_TYPE> The type of behavior.
      * @param behaviorType Behavior type. (NotNull)

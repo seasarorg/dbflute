@@ -1,4 +1,4 @@
-<map version="0.8.1">
+<map version="0.8.0">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
 <node CREATED="1175069378890" ID="Freemind_Link_230420394" MODIFIED="1199822211484" TEXT="jflute-tool-map">
 <node CREATED="1175142452062" ID="Freemind_Link_465193280" MODIFIED="1184829354687" POSITION="right" TEXT="Java">
@@ -953,7 +953,7 @@
 </node>
 </node>
 </node>
-<node CREATED="1184818183078" FOLDED="true" ID="Freemind_Link_249127485" MODIFIED="1184829367968" TEXT="PostgreSQL">
+<node CREATED="1184818183078" ID="Freemind_Link_249127485" MODIFIED="1184829367968" TEXT="PostgreSQL">
 <node CREATED="1203863647443" FOLDED="true" ID="Freemind_Link_1430427710" MODIFIED="1203863653663" TEXT="Architecture">
 <node CREATED="1203863657611" ID="Freemind_Link_1963038693" MODIFIED="1203863660767" TEXT="&#x8ffd;&#x8a18;&#x578b;"/>
 </node>
@@ -1034,6 +1034,9 @@
 <node CREATED="1203867585262" FOLDED="true" ID="Freemind_Link_1048808702" MODIFIED="1203867587337" TEXT="*solutions">
 <node CREATED="1203867587839" ID="Freemind_Link_1022427723" MODIFIED="1203867741873" TEXT="Update at first and subsequently insert if the update result is zero."/>
 </node>
+</node>
+<node CREATED="1204864016931" FOLDED="true" ID="Freemind_Link_1272061110" MODIFIED="1204864020468" TEXT="*ref-url">
+<node CREATED="1204864020904" ID="Freemind_Link_366698645" MODIFIED="1204864021492" TEXT="http://www.postgresql.org/docs/faqs.FAQ_japanese.html"/>
 </node>
 </node>
 </node>

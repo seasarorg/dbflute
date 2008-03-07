@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.seasar.framework.beans.MethodNotFoundRuntimeException;
 import org.seasar.dao.DaoMetaData;
 import org.seasar.dao.DaoMetaDataFactory;
 import org.seasar.dao.SqlCommand;
@@ -76,6 +77,11 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         final java.lang.reflect.Method method = invocation.getMethod();
         if (!org.seasar.framework.util.MethodUtil.isAbstract(method)) {
             return invocation.proceed();
+        }
+		
+        if (method.getName().equals("initializeDaoMetaData")) {
+            initializeSqlCommand(invocation);
+            return null;
         }
 
         if (_log.isDebugEnabled()) {
@@ -161,6 +167,31 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // ===================================================================================
     //                                                                          SqlCommand
     //                                                                          ==========
+    protected void initializeSqlCommand(MethodInvocation invocation) {
+        final Class<?> targetType = getTargetClass(invocation);
+        final DaoMetaData dmd = daoMetaDataFactory_.getDaoMetaData(targetType);
+        if (${glOutsideSqlDaoName}.class.isAssignableFrom(targetType)) {
+            return;// Do nothing!
+        } else {
+            final Object[] arguments = invocation.getArguments();
+            if (arguments != null && arguments.length > 0 && arguments[0] instanceof String) {
+                final String methodName = (String)arguments[0];
+                try {
+                    dmd.getSqlCommand(methodName);
+                } catch (MethodNotFoundRuntimeException ignored) {
+                    // Do nothing!
+					if (_log.isDebugEnabled()) {
+					    _log.debug("Not Found the method: " + methodName + " msg=" + ignored.getMessage());
+					}
+                }
+                return;
+            } else {
+                String msg = "The method should have one string argument as method name: " + invocation;
+                throw new IllegalStateException(msg);
+            }
+        }
+    }
+    
     protected SqlCommand findSqlCommand(MethodInvocation invocation) {
         final SqlCommand cmd;
         final Class<?> targetType = getTargetClass(invocation);
@@ -440,7 +471,7 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
         _log.debug("SqlCommand Initialization Cost: [" + ${glTraceViewUtilName}.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
 
-    protected void assertRetType(Class retType, Object ret) {
+    protected void assertRetType(Class<?> retType, Object ret) {
         if (java.util.List.class.isAssignableFrom(retType)) {
             if (ret != null && !(ret instanceof java.util.List)) {
                 String msg = "The retType is difference from actual return: ";
@@ -459,14 +490,14 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     // ===================================================================================
     //                                                                        Trace Return
     //                                                                        ============
-    protected void traceReturn(org.aopalliance.intercept.MethodInvocation invocation, Class retType, Object ret, long before, long after) throws Throwable {
+    protected void traceReturn(org.aopalliance.intercept.MethodInvocation invocation, Class<?> retType, Object ret, long before, long after) throws Throwable {
         try {
             final String daoResultPrefix = "===========/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + " - ";
             if (java.util.List.class.isAssignableFrom(retType)) {
                 if (ret == null) {
                     _log.debug(daoResultPrefix + "Selected list: null]");
                 } else {
-                    final java.util.List ls = (java.util.List) ret;
+                    final java.util.List<?> ls = (java.util.List<?>) ret;
                     if (ls.isEmpty()) {
                         _log.debug(daoResultPrefix + "Selected list: 0]");
                     } else if (ls.size() == 1 && ls.get(0) instanceof Number) {

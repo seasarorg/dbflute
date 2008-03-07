@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 import javax.sql.DataSource;
 
@@ -43,7 +43,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     //                                                                          Definition
     //                                                                          ==========
     /** Log-instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoInterceptor}.class);
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDaoMetaDataFactoryImpl}.class);
 
     // -----------------------------------------------------
     //                                           For Logging
@@ -168,6 +168,7 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
             sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) was not found!");
         }
         _log.info(sb);
+		
         ${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
     }

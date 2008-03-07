@@ -59,7 +59,7 @@ public class ${myClassName} {
 		}
         _defaultStatementConfig = defaultStatementConfig;
     }
-	
+
     // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============
