@@ -9,13 +9,36 @@ namespace ${glPackageBaseCommonSqlClause} {
 [System.Serializable]
 public class ${myClassName} : ${glSqlClauseAbstractName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _fetchScopeSelectHint = "";
     protected String _fetchScopeSqlSuffix = "";
     protected String _lockSqlSuffix = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public ${myClassName}(String tableName)
         : base(tableName) {}
 
+    // ===================================================================================
+    //                                                          Database Original Override
+    //                                                          ==========================
+    protected override String buildUnionClause(String selectClause) {
+	
+	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	    // Remove select-hint comment from select clause of union
+		// for fetch-scope with union().
+	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        selectClause = replaceString(selectClause, SELECT_HINT, "");
+        return base.buildUnionClause(selectClause);
+    }
+	
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
     protected override void doFetchFirst() {
         doFetchPage();
     }
@@ -43,6 +66,9 @@ public class ${myClassName} : ${glSqlClauseAbstractName} {
         _fetchScopeSqlSuffix = "";
     }
 
+    // ===================================================================================
+    //                                                                       Lock Override
+    //                                                                       =============
     public override ${glSqlClauseInterfaceName} lockForUpdate() {
         ${glDBMetaInterfaceName} dbmeta = ${glDBMetaInstanceHandlerName}.FindDBMeta(_tableName);
         if (dbmeta.HasPrimaryKey) {
@@ -57,6 +83,9 @@ public class ${myClassName} : ${glSqlClauseAbstractName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Hint Override
+    //                                                                       =============
     protected override String createSelectHint() {
         return _fetchScopeSelectHint;
     }

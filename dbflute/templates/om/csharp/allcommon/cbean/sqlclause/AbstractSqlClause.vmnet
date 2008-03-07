@@ -156,7 +156,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
 	    return buildClauseFromWhereAsTemplate(true);
 	}
 	
-    protected String buildClauseFromWhereAsTemplate(bool template) {
+    protected virtual String buildClauseFromWhereAsTemplate(bool template) {
         StringBuilder sb = new StringBuilder(512);
         sb.append(getFromClause());
         sb.append(getFromHint());
@@ -166,7 +166,7 @@ public abstract class ${myClassName} : ${glSqlClauseInterfaceName} {
         return sb.toString();
 	}
 	
-    protected String buildUnionClause(String selectClause) {
+    protected virtual String buildUnionClause(String selectClause) {
         StringBuilder sb = new StringBuilder();
         for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
              UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
