@@ -813,8 +813,8 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 
     // ===================================================================================
-    //                                                                             Advance
-    //                                                                             =======
+    //                                                                          FetchScope
+    //                                                                          ==========
     /**
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)

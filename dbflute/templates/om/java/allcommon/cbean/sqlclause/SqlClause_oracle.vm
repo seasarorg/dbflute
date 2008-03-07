@@ -13,6 +13,9 @@ import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
  */
 public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** String of fetch-scope as select-hint. */
     protected String _fetchScopeSelectHint = "";
 
@@ -22,15 +25,35 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
-     * 
      * @param tableName Table name. (NotNull)
      **/
     public ${myClassName}(String tableName) {
         super(tableName);
     }
 
+    // ===================================================================================
+    //                                                          Database Original Override
+    //                                                          ==========================
+    @Override
+    protected String buildUnionClause(String selectClause) {
+	
+	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	    // Remove select-hint comment from select clause of union
+		// for fetch-scope with union().
+	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        selectClause = replaceString(selectClause, SELECT_HINT, "");
+        return super.buildUnionClause(selectClause);
+    }
+	
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
     /**
      * ${database.ImplementComment}
      */
@@ -67,9 +90,11 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
         _fetchScopeSqlSuffix = "";
     }
 
+    // ===================================================================================
+    //                                                                       Lock Override
+    //                                                                       =============
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glSqlClauseInterfaceName} lockForUpdate() {
@@ -84,9 +109,11 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Hint Override
+    //                                                                       =============
     /**
      * ${database.ImplementComment}
-     * 
      * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
@@ -95,7 +122,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
@@ -104,7 +130,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
@@ -113,7 +138,6 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
