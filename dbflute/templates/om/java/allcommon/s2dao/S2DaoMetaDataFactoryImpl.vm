@@ -345,6 +345,9 @@ public class ${glDaoMetaDataFactoryImpl} implements DaoMetaDataFactory, Disposab
     //                                                                             Dispose
     //                                                                             =======
     public synchronized void dispose() {
+	    if (${glDBFluteConfig}.getInstance().isConditionBeanMetaDataInitialized()) {
+		    return;
+		}
         daoMetaDataCache.clear();
         initialized = false;
     }

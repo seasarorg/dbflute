@@ -9,7 +9,8 @@ import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 public interface ${glBehaviorSelectorInterfaceName} {
 
     /**
-     * Initialize condition-bean meta data.
+     * Initialize condition-bean meta data. <br />
+	 * If you call this, Hot Deploy of OutsideSql becomes Cool!
      */
     public void initializeConditionBeanMetaData();
 	

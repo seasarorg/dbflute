@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
@@ -31,7 +32,8 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
     //                                                                          Initialize
     //                                                                          ==========
     /**
-     * Initialize condition-bean meta data.
+     * Initialize condition-bean meta data. <br />
+	 * If you call this, Hot Deploy of OutsideSql becomes Cool!
      */
     public void initializeConditionBeanMetaData() {
         final Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.getDBMetaMap();
@@ -49,6 +51,9 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
 			}
 			dao.initializeDaoMetaData("selectList");
         }
+		${glDBFluteConfig}.getInstance().unlock();
+		${glDBFluteConfig}.getInstance().setConditionBeanMetaDataInitialized(true);
+		${glDBFluteConfig}.getInstance().lock();
 	    if (_log.isDebugEnabled()) {
 		    long after = System.currentTimeMillis();
 		    _log.debug("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + "]");

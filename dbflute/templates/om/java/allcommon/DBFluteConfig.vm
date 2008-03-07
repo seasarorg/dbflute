@@ -22,6 +22,7 @@ public class ${myClassName} {
     //                                                                           Attribute
     //                                                                           =========
 	protected ${glStatementConfig} _defaultStatementConfig;
+	protected boolean _conditionBeanMetaDataInitialized;
 	protected boolean _internalDebug;
 	protected boolean _locked = true;
 	
@@ -55,11 +56,26 @@ public class ${myClassName} {
     public void setDefaultStatementConfig(${glStatementConfig} defaultStatementConfig) {
 	    assertNotLocked();
 	    if (_log.isInfoEnabled()) {
-		    _log.info("...Setting default statement config: " + defaultStatementConfig);
+		    _log.info("...Setting defaultStatementConfig: " + defaultStatementConfig);
 		}
         _defaultStatementConfig = defaultStatementConfig;
     }
 
+    // ===================================================================================
+    //                                                             ConditionBean Meta Data
+    //                                                             =======================
+	public boolean isConditionBeanMetaDataInitialized() {
+	    return _conditionBeanMetaDataInitialized;
+	}
+	
+	public void setConditionBeanMetaDataInitialized(boolean conditionBeanMetaDataInitialized) {
+	    assertNotLocked();
+	    if (_log.isInfoEnabled()) {
+		    _log.info("...Setting conditionBeanMetaDataInitialized: " + conditionBeanMetaDataInitialized);
+		}
+	    _conditionBeanMetaDataInitialized = conditionBeanMetaDataInitialized;
+	}
+	
     // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============
@@ -70,7 +86,7 @@ public class ${myClassName} {
 	public void setInternalDebug(boolean internalDebug) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Setting internal debug: " + internalDebug);
+		    _log.info("...Setting internalDebug: " + internalDebug);
 		}
 	    _internalDebug = internalDebug;
 	}
