@@ -1,15 +1,42 @@
 
 using System;
-
 using Seasar.Quill;
 
+using ${glPackageBaseCommon};
 using ${glPackageBaseCommonBhv};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommon} {
 
     public class ${glCacheBehaviorSelectorName} : ${glBehaviorSelectorInterfaceName} {
 
+        // ===================================================================================
+        //                                                                          Initialize
+        //                                                                          ==========
+        // public void InitializeConditionBeanMetaData() {
+        //     Map<String, ${glDBMetaInterfaceName}> dbmetaMap = ${glDBMetaInstanceHandlerName}.getDBMetaMap();
+        //     Collection<${glDBMetaInterfaceName}> dbmetas = dbmetaMap.values();
+        //     DateTime before = 0;
+        //     if (_log.IsDebugEnabled) {
+        //         before = DateTime.Now;
+        //         _log.Debug("/= = = = = = = = = = = = = = = = = initializeConditionBeanMetaData()");
+        //     }
+        //     for (${glDBMetaInterfaceName} dbmeta : dbmetas) {
+        //         ${glBehaviorReadableInterfaceName} bhv = byName(dbmeta.getTableDbName());
+        //         ${glDaoReadableInterfaceName} dao = bhv.getDaoReadable();
+        //         if (_log.IsDebugEnabled) {
+        //             _log.Debug("[" + dbmeta.TableDbName + "]");
+        //         }
+        //         dao.InitializeDaoMetaData("selectList");
+        //     }
+        //     if (_log.IsDebugEnabled) {
+        //         DateTime after = DateTime.Now;
+        //         _log.Debug("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + "]");
+        //     }
+        // }
+    
         // ===============================================================================
         //                                                                  Implementation
         //                                                                  ==============

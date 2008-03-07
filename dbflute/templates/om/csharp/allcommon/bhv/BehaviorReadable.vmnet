@@ -18,32 +18,17 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        /// <summary>
-        /// The property of table db-Name. (readonly)
-        /// </summary>
         String TableDbName { get; }
 
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
-        /// <summary>
-        /// The property of DBMeta. (readonly)
-        /// </summary>
         ${glDBMetaInterfaceName} DBMeta { get; }
 
         // ===============================================================================
         //                                                                    New Instance
         //                                                                    ============
-        /// <summary>
-        /// New entity.
-        /// </summary>
-        /// <returns>Entity. (NotNull)</returns>
         ${glEntityInterfaceName} NewEntity();
-
-        /// <summary>
-        /// New condition-bean.
-        /// </summary>
-        /// <returns>Condition-bean. (NotNull)</returns>
         ${glConditionBeanInterfaceName} NewConditionBean();
 
         // ===============================================================================
