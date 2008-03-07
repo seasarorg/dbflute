@@ -148,7 +148,7 @@ public interface ${myClassName} extends ${InterfaceName} {
 #end
 #if ($table.isUseSequence())
 
-    public String selectNextVal_SQL = "${table.SequenceNextSql}";
+    public String selectNextVal_SQL = "${table.sequenceNextSql}";
     public ${table.sequenceReturnType} selectNextVal();
 #end
 }

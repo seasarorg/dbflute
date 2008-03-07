@@ -2007,7 +2007,6 @@ public class Table implements IDMethod {
 
     /**
      * Get the value of sequence name from definition map.
-     * 
      * @return Defined sequence name. (NotNull)
      */
     public String getDefinedSequenceName() {
@@ -2023,16 +2022,21 @@ public class Table implements IDMethod {
 
     /**
      * Get the value of sequence-next-sql as java name.
-     * 
-     * @return Name.
+     * @return Name.　(NotNull)
      */
-    public String getSequenceNextSql() {
+    public String getSequenceNextSql() {// For String Literal in Program.
         final String sequenceName = getDefinedSequenceName();
         if (sequenceName == null) {
             return "";
         }
         String result = getDatabase().getSequenceNextSql();
         result = DfPropertyUtil.convertAll(result, "$$sequenceName$$", sequenceName);
+        
+        // Escape double quotation for String Literal.
+        if (result.contains("\"")) {
+            result = DfPropertyUtil.convertAll(result, "\"", "\\\"");
+        }
+        
         return result;
     }
 
