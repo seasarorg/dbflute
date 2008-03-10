@@ -19,6 +19,7 @@
   <property name="dbflute.teeda.example.dir" value="${workspace.base}/dbflute-teeda-example"/>
   <property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
   <property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
+  <property name="dbflute.multipledb.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
   <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
 
   <target name="dist" description="==> generates distribution">
@@ -91,6 +92,11 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  	
+    <copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
   <target name="reflectvarious" description="==> reflect to test application">
