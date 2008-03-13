@@ -532,6 +532,36 @@ namespace ${glPackageBaseCommonS2Dao} {
 		protected bool IsEntity(Type beanType) {
             return typeof(Entity).IsAssignableFrom(beanType);
         }
+        public override bool HasModifiedPropertyNamesPropertyName {
+            get {
+                return BeanType.GetProperty(_modifiedPropertyNamesPropertyName) != null;
+            }
+        }
+        public override bool HasClearModifiedPropertyNamesMethodName {
+            get {
+                return BeanType.GetMethod(_clearModifiedPropertyNamesMethodName) != null;
+            }
+        }
+        public override IDictionary GetModifiedPropertyNames(object bean) {
+            string propertyNames = _modifiedPropertyNamesPropertyName;
+            if (!HasModifiedPropertyNamesPropertyName) {
+                throw new NotFoundModifiedPropertiesRuntimeException(bean.GetType().Name, propertyNames);
+            }
+            PropertyInfo modifiedPropertyType = BeanType.GetProperty(propertyNames);
+            object value = modifiedPropertyType.GetValue(bean, null);
+            IDictionary names = (IDictionary)value;
+            return names;
+        }
+        public override void ClearModifiedPropertyNames(object bean) {
+            if (HasClearModifiedPropertyNamesMethodName) {
+                MethodInfo mi = BeanType.GetMethod(ClearModifiedPropertyNamesMethodName);
+                mi.Invoke(bean, null);
+            } else if (HasModifiedPropertyNamesPropertyName) {
+                PropertyInfo pi = BeanType.GetProperty(ModifiedPropertyNamesPropertyName);
+                IDictionary modifiedPropertyNames = (IDictionary)pi.GetValue(bean, null);
+                modifiedPropertyNames.Clear();
+            }
+        }
     }
 	
     public class BeanMetaDataExtension : BeanMetaDataDBFluteDBMetaExtension {
