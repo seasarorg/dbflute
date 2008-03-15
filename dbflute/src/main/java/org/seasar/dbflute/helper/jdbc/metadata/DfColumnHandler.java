@@ -119,14 +119,20 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         if (dbTypeName == null) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
             return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("char")) {
+        } else if (dbTypeName.toLowerCase().contains("varchar")) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
+            return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("char")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.CHAR);
+            return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("timestamp")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.TIMESTAMP);
             return torqueType;
         } else if (dbTypeName.toLowerCase().contains("date")) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.DATE);
             return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("timestamp")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.TIMESTAMP);
+        } else if (dbTypeName.toLowerCase().contains("clob")) {
+            final String torqueType = TypeMap.getTorqueType(java.sql.Types.CLOB);
             return torqueType;
         } else {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
