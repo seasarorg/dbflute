@@ -108,8 +108,8 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             try {
                 return TypeMap.getTorqueType(sqlTypeCode);
             } catch (RuntimeException e) {
-                String msg = "Not found the sqlTypeCode in TypeMap: sqlTypeCode=";
-                msg = msg + sqlTypeCode + " message=" + e.getMessage();
+                String msg = "Not found the sqlTypeCode in TypeMap: columnMetaInfo=";
+                msg = msg + columnMetaInfo + " message=" + e.getMessage();
                 _log.warn(msg);
             }
         }
@@ -227,6 +227,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
         public void setSql2EntityTableName(String sql2entityTableName) {
             this.sql2entityTableName = sql2entityTableName;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcTypeCode
+                    + ", " + required + ", " + defaultValue + "}";
         }
     }
 

@@ -386,7 +386,6 @@ public class TypeMap {
         if (!_jdbcIntToTorqueTypeMap.containsKey(jdbcType)) {
             String msg = "_jdbcIntToTorqueTypeMap doesn't contain the type as key: ";
             msg = msg + "key=" + jdbcType + " map=" + _jdbcIntToTorqueTypeMap;
-            _log.warn(msg);
             throw new IllegalStateException(msg);
         }
         return _jdbcIntToTorqueTypeMap.get(jdbcType);
