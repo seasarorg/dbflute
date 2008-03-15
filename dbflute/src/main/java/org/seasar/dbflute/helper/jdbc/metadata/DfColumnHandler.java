@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInfo;
 
 /**
@@ -32,8 +33,14 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInf
  */
 public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfColumnHandler.class);
 
+    // ===================================================================================
+    //                                                                        Meta Getting
+    //                                                                        ============
     /**
      * Retrieves all the column names and types for a given table from
      * JDBC metadata.  It returns a List of Lists.  Each element
@@ -86,9 +93,18 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return columns;
     }
 
+    // ===================================================================================
+    //                                                                 Torque Type Getting
+    //                                                                 ===================
     public String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
         final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
         if (Types.OTHER != sqlTypeCode) {
+
+            // For compatible to Oracle's JDBC driver.
+            if (isOracleCompatibleDate(sqlTypeCode, columnMetaInfo.getDbTypeName())) {
+                return getDateTorqueType();
+            }
+
             try {
                 return TypeMap.getTorqueType(sqlTypeCode);
             } catch (RuntimeException e) {
@@ -117,7 +133,22 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             return torqueType;
         }
     }
-    
+
+    protected boolean isOracleCompatibleDate(final int sqlTypeCode, final String dbTypeName) {
+        return isOracle() && java.sql.Types.TIMESTAMP == sqlTypeCode && "date".equalsIgnoreCase(dbTypeName);
+    }
+
+    protected String getDateTorqueType() {
+        return TypeMap.getTorqueType(java.sql.Types.DATE);
+    }
+
+    protected boolean isOracle() {
+        return DfBuildProperties.getInstance().getBasicProperties().isDatabaseOracle();
+    }
+
+    // ===================================================================================
+    //                                                                    Column Meta Info
+    //                                                                    ================
     public static class DfColumnMetaInfo {
         protected String columnName;
         protected int jdbcTypeCode;
@@ -143,7 +174,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         public void setColumnSize(int columnSize) {
             this.columnSize = columnSize;
         }
-        
+
         public int getDecimalDigits() {
             return decimalDigits;
         }
@@ -151,7 +182,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         public void setDecimalDigits(int decimalDigits) {
             this.decimalDigits = decimalDigits;
         }
-        
+
         public String getDefaultValue() {
             return defaultValue;
         }
@@ -183,11 +214,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         public void setDbTypeName(String sqlTypeName) {
             this.dbTypeName = sqlTypeName;
         }
-        
+
         public String getSql2EntityableName() {
             return sql2entityTableName;
         }
-        
+
         public void setSql2EntityTableName(String sql2entityTableName) {
             this.sql2entityTableName = sql2entityTableName;
         }

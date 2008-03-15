@@ -89,13 +89,13 @@ import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
 
 /**
- * This class generates an XML schema of an existing database from JDBC metadata..
- * <p>
- * @author mkubo
- * @version $Revision$ $Date$
+ * @author Modified by jflute
  */
 public class TorqueJDBCTransformTask extends DfAbstractTask {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
 
     public static final int IDX_COLUMN_NAME = 0;
@@ -112,18 +112,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         return false;
     }
 
-    // ==============================================================================
-    //                                                                      Attribute
-    //                                                                      =========
-    // ------------------------------------
-    //                        Database Info
-    //                        -------------
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                         Database Info
+    //                                         -------------
     /** Name of XML database schema produced. */
     protected String _xmlSchema;
 
-    // ------------------------------------
-    //                        Document Info
-    //                        -------------
+    // -----------------------------------------------------
+    //                                         Document Info
+    //                                         -------------
     /** DOM document produced. */
     protected DocumentImpl _doc;
 
@@ -133,25 +133,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /** Hashtable to track what table a column belongs to. */
     protected Hashtable<String, String> _columnTableMap;
 
-    // ------------------------------------
-    //                              Handler
-    //                              -------
+    // -----------------------------------------------------
+    //                                               Handler
+    //                                               -------
     protected DfTableNameHandler _tableNameHandler = new DfTableNameHandler();
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
     protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler();
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
 
-    // ==============================================================================
-    //                                                                       Accessor
-    //                                                                       ========
-    public void setOutputFile(String v) {
-        _xmlSchema = v;
-    }
-
-    // ==============================================================================
-    //                                                                    Main Method
-    //                                                                    ===========
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     @Override
     protected void doExecute() {
         _log.info("------------------------------------------------------- [Torque - JDBCToXMLSchema] Start!");
@@ -349,6 +342,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _doc.appendChild(_databaseNode);
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
     }
@@ -490,5 +486,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
         return _columnHandler.getColumns(dbMeta, _schema, tableMetaInfo);
+    }
+    
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setOutputFile(String v) {
+        _xmlSchema = v;
     }
 }

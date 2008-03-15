@@ -170,8 +170,10 @@ public class TypeMap {
     //                                                                            Type Map
     //                                                                            ========
     private static Hashtable<String, String> _jdbcToJavaNativeMap = null;
-    private static Hashtable<String, String> _jdbcToTorqueTypeMap = null;
     private static Hashtable<Integer, String> _jdbcIntToTorqueTypeMap = null;
+
+    // TODO: @jflute -- Unnecessary
+    //    private static Hashtable<String, String> _jdbcToTorqueTypeMap = null;
 
     // ===================================================================================
     //                                                                    Initialized Mark
@@ -244,6 +246,7 @@ public class TypeMap {
         _jdbcToJavaNativeMap.put(BOOLEANCHAR, getJavaNativeByJdbc(BOOLEANCHAR, BOOLEANCHAR_NATIVE_TYPE));
         _jdbcToJavaNativeMap.put(BOOLEANINT, getJavaNativeByJdbc(BOOLEANINT, BOOLEANINT_NATIVE_TYPE));
 
+        // TODO: @jflute -- Unnecessary
         //            _jdbcToJavaNativeMap.put(CHAR, CHAR_NATIVE_TYPE);
         //            _jdbcToJavaNativeMap.put(VARCHAR, VARCHAR_NATIVE_TYPE);
         //            _jdbcToJavaNativeMap.put(LONGVARCHAR, LONGVARCHAR_NATIVE_TYPE);
@@ -268,28 +271,29 @@ public class TypeMap {
         //            _jdbcToJavaNativeMap.put(BOOLEANCHAR, BOOLEANCHAR_NATIVE_TYPE);
         //            _jdbcToJavaNativeMap.put(BOOLEANINT, BOOLEANINT_NATIVE_TYPE);
 
-        _jdbcToTorqueTypeMap = new Hashtable<String, String>();
-        _jdbcToTorqueTypeMap.put(CHAR, CHAR);
-        _jdbcToTorqueTypeMap.put(VARCHAR, VARCHAR);
-        _jdbcToTorqueTypeMap.put(LONGVARCHAR, LONGVARCHAR);
-        _jdbcToTorqueTypeMap.put(CLOB, CLOB);
-        _jdbcToTorqueTypeMap.put(NUMERIC, NUMERIC);
-        _jdbcToTorqueTypeMap.put(DECIMAL, DECIMAL);
-        _jdbcToTorqueTypeMap.put(BIT, BIT);
-        _jdbcToTorqueTypeMap.put(TINYINT, TINYINT);
-        _jdbcToTorqueTypeMap.put(SMALLINT, SMALLINT);
-        _jdbcToTorqueTypeMap.put(INTEGER, INTEGER);
-        _jdbcToTorqueTypeMap.put(BIGINT, BIGINT);
-        _jdbcToTorqueTypeMap.put(REAL, REAL);
-        _jdbcToTorqueTypeMap.put(FLOAT, FLOAT);
-        _jdbcToTorqueTypeMap.put(DOUBLE, DOUBLE);
-        _jdbcToTorqueTypeMap.put(BINARY, BINARY);
-        _jdbcToTorqueTypeMap.put(VARBINARY, VARBINARY);
-        _jdbcToTorqueTypeMap.put(LONGVARBINARY, LONGVARBINARY);
-        _jdbcToTorqueTypeMap.put(BLOB, BLOB);
-        _jdbcToTorqueTypeMap.put(DATE, DATE);
-        _jdbcToTorqueTypeMap.put(TIME, TIME);
-        _jdbcToTorqueTypeMap.put(TIMESTAMP, TIMESTAMP);
+        // TODO: @jflute -- Unnecessary
+        //        _jdbcToTorqueTypeMap = new Hashtable<String, String>();
+        //        _jdbcToTorqueTypeMap.put(CHAR, CHAR);
+        //        _jdbcToTorqueTypeMap.put(VARCHAR, VARCHAR);
+        //        _jdbcToTorqueTypeMap.put(LONGVARCHAR, LONGVARCHAR);
+        //        _jdbcToTorqueTypeMap.put(CLOB, CLOB);
+        //        _jdbcToTorqueTypeMap.put(NUMERIC, NUMERIC);
+        //        _jdbcToTorqueTypeMap.put(DECIMAL, DECIMAL);
+        //        _jdbcToTorqueTypeMap.put(BIT, BIT);
+        //        _jdbcToTorqueTypeMap.put(TINYINT, TINYINT);
+        //        _jdbcToTorqueTypeMap.put(SMALLINT, SMALLINT);
+        //        _jdbcToTorqueTypeMap.put(INTEGER, INTEGER);
+        //        _jdbcToTorqueTypeMap.put(BIGINT, BIGINT);
+        //        _jdbcToTorqueTypeMap.put(REAL, REAL);
+        //        _jdbcToTorqueTypeMap.put(FLOAT, FLOAT);
+        //        _jdbcToTorqueTypeMap.put(DOUBLE, DOUBLE);
+        //        _jdbcToTorqueTypeMap.put(BINARY, BINARY);
+        //        _jdbcToTorqueTypeMap.put(VARBINARY, VARBINARY);
+        //        _jdbcToTorqueTypeMap.put(LONGVARBINARY, LONGVARBINARY);
+        //        _jdbcToTorqueTypeMap.put(BLOB, BLOB);
+        //        _jdbcToTorqueTypeMap.put(DATE, DATE);
+        //        _jdbcToTorqueTypeMap.put(TIME, TIME);
+        //        _jdbcToTorqueTypeMap.put(TIMESTAMP, TIMESTAMP);
 
         _jdbcIntToTorqueTypeMap = new Hashtable<Integer, String>();
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.CHAR), CHAR);
@@ -338,27 +342,31 @@ public class TypeMap {
         return _jdbcToJavaNativeMap.get(jdbcType);
     }
 
-    /**
-     * Returns Torque type constant corresponding to JDBC type code.
-     * Used but Torque JDBC task.
-     *
-     * @param jdbcType the SQL type
-     * @return Torque type constant
-     */
-    public static String getTorqueType(String jdbcType) {
-        // Make sure the we are initialized.
-        if (!_initialized) {
-            initialize();
-        }
-        if (!_jdbcToTorqueTypeMap.containsKey(jdbcType)) {
-            String msg = "_jdbcToTorqueTypeMap doesn't contain the type as key: ";
-            msg = msg + "key=" + jdbcType + " map=" + _jdbcIntToTorqueTypeMap;
-            _log.warn(msg);
-            throw new IllegalStateException(msg);
-        }
-        return _jdbcToTorqueTypeMap.get(jdbcType);
-    }
+    // TODO: @jflute -- Unnecessary
+    //    /**
+    //     * Returns Torque type constant corresponding to JDBC type code.
+    //     * Used but Torque JDBC task.
+    //     *
+    //     * @param jdbcType the SQL type
+    //     * @return Torque type constant
+    //     */
+    //    public static String getTorqueType(String jdbcType) {
+    //        // Make sure the we are initialized.
+    //        if (!_initialized) {
+    //            initialize();
+    //        }
+    //        if (!_jdbcToTorqueTypeMap.containsKey(jdbcType)) {
+    //            String msg = "_jdbcToTorqueTypeMap doesn't contain the type as key: ";
+    //            msg = msg + "key=" + jdbcType + " map=" + _jdbcIntToTorqueTypeMap;
+    //            _log.warn(msg);
+    //            throw new IllegalStateException(msg);
+    //        }
+    //        return _jdbcToTorqueTypeMap.get(jdbcType);
+    //    }
 
+    // ===================================================================================
+    //                                                                  Torque Type Getter
+    //                                                                  ==================
     /**
      * Returns Torque type constant corresponding to JDBC type code.
      * Used but Torque JDBC task.
@@ -384,6 +392,9 @@ public class TypeMap {
         return _jdbcIntToTorqueTypeMap.get(jdbcType);
     }
 
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
     /**
      * Returns true if the type is boolean in the java
      * object and a numeric (1 or 0) in the database.

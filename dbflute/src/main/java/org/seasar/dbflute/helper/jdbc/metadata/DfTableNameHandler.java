@@ -29,7 +29,6 @@ import org.seasar.dbflute.DfBuildProperties;
 
 /**
  * This class generates an XML schema of an existing database from JDBC metadata..
- * <p>
  * @author jflute
  */
 public class DfTableNameHandler extends DfAbstractMetaDataHandler {
@@ -39,7 +38,6 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
     /**
      * Get all the table names in the current database that are not
      * system tables.
-     * 
      * @param dbMeta JDBC database metadata.
      * @return The list of all the table meta info in a database.
      * @throws SQLException
@@ -147,7 +145,6 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
 
     /**
      * Is the database Oracle?
-     * 
      * @return Determination.
      */
     protected boolean isOracle() {
