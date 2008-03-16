@@ -183,6 +183,12 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                             _log.warn(sb);
                             continue;
                         } else {
+                            final SQLException nextException = e.getNextException();
+                            if (nextException != null) {
+                                _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+                                _log.warn("SQLException was thrown! getNextException()=" + nextException.getClass(), nextException);
+                                _log.warn("* * * * * * * * * */");
+                            }
                             throw e;
                         }
                     } finally {
