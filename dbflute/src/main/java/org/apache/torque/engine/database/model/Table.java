@@ -1173,8 +1173,8 @@ public class Table implements IDMethod {
     public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList) {
 
-        final DfFlexibleNameMap<String, Object> localColumnNameMap = createFlexibleNameMapByKeyList(localColumnNameList);
-        final DfFlexibleNameMap<String, Object> foreignColumnNameMap = createFlexibleNameMapByKeyList(foreignColumnNameList);
+        final DfFlexibleNameMap<String, Object> localColumnNameSet = createFlexibleNameMapByKeyList(localColumnNameList);
+        final DfFlexibleNameMap<String, Object> foreignColumnNameSet = createFlexibleNameMapByKeyList(foreignColumnNameList);
 
         final ForeignKey[] fkArray = getForeignKeys();
         for (final ForeignKey key : fkArray) {
@@ -1193,18 +1193,21 @@ public class Table implements IDMethod {
                     throw new IllegalStateException(msg);
                 }
 
+                final Set<String> currentLocalColumnNameSet = new HashSet<String>(currentLocalColumnNameList);
+                final Set<String> currentForeignColumnNameSet = new HashSet<String>(currentForeignColumnNameList);
+
                 boolean sameAsLocal = false;
                 boolean sameAsForeign = false;
-                if (localColumnNameMap.size() == currentLocalColumnNameList.size()) {
-                    for (String currentLocalColumnName : currentLocalColumnNameList) {
-                        if (localColumnNameMap.containsKey(currentLocalColumnName)) {
+                if (localColumnNameSet.size() == currentLocalColumnNameSet.size()) {
+                    for (String currentLocalColumnName : currentLocalColumnNameSet) {
+                        if (localColumnNameSet.containsKey(currentLocalColumnName)) {
                             sameAsLocal = true;
                         }
                     }
                 }
-                if (foreignColumnNameMap.size() == currentForeignColumnNameList.size()) {
-                    for (String currentForeignColumnName : currentForeignColumnNameList) {
-                        if (foreignColumnNameMap.containsKey(currentForeignColumnName)) {
+                if (foreignColumnNameSet.size() == currentForeignColumnNameSet.size()) {
+                    for (String currentForeignColumnName : currentForeignColumnNameSet) {
+                        if (foreignColumnNameSet.containsKey(currentForeignColumnName)) {
                             sameAsForeign = true;
                         }
                     }
