@@ -98,7 +98,7 @@ public class DfAdditionalForeignKeyInitializer {
         for (final Table table : tableArray) {
             final List<String> localColumnNameList = getLocalColumnNameList(foreignName, foreignTableName,
                     foreignColumnNameList, table.getName(), false);
-            if (localColumnNameList == null || !table.containsColumn(localColumnNameList)) {
+            if (localColumnNameList == null || !table.containsColumnsByFlexibleName(localColumnNameList)) {
                 continue;
             }
 
@@ -128,7 +128,7 @@ public class DfAdditionalForeignKeyInitializer {
         table.addForeignKey(fk);
         getTableByFlexibleName(foreignTableName).addReferrer(fk);
         for (String foreignColumnName : foreignColumnNameList) {
-            final Column foreignColumn = getTableByFlexibleName(foreignTableName).getColumn(foreignColumnName);
+            final Column foreignColumn = getTableByFlexibleName(foreignTableName).getColumnByFlexibleName(foreignColumnName);
             foreignColumn.addReferrer(fk);
         }
     }
@@ -170,7 +170,7 @@ public class DfAdditionalForeignKeyInitializer {
         if (localColumnNameList == null || localColumnNameList.isEmpty()) {
             localColumnNameList = new ArrayList<String>();
             for (String foreignColumnName : foreignColumnNameList) {
-                final Column column = getTableByFlexibleName(localTableName).getColumn(foreignColumnName);
+                final Column column = getTableByFlexibleName(localTableName).getColumnByFlexibleName(foreignColumnName);
                 if (column == null) {
                     if (isErrorNotFound) {
                         String msg = "The localTable[" + localTableName + "] should have the columns '";
@@ -196,7 +196,7 @@ public class DfAdditionalForeignKeyInitializer {
     }
 
     protected void assertForeignTableColumn(final String foreignTableName, List<String> foreignColumnNameList) {
-        if (!getTableByFlexibleName(foreignTableName).containsColumn(foreignColumnNameList)) {
+        if (!getTableByFlexibleName(foreignTableName).containsColumnsByFlexibleName(foreignColumnNameList)) {
             String msg = "Not found column by the foreignColumnNameList: " + foreignColumnNameList;
             msg = msg + " of " + foreignTableName;
             msg = msg + " additionalForeignKeyMap=" + getAdditionalForeignKeyMap();
@@ -213,7 +213,7 @@ public class DfAdditionalForeignKeyInitializer {
     }
 
     protected void assertLocalTableColumn(final String localTableName, List<String> localColumnNameList) {
-        if (!getTableByFlexibleName(localTableName).containsColumn(localColumnNameList)) {
+        if (!getTableByFlexibleName(localTableName).containsColumnsByFlexibleName(localColumnNameList)) {
             String msg = "Not found column by the localColumnNameList: " + localColumnNameList;
             msg = msg + " of " + localTableName;
             msg = msg + " additionalForeignKeyMap=" + getAdditionalForeignKeyMap();

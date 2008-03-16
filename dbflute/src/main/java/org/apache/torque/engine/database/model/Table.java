@@ -989,19 +989,9 @@ public class Table implements IDMethod {
     //                                         -------------
     /**
      * Returns true if the table contains a specified column
-     *
-     * @param col the column
-     * @return true if the table contains the column
-     */
-    public boolean containsColumn(Column col) {
-        return _columnList.contains(col);
-    }
-
-    /**
-     * Returns true if the table contains a specified column
-     *
      * @param name name of the column
      * @return true if the table contains the column
+     * @deprecated
      */
     public boolean containsColumn(String name) {
         return _columnsByName.containsKey(name);
@@ -1009,9 +999,9 @@ public class Table implements IDMethod {
 
     /**
      * Returns true if the table contains a specified column
-     *
      * @param columnNameList the list of column name.
      * @return true if the table contains the column
+     * @deprecated
      */
     public boolean containsColumn(List<String> columnNameList) {
         for (String columnName : columnNameList) {
@@ -1021,6 +1011,16 @@ public class Table implements IDMethod {
         }
         return true;
     }
+    
+    public boolean containsColumnsByFlexibleName(List<String> columnNameList) {
+        for (String columnName : columnNameList) {
+            if (getColumnByFlexibleName(columnName) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     // ===================================================================================
     //                                                                         Foreign Key
