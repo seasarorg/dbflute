@@ -361,7 +361,7 @@ public class ForeignKey {
     public String getLocalColumnJavaNameAsOne() {
         final String columnName = getLocalColumnNameAsOne();
         final Table localTable = getTable();
-        return localTable.getColumn(columnName).getJavaName();
+        return localTable.getColumnByFlexibleName(columnName).getJavaName();
     }
 
     /**
@@ -378,7 +378,7 @@ public class ForeignKey {
         final List<Column> resultList = new ArrayList<Column>();
         for (final Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
             final String name = (String) ite.next();
-            final Column col = getTable().getColumn(name);
+            final Column col = getTable().getColumnByFlexibleName(name);
             if (col == null) {
                 String msg = "The columnName is not existing at the table: ";
                 msg = msg + "columnName=" + name + " tableName=" + getTable().getName();
@@ -423,7 +423,7 @@ public class ForeignKey {
     public String getForeignColumnJavaNameAsOne() {
         final String columnName = getForeignColumnNameAsOne();
         final Table foreignTable = getForeignTable();
-        return foreignTable.getColumn(columnName).getJavaName();
+        return foreignTable.getColumnByFlexibleName(columnName).getJavaName();
     }
 
     /**
@@ -441,7 +441,7 @@ public class ForeignKey {
         final List<Column> resultList = new ArrayList<Column>();
         for (Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
             final String name = (String) ite.next();
-            final Column foreignCol = foreignTable.getColumn(name);
+            final Column foreignCol = foreignTable.getColumnByFlexibleName(name);
             resultList.add(foreignCol);
         }
         return resultList;

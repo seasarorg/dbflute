@@ -35,6 +35,10 @@ public class DfFlexibleNameMap<T, E> {
         return (E) caseInsensitiveMap.get(removeUnderscore(flexibleName));
     }
     
+    public int size() {
+        return caseInsensitiveMap.size();
+    }
+    
     public boolean isEmpty() {
         return caseInsensitiveMap.isEmpty();
     }
@@ -43,6 +47,7 @@ public class DfFlexibleNameMap<T, E> {
         return DfStringUtil.replace(target, "_", "");
     }
     
+    @Override
     public String toString() {
         return caseInsensitiveMap.toString();
     }

@@ -55,6 +55,7 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -1011,7 +1012,7 @@ public class Table implements IDMethod {
         }
         return true;
     }
-    
+
     public boolean containsColumnsByFlexibleName(List<String> columnNameList) {
         for (String columnName : columnNameList) {
             if (getColumnByFlexibleName(columnName) == null) {
@@ -1020,7 +1021,6 @@ public class Table implements IDMethod {
         }
         return true;
     }
-
 
     // ===================================================================================
     //                                                                         Foreign Key
@@ -1173,8 +1173,8 @@ public class Table implements IDMethod {
     public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList) {
 
-        final Set<String> localColumnNameSet = new HashSet<String>(localColumnNameList);
-        final Set<String> foreignColumnNameSet = new HashSet<String>(foreignColumnNameList);
+        final DfFlexibleNameMap<String, Object> localColumnNameMap = createFlexibleNameMapByKeyList(localColumnNameList);
+        final DfFlexibleNameMap<String, Object> foreignColumnNameMap = createFlexibleNameMapByKeyList(foreignColumnNameList);
 
         final ForeignKey[] fkArray = getForeignKeys();
         for (final ForeignKey key : fkArray) {
@@ -1193,17 +1193,37 @@ public class Table implements IDMethod {
                     throw new IllegalStateException(msg);
                 }
 
-                final Set<String> currentLocalColumnNameSet = new HashSet<String>(currentLocalColumnNameList);
-                final Set<String> currentForeignColumnNameSet = new HashSet<String>(currentForeignColumnNameList);
-
-                if (localColumnNameSet.equals(currentLocalColumnNameSet)) {
-                    if (foreignColumnNameSet.equals(currentForeignColumnNameSet)) {
-                        return true;
+                boolean sameAsLocal = false;
+                boolean sameAsForeign = false;
+                if (localColumnNameMap.size() == currentLocalColumnNameList.size()) {
+                    for (String currentLocalColumnName : currentLocalColumnNameList) {
+                        if (localColumnNameMap.containsKey(currentLocalColumnName)) {
+                            sameAsLocal = true;
+                        }
                     }
+                }
+                if (foreignColumnNameMap.size() == currentForeignColumnNameList.size()) {
+                    for (String currentForeignColumnName : currentForeignColumnNameList) {
+                        if (foreignColumnNameMap.containsKey(currentForeignColumnName)) {
+                            sameAsForeign = true;
+                        }
+                    }
+                }
+                if (sameAsLocal && sameAsForeign) {
+                    return true;
                 }
             }
         }
         return false;
+    }
+
+    protected <ELEMENT_TYPE> DfFlexibleNameMap<ELEMENT_TYPE, Object> createFlexibleNameMapByKeyList(
+            List<ELEMENT_TYPE> keyList) {
+        HashMap<ELEMENT_TYPE, Object> map = new HashMap<ELEMENT_TYPE, Object>();
+        for (ELEMENT_TYPE name : keyList) {
+            map.put(name, null);
+        }
+        return new DfFlexibleNameMap<ELEMENT_TYPE, Object>(map);
     }
 
     /**
@@ -1243,6 +1263,7 @@ public class Table implements IDMethod {
     public int resolveReferrerIndexAsOne(ForeignKey foreignKey) {// oneToOne!
         return doResolveRelationIndex(foreignKey, true, true);
     }
+
     public int resolveRefererIndexAsOne(ForeignKey foreignKey) {// oneToOne!
         return resolveReferrerIndexAsOne(foreignKey);
     }
@@ -1250,6 +1271,7 @@ public class Table implements IDMethod {
     public int resolveReferrerIndex(ForeignKey foreignKey) {
         return doResolveRelationIndex(foreignKey, true, false);
     }
+
     public int resolveRefererIndex(ForeignKey foreignKey) {
         return resolveReferrerIndex(foreignKey);
     }
@@ -1382,6 +1404,7 @@ public class Table implements IDMethod {
     public boolean hasForeignKeyOrReferrer() {
         return hasForeignKey() || hasReferrer();
     }
+
     public boolean hasForeignKeyOrReferer() {
         return hasForeignKeyOrReferrer();
     }
@@ -1389,6 +1412,7 @@ public class Table implements IDMethod {
     public boolean hasForeignKeyOrReferrerAsOne() {
         return hasForeignKey() || hasReferrerAsOne();
     }
+
     public boolean hasForeignKeyOrRefererAsOne() {
         return hasForeignKeyOrReferrerAsOne();
     }
@@ -1417,6 +1441,7 @@ public class Table implements IDMethod {
     public List<ForeignKey> getReferrerList() {
         return _referrers;
     }
+
     public List<ForeignKey> getRefererList() {
         return getReferrerList();
     }
@@ -2031,12 +2056,12 @@ public class Table implements IDMethod {
         }
         String result = getDatabase().getSequenceNextSql();
         result = DfPropertyUtil.convertAll(result, "$$sequenceName$$", sequenceName);
-        
+
         // Escape double quotation for String Literal.
         if (result.contains("\"")) {
             result = DfPropertyUtil.convertAll(result, "\"", "\\\"");
         }
-        
+
         return result;
     }
 
