@@ -1178,7 +1178,7 @@ public class Table implements IDMethod {
 
         final ForeignKey[] fkArray = getForeignKeys();
         for (final ForeignKey key : fkArray) {
-            if (key.getForeignTableName().equals(foreignTableName)) {
+            if (isSameTableAsFlexible(key.getForeignTableName(), foreignTableName)) {
                 final List<String> currentLocalColumnNameList = key.getLocalColumns();
                 if (currentLocalColumnNameList == null || currentLocalColumnNameList.isEmpty()) {
                     String msg = "The foreignKey did not have local column name list: " + currentLocalColumnNameList;
@@ -1216,6 +1216,18 @@ public class Table implements IDMethod {
                     return true;
                 }
             }
+        }
+        return false;
+    }
+    
+    protected boolean isSameTableAsFlexible(String tableOne, String tableTwo) {
+        if (tableOne.equalsIgnoreCase(tableTwo)) {
+            return true;
+        }
+        tableOne = DfStringUtil.replace(tableOne, "_", "");
+        tableTwo = DfStringUtil.replace(tableTwo, "_", "");
+        if (tableOne.equalsIgnoreCase(tableTwo)) {
+            return true;
         }
         return false;
     }
