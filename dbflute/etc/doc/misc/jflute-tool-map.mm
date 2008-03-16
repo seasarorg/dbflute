@@ -1102,6 +1102,10 @@
 <node CREATED="1204864020904" ID="Freemind_Link_366698645" MODIFIED="1204864021492" TEXT="http://www.postgresql.org/docs/faqs.FAQ_japanese.html"/>
 </node>
 </node>
+<node CREATED="1205613020999" ID="Freemind_Link_1689117473" MODIFIED="1205613024638" TEXT="*ref-url">
+<node CREATED="1205613024968" ID="Freemind_Link_738929848" MODIFIED="1205613025379" TEXT="http://www.postgresqlformac.com/"/>
+<node CREATED="1205670285607" ID="Freemind_Link_544621092" MODIFIED="1205670289381" TEXT="http://www2.russbrooks.com:8080/2007/11/4/install-postgresql-on-mac-os-x-10-5-leopard"/>
+</node>
 </node>
 <node CREATED="1187674688093" FOLDED="true" ID="Freemind_Link_1803707558" MODIFIED="1198298887796" TEXT="SQLServer">
 <node CREATED="1198298865765" ID="Freemind_Link_1331306264" MODIFIED="1198299495578" TEXT="*overview">
