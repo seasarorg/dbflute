@@ -89,8 +89,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author <a href="mailto:fedor.karpelevitch@home.com">Fedor Karpelevitch</a>
  * @version $Id$
  */
-public class XmlToData extends DefaultHandler implements EntityResolver
-{
+public class XmlToData extends DefaultHandler implements EntityResolver {
     /** Logging class from commons.logging */
     private static Log log = LogFactory.getLog(XmlToData.class);
     private Database database;
@@ -101,8 +100,7 @@ public class XmlToData extends DefaultHandler implements EntityResolver
 
     private static SAXParserFactory saxFactory;
 
-    static
-    {
+    static {
         saxFactory = SAXParserFactory.newInstance();
         saxFactory.setValidating(true);
     }
@@ -110,9 +108,7 @@ public class XmlToData extends DefaultHandler implements EntityResolver
     /**
      * Default custructor
      */
-    public XmlToData(Database database, String dtdFilePath)
-            throws MalformedURLException, IOException
-    {
+    public XmlToData(Database database, String dtdFilePath) throws MalformedURLException, IOException {
         this.database = database;
         dtdFile = new File(dtdFilePath);
         this.dtdFileName = "file://" + dtdFile.getName();
@@ -122,22 +118,17 @@ public class XmlToData extends DefaultHandler implements EntityResolver
     /**
      *
      */
-    public List parseFile(String xmlFile)
-            throws Exception
-    {
+    public List parseFile(String xmlFile) throws Exception {
         data = new ArrayList<DataRow>();
 
         SAXParser parser = saxFactory.newSAXParser();
 
-        FileReader fr = new FileReader (xmlFile);
-        BufferedReader br = new BufferedReader (fr);
-        try
-        {
-            InputSource is = new InputSource (br);
+        FileReader fr = new FileReader(xmlFile);
+        BufferedReader br = new BufferedReader(fr);
+        try {
+            InputSource is = new InputSource(br);
             parser.parse(is, this);
-        }
-        finally
-        {
+        } finally {
             br.close();
         }
         return data;
@@ -146,45 +137,31 @@ public class XmlToData extends DefaultHandler implements EntityResolver
     /**
      * Handles opening elements of the xml file.
      */
-    public void startElement(String uri, String localName, String rawName,
-                             Attributes attributes)
-            throws SAXException
-    {
-        try
-        {
-            if (rawName.equals("dataset"))
-            {
+    public void startElement(String uri, String localName, String rawName, Attributes attributes) throws SAXException {
+        try {
+            if (rawName.equals("dataset")) {
                 //ignore <dataset> for now.
-            }
-            else
-            {
+            } else {
                 Table table = database.getTable(rawName);
 
-                if (table == null)
-                {
+                if (table == null) {
                     throw new SAXException("Table '" + rawName + "' unknown");
                 }
                 List<ColumnValue> columnValues = new ArrayList<ColumnValue>();
-                for (int i = 0; i < attributes.getLength(); i++)
-                {
-                    Column col = table
-                        .getColumnByJavaName(attributes.getQName(i));
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    Column col = table.getColumn(attributes.getQName(i));
 
-                    if (col == null)
-                    {
-                        throw new SAXException("Column " 
-                                + attributes.getQName(i) + " in table " 
-                                + rawName + " unknown.");
+                    if (col == null) {
+                        throw new SAXException("Column " + attributes.getQName(i) + " in table " + rawName
+                                + " unknown.");
                     }
-                        
+
                     String value = attributes.getValue(i);
                     columnValues.add(new ColumnValue(col, value));
                 }
                 data.add(new DataRow(table, columnValues));
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new SAXException(e);
         }
     }
@@ -194,26 +171,18 @@ public class XmlToData extends DefaultHandler implements EntityResolver
      *
      * @return an InputSource for the database.dtd file
      */
-    public InputSource resolveEntity(String publicId, String systemId)
-            throws SAXException
-    {
-		try 
-		{
-			if (dataDTD != null && dtdFileName.equals(systemId))
-			{
-			    log.info("Resolver: used " + dtdFile.getPath());
-			    return dataDTD;
-			}
-			else
-			{
-			    log.info("Resolver: used " + systemId);
-			    return getInputSource(systemId);
-			}
-		} 
-		catch (IOException e) 
-		{
-			throw new SAXException(e);
-		}
+    public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
+        try {
+            if (dataDTD != null && dtdFileName.equals(systemId)) {
+                log.info("Resolver: used " + dtdFile.getPath());
+                return dataDTD;
+            } else {
+                log.info("Resolver: used " + systemId);
+                return getInputSource(systemId);
+            }
+        } catch (IOException e) {
+            throw new SAXException(e);
+        }
     }
 
     /**
@@ -222,9 +191,7 @@ public class XmlToData extends DefaultHandler implements EntityResolver
      * @param urlString
      * @return an InputSource for the URL String
      */
-    public InputSource getInputSource(String urlString)
-            throws IOException
-    {
+    public InputSource getInputSource(String urlString) throws IOException {
         URL url = new URL(urlString);
         InputSource src = new InputSource(url.openStream());
         return src;
@@ -233,24 +200,20 @@ public class XmlToData extends DefaultHandler implements EntityResolver
     /**
      *
      */
-    public class DataRow
-    {
+    public class DataRow {
         private Table table;
         private List columnValues;
 
-        public DataRow(Table table, List columnValues)
-        {
+        public DataRow(Table table, List columnValues) {
             this.table = table;
             this.columnValues = columnValues;
         }
 
-        public Table getTable()
-        {
+        public Table getTable() {
             return table;
         }
 
-        public List getColumnValues()
-        {
+        public List getColumnValues() {
             return columnValues;
         }
     }
@@ -258,29 +221,24 @@ public class XmlToData extends DefaultHandler implements EntityResolver
     /**
      *
      */
-    public class ColumnValue
-    {
+    public class ColumnValue {
         private Column col;
         private String val;
 
-        public ColumnValue(Column col, String val)
-        {
+        public ColumnValue(Column col, String val) {
             this.col = col;
             this.val = val;
         }
 
-        public Column getColumn()
-        {
+        public Column getColumn() {
             return col;
         }
 
-        public String getValue()
-        {
+        public String getValue() {
             return val;
         }
 
-        public String getEscapedValue()
-        {
+        public String getEscapedValue() {
             StringBuffer sb = new StringBuffer();
             sb.append("'");
             sb.append(StringUtils.replace(val, "'", "\\'"));

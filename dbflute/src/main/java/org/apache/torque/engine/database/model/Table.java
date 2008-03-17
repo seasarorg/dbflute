@@ -57,7 +57,6 @@ package org.apache.torque.engine.database.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -134,10 +133,8 @@ public class Table implements IDMethod {
 
     private String _pkg;
 
-    private Hashtable<String, Column> _columnsByName;
-
-    private Hashtable<String, Column> _columnsByJavaName;
-
+    protected DfFlexibleNameMap<String, Column> _columnMap = new DfFlexibleNameMap<String, Column>();
+    
     private boolean _isNeedsTransactionInPostgres;
 
     private boolean _isHeavyIndexing;
@@ -170,8 +167,6 @@ public class Table implements IDMethod {
         _referrers = new ArrayList<ForeignKey>(5);
         _indices = new ArrayList<Index>(5);
         _unices = new ArrayList<Unique>(5);
-        _columnsByName = new Hashtable<String, Column>();
-        _columnsByJavaName = new Hashtable<String, Column>();
     }
 
     // ===================================================================================
@@ -876,8 +871,7 @@ public class Table implements IDMethod {
             _inheritanceColumn = col;
         }
         _columnList.add(col);
-        _columnsByName.put(col.getName(), col);
-        _columnsByJavaName.put(col.getJavaName(), col);
+        _columnMap.put(col.getName(), col);
 
         col.setPosition(_columnList.size());
         _isNeedsTransactionInPostgres |= col.requiresTransactionInPostgres();
@@ -967,22 +961,7 @@ public class Table implements IDMethod {
      * @return Return a Column object or null if it does not exist.
      */
     public Column getColumn(String name) {
-        return (Column) _columnsByName.get(name);
-    }
-
-    /**
-     * Returns a specified column.
-     *
-     * @param javaName java name of the column
-     * @return Return a Column object or null if it does not exist.
-     */
-    public Column getColumnByJavaName(String javaName) {
-        return (Column) _columnsByJavaName.get(javaName);
-    }
-
-    public Column getColumnByFlexibleName(String flexibleName) {
-        final DfFlexibleNameMap<String, Column> flexibleNameMap = new DfFlexibleNameMap<String, Column>(_columnsByName);
-        return flexibleNameMap.get(flexibleName);
+        return (Column) _columnMap.get(name);
     }
 
     // -----------------------------------------------------
@@ -995,7 +974,7 @@ public class Table implements IDMethod {
      * @deprecated
      */
     public boolean containsColumn(String name) {
-        return _columnsByName.containsKey(name);
+        return _columnMap.containsKey(name);
     }
 
     /**
@@ -1015,7 +994,7 @@ public class Table implements IDMethod {
 
     public boolean containsColumnsByFlexibleName(List<String> columnNameList) {
         for (String columnName : columnNameList) {
-            if (getColumnByFlexibleName(columnName) == null) {
+            if (getColumn(columnName) == null) {
                 return false;
             }
         }
@@ -2304,7 +2283,7 @@ public class Table implements IDMethod {
     protected static final String DEF_VERSION_NO = "version_no";
 
     protected boolean hasDefaultVersionNoColumn() {
-        return getColumnByFlexibleName(DEF_VERSION_NO) != null;
+        return getColumn(DEF_VERSION_NO) != null;
     }
 
     /**
@@ -2335,7 +2314,7 @@ public class Table implements IDMethod {
         }
         final String versionNoFieldName = getDatabase().getVersionNoFieldName();
         if ("".equals(versionNoFieldName) && hasDefaultVersionNoColumn()) {
-            final Column column = getColumnByFlexibleName(DEF_VERSION_NO);
+            final Column column = getColumn(DEF_VERSION_NO);
             return buildVersionNoJavaName(column.getName());
         } else {
             return buildVersionNoJavaName(versionNoFieldName);
@@ -2382,7 +2361,6 @@ public class Table implements IDMethod {
             return false;
         }
         final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
-        final DfFlexibleNameMap<String, Column> flexibleNameMap = new DfFlexibleNameMap<String, Column>(_columnsByName);
         for (String commonColumnName : commonColumnNameList) {
             if (commonColumnProperties.isCommonColumnConvertion(commonColumnName)) {
                 try {
@@ -2391,7 +2369,7 @@ public class Table implements IDMethod {
                     return false;
                 }
             } else {
-                if (!flexibleNameMap.containsKey(commonColumnName)) {
+                if (!_columnMap.containsKey(commonColumnName)) {
                     return false;
                 }
             }
@@ -2406,7 +2384,7 @@ public class Table implements IDMethod {
         }
         final List<String> commonColumnNameList = getDatabase().getCommonColumnNameList();
         for (String commonColumnName : commonColumnNameList) {
-            ls.add(getColumnByFlexibleName(commonColumnName));
+            ls.add(getColumn(commonColumnName));
         }
         return ls;
     }
@@ -2436,7 +2414,7 @@ public class Table implements IDMethod {
     }
 
     protected Column getCommonColumnNormal(String commonColumnName) {
-        final Column column = getColumnByFlexibleName(commonColumnName);
+        final Column column = getColumn(commonColumnName);
         if (column == null) {
             String msg = "Not found column by '" + commonColumnName + "'.";
             throw new IllegalStateException(msg);
@@ -2445,7 +2423,7 @@ public class Table implements IDMethod {
     }
 
     protected Column getCommonColumnConvertion(String commonColumnName, String filteredCommonColumn) {
-        final Column column = getColumnByFlexibleName(filteredCommonColumn);
+        final Column column = getColumn(filteredCommonColumn);
         if (column == null) {
             String msg = "Not found column by '" + filteredCommonColumn + "'. Original name is '" + commonColumnName
                     + "'.";

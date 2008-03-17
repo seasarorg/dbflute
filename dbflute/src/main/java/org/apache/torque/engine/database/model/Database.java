@@ -505,7 +505,7 @@ public class Database {
                     final List<String> columnNameList = tableElementMap.get(tableName);
                     for (String columnName : columnNameList) {
                         _log.debug("            " + columnName);
-                        final Column targetColumn = targetTable.getColumnByFlexibleName(columnName);
+                        final Column targetColumn = targetTable.getColumn(columnName);
                         if (targetColumn == null) {
                             String msg = "The column[" + targetColumn
                                     + "] of includeQueryMap was not found in the table[" + tableName + "]";

@@ -298,7 +298,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         foreignInfo.setForeignDBMeta(${foreignKeys.foreignTableDBMetaClassName}.getInstance());
         final Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $foreignKeys.localColumnList)
-        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${foreignKeys.getForeignColumnByLocalColumn(${column}).javaBeansRulePropertyNameInitCap}());
+#set ($yourColumn = ${foreignKeys.getForeignColumnByLocalColumn(${column})})
+        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${foreignKeys.foreignTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
 #end
         foreignInfo.setLocalForeignColumnInfoMap(map);
         foreignInfo.setRelationNo(${table.resolveForeignIndex($foreignKeys)});
@@ -317,7 +318,8 @@ public class ${myClassName} extends ${glDBMetaAbstractName} {
         foreignInfo.setForeignDBMeta(${referrer.referrerTableDBMetaClassName}.getInstance());
         final Map<${genericsColumnInfoMap}> map = new LinkedHashMap<${genericsColumnInfoMap}>();
 #foreach ($column in $referrer.foreignColumnList)
-        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap}());
+#set ($yourColumn = ${referrer.getLocalColumnByForeignColumn(${column})})
+        map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
 #end
         foreignInfo.setLocalForeignColumnInfoMap(map);
         foreignInfo.setRelationNo(${table.resolveReferrerIndexAsOne($referrer)});

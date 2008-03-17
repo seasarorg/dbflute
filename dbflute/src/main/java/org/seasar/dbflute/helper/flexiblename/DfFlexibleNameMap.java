@@ -2,6 +2,7 @@ package org.seasar.dbflute.helper.flexiblename;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +26,10 @@ public class DfFlexibleNameMap<KEY, VALUE> {
     
     public DfFlexibleNameMap(Map<KEY, ? extends VALUE> map) {
         putAll(map);
+    }
+    
+    public DfFlexibleNameMap(List<KEY> keyList, List<VALUE> valueList) {
+        putAll(keyList, valueList);
     }
 
     // ===================================================================================
@@ -52,6 +57,20 @@ public class DfFlexibleNameMap<KEY, VALUE> {
         final Set<KEY> keySet = map.keySet();
         for (KEY key : keySet) {
             put(key, map.get(key));
+        }
+    }
+    
+    public final void putAll(List<KEY> keyList, List<VALUE> valueList) {
+        if (keyList.size() != valueList.size()) {
+            String msg = "The keyList and valueList should have the same size:";
+            msg = msg + " keyList.size()=" + keyList.size() + " valueList.size()=" + valueList.size();
+            msg = msg + " keyList=" + keyList + " valueList=" + valueList;
+            throw new IllegalStateException(msg);
+        }
+        int index = 0;
+        for (KEY key : keyList) {
+            put(key, valueList.get(index));
+            ++index;
         }
     }
 

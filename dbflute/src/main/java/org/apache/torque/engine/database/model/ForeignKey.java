@@ -201,6 +201,8 @@ public class ForeignKey {
     public void addReference(List<String> localColumnNameList, List<String> foreignColumnNameList) {
         _localColumns.addAll(localColumnNameList);
         _foreignColumns.addAll(foreignColumnNameList);
+        _localForeignMap.putAll(localColumnNameList, foreignColumnNameList);
+        _foreignLocalMap.putAll(foreignColumnNameList, localColumnNameList);
     }
 
     // -----------------------------------------------------
@@ -365,7 +367,7 @@ public class ForeignKey {
     public String getLocalColumnJavaNameAsOne() {
         final String columnName = getLocalColumnNameAsOne();
         final Table localTable = getTable();
-        return localTable.getColumnByFlexibleName(columnName).getJavaName();
+        return localTable.getColumn(columnName).getJavaName();
     }
 
     /**
@@ -382,7 +384,7 @@ public class ForeignKey {
         final List<Column> resultList = new ArrayList<Column>();
         for (final Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
             final String name = (String) ite.next();
-            final Column col = getTable().getColumnByFlexibleName(name);
+            final Column col = getTable().getColumn(name);
             if (col == null) {
                 String msg = "The columnName is not existing at the table: ";
                 msg = msg + "columnName=" + name + " tableName=" + getTable().getName();
@@ -395,7 +397,7 @@ public class ForeignKey {
 
     public Column getLocalColumnByForeignColumn(Column foreignColumn) {
         final String localColumnName = getForeignLocalMapping().get(foreignColumn.getName());
-        return getTable().getColumnByFlexibleName(localColumnName);
+        return getTable().getColumn(localColumnName);
     }
 
     // -----------------------------------------------------
@@ -427,7 +429,7 @@ public class ForeignKey {
     public String getForeignColumnJavaNameAsOne() {
         final String columnName = getForeignColumnNameAsOne();
         final Table foreignTable = getForeignTable();
-        return foreignTable.getColumnByFlexibleName(columnName).getJavaName();
+        return foreignTable.getColumn(columnName).getJavaName();
     }
 
     /**
@@ -445,7 +447,7 @@ public class ForeignKey {
         final List<Column> resultList = new ArrayList<Column>();
         for (Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
             final String name = (String) ite.next();
-            final Column foreignCol = foreignTable.getColumnByFlexibleName(name);
+            final Column foreignCol = foreignTable.getColumn(name);
             resultList.add(foreignCol);
         }
         return resultList;
@@ -467,7 +469,7 @@ public class ForeignKey {
 
     public Column getForeignColumnByLocalColumn(Column localColumn) {
         final String foreignColumnName = getLocalForeignMapping().get(localColumn.getName());
-        return getForeignTable().getColumnByFlexibleName(foreignColumnName);
+        return getForeignTable().getColumn(foreignColumnName);
     }
 
     // ==========================================================================================

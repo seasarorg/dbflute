@@ -127,7 +127,7 @@ public class DfAdditionalForeignKeyInitializer {
         table.addForeignKey(fk);
         getTable(foreignTableName).addReferrer(fk);
         for (String foreignColumnName : foreignColumnNameList) {
-            final Column foreignColumn = getTable(foreignTableName).getColumnByFlexibleName(foreignColumnName);
+            final Column foreignColumn = getTable(foreignTableName).getColumn(foreignColumnName);
             foreignColumn.addReferrer(fk);
         }
     }
@@ -169,7 +169,7 @@ public class DfAdditionalForeignKeyInitializer {
         if (localColumnNameList == null || localColumnNameList.isEmpty()) {
             localColumnNameList = new ArrayList<String>();
             for (String foreignColumnName : foreignColumnNameList) {
-                final Column column = getTable(localTableName).getColumnByFlexibleName(foreignColumnName);
+                final Column column = getTable(localTableName).getColumn(foreignColumnName);
                 if (column == null) {
                     if (isErrorNotFound) {
                         String msg = "The localTable[" + localTableName + "] should have the columns '";
