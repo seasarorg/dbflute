@@ -158,7 +158,7 @@ public class XmlToData extends DefaultHandler implements EntityResolver
             }
             else
             {
-                Table table = database.getTableByJavaName(rawName);
+                Table table = database.getTable(rawName);
 
                 if (table == null)
                 {

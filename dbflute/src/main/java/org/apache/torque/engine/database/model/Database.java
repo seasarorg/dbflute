@@ -56,7 +56,6 @@ package org.apache.torque.engine.database.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -115,9 +114,7 @@ public class Database {
 
     protected AppData _dbParent;
 
-    protected Hashtable<String, Table> _tablesByName = new Hashtable<String, Table>();
-
-    protected Hashtable<String, Table> _tablesByJavaName = new Hashtable<String, Table>();
+    protected DfFlexibleNameMap<String, Table> _flexibleTableMap = new DfFlexibleNameMap<String, Table>();
 
     protected boolean _isHeavyIndexing;
 
@@ -179,21 +176,7 @@ public class Database {
      * @return A Table object.  If it does not exist it returns null
      */
     public Table getTable(String name) {
-        return (Table) _tablesByName.get(name);
-    }
-
-    /**
-     * Return the table with the specified javaName.
-     * @param javaName name of the java object representing the table
-     * @return A Table object.  If it does not exist it returns null
-     */
-    public Table getTableByJavaName(String javaName) {
-        return (Table) _tablesByJavaName.get(javaName);
-    }
-
-    public Table getTableByFlexibleName(String flexibleName) {
-        final DfFlexibleNameMap<String, Table> flexibleNameMap = new DfFlexibleNameMap<String, Table>(_tablesByName);
-        return flexibleNameMap.get(flexibleName);
+        return (Table) _flexibleTableMap.get(name);
     }
 
     /**
@@ -216,8 +199,7 @@ public class Database {
     public void addTable(Table tbl) {
         tbl.setDatabase(this);
         _tableList.add(tbl);
-        _tablesByName.put(tbl.getName(), tbl);
-        _tablesByJavaName.put(tbl.getJavaName(), tbl);
+        _flexibleTableMap.put(tbl.getName(), tbl);
         tbl.setPackage(getPackage());
     }
 
@@ -282,7 +264,7 @@ public class Database {
             ForeignKey[] fks = currTable.getForeignKeys();
             for (int j = 0; j < fks.length; j++) {
                 ForeignKey currFK = fks[j];
-                Table foreignTable = getTableByFlexibleName(currFK.getForeignTableName());
+                Table foreignTable = getTable(currFK.getForeignTableName());
                 if (foreignTable == null) {
                     throw new EngineException("Attempt to set foreign" + " key to nonexistent table, "
                             + currFK.getForeignTableName());
@@ -515,7 +497,7 @@ public class Database {
                 final Set<String> tableElementKeySet = tableElementMap.keySet();
                 for (String tableName : tableElementKeySet) {
                     _log.debug("        " + tableName);
-                    final Table targetTable = getTableByFlexibleName(tableName);
+                    final Table targetTable = getTable(tableName);
                     if (targetTable == null) {
                         String msg = "The table[" + tableName + "] of includeQueryMap was not found: " + map;
                         throw new IllegalStateException(msg);

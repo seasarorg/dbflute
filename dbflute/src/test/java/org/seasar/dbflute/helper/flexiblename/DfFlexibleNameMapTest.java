@@ -1,26 +1,40 @@
 package org.seasar.dbflute.helper.flexiblename;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 public class DfFlexibleNameMapTest {
 
-    public DfFlexibleNameMapTest() {
-    }
-
     @Test
-    public void test_isHitByTheHint() {
-
-        final Map<String, String> map = new LinkedHashMap<String, String>();
-        map.put("RTIME", "");
-        map.put("RUSER", "");
-        map.put("UTIME", "");
-        map.put("UUSER", "");
-
-        final DfFlexibleNameMap<String, String> flexibleNameMap = new DfFlexibleNameMap<String, String>(map);
-        Assert.assertTrue(flexibleNameMap.containsKey("U_TIME"));
+    public void test_Basic() {
+        // ## Arrange ##
+        final DfFlexibleNameMap<String, String> map = new DfFlexibleNameMap<String, String>();
+        
+        // ## Act ##
+        map.put("R_TIME", "aaa");
+        map.put("Ruser", "bbb");
+        map.put("UTIME", "ccc");
+        map.put("uuser", "ddd");
+        
+        // ## Assert ##
+        // {R_TIME}
+        Assert.assertTrue(map.containsKey("R_TIME"));
+        Assert.assertTrue(map.containsKey("RTIME"));
+        Assert.assertTrue(map.containsKey("rTime"));
+        Assert.assertTrue(map.containsKey("RTime"));
+        Assert.assertEquals("aaa", map.get("R_TIME"));
+        Assert.assertEquals("aaa", map.get("RTIME"));
+        Assert.assertEquals("aaa", map.get("rTime"));
+        Assert.assertEquals("aaa", map.get("RTime"));
+        
+        // {Ruser}
+        Assert.assertTrue(map.containsKey("R_USER"));
+        Assert.assertTrue(map.containsKey("RUSER"));
+        Assert.assertTrue(map.containsKey("rUser"));
+        Assert.assertTrue(map.containsKey("RUser"));
+        Assert.assertEquals("bbb", map.get("R_USER"));
+        Assert.assertEquals("bbb", map.get("RUSER"));
+        Assert.assertEquals("bbb", map.get("rUser"));
+        Assert.assertEquals("bbb", map.get("RUser"));
     }
 }

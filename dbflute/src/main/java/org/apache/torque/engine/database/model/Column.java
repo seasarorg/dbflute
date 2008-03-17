@@ -1379,8 +1379,9 @@ public class Column {
             final String classificationName = getClassificationName();
             final List<Map<String, String>> classificationMapList = definitionMap.get(classificationName);
             if (classificationMapList == null) {
-                String msg = "The definitionMap did not contain the classificationName: ";
-                msg = msg + "definitionMap=" + definitionMap + " classificationName=" + classificationName;
+                String msg = "The definitionMap did not contain the classificationName:";
+                msg = msg + " classificationName=" + classificationName;
+                msg = msg + " definitionMap=" + definitionMap;
                 throw new IllegalStateException(msg);
             }
             return classificationMapList;

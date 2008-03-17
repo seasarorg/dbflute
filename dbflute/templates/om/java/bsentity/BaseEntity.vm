@@ -131,7 +131,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                          ==========================
 #foreach ($col in $table.Columns)
   #if (${col.hasClassification()})
-    #foreach ($classificationMap in $col.ClassificationMapList)
+    #foreach ($classificationMap in $col.classificationMapList)
 
     /**
      * Classify the value of ${col.UncapitalisedJavaName} as ${classificationMap.get('name')}. <br />

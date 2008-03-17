@@ -56,7 +56,6 @@ package org.apache.torque.engine.database.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +63,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.xml.sax.Attributes;
@@ -87,8 +87,10 @@ public class ForeignKey {
     private String _name;
 
     private List<String> _localColumns = new ArrayList<String>(3);
-
     private List<String> _foreignColumns = new ArrayList<String>(3);
+    
+    protected DfFlexibleNameMap<String, String> _localForeignMap = new DfFlexibleNameMap<String, String>();
+    protected DfFlexibleNameMap<String, String> _foreignLocalMap = new DfFlexibleNameMap<String, String>();
 
     private String _foreignPropertyNamePrefix;
 
@@ -121,7 +123,7 @@ public class ForeignKey {
     public boolean isForeignColumnsSameAsForeignTablePrimaryKeys() {
         final List<String> foreginTablePrimaryKeyNameList = new ArrayList<String>();
         {
-            final Table fkTable = _baseTable.getDatabase().getTableByFlexibleName(_foreignTableName);
+            final Table fkTable = _baseTable.getDatabase().getTable(_foreignTableName);
             final List<Column> foreignTablePrimaryKeyList = fkTable.getPrimaryKey();
             for (Column column : foreignTablePrimaryKeyList) {
                 foreginTablePrimaryKeyNameList.add(column.getName());
@@ -186,6 +188,8 @@ public class ForeignKey {
     public void addReference(String local, String foreign) {
         _localColumns.add(local);
         _foreignColumns.add(foreign);
+        _localForeignMap.put(local, foreign);
+        _foreignLocalMap.put(foreign, local);
     }
 
     /**
@@ -432,7 +436,7 @@ public class ForeignKey {
      * @return the foreign objects
      */
     public List<Column> getForeignColumnObjectList() {
-        final Table foreignTable = getTable().getDatabase().getTableByFlexibleName(getForeignTableName());
+        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
         final List<String> columnList = getForeignColumns();
         if (columnList == null || columnList.isEmpty()) {
             String msg = "The getForeignColumns() is null or empty." + columnList;
@@ -453,7 +457,7 @@ public class ForeignKey {
      * @return Foreign table.
      */
     public Table getForeignTable() {
-        final Table foreignTable = getTable().getDatabase().getTableByFlexibleName(getForeignTableName());
+        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
         if (foreignTable == null) {
             String msg = "The database does not contain the foreign table name: " + getForeignTableName();
             throw new IllegalStateException(msg);
@@ -470,32 +474,24 @@ public class ForeignKey {
     //                                                                  Get Column Mapping Method
     //                                                                  =========================
 
-    /**
-     * Utility method to get local column names to foreign column names
-     * mapping for this foreign key.
-     *
-     * @return table mapping foreign names to local names
-     */
-    public Hashtable<String, String> getLocalForeignMapping() {
-        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
-        for (int i = 0; i < _localColumns.size(); i++) {
-            resultHash.put(_localColumns.get(i), _foreignColumns.get(i));
-        }
-        return resultHash;
+    public DfFlexibleNameMap<String, String> getLocalForeignMapping() {
+        return _localForeignMap;
+// This comment-out for FlexibleMap 
+//        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
+//        for (int i = 0; i < _localColumns.size(); i++) {
+//            resultHash.put(_localColumns.get(i), _foreignColumns.get(i));
+//        }
+//        return resultHash;
     }
 
-    /**
-     * Utility method to get foreign column names to local column names
-     * mapping for this foreign key.
-     *
-     * @return table mapping local names to foreign names
-     */
-    public Hashtable<String, String> getForeignLocalMapping() {
-        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
-        for (int i = 0; i < _localColumns.size(); i++) {
-            resultHash.put(_foreignColumns.get(i), _localColumns.get(i));
-        }
-        return resultHash;
+    public DfFlexibleNameMap<String, String> getForeignLocalMapping() {
+        return _foreignLocalMap;
+     // This comment-out for FlexibleMap 
+//        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
+//        for (int i = 0; i < _localColumns.size(); i++) {
+//            resultHash.put(_foreignColumns.get(i), _localColumns.get(i));
+//        }
+//        return resultHash;
     }
 
     /**
@@ -510,14 +506,14 @@ public class ForeignKey {
      * </pre>
      * @return table mapping foreign objects to local objects
      */
-    public Hashtable<Column, Column> getLocalForeignColumnObjectMapping() {
-        final Hashtable<Column, Column> resultHash = new Hashtable<Column, Column>();
+    public DfFlexibleNameMap<Column, Column> getLocalForeignColumnObjectMapping() {
+        final DfFlexibleNameMap<Column, Column> map = new DfFlexibleNameMap<Column, Column>();
         final List<Column> localList = getLocalColumnObjectList();
         final List<Column> foreignList = getForeignColumnObjectList();
         for (int i = 0; i < localList.size(); i++) {
-            resultHash.put(localList.get(i), foreignList.get(i));
+            map.put(localList.get(i), foreignList.get(i));
         }
-        return resultHash;
+        return map;
     }
 
     /**
@@ -532,14 +528,14 @@ public class ForeignKey {
      * </pre>
      * @return table mapping foreign objects to local objects
      */
-    public Hashtable<Column, Column> getForeignLocalColumnObjectMapping() {
-        final Hashtable<Column, Column> resultHash = new Hashtable<Column, Column>();
+    public DfFlexibleNameMap<Column, Column> getForeignLocalColumnObjectMapping() {
+        final DfFlexibleNameMap<Column, Column> map = new DfFlexibleNameMap<Column, Column>();
         final List<Column> localList = getLocalColumnObjectList();
         final List<Column> foreignList = getForeignColumnObjectList();
         for (int i = 0; i < localList.size(); i++) {
-            resultHash.put(foreignList.get(i), localList.get(i));
+            map.put(foreignList.get(i), localList.get(i));
         }
-        return resultHash;
+        return map;
     }
 
     // ==========================================================================================
