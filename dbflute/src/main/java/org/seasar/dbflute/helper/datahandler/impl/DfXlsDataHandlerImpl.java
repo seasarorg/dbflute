@@ -450,18 +450,19 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return columnMap;
     }
 
-    protected List<String> createValueList(final DataTable dataTable, final DataRow dataRow) {
-        final List<String> valueList = new ArrayList<String>();
-        for (int k = 0; k < dataTable.getColumnSize(); k++) {
-            final DataColumn dataColumn = dataTable.getColumn(k);
-            if (!dataColumn.isWritable()) {
-                continue;
-            }
-            final Object value = dataRow.getValue(k);
-            valueList.add(value != null ? value.toString() : null);
-        }
-        return valueList;
-    }
+    // Old style method to createColumnContainer()
+    //    protected List<String> createValueList(final DataTable dataTable, final DataRow dataRow) {
+    //        final List<String> valueList = new ArrayList<String>();
+    //        for (int k = 0; k < dataTable.getColumnSize(); k++) {
+    //            final DataColumn dataColumn = dataTable.getColumn(k);
+    //            if (!dataColumn.isWritable()) {
+    //                continue;
+    //            }
+    //            final Object value = dataRow.getValue(k);
+    //            valueList.add(value != null ? value.toString() : null);
+    //        }
+    //        return valueList;
+    //    }
 
     protected ColumnContainer createColumnContainer(final DataTable dataTable, final DataRow dataRow) {
         final ColumnContainer container = new ColumnContainer();
