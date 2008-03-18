@@ -122,11 +122,15 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // - - - - - - - - - - - - - - 
                             // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
-                            if (isTimestampValue(value)) {
-                                final Timestamp timestampValue = getTimestampValue(value);
-                                statement.setTimestamp(bindCount, timestampValue);
-                                bindCount++;
-                                continue;
+                            if (value != null) {
+                                // Not use DataColumn about Timestamp
+                                // We trust value format.
+                                if (isTimestampValue(value)) {
+                                    final Timestamp timestampValue = getTimestampValue(value);
+                                    statement.setTimestamp(bindCount, timestampValue);
+                                    bindCount++;
+                                    continue;
+                                }
                             }
 
                             // - - - - - - - - - - - - - - 
