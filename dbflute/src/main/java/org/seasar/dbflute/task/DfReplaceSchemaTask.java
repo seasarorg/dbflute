@@ -315,6 +315,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected void writeDbFromXls(String directoryPath) {
         final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
         xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
+        xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());

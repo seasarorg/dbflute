@@ -55,10 +55,15 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
         final String tableName = tableMetaInfo.getTableName();
+        return getColumns(dbMeta, tableMetaInfo.selectRealSchemaName(schemaName), tableName);
+    }
+
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName)
+            throws SQLException {
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
         try {
-            final String realSchemaName = tableMetaInfo.selectRealSchemaName(schemaName);
+            final String realSchemaName = schemaName;
             columnResultSet = dbMeta.getColumns(null, realSchemaName, tableName, null);
             while (columnResultSet.next()) {
                 final String columnName = columnResultSet.getString(4);

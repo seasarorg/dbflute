@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +21,14 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.helper.datahandler.DfXlsDataHandler;
 import org.seasar.dbflute.helper.datahandler.impl.internal.DfSybaseSqlWriter;
 import org.seasar.dbflute.helper.excel.DfXlsReader;
 import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler.DfColumnMetaInfo;
 import org.seasar.extension.dataset.ColumnType;
 import org.seasar.extension.dataset.DataColumn;
 import org.seasar.extension.dataset.DataRow;
@@ -47,6 +49,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _loggingInsertSql;
+    protected String _schemaName;
 
     // ===================================================================================
     //                                                                                Main
@@ -88,6 +91,17 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 PreparedStatement statement = null;
                 try {
                     for (int j = 0; j < dataTable.getRowSize(); j++) {
+
+                        // ColumnMetaInfo
+                        final DfColumnHandler columnHandler = new DfColumnHandler();
+                        final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+                        final List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData,
+                                _schemaName, tableName);
+                        final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
+                        for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
+                            columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
+                        }
+
                         final DataRow dataRow = dataTable.getRow(j);
                         if (statement == null) {
                             final MyCreatedState myCreatedState = new MyCreatedState();
@@ -95,12 +109,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             statement = dataSource.getConnection().prepareStatement(preparedSql);
                         }
 
+                        // ColumnValue and ColumnObject
                         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
                         final Map<String, String> columnValueMap = columnContainer.getColumnValueMap();
-                        final Map<String, DataColumn> columnObjectMap = columnContainer.getColumnObjectMap();
                         if (_loggingInsertSql) {
-                            final List<String> valueList = new ArrayList<String>(columnContainer.getColumnValueMap()
-                                    .values());
+                            final List<String> valueList = new ArrayList<String>(columnValueMap.values());
                             _log.info(getSql4Log(tableName, columnNameList, valueList));
                         }
 
@@ -131,10 +144,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // Against Number Headache
                             // - - - - - - - - - - - - - -
                             if (value != null) {
-                                final DataColumn dataColumn = columnObjectMap.get(columnName);
-                                if (dataColumn != null) {
-                                    final Class<?> columnType = dataColumn.getColumnType().getType();
-                                    System.out.println(dataColumn.getColumnName() + ", [" + value + "]: " + columnType);
+                                final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+                                if (columnMetaInfo != null) {
+                                    final int jdbcType = columnMetaInfo.getJdbcTypeCode();
+                                    final String torqueType = TypeMap.getTorqueType(jdbcType);
+                                    final Class<?> columnType = TypeMap.getJavaType(torqueType);
+                                    System.out.println(columnName + ", [" + value + "]: " + columnType);
                                     if (columnType != null && Number.class.isAssignableFrom(columnType)) {
                                         if (isBigDecimalValue(value)) {
                                             final BigDecimal bigDecimalValue = getBigDecimalValue(value);
@@ -508,5 +523,13 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     public void setLoggingInsertSql(boolean loggingSql) {
         this._loggingInsertSql = loggingSql;
+    }
+
+    public String getSchemaName() {
+        return _schemaName;
+    }
+
+    public void setSchemaName(String name) {
+        _schemaName = name;
     }
 }
