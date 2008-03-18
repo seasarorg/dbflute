@@ -156,7 +156,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         runInfo.setRollbackOnly(getMyProperties().isReplaceSchemaRollbackOnly());
         return runInfo;
     }
-    
+
     protected String getReplaceSchemaSqlFileEncoding() {
         return "UTF-8";
     }
@@ -235,7 +235,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected String getEnvironmentType() {
         return getMyProperties().getEnvironmentType();
     }
-    
+
     public boolean isLoggingInsertSql() {
         return getMyProperties().isLoggingInsertSql();
     }
@@ -316,6 +316,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
         xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
         xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
+        if (getBasicProperties().isDatabasePostgreSQL()) {
+            xlsDataHandler.setUseDatabaseMetaData(true);
+        }
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());

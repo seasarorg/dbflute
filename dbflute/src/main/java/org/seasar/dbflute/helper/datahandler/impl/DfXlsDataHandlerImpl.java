@@ -50,6 +50,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     //                                                                           =========
     protected boolean _loggingInsertSql;
     protected String _schemaName;
+    protected boolean _useDatabaseMetaData;
 
     // ===================================================================================
     //                                                                                Main
@@ -93,13 +94,19 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     for (int j = 0; j < dataTable.getRowSize(); j++) {
 
                         // ColumnMetaInfo
-                        final DfColumnHandler columnHandler = new DfColumnHandler();
-                        final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-                        final List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData,
-                                _schemaName, tableName);
                         final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
-                        for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
-                            columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
+                        if (isUseDatabaseMetaData()) {
+                            final DfColumnHandler columnHandler = new DfColumnHandler();
+                            final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+                            List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData, _schemaName,
+                                    tableName);
+                            if (columnMetaDataList == null || columnMetaDataList.isEmpty()) {
+                                columnMetaDataList = columnHandler.getColumns(metaData, _schemaName, tableName
+                                        .toLowerCase());
+                            }
+                            for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
+                                columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
+                            }
                         }
 
                         final DataRow dataRow = dataTable.getRow(j);
@@ -143,13 +150,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // - - - - - - - - - - - - - - 
                             // Against Number Headache
                             // - - - - - - - - - - - - - -
-                            if (value != null) {
+                            if (value != null && isUseDatabaseMetaData()) {
                                 final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
                                 if (columnMetaInfo != null) {
                                     final int jdbcType = columnMetaInfo.getJdbcTypeCode();
                                     final String torqueType = TypeMap.getTorqueType(jdbcType);
                                     final Class<?> columnType = TypeMap.getJavaType(torqueType);
-                                    System.out.println(columnName + ", [" + value + "]: " + columnType);
                                     if (columnType != null && Number.class.isAssignableFrom(columnType)) {
                                         if (isBigDecimalValue(value)) {
                                             final BigDecimal bigDecimalValue = getBigDecimalValue(value);
@@ -531,5 +537,13 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     public void setSchemaName(String name) {
         _schemaName = name;
+    }
+
+    public boolean isUseDatabaseMetaData() {
+        return _useDatabaseMetaData;
+    }
+
+    public void setUseDatabaseMetaData(boolean databaseMetaData) {
+        _useDatabaseMetaData = databaseMetaData;
     }
 }
