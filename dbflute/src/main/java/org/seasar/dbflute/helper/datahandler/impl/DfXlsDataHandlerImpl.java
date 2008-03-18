@@ -85,13 +85,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 }
 
                 final List<String> columnNameList = new ArrayList<String>();
-                final Map<Integer, Class<?>> columnTypeMap = new HashMap<Integer, Class<?>>();
-                for (int j = 0; j < dataTable.getColumnSize(); j++) {
-                    final DataColumn dataColumn = dataTable.getColumn(j);
-                    columnNameList.add(dataColumn.getColumnName());
-                    columnTypeMap.put(j, dataColumn.getColumnType().getType());
-                }
-
                 PreparedStatement statement = null;
                 try {
                     for (int j = 0; j < dataTable.getRowSize(); j++) {
@@ -103,17 +96,18 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                         }
 
                         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
+                        final Map<String, String> columnValueMap = columnContainer.getColumnValueMap();
                         final Map<String, DataColumn> columnObjectMap = columnContainer.getColumnObjectMap();
-                        final List<String> valueList = new ArrayList<String>(columnContainer.getColumnValueMap()
-                                .values());
                         if (_loggingInsertSql) {
+                            final List<String> valueList = new ArrayList<String>(columnContainer.getColumnValueMap()
+                                    .values());
                             _log.info(getSql4Log(tableName, columnNameList, valueList));
                         }
 
                         int bindCount = 1;
-                        int columnIndex = -1;
-                        for (String value : valueList) {
-                            ++columnIndex;
+                        final Set<String> columnNameSet = columnValueMap.keySet();
+                        for (String columnName : columnNameSet) {
+                            String value = columnValueMap.get(columnName);
                             if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
                                 value = value.substring(1);
                                 value = value.substring(0, value.length() - 1);
@@ -137,9 +131,10 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // Against Number Headache
                             // - - - - - - - - - - - - - -
                             if (value != null) {
-                                final DataColumn dataColumn = columnObjectMap.get(columnIndex);
+                                final DataColumn dataColumn = columnObjectMap.get(columnName);
                                 if (dataColumn != null) {
                                     final Class<?> columnType = dataColumn.getColumnType().getType();
+                                    System.out.println(dataColumn.getColumnName() + ", [" + value + "]: " + columnType);
                                     if (columnType != null && Number.class.isAssignableFrom(columnType)) {
                                         if (isBigDecimalValue(value)) {
                                             final BigDecimal bigDecimalValue = getBigDecimalValue(value);
