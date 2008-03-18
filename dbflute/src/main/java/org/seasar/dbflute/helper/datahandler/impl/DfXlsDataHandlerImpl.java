@@ -2,6 +2,7 @@ package org.seasar.dbflute.helper.datahandler.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -9,6 +10,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,9 +85,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 }
 
                 final List<String> columnNameList = new ArrayList<String>();
+                final Map<Integer, Class<?>> columnTypeMap = new HashMap<Integer, Class<?>>();
                 for (int j = 0; j < dataTable.getColumnSize(); j++) {
                     final DataColumn dataColumn = dataTable.getColumn(j);
                     columnNameList.add(dataColumn.getColumnName());
+                    columnTypeMap.put(j, dataColumn.getColumnType().getType());
                 }
 
                 PreparedStatement statement = null;
@@ -97,13 +102,18 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             statement = dataSource.getConnection().prepareStatement(preparedSql);
                         }
 
-                        final List<String> valueList = createValueList(dataTable, dataRow);
+                        final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
+                        final Map<String, DataColumn> columnObjectMap = columnContainer.getColumnObjectMap();
+                        final List<String> valueList = new ArrayList<String>(columnContainer.getColumnValueMap()
+                                .values());
                         if (_loggingInsertSql) {
                             _log.info(getSql4Log(tableName, columnNameList, valueList));
                         }
 
                         int bindCount = 1;
+                        int columnIndex = -1;
                         for (String value : valueList) {
+                            ++columnIndex;
                             if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
                                 value = value.substring(1);
                                 value = value.substring(0, value.length() - 1);
@@ -117,6 +127,31 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 statement.setTimestamp(bindCount, timestampValue);
                                 bindCount++;
                                 continue;
+                            }
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Number Headache
+                            // - - - - - - - - - - - - - -
+                            if (value != null) {
+                                final DataColumn dataColumn = columnObjectMap.get(columnIndex);
+                                if (dataColumn != null) {
+                                    final Class<?> columnType = dataColumn.getColumnType().getType();
+                                    if (columnType != null && Number.class.isAssignableFrom(columnType)) {
+                                        if (isBigDecimalValue(value)) {
+                                            final BigDecimal bigDecimalValue = getBigDecimalValue(value);
+                                            try {
+                                                final long longValue = bigDecimalValue.longValueExact();
+                                                statement.setLong(bindCount, longValue);
+                                                bindCount++;
+                                                continue;
+                                            } catch (ArithmeticException e) {
+                                                statement.setBigDecimal(bindCount, bigDecimalValue);
+                                                bindCount++;
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
                             try {
@@ -167,7 +202,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     if (nextException != null) {
                         _log.warn("");
                         _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                        _log.warn("SQLException was thrown! getNextException()=" + nextException.getClass(), nextException);
+                        _log.warn("SQLException was thrown! getNextException()=" + nextException.getClass(),
+                                nextException);
                         _log.warn("* * * * * * * * * */");
                         _log.warn("");
                     }
@@ -221,6 +257,26 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             }
         }
         return value;
+    }
+
+    protected boolean isBigDecimalValue(String value) {
+        if (value == null) {
+            return false;
+        }
+        try {
+            new BigDecimal(value);
+            return true;
+        } catch (NumberFormatException e) {
+        }
+        return false;
+    }
+
+    protected BigDecimal getBigDecimalValue(String value) {
+        try {
+            return new BigDecimal(value);
+        } catch (RuntimeException e) {
+            throw e;
+        }
     }
 
     public void writeSeveralDataForSqlServer(String dataDirectoryName, final DataSource dataSource) {
@@ -385,6 +441,42 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             valueList.add(value != null ? value.toString() : null);
         }
         return valueList;
+    }
+
+    protected ColumnContainer createColumnContainer(final DataTable dataTable, final DataRow dataRow) {
+        final ColumnContainer container = new ColumnContainer();
+        for (int k = 0; k < dataTable.getColumnSize(); k++) {
+            final DataColumn dataColumn = dataTable.getColumn(k);
+            if (!dataColumn.isWritable()) {
+                continue;
+            }
+            final Object value = dataRow.getValue(k);
+            final String columnName = dataColumn.getColumnName();
+            container.addColumnValue(columnName, value != null ? value.toString() : null);
+            container.addColumnObject(columnName, dataColumn);
+        }
+        return container;
+    }
+
+    protected static class ColumnContainer {
+        protected Map<String, String> columnValueMap = new LinkedHashMap<String, String>();
+        protected Map<String, DataColumn> columnObjectMap = new LinkedHashMap<String, DataColumn>();
+
+        public Map<String, String> getColumnValueMap() {
+            return columnValueMap;
+        }
+
+        public void addColumnValue(String columnName, String columnValue) {
+            this.columnValueMap.put(columnName, columnValue);
+        }
+
+        public Map<String, DataColumn> getColumnObjectMap() {
+            return columnObjectMap;
+        }
+
+        public void addColumnObject(String columnName, DataColumn columnObject) {
+            this.columnObjectMap.put(columnName, columnObject);
+        }
     }
 
     protected String getSql4Log(String tableName, List<String> columnNameList,
