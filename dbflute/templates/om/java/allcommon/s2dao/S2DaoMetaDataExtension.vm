@@ -1015,6 +1015,49 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
     protected static class RelationRowCreatorExtension extends org.seasar.dao.impl.RelationRowCreatorImpl {
     
         @Override
+        protected Object createRelationRow(RelationRowCreationResource res)
+                throws SQLException {
+            // - - - - - - - - - - - 
+            // Recursive Call Point!
+            // - - - - - - - - - - -
+            if (!res.hasPropertyCacheElement()) {
+                return null;
+            }
+            setupRelationKeyValue(res);
+            setupRelationAllValue(res);
+            return res.getRow();
+        }
+	
+        @Override
+        protected void setupRelationKeyValue(RelationRowCreationResource res) {
+            final RelationPropertyType rpt = res.getRelationPropertyType();
+            final BeanMetaData bmd = rpt.getBeanMetaData();
+            for (int i = 0; i < rpt.getKeySize(); ++i) {
+                final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
+    
+                if (!res.containsColumnName(columnName)) {
+                    continue;
+                }
+                if (!res.hasRowInstance()) {
+                    res.setRow(newRelationRow(rpt));
+                }
+                if (!res.containsRelKeyValueIfExists(columnName)) {
+                    continue;
+                }
+                final Object value = res.extractRelKeyValue(columnName);
+                if (value == null) {
+                    continue;
+                }
+    
+                final String yourKey = rpt.getYourKey(i);
+                final PropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
+                final PropertyDesc pd = pt.getPropertyDesc();
+                pd.setValue(res.getRow(), value);
+                continue;
+            }
+        }
+	
+        @Override
         protected void setupRelationAllValue(RelationRowCreationResource res) throws SQLException {
             final Map propertyCacheElement = res.extractPropertyCacheElement();
             final Set columnNameCacheElementKeySet = propertyCacheElement.keySet();
@@ -1131,6 +1174,24 @@ public class ${glDaoMetaDataExtension} extends DaoMetaDataImpl {
             return 2;// for Compatible
         }
         
+        @Override
+        protected RelationRowCreationResource createResourceForRow(ResultSet rs,
+                RelationPropertyType rpt, Set columnNames, Map relKeyValues,
+                Map relationPropertyCache) throws SQLException {
+            final RelationRowCreationResource res = new RelationRowCreationResourceExtension();
+            res.setResultSet(rs);
+            res.setRelationPropertyType(rpt);
+            res.setColumnNames(columnNames);
+            res.setRelKeyValues(relKeyValues);
+            res.setRelationPropertyCache(relationPropertyCache);
+            res.setBaseSuffix("");// as Default
+            res.setRelationNoSuffix(buildRelationNoSuffix(rpt));
+            res.setLimitRelationNestLevel(getLimitRelationNestLevel());
+            res.setCurrentRelationNestLevel(1);// as Default
+            res.setCreateDeadLink(isCreateDeadLink());
+            return res;
+        }
+	
         @Override
         protected RelationRowCreationResource createResourceForPropertyCache(RelationPropertyType rpt, Set columnNames,
                 Map relationPropertyCache, String baseSuffix, String relationNoSuffix, int limitRelationNestLevel)
