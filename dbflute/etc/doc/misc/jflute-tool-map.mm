@@ -779,9 +779,9 @@
 </node>
 </node>
 </node>
-<node CREATED="1203650135775" FOLDED="true" ID="Freemind_Link_91786433" MODIFIED="1203650137727" TEXT="*tools">
-<node CREATED="1202980038286" ID="Freemind_Link_1525497877" MODIFIED="1203645152228" TEXT="Recovery">
-<node CREATED="1202980043818" ID="Freemind_Link_1270393628" MODIFIED="1202980044757" TEXT="Recovery Manager">
+<node CREATED="1203650135775" ID="Freemind_Link_91786433" MODIFIED="1203650137727" TEXT="*tools">
+<node CREATED="1202980038286" FOLDED="true" ID="Freemind_Link_1525497877" MODIFIED="1203645152228" TEXT="Recovery">
+<node CREATED="1202980043818" FOLDED="true" ID="Freemind_Link_1270393628" MODIFIED="1202980044757" TEXT="Recovery Manager">
 <node CREATED="1202980071726" FOLDED="true" ID="Freemind_Link_873617993" MODIFIED="1202980073895" TEXT="*overview">
 <node CREATED="1202980076651" ID="Freemind_Link_1612123190" MODIFIED="1202980083174" TEXT="Oracle&#x304c;&#x6a19;&#x6e96;&#x3067;&#x63d0;&#x4f9b;&#x3057;&#x3066;&#x3044;&#x308b;&#x30d0;&#x30c3;&#x30af;&#x30a2;&#x30c3;&#x30d7;&#x3001;&#x30ea;&#x30b9;&#x30c8;&#x30a2;&#x3001;&#x30ea;&#x30ab;&#x30d0;&#x30ea;&#xa;&#x306e;&#x64cd;&#x4f5c;&#x3084;&#x7ba1;&#x7406;&#x3092;&#x884c;&#x3046;&#x3053;&#x3068;&#x304c;&#x3067;&#x304d;&#x308b;&#x30e6;&#x30fc;&#x30c6;&#x30a3;&#x30ea;&#x30c6;&#x30a3;"/>
 </node>
@@ -809,6 +809,9 @@
 </node>
 </node>
 </node>
+<node CREATED="1206434811971" ID="Freemind_Link_1758811184" MODIFIED="1206434818005" TEXT="ImportExport">
+<node CREATED="1206434819943" ID="Freemind_Link_1527661707" MODIFIED="1206434881286" TEXT="imp xxx/password file=./file.dmp log=imp.log fromuser=yyy touser=xxx"/>
+</node>
 </node>
 <node CREATED="1200549597388" ID="Freemind_Link_1773218617" MODIFIED="1203650139620" TEXT="*topics">
 <node CREATED="1200549601374" FOLDED="true" ID="Freemind_Link_131453730" MODIFIED="1200549614968" TEXT="Refused by Listener">
@@ -817,7 +820,7 @@
 <node CREATED="1200549644237" ID="Freemind_Link_1815062011" MODIFIED="1200549646112" TEXT="http://127.0.0.1:8080/apex/f?p=4550"/>
 </node>
 </node>
-<node CREATED="1203645576634" FOLDED="true" ID="Freemind_Link_78021474" MODIFIED="1203645590842" TEXT="What should I do at first?">
+<node CREATED="1203645576634" ID="Freemind_Link_78021474" MODIFIED="1203645590842" TEXT="What should I do at first?">
 <node CREATED="1198071478031" ID="Freemind_Link_827831415" MODIFIED="1198071754406" TEXT="create database [database_name]&#x306f;&#x4e0d;&#x8981;&#x304b;&#x3082;"/>
 <node CREATED="1198071516906" ID="Freemind_Link_1834048894" MODIFIED="1198071531796" TEXT="create user [user_name] identified by [password]"/>
 <node CREATED="1198071552062" ID="Freemind_Link_1487120499" MODIFIED="1198071579359" TEXT="grant all privileges to [user_name]"/>
