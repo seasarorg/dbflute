@@ -532,7 +532,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 _primaryKeys = new String[_primaryKeyList.size()];
                 int index = 0;
                 foreach (IPropertyType pt in _primaryKeyList) {
-                    _primaryKeys[index] = pt;
+                    _primaryKeys[index] = pt.ColumnName;
                     ++index;
                 }
 			    return;
