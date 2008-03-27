@@ -82,7 +82,7 @@ namespace ${myDBMetaPackageName} {
         //                              Column Property-Name
         //                              --------------------
 #foreach ($col in $table.columns)
-        public static readonly String PROPERTY_NAME_${col.name} = "$col.name";
+        public static readonly String PROPERTY_NAME_${col.name} = "$col.javaName";
 #end
 
         // -------------------------------------------------
