@@ -470,6 +470,7 @@ namespace ${glPackageBaseCommonS2Dao} {
     }
 
 	public class BeanMetaDataDBFluteDBMetaExtension : BeanMetaDataImpl {
+	    protected List<PropertyType> _primaryKeyList = new ArrayList<PropertyType>();
         public BeanMetaDataDBFluteDBMetaExtension() 
             : base() {
         }
@@ -493,6 +494,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                         pt = CreatePropertyTypeExtension(pi, dbmeta);
                         if (pt != null) {
                             AddPropertyType(pt);
+                            if (pt.IsPrimaryKey) {
+                                _primaryKeyList.add(pt);
+                            }
                         }
                     }
                 }
@@ -511,7 +515,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected IPropertyType CreatePropertyTypeExtension(PropertyInfo pi, DBMeta dbmeta) {
             string columnName = _beanAnnotationReader.GetColumn(pi);
             if (columnName == null) {
-                return null; ;
+                return null;
             }
             IValueType valueType = ValueTypes.GetValueType(pi.PropertyType);
             IPropertyType pt = new PropertyTypeImpl(pi, valueType, columnName);
@@ -525,6 +529,12 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         protected override void SetupDatabaseMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (IsEntity(beanType)) {
+                _primaryKeys = new String[_primaryKeyList.size()];
+                int index = 0;
+                foreach (PropertyType pt in _primaryKeyList) {
+                    _primaryKeys[index] = pt;
+                    ++index;
+                }
 			    return;
 			}
             base.SetupDatabaseMetaData(beanType, dbMetaData, dbms);

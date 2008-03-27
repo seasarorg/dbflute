@@ -1604,6 +1604,18 @@
 <node CREATED="1198298548750" ID="Freemind_Link_410632610" MODIFIED="1198298628484" TEXT="&#x30b3;&#x30f3;&#x30c8;&#x30ed;&#x30fc;&#x30eb;&#x30bb;&#x30f3;&#x30bf;&#x30fc;&#x3067;&#x4f55;&#x3067;&#x3082;&#x3067;&#x304d;&#x308b;&#x304c;&#x3001;&#xa;&#x30b3;&#x30de;&#x30f3;&#x30c9;&#x30a6;&#x30a3;&#x30f3;&#x30c9;&#x30a6;&#x3084;&#x30b3;&#x30de;&#x30f3;&#x30c9;&#x884c;&#x30d7;&#x30ed;&#x30bb;&#x30c3;&#x30b5;&#x3067;&#xa;&#x30b3;&#x30de;&#x30f3;&#x30c9;&#x30e9;&#x30a4;&#x30f3;&#x3067;&#x64cd;&#x4f5c;&#x3082;&#x53ef;&#x80fd;&#x3002;"/>
 <node CREATED="1202465825045" ID="Freemind_Link_788031810" MODIFIED="1202465828704" TEXT="REORG"/>
 </node>
+<node CREATED="1206611011925" FOLDED="true" ID="Freemind_Link_28299994" MODIFIED="1206611015434" TEXT="*ref-url">
+<node CREATED="1206611015980" ID="Freemind_Link_1472222203" MODIFIED="1206611041972" TEXT="DeveloperDomain">
+<node CREATED="1206611042337" ID="Freemind_Link_35436072" MODIFIED="1206611042861" TEXT="http://www-06.ibm.com/jp/software/data/developer/"/>
+</node>
+<node CREATED="1206611044273" ID="Freemind_Link_392889395" MODIFIED="1206611046852" TEXT="DB2Forum">
+<node CREATED="1206611058924" ID="Freemind_Link_1675213602" MODIFIED="1206611059636" TEXT="http://db2forum.jp"/>
+</node>
+<node CREATED="1206611072348" ID="Freemind_Link_557120126" MODIFIED="1206611074580" TEXT="RedBook">
+<node CREATED="1206611075634" ID="Freemind_Link_891320611" MODIFIED="1206611085172" TEXT="http://www.redbooks.ibm.com/"/>
+<node CREATED="1206611086641" ID="Freemind_Link_718229831" MODIFIED="1206611087101" TEXT="http://www-06.ibm.com/jp/support/redbooks/"/>
+</node>
+</node>
 </node>
 <node CREATED="1186634899281" FOLDED="true" ID="Freemind_Link_732361436" MODIFIED="1186634901281" TEXT="Sybase">
 <node CREATED="1186634929171" FOLDED="true" ID="Freemind_Link_717902627" MODIFIED="1186634933609" TEXT="*trouble">
