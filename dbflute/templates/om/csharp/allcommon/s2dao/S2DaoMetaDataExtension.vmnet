@@ -470,7 +470,7 @@ namespace ${glPackageBaseCommonS2Dao} {
     }
 
 	public class BeanMetaDataDBFluteDBMetaExtension : BeanMetaDataImpl {
-	    protected List<PropertyType> _primaryKeyList = new ArrayList<PropertyType>();
+	    protected ${glPackageBaseCommonJavaLike}.List<IPropertyType> _primaryKeyList = new ${glPackageBaseCommonJavaLike}.ArrayList<IPropertyType>();
         public BeanMetaDataDBFluteDBMetaExtension() 
             : base() {
         }
@@ -531,7 +531,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (IsEntity(beanType)) {
                 _primaryKeys = new String[_primaryKeyList.size()];
                 int index = 0;
-                foreach (PropertyType pt in _primaryKeyList) {
+                foreach (IPropertyType pt in _primaryKeyList) {
                     _primaryKeys[index] = pt;
                     ++index;
                 }
