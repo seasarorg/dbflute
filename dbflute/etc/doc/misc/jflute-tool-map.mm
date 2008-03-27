@@ -1212,7 +1212,12 @@
 </node>
 </node>
 <node CREATED="1205489782990" ID="Freemind_Link_19378797" MODIFIED="1205489787193" TEXT="Objects"/>
-<node CREATED="1201421172027" FOLDED="true" ID="Freemind_Link_621290148" MODIFIED="1201421173815" TEXT="Driver">
+<node CREATED="1206544045882" ID="Freemind_Link_802128601" MODIFIED="1206544050522" TEXT="Commands">
+<node CREATED="1206544056344" ID="Freemind_Link_804026025" MODIFIED="1206544056899" TEXT="SET CURRENT SCHEMA = &#x2019;MYSCHEMA&#x2019;">
+<node CREATED="1206546099287" ID="Freemind_Link_872663157" MODIFIED="1206546100854" TEXT="http://publib.boulder.ibm.com/infocenter/db2luw/v9r5/index.jsp?topic=/com.ibm.db2.luw.sql.ref.doc/doc/r0005881.html"/>
+</node>
+</node>
+<node CREATED="1201421172027" ID="Freemind_Link_621290148" MODIFIED="1201421173815" TEXT="Driver">
 <node CREATED="1201421233707" FOLDED="true" ID="Freemind_Link_726245924" MODIFIED="1201421235447" TEXT="JDBC4">
 <node CREATED="1201421240563" ID="Freemind_Link_160910577" MODIFIED="1201421246198" TEXT="db2jcc4.jar/db2jcc_license_cu.jar"/>
 </node>
@@ -1221,6 +1226,12 @@
 </node>
 <node CREATED="1201427807995" FOLDED="true" ID="Freemind_Link_151221357" MODIFIED="1201427811991" TEXT="Download">
 <node CREATED="1201427812444" ID="Freemind_Link_171484818" MODIFIED="1201427812985" TEXT="https://www14.software.ibm.com/webapp/iwm/web/preLogin.do?lang=en_US&amp;source=swg-idsjs11"/>
+</node>
+<node CREATED="1206543946933" FOLDED="true" ID="Freemind_Link_121714090" MODIFIED="1206544019449" TEXT="ConnectProperty">
+<node CREATED="1206543999158" FOLDED="true" ID="Freemind_Link_7751027" MODIFIED="1206544001505" TEXT="*ref-url">
+<node CREATED="1206543995824" ID="Freemind_Link_181830428" MODIFIED="1206543997384" TEXT="http://publib.boulder.ibm.com/infocenter/db2luw/v8/index.jsp?topic=/com.ibm.db2.udb.doc/ad/rjvdsprp.htm"/>
+<node CREATED="1206543941784" ID="Freemind_Link_435071913" MODIFIED="1206543942706" TEXT="http://publib.boulder.ibm.com/infocenter/db2luw/v8/topic/com.ibm.db2.udb.doc/ad/tjvjcccn.htm"/>
+</node>
 </node>
 <node CREATED="1201421258699" FOLDED="true" ID="Freemind_Link_1526885924" MODIFIED="1201421259622" TEXT="OLD">
 <node CREATED="1201421186491" ID="Freemind_Link_45015821" MODIFIED="1201421194974" TEXT="db2java.zip&#x306f;&#x975e;&#x63a8;&#x5968;"/>

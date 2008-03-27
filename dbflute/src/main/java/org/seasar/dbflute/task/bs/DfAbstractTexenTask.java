@@ -17,6 +17,8 @@ package org.seasar.dbflute.task.bs;
 
 import java.io.File;
 import java.io.FileReader;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Properties;
@@ -94,6 +96,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             initializeDatabaseInfo();
             if (isUseDataSource()) {
                 setupDataSource();
+                connectSchema();
             }
             doExecute();
             if (isUseDataSource()) {
@@ -322,6 +325,26 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return DfDataSourceContext.getDataSource();
     }
 
+    protected void connectSchema() {
+        if (getBasicProperties().isDatabaseDB2() && _schema != null) {
+            final Statement statement;
+            try {
+                statement = getDataSource().getConnection().createStatement();
+            } catch (SQLException e) {
+                _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
+                return;
+            }
+            final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
+            try {
+                _log.info("...Executing command: " + sql);
+                statement.execute(sql);
+            } catch (SQLException e) {
+                _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
+                return;
+            }
+        }
+    }
+    
     // -----------------------------------------------------
     //                                    Context Properties
     //                                    ------------------

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.task.bs;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -65,6 +67,7 @@ public abstract class DfAbstractTask extends Task {
             initializeDatabaseInfo();
             if (isUseDataSource()) {
                 setupDataSource();
+                connectSchema();
             }
             doExecute();
             if (isUseDataSource()) {
@@ -149,6 +152,26 @@ public abstract class DfAbstractTask extends Task {
         return DfDataSourceContext.getDataSource();
     }
 
+    protected void connectSchema() {
+        if (getBasicProperties().isDatabaseDB2() && _schema != null) {
+            final Statement statement;
+            try {
+                statement = getDataSource().getConnection().createStatement();
+            } catch (SQLException e) {
+                _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
+                return;
+            }
+            final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
+            try {
+                _log.info("...Executing command: " + sql);
+                statement.execute(sql);
+            } catch (SQLException e) {
+                _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
+                return;
+            }
+        }
+    }
+    
     public void setContextProperties(String file) {
         final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
         DfBuildProperties.getInstance().setProperties(prop);
