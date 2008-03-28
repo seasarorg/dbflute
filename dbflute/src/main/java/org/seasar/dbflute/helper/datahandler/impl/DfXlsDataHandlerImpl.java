@@ -88,27 +88,30 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     continue;
                 }
 
+                // ColumnMetaInfo
+                final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
+                if (isUseDatabaseMetaData()) {
+                    try {
+                        final DfColumnHandler columnHandler = new DfColumnHandler();
+                        final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+                        List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData, _schemaName,
+                                tableName);
+                        if (columnMetaDataList == null || columnMetaDataList.isEmpty()) {
+                            columnMetaDataList = columnHandler.getColumns(metaData, _schemaName, tableName
+                                    .toLowerCase());
+                        }
+                        for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
+                            columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
                 final List<String> columnNameList = new ArrayList<String>();
                 PreparedStatement statement = null;
                 try {
                     for (int j = 0; j < dataTable.getRowSize(); j++) {
-
-                        // ColumnMetaInfo
-                        final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
-                        if (isUseDatabaseMetaData()) {
-                            final DfColumnHandler columnHandler = new DfColumnHandler();
-                            final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-                            List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData, _schemaName,
-                                    tableName);
-                            if (columnMetaDataList == null || columnMetaDataList.isEmpty()) {
-                                columnMetaDataList = columnHandler.getColumns(metaData, _schemaName, tableName
-                                        .toLowerCase());
-                            }
-                            for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
-                                columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
-                            }
-                        }
-
                         final DataRow dataRow = dataTable.getRow(j);
                         if (statement == null) {
                             final MyCreatedState myCreatedState = new MyCreatedState();
@@ -138,7 +141,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // - - - - - - - - - - - - - -
                             if (value != null) {
                                 boolean dbTypeCertainlyDateAndTimestamp = false;
-                                if (isUseDatabaseMetaData()) {
+                                if (!columnMetaInfoMap.isEmpty()) {
                                     final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
                                     if (columnMetaInfo != null) {
                                         final int jdbcType = columnMetaInfo.getJdbcTypeCode();
@@ -162,7 +165,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // - - - - - - - - - - - - - - 
                             // Against Number Headache
                             // - - - - - - - - - - - - - -
-                            if (value != null && isUseDatabaseMetaData()) {
+                            if (value != null && !columnMetaInfoMap.isEmpty()) {
                                 final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
                                 if (columnMetaInfo != null) {
                                     final int jdbcType = columnMetaInfo.getJdbcTypeCode();
