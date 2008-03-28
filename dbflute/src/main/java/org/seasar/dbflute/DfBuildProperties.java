@@ -21,12 +21,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -465,9 +462,9 @@ public final class DfBuildProperties {
     }
 
     // -----------------------------------------------------
-    //                      invokeReplaceSchemaDefinitionMap
-    //                      --------------------------------
-    public DfReplaceSchemaProperties getInvokeReplaceSchemaProperties() {
+    //                            ReplaceSchemaDefinitionMap
+    //                            --------------------------
+    public DfReplaceSchemaProperties getReplaceSchemaProperties() {
         return getHandler().getReplaceSchemaProperties(getProperties());
     }
 

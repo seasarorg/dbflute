@@ -51,6 +51,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     protected boolean _loggingInsertSql;
     protected String _schemaName;
     protected boolean _useDatabaseMetaData;
+    protected boolean _useStringTimestamp;
 
     // ===================================================================================
     //                                                                                Main
@@ -109,6 +110,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 }
 
                 final List<String> columnNameList = new ArrayList<String>();
+                for (int j = 0; j < dataTable.getColumnSize(); j++) {
+                    final DataColumn dataColumn = dataTable.getColumn(j);
+                    final String columnName = dataColumn.getColumnName();
+                    columnNameList.add(columnName);
+                }
+
                 PreparedStatement statement = null;
                 try {
                     for (int j = 0; j < dataTable.getRowSize(); j++) {
@@ -132,7 +139,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                         for (String columnName : columnNameSet) {
                             String value = columnValueMap.get(columnName);
 
+                            // - - - - - - - - - - - - - - - - - - -
                             // Remove double quotation if it exists.
+                            // - - - - - - - - - - - - - - - - - - -
                             if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
                                 value = value.substring(1);
                                 value = value.substring(0, value.length() - 1);
@@ -141,29 +150,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // - - - - - - - - - - - - - - 
                             // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
-                            if (value != null) {
-                                if (!columnMetaInfoMap.isEmpty()) {
-                                    final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-                                    if (columnMetaInfo != null) {
-                                        final int jdbcType = columnMetaInfo.getJdbcTypeCode();
-                                        final String torqueType = TypeMap.getTorqueType(jdbcType);
-                                        final Class<?> columnType = TypeMap.getJavaType(torqueType);
-                                        if (columnType != null && java.util.Date.class.isAssignableFrom(columnType)) {
-                                            if (isTimestampValue(value)) {
-                                                final Timestamp timestampValue = getTimestampValue(value);
-                                                statement.setTimestamp(bindCount, timestampValue);
-                                                bindCount++;
-                                                continue;
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    if (isTimestampValue(value)) {
-                                        final Timestamp timestampValue = getTimestampValue(value);
-                                        statement.setTimestamp(bindCount, timestampValue);
-                                        bindCount++;
-                                        continue;
-                                    }
+                            if (value != null && isUseStringTimestamp()) {
+                                if (isTimestampValue(value)) {
+                                    final Timestamp timestampValue = getTimestampValue(value);
+                                    statement.setTimestamp(bindCount, timestampValue);
+                                    bindCount++;
+                                    continue;
                                 }
                             }
 
@@ -206,7 +198,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 }
 
                                 // /* * * * * * * * * * * * * * * * Against null!
-                                // TODO: @jflute -- I want to change the logic. Use MetaData!
                                 final int type;
                                 if (message.contains("VARCHAR")) {
                                     type = java.sql.Types.VARCHAR;
@@ -395,7 +386,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DataTable table = dataSet.getTable(i);
             final String tableName = table.getTableName();
-            final Map columnMap = getDatabaseMetaColumnMap(tableName, dataSource);
+            final Map<?, ?> columnMap = getDatabaseMetaColumnMap(tableName, dataSource);
 
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DataColumn dataColumn = table.getColumn(j);
@@ -412,7 +403,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             final DataTable table = dataSet.getTable(i);
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableName();
-            final Map columnMap = getDatabaseMetaColumnMap(tableName, dataSource);
+            final Map<?, ?> columnMap = getDatabaseMetaColumnMap(tableName, dataSource);
 
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
@@ -455,7 +446,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return new DfFlexibleNameMap<String, List<String>>(targetMap);
     }
 
-    protected Map getDatabaseMetaColumnMap(String tableName, DataSource dataSource) {
+    protected Map<?, ?> getDatabaseMetaColumnMap(String tableName, DataSource dataSource) {
         final Connection connection;
         final DatabaseMetaData dbMetaData;
         try {
@@ -464,7 +455,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        final Map columnMap = DatabaseMetaDataUtil.getColumnMap(dbMetaData, tableName);
+        final Map<?, ?> columnMap = DatabaseMetaDataUtil.getColumnMap(dbMetaData, tableName);
         return columnMap;
     }
 
@@ -546,23 +537,31 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return _loggingInsertSql;
     }
 
-    public void setLoggingInsertSql(boolean loggingSql) {
-        this._loggingInsertSql = loggingSql;
+    public void setLoggingInsertSql(boolean loggingInsertSql) {
+        this._loggingInsertSql = loggingInsertSql;
     }
 
     public String getSchemaName() {
         return _schemaName;
     }
 
-    public void setSchemaName(String name) {
-        _schemaName = name;
+    public void setSchemaName(String schemaName) {
+        _schemaName = schemaName;
     }
 
     public boolean isUseDatabaseMetaData() {
         return _useDatabaseMetaData;
     }
 
-    public void setUseDatabaseMetaData(boolean databaseMetaData) {
-        _useDatabaseMetaData = databaseMetaData;
+    public void setUseDatabaseMetaData(boolean useDatabaseMetaData) {
+        _useDatabaseMetaData = useDatabaseMetaData;
+    }
+
+    public boolean isUseStringTimestamp() {
+        return _useStringTimestamp;
+    }
+
+    public void setUseStringTimestamp(boolean useStringTimestamp) {
+        _useStringTimestamp = useStringTimestamp;
     }
 }

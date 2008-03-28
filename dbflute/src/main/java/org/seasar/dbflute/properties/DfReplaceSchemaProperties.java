@@ -10,9 +10,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     private static final Log _log = LogFactory.getLog(DfReplaceSchemaProperties.class);
 
-    /**
-     * Constructor.
-     */
     public DfReplaceSchemaProperties(Properties prop) {
         super(prop);
     }
@@ -87,7 +84,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         //            throw new IllegalStateException(msg);
         //        }
     }
-    
+
     public boolean isLoggingInsertSql() {
         String propString = (String) getReplaceSchemaDefinitionMap().get("loggingInsertSql");
         if (propString == null) {
@@ -100,33 +97,25 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public boolean isReplaceSchemaAutoCommit() {
-        final String propString = (String) getReplaceSchemaDefinitionMap().get("isAutoCommit");
-        if (propString == null) {
-            return true;
-        }
-        if (propString != null && propString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
+        return analyzeBooleanProperty("isAutoCommit", true);
     }
 
     public boolean isReplaceSchemaRollbackOnly() {
-        final String propString = (String) getReplaceSchemaDefinitionMap().get("isRollbackOnly");
-        if (propString == null) {
-            return false;
-        }
-        if (propString != null && propString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
+        return analyzeBooleanProperty("isRollbackOnly", false);
     }
 
     public boolean isReplaceSchemaErrorContinue() {
-        final String propString = (String) getReplaceSchemaDefinitionMap().get("isErrorContinue");
+        return analyzeBooleanProperty("isErrorContinue", true);
+    }
+
+    public boolean isReplaceSchemaXlsStringTimestamp() {
+        return analyzeBooleanProperty("isReplaceSchemaXlsStringTimestamp", true);
+    }
+
+    protected boolean analyzeBooleanProperty(String propertyName, boolean defaultDetermination) {
+        final String propString = (String) getReplaceSchemaDefinitionMap().get(propertyName);
         if (propString == null) {
-            return true;
+            return defaultDetermination;
         }
         if (propString != null && propString.equalsIgnoreCase("true")) {
             return true;

@@ -77,7 +77,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("isReplaceSchemaAutoCommit    = " + getMyProperties().isReplaceSchemaAutoCommit());
         _log.info("isReplaceSchemaRollbackOnly  = " + getMyProperties().isReplaceSchemaRollbackOnly());
         _log.info("isReplaceSchemaErrorContinue = " + getMyProperties().isReplaceSchemaErrorContinue());
-
+        _log.info("isReplaceSchemaXlsStringTimestamp = " + getMyProperties().isReplaceSchemaXlsStringTimestamp());
+        
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
         replaceSchema(runInfo);
@@ -90,7 +91,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromXlsAsAdditionalData();
         takeFinally(runInfo);
     }
-
+    
     // --------------------------------------------
     //                            initialize schema
     //                            -----------------
@@ -243,7 +244,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected DfReplaceSchemaProperties getMyProperties() {
-        return DfBuildProperties.getInstance().getInvokeReplaceSchemaProperties();
+        return DfBuildProperties.getInstance().getReplaceSchemaProperties();
     }
 
     // --------------------------------------------
@@ -318,7 +319,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
         xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
         xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
-        xlsDataHandler.setUseDatabaseMetaData(true);// Always use database meta data.
+        if (getBasicProperties().isDatabasePostgreSQL()) {
+            xlsDataHandler.setUseDatabaseMetaData(true);
+        }
+        xlsDataHandler.setUseStringTimestamp(getMyProperties().isReplaceSchemaXlsStringTimestamp());
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
