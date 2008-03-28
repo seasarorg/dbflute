@@ -194,7 +194,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 }
                             }
 
-                            // TODO: @jflute -- I want to change the logic. Use MetaData!
                             try {
                                 statement.setObject(bindCount, value);
                             } catch (SQLException e) {
@@ -207,6 +206,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 }
 
                                 // /* * * * * * * * * * * * * * * * Against null!
+                                // TODO: @jflute -- I want to change the logic. Use MetaData!
                                 final int type;
                                 if (message.contains("VARCHAR")) {
                                     type = java.sql.Types.VARCHAR;
