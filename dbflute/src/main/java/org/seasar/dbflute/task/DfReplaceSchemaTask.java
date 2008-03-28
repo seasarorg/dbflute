@@ -74,11 +74,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("* * * * * * * * * * *");
         _log.info("environmentType: " + getEnvironmentType());
         _log.info("* * * * * * * * * * *");
-        _log.info("loggingInsertSql    = " + getMyProperties().isLoggingInsertSql());
-        _log.info("autoCommit    = " + getMyProperties().isAutoCommit());
-        _log.info("rollbackOnly  = " + getMyProperties().isRollbackOnly());
-        _log.info("errorContinue = " + getMyProperties().isErrorContinue());
-        _log.info("stringTimestamp = " + getMyProperties().isStringTimestamp());
+        _log.info("loggingInsertSql = " + getMyProperties().isLoggingInsertSql());
+        _log.info("autoCommit       = " + getMyProperties().isAutoCommit());
+        _log.info("rollbackOnly     = " + getMyProperties().isRollbackOnly());
+        _log.info("errorContinue    = " + getMyProperties().isErrorContinue());
+        _log.info("stringTimestamp  = " + getMyProperties().isStringTimestamp());
 
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
