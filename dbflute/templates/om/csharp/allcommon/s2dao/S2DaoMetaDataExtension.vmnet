@@ -529,12 +529,18 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         protected override void SetupDatabaseMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (IsEntity(beanType)) {
+			    // = = = = = = = = = = = = = = = = = = = = = = =
+			    // Set up _primaryKeys and _identifierGenerator!
+			    // = = = = = = = = = = = = = = = = = = = = = = =
                 _primaryKeys = new String[_primaryKeyList.size()];
                 int index = 0;
                 foreach (IPropertyType pt in _primaryKeyList) {
                     _primaryKeys[index] = pt.ColumnName;
                     ++index;
                 }
+				if (_identifierGenerator == null) {
+                    _identifierGenerator = Seasar.Dao.Id.IdentifierGeneratorFactory.CreateIdentifierGenerator(null, dbms);
+				}
 			    return;
 			}
             base.SetupDatabaseMetaData(beanType, dbMetaData, dbms);
