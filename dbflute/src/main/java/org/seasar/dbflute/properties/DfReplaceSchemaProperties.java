@@ -108,8 +108,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return analyzeBooleanProperty("isErrorContinue", true);
     }
 
-    public boolean isReplaceSchemaXlsStringTimestamp() {
-        return analyzeBooleanProperty("isReplaceSchemaXlsStringTimestamp", true);
+    public boolean isReplaceSchemaStringTimestamp() {
+        return analyzeBooleanProperty("isStringTimestamp", true);
     }
 
     protected boolean analyzeBooleanProperty(String propertyName, boolean defaultDetermination) {

@@ -74,10 +74,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("* * * * * * * * * * *");
         _log.info("environmentType: " + getEnvironmentType());
         _log.info("* * * * * * * * * * *");
-        _log.info("isReplaceSchemaAutoCommit    = " + getMyProperties().isReplaceSchemaAutoCommit());
-        _log.info("isReplaceSchemaRollbackOnly  = " + getMyProperties().isReplaceSchemaRollbackOnly());
-        _log.info("isReplaceSchemaErrorContinue = " + getMyProperties().isReplaceSchemaErrorContinue());
-        _log.info("isReplaceSchemaXlsStringTimestamp = " + getMyProperties().isReplaceSchemaXlsStringTimestamp());
+        _log.info("isAutoCommit    = " + getMyProperties().isReplaceSchemaAutoCommit());
+        _log.info("isRollbackOnly  = " + getMyProperties().isReplaceSchemaRollbackOnly());
+        _log.info("isErrorContinue = " + getMyProperties().isReplaceSchemaErrorContinue());
+        _log.info("isStringTimestamp = " + getMyProperties().isReplaceSchemaStringTimestamp());
         
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
@@ -322,7 +322,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         if (getBasicProperties().isDatabasePostgreSQL()) {
             xlsDataHandler.setUseDatabaseMetaData(true);
         }
-        xlsDataHandler.setUseStringTimestamp(getMyProperties().isReplaceSchemaXlsStringTimestamp());
+        xlsDataHandler.setUseStringTimestamp(getMyProperties().isReplaceSchemaStringTimestamp());
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
