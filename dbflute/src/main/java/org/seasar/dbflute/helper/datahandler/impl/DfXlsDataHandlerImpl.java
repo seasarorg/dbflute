@@ -137,9 +137,21 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
                             if (value != null) {
+                                boolean dbTypeCertainlyDateAndTimestamp = false;
+                                if (isUseDatabaseMetaData()) {
+                                    final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+                                    if (columnMetaInfo != null) {
+                                        final int jdbcType = columnMetaInfo.getJdbcTypeCode();
+                                        final String torqueType = TypeMap.getTorqueType(jdbcType);
+                                        final Class<?> columnType = TypeMap.getJavaType(torqueType);
+                                        if (columnType != null && java.util.Date.class.isAssignableFrom(columnType)) {
+                                            dbTypeCertainlyDateAndTimestamp = true;
+                                        }
+                                    }
+                                }
                                 // Not use DataColumn about Timestamp
                                 // We trust value format.
-                                if (isTimestampValue(value)) {
+                                if (dbTypeCertainlyDateAndTimestamp && isTimestampValue(value)) {
                                     final Timestamp timestampValue = getTimestampValue(value);
                                     statement.setTimestamp(bindCount, timestampValue);
                                     bindCount++;
@@ -174,6 +186,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 }
                             }
 
+                            // TODO: @jflute -- I want to change the logic. Use MetaData!
                             try {
                                 statement.setObject(bindCount, value);
                             } catch (SQLException e) {

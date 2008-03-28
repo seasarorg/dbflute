@@ -77,7 +77,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("isReplaceSchemaAutoCommit    = " + getMyProperties().isReplaceSchemaAutoCommit());
         _log.info("isReplaceSchemaRollbackOnly  = " + getMyProperties().isReplaceSchemaRollbackOnly());
         _log.info("isReplaceSchemaErrorContinue = " + getMyProperties().isReplaceSchemaErrorContinue());
-        
+
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
         replaceSchema(runInfo);
@@ -90,7 +90,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromXlsAsAdditionalData();
         takeFinally(runInfo);
     }
-    
+
     // --------------------------------------------
     //                            initialize schema
     //                            -----------------
@@ -318,9 +318,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
         xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
         xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
-        if (getBasicProperties().isDatabasePostgreSQL()) {
-            xlsDataHandler.setUseDatabaseMetaData(true);
-        }
+        xlsDataHandler.setUseDatabaseMetaData(true);// Always use database meta data.
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
