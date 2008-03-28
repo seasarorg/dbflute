@@ -96,26 +96,36 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return propString.equalsIgnoreCase("true");
     }
 
-    public boolean isReplaceSchemaAutoCommit() {
+    public boolean isAutoCommit() {
         return analyzeBooleanProperty("isAutoCommit", true);
     }
 
-    public boolean isReplaceSchemaRollbackOnly() {
+    public boolean isRollbackOnly() {
         return analyzeBooleanProperty("isRollbackOnly", false);
     }
 
-    public boolean isReplaceSchemaErrorContinue() {
+    public boolean isErrorContinue() {
         return analyzeBooleanProperty("isErrorContinue", true);
     }
 
-    public boolean isReplaceSchemaStringTimestamp() {
+    public boolean isStringTimestamp() {
         return analyzeBooleanProperty("isStringTimestamp", true);
     }
 
     protected boolean analyzeBooleanProperty(String propertyName, boolean defaultDetermination) {
-        final String propString = (String) getReplaceSchemaDefinitionMap().get(propertyName);
+        String propString = (String) getReplaceSchemaDefinitionMap().get(propertyName);
         if (propString == null) {
-            return defaultDetermination;
+            if (propertyName.startsWith("is")) {
+                final String secondString = propertyName.substring("is".length());
+                final String secondProperty = secondString.substring(0).toLowerCase() + secondString.substring(1);
+                final String secondPropString = (String) getReplaceSchemaDefinitionMap().get(secondProperty);
+                if (secondPropString != null) {
+                    propString = secondPropString;
+                }
+            }
+            if (propString == null) {
+                return defaultDetermination;
+            }
         }
         if (propString != null && propString.equalsIgnoreCase("true")) {
             return true;

@@ -74,11 +74,12 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("* * * * * * * * * * *");
         _log.info("environmentType: " + getEnvironmentType());
         _log.info("* * * * * * * * * * *");
-        _log.info("isAutoCommit    = " + getMyProperties().isReplaceSchemaAutoCommit());
-        _log.info("isRollbackOnly  = " + getMyProperties().isReplaceSchemaRollbackOnly());
-        _log.info("isErrorContinue = " + getMyProperties().isReplaceSchemaErrorContinue());
-        _log.info("isStringTimestamp = " + getMyProperties().isReplaceSchemaStringTimestamp());
-        
+        _log.info("loggingInsertSql    = " + getMyProperties().isLoggingInsertSql());
+        _log.info("autoCommit    = " + getMyProperties().isAutoCommit());
+        _log.info("rollbackOnly  = " + getMyProperties().isRollbackOnly());
+        _log.info("errorContinue = " + getMyProperties().isErrorContinue());
+        _log.info("stringTimestamp = " + getMyProperties().isStringTimestamp());
+
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
         replaceSchema(runInfo);
@@ -91,7 +92,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromXlsAsAdditionalData();
         takeFinally(runInfo);
     }
-    
+
     // --------------------------------------------
     //                            initialize schema
     //                            -----------------
@@ -154,9 +155,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
         runInfo.setEncoding(getReplaceSchemaSqlFileEncoding());
-        runInfo.setAutoCommit(getMyProperties().isReplaceSchemaAutoCommit());
-        runInfo.setErrorContinue(getMyProperties().isReplaceSchemaErrorContinue());
-        runInfo.setRollbackOnly(getMyProperties().isReplaceSchemaRollbackOnly());
+        runInfo.setAutoCommit(getMyProperties().isAutoCommit());
+        runInfo.setErrorContinue(getMyProperties().isErrorContinue());
+        runInfo.setRollbackOnly(getMyProperties().isRollbackOnly());
         return runInfo;
     }
 
@@ -322,7 +323,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         if (getBasicProperties().isDatabasePostgreSQL()) {
             xlsDataHandler.setUseDatabaseMetaData(true);
         }
-        xlsDataHandler.setUseStringTimestamp(getMyProperties().isReplaceSchemaStringTimestamp());
+        xlsDataHandler.setUseStringTimestamp(getMyProperties().isStringTimestamp());
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (basicProperties.isDatabaseSqlServer()) {
             xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
