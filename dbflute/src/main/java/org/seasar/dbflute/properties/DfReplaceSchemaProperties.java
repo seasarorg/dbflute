@@ -117,7 +117,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (propString == null) {
             if (propertyName.startsWith("is")) {
                 final String secondString = propertyName.substring("is".length());
-                final String secondProperty = secondString.substring(0).toLowerCase() + secondString.substring(1);
+                final String secondProperty = secondString.substring(0, 1).toLowerCase() + secondString.substring(1);
                 final String secondPropString = (String) getReplaceSchemaDefinitionMap().get(secondProperty);
                 if (secondPropString != null) {
                     propString = secondPropString;
