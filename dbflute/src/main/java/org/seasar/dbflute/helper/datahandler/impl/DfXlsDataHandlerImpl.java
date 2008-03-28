@@ -131,6 +131,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                         final Set<String> columnNameSet = columnValueMap.keySet();
                         for (String columnName : columnNameSet) {
                             String value = columnValueMap.get(columnName);
+
+                            // Remove double quotation if it exists.
                             if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
                                 value = value.substring(1);
                                 value = value.substring(0, value.length() - 1);
@@ -140,7 +142,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
                             if (value != null) {
-                                boolean dbTypeCertainlyDateAndTimestamp = false;
                                 if (!columnMetaInfoMap.isEmpty()) {
                                     final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
                                     if (columnMetaInfo != null) {
@@ -148,17 +149,21 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                         final String torqueType = TypeMap.getTorqueType(jdbcType);
                                         final Class<?> columnType = TypeMap.getJavaType(torqueType);
                                         if (columnType != null && java.util.Date.class.isAssignableFrom(columnType)) {
-                                            dbTypeCertainlyDateAndTimestamp = true;
+                                            if (isTimestampValue(value)) {
+                                                final Timestamp timestampValue = getTimestampValue(value);
+                                                statement.setTimestamp(bindCount, timestampValue);
+                                                bindCount++;
+                                                continue;
+                                            }
                                         }
                                     }
-                                }
-                                // Not use DataColumn about Timestamp
-                                // We trust value format.
-                                if (dbTypeCertainlyDateAndTimestamp && isTimestampValue(value)) {
-                                    final Timestamp timestampValue = getTimestampValue(value);
-                                    statement.setTimestamp(bindCount, timestampValue);
-                                    bindCount++;
-                                    continue;
+                                } else {
+                                    if (isTimestampValue(value)) {
+                                        final Timestamp timestampValue = getTimestampValue(value);
+                                        statement.setTimestamp(bindCount, timestampValue);
+                                        bindCount++;
+                                        continue;
+                                    }
                                 }
                             }
 
@@ -254,9 +259,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     }
                 }
             }
-            // Commentted out for Performance Tuning.
-            //            final SqlWriter sqlWriter = new SqlWriter(dataSource);
-            //            sqlWriter.write(dataSet);
         }
     }
 
