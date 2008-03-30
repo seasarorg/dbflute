@@ -175,39 +175,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 continue;
                             }
 
-                            try {
-                                statement.setObject(bindCount, value);
-                            } catch (SQLException e) {
-                                if (value != null) {
-                                    throw e;
-                                }
-                                final String message = e.getMessage();
-                                if (!message.contains("null")) {
-                                    throw e;
-                                }
-
-                                // /* * * * * * * * * * * * * * * * Against null!
-                                // If the column does not have meta data.
-                                final int type;
-                                if (message.contains("VARCHAR")) {
-                                    type = java.sql.Types.VARCHAR;
-                                } else if (message.contains("CLOB")) {
-                                    type = java.sql.Types.CLOB;
-                                } else if (message.contains("INTEGER")) {
-                                    type = java.sql.Types.INTEGER;
-                                } else {
-                                    type = java.sql.Types.VARCHAR;
-                                }
-                                try {
-                                    statement.setNull(bindCount, type);
-                                    String msg = "The exception was simple so that it set null as VARCHAR: bindCount=";
-                                    _log.debug(msg + bindCount);
-                                } catch (Exception ignored) {
-                                    _log.debug("The exception was not simple: ignored=" + ignored.getMessage());
-                                    throw e;
-                                }
-                                // * * * * * */
-                            }
+                            statement.setObject(bindCount, value);
                             bindCount++;
                         }
                         statement.addBatch();
@@ -280,13 +248,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         if (!java.sql.Date.class.isAssignableFrom(columnType)) {
             return false;
         }
-        if (isTimestampValue(value)) {
-            final Timestamp timestampValue = getTimestampValue(value);
-            statement.setTimestamp(bindCount, timestampValue);
-            return true;
-        } else {
+        if (!isTimestampValue(value)) {
             return false;
         }
+        final Timestamp timestampValue = getTimestampValue(value);
+        statement.setTimestamp(bindCount, timestampValue);
+        return true;
     }
 
     protected boolean processNumber(String columnName, String value, PreparedStatement statement, int bindCount,
@@ -307,18 +274,17 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         if (!Number.class.isAssignableFrom(columnType)) {
             return false;
         }
-        if (isBigDecimalValue(value)) {
-            final BigDecimal bigDecimalValue = getBigDecimalValue(value);
-            try {
-                final long longValue = bigDecimalValue.longValueExact();
-                statement.setLong(bindCount, longValue);
-                return true;
-            } catch (ArithmeticException e) {
-                statement.setBigDecimal(bindCount, bigDecimalValue);
-                return true;
-            }
-        } else {
+        if (!isBigDecimalValue(value)) {
             return false;
+        }
+        final BigDecimal bigDecimalValue = getBigDecimalValue(value);
+        try {
+            final long longValue = bigDecimalValue.longValueExact();
+            statement.setLong(bindCount, longValue);
+            return true;
+        } catch (ArithmeticException e) {
+            statement.setBigDecimal(bindCount, bigDecimalValue);
+            return true;
         }
     }
 
