@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.datahandler.DfSeparatedDataSeveralHandlingInfo;
@@ -48,39 +47,41 @@ import org.seasar.dbflute.task.bs.DfAbstractTask;
 
 public class DfReplaceSchemaTask extends DfAbstractTask {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfReplaceSchemaTask.class);
 
-    // =========================================================================================
-    //                                                                                DataSource
-    //                                                                                ==========
+    // ===================================================================================
+    //                                                                 DataSource Override
+    //                                                                 ===================
     @Override
     protected boolean isUseDataSource() {
         return true;
     }
 
-    // =========================================================================================
-    //                                                                                   Execute
-    //                                                                                   =======
-    /**
-     * Load the sql file and then execute it.
-     *
-     * @throws BuildException
-     */
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     @Override
     protected void doExecute() {
-        _log.info("* * * * * * * * * * *");
-        _log.info("environmentType: " + getEnvironmentType());
-        _log.info("* * * * * * * * * * *");
-        _log.info("loggingInsertSql = " + getMyProperties().isLoggingInsertSql());
-        _log.info("autoCommit       = " + getMyProperties().isAutoCommit());
-        _log.info("rollbackOnly     = " + getMyProperties().isRollbackOnly());
-        _log.info("errorContinue    = " + getMyProperties().isErrorContinue());
-        _log.info("stringTimestamp  = " + getMyProperties().isStringTimestamp());
+        if (_log.isInfoEnabled()) {
+            _log.info("* * * * * * * * * * *");
+            _log.info("environmentType: " + getEnvironmentType());
+            _log.info("* * * * * * * * * * *");
+            _log.info("loggingInsertSql = " + getMyProperties().isLoggingInsertSql());
+            _log.info("autoCommit       = " + getMyProperties().isAutoCommit());
+            _log.info("rollbackOnly     = " + getMyProperties().isRollbackOnly());
+            _log.info("errorContinue    = " + getMyProperties().isErrorContinue());
+            _log.info("sqlFileEncoding  = " + getMyProperties().getSqlFileEncoding());
+        }
 
         initializeSchema();
+
         final DfRunnerInformation runInfo = createRunnerInformation();
-        replaceSchema(runInfo);
+        createSchema(runInfo);
+
         writeDbFromSeparatedFileAsCommonData("tsv", "\t");
         writeDbFromSeparatedFileAsCommonData("csv", ",");
         writeDbFromXlsAsCommonData();
@@ -88,11 +89,12 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         writeDbFromSeparatedFileAsAdditionalData("tsv", "\t");
         writeDbFromSeparatedFileAsAdditionalData("csv", ",");
         writeDbFromXlsAsAdditionalData();
+
         takeFinally(runInfo);
     }
 
     // --------------------------------------------
-    //                            initialize schema
+    //                            Initialize Schema
     //                            -----------------
     protected void initializeSchema() {
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
@@ -144,8 +146,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     // --------------------------------------------
-    //                                       runner
-    //                                       ------
+    //                                Create Schema
+    //                                -------------
     protected DfRunnerInformation createRunnerInformation() {
         final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
@@ -160,10 +162,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected String getReplaceSchemaSqlFileEncoding() {
-        return "UTF-8";
+        return getMyProperties().getSqlFileEncoding();
     }
 
-    protected void replaceSchema(DfRunnerInformation runInfo) {
+    protected void createSchema(DfRunnerInformation runInfo) {
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
     }
@@ -177,9 +179,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource());
     }
 
-    // --------------------------------------------
-    //                      replace schema sql file
-    //                      -----------------------
     protected List<File> getReplaceSchemaSqlFileList() {
         final List<File> fileList = new ArrayList<File>();
         fileList.addAll(getReplaceSchemaNextSqlFileList());
@@ -199,6 +198,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
                 return false;
             }
         };
+
         // Order by FileName Asc
         final Comparator<File> fileNameAscComparator = new Comparator<File>() {
             public int compare(File o1, File o2) {
@@ -247,8 +247,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     // --------------------------------------------
-    //                           after all sql file
-    //                           ------------------
+    //                                 Take Finally
+    //                                 ------------
     protected List<File> getTakeFinallySqlFileList() {
         final List<File> fileList = new ArrayList<File>();
         fileList.addAll(getTakeFinallyNextSqlFileList());
@@ -304,37 +304,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     // --------------------------------------------
-    //                                     xls data
-    //                                     --------
-    protected void writeDbFromXlsAsCommonData() {
-        writeDbFromXls(getCommonDataDirectoryPath("xls"));
-    }
-
-    protected void writeDbFromXlsAsAdditionalData() {
-        writeDbFromXls(getAdditionalDataDirectoryPath(getEnvironmentType(), "xls"));
-    }
-
-    protected void writeDbFromXls(String directoryPath) {
-        final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
-        xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
-        xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
-        if (getBasicProperties().isDatabasePostgreSQL()) {
-            xlsDataHandler.setUseDatabaseMetaData(true);
-        }
-        xlsDataHandler.setUseStringTimestamp(getMyProperties().isStringTimestamp());
-        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        if (basicProperties.isDatabaseSqlServer()) {
-            xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
-        } else if (basicProperties.isDatabaseSybase()) {
-            xlsDataHandler.writeSeveralDataForSybase(directoryPath, getDataSource());
-        } else {
-            xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
-        }
-    }
-
-    // --------------------------------------------
-    //                                     tsv data
-    //                                     --------
+    //                               Separated Data
+    //                               --------------
     protected void writeDbFromSeparatedFileAsCommonData(String typeName, String delimter) {
         writeDbFromSeparatedFile(typeName, delimter, getCommonDataDirectoryPath("tsv"));
     }
@@ -380,5 +351,30 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected String getAdditionalDataDirectoryPath(final String envType, final String typeName) {
         return getReplaceSchemaSqlFileDirectoryName() + "/data/" + envType + "/" + typeName;
+    }
+
+    // --------------------------------------------
+    //                                     Xls Data
+    //                                     --------
+    protected void writeDbFromXlsAsCommonData() {
+        writeDbFromXls(getCommonDataDirectoryPath("xls"));
+    }
+
+    protected void writeDbFromXlsAsAdditionalData() {
+        writeDbFromXls(getAdditionalDataDirectoryPath(getEnvironmentType(), "xls"));
+    }
+
+    protected void writeDbFromXls(String directoryPath) {
+        final DfXlsDataHandlerImpl xlsDataHandler = new DfXlsDataHandlerImpl();
+        xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
+        xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
+        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
+        if (basicProperties.isDatabaseSqlServer()) {
+            xlsDataHandler.writeSeveralDataForSqlServer(directoryPath, getDataSource());
+        } else if (basicProperties.isDatabaseSybase()) {
+            xlsDataHandler.writeSeveralDataForSybase(directoryPath, getDataSource());
+        } else {
+            xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
+        }
     }
 }

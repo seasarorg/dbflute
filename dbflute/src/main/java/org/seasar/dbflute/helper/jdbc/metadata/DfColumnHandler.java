@@ -43,23 +43,20 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                                                        ============
     /**
      * Retrieves all the column names and types for a given table from
-     * JDBC metadata.  It returns a List of Lists.  Each element
+     * JDBC meta data.  It returns a List of Lists.  Each element
      * of the returned List is a List with:
      *
-     * @param dbMeta JDBC metadata.
+     * @param dbMeta JDBC meta data.
      * @param schemaName Schema name. (NotNull & AllowedEmpty)
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return The list of columns in <code>tableName</code>.
-     * @throws SQLException
      */
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, DfTableMetaInfo tableMetaInfo)
-            throws SQLException {
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, DfTableMetaInfo tableMetaInfo) {
         final String tableName = tableMetaInfo.getTableName();
         return getColumns(dbMeta, tableMetaInfo.selectRealSchemaName(schemaName), tableName);
     }
 
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName)
-            throws SQLException {
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName) {
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
         try {
@@ -88,11 +85,14 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 columns.add(columnMetaInfo);
             }
         } catch (SQLException e) {
-            _log.warn("SQLException occured: schemaName=" + schemaName + " tableName=" + tableName);
-            throw e;
+            String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
+            throw new IllegalStateException(msg);
         } finally {
             if (columnResultSet != null) {
-                columnResultSet.close();
+                try {
+                    columnResultSet.close();
+                } catch (SQLException ignored) {
+                }
             }
         }
         return columns;

@@ -8,83 +8,57 @@ import org.apache.commons.logging.LogFactory;
 
 public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfReplaceSchemaProperties.class);
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfReplaceSchemaProperties(Properties prop) {
         super(prop);
     }
 
-    // ===============================================================================
-    //                                   Properties - invokeReplaceSchemaDefinitionMap
-    //                                   =============================================
-    public static final String KEY_oldKey = "invokeReplaceSchemaDefinitionMap";
+    // ===================================================================================
+    //                                                          replaceSchemaDefinitionMap
+    //                                                          ==========================
     public static final String KEY_replaceSchemaDefinitionMap = "replaceSchemaDefinitionMap";
     protected Map<String, Object> _replaceSchemaDefinitionMap;
 
     public Map<String, Object> getReplaceSchemaDefinitionMap() {
         if (_replaceSchemaDefinitionMap == null) {
-            final Map<String, Object> defaultMap = mapProp("torque." + KEY_oldKey, DEFAULT_EMPTY_MAP);
-            _replaceSchemaDefinitionMap = mapProp("torque." + KEY_replaceSchemaDefinitionMap, defaultMap);
+            _replaceSchemaDefinitionMap = mapProp("torque." + KEY_replaceSchemaDefinitionMap, DEFAULT_EMPTY_MAP);
             _log.info("...Initializing " + KEY_replaceSchemaDefinitionMap + ": " + _replaceSchemaDefinitionMap);
         }
         return _replaceSchemaDefinitionMap;
     }
 
+    // ===================================================================================
+    //                                                                            SQL File
+    //                                                                            ========
     public String getReplaceSchemaSqlFile() {
-        final String sqlFile = (String) getReplaceSchemaDefinitionMap().get("sqlFile");
-        if (sqlFile != null && sqlFile.trim().length() != 0) {
-            return sqlFile;
-        } else {
-            return "./playsql/replace-schema.sql";
-        }
+        return "./playsql/replace-schema.sql";
     }
 
     public String getTakeFinallySqlFile() {
         return "./playsql/take-finally.sql";
     }
 
-    public boolean isEnvironmentTypeTest() {
-        return getEnvironmentType().equalsIgnoreCase("test");
-    }
-
-    public boolean isEnvironmentTypeUT() {
-        return getEnvironmentType().equalsIgnoreCase("ut");
-    }
-
-    public boolean isEnvironmentTypeIT() {
-        return getEnvironmentType().equalsIgnoreCase("it");
-    }
-
-    public boolean isEnvironmentTypePT() {
-        return getEnvironmentType().equalsIgnoreCase("pt");
-    }
-
-    public boolean isEnvironmentTypeReal() {
-        return getEnvironmentType().equalsIgnoreCase("real");
-    }
-
+    // ===================================================================================
+    //                                                                    Environment Type
+    //                                                                    ================
     public String getEnvironmentType() {
         final String propString = (String) getReplaceSchemaDefinitionMap().get("environmentType");
         if (propString == null) {
             return "ut";
         }
         return propString;
-
-        // For All OK!
-        //        if (propString.trim().equalsIgnoreCase("ut")) {
-        //            return "ut";
-        //        } else if (propString.trim().equalsIgnoreCase("it")) {
-        //            return "it";
-        //        } else if (propString.trim().equalsIgnoreCase("pt")) {
-        //            return "pt";
-        //        } else if (propString.trim().equalsIgnoreCase("real")) {
-        //            return "real";
-        //        } else {
-        //            String msg = "The environmentType[" + propString + "] is unsupported. Options are {test/it/pt/real}";
-        //            throw new IllegalStateException(msg);
-        //        }
     }
 
+    // ===================================================================================
+    //                                                                    Other Properties
+    //                                                                    ================
     public boolean isLoggingInsertSql() {
         String propString = (String) getReplaceSchemaDefinitionMap().get("loggingInsertSql");
         if (propString == null) {
@@ -108,10 +82,18 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return analyzeBooleanProperty("isErrorContinue", true);
     }
 
-    public boolean isStringTimestamp() {
-        return analyzeBooleanProperty("isStringTimestamp", true);
+    public String getSqlFileEncoding() {
+        final String sqlFileEncoding = (String) getReplaceSchemaDefinitionMap().get("sqlFileEncoding");
+        if (sqlFileEncoding != null && sqlFileEncoding.trim().length() != 0) {
+            return sqlFileEncoding;
+        } else {
+            return "UTF-8";
+        }
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected boolean analyzeBooleanProperty(String propertyName, boolean defaultDetermination) {
         String propString = (String) getReplaceSchemaDefinitionMap().get(propertyName);
         if (propString == null) {

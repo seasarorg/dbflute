@@ -1,3 +1,18 @@
+/*
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.helper.datahandler.impl;
 
 import java.io.File;
@@ -42,6 +57,9 @@ import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
 
 public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
 
@@ -50,11 +68,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     //                                                                           =========
     protected boolean _loggingInsertSql;
     protected String _schemaName;
-    protected boolean _useDatabaseMetaData;
-    protected boolean _useStringTimestamp;
 
     // ===================================================================================
-    //                                                                                Main
+    //                                                                                Read
     //                                                                                ====
     public List<DataSet> readSeveralData(String dataDirectoryName) {
         final List<File> xlsList = getXlsList(dataDirectoryName);
@@ -66,6 +82,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         return ls;
     }
 
+    // ===================================================================================
+    //                                                                               Write
+    //                                                                               =====
     public void writeSeveralData(String dataDirectoryName, final DataSource dataSource) {
         final List<File> xlsList = getXlsList(dataDirectoryName);
 
@@ -89,26 +108,11 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     continue;
                 }
 
-                // ColumnMetaInfo
-                final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
-                if (isUseDatabaseMetaData()) {
-                    try {
-                        final DfColumnHandler columnHandler = new DfColumnHandler();
-                        final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-                        List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData, _schemaName,
-                                tableName);
-                        if (columnMetaDataList == null || columnMetaDataList.isEmpty()) {
-                            columnMetaDataList = columnHandler.getColumns(metaData, _schemaName, tableName
-                                    .toLowerCase());
-                        }
-                        for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
-                            columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
-                        }
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                // Set up columnMetaInfo.
+                final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(dataSource,
+                        tableName);
 
+                // Set up columnNameList.
                 final List<String> columnNameList = new ArrayList<String>();
                 for (int j = 0; j < dataTable.getColumnSize(); j++) {
                     final DataColumn dataColumn = dataTable.getColumn(j);
@@ -138,6 +142,14 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                         final Set<String> columnNameSet = columnValueMap.keySet();
                         for (String columnName : columnNameSet) {
                             String value = columnValueMap.get(columnName);
+                            if (value == null) {
+                                final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+                                if (columnMetaInfo != null) {
+                                    final int jdbcTypeCode = columnMetaInfo.getJdbcTypeCode();
+                                    statement.setNull(bindCount, jdbcTypeCode);
+                                    bindCount++;
+                                }
+                            }
 
                             // - - - - - - - - - - - - - - - - - - -
                             // Remove double quotation if it exists.
@@ -150,40 +162,17 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // - - - - - - - - - - - - - - 
                             // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
-                            if (value != null && isUseStringTimestamp()) {
-                                if (isTimestampValue(value)) {
-                                    final Timestamp timestampValue = getTimestampValue(value);
-                                    statement.setTimestamp(bindCount, timestampValue);
-                                    bindCount++;
-                                    continue;
-                                }
+                            if (processTimestamp(columnName, value, statement, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
                             }
 
                             // - - - - - - - - - - - - - - 
                             // Against Number Headache
                             // - - - - - - - - - - - - - -
-                            if (value != null && !columnMetaInfoMap.isEmpty()) {
-                                final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-                                if (columnMetaInfo != null) {
-                                    final int jdbcType = columnMetaInfo.getJdbcTypeCode();
-                                    final String torqueType = TypeMap.getTorqueType(jdbcType);
-                                    final Class<?> columnType = TypeMap.getJavaType(torqueType);
-                                    if (columnType != null && Number.class.isAssignableFrom(columnType)) {
-                                        if (isBigDecimalValue(value)) {
-                                            final BigDecimal bigDecimalValue = getBigDecimalValue(value);
-                                            try {
-                                                final long longValue = bigDecimalValue.longValueExact();
-                                                statement.setLong(bindCount, longValue);
-                                                bindCount++;
-                                                continue;
-                                            } catch (ArithmeticException e) {
-                                                statement.setBigDecimal(bindCount, bigDecimalValue);
-                                                bindCount++;
-                                                continue;
-                                            }
-                                        }
-                                    }
-                                }
+                            if (processNumber(columnName, value, statement, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
                             }
 
                             try {
@@ -198,6 +187,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 }
 
                                 // /* * * * * * * * * * * * * * * * Against null!
+                                // If the column does not have meta data.
                                 final int type;
                                 if (message.contains("VARCHAR")) {
                                     type = java.sql.Types.VARCHAR;
@@ -250,6 +240,87 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                     }
                 }
             }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected DfFlexibleNameMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
+        final DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleNameMap<String, DfColumnMetaInfo>();
+        try {
+            final DfColumnHandler columnHandler = new DfColumnHandler();
+            final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+            List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData, _schemaName, tableName);
+            if (columnMetaDataList == null || columnMetaDataList.isEmpty()) {
+                columnMetaDataList = columnHandler.getColumns(metaData, _schemaName, tableName.toLowerCase());
+            }
+            for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
+                columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
+            }
+            return columnMetaInfoMap;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected boolean processTimestamp(String columnName, String value, PreparedStatement statement, int bindCount,
+            DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (value == null) {
+            return false;
+        }
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo == null) {
+            return false;
+        }
+        final int jdbcTypeCode = columnMetaInfo.getJdbcTypeCode();
+        final String torqueType = TypeMap.getTorqueType(jdbcTypeCode);
+        final Class<?> columnType = TypeMap.getJavaType(torqueType);
+        if (columnType == null) {
+            return false;
+        }
+        if (!java.sql.Date.class.isAssignableFrom(columnType)) {
+            return false;
+        }
+        if (isTimestampValue(value)) {
+            final Timestamp timestampValue = getTimestampValue(value);
+            statement.setTimestamp(bindCount, timestampValue);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected boolean processNumber(String columnName, String value, PreparedStatement statement, int bindCount,
+            DfFlexibleNameMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (value == null) {
+            return false;
+        }
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo == null) {
+            return false;
+        }
+        final int jdbcType = columnMetaInfo.getJdbcTypeCode();
+        final String torqueType = TypeMap.getTorqueType(jdbcType);
+        final Class<?> columnType = TypeMap.getJavaType(torqueType);
+        if (columnType == null) {
+            return false;
+        }
+        if (!Number.class.isAssignableFrom(columnType)) {
+            return false;
+        }
+        if (isBigDecimalValue(value)) {
+            final BigDecimal bigDecimalValue = getBigDecimalValue(value);
+            try {
+                final long longValue = bigDecimalValue.longValueExact();
+                statement.setLong(bindCount, longValue);
+                return true;
+            } catch (ArithmeticException e) {
+                statement.setBigDecimal(bindCount, bigDecimalValue);
+                return true;
+            }
+        } else {
+            return false;
         }
     }
 
@@ -308,6 +379,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
     }
 
+    // ===================================================================================
+    //                                                                     Special Support
+    //                                                                     ===============
     public void writeSeveralDataForSqlServer(String dataDirectoryName, final DataSource dataSource) {
         final List<File> xlsList = getXlsList(dataDirectoryName);
 
@@ -547,21 +621,5 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     public void setSchemaName(String schemaName) {
         _schemaName = schemaName;
-    }
-
-    public boolean isUseDatabaseMetaData() {
-        return _useDatabaseMetaData;
-    }
-
-    public void setUseDatabaseMetaData(boolean useDatabaseMetaData) {
-        _useDatabaseMetaData = useDatabaseMetaData;
-    }
-
-    public boolean isUseStringTimestamp() {
-        return _useStringTimestamp;
-    }
-
-    public void setUseStringTimestamp(boolean useStringTimestamp) {
-        _useStringTimestamp = useStringTimestamp;
     }
 }

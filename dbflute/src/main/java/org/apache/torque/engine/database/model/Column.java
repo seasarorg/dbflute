@@ -74,21 +74,23 @@ import org.xml.sax.Attributes;
 
 /**
  * A Class for holding data about a column used in an Application.
- *
- * @author Modified by mkubo
+ * @author Modified by jflute
  */
 public class Column {
-    /** Logging class from commons.logging */
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static Log _log = LogFactory.getLog(Column.class);
 
-    // ==============================================================================
-    //                                                                      Attribute
-    //                                                                      =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private Table _parentTable;
 
-    // ------------------------------------
-    //                                Basic
-    //                                -----
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     private String _name;
 
     private String _description;
@@ -99,9 +101,9 @@ public class Column {
 
     private String _defaultValue;
 
-    // ------------------------------------
-    //                                 Type
-    //                                 ----
+    // -----------------------------------------------------
+    //                                                  Type
+    //                                                  ----
     private String _torqueType;
 
     private String _dbType;
