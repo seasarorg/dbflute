@@ -129,6 +129,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             DfDropForeignKeyByJdbcCallback callback) {
         Statement statement = null;
         try {
+            statement = connection.createStatement();
             for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
                 final DfForeignKeyHandler handler = new DfForeignKeyHandler();
                 final DatabaseMetaData dbMetaData = connection.getMetaData();
