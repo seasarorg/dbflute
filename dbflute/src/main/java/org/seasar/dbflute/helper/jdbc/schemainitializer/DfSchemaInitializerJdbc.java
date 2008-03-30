@@ -39,7 +39,6 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                   Initialize Schema
     //                                                                   =================
     public void initializeSchema() {
-        _log.info("initializeSchema(): " + _schema);
         Connection connection = null;
         try {
             connection = _dataSource.getConnection();
@@ -51,16 +50,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            _log.info("");
-            _log.info("truncateTableIfPossible()");
             truncateTableIfPossible(connection, tableMetaInfoList);
-            _log.info("");
-            _log.info("dropForeignKey()");
             dropForeignKey(connection, tableMetaInfoList);
-            _log.info("");
-            _log.info("dropTable()");
             dropTable(connection, tableMetaInfoList);
-            _log.info("");
         } catch (SQLException e) {
             if (connection != null) {
                 try {
