@@ -19,8 +19,7 @@ import org.seasar.dbflute.helper.flexiblename.DfFlexibleNameMap;
 import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
- * Classification properties for Torque.
- * 
+ * Classification properties.
  * @author jflute
  */
 public final class DfClassificationProperties extends DfAbstractHelperProperties {

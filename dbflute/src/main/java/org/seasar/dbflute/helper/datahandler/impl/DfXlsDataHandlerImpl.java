@@ -55,6 +55,10 @@ import org.seasar.extension.dataset.states.SqlContext;
 import org.seasar.extension.dataset.types.ColumnTypes;
 import org.seasar.extension.jdbc.util.DatabaseMetaDataUtil;
 
+/**
+ * Classification properties.
+ * @author jflute
+ */
 public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     // ===================================================================================
