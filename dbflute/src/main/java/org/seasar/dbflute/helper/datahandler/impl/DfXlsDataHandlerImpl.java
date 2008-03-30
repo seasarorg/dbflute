@@ -148,6 +148,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                     final int jdbcTypeCode = columnMetaInfo.getJdbcTypeCode();
                                     statement.setNull(bindCount, jdbcTypeCode);
                                     bindCount++;
+                                    continue;
                                 }
                             }
 
