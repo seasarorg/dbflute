@@ -554,7 +554,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         columnNameString = columnNameString.substring(1, columnNameString.length() - 1);
         String bindParameterString = bindParameters.toString();
         bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
-        return "insert into " + tableName + "(" + columnNameString + ") values(" + bindParameterString + ")";
+        return tableName + ":{" + bindParameterString + "}";
     }
 
     public static class MyCreatedState {
