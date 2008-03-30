@@ -140,11 +140,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
                     final String dropForeignKeySql = callback.buildDropForeignKeySql(foreignKeyMetaInfo);
                     _log.info(dropForeignKeySql);
-                    try {
-                        statement.execute(dropForeignKeySql);
-                    } catch (SQLException ignored) {
-                        _log.info("  *Failed to drop " + foreignKeyMetaInfo.getForeignKeyName());
-                    }
+                    statement.execute(dropForeignKeySql);
                 }
             }
         } catch (SQLException e) {
