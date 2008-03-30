@@ -67,14 +67,16 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     @Override
     protected void doExecute() {
         if (_log.isInfoEnabled()) {
-            _log.info("* * * * * * * * * * *");
+            _log.info("/* * * * * * * * * * * * * * * * * *");
+            _log.info("Replace Schema Properties: ");
+            _log.info("* * * * * * * * * */");
             _log.info("environmentType: " + getEnvironmentType());
-            _log.info("* * * * * * * * * * *");
             _log.info("loggingInsertSql = " + getMyProperties().isLoggingInsertSql());
             _log.info("autoCommit       = " + getMyProperties().isAutoCommit());
             _log.info("rollbackOnly     = " + getMyProperties().isRollbackOnly());
             _log.info("errorContinue    = " + getMyProperties().isErrorContinue());
             _log.info("sqlFileEncoding  = " + getMyProperties().getSqlFileEncoding());
+            _log.info("");
         }
 
         initializeSchema();
@@ -97,6 +99,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                            Initialize Schema
     //                            -----------------
     protected void initializeSchema() {
+        if (_log.isInfoEnabled()) {
+            _log.info("/* * * * * * * * * * * * * * * * * *");
+            _log.info("initializeSchema(): " + _schema);
+            _log.info("* * * * * * * * * */");
+        }
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaInitializer initializer;
         if (basicProperties.isDatabaseMySQL()) {
@@ -112,6 +119,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         }
         if (initializer != null) {
             initializer.initializeSchema();
+        }
+        if (_log.isInfoEnabled()) {
+            _log.info("");
         }
     }
 
@@ -167,13 +177,29 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void createSchema(DfRunnerInformation runInfo) {
+        if (_log.isInfoEnabled()) {
+            _log.info("/* * * * * * * * * * * * * * * * * *");
+            _log.info("createSchema(): " + _schema);
+            _log.info("* * * * * * * * * */");
+        }
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
+        if (_log.isInfoEnabled()) {
+            _log.info("");
+        }
     }
 
     protected void takeFinally(DfRunnerInformation runInfo) {
+        if (_log.isInfoEnabled()) {
+            _log.info("/* * * * * * * * * * * * * * * * * *");
+            _log.info("takeFinally(): " + _schema);
+            _log.info("* * * * * * * * * */");
+        }
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.execute(getSqlFileRunner(runInfo), getTakeFinallySqlFileList());
+        if (_log.isInfoEnabled()) {
+            _log.info("");
+        }
     }
 
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
