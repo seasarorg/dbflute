@@ -20,11 +20,8 @@ public class DfSqlFileFireMan {
      */
     public void execute(DfSqlFileRunner runner, List<File> fileList) throws BuildException {
         try {
-            _log.debug("/************************************************************************************");
-
             int goodSqlCount = 0;
             int totalSqlCount = 0;
-
             for (final File file : fileList) {
                 if (!file.exists()) {
                     throw new FileNotFoundException("The file '" + file.getPath() + "' does not exist.");
@@ -32,7 +29,6 @@ public class DfSqlFileFireMan {
 
                 if (_log.isDebugEnabled()) {
                     final String mitameJushi = "_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/";
-                    _log.debug("");
                     _log.debug(mitameJushi + mitameJushi);
                     _log.debug("sqlFile: " + file);
                     _log.debug("_/_/_/_/");
@@ -43,7 +39,7 @@ public class DfSqlFileFireMan {
                 goodSqlCount = goodSqlCount + runner.getGoodSqlCount();
                 totalSqlCount = totalSqlCount + runner.getTotalSqlCount();
             }
-            _log.debug("*****************/ {" + goodSqlCount + " of " + totalSqlCount + "}");
+            _log.debug("Fired SQL:{" + goodSqlCount + " of " + totalSqlCount + "}");
         } catch (Exception e) {
             _log.warn(getClass().getName() + "#execute() threw the exception!", e);
             if (e instanceof RuntimeException) {
