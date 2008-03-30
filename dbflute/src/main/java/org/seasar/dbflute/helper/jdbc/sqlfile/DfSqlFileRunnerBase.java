@@ -119,9 +119,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 reader = null;
             }
         }
-        _log.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info(_goodSqlCount + " of " + _totalSqlCount + " SQL statements executed successfully.");
-        _log.info("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        _log.info("  --> " + _goodSqlCount + " of " + _totalSqlCount + " SQL statements executed successfully.");
     }
 
     protected void traceSql(String sql) {

@@ -28,10 +28,7 @@ public class DfSqlFileFireMan {
                 }
 
                 if (_log.isDebugEnabled()) {
-                    final String mitameJushi = "_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/";
-                    _log.debug(mitameJushi + mitameJushi);
-                    _log.debug("sqlFile: " + file);
-                    _log.debug("_/_/_/_/");
+                    _log.debug("SQL File: " + file);
                 }
                 runner.setSrc(file);
                 runner.runTransaction();
