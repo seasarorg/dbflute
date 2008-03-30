@@ -37,8 +37,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
 
     /**
      * Retrieves a list of foreign key columns for a given table.
-     *
-     * @param dbMeta JDBC metadata.
+     * @param dbMeta JDBC meta data.
      * @param tableMetaInfo The meta information of table.
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException

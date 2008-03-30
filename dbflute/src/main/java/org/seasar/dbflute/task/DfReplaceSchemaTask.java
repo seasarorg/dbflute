@@ -142,6 +142,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected DfSchemaInitializer createSchemaInitializerJdbc() {
         final DfSchemaInitializerJdbc initializer = new DfSchemaInitializerJdbc();
         initializer.setDataSource(getDataSource());
+        initializer.setSchema(getBasicProperties().getDatabaseSchema());
         return initializer;
     }
 

@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
@@ -20,26 +19,55 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfTableNameHandler.DfTableMetaInf
 
 /**
  * The schema initializer with JDBC.
- * 
  * @author jflute
  */
 public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfSchemaInitializerJdbc.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected DataSource _dataSource;
 
-    public void setDataSource(DataSource dataSource) {
-        _dataSource = dataSource;
-    }
+    protected String _schema;
 
+    // ===================================================================================
+    //                                                                   Initialize Schema
+    //                                                                   =================
     public void initializeSchema() {
-        truncateTableIfPossible();
-        dropForeignKey();
-        dropTable();
+        Connection connection = null;
+        try {
+            connection = _dataSource.getConnection();
+            final List<DfTableMetaInfo> tableMetaInfoList;
+            try {
+                final DatabaseMetaData dbMetaData = connection.getMetaData();
+                final DfTableNameHandler tableNameHandler = new DfTableNameHandler();
+                tableMetaInfoList = tableNameHandler.getTableNameList(dbMetaData, _schema);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            truncateTableIfPossible(connection, tableMetaInfoList);
+            dropForeignKey(connection, tableMetaInfoList);
+            dropTable(connection, tableMetaInfoList);
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ignored) {
+                    _log.info("connection.close() threw the exception!", ignored);
+                }
+            }
+        }
     }
 
-    protected void truncateTableIfPossible() {
+    // ===================================================================================
+    //                                                                      Truncate Table
+    //                                                                      ==============
+    protected void truncateTableIfPossible(Connection connection, List<DfTableMetaInfo> tableMetaInfoList) {
         final DfTruncateTableByJdbcCallback callback = new DfTruncateTableByJdbcCallback() {
             public String buildTruncateTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
@@ -47,54 +75,40 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 return sb.toString();
             }
         };
-        callbackTruncateTableByJdbc(_dataSource, callback);
+        callbackTruncateTableByJdbc(connection, tableMetaInfoList, callback);
     }
 
     protected static interface DfTruncateTableByJdbcCallback {
         public String buildTruncateTableSql(DfTableMetaInfo metaInfo);
     }
 
-    protected void callbackTruncateTableByJdbc(DataSource dataSource, DfTruncateTableByJdbcCallback callback) {
-        Connection conn = null;
-        Statement statement = null;
-        try {
-            conn = dataSource.getConnection();
-            statement = conn.createStatement();
-            final DatabaseMetaData dbMeta = conn.getMetaData();
-            final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
-
-            final DfTableNameHandler tableNameHandler = new DfTableNameHandler();
-            final List<DfTableMetaInfo> tableNameList = tableNameHandler.getTableNameList(dbMeta, schema);
-            for (DfTableMetaInfo metaInfo : tableNameList) {
-                final String truncateTableSql = callback.buildTruncateTableSql(metaInfo);
-                try {
-                    statement.execute(truncateTableSql);
-                    _log.info(truncateTableSql);
-                } catch (Exception e) {
-                    continue;
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("conn.close() threw the exception!", ignored);
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
+    protected void callbackTruncateTableByJdbc(Connection connection, List<DfTableMetaInfo> tableMetaInfoList,
+            DfTruncateTableByJdbcCallback callback) {
+        for (DfTableMetaInfo metaInfo : tableMetaInfoList) {
+            final String truncateTableSql = callback.buildTruncateTableSql(metaInfo);
+            Statement statement = null;
+            try {
+                statement = connection.createStatement();
+                statement.execute(truncateTableSql);
+                _log.info(truncateTableSql);
+            } catch (Exception e) {
+                continue;
+            } finally {
+                if (statement != null) {
+                    try {
+                        statement.close();
+                    } catch (SQLException ignored) {
+                        _log.info("statement.close() threw the exception!", ignored);
+                    }
                 }
             }
         }
     }
 
-    protected void dropForeignKey() {
+    // ===================================================================================
+    //                                                                    Drop Foreign Key
+    //                                                                    ================
+    protected void dropForeignKey(Connection connection, List<DfTableMetaInfo> tableMetaInfoList) {
         final DfDropForeignKeyByJdbcCallback callback = new DfDropForeignKeyByJdbcCallback() {
             public String buildDropForeignKeySql(DfForeignKeyMetaInfo metaInfo) {
                 final String foreignKeyName = metaInfo.getForeignKeyName();
@@ -104,28 +118,22 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 return sb.toString();
             }
         };
-        callbackDropForeignKeyByJdbc(_dataSource, callback);
+        callbackDropForeignKeyByJdbc(connection, tableMetaInfoList, callback);
     }
 
     protected static interface DfDropForeignKeyByJdbcCallback {
         public String buildDropForeignKeySql(DfForeignKeyMetaInfo metaInfo);
     }
 
-    protected void callbackDropForeignKeyByJdbc(DataSource dataSource, DfDropForeignKeyByJdbcCallback callback) {
-        Connection conn = null;
+    protected void callbackDropForeignKeyByJdbc(Connection connection, List<DfTableMetaInfo> tableMetaInfoList,
+            DfDropForeignKeyByJdbcCallback callback) {
         Statement statement = null;
         try {
-            conn = dataSource.getConnection();
-            statement = conn.createStatement();
-            final DatabaseMetaData dbMeta = conn.getMetaData();
-            final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
-
-            final DfTableNameHandler tableNameHandler = new DfTableNameHandler();
-            final List<DfTableMetaInfo> tableNameList = tableNameHandler.getTableNameList(dbMeta, schema);
-            for (DfTableMetaInfo tableMetaInfo : tableNameList) {
+            for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
                 final DfForeignKeyHandler handler = new DfForeignKeyHandler();
-                final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = handler.getForeignKeyMetaInfo(dbMeta,
-                        schema, tableMetaInfo);
+                final DatabaseMetaData dbMetaData = connection.getMetaData();
+                final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = handler.getForeignKeyMetaInfo(
+                        dbMetaData, _schema, tableMetaInfo);
                 final Set<String> keySet = foreignKeyMetaInfoMap.keySet();
                 for (String foreignKeyName : keySet) {
                     final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
@@ -137,13 +145,6 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("conn.close() threw the exception!", ignored);
-                }
-            }
             if (statement != null) {
                 try {
                     statement.close();
@@ -154,7 +155,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected void dropTable() {
+    // ===================================================================================
+    //                                                                          Drop Table
+    //                                                                          ==========
+    protected void dropTable(Connection connection, List<DfTableMetaInfo> tableMetaInfoList) {
         final DfDropTableByJdbcCallback callback = new DfDropTableByJdbcCallback() {
             public String buildDropTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
@@ -162,25 +166,19 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 return sb.toString();
             }
         };
-        callbackDropTableByJdbc(_dataSource, callback);
+        callbackDropTableByJdbc(connection, tableMetaInfoList, callback);
     }
 
     protected static interface DfDropTableByJdbcCallback {
         public String buildDropTableSql(DfTableMetaInfo metaInfo);
     }
 
-    protected void callbackDropTableByJdbc(DataSource dataSource, DfDropTableByJdbcCallback callback) {
-        Connection conn = null;
+    protected void callbackDropTableByJdbc(Connection connection, List<DfTableMetaInfo> tableMetaInfoList,
+            DfDropTableByJdbcCallback callback) {
         Statement statement = null;
         try {
-            conn = dataSource.getConnection();
-            statement = conn.createStatement();
-            final DatabaseMetaData dbMeta = conn.getMetaData();
-            final String schema = DfBuildProperties.getInstance().getBasicProperties().getDatabaseSchema();
-
-            final DfTableNameHandler tableNameHandler = new DfTableNameHandler();
-            final List<DfTableMetaInfo> tableNameList = tableNameHandler.getTableNameList(dbMeta, schema);
-            for (DfTableMetaInfo metaInfo : tableNameList) {
+            statement = connection.createStatement();
+            for (DfTableMetaInfo metaInfo : tableMetaInfoList) {
                 final String dropTableSql = callback.buildDropTableSql(metaInfo);
                 _log.info(dropTableSql);
                 statement.execute(dropTableSql);
@@ -188,13 +186,6 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("conn.close() threw the exception!", ignored);
-                }
-            }
             if (statement != null) {
                 try {
                     statement.close();
@@ -203,5 +194,16 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setDataSource(DataSource dataSource) {
+        _dataSource = dataSource;
+    }
+
+    public void setSchema(String schema) {
+        _schema = schema;
     }
 }

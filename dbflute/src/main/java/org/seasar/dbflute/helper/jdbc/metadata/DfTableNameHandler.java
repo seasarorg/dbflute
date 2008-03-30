@@ -61,11 +61,11 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
                 final String tableComment = resultSet.getString("REMARKS");
 
                 if (isTableExcept(tableName)) {
-                    _log.debug("$ isTableExcept(" + tableName + ") == true");
+                    _log.info("$ isTableExcept(" + tableName + ") == true");
                     continue;
                 }
                 if (isOracle() && tableName.startsWith("BIN$")) {
-                    _log.debug("$ isTableExcept(" + tableName + ") == true {Forced because the database is Oracle!}");
+                    _log.info("$ isTableExcept(" + tableName + ") == true {Forced because the database is Oracle!}");
                     continue;
                 }
 
@@ -128,7 +128,6 @@ public class DfTableNameHandler extends DfAbstractMetaDataHandler {
 
     /**
      * Log database-types. {This is a mere helper method.}
-     * 
      * @param types Database-types. (NotNull)
      */
     protected void logDatabaseTypes(String[] types) {
