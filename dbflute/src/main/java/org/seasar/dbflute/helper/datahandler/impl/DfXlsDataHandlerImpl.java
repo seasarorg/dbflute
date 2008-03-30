@@ -250,7 +250,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         if (columnType == null) {
             return false;
         }
-        if (!java.sql.Date.class.isAssignableFrom(columnType)) {
+        if (!java.util.Date.class.isAssignableFrom(columnType)) {
             return false;
         }
         if (!isTimestampValue(value)) {
