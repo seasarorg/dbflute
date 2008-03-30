@@ -35,9 +35,7 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerJdbc;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerMySQL;
-import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerOracle;
 import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerSqlServer;
-import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerSybase;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
@@ -109,12 +107,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final DfSchemaInitializer initializer;
         if (basicProperties.isDatabaseMySQL()) {
             initializer = createSchemaInitializerMySQL();
-        } else if (basicProperties.isDatabaseOracle()) {
-            initializer = createSchemaInitializerOracle();
         } else if (basicProperties.isDatabaseSqlServer()) {
             initializer = createSchemaInitializerSqlServer();
-        } else if (basicProperties.isDatabaseSybase()) {
-            initializer = createSchemaInitializerSybase();
         } else {
             initializer = createSchemaInitializerJdbc();
         }
@@ -132,20 +126,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return initializer;
     }
 
-    protected DfSchemaInitializer createSchemaInitializerOracle() {
-        final DfSchemaInitializerOracle initializer = new DfSchemaInitializerOracle();
-        initializer.setDataSource(getDataSource());
-        return initializer;
-    }
-
     protected DfSchemaInitializer createSchemaInitializerSqlServer() {
         final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
-        initializer.setDataSource(getDataSource());
-        return initializer;
-    }
-
-    protected DfSchemaInitializer createSchemaInitializerSybase() {
-        final DfSchemaInitializerSybase initializer = new DfSchemaInitializerSybase();
         initializer.setDataSource(getDataSource());
         return initializer;
     }

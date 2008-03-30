@@ -7,14 +7,12 @@ import javax.sql.DataSource;
  */
 public class DfSchemaInitializerOracle implements DfSchemaInitializer {
 
-    protected DfSchemaInitializerJdbc _schemaInitializer = new DfSchemaInitializerJdbc();
-
     public void setDataSource(DataSource dataSource) {
-        _schemaInitializer.setDataSource(dataSource);
+        throw new UnsupportedOperationException("Please use " + DfSchemaInitializerJdbc.class);
     }
 
     public void initializeSchema() {
-        _schemaInitializer.initializeSchema();
+        throw new UnsupportedOperationException("Please use " + DfSchemaInitializerJdbc.class);
     }
 
     // * * * * * * * * * * * * * * * * * * * * * * * *  
