@@ -3,7 +3,6 @@ package org.seasar.dbflute.helper.jdbc.schemainitializer;
 import javax.sql.DataSource;
 
 /**
- * 
  * @author jflute
  */
 public class DfSchemaInitializerOracle implements DfSchemaInitializer {
