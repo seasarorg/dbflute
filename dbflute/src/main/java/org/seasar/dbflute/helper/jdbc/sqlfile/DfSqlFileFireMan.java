@@ -27,16 +27,21 @@ public class DfSqlFileFireMan {
                     throw new FileNotFoundException("The file '" + file.getPath() + "' does not exist.");
                 }
 
-                if (_log.isDebugEnabled()) {
-                    _log.debug("SQL File: " + file);
+                if (_log.isInfoEnabled()) {
+                    _log.info("SQL File: " + file);
                 }
+
                 runner.setSrc(file);
                 runner.runTransaction();
 
                 goodSqlCount = goodSqlCount + runner.getGoodSqlCount();
                 totalSqlCount = totalSqlCount + runner.getTotalSqlCount();
+
+                if (_log.isInfoEnabled()) {
+                    _log.info("");
+                }
             }
-            _log.debug("Fired SQL:{" + goodSqlCount + " of " + totalSqlCount + "}");
+            _log.debug("Fired SQL:{" + goodSqlCount + " of " + totalSqlCount + " in " + fileList.size() + " files}");
         } catch (Exception e) {
             _log.warn(getClass().getName() + "#execute() threw the exception!", e);
             if (e instanceof RuntimeException) {

@@ -392,7 +392,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         if (_log.isInfoEnabled()) {
             _log.info("* * * * * * * * * * *");
             _log.info("*                   *");
-            _log.info("* Write DB from Xls *");
+            _log.info("* Write DB from xls *");
             _log.info("*                   *");
             _log.info("* * * * * * * * * * *");
         }
