@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007 the Seasar Foundation and the Others.
+ * Copyright 2004-2008 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,48 +41,34 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
-    /**
-     * Retrieves all the column names and types for a given table from
-     * JDBC meta data.  It returns a List of Lists.  Each element
-     * of the returned List is a List with:
-     *
-     * @param dbMeta JDBC meta data.
-     * @param schemaName Schema name. (NotNull & AllowedEmpty)
-     * @param tableMetaInfo The meta information of table. (NotNull)
-     * @return The list of columns in <code>tableName</code>.
-     */
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, DfTableMetaInfo tableMetaInfo) {
         final String tableName = tableMetaInfo.getTableName();
         return getColumns(dbMeta, tableMetaInfo.selectRealSchemaName(schemaName), tableName);
     }
 
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName) {
+        return getColumns(dbMeta, schemaName, tableName, false);
+    }
+
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, String schemaName, String tableName,
+            boolean caseInsensitive) {
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
+        ResultSet columnResultSetLowerSpare = null;
+        ResultSet columnResultSetUpperSpare = null;
         try {
             final String realSchemaName = schemaName;
             columnResultSet = dbMeta.getColumns(null, realSchemaName, tableName, null);
-            while (columnResultSet.next()) {
-                final String columnName = columnResultSet.getString(4);
-                if (isColumnExcept(columnName)) {
-                    continue;
+            setupColumnMetaInfo(columns, columnResultSet);
+            if (caseInsensitive) {
+                if (columns.isEmpty()) {
+                    columnResultSetLowerSpare = dbMeta.getColumns(null, realSchemaName, tableName.toLowerCase(), null);
+                    setupColumnMetaInfo(columns, columnResultSetLowerSpare);
                 }
-                final Integer jdbcTypeCode = new Integer(columnResultSet.getString(5));
-                final String dbTypeName = columnResultSet.getString(6);
-                final Integer columnSize = new Integer(columnResultSet.getInt(7));
-                final Integer decimalDigits = columnResultSet.getInt(9);
-                final Integer nullType = new Integer(columnResultSet.getInt(11));
-                final String defaultValue = columnResultSet.getString(13);
-
-                final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
-                columnMetaInfo.setColumnName(columnName);
-                columnMetaInfo.setJdbcTypeCode(jdbcTypeCode);
-                columnMetaInfo.setDbTypeName(dbTypeName);
-                columnMetaInfo.setColumnSize(columnSize);
-                columnMetaInfo.setDecimalDigits(decimalDigits);
-                columnMetaInfo.setRequired(nullType == 0);
-                columnMetaInfo.setDefaultValue(defaultValue);
-                columns.add(columnMetaInfo);
+                if (columns.isEmpty()) {
+                    columnResultSetUpperSpare = dbMeta.getColumns(null, realSchemaName, tableName.toUpperCase(), null);
+                    setupColumnMetaInfo(columns, columnResultSetUpperSpare);
+                }
             }
         } catch (SQLException e) {
             String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
@@ -94,8 +80,45 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 } catch (SQLException ignored) {
                 }
             }
+            if (columnResultSetLowerSpare != null) {
+                try {
+                    columnResultSetLowerSpare.close();
+                } catch (SQLException ignored) {
+                }
+            }
+            if (columnResultSetUpperSpare != null) {
+                try {
+                    columnResultSetUpperSpare.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
         return columns;
+    }
+
+    protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet) throws SQLException {
+        while (columnResultSet.next()) {
+            final String columnName = columnResultSet.getString(4);
+            if (isColumnExcept(columnName)) {
+                continue;
+            }
+            final Integer jdbcTypeCode = new Integer(columnResultSet.getString(5));
+            final String dbTypeName = columnResultSet.getString(6);
+            final Integer columnSize = new Integer(columnResultSet.getInt(7));
+            final Integer decimalDigits = columnResultSet.getInt(9);
+            final Integer nullType = new Integer(columnResultSet.getInt(11));
+            final String defaultValue = columnResultSet.getString(13);
+
+            final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
+            columnMetaInfo.setColumnName(columnName);
+            columnMetaInfo.setJdbcTypeCode(jdbcTypeCode);
+            columnMetaInfo.setDbTypeName(dbTypeName);
+            columnMetaInfo.setColumnSize(columnSize);
+            columnMetaInfo.setDecimalDigits(decimalDigits);
+            columnMetaInfo.setRequired(nullType == 0);
+            columnMetaInfo.setDefaultValue(defaultValue);
+            columns.add(columnMetaInfo);
+        }
     }
 
     // ===================================================================================

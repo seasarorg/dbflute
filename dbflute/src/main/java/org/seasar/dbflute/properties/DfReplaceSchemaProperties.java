@@ -6,6 +6,9 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * @author jflute
+ */
 public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================

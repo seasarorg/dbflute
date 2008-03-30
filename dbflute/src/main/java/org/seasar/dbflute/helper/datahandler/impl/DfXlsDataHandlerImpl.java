@@ -251,10 +251,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         try {
             final DfColumnHandler columnHandler = new DfColumnHandler();
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-            List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData, _schemaName, tableName);
-            if (columnMetaDataList == null || columnMetaDataList.isEmpty()) {
-                columnMetaDataList = columnHandler.getColumns(metaData, _schemaName, tableName.toLowerCase());
-            }
+            final List<DfColumnMetaInfo> columnMetaDataList = columnHandler.getColumns(metaData, _schemaName,
+                    tableName, true);
             for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
             }
