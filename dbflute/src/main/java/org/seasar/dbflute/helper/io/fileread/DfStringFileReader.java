@@ -10,9 +10,18 @@ import java.io.IOException;
  */
 public class DfStringFileReader {
 
-    // TODO: @jflute - staticじゃないように修正すること
-    
-    public static String readString(String path, String encoding) {
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _saveInitialUnicodeBom;
+
+    protected String _lineCommentMark = "#";
+
+    // ===================================================================================
+    //                                                                                Read
+    //                                                                                ====
+    public String readString(String path, String encoding) {
+        final String lineSeparator = System.getProperty("line.separator");
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
         if (file.exists()) {
@@ -32,7 +41,11 @@ public class DfStringFileReader {
                     if (lineString == null) {
                         break;
                     }
-                    sb.append(lineString + System.getProperty("line.separator"));
+                    // If the line is comment...
+                    if (_lineCommentMark != null && lineString.trim().startsWith(_lineCommentMark)) {
+                        continue;
+                    }
+                    sb.append(lineString + lineSeparator);
                 }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -40,6 +53,28 @@ public class DfStringFileReader {
                 throw new RuntimeException(e);
             }
         }
-        return sb.toString();
+        if (!_saveInitialUnicodeBom) {
+            return removeInitialUnicodeBomIfNeeds(encoding, sb.toString());
+        } else {
+            return sb.toString();
+        }
+    }
+
+    protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {
+        if ("UTF-8".equalsIgnoreCase(encoding) && value.length() > 0 && value.charAt(0) == '\uFEFF') {
+            value = value.substring(1);
+        }
+        return value;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setSaveInitialUnicodeBom(boolean saveInitialUnicodeBom) {
+        _saveInitialUnicodeBom = saveInitialUnicodeBom;
+    }
+
+    public void setLineCommentMark(String lineCommentMark) {
+        _lineCommentMark = lineCommentMark;
     }
 }

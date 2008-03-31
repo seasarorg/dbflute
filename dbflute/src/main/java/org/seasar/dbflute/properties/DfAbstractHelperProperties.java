@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.io.fileread.DfListStringFileReader;
 import org.seasar.dbflute.helper.io.fileread.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.fileread.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
@@ -188,7 +189,6 @@ public abstract class DfAbstractHelperProperties {
     //                                               -------
     /**
      * Get property as integer. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @return Property as integer.
      */
@@ -203,7 +203,6 @@ public abstract class DfAbstractHelperProperties {
 
     /**
      * Get property as integer. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @param defaultValue Default value.
      * @return Property as integer.
@@ -226,12 +225,15 @@ public abstract class DfAbstractHelperProperties {
     //                                                  ----
     /**
      * Get property as list. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @return Property as list. (NotNull)
      */
     final protected List<Object> listProp(String key) {
         try {
+            final List<Object> outsidePropList = getOutsidePropList(key);
+            if (!outsidePropList.isEmpty()) {
+                return outsidePropList;
+            }
             return DfPropertyUtil.listProp(_buildProperties, key, ";");
         } catch (RuntimeException e) {
             _log.warn("DfPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
@@ -241,13 +243,16 @@ public abstract class DfAbstractHelperProperties {
 
     /**
      * Get property as list. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @param defaultValue Default value. (Nullable)
      * @return Property as list. (Nullable: If the default-value is null)
      */
     final protected List<Object> listProp(String key, List<Object> defaultValue) {
         try {
+            final List<Object> outsidePropList = getOutsidePropList(key);
+            if (!outsidePropList.isEmpty()) {
+                return outsidePropList;
+            }
             final List<Object> result = DfPropertyUtil.listProp(_buildProperties, key, ";");
             if (result.isEmpty()) {
                 return defaultValue;
@@ -267,7 +272,6 @@ public abstract class DfAbstractHelperProperties {
     //                                                   ---
     /**
      * Get property as map. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @return Property as map. (NotNull)
      */
@@ -277,7 +281,7 @@ public abstract class DfAbstractHelperProperties {
             if (!outsidePropMap.isEmpty()) {
                 return outsidePropMap;
             }
-            return DfPropertyUtil.mapProp(_buildProperties, key, ";");// TODO: DelimiterはDefaultでOK
+            return DfPropertyUtil.mapProp(_buildProperties, key, ";");
         } catch (RuntimeException e) {
             _log.warn("DfPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
             throw e;
@@ -286,7 +290,6 @@ public abstract class DfAbstractHelperProperties {
 
     /**
      * Get property as map. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @param defaultValue Default value. (Nullable)
      * @return Property as map. (Nullable: If the default-value is null)
@@ -313,12 +316,20 @@ public abstract class DfAbstractHelperProperties {
 
     protected String getOutsidePropString(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
-        return DfStringFileReader.readString("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
+        final DfStringFileReader reader = new DfStringFileReader();
+        return reader.readString("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
     }
 
     protected Map<String, Object> getOutsidePropMap(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
-        return DfMapStringFileReader.readMap("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        return reader.readMap("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
+    }
+
+    protected List<Object> getOutsidePropList(String key) {
+        final String filteredKey = DfStringUtil.replace(key, "torque.", "");
+        final DfListStringFileReader reader = new DfListStringFileReader();
+        return reader.readList("./dfprop/" + filteredKey + ".dfprop", "UTF-8");
     }
 
     // ===============================================================================

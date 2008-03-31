@@ -163,19 +163,21 @@ public class ${glOutsideSqlContextName} {
      * @param sqlFileEncoding The encoding of SQL file. (NotNull)
      * @param dbmsSuffix The suffix of DBMS. (NotNull)
      * @return The text of SQL. (NotNull)
-     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the sql is not found.
+     * @exception ${glPackageBaseCommonException}.${glOutsideSqlNotFoundException} When the SQL is not found.
      */
     public String readOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
         final String standardPath = _outsideSqlPath;
         final String dbmsPath = buildDbmsPath(standardPath, dbmsSuffix);
+        String sql;
         if (isExistResource(dbmsPath)) {
-            return readText(dbmsPath, sqlFileEncoding);
+            sql = readText(dbmsPath, sqlFileEncoding);
         } else if (isExistResource(standardPath)) {
-            return readText(standardPath, sqlFileEncoding);
+            sql = readText(standardPath, sqlFileEncoding);
         } else {
             throwOutsideSqlNotFoundException(standardPath);
             return null; // Non Reachable.
         }
+        return removeInitialUnicodeBomIfNeeds(sqlFileEncoding, sql);
     }
 
     protected String buildDbmsPath(String standardPath, String dbmsSuffix) {
@@ -188,6 +190,13 @@ public class ${glOutsideSqlContextName} {
             dbmsPath = standardPath + dbmsSuffix;
         }
         return dbmsPath;
+    }
+
+    protected String removeInitialUnicodeBomIfNeeds(String sqlFileEncoding, String sql) {
+        if ("UTF-8".equalsIgnoreCase(sqlFileEncoding) && sql.length() > 0 && sql.charAt(0) == '\uFEFF') {
+            sql = sql.substring(1);
+        }
+        return sql;
     }
 
     // ===================================================================================

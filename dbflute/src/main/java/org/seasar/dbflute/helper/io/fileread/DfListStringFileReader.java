@@ -3,16 +3,16 @@ package org.seasar.dbflute.helper.io.fileread;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.seasar.dbflute.helper.mapstring.DfMapListStringImpl;
 
 /**
  * @author jflute
+ * @since 0.6.8 (2008/03/31 Monday)
  */
-public class DfMapStringFileReader {
+public class DfListStringFileReader {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -24,7 +24,7 @@ public class DfMapStringFileReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public Map<String, Object> readMap(String path, String encoding) {
+    public List<Object> readList(String path, String encoding) {
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
         if (file.exists()) {
@@ -63,10 +63,10 @@ public class DfMapStringFileReader {
             }
         }
         if (sb.toString().trim().length() == 0) {
-            return new LinkedHashMap<String, Object>();
+            return new ArrayList<Object>();
         }
         final DfMapListStringImpl mapListString = new DfMapListStringImpl();
-        return mapListString.generateMap(sb.toString());
+        return mapListString.generateList(sb.toString());
     }
 
     protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {
@@ -74,36 +74,6 @@ public class DfMapStringFileReader {
             value = value.substring(1);
         }
         return value;
-    }
-
-    public Map<String, String> readMapAsStringValue(String path, String encoding) {
-        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (String) map.get(key));
-        }
-        return resultMap;
-    }
-
-    public Map<String, java.util.List<String>> readMapAsListStringValue(String path, String encoding) {
-        final Map<String, java.util.List<String>> resultMap = new LinkedHashMap<String, java.util.List<String>>();
-        final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (java.util.List<String>) map.get(key));
-        }
-        return resultMap;
-    }
-
-    public Map<String, java.util.Map<String, String>> readMapAsMapValue(String path, String encoding) {
-        final Map<String, java.util.Map<String, String>> resultMap = new LinkedHashMap<String, java.util.Map<String, String>>();
-        final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (java.util.Map<String, String>) map.get(key));
-        }
-        return resultMap;
     }
 
     // ===================================================================================

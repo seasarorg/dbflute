@@ -474,18 +474,21 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/default-value.txt";
-        return DfMapStringFileReader.readMapAsStringValue(path, "UTF-8");
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        return reader.readMapAsStringValue(path, "UTF-8");
     }
 
     private DfFlexibleNameMap<String, String> getTableNameMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/table-name.txt";
-        final Map<String, String> targetMap = DfMapStringFileReader.readMapAsStringValue(path, "UTF-8");
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        final Map<String, String> targetMap = reader.readMapAsStringValue(path, "UTF-8");
         return new DfFlexibleNameMap<String, String>(targetMap);
     }
 
     private DfFlexibleNameMap<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
         final String path = dataDirectoryName + "/not-trim-column.txt";
-        final Map<String, List<String>> targetMap = DfMapStringFileReader.readMapAsListStringValue(path, "UTF-8");
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        final Map<String, List<String>> targetMap = reader.readMapAsListStringValue(path, "UTF-8");
         return new DfFlexibleNameMap<String, List<String>>(targetMap);
     }
 

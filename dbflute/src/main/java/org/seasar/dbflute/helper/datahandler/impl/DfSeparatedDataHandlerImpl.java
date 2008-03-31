@@ -121,12 +121,14 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
     private Map<String, Map<String, String>> getConvertValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final String path = info.getBasePath() + "/" + encoding + "/convert-value.txt";
-        return DfMapStringFileReader.readMapAsMapValue(path, encoding);
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        return reader.readMapAsMapValue(path, encoding);
     }
 
     private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final String path = info.getBasePath() + "/" + encoding + "/default-value.txt";
-        return DfMapStringFileReader.readMapAsStringValue(path, encoding);
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        return reader.readMapAsStringValue(path, encoding);
     }
 
     protected FilenameFilter createFilenameFilter(final String typeName) {
