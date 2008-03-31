@@ -71,36 +71,31 @@ import org.seasar.dbflute.DfBuildProperties;
  * These don't quite correspond to the way the peer
  * system works so we'll have to make some adjustments.
  * <pre>
- * --------------------------------------
- * SQL Type      | Java Type            |
- * --------------------------------------
- * CHAR          | String               |
- * VARCHAR       | String               |
- * LONGVARCHAR   | String               |
- * NUMERIC       | java.math.BigDecimal |
- * DECIMAL       | java.math.BigDecimal |
- * BIT           | Boolean              |
- * TINYINT       | java.math.BigDecimal |
- * SMALLINT      | java.math.BigDecimal |
- * INTEGER       | java.math.BigDecimal |
- * BIGINT        | java.math.BigDecimal |
- * REAL          | java.math.BigDecimal |
- * FLOAT         | java.math.BigDecimal |
- * DOUBLE        | java.math.BigDecimal |
- * BINARY        | byte[]               |
- * VARBINARY     | byte[]               |
- * LONGVARBINARY | byte[]               |
- * DATE          | java.util.Date       |
- * TIME          | java.sql.Time        |
- * TIMESTAMP     | java.sql.Timestamp   |
- *
- * -------------------------------------------------------
- * A couple variations have been introduced to cover cases
- * that may arise, but are not covered above
- * BOOLEANCHAR   | Boolean              | String
- * BOOLEANINT    | OR Boolean           | Integer
+ * ----------------------------------------------------
+ * DBFlute Type  | Java Type            | CSharp Type |
+ * ----------------------------------------------------
+ * CHAR          | java.lang.String     | String      |
+ * VARCHAR       | java.lang.String     | String      |
+ * LONGVARCHAR   | java.lang.String     | String      |
+ * NUMERIC       | java.math.BigDecimal | decimal?    |
+ * DECIMAL       | java.math.BigDecimal | decimal?    |
+ * BIT           | java.lang.Boolean    | bool?       |
+ * BOOLEAN       | java.lang.Boolean    | bool?       |
+ * TINYINT       | java.math.BigDecimal | int?        |
+ * SMALLINT      | java.math.BigDecimal | int?        |
+ * INTEGER       | java.math.BigDecimal | int?        |
+ * BIGINT        | java.math.BigDecimal | long?       |
+ * REAL          | java.math.BigDecimal | decimal?    |
+ * FLOAT         | java.math.BigDecimal | decimal?    |
+ * DOUBLE        | java.math.BigDecimal | decimal?    |
+ * BINARY        | byte[]               | byte[]      |
+ * VARBINARY     | byte[]               | byte[]      |
+ * LONGVARBINARY | byte[]               | byte[]      |
+ * DATE          | java.util.Date       | DateTime?   |
+ * TIME          | java.sql.Time        | DateTime?   |
+ * TIMESTAMP     | java.sql.Timestamp   | DateTime?   |
+ * ----------------------------------------------------
  * </pre>
- *
  */
 public class TypeMap {
 
@@ -120,6 +115,7 @@ public class TypeMap {
     public static final String NUMERIC = "NUMERIC";
     public static final String DECIMAL = "DECIMAL";
     public static final String BIT = "BIT";
+    public static final String BOOLEAN = "BOOLEAN";
     public static final String TINYINT = "TINYINT";
     public static final String SMALLINT = "SMALLINT";
     public static final String INTEGER = "INTEGER";
@@ -149,6 +145,7 @@ public class TypeMap {
     public static final String NUMERIC_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String DECIMAL_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String BIT_NATIVE_TYPE = "Boolean";
+    public static final String BOOLEAN_NATIVE_TYPE = "Boolean";
     public static final String TINYINT_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String SMALLINT_NATIVE_TYPE = "java.math.BigDecimal";
     public static final String INTEGER_NATIVE_TYPE = "java.math.BigDecimal";
@@ -171,9 +168,6 @@ public class TypeMap {
     //                                                                            ========
     private static Hashtable<String, String> _torqueTypeToJavaNativeMap = null;
     private static Hashtable<Integer, String> _jdbcIntToTorqueTypeMap = null;
-
-    // TODO: @jflute -- Unnecessary
-    //    private static Hashtable<String, String> _jdbcToTorqueTypeMap = null;
 
     // ===================================================================================
     //                                                                    Initialized Mark
@@ -229,6 +223,7 @@ public class TypeMap {
         _torqueTypeToJavaNativeMap.put(NUMERIC, getJavaNativeByJdbc(NUMERIC, getDefaultNumericJavaType()));
         _torqueTypeToJavaNativeMap.put(DECIMAL, getJavaNativeByJdbc(DECIMAL, DECIMAL_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(BIT, getJavaNativeByJdbc(BIT, BIT_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(BOOLEAN, getJavaNativeByJdbc(BOOLEAN, BOOLEAN_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(TINYINT, getJavaNativeByJdbc(TINYINT, TINYINT_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(SMALLINT, getJavaNativeByJdbc(SMALLINT, SMALLINT_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(INTEGER, getJavaNativeByJdbc(INTEGER, INTEGER_NATIVE_TYPE));
@@ -246,55 +241,6 @@ public class TypeMap {
         _torqueTypeToJavaNativeMap.put(BOOLEANCHAR, getJavaNativeByJdbc(BOOLEANCHAR, BOOLEANCHAR_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(BOOLEANINT, getJavaNativeByJdbc(BOOLEANINT, BOOLEANINT_NATIVE_TYPE));
 
-        // TODO: @jflute -- Unnecessary
-        //            _jdbcToJavaNativeMap.put(CHAR, CHAR_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(VARCHAR, VARCHAR_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(LONGVARCHAR, LONGVARCHAR_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(CLOB, CLOB_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(NUMERIC, NUMERIC_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(DECIMAL, DECIMAL_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(BIT, BIT_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(TINYINT, TINYINT_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(SMALLINT, SMALLINT_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(INTEGER, INTEGER_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(BIGINT, BIGINT_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(REAL, REAL_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(FLOAT, FLOAT_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(DOUBLE, DOUBLE_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(BINARY, BINARY_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(VARBINARY, VARBINARY_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(LONGVARBINARY, LONGVARBINARY_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(BLOB, BLOB_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(DATE, DATE_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(TIME, TIME_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(TIMESTAMP, TIMESTAMP_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(BOOLEANCHAR, BOOLEANCHAR_NATIVE_TYPE);
-        //            _jdbcToJavaNativeMap.put(BOOLEANINT, BOOLEANINT_NATIVE_TYPE);
-
-        // TODO: @jflute -- Unnecessary
-        //        _jdbcToTorqueTypeMap = new Hashtable<String, String>();
-        //        _jdbcToTorqueTypeMap.put(CHAR, CHAR);
-        //        _jdbcToTorqueTypeMap.put(VARCHAR, VARCHAR);
-        //        _jdbcToTorqueTypeMap.put(LONGVARCHAR, LONGVARCHAR);
-        //        _jdbcToTorqueTypeMap.put(CLOB, CLOB);
-        //        _jdbcToTorqueTypeMap.put(NUMERIC, NUMERIC);
-        //        _jdbcToTorqueTypeMap.put(DECIMAL, DECIMAL);
-        //        _jdbcToTorqueTypeMap.put(BIT, BIT);
-        //        _jdbcToTorqueTypeMap.put(TINYINT, TINYINT);
-        //        _jdbcToTorqueTypeMap.put(SMALLINT, SMALLINT);
-        //        _jdbcToTorqueTypeMap.put(INTEGER, INTEGER);
-        //        _jdbcToTorqueTypeMap.put(BIGINT, BIGINT);
-        //        _jdbcToTorqueTypeMap.put(REAL, REAL);
-        //        _jdbcToTorqueTypeMap.put(FLOAT, FLOAT);
-        //        _jdbcToTorqueTypeMap.put(DOUBLE, DOUBLE);
-        //        _jdbcToTorqueTypeMap.put(BINARY, BINARY);
-        //        _jdbcToTorqueTypeMap.put(VARBINARY, VARBINARY);
-        //        _jdbcToTorqueTypeMap.put(LONGVARBINARY, LONGVARBINARY);
-        //        _jdbcToTorqueTypeMap.put(BLOB, BLOB);
-        //        _jdbcToTorqueTypeMap.put(DATE, DATE);
-        //        _jdbcToTorqueTypeMap.put(TIME, TIME);
-        //        _jdbcToTorqueTypeMap.put(TIMESTAMP, TIMESTAMP);
-
         _jdbcIntToTorqueTypeMap = new Hashtable<Integer, String>();
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.CHAR), CHAR);
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.VARCHAR), VARCHAR);
@@ -303,6 +249,7 @@ public class TypeMap {
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.NUMERIC), NUMERIC);
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.DECIMAL), DECIMAL);
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.BIT), BIT);
+        _jdbcIntToTorqueTypeMap.put(new Integer(Types.BOOLEAN), BOOLEAN);
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.TINYINT), TINYINT);
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.SMALLINT), SMALLINT);
         _jdbcIntToTorqueTypeMap.put(new Integer(Types.INTEGER), INTEGER);
@@ -349,28 +296,6 @@ public class TypeMap {
         }
         return _torqueTypeToJavaNativeMap.get(torqueType);
     }
-
-    // TODO: @jflute -- Unnecessary
-    //    /**
-    //     * Returns Torque type constant corresponding to JDBC type code.
-    //     * Used but Torque JDBC task.
-    //     *
-    //     * @param jdbcType the SQL type
-    //     * @return Torque type constant
-    //     */
-    //    public static String getTorqueType(String jdbcType) {
-    //        // Make sure the we are initialized.
-    //        if (!_initialized) {
-    //            initialize();
-    //        }
-    //        if (!_jdbcToTorqueTypeMap.containsKey(jdbcType)) {
-    //            String msg = "_jdbcToTorqueTypeMap doesn't contain the type as key: ";
-    //            msg = msg + "key=" + jdbcType + " map=" + _jdbcIntToTorqueTypeMap;
-    //            _log.warn(msg);
-    //            throw new IllegalStateException(msg);
-    //        }
-    //        return _jdbcToTorqueTypeMap.get(jdbcType);
-    //    }
 
     // ===================================================================================
     //                                                                  Torque Type Getter
