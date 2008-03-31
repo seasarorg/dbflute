@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_beanMetaDataCacheMap);
             _beanMetaData = handler.FindOrCreateCachedMetaIfNeeds(_beanType, _annotationReaderFactory, _dbMetaData, _dbms);
 			if (_beanMetaData == null) {
-			    _beanMetaData = new BeanMetaDataExtension(_beanType, _annotationReaderFactory, false);
+			    _beanMetaData = new BeanMetaDataCacheExtension(_beanType, _annotationReaderFactory, false);// Don't use cache!
 			}
 
             // For lazy initializing methods!
@@ -200,7 +200,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected IBeanMetaData CreateBeanMetaData4UpdateDeleteByAuto(MethodInfo method) {
             if (method.Name.Contains("Nonstrict")) {
-                BeanMetaDataNonConcurrency bmdNonConcurrency = new BeanMetaDataNonConcurrency(_beanType, _annotationReaderFactory, false);
+                BeanMetaDataForUpdateNonConcurrency bmdNonConcurrency = new BeanMetaDataForUpdateNonConcurrency(_beanType, _annotationReaderFactory, false);
                 bmdNonConcurrency.Initialize(_dbMetaData, _dbms);
                 return bmdNonConcurrency;
             } else {
@@ -238,8 +238,8 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (beanClass4SelectMethodByManual.Equals(_beanType)) {
                 return _beanMetaData;
             }
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanClass4SelectMethodByManual, _annotationReaderFactory, false);
-            bmdExt.Initialize(databaseMetaData, dbInfo);
+            BeanMetaDataCacheExtension bmdExt = new BeanMetaDataCacheExtension(beanClass4SelectMethodByManual, _annotationReaderFactory, false);
+            bmdExt.Initialize(databaseMetaData, dbInfo);// Don't use cache!
             return bmdExt;
         }
 
@@ -326,8 +326,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected IBeanMetaData CreateSpecifiedOutsideSqlCustomizeBeanMetaData(Type clazz) {
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(clazz, this.AnnotationReaderFactory, false);
-            bmdExt.Initialize(_dbMetaData, _dbms);
+            BeanMetaDataCacheExtension bmdExt = new BeanMetaDataCacheExtension(clazz, this.AnnotationReaderFactory, false);
+            bmdExt.Initialize(_dbMetaData, _dbms);// Don't use cache!
             return bmdExt;
         }
 
@@ -360,8 +360,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected IBeanMetaData CreateSpecifiedOutsideSqlCursorBeanMetaData(MethodInfo method) {
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(GetOutsideSqlDefaultBeanClass(method), this.AnnotationReaderFactory, false);
-            bmdExt.Initialize(_dbMetaData, _dbms);
+            BeanMetaDataCacheExtension bmdExt = new BeanMetaDataCacheExtension(GetOutsideSqlDefaultBeanClass(method), this.AnnotationReaderFactory, false);
+            bmdExt.Initialize(_dbMetaData, _dbms);// Don't use cache!
             return bmdExt;
         }
 
@@ -538,7 +538,7 @@ namespace ${glPackageBaseCommonS2Dao} {
 		    // = = = = = = = = = = = = = = = = = = = = = = =
 		    // Set up _primaryKeys and _identifierGenerator!
 		    // = = = = = = = = = = = = = = = = = = = = = = =
-			if (_primaryKeys == null) {
+			if (_primaryKeys == null || _primaryKeys.Length == 0) {
                 _primaryKeys = new String[_primaryKeyList.size()];
                 int index = 0;
                 foreach (IPropertyType pt in _primaryKeyList) {
@@ -585,11 +585,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 	
-    public class BeanMetaDataExtension : BeanMetaDataDBFluteDBMetaExtension {
+    public class BeanMetaDataCacheExtension : BeanMetaDataDBFluteDBMetaExtension {
 	    protected Map<Type, IBeanMetaData> _metaMap;
 	    protected int _nestNo;
 		
-        public BeanMetaDataExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
+        public BeanMetaDataCacheExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {
             this.BeanType = beanType;
             this._relation = relation;
@@ -622,7 +622,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (this.NestNo > 0) {
                 isRelation = true;
             }
-            BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(propertyInfo.PropertyType, this.AnnotationReaderFactory, isRelation);
+            BeanMetaDataCacheExtension bmdExt = new BeanMetaDataCacheExtension(propertyInfo.PropertyType, this.AnnotationReaderFactory, isRelation);
             bmdExt.NestNo = this.NestNo + 1;
             bmdExt.Initialize(dbMetaData, dbms);
             return bmdExt;
@@ -638,8 +638,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-    public class BeanMetaDataNonConcurrency : BeanMetaDataDBFluteDBMetaExtension {
-        public BeanMetaDataNonConcurrency(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
+    public class BeanMetaDataForUpdateNonConcurrency : BeanMetaDataDBFluteDBMetaExtension {
+        public BeanMetaDataForUpdateNonConcurrency(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {
             this.BeanType = beanType;
             this._relation = relation;
@@ -824,7 +824,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (cachedMeta != null) {
                     return cachedMeta;
                 } else {
-                    BeanMetaDataExtension bmdExt = new BeanMetaDataExtension(beanClass, factory, false);
+                    BeanMetaDataCacheExtension bmdExt = new BeanMetaDataCacheExtension(beanClass, factory, false);
                     bmdExt.MetaMap = _metaMap;
                     bmdExt.Initialize(dbMetaData, dbms);
                     return bmdExt;
