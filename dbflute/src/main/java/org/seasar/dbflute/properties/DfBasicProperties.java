@@ -62,7 +62,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseDB2() {
         return getDatabaseName().equalsIgnoreCase("db2");
     }
-    
+
     public boolean isDatabaseSqlServer() {
         return getDatabaseName().equalsIgnoreCase("mssql");
     }
@@ -83,10 +83,12 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getJavaLocation_for_gen() {
         return stringProp("torque.java.location.for.gen", "");
     }
+
     /** @deprecated */
     public String getJavaLocation_for_main() {
         return stringProp("torque.java.location.for.main", "");
     }
+
     /** @deprecated */
     public String getJavaDir_for_gen() {
         final String fileSeparator = "/";
@@ -108,6 +110,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
         return outputPath;
     }
+
     /** @deprecated */
     public String getJavaDir_for_main() {
         final String fileSeparator = "/";
@@ -129,6 +132,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
         return outputPath;
     }
+
     /** @deprecated */
     public boolean isJavaDirOnlyOne() {
         return getJavaDir_for_gen().equals(getJavaDir_for_main());

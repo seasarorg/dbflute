@@ -48,8 +48,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                      Unique Key
         //                                                                      ==========
-        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
-            return methodName + "():" + path + ":" + option.GenerateUniqueKey() + (resultTypeSpecification != null ? ":" + resultTypeSpecification : "");
+        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOptionName} option, Object resultTypeSpecification) {
+		    String pmbKey = (pmb != null ? pmb.GetType().Name : "null");
+			String resultKey = (resultTypeSpecification != null ? ":" + resultTypeSpecification : "null");
+            return methodName + "():" + path + ":" + pmbKey + ":" + option.GenerateUniqueKey() + resultKey;
         }
 
         // ===============================================================================

@@ -511,7 +511,7 @@ public class ${glInternalSqlParser} {
     //                                        --------------
     protected static class InternalValueAndType {
         public Object _targetValue;
-        public Class _targetType;
+        public Class<?> _targetType;
         protected String _rearOption;
 
         public boolean isValidRearOption() {
@@ -528,10 +528,10 @@ public class ${glInternalSqlParser} {
         public void setTargetValue(Object targetValue) {
             this._targetValue = targetValue;
         }
-        public Class getTargetType() {
+        public Class<?> getTargetType() {
             return _targetType;
         }
-        public void setTargetType(Class targetType) {
+        public void setTargetType(Class<?> targetType) {
             this._targetType = targetType;
         }
         public String getRearOption() {
@@ -557,14 +557,14 @@ public class ${glInternalSqlParser} {
 
         protected void setupValueAndType(InternalValueAndType valueAndType) {
             Object value = valueAndType.getTargetValue();
-            Class clazz = valueAndType.getTargetType();
+            Class<?> clazz = valueAndType.getTargetType();
             String rearOption = null;
             for (int pos = 1; pos < _names.length; ++pos) {
                 if (value == null) {
                     break;
                 }
                 if (Map.class.isInstance(value)) {
-                    final Map map = (Map) value;
+                    final Map<?, ?> map = (Map<?, ?>) value;
                     value = map.get(_names[pos]);
                     if (value == null) {
                         break;
@@ -578,13 +578,13 @@ public class ${glInternalSqlParser} {
                     final PropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                     if (_names.length == (pos + 1) && hasLikeSearchOption(beanDesc, currentName)) {
                         final ${glConditionOptionLikeSearchName} option = getLikeSearchOption(beanDesc, currentName, value);
-                        value = pd.getValue(value);
+                        value = getPropertyValue(clazz, value, currentName, pd);
                         if (value != null && value instanceof String && ((String)value).length() != 0) {
                             value = option.generateRealValue((String) value);
                             rearOption = option.getRearOption();
                         }
                     } else {
-                        value = pd.getValue(value);
+					    value = getPropertyValue(clazz, value, currentName, pd);
                     }
                     clazz = (value != null ? value.getClass() : pd.getPropertyType());
                     continue;
@@ -642,6 +642,38 @@ public class ${glInternalSqlParser} {
             throw new ${glRequiredOptionNotFoundException}(msg);
         }
 		
+		protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, PropertyDesc pd) {
+            try {
+                return pd.getValue(beanValue);
+            } catch (RuntimeException e) {
+                throwPropertyHandlingFailureException(beanType, beanValue, currentName, _expression, _specifiedSql, _bind);
+				return null;// Unreachable!
+            }
+		}
+		
+        protected void throwPropertyHandlingFailureException(Class<?> beanType, Object beanValue, String currentName,
+                String expression, String specifiedSql, boolean bind) {
+            String msg = "Look! Read the message below." + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The handlig of the property was failed!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Advice]" + getLineSeparator();
+            msg = msg + "This is the Framework Exception!" + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator()
+                    + expression + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Bean Type]" + getLineSeparator() + beanType + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Bean Value]" + getLineSeparator() + beanValue + getLineSeparator();
+            msg = msg + getLineSeparator();
+            msg = msg + "[Property Name]" + getLineSeparator() + currentName + getLineSeparator();
+            msg = msg + getLineSeparator();
+			msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+
         protected String initCap(String name) {
 		    return ${glSimpleStringUtil}.initCap(name);
         }
@@ -658,7 +690,7 @@ public class ${glInternalSqlParser} {
             }
         }
 
-        protected void throwBindOrEmbeddedCommentNotFoundPropertyException(String expression, Class targetType, String notFoundProperty, String specifiedSql, boolean bind) {
+        protected void throwBindOrEmbeddedCommentNotFoundPropertyException(String expression, Class<?> targetType, String notFoundProperty, String specifiedSql, boolean bind) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "The property on the " + (bind ? "bind variable" : "embedded value") + " comment was Not Found!" + getLineSeparator();
@@ -689,7 +721,7 @@ public class ${glInternalSqlParser} {
     //                                    Exception Provider
     //                                    ------------------
 	protected static class ParameterCommentExceptionProvider {
-        public static void throwBindOrEmbeddedParameterNullValueException(String expression, Class targetType, String specifiedSql, boolean bind) {
+        public static void throwBindOrEmbeddedParameterNullValueException(String expression, Class<?> targetType, String specifiedSql, boolean bind) {
             String msg = "Look! Read the message below." + getLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
             msg = msg + "The value of " + (bind ? "bind variable" : "embedded value") + " was Null!" + getLineSeparator();
@@ -846,7 +878,14 @@ public class ${glInternalSqlParser} {
             msg = msg + getLineSeparator();
             msg = msg + "[IF Comment Expression]" + getLineSeparator() + expression + getLineSeparator();
             msg = msg + getLineSeparator();
-            msg = msg + "[Cause Message]" + getLineSeparator() + cause.getMessage() + getLineSeparator();
+            msg = msg + "[Cause Message]" + getLineSeparator();
+            msg = msg + cause.getClass() + ":" + getLineSeparator();
+            msg = msg + "  --> " + cause.getMessage() + getLineSeparator();
+            final Throwable nestedCause = cause.getCause();
+            if (nestedCause != null) {
+                msg = msg + nestedCause.getClass() + ":" + getLineSeparator();
+                msg = msg + "  --> " + nestedCause.getMessage() + getLineSeparator();
+            }
             msg = msg + getLineSeparator();
             msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
             msg = msg + "* * * * * * * * * */" + getLineSeparator();

@@ -145,12 +145,13 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected String GenerateSpecifiedOutsideSqlUniqueKey(IMethodInvocation invocation) {
             Object[] args = invocation.Arguments;
             String path = (String)args[0];
+            Object pmb = args[1];
             ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
             Object resultTypeSpecification = null;
             if (args.Length > 3) {
                 resultTypeSpecification = args[3];
             }
-            return ${glOutsideSqlContextName}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, option, resultTypeSpecification);
+            return ${glOutsideSqlContextName}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, pmb, option, resultTypeSpecification);
         }
 
         // ===============================================================================

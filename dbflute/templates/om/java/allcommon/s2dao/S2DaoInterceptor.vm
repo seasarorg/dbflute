@@ -207,12 +207,13 @@ public class ${glDaoInterceptor} extends org.seasar.framework.aop.interceptors.A
     protected String generateSpecifiedOutsideSqlUniqueKey(MethodInvocation invocation) {
         final Object[] args = invocation.getArguments();
         final String path = (String)args[0];
+		final Object pmb = args[1];
         final ${glOutsideSqlOptionName} option = (${glOutsideSqlOptionName})args[2];
         Object resultTypeSpecification = null;
         if (args.length > 3) {
             resultTypeSpecification = args[3];
         }
-        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(invocation.getMethod().getName(), path, option, resultTypeSpecification);
+        return ${glOutsideSqlContextName}.generateSpecifiedOutsideSqlUniqueKey(invocation.getMethod().getName(), path, pmb, option, resultTypeSpecification);
     }
 
     // ===================================================================================
