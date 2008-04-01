@@ -51,9 +51,6 @@ public class ${glCacheBehaviorSelectorName} extends ${glCacheAbstractSelector} i
 			}
 			dao.initializeDaoMetaData("selectList");
         }
-		${glDBFluteConfig}.getInstance().unlock();
-		${glDBFluteConfig}.getInstance().setConditionBeanMetaDataInitialized(true);
-		${glDBFluteConfig}.getInstance().lock();
 	    if (_log.isDebugEnabled()) {
 		    long after = System.currentTimeMillis();
 		    _log.debug("= = = = = = = = = =/ [" + ${glTraceViewUtilName}.convertToPerformanceView(after - before) + "]");
