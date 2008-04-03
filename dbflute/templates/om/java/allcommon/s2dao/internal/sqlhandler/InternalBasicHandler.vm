@@ -14,8 +14,10 @@ import org.seasar.framework.exception.EmptyRuntimeException;
 import org.seasar.framework.exception.SQLRuntimeException;
 
 import ${glPackageBaseCommon}.${glQLog};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContextName};
 import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
 import ${glPackageBaseCommonS2DaoInternalUtil}.${glInternalBindVariableUtil};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * @author ${database.ClassAuthor}
@@ -89,7 +91,11 @@ public class ${glInternalBasicHandler} {
     protected void logSql(Object[] args, Class[] argTypes) {
         if (_log.isDebugEnabled() || ${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
             final String completeSql = getCompleteSql(args);
-            ${glQLog}.log(completeSql);
+			if (isConditionBeanFormatSqlEffective()) {
+                ${glQLog}.log(getLineSeparator() + completeSql);
+			} else {
+                ${glQLog}.log(completeSql);
+			}
 		    if (${glInternalSqlLogRegistry}.existsSqlLogRegistry()) {
 			    final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
 				if (sqlLogRegistry != null) {
@@ -99,6 +105,22 @@ public class ${glInternalBasicHandler} {
         }
     }
 	
+	protected boolean isConditionBeanFormatSqlEffective() {
+	    if (${glConditionBeanContextName}.isExistConditionBeanOnThread()) {
+		    if (${glConditionBeanContextName}.getConditionBeanOnThread().isFormatSql()) {
+			    return true;
+			}
+		}
+		return false;
+	}
+	
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
+    }
+    
 	// ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

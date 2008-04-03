@@ -101,7 +101,6 @@ public class ${glConditionBeanContextName} {
     //                                                                  ==================
     /**
      * Is the argument condition-bean?
-     * 
      * @param dtoInstance DTO instance.
      * @return Determination.
      */
@@ -115,7 +114,6 @@ public class ${glConditionBeanContextName} {
 
     /**
      * Is the type condition-bean?
-     * 
      * @param dtoClass DtoClass.
      * @return Determination.
      */
@@ -173,7 +171,6 @@ public class ${glConditionBeanContextName} {
 
     /**
      * Get database product name.
-     * 
      * @return Database product name.
      */
     public static String getDatabaseProductName() {
@@ -182,7 +179,6 @@ public class ${glConditionBeanContextName} {
 
     /**
      * Set database product name.
-     * 
      * @param name Database product name. (NotNull)
      */
     public static void setDatabaseProductName(String name) {
@@ -244,7 +240,12 @@ public class ${glConditionBeanContextName} {
         msg = msg + getLineSeparator();
 		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
 		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
-			final String dispalySql = filterDisplaySql(cb.toDisplaySql(), cb.getTableDbName());
+			final String dispalySql;
+			if (cb.isFormatSql()) {
+			    dispalySql = cb.toDisplaySql();
+			} else {
+			    dispalySql = filterDisplaySql(cb.toDisplaySql(), cb.getTableSqlName());
+			}
 			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
 		} else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
@@ -264,7 +265,12 @@ public class ${glConditionBeanContextName} {
         msg = msg + getLineSeparator();
 		if (searchKey4Log != null && searchKey4Log instanceof ${glConditionBeanInterfaceName}) {
 		    final ${glConditionBeanInterfaceName} cb = (${glConditionBeanInterfaceName})searchKey4Log;
-			final String dispalySql = filterDisplaySql(cb.toDisplaySql(), cb.getTableDbName());
+			final String dispalySql;
+			if (cb.isFormatSql()) {
+			    dispalySql = cb.toDisplaySql();
+			} else {
+			    dispalySql = filterDisplaySql(cb.toDisplaySql(), cb.getTableSqlName());
+			}
 			msg = msg + "[Executed SQL for Display]" + getLineSeparator() + dispalySql + getLineSeparator();
 		} else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();

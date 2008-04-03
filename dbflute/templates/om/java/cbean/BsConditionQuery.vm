@@ -228,12 +228,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         final ${relationCQPackagePrefix}${myConditionQueryClassName} baseQuery = (${relationCQPackagePrefix}${myConditionQueryClassName})baseQueryAsSuper;
         final ${relationCQPackagePrefix}${myConditionQueryClassName} unionQuery = (${relationCQPackagePrefix}${myConditionQueryClassName})unionQueryAsSuper;
 #end
-#foreach ($foreignKeys in $table.ForeignKeys)
+#foreach ($foreignKeys in $table.foreignKeys)
         if (baseQuery.hasConditionQuery${foreignKeys.foreignPropertyNameInitCap}()) {
             unionQuery.query${foreignKeys.foreignPropertyNameInitCap}().reflectRelationOnUnionQuery(baseQuery.query${foreignKeys.foreignPropertyNameInitCap}(), unionQuery.query${foreignKeys.foreignPropertyNameInitCap}());
         }
 #end
-#foreach ($refferer in $table.Referrers)
+#foreach ($refferer in $table.referrers)
 #if (${refferer.isOneToOne()})
         if (baseQuery.hasConditionQuery${refferer.reffererPropertyNameInitCapAsOne}()) {
             unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}().reflectRelationOnUnionQuery(baseQuery.query${refferer.reffererPropertyNameInitCapAsOne}(), unionQuery.query${refferer.reffererPropertyNameInitCapAsOne}());

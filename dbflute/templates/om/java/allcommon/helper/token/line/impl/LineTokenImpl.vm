@@ -1,5 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenLineImpl};
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenName};
 import ${glPackageBaseCommonHelperTokenLine}.${glLineTokenizingOptionName};
 import ${glPackageBaseCommonHelperTokenLine}.${glLineMakingOptionName};
@@ -9,9 +13,9 @@ import ${glPackageBaseCommonHelperTokenLine}.${glLineMakingOptionName};
  */
 public class ${glLineTokenImplName} implements ${glLineTokenName} {
 
-    public java.util.List${database.filterGenericsString('String')} tokenize(String lineString, ${glLineTokenizingOptionName} lineTokenizingOption) {
+    public List<String> tokenize(String lineString, ${glLineTokenizingOptionName} lineTokenizingOption) {
         final String delimiter = lineTokenizingOption.getDelimiter();
-        final java.util.List${database.filterGenericsString('String')} list = new java.util.ArrayList${database.filterGenericsString('String')}();
+        final List<String> list = new ArrayList<String>();
         int i = 0;
         int j = lineString.indexOf(delimiter);
         for (int h = 0; j >= 0; h++) {
@@ -44,7 +48,7 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
         return target;
     }
 
-    public String make(java.util.List${database.filterGenericsString('String')} valueList, ${glLineMakingOptionName} lineMakingOption) {
+    public String make(java.util.List<String> valueList, ${glLineMakingOptionName} lineMakingOption) {
         assertObjectNotNull("valueList", valueList);
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
@@ -52,9 +56,9 @@ public class ${glLineTokenImplName} implements ${glLineTokenName} {
         return createLineString(valueList, delimiter, lineMakingOption.isQuoteByDoubleQuotation(), lineMakingOption.isTrimSpace());
     }
 
-    protected String createLineString(java.util.List${database.filterGenericsString('String')} valueList, String delimiter, boolean quoteByDoubleQuotation, boolean trimSpace) {
+    protected String createLineString(List<String> valueList, String delimiter, boolean quoteByDoubleQuotation, boolean trimSpace) {
         final StringBuffer sb = new StringBuffer();
-        for (final java.util.Iterator ite = valueList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<String> ite = valueList.iterator(); ite.hasNext(); ) {
             String value = (String)ite.next();
             value = (value != null ? value : "");
             if (trimSpace) {

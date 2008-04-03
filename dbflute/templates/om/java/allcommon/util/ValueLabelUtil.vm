@@ -11,7 +11,6 @@ public class ${glValueLabelUtilName} {
 
     /**
      * Find the label by the value from the list of value label.
-     * 
      * @param valueLabelList The list of value label. (NotNull and NotEmpty)
      * @param value Value. (NotNull)
      * @return Label. (NotNull)
@@ -40,7 +39,7 @@ public class ${glValueLabelUtilName} {
     }
 	
 	public static Map<Object, String> createValueLabelMap(List<Map<String, Object>> valueLabelList) {
-		final Map<Object, String> resultMap = new LinkedHashMap();
+		final Map<Object, String> resultMap = new LinkedHashMap<Object, String>();
 		for (Map<String, Object> elementMap : valueLabelList) {
 			final Object currentValue = elementMap.get("value");
 			final String currentLabel = (String) elementMap.get("label");
@@ -50,7 +49,7 @@ public class ${glValueLabelUtilName} {
 	}
 	
 	public static Map<String, Object> createLabelValueMap(List<Map<String, Object>> valueLabelList) {
-		final Map<String, Object> resultMap = new LinkedHashMap();
+		final Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
 		for (Map<String, Object> elementMap : valueLabelList) {
 			final Object currentValue = elementMap.get("value");
 			final String currentLabel = (String) elementMap.get("label");

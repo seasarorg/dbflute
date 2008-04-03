@@ -4,7 +4,6 @@ import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
 import ${glPackageBaseCommon}.${glEntityInterfaceName};
 import ${glPackageBaseCommonCBean}.${glConditionBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glListResultBeanName};
-import ${glPackageBaseCommonCBean}.${glOrderByBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingBeanInterfaceName};
 import ${glPackageBaseCommonCBean}.${glPagingHandlerName};
 import ${glPackageBaseCommonCBean}.${glPagingInvokerName};
@@ -215,7 +214,7 @@ public interface ${glBehaviorReadableInterfaceName} {
                     return callback.selectListWithFetchScope();
                 }
             };
-            return new ${glPagingInvokerName}(_bhv.getTableDbName()).invokePaging(handler);
+            return new ${glPagingInvokerName}<ENTITY>(_bhv.getTableDbName()).invokePaging(handler);
         }
     }
 

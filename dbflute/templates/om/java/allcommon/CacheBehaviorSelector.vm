@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import ${glPackageBaseCommon}.${glDaoReadableInterfaceName};
-import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonBhv}.${glBehaviorReadableInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInterfaceName};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};

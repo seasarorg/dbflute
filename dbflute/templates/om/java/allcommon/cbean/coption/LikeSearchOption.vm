@@ -1,24 +1,32 @@
 ${database.allClassCopyright}package ${glPackageBaseCommonCOption};
-
 #set ($myClassName = "${glConditionOptionLikeSearchName}")
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import ${glPackageBaseCommonCOptionPartsLocal}.${glConditionOptionPartsAgentJapaneseName};
 
 /**
  * The class of like-search-option.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     protected static final String LIKE_PREFIX = "prefix";
     protected static final String LIKE_SUFFIX = "suffix";
     protected static final String LIKE_CONTAIN = "contain";
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _like;
     protected String _escape;
-
-    protected java.util.List${database.filterGenericsString('LikeAsOrCallback')} _likeAsOrCallbackList = new java.util.ArrayList${database.filterGenericsString('LikeAsOrCallback')}();
+    protected boolean _asOrSplit;
+    protected List<LikeAsOrCallback> _likeAsOrCallbackList;
 
     // ===================================================================================
     //                                                                         Rear Option
@@ -48,16 +56,23 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         }
     }
 
-    public java.util.List${database.filterGenericsString('LikeAsOrCallback')} getLikeAsOrCallbackList() {
+    public boolean hasLikeAsOrCallback() {
+        return _likeAsOrCallbackList != null && !_likeAsOrCallbackList.isEmpty();
+    }
+	
+    public List<LikeAsOrCallback> getLikeAsOrCallbackList() {
+		if (_likeAsOrCallbackList == null) {
+		    _likeAsOrCallbackList = new ArrayList<LikeAsOrCallback>();
+		}
         return _likeAsOrCallbackList;
     }
 
     public void addLikeAsOrCallback(LikeAsOrCallback likeAsOrCallback) {
-        _likeAsOrCallbackList.add(likeAsOrCallback);
+        getLikeAsOrCallbackList().add(likeAsOrCallback);
     }
 
     public void clearLikeAsOrCallback() {
-        _likeAsOrCallbackList.clear();
+        getLikeAsOrCallbackList().clear();
     }
 
     // ===================================================================================
@@ -125,6 +140,15 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
     public ${myClassName} splitByPipeLine(int splitLimitCount) {
         return (${myClassName})doSplitByPipeLine(splitLimitCount);
     }
+	
+	public ${myClassName} asOrSplit() {
+	    _asOrSplit = true;
+		return this;
+	}
+	
+	public boolean isAsOrSplit() {
+	    return _asOrSplit;
+	}
 
     // ===================================================================================
     //                                                                 To Upper/Lower Case
@@ -198,9 +222,11 @@ public class ${myClassName} extends ${glConditionOptionSimpleStringName} {
         final ${myClassName} deepCopy = (${myClassName})super.createDeepCopy();
         deepCopy._like = _like;
         deepCopy._escape = _escape;
-        for (java.util.Iterator ite = _likeAsOrCallbackList.iterator(); ite.hasNext(); ) {
-            deepCopy.addLikeAsOrCallback((LikeAsOrCallback)ite.next());
-        }
+		if (hasLikeAsOrCallback()) {
+            for (Iterator ite = _likeAsOrCallbackList.iterator(); ite.hasNext(); ) {
+                deepCopy.addLikeAsOrCallback((LikeAsOrCallback)ite.next());
+            }
+		}
         return deepCopy;
     }
 

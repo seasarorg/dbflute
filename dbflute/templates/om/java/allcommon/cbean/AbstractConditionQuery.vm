@@ -303,6 +303,9 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
         }
         reflectRelationOnUnionQuery(this, unionQuery);// Reflect Relation!
         getSqlClause().copyIncludedSelectColumn(unionQuery.getSqlClause());// Reflect IncludedSelectColumn!
+		if (getSqlClause().isFormatClauseEffective()) {
+		    unionQuery.getSqlClause().makeFormatClauseEffective();// Reflect FormatClause!
+		}
         final String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.put(key, unionQuery);
         registerUnionQuery(unionQuery, unionAll, (unionAll ? "unionAllQueryMap" : "unionQueryMap") + "." + key);
@@ -404,37 +407,69 @@ public abstract class ${myClassName} implements ${glConditionQueryInterfaceName}
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
-    protected void registerLikeSearchQuery(${glConditionKeyName} key, String value, ${glConditionValueName} cvalue
-                                     , String colName, String capPropName, String uncapPropName, ${glConditionOptionLikeSearchName} option) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-		    if (option == null) {
-			    throwLikeSearchOptionNotFoundException(capPropName, value);
-			}
-            if (value != null && option.isSplit()) {
-                final String[] strArray = option.generateSplitValueArray(value);
-                for (int i=0; i < strArray.length; i++) {
-                    final String currentValue = strArray[i];
-                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
-
-                    // Callback for LikeAsOr!
-                    final java.util.List<${glConditionOptionLikeSearchName}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
-                    if (!callbackList.isEmpty()) {
-                        getSqlClause().makeAdditionalConditionAsOrEffective();
-                        for (java.util.Iterator<${glConditionOptionLikeSearchName}.LikeAsOrCallback> ite = callbackList.iterator(); ite.hasNext(); ) {
-                            final ${glConditionOptionLikeSearchName}.LikeAsOrCallback likeAsOrCallback = (${glConditionOptionLikeSearchName}.LikeAsOrCallback)ite.next();
-                            final String additionalTargetPropertyName = likeAsOrCallback.getAdditionalTargetPropertyName();
-                            final String filteredValue = likeAsOrCallback.filterValue(currentValue);
-                            final ${glConditionOptionLikeSearchName} optionDeepCopy = (${glConditionOptionLikeSearchName})option.createDeepCopy();
-                            optionDeepCopy.clearLikeAsOrCallback();
-                            final ${glConditionOptionLikeSearchName} filteredOption = likeAsOrCallback.filterOption(optionDeepCopy);
-                            invokeSetterLikeSearch(additionalTargetPropertyName, filteredValue, filteredOption);
-                        }
-                        getSqlClause().ignoreAdditionalConditionAsOr();
+    protected void registerLikeSearchQuery(${glConditionKeyName} key
+	                                     , String value
+										 , ${glConditionValueName} cvalue
+										 , String colName
+										 , String capPropName
+										 , String uncapPropName
+										 , ${glConditionOptionLikeSearchName} option) {
+        final String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
+        if (!key.isValidRegistration(cvalue, value, validationMsg)) {
+            return;
+        }
+        if (option == null) {
+            throwLikeSearchOptionNotFoundException(capPropName, value);
+			return;// Unreachable!
+        }
+        if (value == null || !option.isSplit()) {
+            // As Normal Condition.
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+			return;
+        }
+        // - - - - - - - - -
+        // Use splitByXxx().
+        // - - - - - - - - -
+        final String[] strArray = option.generateSplitValueArray(value);
+        if (!option.isAsOrSplit()) {
+            // As 'and' Condition
+            for (int i = 0; i < strArray.length; i++) {
+                final String currentValue = strArray[i];
+                setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
+                
+                // Callback for LikeAsOr!
+                final List<${glConditionOptionLikeSearchName}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
+                if (!callbackList.isEmpty()) {
+                    getSqlClause().makeAdditionalConditionAsOrEffective();
+                    for (Iterator<${glConditionOptionLikeSearchName}.LikeAsOrCallback> ite = callbackList.iterator(); ite.hasNext();) {
+                        final ${glConditionOptionLikeSearchName}.LikeAsOrCallback likeAsOrCallback = (${glConditionOptionLikeSearchName}.LikeAsOrCallback) ite.next();
+                        final String additionalTargetPropertyName = likeAsOrCallback.getAdditionalTargetPropertyName();
+                        final String filteredValue = likeAsOrCallback.filterValue(currentValue);
+                        final ${glConditionOptionLikeSearchName} optionDeepCopy = (${glConditionOptionLikeSearchName}) option.createDeepCopy();
+                        optionDeepCopy.clearLikeAsOrCallback();
+                        final ${glConditionOptionLikeSearchName} filteredOption = likeAsOrCallback.filterOption(optionDeepCopy);
+                        invokeSetterLikeSearch(additionalTargetPropertyName, filteredValue, filteredOption);
                     }
+                    getSqlClause().ignoreAdditionalConditionAsOr();
                 }
-            } else {
-                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
             }
+        } else {
+            // As 'or' Condition
+            for (int i = 0; i < strArray.length; i++) {
+                final String currentValue = strArray[i];
+                if (i == 0) {
+                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
+                } else {
+                    getSqlClause().makeAdditionalConditionAsOrEffective();
+                    invokeSetterLikeSearch(uncapPropName, currentValue, option);
+                }
+            }
+            
+            // @jflute -- Callback for LikeAsOr!
+            // final List<${glConditionOptionLikeSearchName}.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
+            // ...
+            
+            getSqlClause().ignoreAdditionalConditionAsOr();
         }
     }
 

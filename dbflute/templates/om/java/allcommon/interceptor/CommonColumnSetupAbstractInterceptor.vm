@@ -44,13 +44,13 @@ public abstract class ${glCommonColumnSetupAbstractInterceptor} extends org.seas
             setupEntity(entity);
             return invocation.proceed();
         } else if (isListSaveEntityDefinedCommonColumn(firstArgument)) {
-            final java.util.List ls = (java.util.List)firstArgument;
+            final java.util.List<?> ls = (java.util.List<?>)firstArgument;
                 if (_log.isDebugEnabled()) {
                     String msg = "Intercepted the method '" + getShortClassName(method.getDeclaringClass()) + "." + method.getName() + "()'";
                     msg = msg + ": entityList.size()=" + ls.size();
                     _log.debug(msg);
                 }
-            for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+            for (final java.util.Iterator<?> ite = ls.iterator(); ite.hasNext(); ) {
                 final ${glEntityDefinedCommonColumnInterfaceName} entity = (${glEntityDefinedCommonColumnInterfaceName})ite.next();
                 setupEntity(entity);
             }
@@ -90,8 +90,8 @@ public abstract class ${glCommonColumnSetupAbstractInterceptor} extends org.seas
         if (!(obj instanceof java.util.List)) {
             return false;
         }
-        final java.util.List ls = (java.util.List)obj;
-        for (final java.util.Iterator ite = ls.iterator(); ite.hasNext(); ) {
+        final java.util.List<?> ls = (java.util.List<?>)obj;
+        for (final java.util.Iterator<?> ite = ls.iterator(); ite.hasNext(); ) {
             final Object currentObj = ite.next();
             if (!(currentObj instanceof ${glEntityDefinedCommonColumnInterfaceName})) {
                 return false;
@@ -116,7 +116,7 @@ public abstract class ${glCommonColumnSetupAbstractInterceptor} extends org.seas
      * @param clazz Class instance. (NotNull)
      * @return Short class name. (NotNull)
      */
-    protected String getShortClassName(Class clazz) {
+    protected String getShortClassName(Class<?> clazz) {
         String s = clazz.getName();
         int i = s.lastIndexOf('.');
         if (i > 0) {

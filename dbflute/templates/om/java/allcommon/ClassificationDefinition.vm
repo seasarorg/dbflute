@@ -10,7 +10,6 @@ import java.util.Iterator;
 
 /**
  * The definition class that has classification.
- * 
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
 public class ${myClassName} {

@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommonHelperTokenFileImpl};
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import ${glPackageBaseCommonHelperTokenFile}.${glFileTokenName};
 
@@ -141,7 +142,7 @@ public class ${glFileTokenImplName} implements ${glFileTokenName} {
                     fileTokenizingRowResource.setFirstLineInfo(fileTokenizingHeaderInfo);
 
                     if (fileTokenizingOption.isHandleEmptyAsNull()) {
-                        for (final java.util.Iterator ite = temporaryValueList.iterator(); ite.hasNext(); ) {
+                        for (final Iterator<String> ite = temporaryValueList.iterator(); ite.hasNext(); ) {
                             final String value = (String)ite.next();
                             if ("".equals(value)) {
                                 filteredValueList.add(null);

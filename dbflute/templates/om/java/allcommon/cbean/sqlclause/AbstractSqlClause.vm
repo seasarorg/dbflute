@@ -110,6 +110,11 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     //                                 ---------------------
     /** The information of selected foreign table. */
     protected Map<String, String> _selectedForeignInfo;
+		
+    // -----------------------------------------------------
+    //                                         Optional Info
+    //                                         -------------
+	protected boolean _formatClause;
 	
     // ===================================================================================
     //                                                                         Constructor
@@ -187,7 +192,14 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             final UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
             final String unionQueryClause = unionQueryInfo.getUnionQueryClause();
             final boolean unionAll = unionQueryInfo.isUnionAll();
-            sb.append(unionAll ? " union all " : " union ").append(selectClause).append(" ").append(unionQueryClause);
+	        if (isFormatClauseEffective()) {
+	            sb.append(getLineSeparator());
+	        }
+            sb.append(unionAll ? " union all " : " union ");
+	        if (isFormatClauseEffective()) {
+	            sb.append(getLineSeparator());
+	        }
+			sb.append(selectClause).append(" ").append(unionQueryClause);
         }
         return sb.toString();
     }
@@ -266,6 +278,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 
     public String getFromClause() {
         final StringBuilder sb = new StringBuilder();
+		if (isFormatClauseEffective()) {
+		    sb.append(getLineSeparator()).append("  ");
+		}
         sb.append("from ");
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(_tableName).append(" dflocal");
@@ -288,6 +303,9 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             final Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
+		    if (isFormatClauseEffective()) {
+		        sb.append(getLineSeparator()).append("   ");
+		    }
             sb.append(" left outer join ");
             if (inlineWhereClauseList.isEmpty()) {
                 sb.append(joinTableName);
@@ -352,8 +370,14 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
             String clauseElement = (String)ite.next();
             clauseElement = filterWhereClauseSimply(clauseElement);
             if (count == 0) {
+		        if (isFormatClauseEffective()) {
+		            sb.append(getLineSeparator()).append(" ");
+		        }
                 sb.append("where ").append(template  ? getWhereFirstConditionMark() : "").append(clauseElement);
             } else {
+		        if (isFormatClauseEffective()) {
+		            sb.append(getLineSeparator()).append("  ");
+		        }
                 sb.append(" and ").append(clauseElement);
             }
         }
@@ -364,19 +388,30 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
     }
 	
     public String getOrderByClause() {
+	    final String orderByClause;
         if (!_unionQueryInfoList.isEmpty()) {
             if (_selectClauseRealColumnAliasMap == null || _selectClauseRealColumnAliasMap.isEmpty()) {
                 String msg = "The selectClauseColumnAliasMap should not be null or empty when union query exists: " + toString();
                 throw new IllegalStateException(msg);
             }
-            return _orderByClause.getOrderByClause(_selectClauseRealColumnAliasMap);
-        } else {
-            return _orderByClause.getOrderByClause();
-        }
+			orderByClause = _orderByClause.getOrderByClause(_selectClauseRealColumnAliasMap);
+		} else {
+		    orderByClause = _orderByClause.getOrderByClause();
+		}
+	    if (isFormatClauseEffective() && orderByClause != null && orderByClause.trim().length() > 0) {
+	        return getLineSeparator() + " " + orderByClause;
+		} else {
+		    return orderByClause;
+		}
     }
 
     public String getSqlSuffix() {
-        return createSqlSuffix();
+	    final String sqlSuffix = createSqlSuffix();
+        if (isFormatClauseEffective() && sqlSuffix != null && sqlSuffix.trim().length() > 0) {
+            return getLineSeparator() + sqlSuffix;
+        } else {
+            return sqlSuffix;
+		}
     }
 
     // ===================================================================================
@@ -1090,6 +1125,17 @@ public abstract class ${myClassName} implements ${glSqlClauseInterfaceName} {
 		_selectedForeignInfo.put(relationPath, foreignPropertyName);
 	}
 	
+    // ===================================================================================
+    //                                                                       Format Clause
+    //                                                                       =============
+	public boolean isFormatClauseEffective() {
+	    return _formatClause;
+	}
+	
+	public void makeFormatClauseEffective() {
+	    _formatClause = true;
+	}
+
     // ===================================================================================
     //                                                                              Helper
     //                                                                              ======

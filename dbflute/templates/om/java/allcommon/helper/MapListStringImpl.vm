@@ -649,14 +649,12 @@ public class ${glMapListStringImplName} implements ${glMapListStringName} {
 
     /**
      * Assert end-brace-index.
-     * 
      * @param remainderListString Remainder list-string. (NotNull)
      * @param endBraceIndex End-brace-index.
      * @param listString4Log List-string for log. (NotNull)
      * @param currentList4Log Current-list for log. (NotNull)
      */
-    protected void assertEndBraceIndex(String remainderListString, int endBraceIndex, String listString4Log,
-            List currentList4Log) {
+    protected void assertEndBraceIndex(String remainderListString, int endBraceIndex, String listString4Log, List<?> currentList4Log) {
         if (remainderListString == null) {
             String msg = "Argument[remainderListString] must not be null:";
             msg = msg + getNewLineAndIndent() + " # remainderListString --> " + remainderListString;

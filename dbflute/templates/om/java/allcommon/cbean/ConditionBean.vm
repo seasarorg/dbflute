@@ -5,7 +5,6 @@ import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 
 /**
  * The interface of condition-bean.
- * 
  * @author ${database.ClassAuthor}
  */
 public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterfaceName} {
@@ -35,16 +34,14 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                          Table Name
     //                                                                          ==========
     /**
-     * Get table db-name.
-     * 
-     * @return Table db-name. (NotNull)
+     * Get table DB-name.
+     * @return Table DB-name. (NotNull)
      */
     public String getTableDbName();
 
     /**
-     * Get table sql-name.
-     * 
-     * @return Table sql-name. (NotNull)
+     * Get table SQL-name.
+     * @return Table SQL-name. (NotNull)
      */
     public String getTableSqlName();
 
@@ -52,9 +49,9 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                           SqlClause
     //                                                                           =========
     /**
-     * Get sql-clause instance.
+     * Get SQL-clause instance.
      * 
-     * @return Sql-clause. (NotNull)
+     * @return SQL-clause. (NotNull)
      */
     public ${glSqlClauseName} getSqlClause();
 
@@ -63,14 +60,12 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                      ==============
     /**
      * Accept primary-key map-string.
-     * 
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
      */
     public void acceptPrimaryKeyMap(java.util.Map${database.filterGenericsString('String, ? extends Object')} primaryKeyMap);
 
     /**
      * Accept primary-key map-string. Delimiter is at-mark and semicolon.
-     * 
      * @param primaryKeyMapString Primary-key map. (NotNull and NotEmpty)
      */
     public void acceptPrimaryKeyMapString(String primaryKeyMapString);
@@ -80,14 +75,12 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                     ===============
     /**
      * Add order-by PrimaryKey asc. {order by primaryKey1 asc, primaryKey2 asc...}
-     * 
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Asc();
 
     /**
      * Add order-by PrimaryKey desc. {order by primaryKey1 desc, primaryKey2 desc...}
-     * 
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} addOrderBy_PK_Desc();
@@ -97,7 +90,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                               =====
     /**
      * Get condition-query as interface.
-     * 
      * @return Instance of query as interface. (NotNull)
      * @deprecated
      */
@@ -105,7 +97,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
 
     /**
      * Get the conditionQuery of the local table as interface.
-     * 
      * @return The conditionQuery of the local table as interface. (NotNull)
      */
     public ${glConditionQueryInterfaceName} localCQ();
@@ -115,7 +106,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                         ===========
     /**
      * Has union query or union all query?
-     * 
      * @return Determination.
      */
     public boolean hasUnionQueryOrUnionAllQuery();
@@ -125,21 +115,18 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                        ============
     /**
      * Limit select PK only.
-     *
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} limitSelect_PKOnly();
 
     /**
      * Limit select off.
-     *
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} limitSelect_Off();
 
     /**
      * Is limit-select PK only?
-     * 
      * @return Determination.
      */
     public boolean isLimitSelect_PKOnly();
@@ -149,10 +136,10 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     //                                                                          ============
     /**
      * Lock for update.
-     * 
+	 * <p>
      * If you invoke this, your SQL lock target records for update.
      * It depends whether this method supports this on the database type.
-     * 
+     * </p>
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} lockForUpdate();
@@ -163,7 +150,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     /**
      * Set up various things for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!
-     * 
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope();
@@ -171,7 +157,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     /**
      * Do after-care for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!
-     * 
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope();
@@ -179,7 +164,6 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
     /**
      * Is set up various things for select-count-ignore-fetch-scope? {Internal}
      * This method is for INTERNAL. Don't invoke this!
-     * 
      * @return Determination.
      */
     public boolean isSelectCountIgnoreFetchScope();
@@ -198,11 +182,16 @@ public interface ${glConditionBeanInterfaceName} extends ${glPagingBeanInterface
 	public ${glStatementConfig} getStatementConfig();
 	
     // ===================================================================================
+    //                                                                          Format SQL
+    //                                                                          ==========
+	public void formatSql();
+	public boolean isFormatSql();
+	
+    // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
 	/**
 	 * Convert this conditionBean to SQL for display.
-	 * 
 	 * @return SQL for display. (NotNull and NotEmpty)
 	 */
 	public String toDisplaySql();

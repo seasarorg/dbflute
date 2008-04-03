@@ -146,7 +146,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     // * * * * * * * *
     /**
      * ${database.ImplementComment}
-     * 
      * @return Determination.
      */
     public boolean isPaging() {
@@ -156,7 +155,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param paging Determination.
      */
     public void xsetPaging(boolean paging) {
@@ -169,7 +167,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                         -------------
     /**
      * ${database.ImplementComment}
-     * 
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNUll)
      */
@@ -180,7 +177,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNUll)
@@ -192,7 +188,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
@@ -206,7 +201,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                        --------------
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch-start-index.
      */
     public int getFetchStartIndex() {
@@ -215,7 +209,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch-size.
      */
     public int getFetchSize() {
@@ -224,7 +217,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch-page-number.
      */
     public int getFetchPageNumber() {
@@ -233,7 +225,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Page start index. 0 origin. (NotMinus)
      */
     public int getPageStartIndex() {
@@ -242,7 +233,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Page end index. 0 origin. (NotMinus)
      */
     public int getPageEndIndex() {
@@ -251,7 +241,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Is fetch scope effective?
-     * 
      * @return Determiantion.
      */
     public boolean isFetchScopeEffective() {
@@ -263,7 +252,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                         -------------
     /**
      * Get select-hint. {select [select-hint] * from table...}
-     * 
      * @return select-hint. (NotNull)
      */
     public String getSelectHint() {
@@ -272,7 +260,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Get from-base-table-hint. {select * from table [from-base-table-hint] where ...}
-     * 
      * @return from-base-table-hint. (NotNull)
      */
     public String getFromBaseTableHint() {
@@ -281,7 +268,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Get from-hint. {select * from table left outer join ... on ... [from-hint] where ...}
-     * 
      * @return from-hint. (NotNull)
      */
     public String getFromHint() {
@@ -290,7 +276,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Get where clause.
-     * 
      * @return Where clause. (NotNull)
      */
     public String getWhereClause() {
@@ -299,7 +284,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Get sql-suffix. {select * from table where ... order by ... [sql-suffix]}
-     * 
      * @return Sql-suffix.  (NotNull)
      */
     public String getSqlSuffix() {
@@ -311,7 +295,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                                ====================================
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch start index.
      */
     public int getFetchNarrowingSkipStartIndex() {
@@ -320,7 +303,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Fetch size.
      */
     public int getFetchNarrowingLoopCount() {
@@ -329,7 +311,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Determination.
      */
     public boolean isFetchNarrowingSkipStartIndexEffective() {
@@ -338,7 +319,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Determination.
      */
     public boolean isFetchNarrowingLoopCountEffective() {
@@ -347,7 +327,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Determiantion.
      */
     public boolean isFetchNarrowingEffective() {
@@ -371,7 +350,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Get safety max result size.
-     * 
      * @return Safety max result size.
      */
     public int getSafetyMaxResultSize() {
@@ -380,7 +358,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Check safety result.
-     * 
      * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
      */
     public void checkSafetyResult(int safetyMaxResultSize) {
@@ -392,7 +369,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                                       =============================
     /**
      * ${database.ImplementComment}
-     * 
      * @return Sql component of order-by clause. (NotNull)
      */
     public ${glOrderByClauseName} getSqlComponentOfOrderByClause() {
@@ -401,7 +377,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return Order-by clause. (NotNull)
      */
     public String getOrderByClause() {
@@ -410,7 +385,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glOrderByBeanInterfaceName} clearOrderBy() {
@@ -420,7 +394,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glOrderByBeanInterfaceName} ignoreOrderBy() {
@@ -430,7 +403,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glOrderByBeanInterfaceName} makeOrderByEffective() {
@@ -446,7 +418,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Is limit-select PK only?
-     * 
      * @return Determination.
      */
     public boolean isLimitSelect_PKOnly() {
@@ -455,7 +426,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Limit select PK only.
-     *
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} limitSelect_PKOnly() {
@@ -465,7 +435,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 
     /**
      * Limit select off.
-     *
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} limitSelect_Off() {
@@ -478,7 +447,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     //                                                                        ============
     /**
      * ${database.ImplementComment}
-     * 
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} lockForUpdate() {
@@ -492,7 +460,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     /**
      * Set up various things for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!
-     * 
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} xsetupSelectCountIgnoreFetchScope() {
@@ -511,7 +478,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     /**
      * Do after-care for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!
-     * 
      * @return this. (NotNull)
      */
     public ${glConditionBeanInterfaceName} xafterCareSelectCountIgnoreFetchScope() {
@@ -533,7 +499,6 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
     /**
      * Is set up various things for select-count-ignore-fetch-scope?
      * This method is for INTERNAL. Don't invoke this!
-     * 
      * @return Determination.
      */
     public boolean isSelectCountIgnoreFetchScope() {
@@ -549,11 +514,23 @@ public abstract class ${myClassName} implements ${glConditionBeanInterfaceName} 
 	public void configure(${glStatementConfig} statementConfig) {
 	    _statementConfig = statementConfig;
 	}
+	
     /**
      * @return The config of statement. (Nullable)
      */
 	public ${glStatementConfig} getStatementConfig() {
 	    return _statementConfig;
+	}
+	
+    // ===================================================================================
+    //                                                                          Format SQL
+    //                                                                          ==========
+	public void formatSql() {
+	    getSqlClause().makeFormatClauseEffective();
+	}
+	
+    public boolean isFormatSql() {
+	    return getSqlClause().isFormatClauseEffective();
 	}
 	
 	// ===================================================================================
