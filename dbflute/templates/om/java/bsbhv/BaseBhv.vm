@@ -40,28 +40,28 @@ import ${glPackageCB}.*;
  * The behavior of ${table.name}.
  * <pre>
  * [primary-key]
- *     ${table.PrimaryKeyNameCommaString}
+ *     ${table.primaryKeyNameCommaString}
  * 
  * [column-property]
- *     ${table.ColumnNameCommaString}
+ *     ${table.columnNameCommaString}
  * 
  * [foreign-property]
- *     ${table.ForeignPropertyNameCommaString}
+ *     ${table.foreignPropertyNameCommaString}
  * 
  * [referrer-property]
  *     ${table.referrerPropertyNameCommaString}
  * 
  * [sequence]
- *     ${table.DefinedSequenceName}
+ *     ${table.definedSequenceName}
  * 
  * [identity]
- *     ${table.IdentityPropertyName}
+ *     ${table.identityColumnName}
  * 
  * [update-date]
- *     ${table.UpdateDateJavaName}
+ *     ${table.updateDateColumnName}
  * 
  * [version-no]
- *     ${table.VersionNoJavaName}
+ *     ${table.versionNoColumnName}
  * 
  * </pre>
  * @author ${database.ClassAuthor}

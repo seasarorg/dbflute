@@ -40,23 +40,23 @@ namespace ${myExtendedEntityPackageName} {
     ///     ${table.DefinedSequenceName}
     /// 
     /// [identity]
-    ///     ${table.IdentityPropertyName}
+    ///     ${table.identityColumnName}
     /// 
     /// [update-date]
-    ///     ${table.UpdateDateJavaName}
+    ///     ${table.updateDateColumnName}
     /// 
     /// [version-no]
-    ///     ${table.VersionNoJavaName}
+    ///     ${table.versionNoColumnName}
     /// 
     /// ]]>
     /// Author: ${database.ClassAuthor}
     /// </summary>
     [Seasar.Dao.Attrs.Table("${table.AnnotationTableName}")]
 #if ($table.isUseUpdateDate())
-    [Seasar.Dao.Attrs.TimestampProperty("${table.updateDateJavaName}")]
+    [Seasar.Dao.Attrs.TimestampProperty("${table.updateDatePropertyName}")]
 #end
 #if ($table.isUseVersionNo())
-    [Seasar.Dao.Attrs.VersionNoProperty("${table.versionNoJavaName}")]
+    [Seasar.Dao.Attrs.VersionNoProperty("${table.versionNoPropertyName}")]
 #end
     [System.Serializable]
     public partial class ${myClassName} : ${myEntityInterfaceName} {

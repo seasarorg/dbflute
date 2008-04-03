@@ -2008,7 +2008,6 @@ public class Table implements IDMethod {
     //                                                                     ===============
     /**
      * Determine whether this table uses a sequence.
-     * 
      * @return Determination.
      */
     public boolean isUseSequence() {
@@ -2087,7 +2086,6 @@ public class Table implements IDMethod {
 
     /**
      * Extract sequence name of postgreSQL serial type column.
-     * 
      * @return Sequence name of postgreSQL serial type column. (Nullable: If null, not found)
      */
     protected String extractPostgreSQLSerialSequenceName() {
@@ -2126,12 +2124,21 @@ public class Table implements IDMethod {
 
     /**
      * Get the value of assigned property name.
-     * 
      * @return Assigned property name. (NotNull)
      */
     public String getAssignedPropertyName() {
         final Column primaryKeyAsOne = getPrimaryKeyAsOne();
-        return primaryKeyAsOne.getUncapitalisedJavaName();
+        return getPropertyNameResolvedLanguage(primaryKeyAsOne);
+    }
+    
+    protected String getPropertyNameResolvedLanguage(Column col) {
+        if (getProperties().getBasicProperties().isTargetLanguageJava()) {
+            return col.getJavaBeansRulePropertyName();
+        } else if (getProperties().getBasicProperties().isTargetLanguageCSharp()) {
+            return col.getJavaName();
+        } else {
+            return col.getUncapitalisedJavaName();
+        }
     }
 
     // ===================================================================================
@@ -2139,7 +2146,6 @@ public class Table implements IDMethod {
     //                                                                            ========
     /**
      * Determine whether this table uses an identity.
-     * 
      * @return Determination.
      */
     public boolean isUseIdentity() {
@@ -2179,12 +2185,7 @@ public class Table implements IDMethod {
         return null;
     }
 
-    /**
-     * Get the value of identity property name.
-     * 
-     * @return Name.
-     */
-    public String getIdentityPropertyName() {
+    public String getIdentityColumnName() {
         if (!isUseIdentity()) {
             return "";
         }
@@ -2193,7 +2194,7 @@ public class Table implements IDMethod {
         final Column[] columnArray = getColumns();
         for (Column column : columnArray) {
             if (column.isAutoIncrement()) {
-                return column.getUncapitalisedJavaName();
+                return column.getName();
             }
         }
 
@@ -2205,7 +2206,31 @@ public class Table implements IDMethod {
             msg = msg + " columnList=" + getColumnNameCommaString();
             throw new IllegalStateException(msg);
         }
-        return col.getUncapitalisedJavaName();
+        return col.getName();
+    }
+    
+    public String getIdentityPropertyName() {
+        if (!isUseIdentity()) {
+            return "";
+        }
+
+        // It gives priority to auto-increment information of JDBC.
+        final Column[] columnArray = getColumns();
+        for (Column column : columnArray) {
+            if (column.isAutoIncrement()) {
+                return getPropertyNameResolvedLanguage(column);
+            }
+        }
+
+        final String columnName = (String) getDatabase().getIdentityDefinitionMapColumnName(getName());
+        final Column col = getColumn(columnName);
+        if (col == null) {
+            String msg = "The columnName does not exist in the table: ";
+            msg = msg + " tableName=" + getName() + " columnName=" + columnName;
+            msg = msg + " columnList=" + getColumnNameCommaString();
+            throw new IllegalStateException(msg);
+        }
+        return getPropertyNameResolvedLanguage(col);
     }
 
     // ===================================================================================
@@ -2220,7 +2245,6 @@ public class Table implements IDMethod {
     //                                                                          ==========
     /**
      * Determine whether this table uses a update date column.
-     * 
      * @return Determination.
      */
     public boolean isUseUpdateDate() {
@@ -2238,35 +2262,49 @@ public class Table implements IDMethod {
         return true;
     }
 
-    /**
-     * Get the value of update-date as java name.
-     * 
-     * @return String. (NotNull)
-     */
-    public String getUpdateDateJavaName() {
+    protected Column getUpdateDateColumn() {
         if (!isUseUpdateDate()) {
-            return "";
+            return null;
         }
         final String fieldName = getDatabase().getUpdateDateFieldName();
         if (fieldName != null && fieldName.trim().length() != 0) {
-            return makeJavaName(fieldName);
+            final Column column = getColumn(fieldName);
+            return column;
         } else {
-            return "";
+            return null;
         }
     }
+    
+    public String getUpdateDateColumnName() {
+        final Column column = getUpdateDateColumn();
+        if (column == null) {
+            return "";
+        }
+        return column.getName();
+    }
+    
+    public String getUpdateDateJavaName() {
+        final Column column = getUpdateDateColumn();
+        if (column == null) {
+            return "";
+        }
+        return column.getJavaName();
+    }
 
-    /**
-     * Get the value of update-date as uncapitalised java name.
-     * 
-     * @return String. (NotNull)
-     */
     public String getUpdateDateUncapitalisedJavaName() {
         return StringUtils.uncapitalise(getUpdateDateJavaName());
     }
+    
+    public String getUpdateDatePropertyName() {
+        final Column column = getUpdateDateColumn();
+        if (column == null) {
+            return "";
+        }
+        return getPropertyNameResolvedLanguage(column);
+    }
 
     /**
      * Get the value of update-date as uncapitalised java name.
-     * 
      * @return String. (NotNull)
      */
     public String getUpdateDateJavaNative() {
@@ -2303,22 +2341,32 @@ public class Table implements IDMethod {
         return true;
     }
 
-    /**
-     * Get the value of version-no as java name.
-     * 
-     * @return String.
-     */
-    public String getVersionNoJavaName() {
+    public Column getVersionNoColumn() {
         if (!isUseVersionNo()) {
+            return null;
+        }
+        final String versionNoColumnName = getDatabase().getVersionNoFieldName();
+        if ("".equals(versionNoColumnName) && hasDefaultVersionNoColumn()) {
+            return getColumn(DEF_VERSION_NO);
+        } else {
+            return getColumn(versionNoColumnName);
+        }
+    }
+    
+    public String getVersionNoColumnName() {
+        final Column column = getVersionNoColumn();
+        if (column == null) {
             return "";
         }
-        final String versionNoFieldName = getDatabase().getVersionNoFieldName();
-        if ("".equals(versionNoFieldName) && hasDefaultVersionNoColumn()) {
-            final Column column = getColumn(DEF_VERSION_NO);
-            return buildVersionNoJavaName(column.getName());
-        } else {
-            return buildVersionNoJavaName(versionNoFieldName);
+        return column.getName();
+    }
+    
+    public String getVersionNoJavaName() {
+        final Column column = getVersionNoColumn();
+        if (column == null) {
+            return "";
         }
+        return column.getJavaName();
     }
 
     protected String buildVersionNoJavaName(String versionNoFieldName) {
@@ -2334,11 +2382,14 @@ public class Table implements IDMethod {
         }
     }
 
-    /**
-     * Get the value of version-no as uncapitalised java name.
-     * 
-     * @return String.
-     */
+    public String getVersionNoPropertyName() {
+        final Column column = getVersionNoColumn();
+        if (column == null) {
+            return "";
+        }
+        return getPropertyNameResolvedLanguage(column);
+    }
+
     public String getVersionNoUncapitalisedJavaName() {
         return buildVersionNoUncapitalisedJavaName(getVersionNoJavaName());
     }

@@ -125,7 +125,6 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                                                 Torque Type Getting
     //                                                                 ===================
     public String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        System.out.println("column=" + columnMetaInfo.getColumnName() + ", " + columnMetaInfo.getJdbcTypeCode());
         final int sqlTypeCode = columnMetaInfo.getJdbcTypeCode();
         if (Types.OTHER != sqlTypeCode) {
 

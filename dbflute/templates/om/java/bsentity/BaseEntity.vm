@@ -23,28 +23,28 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
  * The entity of ${table.basicInfoDispString}.
  * <pre>
  * [primary-key]
- *     ${table.PrimaryKeyNameCommaString}
+ *     ${table.primaryKeyNameCommaString}
  * 
  * [column-property]
- *     ${table.ColumnNameCommaString}
+ *     ${table.columnNameCommaString}
  * 
  * [foreign-property]
- *     ${table.ForeignPropertyNameCommaString}
+ *     ${table.foreignPropertyNameCommaString}
  * 
  * [referrer-property]
- *     ${table.ReferrerPropertyNameCommaString}
+ *     ${table.referrerPropertyNameCommaString}
  * 
  * [sequence]
- *     ${table.DefinedSequenceName}
+ *     ${table.definedSequenceName}
  * 
  * [identity]
- *     ${table.IdentityPropertyName}
+ *     ${table.identityColumnName}
  * 
  * [update-date]
- *     ${table.UpdateDateJavaName}
+ *     ${table.updateDateColumnName}
  * 
  * [version-no]
- *     ${table.VersionNoJavaName}
+ *     ${table.versionNoColumnName}
  * 
  * </pre>
  * @author ${database.ClassAuthor}
@@ -63,12 +63,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #if ($table.isUseUpdateDate())
     
     /** TIMESTAMP-Annotation */
-    public static final String TIMESTAMP_PROPERTY = "$table.updateDateUncapitalisedJavaName";
+    public static final String TIMESTAMP_PROPERTY = "$table.updateDatePropertyName";
 #end
 #if ($table.isUseVersionNo())
     
     /** VERSION_NO-Annotation */
-    public static final String VERSION_NO_PROPERTY = "$table.versionNoUncapitalisedJavaName";
+    public static final String VERSION_NO_PROPERTY = "$table.versionNoPropertyName";
 #end
 #if ($table.isUseIdentity())
 
