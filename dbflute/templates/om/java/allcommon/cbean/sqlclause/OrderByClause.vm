@@ -68,11 +68,6 @@ public class ${myClassName} implements java.io.Serializable {
         }
     }
 
-    /**
-     * Get the value of allRecordCount.
-     * 
-     * @return The value of allRecordCount.
-     */
     public List<${glOrderByElementName}> getOrderByList() {
         return _orderByList;
     }
@@ -126,12 +121,6 @@ public class ${myClassName} implements java.io.Serializable {
     // =====================================================================================
     //                                                                         First Element
     //                                                                         =============
-    /**
-     * Is first element asc?
-     * If order-by list is empty, throws exception.
-     * 
-     * @return Determination.
-     */
     public boolean isFirstElementAsc() {
         if (isEmpty()) {
             String msg = "This order-by clause is empty: " + toString();
@@ -141,23 +130,10 @@ public class ${myClassName} implements java.io.Serializable {
         return element.isAsc();
     }
 
-    /**
-     * Is first element desc?
-     * If order-by list is empty, throws exception.
-     * 
-     * @return Determination.
-     */
     public boolean isFirstElementDesc() {
         return !isFirstElementAsc();
     }
 
-    /**
-     * Is same as first element alias-name?
-     * If order-by list is empty, throws exception.
-     * 
-     * @param expectedAliasName Expected alias-name. (Nullable)
-     * @return Determination.
-     */
     public boolean isSameAsFirstElementAliasName(String expectedAliasName) {
         if (isEmpty()) {
             String msg = "This order-by clause is empty: " + toString();
@@ -173,9 +149,6 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     /**
-     * Is same as first element column-name?
-     * If order-by list is empty, throws exception.
-     * 
      * @param expectedColumnName Expected column-name. (Nullable)
      * @return Determination.
      */
@@ -194,9 +167,6 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     /**
-     * Is same as first element registered-alias-name?
-     * If order-by list is empty, throws exception.
-     * 
      * @param expectedAliasName Expected alias-name. (Nullable)
      * @return Determination.
      */
@@ -215,9 +185,6 @@ public class ${myClassName} implements java.io.Serializable {
     }
 
     /**
-     * Is same as first element registered-column-name?
-     * If order-by list is empty, throws exception.
-     * 
      * @param expectedColumnName Expected column-name. (Nullable)
      * @return Determination.
      */
@@ -240,7 +207,6 @@ public class ${myClassName} implements java.io.Serializable {
     //                                                                      ================
     /**
      * Is empty?
-     * 
      * @return Determination.
      */
     public boolean isEmpty() {
@@ -249,7 +215,6 @@ public class ${myClassName} implements java.io.Serializable {
 
     /**
      * Get iterator of order-by list.
-     * 
      * @return Determination.
      */
     public java.util.Iterator iterator() {
@@ -268,7 +233,6 @@ public class ${myClassName} implements java.io.Serializable {
     //                                                                 =====================
     /**
      * This method overrides the method that is declared at super.
-     * 
      * @return View-string of all-columns value.
      */
     public String toString() {

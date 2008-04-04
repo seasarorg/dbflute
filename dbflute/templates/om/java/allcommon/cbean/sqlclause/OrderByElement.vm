@@ -3,9 +3,10 @@ ${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
 #set ($myClassName = "${glOrderByElementName}")
 import java.util.Map;
 
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
+
 /**
  * The paging-result-bean of ${myClassName}.
- * 
  * <pre>
  *   For example, if you make order-by 'order BOOK.BOOK_ID asc', the way is as follows:
  *       /-----------------------------------------------------
@@ -15,7 +16,6 @@ import java.util.Map;
  *       orderByElement.SetupAsc();
  *       -------------/
  * </pre>
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} implements java.io.Serializable {
@@ -151,11 +151,56 @@ public class ${myClassName} implements java.io.Serializable {
         final StringBuilder sb = new StringBuilder();
         final String columnAlias = selectClauseRealColumnAliasMap.get(getColumnFullName());
         if (columnAlias == null || columnAlias.trim().length() == 0) {
-            String msg = "The selectClauseRealColumnAliasMap should have the value of the key: " + getColumnFullName();
-            throw new IllegalStateException(msg + " But the map is " + selectClauseRealColumnAliasMap);
+		    throwOrderByColumnNotFoundException(getColumnFullName(), selectClauseRealColumnAliasMap);
         }
         sb.append(columnAlias).append(" ").append(_ascDesc);
         return sb.toString();
+    }
+
+    protected void throwOrderByColumnNotFoundException(String columnName, Map<String, String> selectClauseRealColumnAliasMap) {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The column for order-by was Not Found in select-clause!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "If you use 'union()' or 'unionAll()', Check your condition-bean!" + getLineSeparator();
+        msg = msg + "Order-by for union can use only columns on select-clause." + getLineSeparator();
+        msg = msg + "So the rule when using union is little difference from the one when NOT using." + getLineSeparator();
+        msg = msg + "  For example:" + getLineSeparator();
+        msg = msg + "    [before (x)]" + getLineSeparator();
+        msg = msg + "    AaaCB cb = new AaaCB();" + getLineSeparator();
+        msg = msg + "    cb.query().setXxx...();" + getLineSeparator();
+        msg = msg + "    {" + getLineSeparator();
+        msg = msg + "        AaaCB unionCB = new AaaCB();" + getLineSeparator();
+        msg = msg + "        unionCB.query().setXxx...();" + getLineSeparator();
+        msg = msg + "        cb.union(unionCB.query());" + getLineSeparator();
+        msg = msg + "    }" + getLineSeparator();
+        msg = msg + "    cb.query().queryBbb().addOrderBy_BbbName_Asc();// *NG!" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "    [after (o)]" + getLineSeparator();
+        msg = msg + "    AaaCB cb = new AaaCB();" + getLineSeparator();
+        msg = msg + "    cb.setupSelect_Bbb();// *Point!" + getLineSeparator();
+        msg = msg + "    cb.query().setXxx...();" + getLineSeparator();
+        msg = msg + "    {" + getLineSeparator();
+        msg = msg + "        AaaCB unionCB = new AaaCB();" + getLineSeparator();
+        msg = msg + "        unionCB.query().setXxx...();" + getLineSeparator();
+        msg = msg + "        cb.union(unionCB.query());" + getLineSeparator();
+        msg = msg + "    }" + getLineSeparator();
+        msg = msg + "    cb.query().queryBbb().addOrderBy_BbbName_Asc();// *OK!" + getLineSeparator();
+        msg = msg + "    " + getLineSeparator();
+        msg = msg + "Or else if you DON'T use 'union()' or 'unionAll()', This is the Framework Exception!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Target Column]" + getLineSeparator();
+		msg = msg + columnName + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Internal Object]" + getLineSeparator();
+		msg = msg + "selectClauseRealColumnAliasMap=" + selectClauseRealColumnAliasMap + getLineSeparator();
+        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        throw new IllegalStateException(msg);
+    }
+
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
     }
 
     // =====================================================================================
@@ -163,7 +208,6 @@ public class ${myClassName} implements java.io.Serializable {
     //                                                                        ==============
     /**
      * This method overrides the method that is declared at super.
-     * 
      * @return View-string of all-columns value.
      */
     public String toString() {

@@ -7,17 +7,17 @@ import java.util.LinkedHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ${glPackageBaseCommon}.${glDBFluteConfig};
 import ${glPackageBaseCommonSqlClause}.*;
 import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
 
 /**
- * Condition-Bean context. (referring to s2pager)
- * 
+ * Condition-Bean context.
  * @author ${database.ClassAuthor}
  */
 public class ${glConditionBeanContextName} {
 
-    /** Log-instance. */
+    /** Log instance. */
     private static final Log _log = LogFactory.getLog(${glConditionBeanContextName}.class);
 
     // ===================================================================================
@@ -28,7 +28,6 @@ public class ${glConditionBeanContextName} {
 
     /**
      * Get condition-bean on thread.
-     * 
      * @return Condition-bean context. (Nullable)
      */
     public static ${glConditionBeanInterfaceName} getConditionBeanOnThread() {
@@ -37,7 +36,6 @@ public class ${glConditionBeanContextName} {
 
     /**
      * Set condition-bean on thread.
-     * 
      * @param cb Condition-bean. (NotNull)
      */
     public static void setConditionBeanOnThread(${glConditionBeanInterfaceName} cb) {
@@ -50,7 +48,6 @@ public class ${glConditionBeanContextName} {
 
     /**
      * Is existing condition-bean on thread?
-     * 
      * @return Determination.
      */
     public static boolean isExistConditionBeanOnThread() {
@@ -192,11 +189,25 @@ public class ${glConditionBeanContextName} {
     // ===================================================================================
     //                                                                   SqlClause Creator
     //                                                                   =================
+	/**
+	 * Create SQL-clause. {for condition-bean}
+	 * @param cb Condition-bean. (NotNull) 
+	 * @return SQL-clause. (NotNull)
+	 */
     public static ${glSqlClauseName} createSqlClause(${glConditionBeanInterfaceName} cb) {
         final String tableSqlName = cb.getTableSqlName();
-        return createSqlClause(tableSqlName);
+		final ${glSqlClauseName} sqlClause = createSqlClause(tableSqlName);
+		if (${glDBFluteConfig}.getInstance().isConditionBeanFormatSql()) {
+		    sqlClause.makeFormatClauseEffective();
+		}
+        return sqlClause;
     }
 
+	/**
+	 * Create SQL-clause. {for SimplePagingBean}
+	 * @param tableDbName The DB name of table. (NotNull) 
+	 * @return SQL-clause. (NotNull)
+	 */
     public static ${glSqlClauseName} createSqlClause(String tableDbName) {
         final String databaseProductName = getDatabaseProductName();
         if (databaseProductName == null) {
