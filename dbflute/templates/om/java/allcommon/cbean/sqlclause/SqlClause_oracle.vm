@@ -8,7 +8,6 @@ import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfoName};
 
 /**
  * SqlClause for Oracle.
- * 
  * @author ${database.ClassAuthor}
  */
 public class ${myClassName} extends ${glSqlClauseAbstractName} {
@@ -68,16 +67,22 @@ public class ${myClassName} extends ${glSqlClauseAbstractName} {
         if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
             return;
         }
-        _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (select";
+		final String ln;
+		if (isFormatClauseEffective()) {
+		    ln = getLineSeparator();
+		} else {
+		    ln = "";
+		}
+        _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (" + ln + "select";
         _fetchScopeSqlSuffix = "";
         if (isFetchStartIndexSupported()) {
-            _fetchScopeSqlSuffix = ") base ) where rn > " + getPageStartIndex();
+            _fetchScopeSqlSuffix = ") base )" + ln + " where rn > " + getPageStartIndex();
         }
         if (isFetchSizeSupported()) {
             if (isFetchStartIndexSupported()) {
                 _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + getPageEndIndex();
             } else {
-                _fetchScopeSqlSuffix = ") base ) where rn <= " + getPageEndIndex();
+                _fetchScopeSqlSuffix = ") base )" + ln + " where rn <= " + getPageEndIndex();
             }
         }
     }
