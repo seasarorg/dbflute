@@ -41,6 +41,7 @@ import org.seasar.dbflute.properties.DfSelectParamProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSourceReductionProperties;
 import org.seasar.dbflute.properties.DfSql2EntityProperties;
+import org.seasar.dbflute.properties.DfTransferEntityProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -381,6 +382,10 @@ public final class DfBuildProperties {
     //                           ---------------------------
     public DfTypeMappingProperties getTypeMappingProperties() {
         return getHandler().getTypeMappingProperties(getProperties());
+    }
+    
+    public DfTransferEntityProperties getTransferEntityProperties() {
+        return getHandler().getTransferEntityProperties(getProperties());
     }
 
     //    public String getJdbcToJavaNativeAsStringRemovedLineSeparator() {

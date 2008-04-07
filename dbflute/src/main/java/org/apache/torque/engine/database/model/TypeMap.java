@@ -61,6 +61,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
  * A class that maps JDBC types to their corresponding
@@ -365,8 +367,15 @@ public class TypeMap {
     // ===================================================================================
     //                                                                        Default Type
     //                                                                        ============
-    public static String getDefaultNumericJavaType() {
-        return NUMERIC_NATIVE_TYPE;
+    protected static String getDefaultNumericJavaType() {
+        final DfBuildProperties prop = DfBuildProperties.getInstance();
+        final DfBasicProperties basicProperties = prop.getBasicProperties();
+        if (basicProperties.isTargetLanguageJava()) {
+            return NUMERIC_NATIVE_TYPE;
+        } else {
+            final DfTypeMappingProperties typeMappingProperties = prop.getTypeMappingProperties();
+            return (String) typeMappingProperties.getJdbcToJavaNative().get("NUMERIC");
+        }
     }
 
     // ===================================================================================

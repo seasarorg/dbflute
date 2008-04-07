@@ -531,6 +531,31 @@ targetdatabase = $targetDatabase
     ## *****************************************************************************************************************
     ##                                                                                                           Parsing
     ##                                                                                                           *******
+	#if ($database.hasTransferEntityDefinition() && $database.isTargetLanguageJava())
+      #set ($path = $strings.getPackageAsPath(${database.transferEntityOutputDirectory}))
+      $database.makeDirectory($path)
+
+	  #foreach ($table in $database.tables)
+        #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
+        #set ($myBaseEntityPackageName = "${database.transferEntityBaseEntityOutputDirectory}")
+
+        #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
+        #set ($myExtendedEntityPackageName = "${database.transferEntityExtendedEntityOutputDirectory}")
+
+        #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+        $generator.parse("om/${glResourceDirectory}/bsentity/transfer/TransferBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
+
+        #if (!$database.isStopGenerateExtendedEntity())
+          #set ( $path = "${strings.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+          #if (!$files.file(${generator.OutputPath},$path).exists())
+            $generator.parse("om/${glResourceDirectory}/exentity/transfer/TransferExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
+          #end
+		#end
+
+	  #end
+	#end
+	
+	
     ## ===================================================================================
     ##                                                                          annotation
     ##                                                                          ==========

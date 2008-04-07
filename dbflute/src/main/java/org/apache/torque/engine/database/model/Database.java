@@ -1261,6 +1261,21 @@ public class Database {
             return targetName;
         }
     }
+    
+    // ===================================================================================
+    //                                                                     Transfer Entity
+    //                                                                     ===============
+    public boolean hasTransferEntityDefinition() {
+        return getProperties().getTransferEntityProperties().hasTransferEntityDefinition();
+    }
+    
+    public String getTransferEntityBaseEntityOutputDirectory() {
+        return getProperties().getTransferEntityProperties().getBaseEntityOutputDirectory();
+    }
+    
+    public String getTransferEntityExtendedEntityOutputDirectory() {
+        return getProperties().getTransferEntityProperties().getExtendedEntityOutputDirectory();
+    }
 
     // **********************************************************************************************
     //                                                                             Hard code property
