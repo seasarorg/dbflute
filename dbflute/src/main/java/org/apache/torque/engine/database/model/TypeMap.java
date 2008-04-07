@@ -74,7 +74,7 @@ import org.seasar.dbflute.properties.DfTypeMappingProperties;
  * system works so we'll have to make some adjustments.
  * <pre>
  * ----------------------------------------------------
- * DBFlute Type  | Java Type            | CSharp Type |
+ * JDBC Type    | Java Type            | CSharp Type |
  * ----------------------------------------------------
  * CHAR          | java.lang.String     | String      |
  * VARCHAR       | java.lang.String     | String      |

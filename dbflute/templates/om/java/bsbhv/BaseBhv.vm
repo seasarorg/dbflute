@@ -62,7 +62,6 @@ import ${glPackageCB}.*;
  * 
  * [version-no]
  *     ${table.versionNoColumnName}
- * 
  * </pre>
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}

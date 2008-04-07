@@ -549,6 +549,8 @@ targetdatabase = $targetDatabase
         #set ($myBaseObjectClassName = "${table.baseEntityClassName}")
         #set ($myExtendedObjectClassName = "${table.extendedEntityClassName}")
 
+        $database.debug("    parse('${myExtendedObjectClassName}')")
+		
         #set ( $path = "${strings.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
         $generator.parse("om/${glResourceDirectory}/other/s2jdbc/entity/S2JdbcBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 

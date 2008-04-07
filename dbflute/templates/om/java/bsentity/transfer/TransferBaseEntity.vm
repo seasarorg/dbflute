@@ -69,13 +69,13 @@ public abstract class $myClassName implements java.io.Serializable {
     // * * * * * * * * */
 
     /** The entity of foreign table. */
-    protected ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
+    protected ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignVariableName};
 
     /**
      * Get the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}. {without lazyload}
      * @return The entity of foreign table. (Nullable: If the foreign key does not have NotNull-constraint, please check null.)
      */
-    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${myExtendedEntityPackageName}.${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
@@ -83,7 +83,7 @@ public abstract class $myClassName implements java.io.Serializable {
      * Set the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * @param ${foreignKeys.foreignPropertyName} The entity of foreign table. (Nullable)
      */
-    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
+    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
         this.${foreignVariableName} = ${foreignKeys.foreignPropertyName};
     }
 
@@ -98,7 +98,7 @@ public abstract class $myClassName implements java.io.Serializable {
   #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
   #set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
   #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
-  #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+  #set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
 
   #if (${referrer.isOneToOne()})
 

@@ -27,11 +27,10 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
  * 
  * [version-no]
  *     ${table.versionNoColumnName}
- * 
  * </pre>
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
- @javax.persistence.MappedSuperclass
+@javax.persistence.MappedSuperclass
 public abstract class ${myClassName} implements java.io.Serializable {
 
     // ===================================================================================
@@ -44,16 +43,16 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($col in $table.columns)
+    /** The value of ${col.javaBeansRulePropertyName}. {${col.columnDefinitionLineDisp}} */
 #if ($col.isPrimaryKey())
-	@javax.persistence.ID
+	@javax.persistence.Id
 #end
 #if ($col.isIdentity())
 	@javax.persistence.GeneratedValue
 #end
-    /** The value of ${col.javaBeansRulePropertyName}. {${col.columnDefinitionLineDisp}} */
     public ${col.javaNative} ${col.uncapitalisedJavaName};
+	
 #end
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -65,54 +64,35 @@ public abstract class ${myClassName} implements java.io.Serializable {
     //                                                                       =============
 #set ($foreignKeysIndex = 0)
 #foreach ($foreignKeys in $table.ForeignKeys)
-  #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
-  #set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
-
-    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   ForeignTable    = [${foreignKeys.foreignTable.basicInfoDispString}]
-    //   ForeignProperty = [${foreignKeys.foreignJavaBeansRulePropertyName}]
-    // * * * * * * * * */
-
-    /** The entity of foreign table. */
+#set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
+    /** The entity of foreign table. {${foreignKeys.foreignTable.basicInfoDispString}}*/
 	@javax.persistence.ManyToOne
-    public ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
-  #set ($foreignKeysIndex = $foreignKeysIndex + 1)
-#end
+    public ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignKeys.foreignPropertyName};
 
+#end
     // ===================================================================================
     //                                                                      Referrer Table
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
-  #set ($referrerTable = $referrer.Table)
-  #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
-  #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
-  #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
+#set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
+#if (${referrer.isOneToOne()})
+	/** The list of referrer table. {${referrer.table.basicInfoDispString}}*/
+	@javax.persistence.OneToOne
+    public ${referrerEntityLongClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
 
-  #if (${referrer.isOneToOne()})
-
-    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * {as one}
-    //   ReferrerTable    = [${referrer.table.basicInfoDispString}]
-    //   ReferrerProperty = [${referrer.refererJavaBeansRulePropertyNameAsOne}]
-    // * * * * * * * * */
-
-  #else
-
-    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   ReferrerTable    = [${referrer.table.basicInfoDispString}]
-    //   ReferrerProperty = [${referrer.referrerJavaBeansRulePropertyName}]
-    // * * * * * * * * */
-  #end
-
-    /** The list of referrer table. */
+#else
+    /** The list of referrer table. {${referrer.table.basicInfoDispString}}*/
 	@javax.persistence.OneToMany
-    public java.util.List<${referrerEntityLongClassName}> $referrerVariableName;
+    public java.util.List<${referrerEntityLongClassName}> ${referrer.referrerPropertyName};
+
 #end
-		
+#end
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
 #if ($table.hasPrimaryKey())
-
     /**
      * ${database.OverrideComment}
      * If the primary-key of the other is same as this one, returns true.

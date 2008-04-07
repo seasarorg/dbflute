@@ -47,7 +47,6 @@ namespace ${myExtendedEntityPackageName} {
     /// 
     /// [version-no]
     ///     ${table.versionNoColumnName}
-    /// 
     /// ]]>
     /// Author: ${database.ClassAuthor}
     /// </summary>
@@ -197,16 +196,16 @@ namespace ${myExtendedEntityPackageName} {
         //   ForeignProperty = [${foreignKeys.foreignPropertyNameInitCap}]
         // * * * * * * * * */
 
-        protected ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
+        protected ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignVariableName};
 
         [Seasar.Dao.Attrs.Relno(${foreignKeysIndex}), Seasar.Dao.Attrs.Relkeys("$foreignKeys.RelationKeysCommaString")]
-        public ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignKeys.foreignPropertyNameInitCap} {
+        public ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignKeys.foreignPropertyNameInitCap} {
             get { return ${foreignVariableName}; }
             set { ${foreignVariableName} = value; }
         }
 
-        public ${glPackageExtendedEntity}.${foreignEntityClassName} Look${foreignKeys.foreignPropertyNameInitCap}() {
-            return ${foreignVariableName} != null ? ${foreignVariableName} : new ${glPackageExtendedEntity}.${foreignEntityClassName}();
+        public ${myExtendedEntityPackageName}.${foreignEntityClassName} Look${foreignKeys.foreignPropertyNameInitCap}() {
+            return ${foreignVariableName} != null ? ${foreignVariableName} : new ${myExtendedEntityPackageName}.${foreignEntityClassName}();
         }
 
         public bool HasForeignInstance${foreignKeys.foreignPropertyNameInitCap} {
@@ -227,7 +226,7 @@ namespace ${myExtendedEntityPackageName} {
   #set ($reffererDaoClassName = "${reffererEntityClassName}Dao")
   #set ($reffererCBClassName = "${reffererEntityClassName}${glConditionBeanInitialName}")
   #set ($reffererVariableName = "${glChildrenVariablePrefix}${refferer.ReffererPropertyNameInitCap}")
-  #set ($reffererEntityLongClassName = "${glPackageExtendedEntity}.${reffererEntityClassName}")
+  #set ($reffererEntityLongClassName = "${myExtendedEntityPackageName}.${reffererEntityClassName}")
 
   #if (${refferer.isOneToOne()})
 
@@ -275,7 +274,7 @@ namespace ${myExtendedEntityPackageName} {
             }
         }
 
-        public ${glPackageExtendedEntity}.${reffererEntityClassName} Look${refferer.reffererPropertyNameInitCapAsOne}() {
+        public ${myExtendedEntityPackageName}.${reffererEntityClassName} Look${refferer.reffererPropertyNameInitCapAsOne}() {
             return ${refferer.reffererPropertyNameInitCapAsOne} != null ? ${refferer.reffererPropertyNameInitCapAsOne} : new ${reffererEntityClassName}();
         }
 

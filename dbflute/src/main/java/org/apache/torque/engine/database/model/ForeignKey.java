@@ -825,9 +825,29 @@ public class ForeignKey {
         return getReferrerPropertyNameInitCapAsOne();
     }
 
+    // For S2JDBC
+    public String getReferrerPropertyNameAsOneS2Jdbc() {
+        final List<Column> localColumnList = getLocalColumnObjectList();
+
+        String result = "";
+        for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
+            final Column col = (Column) ite.next();
+
+            if (col.isMultipleFK()) {
+                result = result + col.getJavaName();
+            }
+        }
+        if (result.trim().length() != 0) {
+            result = "By" + result;
+        }
+        if (getTable().getName().equals(getForeignTable().getName())) {
+            result = result + "Self";
+        }
+        return getTable().getUncapitalisedJavaName() + result;
+    }
+    
     /**
      * Returns comma-string for local column name.
-     * 
      * @return Generated string.
      */
     public String getLocalColumnNameCommaString() {

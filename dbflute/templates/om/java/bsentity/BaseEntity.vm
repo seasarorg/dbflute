@@ -45,7 +45,6 @@ import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandlerName};
  * 
  * [version-no]
  *     ${table.versionNoColumnName}
- * 
  * </pre>
  * @author ${database.ClassAuthor}
  */${database.outputSuppressWarningsAfterLineSeparator()}
@@ -234,13 +233,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     public static final String ${foreignKeys.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKeys.RelationKeysCommaString";
 
     /** The entity of foreign table. */
-    protected ${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignVariableName};
+    protected ${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignVariableName};
 
     /**
      * Get the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}. {without lazyload}
      * @return The entity of foreign table. (Nullable: If the foreign key does not have NotNull-constraint, please check null.)
      */
-    public ${glPackageExtendedEntity}.${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${myExtendedEntityPackageName}.${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
@@ -248,7 +247,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * Set the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * @param ${foreignKeys.foreignPropertyName} The entity of foreign table. (Nullable)
      */
-    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${glPackageExtendedEntity}.${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
+    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${myExtendedEntityPackageName}.${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
         this.${foreignVariableName} = ${foreignKeys.foreignPropertyName};
     }
 
@@ -265,7 +264,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * @return The entity of foreign table. (NotNull: If the object is null, it returns new empty entity as read-only.)
 	 * @deprecated look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}().
      */
-    public ${glPackageExtendedEntity}.${foreignEntityClassName} trace${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${myExtendedEntityPackageName}.${foreignEntityClassName} trace${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
         return look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}();
     }
 
@@ -273,8 +272,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
      * Look the foreign entity (for read) of ${foreignKeys.foreignJavaBeansRulePropertyName}.
      * @return The entity of foreign table. (NotNull: If the object is null, it returns new empty entity as read-only.)
      */
-    public ${glPackageExtendedEntity}.${foreignEntityClassName} look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
-        return ${foreignVariableName} != null ? ${foreignVariableName} : new ${glPackageExtendedEntity}.${foreignEntityClassName}();
+    public ${myExtendedEntityPackageName}.${foreignEntityClassName} look${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+        return ${foreignVariableName} != null ? ${foreignVariableName} : new ${myExtendedEntityPackageName}.${foreignEntityClassName}();
     }
   #set ($foreignKeysIndex = $foreignKeysIndex + 1)
 #end
@@ -283,11 +282,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     //                                                                      Referrer Table
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
-  #set ($referrerTable = $referrer.Table)
+  #set ($referrerTable = $referrer.table)
   #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
   #set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
   #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
-  #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+  #set ($referrerEntityLongClassName = "${myExtendedEntityPackageName}.${referrerEntityClassName}")
 
   #if (${referrer.isOneToOne()})
 
